@@ -35,7 +35,6 @@
 ** @{
 **/
 
-
 //! @brief Suspends the calling thread for a number of seconds
 //!
 //! For a function that suspends the thread's operation for milliseconds look at @ref rfSleep_ms()
