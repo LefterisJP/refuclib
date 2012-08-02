@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="refu" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Win32_Dynamic">
+				<Option output="bin\refu" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Release\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-DREFU_DYNAMIC_LIB" />
+					<Add option="-DRF_NEWLINE_CRLF" />
+					<Add option="-DREFU_WIN32_VERSION" />
+					<Add option="-D_WIN32_WINNT=0x501" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+				<ExtraCommands>
+					<Add before="cmd /c rfb_win32.exe -v -oonly -f refu_config_win32" />
+				</ExtraCommands>
+			</Target>
+			<Target title="Win32_Static">
+				<Option output="bin\librefu" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj\Release\" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-DREFU_STATIC_LIB" />
+					<Add option="-DRF_NEWLINE_CRLF" />
+					<Add option="-DREFU_WIN32_VERSION" />
+					<Add option="-D_WIN32_WINNT=0x501" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+				<ExtraCommands>
+					<Add before="cmd /c rfb_win32.exe -v -oonly -f refu_config_win32" />
+				</ExtraCommands>
+			</Target>
+			<Target title="Linux_Dynamic">
+				<Option output="bin\refu" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Release\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-DREFU_DYNAMIC_LIB" />
+					<Add option="-DRF_NEWLINE_LF" />
+					<Add option="-DREFU_LINUX_VERSION" />
+					<Add option="-D_LARGEFILE64_SOURCE" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+				<ExtraCommands>
+					<Add before="./rfb_linux -v -oonly -f refu_config_linux" />
+				</ExtraCommands>
+			</Target>
+			<Target title="Linux_Static">
+				<Option output="bin\librefu" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj\Release\" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-DREFU_STATIC_LIB" />
+					<Add option="-DRF_NEWLINE_LF" />
+					<Add option="-DREFU_LINUX_VERSION" />
+					<Add option="-D_LARGEFILE64_SOURCE" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+				<ExtraCommands>
+					<Add before="./rfb_linux -v -oonly -f refu_config_linux" />
+				</ExtraCommands>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-DRF_OPTION_LIST_CAPACITY_M=2" />
+			<Add option="-DRF_OPTION_STRINGX_CAPACITY_M=2" />
+			<Add option="-DRF_OPTION_VSPRINTF_BUFF=512" />
+			<Add option="-DRF_OPTION_LOCALSTACKMEMORY_SIZE=1048576" />
+			<Add option="-DRF_OPTION_FILE_ADDBOM" />
+			<Add option="-DRF_OPTION_SOURCE_ENCODING=RF_UTF8" />
+			<Add option="-D_FILE_OFFSET_BITS=64" />
+			<Add directory="include" />
+		</Compiler>
+		<Unit filename="include\Data_Formats\rfc_xml.h" />
+		<Unit filename="include\Data_Formats\rfc_xmltag.h" />
+		<Unit filename="include\Data_Structures\rfc_array.h" />
+		<Unit filename="include\Data_Structures\rfc_binaryarray.h" />
+		<Unit filename="include\Data_Structures\rfc_list.h" />
+		<Unit filename="include\IO\rf_unicode.h" />
+		<Unit filename="include\IO\rfc_textfile.h" />
+		<Unit filename="include\Preprocessor\rf_preprocessor.h" />
+		<Unit filename="include\Preprocessor\rf_tokens.h" />
+		<Unit filename="include\Preprocessor\rf_xmacro_argcount.h" />
+		<Unit filename="include\Preprocessor\rf_xmacro_decl.h" />
+		<Unit filename="include\Preprocessor\rf_xmacro_def.h" />
+		<Unit filename="include\Preprocessor\rf_xmacro_eq.h" />
+		<Unit filename="include\Preprocessor\rf_xmacro_gt.h" />
+		<Unit filename="include\Preprocessor\rf_xmacro_lt.h" />
+		<Unit filename="include\Preprocessor\rf_xmacro_sub.h" />
+		<Unit filename="include\String\rfc_string.h" />
+		<Unit filename="include\String\rfc_stringx.h" />
+		<Unit filename="include\Threads\rfc_thread.h" />
+		<Unit filename="include\Threads\rfc_threadx.h" />
+		<Unit filename="include\Time\rfc_date.h" />
+		<Unit filename="include\Time\rfc_timer.h" />
+		<Unit filename="include\rf_io.h" />
+		<Unit filename="include\rf_localmem.h" />
+		<Unit filename="include\rf_numconst.h" />
+		<Unit filename="include\rf_setup.h" />
+		<Unit filename="include\rf_string.h" />
+		<Unit filename="include\rf_system.h" />
+		<Unit filename="include\rf_threads.h" />
+		<Unit filename="include\rf_time.h" />
+		<Unit filename="include\rf_utils.h" />
+		<Unit filename="include\rf_xml.h" />
+		<Unit filename="src\Data_Formats\rfc_xml.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\Data_Formats\rfc_xmltag.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\Data_Formats\xml_private.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\Data_Formats\xml_private.h" />
+		<Unit filename="src\Data_Structures\datastructures_private.h" />
+		<Unit filename="src\Data_Structures\rfc_array.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\Data_Structures\rfc_binaryarray.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\Data_Structures\rfc_list.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\IO\io_private.h" />
+		<Unit filename="src\IO\rf_io.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\IO\rf_io_linux.c">
+			<Option compilerVar="CC" />
+			<Option target="Linux_Dynamic" />
+			<Option target="Linux_Static" />
+		</Unit>
+		<Unit filename="src\IO\rf_io_win32.c">
+			<Option compilerVar="CC" />
+			<Option target="Win32_Dynamic" />
+			<Option target="Win32_Static" />
+		</Unit>
+		<Unit filename="src\IO\rf_unicode.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\IO\rfc_textfile.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\IO\textfile_private.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\IO\textfile_private.h" />
+		<Unit filename="src\String\rfc_string.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\String\rfc_stringx.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\String\string_private.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\String\string_private.h" />
+		<Unit filename="src\System\rf_system_linux.c">
+			<Option compilerVar="CC" />
+			<Option target="Linux_Dynamic" />
+			<Option target="Linux_Static" />
+		</Unit>
+		<Unit filename="src\System\rf_system_win32.c">
+			<Option compilerVar="CC" />
+			<Option target="Win32_Dynamic" />
+			<Option target="Win32_Static" />
+		</Unit>
+		<Unit filename="src\Threads\rfc_thread_linux.c">
+			<Option compilerVar="CC" />
+			<Option target="Linux_Dynamic" />
+			<Option target="Linux_Static" />
+		</Unit>
+		<Unit filename="src\Threads\rfc_thread_win32.c">
+			<Option compilerVar="CC" />
+			<Option target="Win32_Dynamic" />
+			<Option target="Win32_Static" />
+		</Unit>
+		<Unit filename="src\Time\rfc_date.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\Time\rfc_timelinux.c">
+			<Option compilerVar="CC" />
+			<Option target="Linux_Dynamic" />
+			<Option target="Linux_Static" />
+		</Unit>
+		<Unit filename="src\Time\rfc_timewin32.c">
+			<Option compilerVar="CC" />
+			<Option target="Win32_Dynamic" />
+			<Option target="Win32_Static" />
+		</Unit>
+		<Unit filename="src\Time\time_private.h" />
+		<Unit filename="src\Utils\rf_utils.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\rf_localmem.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\rf_numconst.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\rf_setup.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

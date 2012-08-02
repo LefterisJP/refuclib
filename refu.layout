@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Win32_Dynamic" />
+	<File name="src\Data_Formats\rfc_xml.c" open="1" top="1" tabpos="2">
+		<Cursor position="9167" topLine="218" />
+	</File>
+	<File name="src\rf_localmem.c" open="1" top="0" tabpos="1">
+		<Cursor position="972" topLine="0" />
+	</File>
+</CodeBlocks_layout_file>

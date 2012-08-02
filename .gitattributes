@@ -1,0 +1,3 @@
+
+*.cbp merge=keepours
+*.layout merge=keepours
