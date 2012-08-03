@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 #include <time.h> //for time() for random seed
-
+#include <stdlib.h> //for srand()
 #include "../include/rf_setup.h"
 #include "../include/rf_utils.h" //for detecting endianess
 
