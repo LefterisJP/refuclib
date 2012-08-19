@@ -90,28 +90,6 @@ i_DECLIMEX_ void rfUTILS_SwapEndianI(int32_t*   v);
 i_DECLIMEX_ void rfUTILS_SwapEndianUL(uint32_t*   v);
 
 
-
-
-//! Performs bubblesort to an array of bytes, sorting the array starting from the lowest value to the highest
-//! @param arr The array to sort
-//! @param size The size of the array in bytes
-i_DECLIMEX_ void rfBubbleSort_c(char* arr,int32_t size);
-
-//! Performs bubblesort to an array of unsigned shorts, sorting the array starting from the lowest value to the highest
-//! @param arr The array to sort
-//! @param size The size of the array in unsigned shorts
-i_DECLIMEX_ void rfBubbleSort_us(uint16_t* arr,int32_t size);
-
-
-//! Copies from the source to the destination from the start to the end bits. Make sure that the destination AND the source have a size of at least end/8 + 1 bytes
-//! @param src The destination array of bytes
-//! @param dest The source array of bytes
-//! @param start The first bit from which to start copying
-//! @param end The last bit to copy
-//! @param byteLength The length of both arrays in bytes
-//! @warning this at the moment only works correctly as intended for little endian systems at the bit level
-i_DECLIMEX_ void rfCopyBits_Between(char* src,char* dest,uint16_t start,uint16_t end,uint16_t byteLength);
-
 //! Checks if the bit @c BIT_ is set in the variable @c VAR_
 #define RF_BIT_ON(VAR_,BIT_)    ((VAR_) & (1<<(BIT_)))
 //! Checks if the bitflag @c FLAG_ is set in the variable @c VAR_
