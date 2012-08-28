@@ -1,16 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Win32_Dynamic" />
+	<File name="include\IO\rf_unicode.h" open="1" top="0" tabpos="10">
+		<Cursor position="0" topLine="10" />
+	</File>
+	<File name="include\String\rfc_string.h" open="1" top="0" tabpos="8">
+		<Cursor position="1682" topLine="27" />
+	</File>
 	<File name="include\rf_utils.h" open="0" top="0" tabpos="0">
 		<Cursor position="4103" topLine="64" />
 	</File>
 	<File name="src\Data_Formats\rfc_xml.c" open="0" top="0" tabpos="2">
 		<Cursor position="9167" topLine="218" />
 	</File>
+	<File name="src\IO\rf_io.c" open="1" top="1" tabpos="7">
+		<Cursor position="2065" topLine="24" />
+	</File>
+	<File name="src\IO\rf_io_win32.c" open="1" top="0" tabpos="11">
+		<Cursor position="1530" topLine="0" />
+	</File>
+	<File name="src\IO\rf_unicode.c" open="1" top="0" tabpos="9">
+		<Cursor position="0" topLine="0" />
+	</File>
 	<File name="src\Utils\rf_utils.c" open="0" top="0" tabpos="0">
 		<Cursor position="1257" topLine="15" />
 	</File>
-	<File name="src\rf_localmem.c" open="0" top="0" tabpos="1">
-		<Cursor position="972" topLine="0" />
+	<File name="src\rf_localmem.c" open="1" top="0" tabpos="6">
+		<Cursor position="8856" topLine="208" />
 	</File>
 </CodeBlocks_layout_file>

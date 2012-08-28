@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include "io_private.h"
 #include <errno.h>
-#include <String/rfc_string.h> //for rfUTF8_IsContinuationbyte
+#include <IO/rf_unicode.h> //for rfUTF8_IsContinuationbyte
 #include <stdlib.h>//for malloc
 #include <string.h>//for memcpy e.t.c.
 

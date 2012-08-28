@@ -125,7 +125,6 @@ void* i_rfLMSWrapper1(void*(*fptr)(void*),void* arg1)
     rfLMS_Pop(RF_LMS,stackPtrBefore);
     return ret;
 }
-#include <String/rfc_string.h>
 void* i_rfLMSWrapper2(void*(*fptr)(void*,void*),void* arg1,void* arg2)
 {
     void* ret;
