@@ -27,3 +27,7 @@ obj/
 _ReSharper*/
 [Tt]est[Rr]esult*
 rf_options.h
+src/main.c
+errorLog
+infoLog
+refu.depend

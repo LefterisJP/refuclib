@@ -90,6 +90,19 @@
 					<Add before="./rfb_linux -v -oonly -f refu_config_linux" />
 				</ExtraCommands>
 			</Target>
+			<Target title="Win32_Test">
+				<Option output="bin\refu" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Release\" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DREFU_TEST" />
+					<Add option="-DRF_NEWLINE_CRLF" />
+					<Add option="-DREFU_WIN32_VERSION" />
+					<Add option="-D_WIN32_WINNT=0x501" />
+				</Compiler>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
@@ -167,6 +180,7 @@
 			<Option compilerVar="CC" />
 			<Option target="Win32_Dynamic" />
 			<Option target="Win32_Static" />
+			<Option target="Win32_Test" />
 		</Unit>
 		<Unit filename="src\IO\rf_unicode.c">
 			<Option compilerVar="CC" />
@@ -197,6 +211,7 @@
 			<Option compilerVar="CC" />
 			<Option target="Win32_Dynamic" />
 			<Option target="Win32_Static" />
+			<Option target="Win32_Test" />
 		</Unit>
 		<Unit filename="src\Threads\rfc_thread_linux.c">
 			<Option compilerVar="CC" />
@@ -207,6 +222,7 @@
 			<Option compilerVar="CC" />
 			<Option target="Win32_Dynamic" />
 			<Option target="Win32_Static" />
+			<Option target="Win32_Test" />
 		</Unit>
 		<Unit filename="src\Time\rfc_date.c">
 			<Option compilerVar="CC" />
@@ -220,10 +236,15 @@
 			<Option compilerVar="CC" />
 			<Option target="Win32_Dynamic" />
 			<Option target="Win32_Static" />
+			<Option target="Win32_Test" />
 		</Unit>
 		<Unit filename="src\Time\time_private.h" />
 		<Unit filename="src\Utils\rf_utils.c">
 			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\main.c">
+			<Option compilerVar="CC" />
+			<Option target="Win32_Test" />
 		</Unit>
 		<Unit filename="src\rf_localmem.c">
 			<Option compilerVar="CC" />

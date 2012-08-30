@@ -54,7 +54,7 @@ extern "C"
     #ifdef REFU_DYNAMIC_LIB //export  case
         #define i_DECLIMEX_  __declspec(dllexport)
     #else//in import case or static library
-        #ifndef REFU_STATIC_LIB //if this is not a static library
+        #if !( defined(REFU_STATIC_LIB) || defined(REFU_TEST)) //if this is not a static library
             #define i_DECLIMEX_  __declspec(dllimport)
         #else
 			#define i_DECLIMEX_  //static means this should be empty

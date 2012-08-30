@@ -89,13 +89,15 @@ i_RP_ISEMPTY(                                                               \
 //! @param ... Pass the arguments to the function here. The arguments passed NEED to be no more than the arguments defined for the same function with #RF_DECLARE_DFUNCXX
 //!            and also no less than the number of MaxArguments-DefaultArguments. Calling this macro with wrong number of arguments will result in compile error.
 #define RF_SELECT_FUNC(i_FUNCNAME_,...) RP_SELECT_FUNC(i_FUNCNAME_,RF_NARG(__VA_ARGS__), __VA_ARGS__)
+#define RF_SELECT_FUNC2(i_FUNCNAME_,...) RP_SELECT_FUNC2(i_FUNCNAME_,RF_NARG(__VA_ARGS__), __VA_ARGS__)
 
 
 //This macro helps select the function to run
 #define  RP_SELECT_FUNC(FUNCNAME_,ARGSN_,...)   RP_RUN_FUNC( i_RP_PASTE2(FUNCNAME_,ARGSN_),__VA_ARGS__)
+#define  RP_SELECT_FUNC2(FUNCNAME_,ARGSN_,...)   RP_RUN_FUNC2( i_RP_PASTE2(FUNCNAME_,ARGSN_),__VA_ARGS__)
 //This macro runs the function take from select function with the given argument
-#define  RP_RUN_FUNC(FUNCNAME_,...)   FUNCNAME_(__VA_ARGS__)
-
+#define  RP_RUN_FUNC(FUNCNAME_,...)    FUNCNAME_(__VA_ARGS__)
+#define  RP_RUN_FUNC2(FUNCNAME_,...)   FUNCNAME_(__VA_ARGS__)
 //This macro selects a function if I_COND is met
 #define i_RP_SELECT_FUNC_IF(i_FUNCNAME,i_COND,...)  i_RP_PASTE2(i_FUNCNAME,i_COND)(__VA_ARGS__)
 #define i_RP_SELECT_FUNC_IF2(i_FUNCNAME,i_COND,...)  i_RP_PASTE2_2(i_FUNCNAME,i_COND)(__VA_ARGS__)  //second is for a second macro expansion fron the same macro

@@ -591,8 +591,6 @@ i_DECLIMEX_ uint32_t rfString_BytePosToCharPos(void* thisstr,uint32_t bytepos,ch
 //! @brief Compares two Strings and returns true if they are equal and false otherwise
 //!
 //! @isinherited{StringX}
-//! A macro comparing two String and returning true if they are equal and false otherwise. Use it to compare ONLY Strings here not string literals (c strings)
-//! If you need to compare a String with a string literal (c string) use #rfString_Equal_s
 //! @lmsFunction
 //! @param s1 The first string to compare @inhtype{String,StringX} @tmpSTR
 //! @param s2 The second string to compare @inhtype{String,StringX} @tmpSTR
@@ -604,6 +602,18 @@ i_DECLIMEX_ char i_rfString_Equal(void* s1,void* s2);
 #define rfString_Equal(i_STRING1_,i_STRING2_)   i_rfLMSX_WRAP2(char,i_rfString_Equal,i_STRING1_,i_STRING2_)
 #endif
 
+//! @memberof RF_String
+//! @brief Returns a substring of this string
+//!
+//! @isinherited{StringX}
+//! Returns the substring of @c thisstr starting from @c startPos and for @c charsN characters
+//! It is returned inside @c ret.
+//! @param thisstr Te string whose substring we want @inhtype{String,StringX}
+//! @param startPos The starting character where the substring will begin from
+//! @param charsN The number of characters the substring will have
+//! @param ret Pass a reference to an RF_String here to receive the resulting substring.
+//! @return Returns @c true if a substring exists and @c sfalse otherwise
+i_DECLIMEX_ char rfString_Substr(const void* thisstr,uint32_t startPos,uint32_t charsN,RF_String* ret);
 
 //! @memberof RF_String
 //! @brief Finds if a substring exists inside another string.
@@ -638,6 +648,111 @@ i_DECLIMEX_ int32_t i_rfString_Find(const void* thisstr,const void* sstr,const c
     #endif
 #endif
 
+//! @memberof RF_String
+//! @brief Finds if a substring exists inside a specific part of another string.
+//!
+//! @isinherited{StringX}
+//! Finds the existence of String @c sstr inside a specific part of this string with the given options. You have the
+//! option to either match case or perform a case-insensitive search. In addition you can search
+//! for the exact string and not it just being a part of another string.
+//! @lmsFunction
+//! @param thisstr This string we want to search in @inhtype{String,StringX}
+//! @param sstr The substring string we want to search for @inhtype{String,StringX} @tmpSTR
+//! @param startPos The starting character position of @c thisstr from which the search will begin for @c sstr
+//! @param length The character length of @c thisstr insde which you need to search for the substr @c sstr
+//! @param options \rfoptional{0}. Bitflag options denoting some options for the search.Can have values:
+//! + @c RF_CASE_IGNORE: If you want the found substring to ignore the case and returns success for any occurence of the string in any case.
+//!     Default search option is to @b match the case. For now this works only for characters of the english language.
+//! + @c RF_MATCH_WORD: If you want the found substring to be exact. For example an exact search for @e "HELLO" in the string
+//!     @e "HELLOWORLD" would return a failure. Default search is to return any found substring.
+//! @return Returns the character position of the found substring or RF_FAILURE for not found
+#if defined(RF_IAMHERE_FOR_DOXYGEN)
+i_DECLIMEX_ int32_t rfString_Find_i(const void* thisstr,const void* sstr,uint32_t startPos,uint32_t length,const char options);
+#else
+i_DECLIMEX_ int32_t i_rfString_Find_i(const void* thisstr,const void* sstr,uint32_t* startPos,uint32_t* length,const char* options);
+    #ifndef RF_OPTION_DEFAULT_ARGUMENTS
+        #define rfString_Find_i(i_THISSTR_,i_SEARCHSTR_,i_STARTPOS_,i_LENGTH_,i_OPTIONS_)  \
+            i_rfLMS_WRAP5(int32_t,i_rfString_Find_i,i_THISSTR_,i_SEARCHSTR_,i_RFUI32_(i_STARTPOS_),i_RFUI32_(i_LENGTH_),i_RFI8_(i_OPTIONS_))
+    #else
+        #define rfString_Find_i(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_FIND_I,5,__VA_ARGS__)
+        #define i_NPSELECT_RF_STRING_FIND_I1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Find_i() accepts from 4 to 5 arguments\"")
+        #define i_NPSELECT_RF_STRING_FIND_I0(...) RF_SELECT_FUNC(i_SELECT_RF_STRING_FIND_I,__VA_ARGS__)
+        #define i_SELECT_RF_STRING_FIND_I4(i_THISSTR_,i_SEARCHSTR_,i_STARTPOS_,i_LENGTH_) \
+            i_rfLMS_WRAP5(int32_t,i_rfString_Find_i,i_THISSTR_,i_SEARCHSTR_,i_RFUI32_(i_STARTPOS_),i_RFUI32_(i_LENGTH_),i_RFI8_(0))
+        #define i_SELECT_RF_STRING_FIND_I5(i_THISSTR_,i_SEARCHSTR_,i_STARTPOS_,i_LENGTH_,i_OPTIONS_) \
+            i_rfLMS_WRAP5(int32_t,i_rfString_Find_i,i_THISSTR_,i_SEARCHSTR_,i_RFUI32_(i_STARTPOS_),i_RFUI32_(i_LENGTH_),i_RFI8_(i_OPTIONS_))
+        #define i_SELECT_RF_STRING_FIND_I3(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Find_i() accepts from 4 to 5 arguments\"")
+        #define i_SELECT_RF_STRING_FIND_I2(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Find_i() accepts from 4 to 5 arguments\"")
+        #define i_SELECT_RF_STRING_FIND_I1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Find_i() accepts from 4 to 5 arguments\"")
+        #define i_SELECT_RF_STRING_FIND_I0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Find_i() accepts from 4 to 5 arguments\"")
+    #endif
+#endif
+
+//! @memberof RF_String
+//! @brief Finds if a String begins with a particular substring
+//!
+//! @isinherited{StringX}
+//! Determines if the string begins with the @c sstr substring. You have the
+//! option to either match case or perform a case-insensitive search. In addition you can search
+//! for the exact string and not it just being a part of another string.
+//! @lmsFunction
+//! @param thisstr This string we want to search in @inhtype{String,StringX}
+//! @param sstr The substring to check for in the beginning @inhtype{String,StringX} @tmpSTR
+//! @param options \rfoptional{0}. Bitflag options denoting some options for the search.Can have values:
+//! + @c RF_CASE_IGNORE: If you want the found substring to ignore the case and returns success for any occurence of the string in any case.
+//!     Default search option is to @b match the case. For now this works only for characters of the english language.
+//! + @c RF_MATCH_WORD: If you want the found substring to be exact. For example an exact search for @e "HELLO" in the string
+//!     @e "HELLOWORLD" would return a failure. Default search is to return any found substring.
+//! @return Returns true if the string does begin with @c sstr and false if not
+#if defined(RF_IAMHERE_FOR_DOXYGEN)
+i_DECLIMEX_ char rfString_BeginsWith(const void* thisstr,const void* sstr,const char options);
+#else
+    #ifndef RF_OPTION_DEFAULT_ARGUMENTS
+        #define rfString_BeginsWith(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) (rfString_Find(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) == 0)
+    #else
+        #define rfString_BeginsWith(...) RF_SELECT_FUNC_IF_NARGGT2(i_NPSELECT_RF_STRING_BEGINSWITH,3,__VA_ARGS__)
+        #define i_NPSELECT_RF_STRING_BEGINSWITH1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_BeginsWith() accepts from 2 to 3 arguments\"")
+        #define i_NPSELECT_RF_STRING_BEGINSWITH0(...) RF_SELECT_FUNC2(i_SELECT_RF_STRING_BEGINSWITH,__VA_ARGS__)
+        #define i_SELECT_RF_STRING_BEGINSWITH2(i_THISSTR_,i_SEARCHSTR_) (rfString_Find(i_THISSTR_,i_SEARCHSTR_) == 0)
+        #define i_SELECT_RF_STRING_BEGINSWITH3(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) (rfString_Find(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) == 0)
+        #define i_SELECT_RF_STRING_BEGINSWITH1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_BeginsWith() accepts from 2 to 3 arguments\"")
+        #define i_SELECT_RF_STRING_BEGINSWITH0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_BeginsWith() accepts from 2 to 3 arguments\"")
+    #endif
+#endif
+//! @memberof RF_String
+//! @brief Finds if a String ends with a particular substring
+//!
+//! @isinherited{StringX}
+//! Determines if the string ends with the @c sstr substring. You have the
+//! option to either match case or perform a case-insensitive search. In addition you can search
+//! for the exact string and not it just being a part of another string.
+//! @lmsFunction
+//! @param thisstr This string we want to search in @inhtype{String,StringX}
+//! @param sstr The substring to check for in the end of the string @inhtype{String,StringX} @tmpSTR
+//! @param options \rfoptional{0}. Bitflag options denoting some options for the search.Can have values:
+//! + @c RF_CASE_IGNORE: If you want the found substring to ignore the case and returns success for any occurence of the string in any case.
+//!     Default search option is to @b match the case. For now this works only for characters of the english language.
+//! + @c RF_MATCH_WORD: If you want the found substring to be exact. For example an exact search for @e "HELLO" in the string
+//!     @e "HELLOWORLD" would return a failure. Default search is to return any found substring.
+//! @return Returns true if the string does end with @c sstr and false if not
+#if defined(RF_IAMHERE_FOR_DOXYGEN)
+i_DECLIMEX_ char rfString_EndsWith(const void* thisstr,const void* sstr,const char options);
+#else
+    #ifndef RF_OPTION_DEFAULT_ARGUMENTS
+        #define rfString_EndsWith(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) \
+            (rfString_Find(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) == (rfString_Length(i_THISSTR_)-rfString_Length(i_SEARCHSTR_)) )
+    #else
+        #define rfString_EndsWith(...) RF_SELECT_FUNC_IF_NARGGT2(i_NPSELECT_RF_STRING_ENDSWITH,3,__VA_ARGS__)
+        #define i_NPSELECT_RF_STRING_ENDSWITH1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_EndsWith() accepts from 2 to 3 arguments\"")
+        #define i_NPSELECT_RF_STRING_ENDSWITH0(...) RF_SELECT_FUNC2(i_SELECT_RF_STRING_ENDSWITH,__VA_ARGS__)
+        #define i_SELECT_RF_STRING_ENDSWITH2(i_THISSTR_,i_SEARCHSTR_) \
+            (rfString_Find(i_THISSTR_,i_SEARCHSTR_) == (rfString_Length(i_THISSTR_)-rfString_Length(i_SEARCHSTR_)) )
+        #define i_SELECT_RF_STRING_ENDSWITH3(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) \
+            (rfString_Find(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) == (rfString_Length(i_THISSTR_)-rfString_Length(i_SEARCHSTR_)) )
+        #define i_SELECT_RF_STRING_ENDSWITH1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_EndsWith() accepts from 2 to 3 arguments\"")
+        #define i_SELECT_RF_STRING_ENDSWITH0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_EndsWith() accepts from 2 to 3 arguments\"")
+    #endif
+#endif
 
 //! @memberof RF_String
 //! @brief Returns the integer value of a String

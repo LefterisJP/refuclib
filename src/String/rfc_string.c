@@ -973,6 +973,66 @@ char i_rfString_Equal(void* s1P,void* s2P)
     return false;
 }
 
+
+//Returns a substring of this string
+char rfString_Substr(const void* thisstrP,uint32_t startPos,uint32_t charsN,RF_String* ret)
+{
+    uint32_t charI,byteI,count,startI,endI;
+    char started,ended;
+    started = ended = false;
+    RF_String* s = (RF_String*)thisstrP;
+    count=0;
+    startI = endI = 0;
+
+
+    RF_STRING_ITERATE_START(s,charI,byteI)
+        if(charI==startPos)
+        {
+            startI = byteI;
+            started = true;
+        }
+        if(charI==startPos+charsN)
+        {
+            endI = byteI;
+            ended = true;
+        }
+    RF_STRING_ITERATE_END(charI,byteI)
+    //special case. If the end is not yet found but is the last char then keep it
+    if(ended == false && startPos+charsN == charI)
+    {
+        endI = byteI;
+        ended = true;
+    }
+    //if the substring is not found return false
+    if(started == false || ended == false)
+    {
+        return false;
+    }
+    //else success
+    ret->byteLength = endI-startI;
+    ret->bytes = malloc(ret->byteLength+1);
+    strncpy(ret->bytes,s->bytes+startI,ret->byteLength);
+    ret->bytes[ret->byteLength]='\0';
+    return true;
+}
+
+
+//Finds if a substring exists inside a specific part of another string.
+int32_t i_rfString_Find_i(const void* thisstr,const void* sstr,uint32_t* startPosP,uint32_t* lengthP,const char* options)
+{
+    RF_String sub;
+    uint32_t length,startPos;
+    int32_t ret;//the return value
+    length = *lengthP;
+    startPos = *startPosP;
+    //if the substring does not exist fail
+    if(rfString_Substr(thisstr,startPos,length,&sub) == false)
+        return RF_FAILURE;
+    //now search for the sstr substring inside the sub substring defined by length
+    ret=rfString_Find(&sub,sstr,options);
+    rfString_Deinit(&sub);//free the sub substring and return
+    return ret;
+}
 // Finds the existence of String sstr inside this string, either matching case or not
 int32_t i_rfString_Find(const void* str,const void* sstrP,const char* optionsP)
 {
