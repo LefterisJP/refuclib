@@ -1,31 +1,55 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Win32_Dynamic" />
-	<File name="include\IO\rf_unicode.h" open="1" top="0" tabpos="10">
+	<ActiveTarget name="Win32_Test" />
+	<File name="include\IO\rf_unicode.h" open="0" top="0" tabpos="10">
 		<Cursor position="0" topLine="10" />
 	</File>
-	<File name="include\String\rfc_string.h" open="1" top="0" tabpos="8">
-		<Cursor position="1682" topLine="27" />
+	<File name="include\Preprocessor\rf_xmacro_argcount.h" open="1" top="0" tabpos="6">
+		<Cursor position="5567" topLine="74" />
+	</File>
+	<File name="include\String\rfc_string.h" open="1" top="1" tabpos="1">
+		<Cursor position="35107" topLine="646" />
+	</File>
+	<File name="include\String\rfc_stringx.h" open="1" top="0" tabpos="3">
+		<Cursor position="7661" topLine="115" />
+	</File>
+	<File name="include\rf_setup.h" open="1" top="0" tabpos="4">
+		<Cursor position="25932" topLine="435" />
 	</File>
 	<File name="include\rf_utils.h" open="0" top="0" tabpos="0">
 		<Cursor position="4103" topLine="64" />
 	</File>
 	<File name="src\Data_Formats\rfc_xml.c" open="0" top="0" tabpos="2">
-		<Cursor position="9167" topLine="218" />
+		<Cursor position="9521" topLine="218" />
 	</File>
-	<File name="src\IO\rf_io.c" open="1" top="1" tabpos="7">
+	<File name="src\Data_Formats\xml_private.c" open="1" top="0" tabpos="8">
+		<Cursor position="37829" topLine="811" />
+	</File>
+	<File name="src\IO\rf_io.c" open="0" top="0" tabpos="7">
 		<Cursor position="2065" topLine="24" />
 	</File>
-	<File name="src\IO\rf_io_win32.c" open="1" top="0" tabpos="11">
+	<File name="src\IO\rf_io_win32.c" open="0" top="0" tabpos="11">
 		<Cursor position="1530" topLine="0" />
 	</File>
-	<File name="src\IO\rf_unicode.c" open="1" top="0" tabpos="9">
+	<File name="src\IO\rf_unicode.c" open="0" top="0" tabpos="9">
 		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="src\String\rfc_string.c" open="1" top="0" tabpos="2">
+		<Cursor position="39260" topLine="1005" />
+	</File>
+	<File name="src\String\string_private.h" open="1" top="0" tabpos="7">
+		<Cursor position="3037" topLine="32" />
 	</File>
 	<File name="src\Utils\rf_utils.c" open="0" top="0" tabpos="0">
 		<Cursor position="1257" topLine="15" />
 	</File>
-	<File name="src\rf_localmem.c" open="1" top="0" tabpos="6">
-		<Cursor position="8856" topLine="208" />
+	<File name="src\main.c" open="1" top="0" tabpos="5">
+		<Cursor position="331" topLine="0" />
+	</File>
+	<File name="src\rf_localmem.c" open="1" top="0" tabpos="9">
+		<Cursor position="6459" topLine="144" />
+	</File>
+	<File name="src\rf_numconst.c" open="0" top="0" tabpos="0">
+		<Cursor position="1732" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>
