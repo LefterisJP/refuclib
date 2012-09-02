@@ -1018,13 +1018,15 @@ char rfString_Substr(const void* thisstrP,uint32_t startPos,uint32_t charsN,RF_S
 
 
 //Finds if a substring exists inside a specific part of another string.
-int32_t i_rfString_Find_i(const void* thisstr,const void* sstr,uint32_t* startPosP,uint32_t* lengthP,const char* options)
+int32_t i_rfString_Find_i(const void* thisstr,const void* sstr,uint32_t* startPosP,uint32_t* lengthP,const char* optionsP)
 {
     RF_String sub;
     uint32_t length,startPos;
     int32_t ret;//the return value
+    char options;
     length = *lengthP;
     startPos = *startPosP;
+    options = *optionsP;
     //if the substring does not exist fail
     if(rfString_Substr(thisstr,startPos,length,&sub) == false)
         return RF_FAILURE;
