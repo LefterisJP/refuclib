@@ -31,3 +31,5 @@ src/main.c
 errorLog
 infoLog
 refu.depend
+docs/*
+Examples/*

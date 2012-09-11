@@ -1310,10 +1310,10 @@ i_DECLIMEX_ char i_rfString_Replace(RF_String* thisstr,void* sstr,void* rstr,con
 //! @param sub The substring to search for. @inhtype{String,StringX} @tmpSTR
 //! @return Returns true for success and false if none of @c sub characters were found inside the given String
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-    i_DECLIMEX_ char rfString_StripStart(void* thisstr,void* sub);
+    i_DECLIMEX_ char rfString_TrimStart(void* thisstr,void* sub);
 #else
-    i_DECLIMEX_ char i_rfString_StripStart(void* thisstr,void* sub);
-    #define rfString_StripStart(i_THISSTR_,i_SUBSTR_) i_rfLMSX_WRAP2(char,i_rfString_StripStart,i_THISSTR_,i_SUBSTR_)
+    i_DECLIMEX_ char i_rfString_TrimStart(void* thisstr,void* sub);
+    #define rfString_TrimStart(i_THISSTR_,i_SUBSTR_) i_rfLMSX_WRAP2(char,i_rfString_TrimStart,i_THISSTR_,i_SUBSTR_)
 #endif
 //! @memberof RF_String
 //! @brief Removes all characters of a substring starting from the end of the String
@@ -1326,10 +1326,10 @@ i_DECLIMEX_ char i_rfString_Replace(RF_String* thisstr,void* sstr,void* rstr,con
 //! @param sub The substring to search for. @inhtype{String,StringX} @tmpSTR
 //! @return Returns true for success and false if none of @c sub characters were found inside the given String
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-    i_DECLIMEX_ char rfString_StripEnd(void* thisstr,void* sub);
+    i_DECLIMEX_ char rfString_TrimEnd(void* thisstr,void* sub);
 #else
-    i_DECLIMEX_ char i_rfString_StripEnd(void* thisstr,void* sub);
-    #define rfString_StripEnd(i_THISSTR_,i_SUBSTR_) i_rfLMSX_WRAP2(char,i_rfString_StripEnd,i_THISSTR_,i_SUBSTR_)
+    i_DECLIMEX_ char i_rfString_TrimEnd(void* thisstr,void* sub);
+    #define rfString_TrimEnd(i_THISSTR_,i_SUBSTR_) i_rfLMSX_WRAP2(char,i_rfString_TrimEnd,i_THISSTR_,i_SUBSTR_)
 #endif
 
 //! @memberof RF_String
@@ -1343,10 +1343,10 @@ i_DECLIMEX_ char i_rfString_Replace(RF_String* thisstr,void* sstr,void* rstr,con
 //! @param sub The substring to search for. @inhtype{String,StringX} @tmpSTR
 //! @return Returns true for success and false if none of @c sub characters were found inside the given String
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-    i_DECLIMEX_ char rfString_Strip(void* thisstr,void* sub);
+    i_DECLIMEX_ char rfString_Trim(void* thisstr,void* sub);
 #else
-    i_DECLIMEX_ char i_rfString_Strip(void* thisstr,void* sub);
-    #define rfString_Strip(i_THISSTR_,i_SUBSTR_) i_rfLMSX_WRAP2(char,i_rfString_Strip,i_THISSTR_,i_SUBSTR_)
+    i_DECLIMEX_ char i_rfString_Trim(void* thisstr,void* sub);
+    #define rfString_Trim(i_THISSTR_,i_SUBSTR_) i_rfLMSX_WRAP2(char,i_rfString_Trim,i_THISSTR_,i_SUBSTR_)
 #endif
 //! @}
 /*------------------------------------------------------------------------ RF_String File Descriptor I/O functions-------------------------------------------------------------------------------*/

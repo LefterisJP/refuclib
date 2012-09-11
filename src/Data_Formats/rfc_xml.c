@@ -426,13 +426,13 @@ int32_t i_rfXML_InsertStr(RF_XML* x,void* sP,char* flagsP)
             rfString_Deinit(&before);
             goto cleanup2;
         }
-        rfString_StripEnd(&nS,RFS_("\n\t "));
+        rfString_TrimEnd(&nS,RFS_("\n\t "));
         //create the new line that will replace the previous line, and also add the same level of tabs as the previous one
         if(RF_BITFLAG_ON(x->flags,XML_SPACES))///cleanup3 - the newline string
             rfStringX_Init(&newLine,"%s   %s\n%s</%s>%s",before.bytes,nS.bytes,tabs.bytes,x->lastTag->name.bytes,strBuff.bytes);
         else
             rfStringX_Init(&newLine,"%s\t%s\n%s</%s>%s",before.bytes,nS.bytes,tabs.bytes,x->lastTag->name.bytes,strBuff.bytes);
-        rfString_StripEnd(&newLine,RFS_("\n\t"));
+        rfString_TrimEnd(&newLine,RFS_("\n\t"));
         if((error=rfTextFile_Replace(&x->f,x->f.line-1,&newLine)) != RF_SUCCESS)
         {
             LOG_ERROR("Failed to replace a line of the XML file \"%s\" with the requested string",error,x->f.name.bytes);
@@ -462,7 +462,7 @@ int32_t i_rfXML_InsertStr(RF_XML* x,void* sP,char* flagsP)
             rfStringX_Init(&newLine,"%s<%s%s>\n%s   %s%s",before.bytes,x->lastTag->name.bytes,attributes.bytes,tabs.bytes,nS.bytes,strBuff.bytes);
         else
             rfStringX_Init(&newLine,"%s<%s%s>\n%s\t%s%s",before.bytes,x->lastTag->name.bytes,attributes.bytes,tabs.bytes,nS.bytes,strBuff.bytes);
-        rfString_StripEnd(&newLine,RFS_("\n\t "));
+        rfString_TrimEnd(&newLine,RFS_("\n\t "));
         if((error=rfTextFile_Replace(&x->f,x->lastLine,&newLine)) != RF_SUCCESS)
         {
             LOG_ERROR("Failed to replace a line of the XML file \"%s\" with the requested string",error,x->f.name.bytes);

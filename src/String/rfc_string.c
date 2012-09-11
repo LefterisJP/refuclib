@@ -1941,7 +1941,7 @@ char i_rfString_Replace(RF_String* thisstr,void* sstrP,void* rstrP,const uint32_
 }
 
 //Removes all characters of a substring only from the start of the String
-char i_rfString_StripStart(void* thisstrP,void* subP)
+char i_rfString_TrimStart(void* thisstrP,void* subP)
 {
     RF_String* thisstr = (RF_String*) thisstrP;
     RF_String*sub = (RF_String*) subP;
@@ -1990,7 +1990,7 @@ char i_rfString_StripStart(void* thisstrP,void* subP)
 }
 
 //Removes all characters of a substring starting from the end of the String
-char i_rfString_StripEnd(void* thisstrP,void* subP)
+char i_rfString_TrimEnd(void* thisstrP,void* subP)
 {
     RF_String* thisstr = (RF_String*) thisstrP;
     RF_String*sub = (RF_String*) subP;
@@ -2040,10 +2040,10 @@ char i_rfString_StripEnd(void* thisstrP,void* subP)
 }
 
 //Removes all characters of a substring from both ends of the given String
-char i_rfString_Strip(void* thisstrP,void* subP)
+char i_rfString_Trim(void* thisstrP,void* subP)
 {
-    char res1 = rfString_StripStart(thisstrP,subP);
-    char res2 = rfString_StripEnd(thisstrP,subP);
+    char res1 = rfString_TrimStart(thisstrP,subP);
+    char res2 = rfString_TrimEnd(thisstrP,subP);
     return res1|res2;
 }
 

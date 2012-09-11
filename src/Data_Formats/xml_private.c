@@ -346,8 +346,8 @@ int32_t i_rfXML_Parse(RF_XML* x,RF_XMLTag* currentTag)
                         goto cleanup1;
                     }
                 }
-                //strip space and tabs from the beginning and find if and where a tag opens and closes
-                rfString_StripStart(&x->s,RFS_(" \t"));
+                //trim space and tabs from the beginning and find if and where a tag opens and closes
+                rfString_TrimStart(&x->s,RFS_(" \t"));
                 opF = rfString_Find(&x->s,RFS_("<"),0);
                 clF = rfString_Find(&x->s,RFS_("</"),0);
                 //if a new tag is not opening right there
@@ -496,8 +496,8 @@ int32_t rfXML_GoNext_dsk(RF_XML* x,RF_XMLTag* t)
                 {
                     RF_XML_READLINE_GOTO(x,"Parsing failed while expecting tag contents",&x->s,error,cleanup2);
                 }
-                //strip space and tabs from the beginning and find if and where a tag opens and closes
-                rfString_StripStart(&x->s,RFS_(" \t"));
+                //trim space and tabs from the beginning and find if and where a tag opens and closes
+                rfString_TrimStart(&x->s,RFS_(" \t"));
                 opF = rfString_Find(&x->s,RFS_("<"),0);
                 clF = rfString_Find(&x->s,RFS_("</"),0);
                 //if a new tag is not opening right there
@@ -718,8 +718,8 @@ int32_t rfXML_GoIn_dsk(RF_XML* x,uint32_t i)
                 {
                     RF_XML_READLINE_GOTO(x,"Parsing failed while expecting tag contents",&x->s,error,cleanup2);
                 }
-                //strip space and tabs from the beginning and find if and where a tag opens and closes
-                rfString_StripStart(&x->s,RFS_(" \t"));
+                //trim space and tabs from the beginning and find if and where a tag opens and closes
+                rfString_TrimStart(&x->s,RFS_(" \t"));
                 opF = rfString_Find(&x->s,RFS_("<"),0);
                 clF = rfString_Find(&x->s,RFS_("</"),0);
                 //if a new tag is not opening right there
