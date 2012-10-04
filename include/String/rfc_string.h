@@ -51,7 +51,6 @@ extern "C"
 // Checks if a given byte is a continuation byte
 #define rfUTF8_IsContinuationByte2(b__)  ( b__ >= 0x80 && b__<= 0xBF )
 
-#pragma pack(push,1)
 /**
 ** @internal
 ** @author Lefteris
@@ -82,7 +81,7 @@ typedef struct RF_String
     //! to avoid multiple calls to strlen()
     uint32_t byteLength;
 }RF_String;
-#pragma pack(pop)
+
 
 
 //! @memberof RF_String
@@ -453,17 +452,17 @@ i_DECLIMEX_ uint32_t* rfString_ToUTF32(RF_String* s,uint32_t*length);
             /*iterate until we find the character position requested and its equivalent byte position*/\
             while(j_!=startCharacterPos_)\
             {\
-                if( rfUTF8_IsContinuationByte( (string_)->bytes[byteIndex_]) ==false)\
+                if( rfUTF8_IsContinuationByte( ((RF_String*)(string_))->bytes[byteIndex_]) ==false)\
                 {\
                     j_++;\
                 }\
                 byteIndex_++;\
             }\
             /*now start the requested iteration*/\
-            while( (string_)->bytes[byteIndex_]!='\0')\
+            while( ((RF_String*)(string_))->bytes[byteIndex_]!='\0')\
             {\
                 /*if it's a character*/\
-                if( rfUTF8_IsContinuationByte( (string_)->bytes[byteIndex_]) ==false)\
+                if( rfUTF8_IsContinuationByte( ((RF_String*)(string_))->bytes[byteIndex_]) ==false)\
                 {/*Give the character value to the user*/\
                     characterUnicodeValue_ = rfString_BytePosToCodePoint( (string_),byteIndex_);
 
@@ -510,7 +509,7 @@ i_DECLIMEX_ uint32_t* rfString_ToUTF32(RF_String* s,uint32_t*length);
             /*iterate until we find the character position requested and its equivalent byte position*/\
             while(j_!=characterPos_)\
             {\
-                if( rfUTF8_IsContinuationByte( (string_)->bytes[b_index_]) ==false)\
+                if( rfUTF8_IsContinuationByte( ((RF_String*)(string_))->bytes[b_index_]) ==false)\
                 {\
                     j_++;\
                 }\
@@ -520,7 +519,7 @@ i_DECLIMEX_ uint32_t* rfString_ToUTF32(RF_String* s,uint32_t*length);
             while(c_index_!=-1)\
             {\
                 /*if it's a character*/\
-                if( rfUTF8_IsContinuationByte( (string_)->bytes[b_index_]) ==false)\
+                if( rfUTF8_IsContinuationByte( ((RF_String*)(string_))->bytes[b_index_]) ==false)\
                 {/*Give the character value to the user*/\
                     characterUnicodeValue_ = rfString_BytePosToCodePoint( (string_),b_index_);
 
@@ -540,6 +539,14 @@ i_DECLIMEX_ uint32_t* rfString_ToUTF32(RF_String* s,uint32_t*length);
 //! @param s The string whose number of characters to find. @inhtype{String,StringX}
 //! @return Returns the length of the sting in characters, not including the null termintion character
 i_DECLIMEX_ uint32_t rfString_Length(void * s);
+
+//! @memberof RF_String
+//! @brief Returns the cstring representation of the string
+//!
+//! @isinherited{StringX}
+//! @param s The string whose cstring repesentation to get. @inhtype{String,StringX}
+//! @return Returns the a pointer to the array of bytes held inside the string in the UTF-8 encoding
+i_DECLIMEX_ inline char* rfString_Cstr(void* s);
 
 //! @memberof RF_String
 //! @brief Retrieves the unicode code point of the parameter character.

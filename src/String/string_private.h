@@ -48,8 +48,8 @@ extern "C"
 //! @param i_index_ A variable to hold the current byte position of the iteration
 #define RF_STRING_ITERATE_START(i_string_,i_char_,i_index_)     \
             i_index_ = 0;i_char_=0;\
-            while( (i_string_)->bytes[(i_index_)] != '\0'){\
-                if( rfUTF8_IsContinuationByte( (i_string_)->bytes[(i_index_)]) ==false){
+            while( ((RF_String*)(i_string_))->bytes[(i_index_)] != '\0'){\
+                if( rfUTF8_IsContinuationByte( ((RF_String*)(i_string_))->bytes[(i_index_)]) ==false){
 
 #define RF_STRING_ITERATE_END(i_char_,i_index_)  (i_char_)++;}(i_index_)++;}
 
@@ -59,9 +59,9 @@ extern "C"
 //! @param i_char_ An unsigned variable to hold the current character position of the iteration.
 //! @param i_index_ An uint32_t variable to hold the current byte position of the iteration
 #define RF_STRING_ITERATEB_START(i_string_,i_char_,i_index_)     \
-            i_index_ = (i_string_)->byteLength-1;(i_char_)=1;\
+            i_index_ = ((RF_String*)(i_string_))->byteLength-1;(i_char_)=1;\
             do{\
-               if( rfUTF8_IsContinuationByte((i_string_)->bytes[(i_index_)]) ==false){
+               if( rfUTF8_IsContinuationByte(((RF_String*)(i_string_))->bytes[(i_index_)]) ==false){
 
 #define RF_STRING_ITERATEB_END(i_char_,i_index_)  (i_char_)++;}(i_index_)--;}while((i_index_) != 0);
 

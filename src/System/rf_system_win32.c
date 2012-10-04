@@ -99,21 +99,21 @@ int32_t i_rfRemoveDir(void* dirnameP)
             //create the full entry name
             rfStringX_Assign(&path,RFS_("%s"RF_DIRSEP"%s",dirname->bytes,entry->d_name));
             //if this directory entry is a directory itself, call the function recursively
-            stat(path.bytes, &s);
+            stat(path.s.bytes, &s);
             if (s.st_mode & S_IFDIR)
             {
                 int ret;
-                if( (ret = rfRemoveDir(path.bytes)) != RF_SUCCESS)
+                if( (ret = rfRemoveDir(&path)) != RF_SUCCESS)
                     return ret;
                 //else we deleted that directory and we should go to the next entry of this directory
                 continue;
             }
             //if we get here this means it's a file that needs deletion
-            if(DeleteFile(path.bytes)==0)
+            if(DeleteFile(path.s.bytes)==0)
             {
                 RF_WIN32_GETSYSERROR(strBuff)
                 LOG_ERROR("Recursive directory deletion of directory \"%s\" failed because of inability to delete file \"%s\". Windows error (%lu) was given:\n%s",
-                          RE_FILE_DELETE,dirname->bytes,path.bytes,i_ERROR_CODE,strBuff)
+                          RE_FILE_DELETE,dirname->bytes,path.s.bytes,i_ERROR_CODE,strBuff)
                 LocalFree(strBuff);
                 return RE_FILE_DELETE;
             }

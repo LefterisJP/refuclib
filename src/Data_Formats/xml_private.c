@@ -250,7 +250,7 @@ char i_rfXMLTag_PrintToFile(RF_XMLTag* t,RF_TextFile* f,RF_StringX* strBuff,uint
     {
         for(i= 0; i< level; i ++)
             rfTextFile_Write(f,RFS_("\t"));
-        rfTextFile_Write(f,RFS_("%s\n",t->contents.bytes));
+        rfTextFile_Write(f,RFS_("%s\n",rfString_Cstr(&t->contents)));
     }
     //recursively call this function for all the children of this tag
     for(i=0;i < t->children.size; i++)
@@ -390,7 +390,7 @@ int32_t i_rfXML_Parse(RF_XML* x,RF_XMLTag* currentTag)
                     //if we find a closing tag we don't expect
                     if( rfString_Equal(&currentTag->name,&check) == false)
                     {
-                        LOG_ERROR("Expected to find </%s> tag but found </%s>. Aborting XML file parsing.",RE_XML_PARSE_FAILURE,currentTag->name.bytes,check.bytes);
+                        LOG_ERROR("Expected to find </%s> tag but found </%s>. Aborting XML file parsing.",RE_XML_PARSE_FAILURE,currentTag->name.bytes,rfString_Cstr(&check));
                         rfStringX_Deinit(&check);
                         rfXML_Deinit(x);
                         return RE_XML_PARSE_FAILURE;
@@ -544,7 +544,7 @@ int32_t rfXML_GoNext_dsk(RF_XML* x,RF_XMLTag* t)
                     //if we find a closing tag we don't expect
                     if( rfString_Equal(&x->currentTag->name,&check) == false)
                     {
-                        LOG_ERROR("Expected to find </%s> tag but found </%s>. Aborting XML file parsing.",RE_XML_PARSE_FAILURE,x->currentTag->name.bytes,check.bytes);
+                        LOG_ERROR("Expected to find </%s> tag but found </%s>. Aborting XML file parsing.",RE_XML_PARSE_FAILURE,x->currentTag->name.bytes,rfString_Cstr(&check));
                         error = RE_XML_PARSE_FAILURE;
                         goto cleanup3;
                     }
@@ -758,7 +758,7 @@ int32_t rfXML_GoIn_dsk(RF_XML* x,uint32_t i)
                     //if we find a closing tag we don't expect
                     if( rfString_Equal(&x->currentTag->name,&check) == false)
                     {
-                        LOG_ERROR("Expected to find </%s> tag but found </%s>. Aborting XML file parsing.",RE_XML_PARSE_FAILURE,x->currentTag->name.bytes,check.bytes);
+                        LOG_ERROR("Expected to find </%s> tag but found </%s>. Aborting XML file parsing.",RE_XML_PARSE_FAILURE,x->currentTag->name.bytes,rfString_Cstr(&check));
                         error = RE_XML_PARSE_FAILURE;
                         goto cleanup3;
                     }

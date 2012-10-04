@@ -393,13 +393,13 @@ int32_t i_rfXML_InsertStr(RF_XML* x,void* sP,char* flagsP)
     {
         for(i=0;i<x->level;i++)
             rfStringX_Append(&tabs,RFS_("   "));
-        rfStringX_Replace(&nS,RFS_("\n"),RFS_("\n%s   ",tabs.bytes),0,0);
+        rfStringX_Replace(&nS,RFS_("\n"),RFS_("\n%s   ",rfString_Cstr(&tabs)),0,0);
     }
     else
     {
         for(i=0;i<x->level;i++)
             rfStringX_Append(&tabs,RFS_("\t"));
-        rfStringX_Replace(&nS,RFS_("\n"),RFS_("\n%s\t",tabs.bytes),0,0);
+        rfStringX_Replace(&nS,RFS_("\n"),RFS_("\n%s\t",rfString_Cstr(&tabs)),0,0);
     }
 
     if(RF_BITFLAG_ON(flags,XML_TAG_END))///insertion at end of tag
@@ -429,9 +429,9 @@ int32_t i_rfXML_InsertStr(RF_XML* x,void* sP,char* flagsP)
         rfString_TrimEnd(&nS,RFS_("\n\t "));
         //create the new line that will replace the previous line, and also add the same level of tabs as the previous one
         if(RF_BITFLAG_ON(x->flags,XML_SPACES))///cleanup3 - the newline string
-            rfStringX_Init(&newLine,"%s   %s\n%s</%s>%s",before.bytes,nS.bytes,tabs.bytes,x->lastTag->name.bytes,strBuff.bytes);
+            rfStringX_Init(&newLine,"%s   %s\n%s</%s>%s",before.bytes,rfString_Cstr(&nS),rfString_Cstr(&tabs),x->lastTag->name.bytes,rfString_Cstr(&strBuff));
         else
-            rfStringX_Init(&newLine,"%s\t%s\n%s</%s>%s",before.bytes,nS.bytes,tabs.bytes,x->lastTag->name.bytes,strBuff.bytes);
+            rfStringX_Init(&newLine,"%s\t%s\n%s</%s>%s",before.bytes,rfString_Cstr(&nS),rfString_Cstr(&tabs),x->lastTag->name.bytes,rfString_Cstr(&strBuff));
         rfString_TrimEnd(&newLine,RFS_("\n\t"));
         if((error=rfTextFile_Replace(&x->f,x->f.line-1,&newLine)) != RF_SUCCESS)
         {
@@ -459,9 +459,9 @@ int32_t i_rfXML_InsertStr(RF_XML* x,void* sP,char* flagsP)
         }
         //create the new line that will replace the previous line, and also add the same level of tabs as the previous one
         if(RF_BITFLAG_ON(x->flags,XML_SPACES)) ///cleanup3 - the newline string
-            rfStringX_Init(&newLine,"%s<%s%s>\n%s   %s%s",before.bytes,x->lastTag->name.bytes,attributes.bytes,tabs.bytes,nS.bytes,strBuff.bytes);
+            rfStringX_Init(&newLine,"%s<%s%s>\n%s   %s%s",rfString_Cstr(&before),x->lastTag->name.bytes,rfString_Cstr(&attributes),rfString_Cstr(&tabs),rfString_Cstr(&nS),rfString_Cstr(&strBuff));
         else
-            rfStringX_Init(&newLine,"%s<%s%s>\n%s\t%s%s",before.bytes,x->lastTag->name.bytes,attributes.bytes,tabs.bytes,nS.bytes,strBuff.bytes);
+            rfStringX_Init(&newLine,"%s<%s%s>\n%s\t%s%s",rfString_Cstr(&before),x->lastTag->name.bytes,rfString_Cstr(&attributes),rfString_Cstr(&tabs),rfString_Cstr(&nS),rfString_Cstr(&strBuff));
         rfString_TrimEnd(&newLine,RFS_("\n\t "));
         if((error=rfTextFile_Replace(&x->f,x->lastLine,&newLine)) != RF_SUCCESS)
         {

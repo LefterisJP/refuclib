@@ -38,7 +38,7 @@
 #define RF_UTF32_LE 7
 
 // Checks if a given  byte (must be char and not unsigned char) is a continuation byte
-#define rfUTF8_IsContinuationByte(b__)  ( RF_HEXEQ_C( (  (~(b__ ^ 0x80))>>6),0x3 ))
+#define rfUTF8_IsContinuationByte(b__)  ( RF_HEXEQ_C( (  (~( (b__) ^ 0x80))>>6),0x3 ))
 
 #ifdef __cplusplus
 extern "C"

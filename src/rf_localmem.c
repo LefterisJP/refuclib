@@ -25,7 +25,7 @@
 //define The main thread's local stack memory
 RF_LocalMemoryStack RF_MainLMS;
 //define the pointer to the thread specific memory stack
-__thread RF_LocalMemoryStack* RF_LMS;
+i_THREAD__ RF_LocalMemoryStack* RF_LMS;
 
 // A small macro to find the smallest of the macro evaluation indices. Just to avoid copying pasting
 #define i_rfLMS_MinMacroEval() \

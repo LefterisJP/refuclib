@@ -28,7 +28,7 @@
 
 
 //! A macro that calculates an extended string's remaining buffer size (excluding the bytes hidden behind the index pointer)
-#define RF_STRINGX_REMAINING_SIZE(__s__)   ((__s__->bSize-__s__->bIndex) - __s__->byteLength-1)
+#define RF_STRINGX_REMAINING_SIZE(s__)   ((s__)->bSize-(s__)->bIndex) - ((s__)->s.byteLength-1)
 
 /********************************************RF_StringX functions start***************************************************/
 
@@ -55,11 +55,11 @@ RF_StringX* i_rfStringX_Create(const char* lit,...)
     RF_StringX* ret;
     RF_MALLOC(ret,sizeof(RF_StringX));
     //get bytelength
-    ret->byteLength = byteLength;
+    ret->s.byteLength = byteLength;
     //allocate and populate the data
     ret->bSize = byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-    RF_MALLOC(ret->bytes,ret->bSize);
-    strcpy(ret->bytes,buff);
+    RF_MALLOC(ret->s.bytes,ret->bSize);
+    strcpy(ret->s.bytes,buff);
     ret->bIndex = 0;
     if(buffAllocated==true)
         free(buff);
@@ -79,11 +79,11 @@ RF_StringX* i_NVrfStringX_Create(const char* lit)
     RF_StringX* ret;
     RF_MALLOC(ret,sizeof(RF_StringX));
     //get bytelength
-    ret->byteLength = byteLength;
+    ret->s.byteLength = byteLength;
     //allocate and populate the data
     ret->bSize = byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-    RF_MALLOC(ret->bytes,ret->bSize);
-    strcpy(ret->bytes,lit);
+    RF_MALLOC(ret->s.bytes,ret->bSize);
+    strcpy(ret->s.bytes,lit);
     ret->bIndex = 0;
 
     return ret;
@@ -108,11 +108,11 @@ char i_rfStringX_Init(RF_StringX* str,const char* lit,...)
         return false;
     }
     //get bytelength
-    str->byteLength = byteLength;
+    str->s.byteLength = byteLength;
     //allocate and populate the data
     str->bSize = byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-    RF_MALLOC(str->bytes,str->bSize);
-    strcpy(str->bytes,buff);
+    RF_MALLOC(str->s.bytes,str->bSize);
+    strcpy(str->s.bytes,buff);
     str->bIndex = 0;
     if(buffAllocated == true)
         free(buff);
@@ -130,11 +130,11 @@ char i_NVrfStringX_Init(RF_StringX* str,const char* lit)
         return false;
     }
     //get bytelength
-    str->byteLength = byteLength;
+    str->s.byteLength = byteLength;
     //allocate and populate the data
     str->bSize = byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-    RF_MALLOC(str->bytes,str->bSize);
-    strcpy(str->bytes,lit);
+    RF_MALLOC(str->s.bytes,str->bSize);
+    strcpy(str->s.bytes,lit);
     str->bIndex = 0;
     //success
     return true;
@@ -148,15 +148,15 @@ RF_StringX* rfStringX_Create_cp(uint32_t codepoint)
     RF_MALLOC(ret,sizeof(RF_StringX));
     //since this is an extended string let's be a bit more generous with the buffer
     ret->bSize = 5*RF_OPTION_STRINGX_CAPACITY_M;
-    RF_MALLOC(ret->bytes,ret->bSize);
+    RF_MALLOC(ret->s.bytes,ret->bSize);
     ret->bIndex = 0;
 
     //if we only need a byte to encode it
     if(RF_HEXLE_UI(codepoint,0x007f))
     {
-        ret->bytes[0] = codepoint;
-        ret->bytes[1] = '\0';
-        ret->byteLength = 1;
+        ret->s.bytes[0] = codepoint;
+        ret->s.bytes[1] = '\0';
+        ret->s.byteLength = 1;
     }
     //if we need 2 bytes to encode it
     else if( RF_HEXGE_UI(codepoint,0x0080) && RF_HEXLE_UI(codepoint,0x07ff))
@@ -164,19 +164,19 @@ RF_StringX* rfStringX_Create_cp(uint32_t codepoint)
         if(rfUTILS_Endianess() == RF_LITTLE_ENDIAN)
         {
             //get the first bits of the first byte and encode them to the first byte
-            ret->bytes[1] = (codepoint & 0x3F)|(0x02<<6);
+            ret->s.bytes[1] = (codepoint & 0x3F)|(0x02<<6);
             //get the 5 following bits and encode them in the second byte
-            ret->bytes[0] = ((codepoint & 0x7C0) >> 6)  | (0x6<<5);
+            ret->s.bytes[0] = ((codepoint & 0x7C0) >> 6)  | (0x6<<5);
         }
         else
         {
             //get the first bits of the first byte and encode them to the first byte
-            ret->bytes[0] = (codepoint & 0x3F)|(0x02<<6);
+            ret->s.bytes[0] = (codepoint & 0x3F)|(0x02<<6);
             //get the 5 following bits and encode them in the second byte
-            ret->bytes[1] = ((codepoint & 0x7C0) >> 6)  | (0x6<<5);
+            ret->s.bytes[1] = ((codepoint & 0x7C0) >> 6)  | (0x6<<5);
         }
-        ret->bytes[2] = '\0';
-        ret->byteLength = 2;
+        ret->s.bytes[2] = '\0';
+        ret->s.byteLength = 2;
     }
     //if we need 3 bytes to encode it
     else if( RF_HEXGE_UI(codepoint,0x0800) && RF_HEXLE_UI(codepoint,0x0ffff))
@@ -184,23 +184,23 @@ RF_StringX* rfStringX_Create_cp(uint32_t codepoint)
         if(rfUTILS_Endianess() == RF_LITTLE_ENDIAN)
         {
             //get the first bits of the first byte and encode them to the first byte
-            ret->bytes[2] = (codepoint & 0x3F)|(0x02<<6);
+            ret->s.bytes[2] = (codepoint & 0x3F)|(0x02<<6);
             //get the 6 following bits and encode them in the second byte
-            ret->bytes[1] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
+            ret->s.bytes[1] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
             //get the 4 following bits and encode them in the third byte
-            ret->bytes[0] = (((codepoint & 0xF000))>>12) | (0xE<<4);
+            ret->s.bytes[0] = (((codepoint & 0xF000))>>12) | (0xE<<4);
         }
         else
         {
             //get the first bits of the first byte and encode them to the first byte
-            ret->bytes[0] = (codepoint & 0x3F)|(0x02<<6);
+            ret->s.bytes[0] = (codepoint & 0x3F)|(0x02<<6);
             //get the 6 following bits and encode them in the second byte
-            ret->bytes[1] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
+            ret->s.bytes[1] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
             //get the 4 following bits and encode them in the third byte
-            ret->bytes[2] = (((codepoint & 0xF000))>>12) | (0xE<<4);
+            ret->s.bytes[2] = (((codepoint & 0xF000))>>12) | (0xE<<4);
         }
-        ret->bytes[3] = '\0';
-        ret->byteLength = 3;
+        ret->s.bytes[3] = '\0';
+        ret->s.byteLength = 3;
     }
     //if we need 4 bytes to encode it
     else if( RF_HEXGE_UI(codepoint,0x10000) && RF_HEXLE_UI(codepoint,0x10ffff))
@@ -208,27 +208,27 @@ RF_StringX* rfStringX_Create_cp(uint32_t codepoint)
         if(rfUTILS_Endianess() == RF_LITTLE_ENDIAN)
         {
             //get the first bits of the first byte and encode them to the first byte
-            ret->bytes[3] = (codepoint & 0x3F)|(0x02<<6);
+            ret->s.bytes[3] = (codepoint & 0x3F)|(0x02<<6);
             //get the 6 following bits and encode them in the second byte
-            ret->bytes[2] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
+            ret->s.bytes[2] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
             //get the 6 following bits and encode them in the third byte
-            ret->bytes[1] = (((codepoint & 0x3F000))>>12) | (0x02<<6);
+            ret->s.bytes[1] = (((codepoint & 0x3F000))>>12) | (0x02<<6);
             //get the 3 following bits and encode them in the fourth byte
-            ret->bytes[0] = (((codepoint & 0x1C0000))>>18) | (0x1E<<3);
+            ret->s.bytes[0] = (((codepoint & 0x1C0000))>>18) | (0x1E<<3);
         }
         else
         {
             //get the first bits of the first byte and encode them to the first byte
-            ret->bytes[0] = (codepoint & 0x3F)|(0x02<<6);
+            ret->s.bytes[0] = (codepoint & 0x3F)|(0x02<<6);
             //get the 6 following bits and encode them in the second byte
-            ret->bytes[1] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
+            ret->s.bytes[1] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
             //get the 6 following bits and encode them in the third byte
-            ret->bytes[2] = (((codepoint & 0x3F000))>>12) | (0x02<<6);
+            ret->s.bytes[2] = (((codepoint & 0x3F000))>>12) | (0x02<<6);
             //get the 3 following bits and encode them in the fourth byte
-            ret->bytes[3] = (((codepoint & 0x1C0000))>>18) | (0x1E<<3);
+            ret->s.bytes[3] = (((codepoint & 0x1C0000))>>18) | (0x1E<<3);
         }
-        ret->bytes[4] = '\0';
-        ret->byteLength = 4;
+        ret->s.bytes[4] = '\0';
+        ret->s.byteLength = 4;
     }
     else
     {
@@ -245,56 +245,56 @@ char rfStringX_Init_cp(RF_StringX* str,uint32_t codepoint)
 
     //since this is an extended string let's be a bit more generous with the buffer
     str->bSize = 5*RF_OPTION_STRINGX_CAPACITY_M;
-    RF_MALLOC(str->bytes,str->bSize);
+    RF_MALLOC(str->s.bytes,str->bSize);
     str->bIndex = 0;
 
     //if we only need a byte to encode it
     if(RF_HEXLE_UI(codepoint,0x007f))
     {
-        str->bytes[0] = codepoint;
-        str->bytes[1] = '\0';
-        str->byteLength = 1;
+        str->s.bytes[0] = codepoint;
+        str->s.bytes[1] = '\0';
+        str->s.byteLength = 1;
     }
     //if we need 2 bytes to encode it
     else if( RF_HEXGE_UI(codepoint,0x0080) && RF_HEXLE_UI(codepoint,0x07ff))
     {
         //get the first bits of the first byte and encode them to the first byte
-        str->bytes[1] = (codepoint & 0x3F)|(0x02<<6);
+        str->s.bytes[1] = (codepoint & 0x3F)|(0x02<<6);
         //get the 5 following bits and encode them in the second byte
-        str->bytes[0] = ((codepoint & 0x7C0) >> 6)  | (0x6<<5);
-        str->bytes[2] = '\0';
-        str->byteLength = 2;
+        str->s.bytes[0] = ((codepoint & 0x7C0) >> 6)  | (0x6<<5);
+        str->s.bytes[2] = '\0';
+        str->s.byteLength = 2;
     }
     //if we need 3 bytes to encode it
     else if( RF_HEXGE_UI(codepoint,0x0800) && RF_HEXLE_UI(codepoint,0x0ffff))
     {
         //get the first bits of the first byte and encode them to the first byte
-        str->bytes[2] = (codepoint & 0x3F)|(0x02<<6);
+        str->s.bytes[2] = (codepoint & 0x3F)|(0x02<<6);
         //get the 6 following bits and encode them in the second byte
-        str->bytes[1] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
+        str->s.bytes[1] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
         //get the 4 following bits and encode them in the third byte
-        str->bytes[0] = (((codepoint & 0xF000))>>12) | (0xE<<4);
-        str->bytes[3] = '\0';
-        str->byteLength = 3;
+        str->s.bytes[0] = (((codepoint & 0xF000))>>12) | (0xE<<4);
+        str->s.bytes[3] = '\0';
+        str->s.byteLength = 3;
     }
     //if we need 4 bytes to encode it
     else if( RF_HEXGE_UI(codepoint,0x10000) && RF_HEXLE_UI(codepoint,0x10ffff))
     {
         //get the first bits of the first byte and encode them to the first byte
-        str->bytes[3] = (codepoint & 0x3F)|(0x02<<6);
+        str->s.bytes[3] = (codepoint & 0x3F)|(0x02<<6);
         //get the 6 following bits and encode them in the second byte
-        str->bytes[2] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
+        str->s.bytes[2] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
         //get the 6 following bits and encode them in the third byte
-        str->bytes[1] = (((codepoint & 0x3F000))>>12) | (0x02<<6);
+        str->s.bytes[1] = (((codepoint & 0x3F000))>>12) | (0x02<<6);
         //get the 3 following bits and encode them in the fourth byte
-        str->bytes[0] = (((codepoint & 0x1C0000))>>18) | (0x1E<<3);
-        str->bytes[4] = '\0';
-        str->byteLength = 4;
+        str->s.bytes[0] = (((codepoint & 0x1C0000))>>18) | (0x1E<<3);
+        str->s.bytes[4] = '\0';
+        str->s.byteLength = 4;
     }
     else
     {
         LOG_ERROR("Attempted to encode an invalid unicode code point into an extended string",RE_UTF8_INVALID_CODE_POINT);
-        free(str->bytes);
+        free(str->s.bytes);
         return false;
     }
 
@@ -315,8 +315,9 @@ RF_StringX* rfStringX_Create_i(int32_t i)
     RF_StringX* ret;
     RF_MALLOC(ret,sizeof(RF_String));
     ret->bSize = numLen*RF_OPTION_STRINGX_CAPACITY_M;
-    RF_MALLOC(ret->bytes,sizeof(char)*ret->bSize);
-    strcpy(ret->bytes,buff);
+    RF_MALLOC(ret->s.bytes,sizeof(char)*ret->bSize);
+    ret->s.byteLength = numLen;
+    strcpy(ret->s.bytes,buff);
     return ret;
 }
 //Initializes a string with the given integer
@@ -330,8 +331,9 @@ char rfStringX_Init_i(RF_StringX* str,int32_t i)
     numLen = strlen(buff)+1;
 
     str->bSize = numLen*RF_OPTION_STRINGX_CAPACITY_M;
-    RF_MALLOC(str->bytes,sizeof(char)*str->bSize);
-    strcpy(str->bytes,buff);
+    RF_MALLOC(str->s.bytes,sizeof(char)*str->bSize);
+    str->s.byteLength = numLen;
+    strcpy(str->s.bytes,buff);
     return true;
 }
 // Allocates and returns an extended string with the given float.
@@ -346,11 +348,11 @@ RF_StringX* rfStringX_Create_f(float f)
     //initialize and return the string
     RF_StringX* ret;
     RF_MALLOC(ret,sizeof(RF_StringX));
-    ret->byteLength = len;
+    ret->s.byteLength = len;
     ret->bSize = len*RF_OPTION_STRINGX_CAPACITY_M+1;
-    RF_MALLOC(ret->bytes,ret->bSize);
+    RF_MALLOC(ret->s.bytes,ret->bSize);
     ret->bIndex = 0;
-    strcpy(ret->bytes,buff);
+    strcpy(ret->s.bytes,buff);
 
     free(buff);
 
@@ -366,11 +368,11 @@ char rfStringX_Init_f(RF_StringX* str,float f)
     uint32_t len = strlen(buff);
 
     //initialize and return the string
-    str->byteLength = len;
+    str->s.byteLength = len;
     str->bSize = len*RF_OPTION_STRINGX_CAPACITY_M+1;
-    RF_MALLOC(str->bytes,str->bSize);
+    RF_MALLOC(str->s.bytes,str->bSize);
     str->bIndex = 0;
-    strcpy(str->bytes,buff);
+    strcpy(str->s.bytes,buff);
 
     free(buff);
 
@@ -413,10 +415,10 @@ RF_StringX* i_rfStringX_Create_buff(uint32_t buffSize,const char* lit,...)
     }
 
     //allocate and populate the data
-    RF_MALLOC(ret->bytes,ret->bSize);
+    RF_MALLOC(ret->s.bytes,ret->bSize);
     ret->bIndex = 0;
-    ret->byteLength = byteLength;
-    strcpy(ret->bytes,buff);
+    ret->s.byteLength = byteLength;
+    strcpy(ret->s.bytes,buff);
     if(buffAllocated == true)
         free(buff);
     return ret;
@@ -444,10 +446,10 @@ RF_StringX* i_NVrfStringX_Create_buff(uint32_t buffSize,const char* lit)
         ret->bSize = byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
     }
     //allocate and populate the data
-    RF_MALLOC(ret->bytes,ret->bSize);
+    RF_MALLOC(ret->s.bytes,ret->bSize);
     ret->bIndex = 0;
-    ret->byteLength = byteLength;
-    strcpy(ret->bytes,lit);
+    ret->s.byteLength = byteLength;
+    strcpy(ret->s.bytes,lit);
     return ret;
 }
 #endif
@@ -481,10 +483,10 @@ char i_rfStringX_Init_buff(RF_StringX* str,uint32_t buffSize,const char* lit,...
         str->bSize = byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
     }
     //allocate and populate the data
-    RF_MALLOC(str->bytes,str->bSize);
+    RF_MALLOC(str->s.bytes,str->bSize);
     str->bIndex = 0;
-    str->byteLength = byteLength;
-    strcpy(str->bytes,buff);
+    str->s.byteLength = byteLength;
+    strcpy(str->s.bytes,buff);
     if(buffAllocated == true)
         free(buff);
     return true;
@@ -513,10 +515,10 @@ char i_NVrfStringX_Init_buff(RF_StringX* str,uint32_t buffSize,const char* lit)
     }
 
     //allocate and populate the data
-    RF_MALLOC(str->bytes,str->bSize);
+    RF_MALLOC(str->s.bytes,str->bSize);
     str->bIndex = 0;
-    str->byteLength = byteLength;
-    strcpy(str->bytes,lit);
+    str->s.byteLength = byteLength;
+    strcpy(str->s.bytes,lit);
     return true;
 }
 #endif
@@ -586,10 +588,10 @@ char rfStringX_Init_UTF16(RF_StringX* str,const char* s,char endianess)
     }
     //success
     free(codepoints);
-    str->bytes = utf8;
+    str->s.bytes = utf8;
     str->bIndex = 0;
     str->bSize = utf8ByteLength+1;
-    str->byteLength = utf8ByteLength;
+    str->s.byteLength = utf8ByteLength;
     return true;
 
 
@@ -655,10 +657,10 @@ char rfStringX_Init_UTF32(RF_StringX* str,const char* s)
     //if the encoding happened correctly
     if(codeBuffer != 0)
     {
-            str->bytes = (char*)codeBuffer;
+            str->s.bytes = (char*)codeBuffer;
             str->bIndex = 0;
             str->bSize = utf8ByteLength+1;
-            str->byteLength = utf8ByteLength;
+            str->s.byteLength = utf8ByteLength;
             return true;
     }
     //else fail
@@ -677,11 +679,11 @@ struct RF_StringX* i_rfStringX_Create_nc(const char* lit,...)
     READ_VSNPRINTF_ARGS(lit,lit,0)
     RF_MALLOC(ret,sizeof(RF_StringX));
     //get bytelength
-    ret->byteLength = strlen(buff);
+    ret->s.byteLength = strlen(buff);
     //allocate and populate the data
-    ret->bSize = ret->byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-    RF_MALLOC(ret->bytes,ret->bSize);
-    strcpy(ret->bytes,lit);
+    ret->bSize = ret->s.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+    RF_MALLOC(ret->s.bytes,ret->bSize);
+    strcpy(ret->s.bytes,lit);
     ret->bIndex = 0;
     if(buffAllocated == true)
         free(buff);
@@ -695,11 +697,11 @@ struct RF_StringX* i_NVrfStringX_Create_nc(const char* lit)
     RF_StringX* ret;
     RF_MALLOC(ret,sizeof(RF_StringX));
     //get bytelength
-    ret->byteLength = strlen(lit);
+    ret->s.byteLength = strlen(lit);
     //allocate and populate the data
-    ret->bSize = ret->byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-    RF_MALLOC(ret->bytes,ret->bSize);
-    strcpy(ret->bytes,lit);
+    ret->bSize = ret->s.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+    RF_MALLOC(ret->s.bytes,ret->bSize);
+    strcpy(ret->s.bytes,lit);
     ret->bIndex = 0;
 
     return ret;
@@ -714,11 +716,11 @@ char i_rfStringX_Init_nc(struct RF_StringX* str,const char* lit,...)
 {
     READ_VSNPRINTF_ARGS(lit,lit,false)
     //get bytelength
-    str->byteLength = strlen(buff);
+    str->s.byteLength = strlen(buff);
     //allocate and populate the data
-    str->bSize = str->byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-    RF_MALLOC(str->bytes,str->bSize);
-    strcpy(str->bytes,buff);
+    str->bSize = str->s.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+    RF_MALLOC(str->s.bytes,str->bSize);
+    strcpy(str->s.bytes,buff);
     str->bIndex = 0;
     if(buffAllocated == true)
         free(buff);
@@ -729,11 +731,11 @@ char i_rfStringX_Init_nc(struct RF_StringX* str,const char* lit,...)
 char i_NVrfStringX_Init_nc(struct RF_StringX* str,const char* lit)
 {
     //get bytelength
-    str->byteLength = strlen(lit);
+    str->s.byteLength = strlen(lit);
     //allocate and populate the data
-    str->bSize = str->byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-    RF_MALLOC(str->bytes,str->bSize);
-    strcpy(str->bytes,lit);
+    str->bSize = str->s.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+    RF_MALLOC(str->s.bytes,str->bSize);
+    strcpy(str->s.bytes,lit);
     str->bIndex = 0;
     //success
     return true;
@@ -751,12 +753,12 @@ void i_rfStringX_Assign(RF_StringX* dest,void* sourceP)
     if(source->byteLength+1 >= dest->bSize)
     {
         dest->bSize = source->byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-        RF_REALLOC(dest->bytes,char,dest->bSize);
+        RF_REALLOC(dest->s.bytes,char,dest->bSize);
     }
 
     //now copy the value and the bytelength
-    memcpy(dest->bytes,source->bytes,source->byteLength+1);
-    dest->byteLength = source->byteLength;
+    memcpy(dest->s.bytes,source->bytes,source->byteLength+1);
+    dest->s.byteLength = source->byteLength;
 }
 
 //Assigns the value of a unicode character to the string
@@ -767,50 +769,50 @@ char rfStringX_Assign_char(RF_StringX* str,uint32_t codepoint)
     //realloc if needed
     if(str->bSize <5)
     {
-        RF_REALLOC(str->bytes,char,5*RF_OPTION_STRINGX_CAPACITY_M+1);
+        RF_REALLOC(str->s.bytes,char,5*RF_OPTION_STRINGX_CAPACITY_M+1);
     }
     //if we only need a byte to encode it
     if(RF_HEXLE_UI(codepoint,0x007f))
     {
-        str->bytes[0] = codepoint;
-        str->bytes[1] = '\0';
-        str->byteLength = 1;
+        str->s.bytes[0] = codepoint;
+        str->s.bytes[1] = '\0';
+        str->s.byteLength = 1;
     }
     //if we need 2 bytes to encode it
     else if( RF_HEXGE_UI(codepoint,0x0080) && RF_HEXLE_UI(codepoint,0x07ff))
     {
         //get the first bits of the first byte and encode them to the first byte
-        str->bytes[1] = (codepoint & 0x3F)|(0x02<<6);
+        str->s.bytes[1] = (codepoint & 0x3F)|(0x02<<6);
         //get the 5 following bits and encode them in the second byte
-        str->bytes[0] = ((codepoint & 0x7C0) >> 6)  | (0x6<<5);
-        str->bytes[2] = '\0';
-        str->byteLength = 2;
+        str->s.bytes[0] = ((codepoint & 0x7C0) >> 6)  | (0x6<<5);
+        str->s.bytes[2] = '\0';
+        str->s.byteLength = 2;
     }
     //if we need 3 bytes to encode it
     else if( RF_HEXGE_UI(codepoint,0x0800) && RF_HEXLE_UI(codepoint,0x0ffff))
     {
         //get the first bits of the first byte and encode them to the first byte
-        str->bytes[2] = (codepoint & 0x3F)|(0x02<<6);
+        str->s.bytes[2] = (codepoint & 0x3F)|(0x02<<6);
         //get the 6 following bits and encode them in the second byte
-        str->bytes[1] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
+        str->s.bytes[1] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
         //get the 4 following bits and encode them in the third byte
-        str->bytes[0] = (((codepoint & 0xF000))>>12) | (0xE<<4);
-        str->bytes[3] = '\0';
-        str->byteLength = 3;
+        str->s.bytes[0] = (((codepoint & 0xF000))>>12) | (0xE<<4);
+        str->s.bytes[3] = '\0';
+        str->s.byteLength = 3;
     }
     //if we need 4 bytes to encode it
     else if( RF_HEXGE_UI(codepoint,0x10000) && RF_HEXLE_UI(codepoint,0x10ffff))
     {
         //get the first bits of the first byte and encode them to the first byte
-        str->bytes[3] = (codepoint & 0x3F)|(0x02<<6);
+        str->s.bytes[3] = (codepoint & 0x3F)|(0x02<<6);
         //get the 6 following bits and encode them in the second byte
-        str->bytes[2] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
+        str->s.bytes[2] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
         //get the 6 following bits and encode them in the third byte
-        str->bytes[1] = (((codepoint & 0x3F000))>>12) | (0x02<<6);
+        str->s.bytes[1] = (((codepoint & 0x3F000))>>12) | (0x02<<6);
         //get the 3 following bits and encode them in the fourth byte
-        str->bytes[0] = (((codepoint & 0x1C0000))>>18) | (0x1E<<3);
-        str->bytes[4] = '\0';
-        str->byteLength = 4;
+        str->s.bytes[0] = (((codepoint & 0x1C0000))>>18) | (0x1E<<3);
+        str->s.bytes[4] = '\0';
+        str->s.byteLength = 4;
     }
     else
     {
@@ -830,10 +832,10 @@ RF_StringX* rfStringX_FromString_OUT(RF_String* s)
     RF_MALLOC(ret,sizeof(RF_StringX));
     //copy the bytes
     ret->bSize = s->byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-    RF_MALLOC(ret->bytes,ret->bSize);
-    memcpy(ret->bytes,s->bytes,s->byteLength+1);
+    RF_MALLOC(ret->s.bytes,ret->bSize);
+    memcpy(ret->s.bytes,s->bytes,s->byteLength+1);
     ret->bIndex = 0;
-    ret->byteLength = s->byteLength;
+    ret->s.byteLength = s->byteLength;
     return ret;
 }
 //Initializes an RF_StringX from an RF_string
@@ -842,10 +844,10 @@ void rfStringX_FromString_IN(RF_StringX* dst,RF_String* src)
     //allocate the stringX
     dst->bIndex = 0;
     dst->bSize = src->byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-    RF_MALLOC(dst->bytes,dst->bSize)
-    dst->byteLength = src->byteLength;
+    RF_MALLOC(dst->s.bytes,dst->bSize)
+    dst->s.byteLength = src->byteLength;
     //copy the bytes from the String
-    memcpy(dst->bytes,src->bytes,src->byteLength+1);
+    memcpy(dst->s.bytes,src->bytes,src->byteLength+1);
 }
 
 
@@ -856,34 +858,34 @@ RF_StringX* rfStringX_Copy_OUT(RF_StringX* s)
     RF_StringX* ret;
     RF_MALLOC(ret,sizeof(RF_StringX));
     //allocate the new string
-    RF_MALLOC(ret->bytes,s->bSize);
+    RF_MALLOC(ret->s.bytes,s->bSize);
     //before copying make sure that the source string is copied from the beginning of its buffer
-    s->bytes -= s->bIndex;
-    memcpy(ret->bytes,s->bytes,s->bSize);
+    s->s.bytes -= s->bIndex;
+    memcpy(ret->s.bytes,s->s.bytes,s->bSize);
     //put the s->bytes back and put the copied bytes buffer to the same inex
-    s->bytes += s->bIndex;
-    ret->bytes += s->bIndex;
+    s->s.bytes += s->bIndex;
+    ret->s.bytes += s->bIndex;
     //copy the parameters
     ret->bSize = s->bSize;
     ret->bIndex = s->bIndex;
-    ret->byteLength = s->byteLength;
+    ret->s.byteLength = s->s.byteLength;
     return ret;
 }
 //Copies the given source string into the destination string.
 void rfStringX_Copy_IN(RF_StringX* dst,RF_StringX* src)
 {
     //before copying make sure that the source string is copied from the beginning of its buffer
-    src->bytes -= src->bIndex;
+    src->s.bytes -= src->bIndex;
     //copy the bytes
-    RF_MALLOC(dst->bytes,src->bSize);
-    memcpy(dst->bytes,src->bytes,src->bSize);
+    RF_MALLOC(dst->s.bytes,src->bSize);
+    memcpy(dst->s.bytes,src->s.bytes,src->bSize);
     //pur the source bytes back and also the new copied bytes buffer to the same index
-    src->bytes += src->bIndex;
-    dst->bytes += src->bIndex;
+    src->s.bytes += src->bIndex;
+    dst->s.bytes += src->bIndex;
     //copy the parameters
     dst->bSize = src->bSize;
     dst->bIndex = src->bIndex;
-    dst->byteLength = src->byteLength;
+    dst->s.byteLength = src->s.byteLength;
 
 }
 // Copies a certain number of characters from an RF_StringX
@@ -891,24 +893,24 @@ void rfStringX_Copy_chars(RF_StringX* dst,RF_StringX* src,uint32_t charsN)
 {
     uint32_t i=0,bytePos;
     //before copying make sure that the source string is copied from the beginning of its buffer
-    src->bytes -= src->bIndex;
+    src->s.bytes -= src->bIndex;
     //copy the bytes
-    RF_MALLOC(dst->bytes,src->bSize);
-    memcpy(dst->bytes,src->bytes,src->bSize);
+    RF_MALLOC(dst->s.bytes,src->bSize);
+    memcpy(dst->s.bytes,src->s.bytes,src->bSize);
     //pur the source bytes back and also the new copied bytes buffer to the same index
-    src->bytes += src->bIndex;
-    dst->bytes += src->bIndex;
+    src->s.bytes += src->bIndex;
+    dst->s.bytes += src->bIndex;
     //copy the parameters
     dst->bSize = src->bSize;
     dst->bIndex = src->bIndex;
-    dst->byteLength = src->byteLength;
+    dst->s.byteLength = src->s.byteLength;
     //find the byte position and end the string there
     RF_STRING_ITERATE_START(src,i,bytePos)
     if(i == charsN)
         break;
     RF_STRING_ITERATE_END(i,bytePos)
-    dst->byteLength = bytePos;
-    dst->bytes[bytePos] = '\0';
+    dst->s.byteLength = bytePos;
+    dst->s.bytes[bytePos] = '\0';
 }
 
 
@@ -918,16 +920,16 @@ void rfStringX_Copy_chars(RF_StringX* dst,RF_StringX* src,uint32_t charsN)
 void rfStringX_Destroy(RF_StringX* s)
 {
     //an extended string can have moved its internal pointer forward, so we have to put it back at the origin to destroy the whole string freeing all the memory properly
-    s->bytes -= s->bIndex;
-    free(s->bytes);
+    s->s.bytes -= s->bIndex;
+    free(s->s.bytes);
     free(s);
 }
 //Destroys only the contents of the Extended string without freeing the pointer itself.It is an error to give a NULL(0x0) string for deleting. Will most probably lead to a segmentation fault
 void rfStringX_Deinit(RF_StringX* s)
 {
     //an extended string can have moved its internal pointer forward, so we have to put it back at the origin to destroy the whole string freeing all the memory properly
-    s->bytes -= s->bIndex;
-    free(s->bytes);
+    s->s.bytes -= s->bIndex;
+    free(s->s.bytes);
 }
 
 /*-------------------------------------------------------------------------Functions to manipulate an RF_StringX-------------------------------------------------------------------------------*/
@@ -942,18 +944,18 @@ void i_rfStringX_Append(RF_StringX* thisstr,void* otherP)
     uint32_t remSize = RF_STRINGX_REMAINING_SIZE(thisstr);
 
     //calculate the new byte length
-    thisstr->byteLength += other->byteLength;
+    thisstr->s.byteLength += other->byteLength;
 
     //if it does not fit inside the remaining size
     if(remSize <= other->byteLength)
     {
         //reallocate this string to fit the new addition
-        thisstr->bSize = thisstr->byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-        RF_REALLOC(thisstr->bytes,char,thisstr->bSize);
+        thisstr->bSize = thisstr->s.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+        RF_REALLOC(thisstr->s.bytes,char,thisstr->bSize);
     }
 
     //add the string to this one
-    strncat(thisstr->bytes,other->bytes,other->byteLength);
+    strncat(thisstr->s.bytes,other->bytes,other->byteLength);
 }
 
 // Appends an integer to the extended string
@@ -972,18 +974,18 @@ void rfStringX_Append_i(RF_StringX* thisstr,const int32_t i)
     uint32_t remSize = RF_STRINGX_REMAINING_SIZE(thisstr);
 
     //get the new bytelength
-    thisstr->byteLength += numLen;
+    thisstr->s.byteLength += numLen;
 
     //if it does not fit inside the remaining size
     if(remSize <= numLen)
     {
         //reallocate this string to fit the new addition
-        thisstr->bSize= thisstr->byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-        RF_REALLOC(thisstr->bytes,char,thisstr->bSize);
+        thisstr->bSize= thisstr->s.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+        RF_REALLOC(thisstr->s.bytes,char,thisstr->bSize);
     }
 
     //copy the value of the olds string and the number string into the new string
-    strncat(thisstr->bytes,buff,numLen);
+    strncat(thisstr->s.bytes,buff,numLen);
 
     //free the buffer
     free(buff);
@@ -1000,7 +1002,7 @@ void rfStringX_Append_f(RF_StringX* thisstr,const float f)
     //get the size
     len = strlen(buff);
     //calculate the new length
-    thisstr->byteLength += len;
+    thisstr->s.byteLength += len;
     //get this string's  buffer's remaining size and the string's byte size
     uint32_t remSize = RF_STRINGX_REMAINING_SIZE(thisstr);
 
@@ -1008,14 +1010,14 @@ void rfStringX_Append_f(RF_StringX* thisstr,const float f)
     if(remSize <= len)
     {
         //reallocate this string to fit the new addition
-        thisstr->bSize= thisstr->byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+        thisstr->bSize= thisstr->s.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
         //Reallocate this string to fit the new addition
-        RF_REALLOC(thisstr->bytes,char,thisstr->bSize);
+        RF_REALLOC(thisstr->s.bytes,char,thisstr->bSize);
     }
 
 
     //copy the value of the olds string and the number string into the new string
-    strncat(thisstr->bytes,buff,len);
+    strncat(thisstr->s.bytes,buff,len);
     //free the buffer
     free(buff);
 }
@@ -1030,24 +1032,24 @@ void i_rfStringX_Prepend(RF_StringX* thisstr,void* otherP)
     uint32_t remSize = RF_STRINGX_REMAINING_SIZE(thisstr);
 
     //keep the previous byte length
-    uint32_t size = thisstr->byteLength;
+    uint32_t size = thisstr->s.byteLength;
     //get the new byte length
-    thisstr->byteLength += other->byteLength;
+    thisstr->s.byteLength += other->byteLength;
 
     //if it does not fit inside the remaining size
     if(remSize <= other->byteLength)
     {
         //reallocate this string to fit the new addition
-        thisstr->bSize= thisstr->byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-        RF_REALLOC(thisstr->bytes,char,thisstr->bSize);
+        thisstr->bSize= thisstr->s.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+        RF_REALLOC(thisstr->s.bytes,char,thisstr->bSize);
     }
 
     //move the pre-existing string to the end of the buffer, by dislocating each byte by cstrlen
     for(i = size; i >= 0; i --)
-        thisstr->bytes[i+other->byteLength] = thisstr->bytes[i];
+        thisstr->s.bytes[i+other->byteLength] = thisstr->s.bytes[i];
 
     //and now add the new string to the start
-    memcpy(thisstr->bytes,other->bytes,other->byteLength);
+    memcpy(thisstr->s.bytes,other->bytes,other->byteLength);
 }
 
 // Inserts a string to this extended string at the parameter position.
@@ -1061,16 +1063,16 @@ void i_rfStringX_Insert(RF_StringX* thisstr,uint32_t* posP,void* otherP)
     uint32_t remSize = RF_STRINGX_REMAINING_SIZE(thisstr);
 
     //keep the original byte length here
-    size = thisstr->byteLength;
+    size = thisstr->s.byteLength;
     //get the new byte length
-    thisstr->byteLength += other->byteLength;
+    thisstr->s.byteLength += other->byteLength;
 
     //if the new String does not fit
     if(remSize <= other->byteLength)
     {
         //reallocate this string to fit the additiona
-        thisstr->bSize = thisstr->byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-        RF_REALLOC(thisstr->bytes,char,thisstr->bSize);
+        thisstr->bSize = thisstr->s.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+        RF_REALLOC(thisstr->s.bytes,char,thisstr->bSize);
     }
 
     //iterate this string to find the byte position of the character position
@@ -1091,12 +1093,12 @@ void i_rfStringX_Insert(RF_StringX* thisstr,uint32_t* posP,void* otherP)
     //copy the part of the string after the insertion in a temporary buffer
     char* temp;
     RF_MALLOC(temp,size-bytePos+1);
-    strcpy(temp,thisstr->bytes+bytePos);
+    strcpy(temp,thisstr->s.bytes+bytePos);
 
     //now insert the new string
-    strncpy(thisstr->bytes+bytePos,other->bytes,other->byteLength);
+    strncpy(thisstr->s.bytes+bytePos,other->bytes,other->byteLength);
     //and to the remaining part insert the rest of the string stored in the temporary buffer
-    strcpy(thisstr->bytes+(bytePos+other->byteLength),temp);
+    strcpy(thisstr->s.bytes+(bytePos+other->byteLength),temp);
 
     //finally do not forget to free the temporary buffer
     free(temp);
@@ -1131,8 +1133,8 @@ char i_rfStringX_Replace(RF_StringX* thisstr,void* sstrP,void* rstrP,const uint3
         int32_t move = bytePositions[foundN] + sstr->byteLength;
         bytePositions[foundN] = bytePositions[foundN]+thisstr->bIndex-start;
         thisstr->bIndex += move;
-        thisstr->bytes += move;
-        thisstr->byteLength -= move;
+        thisstr->s.bytes += move;
+        thisstr->s.byteLength -= move;
         foundN++;
         //if buffer is in danger of overflow realloc it
         if(foundN > bSize)
@@ -1145,8 +1147,8 @@ char i_rfStringX_Replace(RF_StringX* thisstr,void* sstrP,void* rstrP,const uint3
             break;
     }
     //move the internal pointer back since we are done searching
-    thisstr->bytes -= thisstr->bIndex-start;
-    thisstr->byteLength += thisstr->bIndex-start;
+    thisstr->s.bytes -= thisstr->bIndex-start;
+    thisstr->s.byteLength += thisstr->bIndex-start;
     thisstr->bIndex = start;
     //make sure that the number of occurences to replace do not exceed the actual number of occurences
     if(num > foundN)
@@ -1158,22 +1160,22 @@ char i_rfStringX_Replace(RF_StringX* thisstr,void* sstrP,void* rstrP,const uint3
         int32_t orSize;
         diff = rstr->byteLength - sstr->byteLength;
         //will keep the original size in bytes
-        orSize = thisstr->byteLength +1;
+        orSize = thisstr->s.byteLength +1;
         //reallocate the string to fit the new bigger size if needed
         if( orSize + num*diff > thisstr->bSize)
         {
             thisstr->bSize *= RF_OPTION_STRINGX_CAPACITY_M +1;
-            RF_REALLOC(thisstr->bytes,char,thisstr->bSize)
+            RF_REALLOC(thisstr->s.bytes,char,thisstr->bSize)
         }
         //now replace all the substrings one by one
         for(i = 0; i < num; i ++)
         {
             //move all of the contents of the string to fit the replacement
             for(j =orSize+diff-1; j > bytePositions[i]+sstr->byteLength; j -- )
-                thisstr->bytes[j] = thisstr->bytes[j-diff];
+                thisstr->s.bytes[j] = thisstr->s.bytes[j-diff];
 
             //copy in the replacement
-            strncpy(thisstr->bytes+bytePositions[i],rstr->bytes,rstr->byteLength);
+            strncpy(thisstr->s.bytes+bytePositions[i],rstr->bytes,rstr->byteLength);
             //also increase the original size (since now we moved the whole string by one replacement)
             orSize += diff;
             //also increase all the subsequent found byte positions since there is a change of string size
@@ -1181,7 +1183,7 @@ char i_rfStringX_Replace(RF_StringX* thisstr,void* sstrP,void* rstrP,const uint3
                 bytePositions[j] = bytePositions[j]+diff;
         }
         //finally let's keep the new byte length
-        thisstr->byteLength = orSize-2;
+        thisstr->s.byteLength = orSize-2;
     }
     else if( rstr->byteLength < sstr->byteLength) //replace string is smaller than the removed one
     {
@@ -1192,22 +1194,22 @@ char i_rfStringX_Replace(RF_StringX* thisstr,void* sstrP,void* rstrP,const uint3
         for(i =0; i < num; i ++)
         {
             //copy in the replacement
-            strncpy(thisstr->bytes+bytePositions[i],rstr->bytes,rstr->byteLength);
+            strncpy(thisstr->s.bytes+bytePositions[i],rstr->bytes,rstr->byteLength);
             //move all of the contents of the string to fit the replacement
-            for(j =bytePositions[i]+rstr->byteLength; j < thisstr->byteLength; j ++ )
-                thisstr->bytes[j] = thisstr->bytes[j+diff];
+            for(j =bytePositions[i]+rstr->byteLength; j < thisstr->s.byteLength; j ++ )
+                thisstr->s.bytes[j] = thisstr->s.bytes[j+diff];
             //also decrease all the subsequent found byte positions since there is a change of string size
             for(j = i+1; j < num; j ++)
                 bytePositions[j] = bytePositions[j]-diff;
         }
         //finally let's keep the new byte length
-        thisstr->byteLength -= diff*num;
+        thisstr->s.byteLength -= diff*num;
         //just note that reallocating downwards is not necessary
     }
     else //replace and remove strings are equal
     {
         for(i = 0; i < num; i ++)
-            strncpy(thisstr->bytes+bytePositions[i],rstr->bytes,rstr->byteLength);
+            strncpy(thisstr->s.bytes+bytePositions[i],rstr->bytes,rstr->byteLength);
     }
 
     free(bytePositions);
@@ -1239,8 +1241,8 @@ char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,void* leftP,void* rightP,voi
             //also move after the right
             move = rstr->byteLength+right->byteLength;
             thisstr->bIndex += move;
-            thisstr->bytes += move;
-            thisstr->byteLength -= move;
+            thisstr->s.bytes += move;
+            thisstr->s.byteLength -= move;
             //free temp string before next iteration
             rfString_Deinit(&ss);
         }
@@ -1248,9 +1250,9 @@ char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,void* leftP,void* rightP,voi
         if(found)//if we replaced at least 1 occurence success and get the internal pointer back
         {
             move = thisstr->bIndex-start;
-            thisstr->bytes -= move;
+            thisstr->s.bytes -= move;
             thisstr->bIndex = start;
-            thisstr->byteLength += move;
+            thisstr->s.byteLength += move;
             return true;
         }
         return false;
@@ -1264,10 +1266,10 @@ char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,void* leftP,void* rightP,voi
         {
             //and if the occurence does not existget the string back to where it should be
             move = thisstr->bIndex-start;
-            thisstr->bytes -= move;
+            thisstr->s.bytes -= move;
             thisstr->bIndex = start;
             //and increase its bytelength
-            thisstr->byteLength += move;
+            thisstr->s.byteLength += move;
             return false; //and return failure
         }
     }
@@ -1276,10 +1278,10 @@ char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,void* leftP,void* rightP,voi
     {
         //and if the occurence does not existget the string back to where it should be
         move = thisstr->bIndex-start;
-        thisstr->bytes -= move;
+        thisstr->s.bytes -= move;
         thisstr->bIndex = start;
         //and increase its bytelength
-        thisstr->byteLength += move;
+        thisstr->s.byteLength += move;
         return false; //and return failure
     }
     ///success
@@ -1290,9 +1292,9 @@ char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,void* leftP,void* rightP,voi
     //now we are done and should go back
     rfString_Deinit(&ss);
     move = thisstr->bIndex-start;
-    thisstr->bytes -= move;
+    thisstr->s.bytes -= move;
     thisstr->bIndex = start;
-    thisstr->byteLength += move;
+    thisstr->s.byteLength += move;
     return true;
 
 }
@@ -1311,19 +1313,19 @@ int32_t i_rfStringX_MoveAfter(RF_StringX* thisstr,void* subP,RF_StringX* result,
     //if found, move the internal pointer
     move += sub->byteLength;
     thisstr->bIndex += move;
-    thisstr->bytes+=move;
+    thisstr->s.bytes+=move;
     //also reduce the byte length of this string
-    thisstr->byteLength -= move;
+    thisstr->s.byteLength -= move;
 
     //also if we want the string returned
     if(result != 0)
     {
-        result->byteLength = move-sub->byteLength;
-        result->bSize = result->byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-        RF_MALLOC(result->bytes,result->bSize);
+        result->s.byteLength = move-sub->byteLength;
+        result->bSize = result->s.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+        RF_MALLOC(result->s.bytes,result->bSize);
         result->bIndex = 0;
-        memcpy(result->bytes,thisstr->bytes-move,result->byteLength);
-        result->bytes[result->byteLength] = '\0';
+        memcpy(result->s.bytes,thisstr->s.bytes-move,result->s.byteLength);
+        result->s.bytes[result->s.byteLength] = '\0';
     }
     //return positions moved
     return move;
@@ -1338,7 +1340,7 @@ void rfStringX_MoveBack(RF_StringX* thisstr,uint32_t n)
     //as long as the bIndex is not zero keep reducing the internal pointer and the bytes pointer
     while(thisstr->bIndex >0)
     {
-        if(rfUTF8_IsContinuationByte(thisstr->bytes[0]) == false)
+        if(rfUTF8_IsContinuationByte(thisstr->s.bytes[0]) == false)
         {
             if(n == length)
             {
@@ -1347,10 +1349,10 @@ void rfStringX_MoveBack(RF_StringX* thisstr,uint32_t n)
             length ++;
         }
         //so keep changing the internal index and the bytes pointer
-        thisstr->bytes--;
+        thisstr->s.bytes--;
         thisstr->bIndex--;
         //and also keep adding to the bytelength
-        thisstr->byteLength++;
+        thisstr->s.byteLength++;
     }
 
 }
@@ -1365,7 +1367,7 @@ void rfStringX_MoveForward(RF_StringX* thisstr,uint32_t n)
     //as long as the bIndex is not zero keep reducing the internal pointer and the bytes pointer
     while(thisstr->bIndex < thisstr->bSize)
     {
-        if(rfUTF8_IsContinuationByte(thisstr->bytes[0]) == false)
+        if(rfUTF8_IsContinuationByte(thisstr->s.bytes[0]) == false)
         {
             if(n == length)
             {
@@ -1374,18 +1376,18 @@ void rfStringX_MoveForward(RF_StringX* thisstr,uint32_t n)
             length ++;
         }
         //so keep changing the internal index and the bytes pointer
-        thisstr->bytes++;
+        thisstr->s.bytes++;
         thisstr->bIndex++;
         //and reducing from the byte length
-        thisstr->byteLength--;
+        thisstr->s.byteLength--;
     }
 }
 
 //Resets the internal pointer of the StringX
 void rfStringX_Reset(RF_StringX* thisstr)
 {
-    thisstr->bytes -= thisstr->bIndex;
-    thisstr->byteLength += thisstr->bIndex;
+    thisstr->s.bytes -= thisstr->bIndex;
+    thisstr->s.byteLength += thisstr->bIndex;
     thisstr->bIndex = 0;
 }
 
@@ -1433,19 +1435,19 @@ char rfStringX_MoveAfterv(RF_StringX* thisstr,RF_StringX* result,const char* opt
     //move the internal pointer after the substring
     move = minPos + paramLen;
     thisstr->bIndex += move;
-    thisstr->bytes += move;
+    thisstr->s.bytes += move;
     //and reduce its bytelength
-    thisstr->byteLength -= move;
+    thisstr->s.byteLength -= move;
 
     //initialize the given string if needed
     if(result != 0)
     {
-        result->byteLength = move-paramLen;
-        result->bSize = result->byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-        RF_MALLOC(result->bytes,result->bSize);
+        result->s.byteLength = move-paramLen;
+        result->bSize = result->s.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+        RF_MALLOC(result->s.bytes,result->bSize);
         result->bIndex = 0;
-        memcpy(result->bytes,thisstr->bytes-move,result->byteLength);
-        result->bytes[result->byteLength] = '\0';
+        memcpy(result->s.bytes,thisstr->s.bytes-move,result->s.byteLength);
+        result->s.bytes[result->s.byteLength] = '\0';
     }
     return true;
 }
@@ -1490,18 +1492,18 @@ char i_rfStringX_MoveAfterPair(RF_StringX* thisstr,void* leftP,void* rightP,RF_S
         rfStringX_Deinit(&r);
         //get the pointer back
         move =thisstr->bIndex - start;
-        thisstr->bytes -= move;
-        thisstr->byteLength += move;
+        thisstr->s.bytes -= move;
+        thisstr->s.byteLength += move;
         thisstr->bIndex = start;
         return false;
     }
     //if we want to keep the result
     if(result != 0)
     {
-        result->byteLength = r.byteLength;
-        result->bytes = r.bytes;
+        result->s.byteLength = r.s.byteLength;
+        result->s.bytes = r.s.bytes;
         result->bIndex = 0;
-        result->bSize = r.byteLength+1;
+        result->bSize = r.s.byteLength+1;
     }
     else//deinit the temp string
         rfStringX_Deinit(&r);
@@ -1526,7 +1528,7 @@ RF_StringX* rfStringX_Create_fUTF8(FILE* f, char* eof)
 int32_t rfStringX_Init_fUTF8(RF_StringX* str,FILE* f,char* eof)
 {
     int32_t bytesN;
-    if((bytesN=rfFReadLine_UTF8(f,&str->bytes,&str->byteLength,&str->bSize,eof)) < 0)
+    if((bytesN=rfFReadLine_UTF8(f,&str->s.bytes,&str->s.byteLength,&str->bSize,eof)) < 0)
     {
         LOG_ERROR("Failed to initialize StringX from a UTF-8 file",bytesN);
         return bytesN;
@@ -1551,10 +1553,10 @@ int32_t rfStringX_Assign_fUTF8(RF_StringX* str,FILE*f,char* eof)
     if(str->bSize <= utf8ByteLength+1)
     {
         str->bSize = (utf8ByteLength+1)*2;
-        RF_REALLOC(str->bytes,char,str->bSize);
+        RF_REALLOC(str->s.bytes,char,str->bSize);
     }
-    memcpy(str->bytes,utf8,utf8ByteLength+1);
-    str->byteLength = utf8ByteLength;
+    memcpy(str->s.bytes,utf8,utf8ByteLength+1);
+    str->s.byteLength = utf8ByteLength;
     //free the file'sutf8 buffer
     free(utf8);
     return bytesN;
@@ -1593,7 +1595,7 @@ int32_t rfStringX_Init_fUTF16(RF_StringX* str,FILE* f, char endianess,char* eof)
     //depending on the file's endianess
     if(endianess == RF_LITTLE_ENDIAN)
     {
-        if((bytesN=rfFReadLine_UTF16LE(f,&str->bytes,&str->byteLength,eof)) < 0)
+        if((bytesN=rfFReadLine_UTF16LE(f,&str->s.bytes,&str->s.byteLength,eof)) < 0)
         {
             LOG_ERROR("Failure to initialize a StringX from reading a UTF-16 file",bytesN);
             return bytesN;
@@ -1601,7 +1603,7 @@ int32_t rfStringX_Init_fUTF16(RF_StringX* str,FILE* f, char endianess,char* eof)
     }//end of little endian
     else//big endian
     {
-        if((bytesN=rfFReadLine_UTF16BE(f,&str->bytes,&str->byteLength,eof)) < 0)
+        if((bytesN=rfFReadLine_UTF16BE(f,&str->s.bytes,&str->s.byteLength,eof)) < 0)
         {
             LOG_ERROR("Failure to initialize a StringX from reading a UTF-16 file",bytesN);
             return bytesN;
@@ -1642,10 +1644,10 @@ int32_t rfStringX_Assign_fUTF16(RF_StringX* str,FILE* f, char endianess,char* eo
     if(str->bSize <= utf8ByteLength+1)
     {
         str->bSize = (utf8ByteLength+1)*2;
-        RF_REALLOC(str->bytes,char,str->bSize);
+        RF_REALLOC(str->s.bytes,char,str->bSize);
     }
-    memcpy(str->bytes,utf8,utf8ByteLength+1);
-    str->byteLength = utf8ByteLength;
+    memcpy(str->s.bytes,utf8,utf8ByteLength+1);
+    str->s.byteLength = utf8ByteLength;
     //free the file'sutf8 buffer
     free(utf8);
     return bytesN;
@@ -1699,7 +1701,7 @@ int32_t rfStringX_Init_fUTF32(RF_StringX* str,FILE* f,char endianess,char* eof)
     //depending on the file's endianess
     if(endianess == RF_LITTLE_ENDIAN)
     {
-        if((bytesN=rfFReadLine_UTF32LE(f,&str->bytes,&str->byteLength,eof)) <0)
+        if((bytesN=rfFReadLine_UTF32LE(f,&str->s.bytes,&str->s.byteLength,eof)) <0)
         {
             LOG_ERROR("Failure to initialize a StringX from reading a Little Endian UTF-32 file",bytesN);
             return bytesN;
@@ -1707,7 +1709,7 @@ int32_t rfStringX_Init_fUTF32(RF_StringX* str,FILE* f,char endianess,char* eof)
     }//end of little endian
     else//big endian
     {
-        if((bytesN=rfFReadLine_UTF16BE(f,&str->bytes,&str->byteLength,eof)) < 0)
+        if((bytesN=rfFReadLine_UTF16BE(f,&str->s.bytes,&str->s.byteLength,eof)) < 0)
         {
             LOG_ERROR("Failure to initialize a StringX from reading a Big Endian UTF-32 file",bytesN);
             return bytesN;
@@ -1747,10 +1749,10 @@ int32_t rfStringX_Assign_fUTF32(RF_StringX* str,FILE* f,char endianess, char* eo
     if(str->bSize <= utf8ByteLength+1)
     {
         str->bSize = (utf8ByteLength+1)*2;
-        RF_REALLOC(str->bytes,char,str->bSize);
+        RF_REALLOC(str->s.bytes,char,str->bSize);
     }
-    memcpy(str->bytes,utf8,utf8ByteLength+1);
-    str->byteLength = utf8ByteLength;
+    memcpy(str->s.bytes,utf8,utf8ByteLength+1);
+    str->s.byteLength = utf8ByteLength;
     //free the file'sutf8 buffer
     free(utf8);
     return bytesN;

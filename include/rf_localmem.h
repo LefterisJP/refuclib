@@ -52,7 +52,7 @@ typedef struct RF_LocalMemoryStack
 }RF_LocalMemoryStack;
 
 //! Declare a pointer to the thread-specific the local memory stack
-extern __thread i_DECLIMEX_  RF_LocalMemoryStack* RF_LMS;
+extern i_THREAD__ i_DECLIMEX_  RF_LocalMemoryStack* RF_LMS;
 //! The main thread's local memory stack
 extern i_DECLIMEX_ RF_LocalMemoryStack RF_MainLMS;
 

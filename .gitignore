@@ -33,3 +33,4 @@ infoLog
 refu.depend
 docs/*
 Examples/*
+*.pyc

@@ -34,7 +34,6 @@ extern "C"
 {///opening bracket for calling from C++
 #endif
 
-#pragma pack(push,1)
 /**
 ** @internal
 ** @date 16/05/2010
@@ -72,19 +71,14 @@ extern "C"
 **/
 typedef struct RF_StringX
 {
-    //--Data of String Start here--//
-    //! The string's data
-    char* bytes;
-    //! The string's bytelength. Not including the null termination character.
-    uint32_t byteLength;
-    //--Data of String end here--//
-
+    //! Since this inherits from RF_String, these are the RF_String inherited members
+    RF_String s;
     //! The buffer index, denotes how far from the start of the buffer the start of the string has moved
     uint32_t bIndex;
     //! The size of the buffer allocated for this extended String in bytes.
     uint32_t bSize;
 }RF_StringX;
-#pragma pack(pop)
+
 
 /*-------------------------------------------------------------------------Methods to create an RF_StringX-------------------------------------------------------------------------------*/
 //! @name RF_StringX Creation

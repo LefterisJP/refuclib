@@ -859,6 +859,13 @@ uint32_t rfString_Length(void* str)
     return length;
 }
 
+// Returns the cstring representation of the string
+char* rfString_Cstr(void* str)
+{
+    RF_String* s = (RF_String*)str;
+    return s->bytes;
+}
+
 //Retrieves the unicode code point of the parameter character.
 uint32_t rfString_GetChar(void* str,uint32_t c)
 {
@@ -977,11 +984,10 @@ char i_rfString_Equal(void* s1P,void* s2P)
 //Returns a substring of this string
 char rfString_Substr(const void* thisstrP,uint32_t startPos,uint32_t charsN,RF_String* ret)
 {
-    uint32_t charI,byteI,count,startI,endI;
+    uint32_t charI,byteI,startI,endI;
     char started,ended;
     started = ended = false;
     RF_String* s = (RF_String*)thisstrP;
-    count=0;
     startI = endI = 0;
 
 
@@ -1863,8 +1869,8 @@ char i_rfString_Replace(RF_String* thisstr,void* sstrP,void* rstrP,const uint32_
         int32_t move = bytePositions[foundN] + sstr->byteLength;
         bytePositions[foundN] = bytePositions[foundN]+temp.bIndex;
         temp.bIndex += move;
-        temp.bytes += move;
-        temp.byteLength -= move;
+        temp.s.bytes += move;
+        temp.s.byteLength -= move;
         foundN++;
         //if buffer is in danger of overflow realloc it
         if(foundN > bSize)

@@ -119,19 +119,19 @@ RF_XMLTag* rfXMLTag_CreateLocalv(RF_XMLTag* parent,void* nameP,void* contentP,un
     /// get and add the content
     if(content != 0 )
     {
-        x->contents.byteLength = content->byteLength;
+        x->contents.s.byteLength = content->byteLength;
         x->contents.bIndex = 0;
         x->contents.bSize = content->byteLength+1;
-        x->contents.bytes = rfLMS_Push(RF_LMS,content->byteLength+1);
-        memmove(x->contents.bytes,content->bytes,content->byteLength+1);
+        x->contents.s.bytes = rfLMS_Push(RF_LMS,content->byteLength+1);
+        memmove(x->contents.s.bytes,content->bytes,content->byteLength+1);
     }
     else
     {
-        x->contents.byteLength = 1;
+        x->contents.s.byteLength = 1;
         x->contents.bIndex = 0;
         x->contents.bSize = 1;
-        x->contents.bytes = rfLMS_Push(RF_LMS,1);
-        x->contents.bytes[0] = '\0';
+        x->contents.s.bytes = rfLMS_Push(RF_LMS,1);
+        x->contents.s.bytes[0] = '\0';
     }
 
     //get the attributes
@@ -351,7 +351,7 @@ char rfXMLTag_ToStr_internal(RF_XMLTag* t,RF_StringX* strBuff,uint32_t level)
     {
         for(i= 0; i< level; i ++)
             rfStringX_Append(strBuff,RFS_("\t"));
-        rfStringX_Append(strBuff,RFS_("%s\n",t->contents.bytes));
+        rfStringX_Append(strBuff,RFS_("%s\n",rfString_Cstr(&t->contents)));
     }
     //recursively call this function for all the children of this tag
     for(i=0;i < t->children.size; i++)
