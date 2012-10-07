@@ -110,13 +110,14 @@ i_DECLIMEX_ void rfLMS_MacroEvalPtr(RF_LocalMemoryStack* lms);
 //! This is an internal function and is not intended to be used by the user
 //! @param ret The void* returned by the function
 //! @return The char that the function returned
-inline char i_rfRETURN_char(void* ret);
+i_DECLIMEX_ char i_rfRETURN_char(void* ret);
+
 //! @brief Accepts the void* return result of the wrapper and turns it into an int32_t type
 //!
 //! This is an internal function and is not intended to be used by the user
 //! @param ret The void* returned by the function
 //! @return The int32_t that the function returned
-inline int32_t i_rfRETURN_int32_t(void* ret);
+i_DECLIMEX_ int32_t i_rfRETURN_int32_t(void* ret);
 //do nothing for void
 #define i_rfRETURN_void(i_PARAM_)
 
@@ -125,31 +126,31 @@ inline int32_t i_rfRETURN_int32_t(void* ret);
 
 /* The i_rfLMSWrapperN functions can be called to have total control of how to pass the void* arguments but for fast and easy usage
    the i_rfLMS_WrapN macros are provided. They just universally cast everything to void* and the function to the corresponding type */
-i_DECLIMEX_ inline void* i_rfLMSWrapper1(void*(*fptr)(void*),void* arg1);
-i_DECLIMEX_ inline void* i_rfLMSWrapper2(void*(*fptr)(void*,void*),void* arg1,void* arg2);
-i_DECLIMEX_ inline void* i_rfLMSWrapper3(void*(*fptr)(void*,void*,void*),void* arg1,void* arg2,void* arg3);
-i_DECLIMEX_ inline void* i_rfLMSWrapper4(void*(*fptr)(void*,void*,void*,void*),void* arg1,void* arg2,void* arg3,void* arg4);
-i_DECLIMEX_ inline void* i_rfLMSWrapper5(void*(*fptr)(void*,void*,void*,void*,void*),void* arg1,void* arg2,void* arg3,void* arg4,void* arg5);
-i_DECLIMEX_ inline void* i_rfLMSWrapper6(void*(*fptr)(void*,void*,void*,void*,void*,void*),void* arg1,void* arg2,void* arg3,void* arg4,void* arg5,void* arg6);
-i_DECLIMEX_ inline void* i_rfLMSWrapper7(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*),void* arg1,void* arg2,void* arg3,void* arg4,void* arg5,void* arg6,void* arg7);
-i_DECLIMEX_ inline void* i_rfLMSWrapper8(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*,void*),void* arg1,void* arg2,void* arg3,void* arg4,void* arg5,void* arg6,void* arg7,void* arg8);
-i_DECLIMEX_ inline void* i_rfLMSWrapper9(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*,void*,void*),void* arg1,void* arg2,void* arg3,void* arg4,void* arg5,void* arg6,void* arg7,void* arg8,void* arg9);
-i_DECLIMEX_ inline void* i_rfLMSWrapper10(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*,void*,void*,void*),void* arg1,void* arg2,void* arg3,void* arg4,void* arg5,void* arg6,void* arg7,void* arg8,void* arg9,void* arg10);
-i_DECLIMEX_ inline void* i_rfLMSWrapper11(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*),
+i_DECLIMEX_ void* i_rfLMSWrapper1(void*(*fptr)(void*),void* arg1);
+i_DECLIMEX_ void* i_rfLMSWrapper2(void*(*fptr)(void*,void*),void* arg1,void* arg2);
+i_DECLIMEX_ void* i_rfLMSWrapper3(void*(*fptr)(void*,void*,void*),void* arg1,void* arg2,void* arg3);
+i_DECLIMEX_ void* i_rfLMSWrapper4(void*(*fptr)(void*,void*,void*,void*),void* arg1,void* arg2,void* arg3,void* arg4);
+i_DECLIMEX_ void* i_rfLMSWrapper5(void*(*fptr)(void*,void*,void*,void*,void*),void* arg1,void* arg2,void* arg3,void* arg4,void* arg5);
+i_DECLIMEX_ void* i_rfLMSWrapper6(void*(*fptr)(void*,void*,void*,void*,void*,void*),void* arg1,void* arg2,void* arg3,void* arg4,void* arg5,void* arg6);
+i_DECLIMEX_ void* i_rfLMSWrapper7(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*),void* arg1,void* arg2,void* arg3,void* arg4,void* arg5,void* arg6,void* arg7);
+i_DECLIMEX_ void* i_rfLMSWrapper8(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*,void*),void* arg1,void* arg2,void* arg3,void* arg4,void* arg5,void* arg6,void* arg7,void* arg8);
+i_DECLIMEX_ void* i_rfLMSWrapper9(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*,void*,void*),void* arg1,void* arg2,void* arg3,void* arg4,void* arg5,void* arg6,void* arg7,void* arg8,void* arg9);
+i_DECLIMEX_ void* i_rfLMSWrapper10(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*,void*,void*,void*),void* arg1,void* arg2,void* arg3,void* arg4,void* arg5,void* arg6,void* arg7,void* arg8,void* arg9,void* arg10);
+i_DECLIMEX_ void* i_rfLMSWrapper11(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*),
 void* arg1,void* arg2,void* arg3,void* arg4,void* arg5,void* arg6,void* arg7,void* arg8,void* arg9,void* arg10,void* arg11);
-i_DECLIMEX_ inline void* i_rfLMSWrapper12(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*),
+i_DECLIMEX_ void* i_rfLMSWrapper12(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*),
 void* arg1,void* arg2,void* arg3,void* arg4,void* arg5,void* arg6,void* arg7,void* arg8,void* arg9,void* arg10,void* arg11,void* arg12);
-i_DECLIMEX_ inline void* i_rfLMSWrapper13(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*),
+i_DECLIMEX_ void* i_rfLMSWrapper13(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*),
 void* arg1,void* arg2,void* arg3,void* arg4,void* arg5,void* arg6,void* arg7,void* arg8,void* arg9,void* arg10,void* arg11,void* arg12,void*arg13);
-i_DECLIMEX_ inline void* i_rfLMSWrapper14(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*),
+i_DECLIMEX_ void* i_rfLMSWrapper14(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*),
 void* arg1,void* arg2,void* arg3,void* arg4,void* arg5,void* arg6,void* arg7,void* arg8,void* arg9,void* arg10,void* arg11,void* arg12,void*arg13,void*arg14);
-i_DECLIMEX_ inline void* i_rfLMSWrapper15(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*),
+i_DECLIMEX_ void* i_rfLMSWrapper15(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*),
 void* arg1,void* arg2,void* arg3,void* arg4,void* arg5,void* arg6,void* arg7,void* arg8,void* arg9,void* arg10,void* arg11,void* arg12,void*arg13,void*arg14,void*arg15);
-i_DECLIMEX_ inline void* i_rfLMSWrapper16(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*),
+i_DECLIMEX_ void* i_rfLMSWrapper16(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*),
 void* arg1,void* arg2,void* arg3,void* arg4,void* arg5,void* arg6,void* arg7,void* arg8,void* arg9,void* arg10,void* arg11,void* arg12,void*arg13,void*arg14,void*arg15,void*arg16);
-i_DECLIMEX_ inline void* i_rfLMSWrapper17(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*),
+i_DECLIMEX_ void* i_rfLMSWrapper17(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*),
 void* arg1,void* arg2,void* arg3,void* arg4,void* arg5,void* arg6,void* arg7,void* arg8,void* arg9,void* arg10,void* arg11,void* arg12,void*arg13,void*arg14,void*arg15,void*arg16,void*arg17);
-i_DECLIMEX_ inline void* i_rfLMSWrapper18(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*),
+i_DECLIMEX_ void* i_rfLMSWrapper18(void*(*fptr)(void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*),
 void* arg1,void* arg2,void* arg3,void* arg4,void* arg5,void* arg6,void* arg7,void* arg8,void* arg9,void* arg10,void* arg11,void* arg12,void*arg13,void*arg14,void*arg15,void*arg16,void*arg17,void* arg18);
 //these are wrapper macros that just cast the result. This produces a warning for anything that casts
 //the result to a smaller data type. But they are appropriate for functions that return pointers

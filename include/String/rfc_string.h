@@ -546,7 +546,7 @@ i_DECLIMEX_ uint32_t rfString_Length(void * s);
 //! @isinherited{StringX}
 //! @param s The string whose cstring repesentation to get. @inhtype{String,StringX}
 //! @return Returns the a pointer to the array of bytes held inside the string in the UTF-8 encoding
-i_DECLIMEX_ inline char* rfString_Cstr(void* s);
+i_DECLIMEX_ char* rfString_Cstr(void* s);
 
 //! @memberof RF_String
 //! @brief Retrieves the unicode code point of the parameter character.

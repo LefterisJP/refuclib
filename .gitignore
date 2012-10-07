@@ -30,6 +30,8 @@ rf_options.h
 src/main.c
 errorLog
 infoLog
+refuErrorLog
+refuInfoLog
 refu.depend
 docs/*
 Examples/*
