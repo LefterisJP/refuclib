@@ -237,7 +237,7 @@ int32_t i_rfXML_ToFile(RF_XML* x, void* nameP,char* encodingP)
     //check for file not read in memory
     if(RF_BITFLAG_ON(x->flags,XML_IN_MEMORY)==false)
         return RF_FAILURE;
-    char tempFName[L_tmpnam+1], *tmpNamePtr;
+    char tempFName[L_tmpnam+1], *tmpNamePtr=0;
     //open the output file
     char encoding = *encodingP, temp = false;
     RF_String* name = (RF_String*)nameP;

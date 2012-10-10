@@ -119,19 +119,19 @@ RF_XMLTag* rfXMLTag_CreateLocalv(RF_XMLTag* parent,void* nameP,void* contentP,un
     /// get and add the content
     if(content != 0 )
     {
-        x->contents.s.byteLength = content->byteLength;
+        x->contents.INH_String.byteLength = content->byteLength;
         x->contents.bIndex = 0;
         x->contents.bSize = content->byteLength+1;
-        x->contents.s.bytes = rfLMS_Push(RF_LMS,content->byteLength+1);
-        memmove(x->contents.s.bytes,content->bytes,content->byteLength+1);
+        x->contents.INH_String.bytes = rfLMS_Push(RF_LMS,content->byteLength+1);
+        memmove(x->contents.INH_String.bytes,content->bytes,content->byteLength+1);
     }
     else
     {
-        x->contents.s.byteLength = 1;
+        x->contents.INH_String.byteLength = 1;
         x->contents.bIndex = 0;
         x->contents.bSize = 1;
-        x->contents.s.bytes = rfLMS_Push(RF_LMS,1);
-        x->contents.s.bytes[0] = '\0';
+        x->contents.INH_String.bytes = rfLMS_Push(RF_LMS,1);
+        x->contents.INH_String.bytes[0] = '\0';
     }
 
     //get the attributes

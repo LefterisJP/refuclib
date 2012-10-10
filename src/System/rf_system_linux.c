@@ -125,41 +125,41 @@ int32_t i_rfRemoveDir(void* dirnameP)
                 continue;
             }
             //if we get here this means it's a file that needs deletion
-            if(remove(path.s.bytes)!=0)
+            if(remove(path.INH_String.bytes)!=0)
             {
                 switch(errno)
                 {
                     case EACCES:
                     case EPERM:
                         LOG_ERROR("When attempting to delete file \"%s\" permission is denied on a component of the \
-        path prefix, or write permission is denied on the parent directory of the file to be removed",RE_PERMISSION,path.s.bytes)
+        path prefix, or write permission is denied on the parent directory of the file to be removed",RE_PERMISSION,path.INH_String.bytes)
                         return RE_PERMISSION;
                     break;
                     case EBUSY:
                         LOG_ERROR("When attempting to delete file \"%s\" permission is denied because it is currently\
-        used by some other proccess or by the system",RE_FILE_BUSY,path.s.bytes)
+        used by some other proccess or by the system",RE_FILE_BUSY,path.INH_String.bytes)
                         return RE_FILE_BUSY;
                     break;
                     case EINVAL:
                     case ENOENT:
                     case ENOTDIR:
-                        LOG_ERROR("When attempting to delete file \"%s\" permission is denied because the path argument is invalid or it is not a file",RE_FILE_NOTFILE,path.s.bytes)
+                        LOG_ERROR("When attempting to delete file \"%s\" permission is denied because the path argument is invalid or it is not a file",RE_FILE_NOTFILE,path.INH_String.bytes)
                     return RE_FILE_NOTFILE;
                     break;
                     case EIO:
-                        LOG_ERROR("When attempting to delete file \"%s\" a physical I/O error has occured",RE_FILE_IO,path.s.bytes)
+                        LOG_ERROR("When attempting to delete file \"%s\" a physical I/O error has occured",RE_FILE_IO,path.INH_String.bytes)
                     return RE_FILE_IO;
                     break;
                     case ENAMETOOLONG:
-                        LOG_ERROR("When attempting to delete file \"%s\" the given name is too long",RE_FILE_NAMELENGTH,path.s.bytes)
+                        LOG_ERROR("When attempting to delete file \"%s\" the given name is too long",RE_FILE_NAMELENGTH,path.INH_String.bytes)
                     return RE_FILE_NAMELENGTH;
                     break;
                     case EROFS:
-                        LOG_ERROR("When attempting to delete file \"%s\" the file resides in a read only file system",RE_FILE_RO,path.s.bytes)
+                        LOG_ERROR("When attempting to delete file \"%s\" the file resides in a read only file system",RE_FILE_RO,path.INH_String.bytes)
                     return RE_FILE_RO;
                     break;
                     default:
-                        LOG_ERROR("Failed to delete file \"%s\"",RE_FILE_DELETE,path.s.bytes)
+                        LOG_ERROR("Failed to delete file \"%s\"",RE_FILE_DELETE,path.INH_String.bytes)
                     return RE_FILE_DELETE;
                     break;
                 }

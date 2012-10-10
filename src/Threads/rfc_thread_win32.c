@@ -156,7 +156,9 @@ int32_t rfThread_Join(void* thread)
 
 
 #ifdef RF_MODULE_THREADX //only if we include it compile it
+
 /***************************************************************************************RF_THREADX FUNCTIONS*****************************************************************/
+
 //The function that serves as the starting address for a threadX in win32
 DWORD WINAPI RF_THREADX_FUNCTION(LPVOID  t)
 {
@@ -165,9 +167,9 @@ DWORD WINAPI RF_THREADX_FUNCTION(LPVOID  t)
     RF_ThreadX* thread = (RF_ThreadX*)t;
     //initialize the local memory stack of the thread
     RF_LocalMemoryStack lms;
-    rfLMS_Init(&lms,thread->lmsSize);
+    rfLMS_Init(&lms,thread->INH_Thread.lmsSize);
     //in RF_ThreadX the parameter to the main thread function is a pointer to the thread itself
-    ret = (DWORD) thread->ptr2onExecution(thread);
+    ret = (DWORD) thread->INH_Thread.ptr2onExecution(thread);
     //free the local memory stack and return
     free(lms.stack);
     return ret;
@@ -197,11 +199,11 @@ char i_rfThreadX_Init(RF_ThreadX* t,uint32_t flags,void* (*ptr2onExecution)(RF_T
 #endif
 {
     //get the data and the lms size
-    t->data = data;
-    t->lmsSize = lmsSize;
+    t->INH_Thread.data = data;
+    t->INH_Thread.lmsSize = lmsSize;
     //get the function given by the user
     if(ptr2onExecution != 0)
-        t->ptr2onExecution = (void*(*)(void*))ptr2onExecution;
+        t->INH_Thread.ptr2onExecution = (void*(*)(void*))ptr2onExecution;
     else
     {
         LOG_ERROR("Passed a null pointer for the thread's execution. The thread will be doing nothing, so it is meaningless",RE_THREAD_NULL_EXECUTION_FUNCTION);
@@ -209,13 +211,13 @@ char i_rfThreadX_Init(RF_ThreadX* t,uint32_t flags,void* (*ptr2onExecution)(RF_T
     }
 
     //this is an RF_ThreadX so
-    t->flags = flags;
-    t->flags|= RF_THRATT_THREADX;
+    t->INH_Thread.flags = flags;
+    t->INH_Thread.flags|= RF_THRATT_THREADX;
 
     //passing "this" as a parameter to the function because we are using it in the thread's running life
-    t->tHandle = CreateThread(NULL,0, (LPTHREAD_START_ROUTINE) RF_THREADX_FUNCTION,(LPVOID) t,0, NULL);
+    t->INH_Thread.tHandle = CreateThread(NULL,0, (LPTHREAD_START_ROUTINE) RF_THREADX_FUNCTION,(LPVOID) t,0, NULL);
 
-    if(!t->tHandle)
+    if(!t->INH_Thread.tHandle)
     {
         LOG_ERROR("CreateThread() in Windows failed. Failed to initialize Thread",RE_THREAD_CREATION);
         return false;
@@ -234,7 +236,7 @@ char i_rfThreadX_Init(RF_ThreadX* t,uint32_t flags,void* (*ptr2onExecution)(RF_T
 void rfThreadX_Destroy(RF_ThreadX* t)
 {
     //also free the handle
-    CloseHandle(t->tHandle);
+    CloseHandle(t->INH_Thread.tHandle);
     //destroy the Critical section
     rfCriticalSection_Deinit(&t->lock);
     //free anything the message queue might have left
@@ -254,7 +256,7 @@ void rfThreadX_Destroy(RF_ThreadX* t)
 void rfThreadX_Deinit(RF_ThreadX* t)
 {
     //also free the handle
-    CloseHandle(t->tHandle);
+    CloseHandle(t->INH_Thread.tHandle);
     //destroy the Critical section
     rfCriticalSection_Deinit(&t->lock);
     //free anything the message queue might have left
@@ -271,9 +273,9 @@ void rfThreadX_Deinit(RF_ThreadX* t)
 char rfThreadX_Kill(RF_ThreadX* t)
 {
     //destroy the thread
-    int32_t ret = TerminateThread(t->tHandle,1); //1 is the exit code, @todo make it so that I can input my own exit codes
+    int32_t ret = TerminateThread(t->INH_Thread.tHandle,1); //1 is the exit code, @todo make it so that I can input my own exit codes
     //also free the handle
-    CloseHandle(t->tHandle);
+    CloseHandle(t->INH_Thread.tHandle);
     //destroy the Critical section
     rfCriticalSection_Deinit(&t->lock);
     //free anything the message queue might have left

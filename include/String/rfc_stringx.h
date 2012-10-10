@@ -71,8 +71,8 @@ extern "C"
 **/
 typedef struct RF_StringX
 {
-    //! Since this inherits from RF_String, these are the RF_String inherited members
-    RF_String s;
+    //! The RF_String inherited members
+    RF_String INH_String;
     //! The buffer index, denotes how far from the start of the buffer the start of the string has moved
     uint32_t bIndex;
     //! The size of the buffer allocated for this extended String in bytes.

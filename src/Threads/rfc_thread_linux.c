@@ -33,7 +33,7 @@
 #include <rf_localmem.h>
 
 
-//  The function that serves as the starting address for a RF_Thread in Linux
+// The function that serves as the starting address for an RF_Thread in Linux
 void* RF_THREAD_FUNCTION(void* param)
 {
     void* ret;//the return value
@@ -187,18 +187,20 @@ int32_t rfThread_Join(void* thread)
 
 
 #ifdef RF_MODULE_THREADX //compile only if the module is requested
+
 /***************************************************************************************RF_THREADX FUNCTIONS*****************************************************************/
+
 //  The function that serves as the starting address for a RF_ThreadX in Linux
 void* RF_THREADX_FUNCTION(void* param)
 {
     void* ret;//the return value
     //get a pointer to the thread
-    RF_ThreadX* t = (RF_ThreadX*)param;
+    RF_ThreadX* thread = (RF_ThreadX*)param;
     //initialize the local memory stack of the thread
     RF_LocalMemoryStack lms;
-    rfLMS_Init(&lms,t->lmsSize);
+    rfLMS_Init(&lms,thread->INH_Thread.lmsSize);
     //run the thread function
-    ret = t->ptr2onExecution(t);
+    ret = thread->INH_Thread.ptr2onExecution(thread);
     //free the local memory stack and return
     free(lms.stack);
     return ret;
@@ -228,11 +230,11 @@ char i_rfThreadX_Init(RF_ThreadX* t,uint32_t flags,void* (*ptr2onExecution)(RF_T
 #endif
 {
     //get the data and the thread's local memory stack size
-    t->data = data;
-    t->lmsSize = lmsSize;
+    t->INH_Thread.data = data;
+    t->INH_Thread.lmsSize = lmsSize;
     //get the function given by the user
     if(ptr2onExecution != 0)
-        t->ptr2onExecution = (void*(*)(void*))ptr2onExecution;
+        t->INH_Thread.ptr2onExecution = (void*(*)(void*))ptr2onExecution;
     else
     {
         LOG_ERROR("Passed a null pointer for the thread's execution. The thread will be doing nothing, so it is meaningless",RE_THREAD_NULL_EXECUTION_FUNCTION);
@@ -248,8 +250,8 @@ char i_rfThreadX_Init(RF_ThreadX* t,uint32_t flags,void* (*ptr2onExecution)(RF_T
 
 
     //flags processing should happen here
-    t->flags = 0;
-    t->flags|= RF_THRATT_THREADX;
+    t->INH_Thread.flags = 0;
+    t->INH_Thread.flags|= RF_THRATT_THREADX;
     pthread_attr_t attributes;
     pthread_attr_init(&attributes);
 
@@ -264,7 +266,7 @@ char i_rfThreadX_Init(RF_ThreadX* t,uint32_t flags,void* (*ptr2onExecution)(RF_T
     }
 
     //create the thread
-    if(pthread_create( &t->tHandle, &attributes, RF_THREADX_FUNCTION, t) != 0)
+    if(pthread_create( &t->INH_Thread.tHandle, &attributes, RF_THREADX_FUNCTION, t) != 0)
     {
         LOG_ERROR("Error during POSIX thread creation",RE_THREAD_CREATION);
         return false;
@@ -280,7 +282,7 @@ char i_rfThreadX_Init(RF_ThreadX* t,uint32_t flags,void* (*ptr2onExecution)(RF_T
 void rfThreadX_Destroy(RF_ThreadX* t)
 {
     //exit the thread
-    pthread_exit(&t->tHandle);
+    pthread_exit(&t->INH_Thread.tHandle);
     //destroy the mutex lock
     rfMutex_Deinit(&t->lock);
     //free anything the message queue might have left
@@ -300,7 +302,7 @@ void rfThreadX_Destroy(RF_ThreadX* t)
 void rfThreadX_Deinit(RF_ThreadX* t)
 {
     //exit the thread
-    pthread_exit(&t->tHandle);
+    pthread_exit(&t->INH_Thread.tHandle);
     //destroy the mutex lock
     rfMutex_Deinit(&t->lock);
     //free anything the message queue might have left
@@ -316,7 +318,7 @@ void rfThreadX_Deinit(RF_ThreadX* t)
 // Kills a thread. Same functionality as Deinit but wraps a pthread_kill function call too
 char rfThreadX_Kill(RF_ThreadX* t)
 {
-    int32_t err = pthread_cancel(t->tHandle);
+    int32_t err = pthread_cancel(t->INH_Thread.tHandle);
     int32_t ret;
     switch(err)
     {
@@ -334,7 +336,7 @@ char rfThreadX_Kill(RF_ThreadX* t)
     }
 
     //error
-    pthread_exit(&t->tHandle);
+    pthread_exit(&t->INH_Thread.tHandle);
     //destroy the mutex lock
     rfMutex_Deinit(&t->lock);
     //free anything the message queue might have left

@@ -57,7 +57,6 @@ void* RF_THREADX_FUNCTION(void* param);
 
 
 struct RF_ThreadX;
-#pragma pack(push,1)
 /**
 ** @internal
 ** @author Lefteris
@@ -72,7 +71,8 @@ struct RF_ThreadX;
 **/
 typedef struct RF_ThreadX
 {
-    INHERITS_RF_THREAD
+    //! The inherited RF_Thread data
+    RF_Thread INH_Thread;
     //! The message queue
     RF_SignalThread* msgQueue;
     //! The index of the last input message
@@ -86,10 +86,9 @@ typedef struct RF_ThreadX
     //! The lock in Linux is a mutex
     RF_Mutex lock;
 #else
-    #error Not yet implemented OS solution
+    #error RF_Thread Unsupported Operating System
 #endif
 }RF_ThreadX;
-#pragma pack(pop)
 
 // Values Returned by the Signals sending to the message queue of RF_ThreadX ///
 // The Message queue of the thread is currently busy

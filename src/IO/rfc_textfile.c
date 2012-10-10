@@ -531,8 +531,8 @@ int32_t i_rfTextFile_ReadLine3(RF_TextFile* t,RF_StringX* line,uint32_t characte
     if(t->eof == true)
         return RE_FILE_EOF;
     //make sure that the line StringX internal pointer is reset
-    line->s.bytes -= line->bIndex;
-    line->s.byteLength += line->bIndex;
+    line->INH_String.bytes -= line->bIndex;
+    line->INH_String.byteLength += line->bIndex;
     line->bIndex = 0;
     int32_t bytesN;
     char eof = false;
@@ -585,10 +585,10 @@ int32_t i_rfTextFile_ReadLine3(RF_TextFile* t,RF_StringX* line,uint32_t characte
         rfString_PruneEnd(line,charsN-characters);
     }
     //else if the end of line was found make sure it's not included in the returned string
-    else if(line->s.bytes[line->s.byteLength-1] == '\n')
+    else if(line->INH_String.bytes[line->INH_String.byteLength-1] == '\n')
     {
-        line->s.bytes[line->s.byteLength-1] = '\0';
-        line->s.byteLength--;
+        line->INH_String.bytes[line->INH_String.byteLength-1] = '\0';
+        line->INH_String.byteLength--;
     }
     //success
     t->line++;
@@ -612,8 +612,8 @@ int32_t rfTextFile_ReadLine2(RF_TextFile* t,RF_StringX* line)
     if(t->eof == true)
         return RE_FILE_EOF;
     //make sure that the line StringX internal pointer is reset
-    line->s.bytes -= line->bIndex;
-    line->s.byteLength += line->bIndex;
+    line->INH_String.bytes -= line->bIndex;
+    line->INH_String.byteLength += line->bIndex;
     line->bIndex = 0;
     char eof = false;
     //depending on the encoding
@@ -664,10 +664,10 @@ int32_t rfTextFile_ReadLine2(RF_TextFile* t,RF_StringX* line)
     t->line++;
     t->eof = eof;
     //also if the end of line was found make sure it's not included in the returned string
-    if(line->s.bytes[line->s.byteLength-1] == '\n')
+    if(line->INH_String.bytes[line->INH_String.byteLength-1] == '\n')
     {
-        line->s.bytes[line->s.byteLength-1] = '\0';
-        line->s.byteLength--;
+        line->INH_String.bytes[line->INH_String.byteLength-1] = '\0';
+        line->INH_String.byteLength--;
     }
     return RF_SUCCESS;
 }

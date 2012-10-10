@@ -19,8 +19,10 @@
 
 #include <rf_localmem.h>
 #include <rf_setup.h>
+
 #include <stdlib.h>//for exit()
 #include <string.h>//for memset()
+#include <limits.h>//for some variable type value limits
 
 //define The main thread's local stack memory
 RF_LocalMemoryStack RF_MainLMS;
@@ -33,7 +35,7 @@ i_THREAD__ RF_LocalMemoryStack* RF_LMS;
     if(RF_LMS->macroEvalsI > 0)\
     {\
         /*find the smallest pointer of the macro evaluations. This is where the stack pointer was before the function call*/\
-        stackPtrBefore = 9999999;\
+        stackPtrBefore = ULONG_MAX;\
         for(i=0;i< RF_LMS->macroEvalsI; i ++)\
         {\
             if(RF_LMS->macroEvals[i] < stackPtrBefore)\

@@ -29,6 +29,8 @@
 #include <String/rfc_stringx.h>
 //for HUGE_VAL definition
 #include <math.h>
+//for some variable type limits
+#include <limits.h>
 
 #include <rf_localmem.h> //for the local stack memory
 
@@ -1417,7 +1419,7 @@ char i_rfString_Beforev(void* thisstrP,RF_String* result,const char* optionsP,co
     //get the parameter characters
     va_start(argList,parNP);
 
-    minPos = 9999999;
+    minPos = LONG_MAX;
     for(i = 0; i < parN; i++)
     {
         s = (RF_String*) va_arg(argList,RF_String*);
@@ -1430,7 +1432,7 @@ char i_rfString_Beforev(void* thisstrP,RF_String* result,const char* optionsP,co
     va_end(argList);
 
     //if it is not found
-    if(minPos == 9999999)
+    if(minPos == LONG_MAX)
     {
         return false;
     }
@@ -1502,7 +1504,7 @@ char i_rfString_Afterv(void* thisstrP,RF_String* result,const char* optionsP,con
     //get the parameter characters
     va_start(argList,parNP);
 
-    minPos = 9999999;
+    minPos = ULONG_MAX;
     for(i = 0; i < parN; i++)
     {
         s = (RF_String*) va_arg(argList,RF_String*);
@@ -1517,7 +1519,7 @@ char i_rfString_Afterv(void* thisstrP,RF_String* result,const char* optionsP,con
     }
     va_end(argList);
     //if it is not found
-    if(minPos == 9999999)
+    if(minPos == ULONG_MAX)
     {
         return false;
     }
@@ -1860,7 +1862,7 @@ char i_rfString_Replace(RF_String* thisstr,void* sstrP,void* rstrP,const uint32_
     RF_MALLOC(bytePositions,bSize*sizeof(int32_t));
     //if the given num is 0 just make sure we replace all
     if(number == 0)
-        number = 999999;//max number of occurences
+        number = ULONG_MAX;//max number of occurences
 
     //find how many occurences exist
     rfStringX_FromString_IN(&temp,thisstr);
@@ -1869,8 +1871,8 @@ char i_rfString_Replace(RF_String* thisstr,void* sstrP,void* rstrP,const uint32_
         int32_t move = bytePositions[foundN] + sstr->byteLength;
         bytePositions[foundN] = bytePositions[foundN]+temp.bIndex;
         temp.bIndex += move;
-        temp.s.bytes += move;
-        temp.s.byteLength -= move;
+        temp.INH_String.bytes += move;
+        temp.INH_String.byteLength -= move;
         foundN++;
         //if buffer is in danger of overflow realloc it
         if(foundN > bSize)

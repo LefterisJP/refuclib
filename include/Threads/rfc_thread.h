@@ -48,7 +48,7 @@ extern "C"
     #include <semaphore.h> //for POSIX semaphores
 #endif
 
-#pragma pack(push,1)
+
 /**
 ** @internal
 ** @author Lefteris
@@ -77,28 +77,13 @@ typedef struct RF_Thread
 #ifdef REFU_WIN32_VERSION
     //! Thread handle in windows
     HANDLE tHandle;
-}RF_Thread;
-#define INHERITS_RF_THREAD \
-    uint64_t lmsSize;\
-    uint32_t flags;\
-    void* data;\
-    void* (*ptr2onExecution )(void*);\
-    HANDLE tHandle;
-//end of the windows case
 #elif defined(REFU_LINUX_VERSION)
     //! The thread handle in linux
     pthread_t tHandle;
-}RF_Thread;
-#define INHERITS_RF_THREAD \
-    uint64_t lmsSize;\
-    uint32_t flags;\
-    void* data;\
-    void* (*ptr2onExecution )(void*);\
-    pthread_t tHandle;
-#else//end of the linux case
-    #error Not yet implemented OS solution
+#else
+    #error RF_Thread Unsupported Operating System
 #endif
-#pragma pack(pop)
+}RF_Thread;
 
 /// Thread attributes ///
 // This creates a detached thread. Detached thread means that it is of the fire and forget type. You can't join it with the owner thread later.
@@ -113,7 +98,7 @@ DWORD  WINAPI RF_THREAD_FUNCTION(LPVOID  t);
 //  The function that serves as the starting address for a RF_Thread in Linux
 void* RF_THREAD_FUNCTION(void* param);
 #else
-    #error Not yet implemented OS solution
+    #error RF_Thread Unsupported Operating System
 #endif
 
 //! @memberof RF_Thread
