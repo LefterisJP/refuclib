@@ -1,8 +1,5 @@
-To learn more information about the library visit:
+To learn more information about the library, documentation, building guide and much more visit:
 http://refu.realintelligence.net
-
-
-This is the root directory of the Refu library.
 
 To compile the library edit the appropriate configuration file:
 1)**Windows**:refu_config_win32 
@@ -14,7 +11,7 @@ In linux you may get a "permission denied error" while attempting
 to execute the refu builder. If so then run
 chmod 755 /rfb_linux to give it executable permissions.
 
-As mentioned in the beginning visit  http://refu.realintelligence.net
-for documentation, building guide and much more.
+Contributions to the project are greatly encouraged. In order to learn how to contribute visit the relevant page:
+http://refu.realintelligence.net/RF_ContributePGE.html
 
 Contact me at: lefteris@realintelligence.net
