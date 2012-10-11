@@ -36,3 +36,4 @@ refu.depend
 docs/*
 Examples/*
 *.pyc
+*.layout
