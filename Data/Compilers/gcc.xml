@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<compiler>
+<flagsymbol>-D</flagsymbol>
+<compile>gcc -c -I$INCLUDES $FLAGS $FILE -o ./$OBJDIRNAME/$FILE.o</compile>
+<link_dynamic_win32>gcc -shared $FLAGS $OBJECTS -o $OUTPUT.dll</link_dynamic_win32>
+<link_dynamic_linux>gcc -shared $FLAGS $OBJECTS -o $OUTPUT.so</link_dynamic_linux>
+<link_static>ar rcs ./$OUTPUT.a $OBJECTS</link_static>
+</compiler>

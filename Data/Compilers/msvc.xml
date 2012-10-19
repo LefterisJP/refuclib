@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<compiler>
+<flagsymbol>/D</flagsymbol>
+<compile>cl /c /I$INCLUDES $FLAGS $FILE /Fo./$OBJDIRNAME/$FILE.o</compile>
+<link_dynamic>link /DLL $FLAGS $OBJECTS/OUT $OUTPUT.dll</link_dynamic>
+<link_static>lib $FLAGS $OBJECTS /OUT:$OUTPUT.lib</link_static>
+</compiler>
