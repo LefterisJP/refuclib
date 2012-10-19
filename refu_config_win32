@@ -44,29 +44,26 @@ OUTPUT_NAME=refu
 
 # The modules that you want to build of refu library. Accepted values
 # are either ALL or a combination of the values below. Combine values by 
-# separating each value with a comma
-# STRINGS --> For enabling the usage of RF_String and RF_StringX
-# DATA_STRUCTURES -> For enabling the usage of RF_List, RF_Array and RF_BinaryArray.
+# separating each value with a comma.
+# ---------------------------------------------------------------------------------------------------------
+# String --> For enabling the usage of RF_String and RF_StringX
+# Data_Structures -> For enabling the usage of RF_List, RF_Array and RF_BinaryArray.
 # note that after providing this flag, providing individual datastructure modules flags is meaningless
-	# DATA_STRUCTURES_LIST -> For enabling the usage of RF_List
-	# DATA_STRUCTURES_ARRAY -> For enabling the usage of RF_Array
-	# DATA_STUCTURES_BINARY_ARRAY -> For enabling the usage of RF_BinaryArray
-# TIME -> For enabling the usage of all time related modules such as RF_Timer, RF_Date e.t.c.
-# note that after providing this flag, providing individual time modules flags is meaningless
-	# TIME_TIMER -> For enabling the usage of RF_Timer
-	# TIME_DATE -> For enabling the usage of RF_Date
-# DATA_EXCHANGE_FORMATS -> for enabling the usage of RF_XML and other possible future supported data
-# exchange formats. note that after providing this flag, providing individual Data
-# exchange format modules flags is meaningless
-	# DATA_EXCHANGE_FORMATS_XML -> For enabling the usage of RF_XML
-# IO -> for enabling the usage of RF_TextFile and other I/O related modules.
-# note that after providing this flag, providing individual time modules flags is meaningless
-	# IO_TEXTFILE	-> For enabling the usage of RF_TextFile
-# SYSTEM -> for enabling the usage of system functions that deal with the Operating system such as
+	# List -> For enabling the usage of RF_List
+	# Array -> For enabling the usage of RF_Array
+	# BinaryArray -> For enabling the usage of RF_BinaryArray
+# Time -> For enabling the usage of all time related modules such as RF_Timer, RF_Date e.t.c.
+	# Date -> For enabling the usage of RF_Date
+# Xml -> For enabling the usage of RF_XML
+# IO -> for enabling the usage of I/O functions 
+# Textfile	-> For enabling the usage of RF_TextFile
+# System -> for enabling the usage of system functions that deal with the Operating system such as
 # rfMakeDir e.t.c.
-# THREADING --> For enabling the usage of all Threading related modules such as RF_Thread,RF_Mutex e.t.c.
-	# THREADING_SIMPLE -> For enabling everything except RF_ThreadX
-#Default value is ALL.
+# Threads --> For enabling the usage of all Threading related modules such as RF_Thread,RF_Mutex e.t.c.
+	# Threads_Simple -> For enabling everything in Threads except RF_ThreadX
+	# Threads_X      -> For enabling RF_ThreadX
+# ----------------------------------------------------------------------------------------------------------
+# Default value is ALL.
 REFU_MODULES= ALL
 
 

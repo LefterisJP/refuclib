@@ -1166,7 +1166,7 @@ char i_rfStringX_Replace(RF_StringX* thisstr,void* sstrP,void* rstrP,const uint3
         //reallocate the string to fit the new bigger size if needed
         if( orSize + num*diff > thisstr->bSize)
         {
-            thisstr->bSize *= RF_OPTION_STRINGX_CAPACITY_M +1;
+            thisstr->bSize = (orSize + num*diff)*RF_OPTION_STRINGX_CAPACITY_M;
             RF_REALLOC(thisstr->INH_String.bytes,char,thisstr->bSize)
         }
         //now replace all the substrings one by one
@@ -1185,7 +1185,7 @@ char i_rfStringX_Replace(RF_StringX* thisstr,void* sstrP,void* rstrP,const uint3
                 bytePositions[j] = bytePositions[j]+diff;
         }
         //finally let's keep the new byte length
-        thisstr->INH_String.byteLength = orSize-2;
+        thisstr->INH_String.byteLength = orSize-1;
     }
     else if( rstr->byteLength < sstr->byteLength) //replace string is smaller than the removed one
     {

@@ -19,7 +19,6 @@
 
 #include <rf_system.h>
 #include <errno.h>
-#include <sys/stat.h>
 #include <dirent.h>
 #include <unistd.h> //for rmdir()
 #include <rf_string.h>

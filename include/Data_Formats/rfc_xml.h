@@ -57,10 +57,6 @@ typedef struct RF_XML
 {
     //! The version of the xml file
     float version;
-    //! A counter for the number of root children searched by any search done in the data. Used in resuming search from where it stopped
-    int32_t rootChildrenSearched;
-    //! Help count the root children searched
-    int32_t rcs;
     //! The root tag of the xml data file
     RF_XMLTag root;
     //! A pointer to the current tag being parsed. Used by the parsing function

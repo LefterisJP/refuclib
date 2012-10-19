@@ -69,8 +69,6 @@ int32_t i_rfXML_Init(RF_XML* ret,void* filenameP,char* openFlagP,char* encodingP
     //initialize some data
     ret->version = 0.0;
     ret->flags=0;
-    ret->rcs=0;
-    ret->rootChildrenSearched = 0;
     ret->rootPos = 0;
     ret->currentTag = 0;
     ret->lastTag = 0;
@@ -536,7 +534,6 @@ RF_XMLTag* i_rfXML_GetTag(RF_XML* x,void* tName,void* contents, uint32_t* attrNP
     char ffwhile;
     uint32_t attrN = *attrNP;
     RF_BITFLAG_UNSET(x->flags,XML_SEARCH_DONE);
-    x->rcs = 0;
     //allocate the variable number of attributes array
     if(attrN != 0)
     {
@@ -717,7 +714,6 @@ RF_XMLTag* i_NVrfXML_GetTag(RF_XML* x,void* tName,void* contents)
     if(RF_BITFLAG_ON(x->flags,XML_IN_MEMORY))
     {
         RF_BITFLAG_UNSET(x->flags,XML_SEARCH_DONE);
-        x->rcs =0;
         //search for the tag with the given name starting from the root
         return rfXML_SearchSmall(x,&x->root,tName,contents);
     }//end of the only in memory case
@@ -837,7 +833,6 @@ RF_XMLTag* i_rfXML_GetTag_child(RF_XML* x,void* tName,void* childName,char* dire
     direct = *directP;
     rParent = *rParentP;
     RF_BITFLAG_UNSET(x->flags,XML_SEARCH_DONE);
-    x->rcs = 0;
     return i_rfXML_SearchChild(x,&x->root,tName,childName,direct,rParent);
 }
 

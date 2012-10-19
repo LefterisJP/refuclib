@@ -38,9 +38,6 @@ RF_XMLTag* rfXML_SearchSmall(RF_XML* x,RF_XMLTag* t,void* tName,void* contents)
 {
     uint32_t i;
 	RF_XMLTag* tt;
-	//if this is a root child notice we searched for it
-    if(t->parent == &x->root)
-        x->rcs++;
     //check if this is the tag we are searching for
     if(rfString_Equal(tName,&t->name)==true)
     {
@@ -56,16 +53,13 @@ RF_XMLTag* rfXML_SearchSmall(RF_XML* x,RF_XMLTag* t,void* tName,void* contents)
         {
             //then this is the tag end the search and save how many root children we already searched
             RF_BITFLAG_SET(x->flags,XML_SEARCH_DONE);
-            x->rootChildrenSearched += x->rcs;
             return t;
         }
     }
     //if this is the root make sure we don't search already searched for tags
-    int32_t index = 0;
-    if(t == &x->root)
-        index = x->rootChildrenSearched;
+
     //if not check all of the tag's children
-    for(i = index; i< t->children.size; i++)
+    for(i = 0; i< t->children.size; i++)
     {
         if(RF_BITFLAG_ON(x->flags,XML_SEARCH_DONE)==true)
             break;
@@ -90,13 +84,7 @@ RF_XMLTag* rfXML_SearchFull(RF_XML* x,RF_XMLTag* t,void* tNameP,void* contentsP,
     contents = (RF_String*)contentsP;
     //remember the tag
     x->currentTag = t;
-    //if this is a root child notice we searched for it
-    if(t->parent == &x->root)
-        x->rcs++;
-    //if this is the root make sure we don't search for already searched for tags
-    int32_t index = 0;
-    if(t == &x->root)
-        index = x->rootChildrenSearched;
+
     char match = true;
     if( rfString_Equal(&t->name,tName)==true) //name matches
     {
@@ -123,13 +111,12 @@ RF_XMLTag* rfXML_SearchFull(RF_XML* x,RF_XMLTag* t,void* tNameP,void* contentsP,
         {
             //if this is the tag end the search and save how many root children we already searched
             RF_BITFLAG_SET(x->flags,XML_SEARCH_DONE);
-            x->rootChildrenSearched += x->rcs;
             return t;
         }
     }//end of if name matches
     RF_XMLTag* tt;
     //if not found yet check all of the tag's children
-    for(i = index; i< t->children.size; i++)
+    for(i = 0; i< t->children.size; i++)
     {
         if(RF_BITFLAG_ON(x->flags,XML_SEARCH_DONE)==true)
             break;
@@ -156,14 +143,7 @@ RF_XMLTag* i_rfXML_SearchChild(RF_XML* x,RF_XMLTag* t,void* tNameP,void* childNa
     childName = (RF_String*)childNameP;
     //remember the tag
     x->currentTag = t;
-    //increase the counter of how many root children we have searched
-    if(t->parent == &x->root)
-        x->rcs++;
 
-    //if this is the root make sure we don't search already searched for tags
-    int32_t index = 0;
-    if(t == &x->root)
-        index = x->rootChildrenSearched;
     //check if this has the name of the tag we search for
     if(rfString_Equal(tName,&t->name) == true)
     {
@@ -173,10 +153,8 @@ RF_XMLTag* i_rfXML_SearchChild(RF_XML* x,RF_XMLTag* t,void* tNameP,void* childNa
         {
             if((tt=rfXML_SearchSmall(x,t,childName,0)) != 0)
             {
-                //if the child exists end the search and save how many root children we already searched
+                //if the child exists end the search
                 RF_BITFLAG_SET(x->flags,XML_SEARCH_DONE);
-                x->rootChildrenSearched += x->rcs;
-
                 if(rParent==true)
                     return t;
                 else
@@ -187,15 +165,14 @@ RF_XMLTag* i_rfXML_SearchChild(RF_XML* x,RF_XMLTag* t,void* tNameP,void* childNa
         }
         else//just check its direct children to see if childName exists in them
         {
-            for(i = index; i< t->children.size; i++)
+            for(i = 0; i< t->children.size; i++)
             {
                 tt = rfXMLTag_GetChild(t,i);
                 //if child is found then search is over
                 if( rfString_Equal( &tt->name ,childName) ==true )
                 {
-                    //if the child exists end the search and save how many root children we already searched
+                    //if the child exists end the search
                     RF_BITFLAG_SET(x->flags,XML_SEARCH_DONE);
-                    x->rootChildrenSearched += x->rcs;
                     //return either parent of child depending on the flag
                     if(rParent==true)
                         return t;
@@ -208,7 +185,7 @@ RF_XMLTag* i_rfXML_SearchChild(RF_XML* x,RF_XMLTag* t,void* tNameP,void* childNa
 
     RF_XMLTag* tt;
     //if not check all of the tag's children to see if tName is there
-    for(i = index; i< t->children.size; i++)
+    for(i = 0; i< t->children.size; i++)
     {
         if(RF_BITFLAG_ON(x->flags,XML_SEARCH_DONE)==true)
             break;

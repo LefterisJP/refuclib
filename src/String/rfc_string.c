@@ -25,7 +25,7 @@
 #include "string_private.h"
 //include io_private only for the write check
 #include "../IO/io_private.h"
-//include the extended strin
+//include the extended string
 #include <String/rfc_stringx.h>
 //for HUGE_VAL definition
 #include <math.h>

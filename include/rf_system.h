@@ -63,6 +63,7 @@
     #define RFP_ISGID       0
     #define RFP_ISVTX       0
 #else // the Refu wrappers of the permission bits
+    #include <sys/stat.h> //this is where all permissions are defined in linux
     ///Read permission bit for the owner of the file
     #define RFP_IRUSR S_IRUSR
     #define RFP_IREAD S_IREAD

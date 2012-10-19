@@ -1036,7 +1036,7 @@ int32_t rfTextFile_GoToOffset(RF_TextFile* t,foff_rft offset,int origin)
             {
                 i_FTELL_CHECK("Moving forward and querying file pointer")
             }
-        }while(cOff <=offset);//as long as we are behind the required offset keep going
+        }while(cOff <offset);//as long as we are behind the required offset keep going
     }//end of SEEK_SET (from beginning case)
     else if(origin == SEEK_CUR)///from the current position case
     {
@@ -1058,7 +1058,7 @@ int32_t rfTextFile_GoToOffset(RF_TextFile* t,foff_rft offset,int origin)
                 {
                     i_FTELL_CHECK("Moving forward and querying file pointer")
                 }
-            }while(cOff <=tOffset);//as long as we are behind the required offset keep going
+            }while(cOff <tOffset);//as long as we are behind the required offset keep going
         }
         else///negative case
         {
@@ -1076,7 +1076,7 @@ int32_t rfTextFile_GoToOffset(RF_TextFile* t,foff_rft offset,int origin)
                 {
                     i_FTELL_CHECK("Moving backwards and querying file pointer")
                 }
-            }while(cOff <=offset);//as long as we are behind the required offset keep going
+            }while(cOff <offset);//as long as we are behind the required offset keep going
         }//end of the negative case
     }//end of the SEEK_CUR case
     else
