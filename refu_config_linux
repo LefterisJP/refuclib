@@ -11,17 +11,27 @@ COMPILER_DIR=/usr/bin
 #REFU_DIR=C:\Projects_SourceCode\ReFu
 REFU_DIR=./
 
+# The name of the directory to use (will create if it does not already exist)
+# for dumping the object files. Its parent directory is the refu directory
+OBJ_DIR=obj
 
-# Extra compiler flags that you want to add.
+# Extra compiler flags that you want to send to the provided dompiler
 # Please note that you have to be certain that these are valid flags
-# for your compiuler or else build will fail
-# The flags have to be in one line and separated by space
-COMPILER_FLAGS=
+# for your compiler or else build will fail
+# The flags have to be in one line and separated by spaces
+COMPILER_FLAGS=-Wall
 
-#Extra linking flags that you want to add
+#Extra flags that may be accepted by the program that creates the dynamic libray
 # Please note that you have to be certain that these are valid flags
-# for your compiuler or else build will fail
-LINKER_FLAGS=
+# for your compiler or else build will fail
+# The flags have to be in one line and separated by spaces
+LINKER_DYNAMIC_FLAGS=
+
+#Extra flags that may be accepted by the program that creates a static library
+# Please note that you have to be certain that these are valid flags
+# for your compiler or else build will fail
+# The flags have to be in one line and separated by spaces
+LINKER_STATIC_FLAGS=
 
 #The Operating System you need to compile Refu for
 # Possible values are:

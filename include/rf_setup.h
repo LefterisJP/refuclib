@@ -66,6 +66,7 @@ extern "C"
 
 //include the exact c data types
 #ifndef _MSC_VER
+    #define __STDC_FORMAT_MACROS //also request the printf format macros
     #include <inttypes.h>
 #else//msvc does not have the C99 standard header so we gotta define them explicitly here, since they do have some similar types
     typedef unsigned __int8 uint8_t;

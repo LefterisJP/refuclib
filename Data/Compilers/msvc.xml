@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<compiler_data>
+<macroargument>/D</macroargument>
 <compiler>
-<flagsymbol>/D</flagsymbol>
-<compile>cl /c /I$INCLUDES $FLAGS $FILE /Fo./$OBJDIRNAME/$FILE.o</compile>
-<link_dynamic>link /DLL $FLAGS $OBJECTS/OUT $OUTPUT.dll</link_dynamic>
-<link_static>lib $FLAGS $OBJECTS /OUT:$OUTPUT.lib</link_static>
+	<name>cl</name>
+	<cmd>/c /I$INCLUDES $FLAGS $FILE /Fo./$OBJDIRNAME/$FILE.o</cmd>
 </compiler>
+<linker>
+	<dynamic_linker>
+		<name>link</name>
+		<cmd>/DLL $FLAGS $OBJECTS/OUT $OUTPUT.dll</cmd>
+	</dynamic_linker>
+	<static_linker>
+		<name>lib</name>
+		<cmd>$FLAGS $OBJECTS /OUT:$OUTPUT.lib</cmd>
+	</static_linker>
+</linker>
+</compiler_data>

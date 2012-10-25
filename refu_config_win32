@@ -7,8 +7,11 @@ COMPILER=GCC
 #The directory of the compiler. Absolute Value
 #COMPILER_DIR=C:\Program Files (x86)\CodeBlocks\MinGW\bin
 COMPILER_DIR=C:\MinGW\bin
-#COMPILER_DIR=  C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin
+MSVC_DIR=C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin
 
+# The name of the directory to use (will create if it does not already exist)
+# for dumping the object files. Its parent directory is the refu directory
+OBJ_DIR=obj
 
 #The root directory of the refu library. Absolute value
 REFU_DIR=./
@@ -20,22 +23,29 @@ REFU_DIR=./
 #LINUX
 OS=WINDOWS
 
-# Extra compiler flags that you want to add.
+# Extra compiler flags that you want to send to the provided dompiler
 # Please note that you have to be certain that these are valid flags
-# for your compiuler or else build will fail
-# The flags have to be in one line and separated by space
-COMPILER_FLAGS=
+# for your compiler or else build will fail
+# The flags have to be in one line and separated by spaces
+COMPILER_FLAGS=-Wall
 
-#Extra linking flags that you want to add
+#Extra flags that may be accepted by the program that creates the dynamic libray
 # Please note that you have to be certain that these are valid flags
-# for your compiuler or else build will fail
-LINKER_FLAGS=
+# for your compiler or else build will fail
+# The flags have to be in one line and separated by spaces
+LINKER_DYNAMIC_FLAGS=
+
+#Extra flags that may be accepted by the program that creates a static library
+# Please note that you have to be certain that these are valid flags
+# for your compiler or else build will fail
+# The flags have to be in one line and separated by spaces
+LINKER_STATIC_FLAGS=
 
 #The type of library you want to create
 #Possible values are:
 #STATIC
 #DYNAMIC
-LIBRARY=DYNAMIC
+LIBRARY=STATIC
 
 #The name of the output file, be it a shared or dynamic library.
 #This only affects the name of the final file. For example if it was a dll
