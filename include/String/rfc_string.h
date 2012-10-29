@@ -491,7 +491,7 @@ i_DECLIMEX_ uint32_t* rfString_ToUTF32(RF_String* s,uint32_t*length);
 ** @code
 ** uint32_t charValue;
 ** RF_String foo;rfString_Init(&foo,"I am a String");
-** uint32_t i = rfString_Length(&foo);
+** uint32_t i = rfString_Length(&foo)-1;//-1 is since String indexing starts from 0
 ** rfString_IterateB_Start(&foo,i,charValue)
 **      //for every character in the string,let's print it
 **      printf("Character at index %d is %c\n",i,charValue);
