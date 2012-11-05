@@ -36,15 +36,15 @@ for cName in args.compilers:
         print("Failure at reading the {0} compiler's data. Skipping this compiler...")
         continue;
     #compile a dynamic version of the library
-    if(compileLib(args.verbose,True,config)==False):
+    if(compileLib(args.verbose,True,config,compiler)==False):
         print("Compiling dynamic version of Refu with the {0} compiler failed. Skipping tests for this version...".format(cName));
     else:
-        runTests(config,compiler,True,logFile,args.verbose,args.debug);
+        runTests(config,compiler,True,logFile,args.verbose,args.debug,args.tests);
     #compile a static version of the library
-    if(compileLib(args.verbose,False,config)==False):
+    if(compileLib(args.verbose,False,config,compiler)==False):
         print("Compiling static version of Refu with the {0} compiler failed. Skipping tests for this version...".format(cName));
     else:
-        runTests(config,compiler,False,logFile,args.verbose,args.debug);
+        runTests(config,compiler,False,logFile,args.verbose,args.debug,args.tests);
 
 print("\nAll tests have concluded. For more information you can check logfile: \"{0}\"".format(args.testsLogName));
 logFile.close()

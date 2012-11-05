@@ -1,4 +1,4 @@
-/**
+/*
 ** Copyright (c) 2011-2012, Karapetsas Eleftherios
 ** All rights reserved.
 **
@@ -15,7 +15,8 @@
 **  SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-**/
+*/
+
 
 
 #ifndef REFU_USTRINGX_H
@@ -39,6 +40,7 @@ extern "C"
 ** @date 16/05/2010
 ** @author Lefteris
 ** @endinternal
+**
 ** @brief An extended version of the normal String which offers a movable index and dynamic buffer allocation
 **
 ** The Extended String is an extension over the simple @ref RF_String that adds functionalities that enable moving
@@ -60,6 +62,8 @@ extern "C"
 ** function with an extended string as a parameter will suffice.
 ** All the normal String functions which have <em class="rf_ability1">Can be used with StringX</em> on their description can be used with extended strings safely, since no specific
 ** version of the function exists, or needs to exist to manipulate Extended Strings.
+**
+** @see RF_String
 ** @internal
 ** @todo Generalize most of the constructors below and let the wrapper generate them
 ** @cppcode
@@ -96,6 +100,11 @@ typedef struct RF_StringX
 //! each containing one value to be inserted instead of each %-tag specified in the @c lit parameter, if any. There should be
 //! the same number of these arguments as the number of %-tags that expect a value.
 //! @return The newly initialized string or null pointer in case of failure
+//! @see rfStringX_Init()
+//! @see rfStringX_Create_cp()
+//! @see rfStringX_Create_i()
+//! @see rfStringX_Create_f()
+//! @see rfStringX_Create_buff()
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ RF_StringX* rfStringX_Create(const char* lit,...);
 #else
@@ -120,6 +129,11 @@ i_DECLIMEX_ RF_StringX* i_NVrfStringX_Create(const char* lit);
 //! the same number of these arguments as the number of %-tags that expect a value.
 //! @return The newly initialized string or null pointer in case of failure
 //! @return True for succesfull initialization and false otherwise
+//! @see rfStringX_Create()
+//! @see rfStringX_Init_cp()
+//! @see rfStringX_Init_i()
+//! @see rfStringX_Init_f()
+//! @see rfStringX_Init_buff()
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ char rfStringX_Init(RF_StringX* str,const char* lit,...);
 #else
@@ -135,6 +149,11 @@ i_DECLIMEX_ char i_NVrfStringX_Init(RF_StringX* str,const char* lit);
 //!
 //! @param code The unicode code point to encode, must be an uint32_t
 //! @return An extended String with the code point encoded in it or a null pointer in case of an illegal code point value
+//! @see rfStringX_Init_cp()
+//! @see rfStringX_Create()
+//! @see rfStringX_Create_i()
+//! @see rfStringX_Create_f()
+//! @see rfStringX_Create_buff()
 i_DECLIMEX_ RF_StringX* rfStringX_Create_cp(uint32_t code);
 //! @memberof RF_StringX
 //! @cppnotctor
@@ -143,6 +162,11 @@ i_DECLIMEX_ RF_StringX* rfStringX_Create_cp(uint32_t code);
 //! @param str The String to initialize
 //! @param code The unicode code point to encode, must be an uint32_t
 //! @return true for success or false in case of an illegal code point value
+//! @see rfStringX_Create_cp()
+//! @see rfStringX_Init()
+//! @see rfStringX_Init_i()
+//! @see rfStringX_Init_f()
+//! @see rfStringX_Init_buff()
 i_DECLIMEX_ char rfStringX_Init_cp(RF_StringX* str,uint32_t code);
 
 
@@ -197,6 +221,11 @@ i_DECLIMEX_ char i_NVrfStringX_Init_nc(RF_StringX* str,const char* lit);
 //! Allocates and returns an extended string with the given integer.
 //! @param i The integer to turn into a string
 //! @return Returns the initialized RF_stringX
+//! @see rfStringX_Init_i()
+//! @see rfStringX_Create()
+//! @see rfStringX_Create_cp()
+//! @see rfStringX_Create_f()
+//! @see rfStringX_Create_buff()
 i_DECLIMEX_ RF_StringX* rfStringX_Create_i(int32_t i);
 //! @memberof RF_StringX
 //! @brief Initializes an RF_StringX from an integer
@@ -205,6 +234,11 @@ i_DECLIMEX_ RF_StringX* rfStringX_Create_i(int32_t i);
 //! @param str the String to initialize
 //! @param i The integer to turn into a string
 //! @return Returns true for success and false otherwise
+//! @see rfStringX_Create_i()
+//! @see rfStringX_Init()
+//! @see rfStringX_Init_cp()
+//! @see rfStringX_Init_f()
+//! @see rfStringX_Init_buff()
 i_DECLIMEX_ char rfStringX_Init_i(RF_StringX* str,int32_t i);
 //! @memberof RF_StringX
 //! @brief Creates an RF_StringX from a float
@@ -212,6 +246,11 @@ i_DECLIMEX_ char rfStringX_Init_i(RF_StringX* str,int32_t i);
 //! Allocates and returns an extended string with the given float.
 //! @param f The float to turn into a string
 //! @return Returns the initialized RF_stringX
+//! @see rfStringX_Init_f()
+//! @see rfStringX_Create()
+//! @see rfStringX_Create_cp()
+//! @see rfStringX_Create_i()
+//! @see rfStringX_Create_buff()
 i_DECLIMEX_ RF_StringX* rfStringX_Create_f(float f);
 //! @memberof RF_StringX
 //! @brief Initializes an RF_StringX from a float
@@ -220,6 +259,11 @@ i_DECLIMEX_ RF_StringX* rfStringX_Create_f(float f);
 //! @param str the String to initialize
 //! @param f The float to turn into a string
 //! @return Returns true for success and false otherwise
+//! @see rfStringX_Create_f()
+//! @see rfStringX_Init()
+//! @see rfStringX_Init_cp()
+//! @see rfStringX_Init_i()
+//! @see rfStringX_Init_buff()
 i_DECLIMEX_ char rfStringX_Init_f(RF_StringX* str,float f);
 
 
@@ -237,6 +281,11 @@ i_DECLIMEX_ char rfStringX_Init_f(RF_StringX* str,float f);
 //! each containing one value to be inserted instead of each %-tag specified in the @c lit parameter, if any. There should be
 //! the same number of these arguments as the number of %-tags that expect a value.
 //! @return The newly initialized string
+//! @see rfStringX_Init_buff()
+//! @see rfStringX_Create()
+//! @see rfStringX_Create_cp()
+//! @see rfStringX_Create_i()
+//! @see rfStringX_Create_f()
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ RF_StringX* rfStringX_Create_buff(uint32_t buffSize,const char* lit,...);
 #else
@@ -263,6 +312,11 @@ i_DECLIMEX_ RF_StringX* i_NVrfStringX_Create_buff(uint32_t buffSize,const char* 
 //! each containing one value to be inserted instead of each %-tag specified in the @c lit parameter, if any. There should be
 //! the same number of these arguments as the number of %-tags that expect a value.
 //! @return true for success and false for failure
+//! @see rfStringX_Create_buff()
+//! @see rfStringX_Init()
+//! @see rfStringX_Init_cp()
+//! @see rfStringX_Init_i()
+//! @see rfStringX_Init_f()
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ char rfStringX_Init_buff(RF_StringX* str,uint32_t buffSize,const char* lit,...);
 #else
@@ -287,42 +341,52 @@ i_DECLIMEX_ char i_NVrfStringX_Init_buff(RF_StringX* str,uint32_t buffSize,const
 #ifdef RF_OPTION_DEFAULT_ARGUMENTS
 #define rfStringX_Init_txtbuff(i_STRINGX_,...) rfStringX_Init_buff((i_STRINGX_),RF_OPTION_FGETS_READBYTESN+1,__VA_ARGS__)
 #endif
+
+
 //! @memberof RF_StringX
 //! @brief Allocates and returns an RF_StringX with the given UTF-16 byte sequence
 //!
-//! Given characters have to be in UTF-16. A check for valid sequence of bytes is performed.
-//! @param s The sequence of bytes for the characters in UTF-16. A check to see if it is a valid UTF-8 sequence is performed
-//! @param endianess A flag that determined in what endianess the sequence of UTF-16 bytes is in. Possible values here is
+//! Given characters have to be in UTF-16 and in the endianess of the system. They also have to be null terminated.
+//! @param s A buffer of 2-byte words representing the utf-16 byte sequence. Needs to be null terminated
 //! @c RF_LITTLE_ENDIAN and @c RF_BIG_ENDIAN.
 //! @return Returns the initialized RF_stringX or null in case of failure to initialize, due to invalid utf-16 sequence or illegal endianess value
-i_DECLIMEX_ RF_StringX* rfStringX_Create_UTF16(const char* s,char endianess);
+//! @see rfStringX_Init_UTF16()
+//! @see rfStringX_Create_UTF32()
+i_DECLIMEX_ RF_StringX* rfStringX_Create_UTF16(const uint16_t* s);
 //! @memberof RF_StringX
 //! @brief Initializes an RF_StringX with the given UTF-16 byte sequence
 //!
-//! Given characters have to be in UTF-16. A check for valid sequence of bytes is performed.
+//! Given characters have to be in UTF-16 and in the endianess of the system. They also have to be null terminated.
 //! @param str the String to initialize
-//! @param s The sequence of bytes for the characters in UTF-16. A check to see if it is a valid UTF-8 sequence is performed
-//! @param endianess A flag that determined in what endianess the sequence of UTF-16 bytes is in. Possible values here is
+//! @param s A buffer of 2-byte words representing the utf-16 byte sequence. Needs to be null terminated
 //! @c RF_LITTLE_ENDIAN and @c RF_BIG_ENDIAN.
 //! @return Returns true for success or false in case of failure to initialize, due to invalid utf-16 sequence or illegal endianess value
-i_DECLIMEX_ char rfStringX_Init_UTF16(RF_StringX* str,const char* s,char endianess);
+//! @see rfStringX_Create_UTF16()
+//! @see rfStringX_Init_UTF32()
+i_DECLIMEX_ char rfStringX_Init_UTF16(RF_StringX* str,const uint16_t* s);
 
 //! @memberof RF_StringX
 //! @cppnotctor
 //! @brief Allocates and returns an RF_StringX with the given UTF-32 byte sequence
 //!
-//! Given characters have to be in UTF-32.
-//! @param s The sequence of bytes for the characters in UTF-32. Needs to be null terminated.
+//! Given characters have to be in UTF-32 and in the endianess of the system.
+//! No endianess swapping occurs in the function
+//! @param s A buffer of 4-byte words representing the utf-32 byte sequence. Needs to be null terminated.
 //! @return Returns the initialized RF_stringX or null in case of failure to initialize
-i_DECLIMEX_ RF_StringX* rfStringX_Create_UTF32(const char* s);
+//! @see rfStringX_Init_UTF32()
+//! @see rfStringX_Create_UTF16()
+i_DECLIMEX_ RF_StringX* rfStringX_Create_UTF32(const uint32_t* s);
 //! @memberof RF_StringX
 //! Initializes an RF_StringX with the given UTF-32 byte sequence
 //!
-//! Given characters have to be in UTF-32.
+//! Given characters have to be in UTF-32 and in the endianess of the system.
+//! No endianess swapping occurs in the function
 //! @param str the String to initialize
-//! @param s The sequence of bytes for the characters in UTF-32. Needs to be null terminated.
+//! @param s A buffer of 4-byte words representing the utf-32 byte sequence. Needs to be null terminated.
 //! @return Returns true for succes or false in case of failure to initialize
-i_DECLIMEX_ char rfStringX_Init_UTF32(RF_StringX* str,const char* s);
+//! @see rfStringX_Create_UTF32()
+//! @see rfStringX_Init_UTF16()
+i_DECLIMEX_ char rfStringX_Init_UTF32(RF_StringX* str,const uint32_t* s);
 
 
 //! @}

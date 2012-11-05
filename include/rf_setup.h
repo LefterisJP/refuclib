@@ -1,4 +1,4 @@
-/**
+/*
 ** Copyright (c) 2011-2012, Karapetsas Eleftherios
 ** All rights reserved.
 **
@@ -15,7 +15,7 @@
 **  SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-**/
+*/
 
 
 
@@ -85,6 +85,12 @@ extern int32_t  i_DECLIMEX_ RF_LastError;
 extern i_DECLIMEX_ FILE* rfStdLog;
 //! The standard error used by the library
 extern i_DECLIMEX_ FILE* rfStdErr;
+
+///Macros for endianess
+//! Defines little endian system
+#define RF_LITTLE_ENDIAN    0
+//! Defines big endian system
+#define RF_BIG_ENDIAN       1
 
 
 /**

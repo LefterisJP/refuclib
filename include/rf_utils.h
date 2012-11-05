@@ -1,5 +1,4 @@
-/**
-** @internal
+/*
 ** Copyright (c) 2011-2012, Karapetsas Eleftherios
 ** All rights reserved.
 **
@@ -16,8 +15,7 @@
 **  SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-** @endinternal
-**/
+*/
 
 #ifndef REFU_UTILS_H
 #define REFU_UTILS_H
@@ -30,11 +28,7 @@ extern "C"
 {///opening bracket for calling from C++
 #endif
 
-///Macros for endianess
-//! Defines little endian system
-#define RF_LITTLE_ENDIAN    0
-//! Defines big endian system
-#define RF_BIG_ENDIAN       1
+
 
 //! Gets the value (0) or (1) of the __n__ bit of __byte__
 #define RF_GET_BIT(__byte__,__n__)  ((__byte__& (0x01<<__n__) )>>__n__ )

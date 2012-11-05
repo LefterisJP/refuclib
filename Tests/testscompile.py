@@ -13,11 +13,11 @@ def compileTest(filename,dynamic,config,compiler,testExec,verbose,logFile):
     cmd = compiler.cmd;
     cmd = cmd.replace("$REFUINCLUDE",os.path.join(config.refuDir,"include"));
     cmd = cmd.replace("$FLAGS",compiler.flags);
-    cmd = cmd.replace("$LIBDIR",config.refuDir);
+    cmd = cmd.replace("$LIBDIR",os.path.join(config.refuDir,"Tests"));
     if(dynamic):
-        cmd = cmd.replace("$LIBNAME",os.path.join(config.refuDir,config.outputName+compiler.dynamicExtension))
+        cmd = cmd.replace("$LIBNAME",os.path.join(config.refuDir,"Tests",config.outputName+compiler.dynamicExtension))
     else:#static
-        cmd = cmd.replace("$LIBNAME",os.path.join(config.refuDir,config.outputName+compiler.staticExtension))
+        cmd = cmd.replace("$LIBNAME",os.path.join(config.refuDir,"Tests",config.outputName+compiler.staticExtension))
     if(config.system == "win32"):
         cmd = cmd.replace("$OUTPUT","test.exe")
     else:
@@ -46,6 +46,8 @@ def compileTest(filename,dynamic,config,compiler,testExec,verbose,logFile):
                     line = line.decode("utf8");
                     print("\t\t"+line)
                     logFile.write("\t\t"+line);
+                print("\t-->Testing \"{0}\" ... FAILED to compile".format(filename))
+                logFile.write("\t-->Testing \"{0}\" ... FAILED to compile\n".format(filename))
                 return False;
     except CalledProcessError as err:
         print("\t\tThere was an error while invoking the compiler for test \"{0}\"".format(filename))

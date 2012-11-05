@@ -537,11 +537,11 @@ char rfString_Init_f(RF_String* str,float f)
 }
 
 //Allocates and returns a string with the given UTF-16 byte sequence. Given characters have to be in UTF-16. A check for valid sequence of bytes is performed.<b>Can't be used with RF_StringX</b>
-RF_String* rfString_Create_UTF16(const char* s,char endianess)
+RF_String* rfString_Create_UTF16(const uint16_t* s)
 {
     RF_String* ret;
     RF_MALLOC(ret,sizeof(RF_String));
-    if(rfString_Init_UTF16(ret,s,endianess)==false)
+    if(rfString_Init_UTF16(ret,s)==false)
     {
         free(ret);
         return 0;
@@ -549,7 +549,7 @@ RF_String* rfString_Create_UTF16(const char* s,char endianess)
     return ret;
 }
 //Initializes a string with the given UTF-16 byte sequence. Given characters have to be in UTF-16. A check for valid sequence of bytes is performed.<b>Can't be used with RF_StringX</b>
-char rfString_Init_UTF16(RF_String* str,const char* s,char endianess)
+char rfString_Init_UTF16(RF_String* str,const uint16_t* s)
 {
     //decode the utf-16 and get the code points
     uint32_t* codepoints;
@@ -562,36 +562,13 @@ char rfString_Init_UTF16(RF_String* str,const char* s,char endianess)
     }
     byteLength+=3;//for the last utf-16 null termination character
     RF_MALLOC(codepoints,byteLength*2) //allocate the codepoints
-    //parse the given byte stream depending on the endianess parameter
-    switch(endianess)
+    //parse the given byte stream normally since it has to be in the endianess of the system
+    if(rfUTF16_Decode((char*)s,&characterLength,codepoints) == false)
     {
-        case RF_LITTLE_ENDIAN:
-        case RF_BIG_ENDIAN:
-            if(rfUTILS_Endianess() == endianess)//same endianess as the local
-            {
-                if(rfUTF16_Decode(s,&characterLength,codepoints) == false)
-                {
-                    free(codepoints);
-                    LOG_ERROR("String initialization failed due to invalide UTF-16 sequence",RE_STRING_INIT_FAILURE);
-                    return false;
-                }
-            }
-            else//different
-            {
-                if(rfUTF16_Decode_swap(s,&characterLength,codepoints) == false)
-                {
-                    free(codepoints);
-                    LOG_ERROR("String initialization failed due to invalide UTF-16 sequence",RE_STRING_INIT_FAILURE);
-                    return false;
-                }
-            }
-        break;
-        default:
-            LOG_ERROR("Illegal endianess value provided",RE_INPUT);
-            free(codepoints);
-            return false;
-        break;
-    }//switch ends
+        free(codepoints);
+        LOG_ERROR("String initialization failed due to invalide UTF-16 sequence",RE_STRING_INIT_FAILURE);
+        return false;
+    }
     //now encode these codepoints into UTF8
     if( (utf8 = rfUTF8_Encode(codepoints,characterLength,&utf8ByteLength))==0)
     {
@@ -607,7 +584,7 @@ char rfString_Init_UTF16(RF_String* str,const char* s,char endianess)
 }
 
 //Allocates and returns a string with the given UTF-32 byte sequence. Given characters have to be in UTF-32.
-RF_String* rfString_Create_UTF32(const char* s)
+RF_String* rfString_Create_UTF32(const uint32_t* s)
 {
     RF_String* ret;
     RF_MALLOC(ret,sizeof(RF_String));
@@ -619,41 +596,8 @@ RF_String* rfString_Create_UTF32(const char* s)
     return ret;
 }
 //Initializes a string with the given UTF-32 byte sequence. Given characters have to be in UTF-32.
-char rfString_Init_UTF32(RF_String* str,const char* s)
+char rfString_Init_UTF32(RF_String* str,const uint32_t* codeBuffer)
 {
-    char swapE = false;
-    uint32_t off = 0;
-    int32_t i = 0;
-
-    //get the buffer and if swapping is needed do it for all character
-    uint32_t* codeBuffer = (uint32_t*)(s+off);
-
-    //first of all check for existence of BOM in the beginning of the sequence
-    if(RF_HEXEQ_UI(codeBuffer[0],0xFEFF))//big endian
-    {
-        if(rfUTILS_Endianess()==RF_LITTLE_ENDIAN)
-            swapE = true;
-    }
-    if(RF_HEXEQ_UI(codeBuffer[0],0xFFFE0000))//little
-    {
-        if(rfUTILS_Endianess()==RF_BIG_ENDIAN)
-            swapE = true;
-    }
-    else//according to the standard no BOM means big endian
-    {
-        if(rfUTILS_Endianess() == RF_LITTLE_ENDIAN)
-            swapE = true;
-    }
-
-    //if we need to have endianess swapped do it
-    if(swapE==true)
-    {
-        while(codeBuffer[i] != 0)
-        {
-            rfUTILS_SwapEndianUI(codeBuffer+i);
-            i++;
-        }
-    }
     //find the length of the utf32 buffer in characters
     uint32_t length;
     rfUTF32_Length(codeBuffer,length);
@@ -662,23 +606,19 @@ char rfString_Init_UTF32(RF_String* str,const char* s)
     char* utf8;uint32_t utf8ByteLength;
     if((utf8=rfUTF8_Encode(codeBuffer,length,&utf8ByteLength)) == 0)
     {
-        return false;//error
+        LOG_ERROR("Could not properly encode the UTF32 buffer into UTF8",RE_UTF8_ENCODING);
+        return false;
     }
-    //if the encoding happened correctly
-    if(codeBuffer != 0)
-    {
-        str->bytes = (char*)codeBuffer;
-        str->byteLength = utf8ByteLength;
-        return true;
-    }
-    //else return failure
-    return false;
+
+    str->bytes = utf8;
+    str->byteLength = utf8ByteLength;
+    return true;
 }
 
 // Assigns the value of the source string to the destination.Both strings should already be initialized and hold a value. It is an error to give null parameters.
-void i_rfString_Assign(RF_String* dest,void* sourceP)
+void i_rfString_Assign(RF_String* dest,const void* sourceP)
 {
-    RF_String* source = (RF_String*)sourceP;
+    const RF_String* source = (const RF_String*)sourceP;
     //only if the new string value won't fit in the buffer reallocate the buffer (let's avoid unecessary reallocs)
     if(source->byteLength > dest->byteLength)
     {
@@ -834,9 +774,10 @@ void rfString_Deinit(RF_String* s)
 /*------------------------------------------------------------------------ RF_String unicode conversio functions-------------------------------------------------------------------------------*/
 
 //Returns the strings contents as a UTF-16 buffer
-uint16_t* rfString_ToUTF16(RF_String* s,uint32_t* length)
+uint16_t* rfString_ToUTF16(const void* sP,uint32_t* length)
 {
     uint32_t* codepoints,charsN;
+    const RF_String* s = (const RF_String*) sP;
     //get the unicode codepoints, no check here since RF_String is always guaranteed to have valid UTF=8 and as such valid codepoints
     codepoints = rfUTF8_Decode(s->bytes,s->byteLength,&charsN);
     //encode them in UTF-16, no check here since it comes from an RF_String which is always guaranteed to have valid UTF-8 and as such valid codepoints
@@ -844,17 +785,18 @@ uint16_t* rfString_ToUTF16(RF_String* s,uint32_t* length)
 }
 
 //Returns the strings contents as a UTF-32 buffer
-uint32_t* rfString_ToUTF32(RF_String* s,uint32_t* length)
+uint32_t* rfString_ToUTF32(const void* sP,uint32_t* length)
 {
+    const RF_String* s = (const RF_String*) sP;
     //get the unicode codepoints, no check here since RF_String is always guaranteed to have valid UTF=8 and as such valid codepoints
     return rfUTF8_Decode(s->bytes,s->byteLength,length);
 }
 
 /*------------------------------------------------------------------------ RF_String retrieval functions-------------------------------------------------------------------------------*/
 // Finds the length of the string in characters
-uint32_t rfString_Length(void* str)
+uint32_t rfString_Length(const void* str)
 {
-    RF_String* s = (RF_String*)str;
+    const RF_String* s = (const RF_String*)str;
     uint32_t length,i;
     RF_STRING_ITERATE_START(s,length,i)
     RF_STRING_ITERATE_END(length,i);
@@ -862,16 +804,16 @@ uint32_t rfString_Length(void* str)
 }
 
 // Returns the cstring representation of the string
-char* rfString_Cstr(void* str)
+char* rfString_Cstr(const void* str)
 {
-    RF_String* s = (RF_String*)str;
+    const RF_String* s = (const RF_String*)str;
     return s->bytes;
 }
 
 //Retrieves the unicode code point of the parameter character.
-uint32_t rfString_GetChar(void* str,uint32_t c)
+uint32_t rfString_GetChar(const void* str,uint32_t c)
 {
-    RF_String* thisstr = (RF_String*)str;
+    const RF_String* thisstr = (const RF_String*)str;
     uint32_t length,i;
     uint32_t codePoint = RF_STRING_INDEX_OUT_OF_BOUNDS;
     RF_STRING_ITERATE_START(thisstr,length,i)
@@ -889,10 +831,10 @@ uint32_t rfString_GetChar(void* str,uint32_t c)
 }
 
 //Retrieves the unicode code point of the parameter bytepos of the string. If the byte position is not the start of a character 0 is returned. This is an internal function, there is no need to use it. <i>Can be used with StringX</i>
-uint32_t rfString_BytePosToCodePoint(void* str,uint32_t i)
+uint32_t rfString_BytePosToCodePoint(const void* str,uint32_t i)
 {
     uint32_t codePoint=0;
-    RF_String* thisstr = (RF_String*)str;
+    const RF_String* thisstr = (const RF_String*)str;
     ///Here I am not checking if byte position 'i' is withing bounds and especially if it is a start of a character
     /// This is assumed to have been checked or to be known beforehand by the programmer. That's one of the reasons
     /// why this is an internal function and should not be used unless you know what you are doing
@@ -941,12 +883,12 @@ uint32_t rfString_BytePosToCodePoint(void* str,uint32_t i)
 
 
 //Retrieves character position of a byte position
-uint32_t rfString_BytePosToCharPos(void* thisstrP,uint32_t bytepos,char before)
+uint32_t rfString_BytePosToCharPos(const void* thisstrP,uint32_t bytepos,char before)
 {
     ///here there is no check if this is actually a byte pos inside the string's
     ///byte buffer. The programmer should have made sure it is before hand. This is why it is
     /// an internal function and should only be used if you know what you are doing
-    RF_String* thisstr = (RF_String*)thisstrP;
+    const RF_String* thisstr = (const RF_String*)thisstrP;
     uint32_t charPos = 0;
     uint32_t byteI = 0;
     //iterate the string's bytes until you get to the required byte
@@ -971,10 +913,10 @@ uint32_t rfString_BytePosToCharPos(void* thisstrP,uint32_t bytepos,char before)
 }
 
 // Compares two Strings and returns true if they are equal and false otherwise
-char i_rfString_Equal(void* s1P,void* s2P)
+char i_rfString_Equal(const void* s1P,const void* s2P)
 {
-    RF_String* s1 = (RF_String*)s1P;
-    RF_String* s2 = (RF_String*)s2P;
+    const RF_String* s1 = (const RF_String*)s1P;
+    const RF_String* s2 = (const RF_String*)s2P;
     if( strcmp(s1->bytes,s2->bytes)==0)
     {
         return true;
@@ -989,7 +931,7 @@ char rfString_Substr(const void* thisstrP,uint32_t startPos,uint32_t charsN,RF_S
     uint32_t charI,byteI,startI,endI;
     char started,ended;
     started = ended = false;
-    RF_String* s = (RF_String*)thisstrP;
+    const RF_String* s = (const RF_String*)thisstrP;
     startI = endI = 0;
 
 
@@ -1003,19 +945,20 @@ char rfString_Substr(const void* thisstrP,uint32_t startPos,uint32_t charsN,RF_S
         {
             endI = byteI;
             ended = true;
+            break;
         }
     RF_STRING_ITERATE_END(charI,byteI)
-    //special case. If the end is not yet found but is the last char then keep it
-    if(ended == false && startPos+charsN == charI)
+    //check if the end was not found
+    if(ended == false)
     {
-        endI = byteI;
-        ended = true;
+        if(started == true)//if the start was found return from the start until the end of the string
+        {
+            endI = byteI;
+        }
+        else//else the substring was not found
+            return false;
     }
-    //if the substring is not found return false
-    if(started == false || ended == false)
-    {
-        return false;
-    }
+
     //else success
     ret->byteLength = endI-startI;
     ret->bytes = malloc(ret->byteLength+1);
@@ -1039,17 +982,18 @@ int32_t i_rfString_Find_i(const void* thisstr,const void* sstr,uint32_t* startPo
     if(rfString_Substr(thisstr,startPos,length,&sub) == false)
         return RF_FAILURE;
     //now search for the sstr substring inside the sub substring defined by length
-    ret=rfString_Find(&sub,sstr,options);
+    if((ret=rfString_Find(&sub,sstr,options)) != RF_FAILURE)
+        ret += startPos;//if found make sure to return the proper position in the original string
     rfString_Deinit(&sub);//free the sub substring and return
     return ret;
 }
 // Finds the existence of String sstr inside this string, either matching case or not
 int32_t i_rfString_Find(const void* str,const void* sstrP,const char* optionsP)
 {
-    /// @note TO SELF: If I make any changes to this function do not forget to change the private version that returns byte position too
+    /// note TO SELF: If I make any changes to this function do not forget to change the private version that returns byte position too
     /// located at string_private.c and called rfString_FindByte and rfString_FindByte_s
-    RF_String* thisstr = (RF_String*)str;
-    RF_String* sstr = (RF_String*)sstrP;
+    const RF_String* thisstr = (const RF_String*)str;
+    const RF_String* sstr = (const RF_String*)sstrP;
     char options = *optionsP;
 
     char* found = 0;
@@ -1179,9 +1123,9 @@ int32_t i_rfString_Find(const void* str,const void* sstrP,const char* optionsP)
 }
 
 //Returns the integer value of the string if and only if it contains only numbers. If it contains anything else the function fails.
-char rfString_ToInt(void* str,int32_t* v)
+char rfString_ToInt(const void* str,int32_t* v)
 {
-    RF_String* thisstr = (RF_String*)str;
+    const RF_String* thisstr = (const RF_String*)str;
     char* end;
     //get the integer
     *v = strtol ( thisstr->bytes, &end,10);
@@ -1200,9 +1144,9 @@ char rfString_ToInt(void* str,int32_t* v)
 }
 
 //Returns the float value of a String
-int rfString_ToDouble(void* thisstrP,double* f)
+int rfString_ToDouble(const void* thisstrP,double* f)
 {
-    RF_String* str = (RF_String*)thisstrP;
+    const RF_String* str = (const RF_String*)thisstrP;
     *f = strtod(str->bytes,NULL);
     //check the result
     if(*f == 0.0)
@@ -1224,6 +1168,36 @@ int rfString_ToDouble(void* thisstrP,double* f)
     return RF_SUCCESS;
 }
 
+//Turns any uppercase characters of the string into lower case
+void rfString_ToLower(void* thisstr)
+{
+    uint32_t charI,byteI;
+    RF_String* s = (RF_String*)thisstr;
+    RF_STRING_ITERATE_START(s,charI,byteI)
+        //if the character is lowercase
+        if(s->bytes[byteI] >= 65 && s->bytes[byteI]<=90)
+        {
+            //turn it into uppercase
+            s->bytes[byteI] += 32;
+        }
+    RF_STRING_ITERATE_END(charI,byteI)
+}
+
+//Turns any lowercase characters of the string into upper case
+void rfString_ToUpper(void* thisstr)
+{
+    uint32_t charI,byteI;
+    RF_String* s = (RF_String*)thisstr;
+    RF_STRING_ITERATE_START(s,charI,byteI)
+        //if the character is lowercase
+        if(s->bytes[byteI] >= 97 && s->bytes[byteI]<=122)
+        {
+            //turn it into uppercase
+            s->bytes[byteI] -= 32;
+        }
+    RF_STRING_ITERATE_END(charI,byteI)
+}
+
 // Returns a cstring version of the string.
 const char* rfString_ToCstr(const void* str)
 {
@@ -1232,9 +1206,9 @@ const char* rfString_ToCstr(const void* str)
 }
 
 //Creates and returns an allocated copy of the given string
-RF_String* rfString_Copy_OUT(void* srcP)
+RF_String* rfString_Copy_OUT(const void* srcP)
 {
-    RF_String* src = (RF_String*)srcP;
+    const RF_String* src = (const RF_String*)srcP;
     //create the new string
     RF_String* ret;
     RF_MALLOC(ret,sizeof(RF_String));
@@ -1247,9 +1221,9 @@ RF_String* rfString_Copy_OUT(void* srcP)
 
 }
 // Copies all the contents of a string to another
-void rfString_Copy_IN(RF_String* dst,void* srcP)
+void rfString_Copy_IN(RF_String* dst,const void* srcP)
 {
-    RF_String* src = (RF_String*)srcP;
+    const RF_String* src = (const RF_String*)srcP;
     //get the length
     dst->byteLength = src->byteLength;
     //copy the bytes
@@ -1259,10 +1233,10 @@ void rfString_Copy_IN(RF_String* dst,void* srcP)
 
 }
 //Copies a certain number of characters from a string
-void rfString_Copy_chars(RF_String* dst,void* srcP,uint32_t charsN)
+void rfString_Copy_chars(RF_String* dst,const void* srcP,uint32_t charsN)
 {
     uint32_t i = 0,bytePos;
-    RF_String* src = (RF_String*)srcP;
+    const RF_String* src = (const RF_String*)srcP;
 
     //find the byte position until which we need to copy
     RF_STRING_ITERATE_START(src,i,bytePos)
@@ -1277,10 +1251,10 @@ void rfString_Copy_chars(RF_String* dst,void* srcP,uint32_t charsN)
 
 
 //Applies a limited version of sscanf after the specified substring
-char i_rfString_ScanfAfter(void* str,void* afterstrP,const char* format,void* var)
+char i_rfString_ScanfAfter(const void* str,const void* afterstrP,const char* format,void* var)
 {
-    RF_String* thisstr = (RF_String*)str;
-    RF_String* afterstr = (RF_String*)afterstrP;
+    const RF_String* thisstr = (const RF_String*)str;
+    const RF_String* afterstr = (const RF_String*)afterstrP;
     //return false if the substring is not found
     char* found,*s;
     if( (found = strstr(thisstr->bytes,afterstr->bytes)) ==0 )
@@ -1299,10 +1273,10 @@ char i_rfString_ScanfAfter(void* str,void* afterstrP,const char* format,void* va
 }
 
 //Counts how many times a substring s occurs inside the string
-int32_t i_rfString_Count(void* str,void* sstr2,const char* optionsP)
+int32_t i_rfString_Count(const void* str,const void* sstr2,const char* optionsP)
 {
     RF_String* thisstr = (RF_String*)str;
-    RF_String* sstr = (RF_String*)sstr2;
+    const RF_String* sstr = (const RF_String*)sstr2;
     char options = *optionsP;
     int32_t index = 0;
     int32_t move;
@@ -1328,26 +1302,27 @@ int32_t i_rfString_Count(void* str,void* sstr2,const char* optionsP)
 
 // Tokenizes the given string. Separates it into @c tokensN depending on how many substrings can be created from the @c sep separatior and stores them
 // into the Array of RF_String* that should be passed to the function
-i_DECLIMEX_ char rfString_Tokenize(void* str,char* sep,uint32_t* tokensN,RF_String** tokens)
+i_DECLIMEX_ char i_rfString_Tokenize(const void* str,const void* sepP,uint32_t* tokensN,RF_String** tokens)
 {
-    RF_String* thisstr = (RF_String*)str;
+    const RF_String* thisstr = (const RF_String*)str;
+    const RF_String* sep = (const RF_String*)sepP;
     uint32_t i;
     //first find the occurences of the separator, and then the number of tokens
-    *tokensN = rfString_Count(thisstr,RFS_(sep),0)+1;
+    *tokensN = rfString_Count(thisstr,sep,0)+1;
     //error checking
-    if(*tokensN == 0)
+    if(*tokensN == 1)
         return false;
 
     //allocate the tokens
     RF_MALLOC(*tokens,sizeof(RF_String) *(*tokensN));
     //find the length of the separator
-    uint32_t sepLen = strlen(sep);
+    uint32_t sepLen = sep->byteLength;
     char* s,*e;
     s = thisstr->bytes;
     for(i = 0; i < (*tokensN)-1; i ++)
     {
         //find each substring
-        e = strstr(s,sep);
+        e = strstr(s,sep->bytes);
         (*tokens)[i].byteLength = e-s;
         RF_MALLOC((*tokens)[i].bytes,(*tokens)[i].byteLength+1);
         //put in the data
@@ -1371,12 +1346,12 @@ i_DECLIMEX_ char rfString_Tokenize(void* str,char* sep,uint32_t* tokensN,RF_Stri
     return true;
 }
 //Initializes the given string as the first substring existing between the left and right parameter substrings.
-char i_rfString_Between(void* thisstrP,void* lstrP,void* rstrP,RF_String* result,const char* optionsP)
+char i_rfString_Between(const void* thisstrP,const void* lstrP,const void* rstrP,RF_String* result,const char* optionsP)
 {
     int32_t start,end;
-    RF_String* thisstr = (RF_String*)thisstrP;
-    RF_String* lstr = (RF_String*)lstrP;
-    RF_String* rstr = (RF_String*)rstrP;
+    const RF_String* thisstr = (const RF_String*)thisstrP;
+    const RF_String* lstr = (const RF_String*)lstrP;
+    const RF_String* rstr = (const RF_String*)rstrP;
     char options = *optionsP;
     RF_String temp;
     //find the left substring
@@ -1404,13 +1379,13 @@ char i_rfString_Between(void* thisstrP,void* lstrP,void* rstrP,RF_String* result
 
 //Initializes the given string as the substring from the start until any of the given Strings are found.
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-char rfString_Beforev(void* thisstrP,RF_String* result,const char* optionsP,const unsigned char* parNP, ...)
+char rfString_Beforev(const void* thisstrP,RF_String* result,const char* optionsP,const unsigned char* parNP, ...)
 #else
-char i_rfString_Beforev(void* thisstrP,RF_String* result,const char* optionsP,const unsigned char* parNP, ...)
+char i_rfString_Beforev(const void* thisstrP,RF_String* result,const char* optionsP,const unsigned char* parNP, ...)
 #endif
 {
-    RF_String* thisstr = (RF_String*)thisstrP;
-    RF_String* s;
+    const RF_String* thisstr = (const RF_String*)thisstrP;
+    const RF_String* s;
     char options = *optionsP;
     unsigned char parN = *parNP;
     int32_t i,minPos,thisPos;
@@ -1422,7 +1397,7 @@ char i_rfString_Beforev(void* thisstrP,RF_String* result,const char* optionsP,co
     minPos = LONG_MAX;
     for(i = 0; i < parN; i++)
     {
-        s = (RF_String*) va_arg(argList,RF_String*);
+        s = (const RF_String*) va_arg(argList,RF_String*);
         if( (thisPos= rfString_FindBytePos(thisstr,s,options))!= RF_FAILURE)
         {
             if(thisPos < minPos)
@@ -1446,10 +1421,10 @@ char i_rfString_Beforev(void* thisstrP,RF_String* result,const char* optionsP,co
 }
 
 //Initializes the given string as the substring from the start until the given string is found
-char i_rfString_Before(void* thisstrP,void* sstrP,RF_String* result,const char* optionsP)
+char i_rfString_Before(const void* thisstrP,const void* sstrP,RF_String* result,const char* optionsP)
 {
-    RF_String* thisstr = (RF_String*)thisstrP;
-    RF_String* sstr = (RF_String*) sstrP;
+    const RF_String* thisstr = (const RF_String*)thisstrP;
+    const RF_String* sstr = (const RF_String*) sstrP;
     char options = *optionsP;
     int32_t ret;
     //find the substring
@@ -1468,10 +1443,10 @@ char i_rfString_Before(void* thisstrP,void* sstrP,RF_String* result,const char* 
 
 
 // Initializes the given String with the substring located after (and not including) the after substring inside the parameter string. If the substring is not located the function returns false.
-char i_rfString_After(void* thisstrP,void* afterP,RF_String* out,const char* optionsP)
+char i_rfString_After(const void* thisstrP,const void* afterP,RF_String* out,const char* optionsP)
 {
-    RF_String* thisstr = (RF_String*)thisstrP;
-    RF_String* after = (RF_String*)afterP;
+    const RF_String* thisstr = (const RF_String*)thisstrP;
+    const RF_String* after = (const RF_String*)afterP;
     char options = *optionsP;
     int32_t bytePos;
     //check for substring existence
@@ -1488,13 +1463,13 @@ char i_rfString_After(void* thisstrP,void* afterP,RF_String* out,const char* opt
 
 //Initialize a string after the first of the given substrings found
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-char rfString_Afterv(void* thisstrP,RF_String* result,const char* optionsP,const unsigned char* parNP,...)
+char rfString_Afterv(const void* thisstrP,RF_String* result,const char* optionsP,const unsigned char* parNP,...)
 #else
-char i_rfString_Afterv(void* thisstrP,RF_String* result,const char* optionsP,const unsigned char* parNP,...)
+char i_rfString_Afterv(const void* thisstrP,RF_String* result,const char* optionsP,const unsigned char* parNP,...)
 #endif
 {
-    RF_String* thisstr = (RF_String*)thisstrP;
-    RF_String* s;
+    const RF_String* thisstr = (const RF_String*)thisstrP;
+    const RF_String* s;
     char options = *optionsP;
     unsigned char parN = *parNP;
     int32_t i,minPos,thisPos;
@@ -1504,10 +1479,10 @@ char i_rfString_Afterv(void* thisstrP,RF_String* result,const char* optionsP,con
     //get the parameter characters
     va_start(argList,parNP);
 
-    minPos = ULONG_MAX;
+    minPos = LONG_MAX;
     for(i = 0; i < parN; i++)
     {
-        s = (RF_String*) va_arg(argList,RF_String*);
+        s = (const RF_String*) va_arg(argList,RF_String*);
         if( (thisPos= rfString_FindBytePos(thisstr,s,options))!= RF_FAILURE)
         {
             if(thisPos < minPos)
@@ -1537,9 +1512,9 @@ char i_rfString_Afterv(void* thisstrP,RF_String* result,const char* optionsP,con
 
 
 // Appends the parameter String to this one
-void i_rfString_Append(RF_String* thisstr,void* otherP)
+void i_rfString_Append(RF_String* thisstr,const void* otherP)
 {
-    RF_String* other = (RF_String*)otherP;
+    const RF_String* other = (const RF_String*)otherP;
     ///@note Here if a null addition is given lots of actions are done but the result is safe and the same string as the one entered.
     ///A check here would result in an additional check for every appending so I decided against it
     //calculate the new length
@@ -1580,9 +1555,9 @@ void rfString_Append_f(RF_String* thisstr,const float f)
 }
 
 // Prepends the parameter String to this string
-void i_rfString_Prepend(RF_String* thisstr,void* otherP)
+void i_rfString_Prepend(RF_String* thisstr,const void* otherP)
 {
-    RF_String* other = (RF_String*)otherP;
+    const RF_String* other = (const RF_String*)otherP;
     uint32_t size;
     int32_t i;//is not unsigned since it goes to -1 in the loop
     //keeep the original byte size of the string
@@ -1599,10 +1574,10 @@ void i_rfString_Prepend(RF_String* thisstr,void* otherP)
 }
 
 //Removes all of the specifed string occurences from this String matching case or not, DOES NOT reallocate buffer size.
-char i_rfString_Remove(void* thisstrP,void* rstrP,uint32_t* numberP,const char* optionsP)
+char i_rfString_Remove(void* thisstrP,const void* rstrP,uint32_t* numberP,const char* optionsP)
 {
     RF_String* thisstr = (RF_String*)thisstrP;
-    RF_String* rstr = (RF_String*)rstrP;
+    const RF_String* rstr = (const RF_String*)rstrP;
     char options = *optionsP;
     uint32_t number = *numberP;
     uint32_t i,count,occurences=0;
@@ -1643,12 +1618,12 @@ char i_rfString_Remove(void* thisstrP,void* rstrP,uint32_t* numberP,const char* 
 }
 
 //Removes all of the characters of the string except those specified
-void i_rfString_KeepOnly(void* thisstrP,void* keepstrP)
+void i_rfString_KeepOnly(void* thisstrP,const void* keepstrP)
 {
     uint32_t keepLength,i,j,charValue,temp;
     uint32_t *keepChars;
     RF_String* thisstr = (RF_String*)thisstrP;
-    RF_String* keepstr = (RF_String*)keepstrP;
+    const RF_String* keepstr = (const RF_String*)keepstrP;
     char exists,charBLength;
     //first let's get all of the characters of the keep string in an array
     i=0;
@@ -1671,9 +1646,9 @@ void i_rfString_KeepOnly(void* thisstrP,void* keepstrP)
         if(exists == false)
         {
             charBLength = rfUTF8_FromCodepoint(charValue,&temp);
-            //this is kind of a non-clean way to do it. the rfString_Iterate_Start macro internally uses a byteIndex_ variable
-            //we use that here to determine the current byteIndex_ of the string in the iteration and move the string backs
-            memmove(thisstr->bytes+byteIndex_,thisstr->bytes+byteIndex_+charBLength,thisstr->byteLength-byteIndex_+charBLength);
+            //this is kind of a dirty way to do it. the rfString_Iterate_Start macro internally uses a byteIndex_ variable
+            //we use that here to determine the current byteIndex_ of the string in the iteration and move the string backwards
+            memmove(thisstr->bytes+byteIndex_,thisstr->bytes+byteIndex_+charBLength,thisstr->byteLength-byteIndex_);
             thisstr->byteLength-=charBLength;
             continue;//by contiuing here we make sure that the current string position won't be moved to assure that we also check the newly move characters
         }
@@ -1761,7 +1736,7 @@ char rfString_PruneMiddleB(void* thisstrP,uint32_t p,uint32_t n)
         return false;
 
     //iterate the characters of the string
-    uint32_t j,i,length;
+    uint32_t i,length;
     int32_t pBytePos,nBytePos;
     pBytePos = nBytePos = -1;
     RF_STRING_ITERATE_START(thisstr,length,i)
@@ -1775,21 +1750,14 @@ char rfString_PruneMiddleB(void* thisstrP,uint32_t p,uint32_t n)
         }
         if(length == p-n+1)//+1 is to make sure that indexing works from 0
             nBytePos = i;
-
     RF_STRING_ITERATE_END(length,i)
 
     //if the position was not found in the string do nothing
     if(pBytePos == -1 || nBytePos == -1)
         return false;
-
-    //move the bytes in the buffer to remove the requested characters
-    for(i=nBytePos,j=0;j<= thisstr->byteLength-pBytePos+1; i ++,j++) // here +2 is for (+1 for pbytePos to go to the start of pth character) (+1 for the byteLength to include the null termination character)
-    {
-        thisstr->bytes[i] = thisstr->bytes[pBytePos+j];
-    }
-
-    //find the new byte length
-    thisstr->byteLength -= (nBytePos - pBytePos);
+    //move the contents of the string to cover the removed characters and change its length
+    memmove(thisstr->bytes+nBytePos,thisstr->bytes+pBytePos,thisstr->byteLength-pBytePos+1);
+    thisstr->byteLength -= (pBytePos-nBytePos);
 
     return true;
 }
@@ -1839,10 +1807,10 @@ char rfString_PruneMiddleF(void* thisstrP,uint32_t p,uint32_t n)
 }
 
 // Replaces all of the specified sstr substring from the String with rstr and reallocates size, unless the new size is smaller
-char i_rfString_Replace(RF_String* thisstr,void* sstrP,void* rstrP,const uint32_t* numP,const char* optionsP)
+char i_rfString_Replace(RF_String* thisstr,const void* sstrP,const void* rstrP,const uint32_t* numP,const char* optionsP)
 {
-    RF_String* sstr = (RF_String*)sstrP;
-    RF_String* rstr = (RF_String*)rstrP;
+    const RF_String* sstr = (const RF_String*)sstrP;
+    const RF_String* rstr = (const RF_String*)rstrP;
     char options = *optionsP;
     uint32_t num = *numP;
     RF_StringX temp;//just a temporary string for finding the occurences
@@ -1949,10 +1917,10 @@ char i_rfString_Replace(RF_String* thisstr,void* sstrP,void* rstrP,const uint32_
 }
 
 //Removes all characters of a substring only from the start of the String
-char i_rfString_TrimStart(void* thisstrP,void* subP)
+char i_rfString_TrimStart(void* thisstrP,const void* subP)
 {
     RF_String* thisstr = (RF_String*) thisstrP;
-    RF_String*sub = (RF_String*) subP;
+    const RF_String*sub = (const RF_String*) subP;
     char ret = false,noMatch;
     uint32_t charValue,i = 0,*subValues,j,subLength,bytePos;
 
@@ -1998,10 +1966,10 @@ char i_rfString_TrimStart(void* thisstrP,void* subP)
 }
 
 //Removes all characters of a substring starting from the end of the String
-char i_rfString_TrimEnd(void* thisstrP,void* subP)
+char i_rfString_TrimEnd(void* thisstrP,const void* subP)
 {
     RF_String* thisstr = (RF_String*) thisstrP;
-    RF_String*sub = (RF_String*) subP;
+    const RF_String*sub = (const RF_String*) subP;
     char ret = false,noMatch;
     uint32_t charValue,i = 0,*subValues,j,subLength,bytePos,lastBytePos,testity;
 
@@ -2048,7 +2016,7 @@ char i_rfString_TrimEnd(void* thisstrP,void* subP)
 }
 
 //Removes all characters of a substring from both ends of the given String
-char i_rfString_Trim(void* thisstrP,void* subP)
+char i_rfString_Trim(void* thisstrP,const void* subP)
 {
     char res1 = rfString_TrimStart(thisstrP,subP);
     char res2 = rfString_TrimEnd(thisstrP,subP);
@@ -2084,7 +2052,7 @@ int32_t rfString_Init_fUTF8(RF_String* str,FILE* f,char* eof)
     return bytesN;
 }
 //Assigns to a String from UTF-8 file parsing
-int32_t rfString_Assign_fUTF8(RF_String* str,FILE*f,char* eof)
+int32_t rfString_Assign_fUTF8(RF_String* str,FILE* f,char* eof)
 {
     int32_t bytesN;
     uint32_t utf8ByteLength,utf8BufferSize;//bufferSize unused in this function
@@ -2251,7 +2219,7 @@ int32_t rfString_Init_fUTF32(RF_String* str,FILE* f,char endianess,char* eof)
     }//end of little endian
     else//big endian
     {
-        if((bytesN=rfFReadLine_UTF16BE(f,&str->bytes,&str->byteLength,eof)) < 0)
+        if((bytesN=rfFReadLine_UTF32BE(f,&str->bytes,&str->byteLength,eof)) < 0)
         {
             LOG_ERROR("Failure to initialize a String from reading a Big Endian UTF-32 file",bytesN);
             return bytesN;
@@ -2277,7 +2245,7 @@ int32_t rfString_Assign_fUTF32(RF_String* str,FILE* f,char endianess, char* eof)
     }//end of little endian
     else//big endian
     {
-        if((bytesN=rfFReadLine_UTF16BE(f,&utf8,&utf8ByteLength,eof)) < 0)
+        if((bytesN=rfFReadLine_UTF32BE(f,&utf8,&utf8ByteLength,eof)) < 0)
         {
             LOG_ERROR("Failure to assign to a String from reading a Big Endian UTF-32 file",bytesN);
             return bytesN;
@@ -2312,7 +2280,7 @@ int32_t rfString_Append_fUTF32(RF_String* str,FILE* f,char endianess, char* eof)
     }//end of little endian
     else//big endian
     {
-        if((bytesN=rfFReadLine_UTF16BE(f,&utf8,&utf8ByteLength,eof)) < 0)
+        if((bytesN=rfFReadLine_UTF32BE(f,&utf8,&utf8ByteLength,eof)) < 0)
         {
             LOG_ERROR("Failure to append to a String from reading a Big Endian UTF-32 file",bytesN);
             return bytesN;

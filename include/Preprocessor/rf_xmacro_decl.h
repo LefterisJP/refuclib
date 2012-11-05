@@ -1,4 +1,4 @@
-/**
+/*
 ** Copyright (c) 2011-2012, Karapetsas Eleftherios
 ** All rights reserved.
 **
@@ -53,8 +53,8 @@ retType__ funcNarf__##36(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC36_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34,arg__35,arg__36)\
 retType__ funcNarf__##36(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34,arg__35,arg__36);\
 i_RP_DECLARE_FUNC35(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34,arg__35)
-#define i_RP_DECLARE_FUNC36_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34,arg__35,arg__36)   
-#define i_RP_DECLARE_FUNC36_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34,arg__35,arg__36)   
+#define i_RP_DECLARE_FUNC36_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34,arg__35,arg__36)
+#define i_RP_DECLARE_FUNC36_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34,arg__35,arg__36)
 
 
 
@@ -70,8 +70,8 @@ retType__ funcNarf__##35(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC35_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34,arg__35)\
 retType__ funcNarf__##35(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34,arg__35);\
 i_RP_DECLARE_FUNC34(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34)
-#define i_RP_DECLARE_FUNC35_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34,arg__35)   
-#define i_RP_DECLARE_FUNC35_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34,arg__35)   
+#define i_RP_DECLARE_FUNC35_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34,arg__35)
+#define i_RP_DECLARE_FUNC35_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34,arg__35)
 
 
 
@@ -87,8 +87,8 @@ retType__ funcNarf__##34(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC34_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34)\
 retType__ funcNarf__##34(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34);\
 i_RP_DECLARE_FUNC33(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33)
-#define i_RP_DECLARE_FUNC34_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34)   
-#define i_RP_DECLARE_FUNC34_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34)   
+#define i_RP_DECLARE_FUNC34_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34)
+#define i_RP_DECLARE_FUNC34_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34)
 
 
 
@@ -104,8 +104,8 @@ retType__ funcNarf__##33(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC33_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33)\
 retType__ funcNarf__##33(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33);\
 i_RP_DECLARE_FUNC32(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32)
-#define i_RP_DECLARE_FUNC33_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33)   
-#define i_RP_DECLARE_FUNC33_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33)   
+#define i_RP_DECLARE_FUNC33_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33)
+#define i_RP_DECLARE_FUNC33_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33)
 
 
 
@@ -121,8 +121,8 @@ retType__ funcNarf__##32(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC32_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32)\
 retType__ funcNarf__##32(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32);\
 i_RP_DECLARE_FUNC31(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31)
-#define i_RP_DECLARE_FUNC32_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32)   
-#define i_RP_DECLARE_FUNC32_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32)   
+#define i_RP_DECLARE_FUNC32_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32)
+#define i_RP_DECLARE_FUNC32_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32)
 
 
 
@@ -138,8 +138,8 @@ retType__ funcNarf__##31(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC31_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31)\
 retType__ funcNarf__##31(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31);\
 i_RP_DECLARE_FUNC30(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30)
-#define i_RP_DECLARE_FUNC31_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31)   
-#define i_RP_DECLARE_FUNC31_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31)   
+#define i_RP_DECLARE_FUNC31_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31)
+#define i_RP_DECLARE_FUNC31_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31)
 
 
 
@@ -155,8 +155,8 @@ retType__ funcNarf__##30(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC30_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30)\
 retType__ funcNarf__##30(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30);\
 i_RP_DECLARE_FUNC29(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29)
-#define i_RP_DECLARE_FUNC30_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30)   
-#define i_RP_DECLARE_FUNC30_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30)   
+#define i_RP_DECLARE_FUNC30_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30)
+#define i_RP_DECLARE_FUNC30_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30)
 
 
 
@@ -172,8 +172,8 @@ retType__ funcNarf__##29(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC29_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29)\
 retType__ funcNarf__##29(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29);\
 i_RP_DECLARE_FUNC28(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28)
-#define i_RP_DECLARE_FUNC29_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29)   
-#define i_RP_DECLARE_FUNC29_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29)   
+#define i_RP_DECLARE_FUNC29_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29)
+#define i_RP_DECLARE_FUNC29_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29)
 
 
 
@@ -189,8 +189,8 @@ retType__ funcNarf__##28(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC28_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28)\
 retType__ funcNarf__##28(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28);\
 i_RP_DECLARE_FUNC27(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27)
-#define i_RP_DECLARE_FUNC28_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28)   
-#define i_RP_DECLARE_FUNC28_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28)   
+#define i_RP_DECLARE_FUNC28_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28)
+#define i_RP_DECLARE_FUNC28_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28)
 
 
 
@@ -206,8 +206,8 @@ retType__ funcNarf__##27(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC27_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27)\
 retType__ funcNarf__##27(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27);\
 i_RP_DECLARE_FUNC26(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26)
-#define i_RP_DECLARE_FUNC27_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27)   
-#define i_RP_DECLARE_FUNC27_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27)   
+#define i_RP_DECLARE_FUNC27_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27)
+#define i_RP_DECLARE_FUNC27_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27)
 
 
 
@@ -223,8 +223,8 @@ retType__ funcNarf__##26(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC26_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26)\
 retType__ funcNarf__##26(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26);\
 i_RP_DECLARE_FUNC25(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25)
-#define i_RP_DECLARE_FUNC26_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26)   
-#define i_RP_DECLARE_FUNC26_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26)   
+#define i_RP_DECLARE_FUNC26_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26)
+#define i_RP_DECLARE_FUNC26_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26)
 
 
 
@@ -240,8 +240,8 @@ retType__ funcNarf__##25(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC25_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25)\
 retType__ funcNarf__##25(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25);\
 i_RP_DECLARE_FUNC24(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24)
-#define i_RP_DECLARE_FUNC25_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25)   
-#define i_RP_DECLARE_FUNC25_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25)   
+#define i_RP_DECLARE_FUNC25_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25)
+#define i_RP_DECLARE_FUNC25_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25)
 
 
 
@@ -257,8 +257,8 @@ retType__ funcNarf__##24(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC24_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24)\
 retType__ funcNarf__##24(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24);\
 i_RP_DECLARE_FUNC23(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23)
-#define i_RP_DECLARE_FUNC24_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24)   
-#define i_RP_DECLARE_FUNC24_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24)   
+#define i_RP_DECLARE_FUNC24_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24)
+#define i_RP_DECLARE_FUNC24_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24)
 
 
 
@@ -274,8 +274,8 @@ retType__ funcNarf__##23(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC23_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23)\
 retType__ funcNarf__##23(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23);\
 i_RP_DECLARE_FUNC22(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22)
-#define i_RP_DECLARE_FUNC23_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23)   
-#define i_RP_DECLARE_FUNC23_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23)   
+#define i_RP_DECLARE_FUNC23_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23)
+#define i_RP_DECLARE_FUNC23_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23)
 
 
 
@@ -291,8 +291,8 @@ retType__ funcNarf__##22(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC22_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22)\
 retType__ funcNarf__##22(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22);\
 i_RP_DECLARE_FUNC21(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21)
-#define i_RP_DECLARE_FUNC22_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22)   
-#define i_RP_DECLARE_FUNC22_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22)   
+#define i_RP_DECLARE_FUNC22_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22)
+#define i_RP_DECLARE_FUNC22_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22)
 
 
 
@@ -308,8 +308,8 @@ retType__ funcNarf__##21(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC21_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21)\
 retType__ funcNarf__##21(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21);\
 i_RP_DECLARE_FUNC20(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20)
-#define i_RP_DECLARE_FUNC21_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21)   
-#define i_RP_DECLARE_FUNC21_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21)   
+#define i_RP_DECLARE_FUNC21_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21)
+#define i_RP_DECLARE_FUNC21_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21)
 
 
 
@@ -325,8 +325,8 @@ retType__ funcNarf__##20(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC20_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20)\
 retType__ funcNarf__##20(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20);\
 i_RP_DECLARE_FUNC19(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19)
-#define i_RP_DECLARE_FUNC20_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20)   
-#define i_RP_DECLARE_FUNC20_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20)   
+#define i_RP_DECLARE_FUNC20_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20)
+#define i_RP_DECLARE_FUNC20_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20)
 
 
 
@@ -342,8 +342,8 @@ retType__ funcNarf__##19(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC19_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19)\
 retType__ funcNarf__##19(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19);\
 i_RP_DECLARE_FUNC18(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18)
-#define i_RP_DECLARE_FUNC19_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19)   
-#define i_RP_DECLARE_FUNC19_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19)   
+#define i_RP_DECLARE_FUNC19_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19)
+#define i_RP_DECLARE_FUNC19_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19)
 
 
 
@@ -359,8 +359,8 @@ retType__ funcNarf__##18(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC18_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18)\
 retType__ funcNarf__##18(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18);\
 i_RP_DECLARE_FUNC17(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17)
-#define i_RP_DECLARE_FUNC18_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18)   
-#define i_RP_DECLARE_FUNC18_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18)   
+#define i_RP_DECLARE_FUNC18_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18)
+#define i_RP_DECLARE_FUNC18_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18)
 
 
 
@@ -376,8 +376,8 @@ retType__ funcNarf__##17(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC17_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17)\
 retType__ funcNarf__##17(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17);\
 i_RP_DECLARE_FUNC16(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16)
-#define i_RP_DECLARE_FUNC17_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17)   
-#define i_RP_DECLARE_FUNC17_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17)   
+#define i_RP_DECLARE_FUNC17_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17)
+#define i_RP_DECLARE_FUNC17_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17)
 
 
 
@@ -393,8 +393,8 @@ retType__ funcNarf__##16(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC16_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16)\
 retType__ funcNarf__##16(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16);\
 i_RP_DECLARE_FUNC15(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15)
-#define i_RP_DECLARE_FUNC16_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16)   
-#define i_RP_DECLARE_FUNC16_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16)   
+#define i_RP_DECLARE_FUNC16_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16)
+#define i_RP_DECLARE_FUNC16_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16)
 
 
 
@@ -410,8 +410,8 @@ retType__ funcNarf__##15(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC15_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15)\
 retType__ funcNarf__##15(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15);\
 i_RP_DECLARE_FUNC14(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14)
-#define i_RP_DECLARE_FUNC15_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15)   
-#define i_RP_DECLARE_FUNC15_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15)   
+#define i_RP_DECLARE_FUNC15_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15)
+#define i_RP_DECLARE_FUNC15_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15)
 
 
 
@@ -427,8 +427,8 @@ retType__ funcNarf__##14(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC14_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14)\
 retType__ funcNarf__##14(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14);\
 i_RP_DECLARE_FUNC13(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13)
-#define i_RP_DECLARE_FUNC14_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14)   
-#define i_RP_DECLARE_FUNC14_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14)   
+#define i_RP_DECLARE_FUNC14_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14)
+#define i_RP_DECLARE_FUNC14_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14)
 
 
 
@@ -444,8 +444,8 @@ retType__ funcNarf__##13(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC13_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13)\
 retType__ funcNarf__##13(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13);\
 i_RP_DECLARE_FUNC12(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12)
-#define i_RP_DECLARE_FUNC13_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13)   
-#define i_RP_DECLARE_FUNC13_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13)   
+#define i_RP_DECLARE_FUNC13_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13)
+#define i_RP_DECLARE_FUNC13_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13)
 
 
 
@@ -461,8 +461,8 @@ retType__ funcNarf__##12(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC12_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12)\
 retType__ funcNarf__##12(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12);\
 i_RP_DECLARE_FUNC11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11)
-#define i_RP_DECLARE_FUNC12_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12)   
-#define i_RP_DECLARE_FUNC12_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12)   
+#define i_RP_DECLARE_FUNC12_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12)
+#define i_RP_DECLARE_FUNC12_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12)
 
 
 
@@ -478,8 +478,8 @@ retType__ funcNarf__##11(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC11_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11)\
 retType__ funcNarf__##11(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11);\
 i_RP_DECLARE_FUNC10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10)
-#define i_RP_DECLARE_FUNC11_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11)   
-#define i_RP_DECLARE_FUNC11_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11)   
+#define i_RP_DECLARE_FUNC11_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11)
+#define i_RP_DECLARE_FUNC11_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11)
 
 
 
@@ -495,8 +495,8 @@ retType__ funcNarf__##10(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8
 #define i_RP_DECLARE_FUNC10_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10)\
 retType__ funcNarf__##10(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10);\
 i_RP_DECLARE_FUNC9(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9)
-#define i_RP_DECLARE_FUNC10_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10)   
-#define i_RP_DECLARE_FUNC10_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10)   
+#define i_RP_DECLARE_FUNC10_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10)
+#define i_RP_DECLARE_FUNC10_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10)
 
 
 
@@ -512,8 +512,8 @@ retType__ funcNarf__##9(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,
 #define i_RP_DECLARE_FUNC9_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9)\
 retType__ funcNarf__##9(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9);\
 i_RP_DECLARE_FUNC8(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8)
-#define i_RP_DECLARE_FUNC9_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9)   
-#define i_RP_DECLARE_FUNC9_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9)   
+#define i_RP_DECLARE_FUNC9_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9)
+#define i_RP_DECLARE_FUNC9_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9)
 
 
 
@@ -529,8 +529,8 @@ retType__ funcNarf__##8(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8)
 #define i_RP_DECLARE_FUNC8_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8)\
 retType__ funcNarf__##8(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8);\
 i_RP_DECLARE_FUNC7(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7)
-#define i_RP_DECLARE_FUNC8_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8)   
-#define i_RP_DECLARE_FUNC8_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8)   
+#define i_RP_DECLARE_FUNC8_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8)
+#define i_RP_DECLARE_FUNC8_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8)
 
 
 
@@ -546,8 +546,8 @@ retType__ funcNarf__##7(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7);
 #define i_RP_DECLARE_FUNC7_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7)\
 retType__ funcNarf__##7(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7);\
 i_RP_DECLARE_FUNC6(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6)
-#define i_RP_DECLARE_FUNC7_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7)   
-#define i_RP_DECLARE_FUNC7_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7)   
+#define i_RP_DECLARE_FUNC7_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7)
+#define i_RP_DECLARE_FUNC7_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7)
 
 
 
@@ -563,8 +563,8 @@ retType__ funcNarf__##6(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6);
 #define i_RP_DECLARE_FUNC6_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6)\
 retType__ funcNarf__##6(arg__1,arg__2,arg__3,arg__4,arg__5,arg__6);\
 i_RP_DECLARE_FUNC5(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5)
-#define i_RP_DECLARE_FUNC6_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6)   
-#define i_RP_DECLARE_FUNC6_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6)   
+#define i_RP_DECLARE_FUNC6_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6)
+#define i_RP_DECLARE_FUNC6_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6)
 
 
 
@@ -580,8 +580,8 @@ retType__ funcNarf__##5(arg__1,arg__2,arg__3,arg__4,arg__5);
 #define i_RP_DECLARE_FUNC5_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5)\
 retType__ funcNarf__##5(arg__1,arg__2,arg__3,arg__4,arg__5);\
 i_RP_DECLARE_FUNC4(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4)
-#define i_RP_DECLARE_FUNC5_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5)   
-#define i_RP_DECLARE_FUNC5_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5)   
+#define i_RP_DECLARE_FUNC5_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5)
+#define i_RP_DECLARE_FUNC5_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5)
 
 
 
@@ -597,8 +597,8 @@ retType__ funcNarf__##4(arg__1,arg__2,arg__3,arg__4);
 #define i_RP_DECLARE_FUNC4_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4)\
 retType__ funcNarf__##4(arg__1,arg__2,arg__3,arg__4);\
 i_RP_DECLARE_FUNC3(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3)
-#define i_RP_DECLARE_FUNC4_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4)   
-#define i_RP_DECLARE_FUNC4_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4)   
+#define i_RP_DECLARE_FUNC4_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4)
+#define i_RP_DECLARE_FUNC4_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3,arg__4)
 
 
 
@@ -614,8 +614,8 @@ retType__ funcNarf__##3(arg__1,arg__2,arg__3);
 #define i_RP_DECLARE_FUNC3_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3)\
 retType__ funcNarf__##3(arg__1,arg__2,arg__3);\
 i_RP_DECLARE_FUNC2(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2)
-#define i_RP_DECLARE_FUNC3_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3)   
-#define i_RP_DECLARE_FUNC3_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3)   
+#define i_RP_DECLARE_FUNC3_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3)
+#define i_RP_DECLARE_FUNC3_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg__3)
 
 
 
@@ -631,8 +631,8 @@ retType__ funcNarf__##2(arg__1,arg__2);
 #define i_RP_DECLARE_FUNC2_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2)\
 retType__ funcNarf__##2(arg__1,arg__2);\
 i_RP_DECLARE_FUNC1(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1)
-#define i_RP_DECLARE_FUNC2_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2)   
-#define i_RP_DECLARE_FUNC2_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2)   
+#define i_RP_DECLARE_FUNC2_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2)
+#define i_RP_DECLARE_FUNC2_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2)
 
 
 
@@ -648,14 +648,14 @@ retType__ funcNarf__##1(arg__1);
 #define i_RP_DECLARE_FUNC1_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1)\
 retType__ funcNarf__##1(arg__1);\
 i_RP_DECLARE_FUNC0(funcNarf__,retType__,maxArgsN__,defArgsN__)
-#define i_RP_DECLARE_FUNC1_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1)   
-#define i_RP_DECLARE_FUNC1_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1)   
+#define i_RP_DECLARE_FUNC1_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1)
+#define i_RP_DECLARE_FUNC1_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1)
 
 
 //! This macro is used to declare a function with 0 arguments in a header file
 #define i_RP_DECLARE_FUNC0(funcNarf__,retType__,maxArgsN__,defArgsN__)\
 i_RP_PICK_FUNC_DECL(i_RP_DECLARE_FUNC0_IMP,i_RP_DECL_MACRO_CHECK1(maxArgsN__,defArgsN__,0),i_RP_DECL_MACRO_CHECK2(maxArgsN__,defArgsN__,0))(funcNarf__,retType__,maxArgsN__,defArgsN__)
 #define i_RP_DECLARE_FUNC0_IMP00(funcNarf__,retType__,maxArgsN__,defArgsN__)  retType__  funcNarf__##0();
-#define i_RP_DECLARE_FUNC0_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__)   
-#define i_RP_DECLARE_FUNC0_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__)   
-#define i_RP_DECLARE_FUNC0_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__)   
+#define i_RP_DECLARE_FUNC0_IMP01(funcNarf__,retType__,maxArgsN__,defArgsN__)
+#define i_RP_DECLARE_FUNC0_IMP10(funcNarf__,retType__,maxArgsN__,defArgsN__)
+#define i_RP_DECLARE_FUNC0_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__)

@@ -1,4 +1,4 @@
-/**
+/*
 ** Copyright (c) 2011-2012, Karapetsas Eleftherios
 ** All rights reserved.
 **
@@ -15,7 +15,7 @@
 **  SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-**/
+*/
 
 #ifndef RF_UNICODE_H
 #define RF_UNICODE_H
@@ -66,17 +66,17 @@ extern "C"
 //! @param[in] charsN The number of codepoints inside the buffer, that is how many characters are in there
 //! @param[out] utf8Length Pass a pointer to @c uint32_t to receive inside it the bytelength of the allcoated utf8 buffer without the null termination counted
 //! @return Returns the allocated UTF-8 encoded byte buffer for success or @c 0 if there was an error
-i_DECLIMEX_ char* rfUTF8_Encode(uint32_t* codepoints,uint32_t charsN,uint32_t* utf8Length);
+i_DECLIMEX_ char* rfUTF8_Encode(const uint32_t* codepoints,uint32_t charsN,uint32_t* utf8Length);
 
 //! @brief Takes a utf8 buffer and decodes it into unicode codepoints
 //!
 //! Note that the returned decoded codepoints buffer needs to be freed by
-//! the user explicitly after done with its use
+//! the user explicitly after done with its use. The returned buffer is null terminated
 //! @param[in] utf8 The utf8 buffer
 //! @param[in] utf8BLength The bytes length of the UTF8 buffer
 //! @param[out] charsN Pass a reference to an @c uint32_t here to receive the number of
 //! unicode characters contained in the @c utf8 and the returned codepoints buffer
-//! @return Returns the allocated codepoints buffer
+//! @return Returns the allocated codepoints buffer. The returned buffer is null terminated
 i_DECLIMEX_ uint32_t* rfUTF8_Decode(const char* utf8,uint32_t utf8BLength,uint32_t* charsN);
 
 
@@ -114,13 +114,14 @@ i_DECLIMEX_ char rfUTF16_Decode_swap(const char* buff,uint32_t* length,uint32_t*
 //! @brief Encodes a buffer of unicode codepoints into UTF-16
 //!
 //! Note that the returned allocated UTF-16 buffer needs to be freed
-//! by the user explicitly after done with its use.
+//! by the user explicitly after done with its use. Also the returned buffer is null terminated.
 //! @param[in] codepoints Provides a buffer of unicode codepoints for encoding
 //! @param[in] charsN Provide the number of characters in the codepoints buffer (excluding the null termination character)
 //! @param[out] utf16Length Give a reference to a uint32_t to receive the length in 16bit unsigned integers of the utf-16
 //! buffer that the function will return
 //! @return Returns the a utf-16 encoded buffer of the given @c codepoints for success.
 //! If an illegal codepoint is found then an error is logged and 0 is returned. The buffer needs to be freed by the user later.
+//! The returned buffer is null terminated.
 i_DECLIMEX_ uint16_t* rfUTF16_Encode(const uint32_t* codepoints,uint32_t charsN,uint32_t* utf16Length);
 
 //! Parses a utf-8 byte sequence returning the byte length and verifying its validity

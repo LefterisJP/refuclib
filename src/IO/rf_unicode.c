@@ -26,7 +26,7 @@
 
 /*--------------------------------------------------------------------Unicode related convenience macros-------------------------------------------------------------------------------*/
 //Takes a buffer of unicode character and turns them into a UTF-8 encoded string
-char* rfUTF8_Encode(uint32_t* codepoints,uint32_t charsN,uint32_t* byteLength)
+char* rfUTF8_Encode(const uint32_t* codepoints,uint32_t charsN,uint32_t* byteLength)
 {
     char* utf8;
     uint32_t charN;
@@ -144,6 +144,8 @@ uint32_t* rfUTF8_Decode(const char* utf8,uint32_t utf8Length,uint32_t* charsN)
         }
         (*charsN) +=1;
     }
+    //null terminate it
+    codePoints[*charsN] = 0;
     return codePoints;
 }
 
@@ -197,7 +199,7 @@ int32_t rfUTF8_VerifySequence(const char* bytes,uint32_t * i)
         else if(RF_HEXEQ_C( ( (~(bytes[*i] ^ 0xF0))>>3), 0x1F))
         {
             //in this type of starting byte a number of invalid bytes can be encountered. We have to check for them.
-            if(RF_HEXGE_C(bytes[*i],0xBF)) //invalid byte value are from 0xBF to 0xFF
+            if(RF_HEXGE_C(bytes[*i],0xF5)) //invalid byte value are from 0xF5 to 0xFF
             {
                 LOG_ERROR("While decoding a UTF-8 byte sequence, an invalid byte was encountered",RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE);
                 return RF_FAILURE;
@@ -346,7 +348,7 @@ uint16_t* rfUTF16_Encode(const uint32_t* codepoints,uint32_t charsN,uint32_t* le
     uint32_t i,U;
     uint16_t* utf16;
     RF_MALLOC(utf16,4*charsN+2)//worst case scenario allocation
-    //for all codepoints
+    //for all codepoints  (i -> charIndex , length -> byteIndex
     for(i = 0,*length=0; i < charsN; i ++)
     {
         if(RF_HEXG_UI(codepoints[i],0x10FFFF))
@@ -368,6 +370,8 @@ uint16_t* rfUTF16_Encode(const uint32_t* codepoints,uint32_t charsN,uint32_t* le
         utf16[(*length)+1] |= (uint16_t)(U&(uint32_t)0x3FF);
         (*length)+=2;
     }
+    //null terminate it
+    utf16[(*length)] = 0;
     return utf16;
 }
 

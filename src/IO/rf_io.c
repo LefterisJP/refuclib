@@ -811,7 +811,7 @@ int32_t rfFgetc_UTF8(FILE* f,uint32_t *ret,char cp)
         else if(RF_HEXEQ_C( ( (~(c ^ 0xF0))>>3), 0x1F))
         {
             //in this type of starting byte a number of invalid bytes can be encountered. We have to check for them.
-            if(RF_HEXGE_C(c,0xBF)) //invalid byte value are from 0xBF to 0xFF
+            if(RF_HEXGE_C(c,0xF5)) //invalid byte value are from 0xF5 to 0xFF
             {
                 LOG_ERROR("While decoding a UTF-8 file byte stream, an invalid byte was encountered",RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE);
                 return RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE;

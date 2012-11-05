@@ -527,11 +527,11 @@ char i_NVrfStringX_Init_buff(RF_StringX* str,uint32_t buffSize,const char* lit)
 
 
 //Allocates and returns a string with the given UTF-16 byte sequence. Given characters have to be in UTF-16. A check for valid sequence of bytes is performed
-RF_StringX* rfStringX_Create_UTF16(const char* s,char endianess)
+RF_StringX* rfStringX_Create_UTF16(const uint16_t* s)
 {
     RF_StringX* ret;
     RF_MALLOC(ret,sizeof(RF_StringX));
-    if(rfStringX_Init_UTF16(ret,s,endianess)==false)
+    if(rfStringX_Init_UTF16(ret,s)==false)
     {
         free(ret);
         return 0;
@@ -539,7 +539,7 @@ RF_StringX* rfStringX_Create_UTF16(const char* s,char endianess)
     return ret;
 }
 //Initializes a string with the given UTF-16 byte sequence. Given characters have to be in UTF-16. A check for valid sequence of bytes is performed
-char rfStringX_Init_UTF16(RF_StringX* str,const char* s,char endianess)
+char rfStringX_Init_UTF16(RF_StringX* str,const uint16_t* s)
 {
     //decode the utf-16 and get the code points
     uint32_t* codepoints;
@@ -552,36 +552,13 @@ char rfStringX_Init_UTF16(RF_StringX* str,const char* s,char endianess)
     }
     byteLength+=3;//for the last utf-16 null termination character
     RF_MALLOC(codepoints,byteLength*2) //allocate the codepoints
-    //parse the given byte stream depending on the endianess parameter
-    switch(endianess)
+    //decode the byte stream into codepoints
+    if(rfUTF16_Decode((char*)s,&characterLength,codepoints)==false)
     {
-        case RF_LITTLE_ENDIAN:
-        case RF_BIG_ENDIAN:
-            if(rfUTILS_Endianess() == endianess)//same endianess as the local machine
-            {
-                if(rfUTF16_Decode(s,&characterLength,codepoints)==false)
-                {
-                    free(codepoints);
-                    LOG_ERROR("StringX initialization failed due to invalide UTF-16 sequence",RE_STRING_INIT_FAILURE);
-                    return false;
-                }
-            }
-            else//different endianess, need to swap
-            {
-                if(rfUTF16_Decode_swap(s,&characterLength,codepoints)==false)
-                {
-                    free(codepoints);
-                    LOG_ERROR("StringX initialization failed due to invalide UTF-16 sequence",RE_STRING_INIT_FAILURE);
-                    return false;
-                }
-            }
-        break;
-        default:
-            LOG_ERROR("Illegal endianess value provided",RE_INPUT);
-            free(codepoints);
-            return 0;
-        break;
-    }//switch ends
+        free(codepoints);
+        LOG_ERROR("StringX initialization failed due to invalide UTF-16 sequence",RE_STRING_INIT_FAILURE);
+        return false;
+    }
     //now encode these codepoints into UTF8
     if( (utf8 = rfUTF8_Encode(codepoints,characterLength,&utf8ByteLength))==0)
     {
@@ -600,7 +577,7 @@ char rfStringX_Init_UTF16(RF_StringX* str,const char* s,char endianess)
 }
 
 //Allocates and returns a string with the given UTF-32 byte sequence. Given characters have to be in UTF-32
-RF_StringX* rfStringX_Create_UTF32(const char* s)
+RF_StringX* rfStringX_Create_UTF32(const uint32_t* s)
 {
     RF_StringX* ret;
     RF_MALLOC(ret,sizeof(RF_StringX));
@@ -612,41 +589,8 @@ RF_StringX* rfStringX_Create_UTF32(const char* s)
     return ret;
 }
 //Initializes a string with the given UTF-32 byte sequence. Given characters have to be in UTF-32
-char rfStringX_Init_UTF32(RF_StringX* str,const char* s)
+char rfStringX_Init_UTF32(RF_StringX* str,const uint32_t* codeBuffer)
 {
-    char swapE = false;
-    uint32_t off = 0;
-    int32_t i = 0;
-
-    //get the buffer and if swapping is needed do it for all character
-    uint32_t* codeBuffer = (uint32_t*)(s+off);
-
-    //first of all check for existence of BOM in the beginning of the sequence
-    if(RF_HEXEQ_UI(codeBuffer[0],0xFEFF))//big endian
-    {
-        if(rfUTILS_Endianess()==RF_LITTLE_ENDIAN)
-            swapE = true;
-    }
-    if(RF_HEXEQ_UI(codeBuffer[0],0xFFFE0000))//little
-    {
-        if(rfUTILS_Endianess()==RF_BIG_ENDIAN)
-            swapE = true;
-    }
-    else//according to the standard no BOM means big endian
-    {
-        if(rfUTILS_Endianess() == RF_LITTLE_ENDIAN)
-            swapE = true;
-    }
-
-    //if we need to have endianess swapped do it
-    if(swapE==true)
-    {
-        while(codeBuffer[i] != 0)
-        {
-            rfUTILS_SwapEndianUI(codeBuffer+i);
-            i++;
-        }
-    }
     //find the length of the utf32 buffer in characters
     uint32_t length;
     rfUTF32_Length(codeBuffer,length);
@@ -654,19 +598,15 @@ char rfStringX_Init_UTF32(RF_StringX* str,const char* s)
     char* utf8;uint32_t utf8ByteLength;
     if((utf8=rfUTF8_Encode(codeBuffer,length,&utf8ByteLength)) == 0)
     {
+        LOG_ERROR("Could not encode UTF32 codepoints into a UTF7 bytestream",RE_UTF8_ENCODING)
         return false;//error
     }
-    //if the encoding happened correctly
-    if(codeBuffer != 0)
-    {
-            str->INH_String.bytes = (char*)codeBuffer;
-            str->bIndex = 0;
-            str->bSize = utf8ByteLength+1;
-            str->INH_String.byteLength = utf8ByteLength;
-            return true;
-    }
-    //else fail
-    return false;
+
+    str->INH_String.bytes = (char*)utf8;
+    str->bIndex = 0;
+    str->bSize = utf8ByteLength+1;
+    str->INH_String.byteLength = utf8ByteLength;
+    return true;
 }
 
 // Allocates and returns an extended String. NO VALID-UTF8 check is performed

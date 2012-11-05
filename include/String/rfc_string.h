@@ -1,4 +1,4 @@
-/**
+/*
 ** Copyright (c) 2011-2012, Karapetsas Eleftherios
 ** All rights reserved.
 **
@@ -15,7 +15,7 @@
 **  SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-**/
+*/
 
 #ifndef REFU_USTRING_H
 #define REFU_USTRING_H
@@ -66,6 +66,8 @@ extern "C"
 ** All the functions which have @isinherited{StringX} on their description can be used with extended strings safely, since no specific
 ** version of the function exists, or needs to exist to manipulate Extended Strings. To make the documentation even clearer the functions that should not
 ** be used with the extended string are marked with @notinherited{StringX}
+**
+** @see RF_StringX
 ** @internal
 ** @cppcode
 ** //default constructor
@@ -132,6 +134,8 @@ RF_String* RFS_(const char* s,...);
 //! each containing one value to be inserted instead of each %-tag specified in the @c slit parameter, if any. There should be
 //! the same number of these arguments as the number of %-tags that expect a value.
 //! @return Returns the initialized RF_string or null in case of failure to initialize, due to invalid utf-8 sequence
+//! @see rfString_Init()
+//! @see rfStringX_Create()
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ RF_String* rfString_Create(const char* s,...);
 #else
@@ -162,6 +166,8 @@ i_DECLIMEX_ RF_String* i_NVrfString_CreateLocal(const char* s);
 //! each containing one value to be inserted instead of each %-tag specified in the @c slit parameter, if any. There should be
 //! the same number of these arguments as the number of %-tags that expect a value.
 //! @return Returns true in case of correct initialization and false , due to invalid utf-8 sequence
+//! @see rfString_Create()
+//! @see rfStringX_Init()
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ char rfString_Init(RF_String* str,const char* s,...);
 #else
@@ -179,6 +185,8 @@ i_DECLIMEX_ char i_NVrfString_Init(RF_String* str,const char* s);
 //! @notinherited{StringX}
 //! @param code The unicode code point to encode
 //! @return A String with the code point encoded in it or a null pointer in case of an illegal code point value
+//! @see rfString_Init_cp()
+//! @see rfStringX_Create_cp()
 i_DECLIMEX_ RF_String* rfString_Create_cp(uint32_t code);
 //! @memberof RF_String
 //! @brief Initializes a string by turning a unicode code point in a String (encoded in UTF-8).
@@ -187,6 +195,8 @@ i_DECLIMEX_ RF_String* rfString_Create_cp(uint32_t code);
 //! @param str The string to initialize
 //! @param code The unicode code point to encode
 //! @return Returns true in case of correct initialization and false , due to illegal code point value
+//! @see rfString_Create_cp()
+//! @see rfStringX_Init_cp()
 i_DECLIMEX_ char rfString_Init_cp(RF_String* str,uint32_t code);
 
 
@@ -203,6 +213,7 @@ i_DECLIMEX_ char rfString_Init_cp(RF_String* str,uint32_t code);
 //! each containing one value to be inserted instead of each %-tag specified in the @c slit parameter, if any. There should be
 //! the same number of these arguments as the number of %-tags that expect a value.
 //! @return Returns the initialized RF_string or null in case of failure to initialize
+//! @see rfString_Init_nc()
 i_DECLIMEX_ RF_String* rfString_Create_nc(const char* s,...);
 #else
 i_DECLIMEX_ RF_String* i_rfString_Create_nc(const char* s,...);
@@ -225,6 +236,7 @@ i_DECLIMEX_ RF_String* i_NVrfString_Create_nc(const char* s);
 //! each containing one value to be inserted instead of each %-tag specified in the @c slit parameter, if any. There should be
 //! the same number of these arguments as the number of %-tags that expect a value.
 //! @return Returns true in case of correct initialization and false otherwise
+//! @see rfString_Create_nc()
 i_DECLIMEX_ char rfString_Init_nc(RF_String* str,const char* s,...);
 #else
 i_DECLIMEX_ char i_rfString_Init_nc(RF_String* str,const char* s,...);
@@ -241,6 +253,7 @@ i_DECLIMEX_ char i_NVrfString_Init_nc(RF_String* str,const char* s);
 //! @notinherited{StringX}
 //! @param i The integer to turn into a string
 //! @return Returns the initialized RF_string
+//! @see rfString_Init_i()
 i_DECLIMEX_ RF_String* rfString_Create_i(int32_t i);
 //! @memberof RF_String
 //! @brief Initializes a string with the given integer.
@@ -249,6 +262,7 @@ i_DECLIMEX_ RF_String* rfString_Create_i(int32_t i);
 //! @param str The string to initialize
 //! @param i The integer to turn into a string
 //! @return Returns true in case of correct initialization and false otherwise
+//! @see rfString_Create_i()
 i_DECLIMEX_ char rfString_Init_i(RF_String* str,int32_t i);
 //! @memberof RF_String
 //! @opassign
@@ -257,6 +271,7 @@ i_DECLIMEX_ char rfString_Init_i(RF_String* str,int32_t i);
 //! @notinherited{StringX}
 //! @param f The float to turn into a string
 //! @return Returns the initialized RF_string
+//! @see rfString_Init_f()
 i_DECLIMEX_ RF_String* rfString_Create_f(float f);
 //! @memberof RF_String
 //! @brief Initializes a string with the given float.
@@ -265,52 +280,64 @@ i_DECLIMEX_ RF_String* rfString_Create_f(float f);
 //! @param str The string to initialize
 //! @param f The float to turn into a string
 //! @return Returns true in case of correct initialization and false otherwise
+//! @see rfString_Create_f()
 i_DECLIMEX_ char rfString_Init_f(RF_String* str,float f);
 
 //! @memberof RF_String
 //! @brief Allocates and returns a string with the given UTF-16 byte sequence.
 //!
 //! @notinherited{StringX}
-//! Given characters have to be in UTF-16
-//! @param s The sequence of bytes for the characters in UTF-16.
-//! @param endianess A flag that determined in what endianess the sequence of UTF-16 bytes is in. Possible values here is
-//! @c RF_LITTLE_ENDIAN and @c RF_BIG_ENDIAN.
+//! Given characters have to be in UTF-16 and in the endianess of the system. They also have to be null terminated.
+//! @param s A buffer of 2-byte words representing the utf-16 byte sequence. Needs to be null terminated.
 //! @return Returns the initialized RF_string or null in case of failure to initialize, due to invalid utf-16 sequence or illegal endianess value
-i_DECLIMEX_ RF_String* rfString_Create_UTF16(const char* s,char endianess);
+//! @see rfString_Init_UTF16()
+//! @see rfString_Create_fUTF16()
+//! @see rfString_Init_UTF16()
+i_DECLIMEX_ RF_String* rfString_Create_UTF16(const uint16_t* s);
 //! @memberof RF_String
 //! @brief Initializes a string with the given UTF-16 byte sequence.
 //!
 //! @notinherited{StringX}
-//! Given characters have to be in UTF-16
+//! Given characters have to be in UTF-16 and in the endianess of the system. They also have to be null terminated.
 //! @param str The string to initialize
-//! @param s The sequence of bytes for the characters in UTF-16.
-//! @param endianess A flag that determined in what endianess the sequence of UTF-16 bytes is in. Possible values here is
-//! @c RF_LITTLE_ENDIAN and @c RF_BIG_ENDIAN.
+//! @param s A buffer of 2-byte words representing the utf-16 byte sequence. Needs to be null terminated.
 //! @return Returns true for succesfull initialization and false otherwise due to invalid utf-16 sequence or illegal endianess value
-i_DECLIMEX_ char rfString_Init_UTF16(RF_String* str,const char* s,char endianess);
+//! @see rfString_Create_UTF16()
+//! @see rfString_Create_fUTF16()
+//! @see rfString_Init_UTF16()
+i_DECLIMEX_ char rfString_Init_UTF16(RF_String* str,const uint16_t* s);
 
 //! @memberof RF_String
 //! @cppnotctor
 //! @brief Allocates and returns a string with the given UTF-32 byte sequence.
 //!
 //! @notinherited{StringX}
-//! Given characters have to be in UTF-32
-//! @param s The sequence of bytes for the characters in UTF-32. Needs to be null terminated.
+//! Given characters have to be in UTF-32 and in the endianess of the system.
+//! No endianess swapping occurs in the function
+//! @param s A buffer of 4-byte words representing the utf-32 byte sequence. Needs to be null terminated.
 //! @return Returns the initialized RF_string or null in case of failure to initialize
-i_DECLIMEX_ RF_String* rfString_Create_UTF32(const char* s);
+//! @see rfString_Init_UTF32()
+//! @see rfString_Create_fUTF32()
+//! @see rfString_Init_UTF32()
+i_DECLIMEX_ RF_String* rfString_Create_UTF32(const uint32_t* s);
 //! @memberof RF_String
 //! @brief Initializes a string with the given UTF-32 byte sequence.
 //!
 //! @notinherited{StringX}
-//! Given characters have to be in UTF-32
+//! Given characters have to be in UTF-32 and in the endianess of the system.
+//! No endianess swapping occurs in the function
 //! @param str The string to initialize
-//! @param s The sequence of bytes for the characters in UTF-32. Needs to be null terminated.
+//! @param s A buffer of 4-byte words representing the utf-32 byte sequence. Needs to be null terminated.
 //! @return Returns true for successful initialization and false otherwise
-i_DECLIMEX_ char rfString_Init_UTF32(RF_String* str,const char* s);
+//! @see rfString_Create_UTF32()
+//! @see rfString_Create_fUTF32()
+//! @see rfString_Init_UTF32()
+i_DECLIMEX_ char rfString_Init_UTF32(RF_String* str,const uint32_t* s);
+
 //!@}
 
-/*-------------------------------------------------------------------------Methods to copy/assign an RF_String-------------------------------------------------------------------------------*/
-//! @name Copying - Assigning a String
+/*-------------------------------------------------------------------------Methods to assign to an RF_String-------------------------------------------------------------------------------*/
+//! @name Copying - Assigning to a String
 //! @{
 
 //! @memberof RF_String
@@ -321,10 +348,12 @@ i_DECLIMEX_ char rfString_Init_UTF32(RF_String* str,const char* s);
 //! Both strings should already be initialized and hold a value. It is an error to give null parameters.
 //! @param dest The destination string, which should get assigned
 //! @param source The source string, whose values to copy. @inhtype{String,StringX} @tmpSTR
+//! @see rfString_Assign_char()
+//! @see rfStringX_Assign()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-void rfString_Assign(RF_String* dest,void* source);
+void rfString_Assign(RF_String* dest,const void* source);
 #else
-i_DECLIMEX_ void i_rfString_Assign(RF_String* dest,void* source);
+i_DECLIMEX_ void i_rfString_Assign(RF_String* dest,const void* source);
 #define rfString_Assign(i_DESTINATION_,i_SOURCE_) i_rfLMS_WRAP2(void,i_rfString_Assign,i_DESTINATION_,i_SOURCE_)
 #endif
 
@@ -335,9 +364,54 @@ i_DECLIMEX_ void i_rfString_Assign(RF_String* dest,void* source);
 //! @param thisstr The string to assign to
 //! @param character The unicode character codepoint to assign to the String
 //! @return Returns @c true for succesfull assignment and @c false if the given @c character was not a valid unicode codepoint
+//! @see rfString_Assign()
+//! @see rfStringX_Assign_char()
 i_DECLIMEX_ char rfString_Assign_char(RF_String* thisstr,uint32_t character);
 
 //! @}
+
+
+/*------------------------------------------------------------------------ RF_String Copying functions-------------------------------------------------------------------------------*/
+//! @name String Copying Functions
+//! @{
+
+//! @memberof RF_String
+//! @cppignore
+//! @brief Creates and returns an allocated copy of the given string
+//!
+//! @isinherited{StringX}
+//! @note The Returned Substring needs to be freed by the user. BEWARE when assigning to a string using this function since if any previous string exists there IS NOT getting freed. You have to free it explicitly
+//! @param src The string to copy from. @inhtype{String,StringX}
+//! @return Returns a string copied from the previous one or null if the original string was null
+//! @see rfString_Copy_IN()
+//! @see rfString_Copy_chars()
+i_DECLIMEX_ RF_String* rfString_Copy_OUT(const void* src);
+//! @memberof RF_String
+//! @cppignore
+//! @brief Copies all the contents of a string to another
+//!
+//! @isinherited{StringX}
+//! @param dst The string to copy in.
+//! @param src The string to copy from. @inhtype{String,StringX}
+//! If the value is bigger than the maximum number of characters then still all characters are copied.
+//! @see rfString_Copy_OUT()
+//! @see rfString_Copy_chars()
+i_DECLIMEX_ void rfString_Copy_IN(RF_String* dst,const void* src);
+//! @memberof RF_String
+//! @brief Copies a certain number of characters from a string
+//!
+//! @isinherited{StringX}
+//! Copies @c n characters from @c src String into the destination @c dst string.
+//! @param dst The string to copy in
+//! @param src The string to copy from. @inhtype{String,StringX}
+//! @param n The number of characters to copy from the @c src string
+//! If the value is bigger than the maximum number of characters then still all characters are copied.
+//! @see rfString_Copy_IN()
+//! @see rfString_Copy_OUT()
+i_DECLIMEX_ void rfString_Copy_chars(RF_String* dst,const void* src,uint32_t n);
+
+//! @}
+
 /*-------------------------------------------------------------------------Methods to get rid of an RF_String-------------------------------------------------------------------------------*/
 //! @name Getting rid of an RF_String
 //! @{
@@ -350,6 +424,7 @@ i_DECLIMEX_ char rfString_Assign_char(RF_String* thisstr,uint32_t character);
 //! It is an error to give a NULL(0x0) string for deleting. Will most probably lead to a segmentation fault
 //! Use it for strings made with _Create
 //! @param s The string for deletion
+//! @see rfString_Deinit()
 i_DECLIMEX_ void rfString_Destroy(RF_String* s);
 //! @memberof RF_String
 //! @cppignore
@@ -359,6 +434,7 @@ i_DECLIMEX_ void rfString_Destroy(RF_String* s);
 //! It is an error to give a NULL(0x0) string for deleting. Will most probably lead to a segmentation fault
 //! Use it for strings made with _Init
 //! @param s The string for deletion
+//! @see rfString_Destroy()
 i_DECLIMEX_ void rfString_Deinit(RF_String* s);
 
 
@@ -371,18 +447,20 @@ i_DECLIMEX_ void rfString_Deinit(RF_String* s);
 //! @brief Returns the strings contents as a UTF-8 buffer
 //!
 //! @isinherited{StringX}
-//! This is just a macro wrapper of @ref rfString_ToStr() and exists here
+//! This is just a macro wrapper of @ref rfString_Cstr() and exists here
 //! just so that users can guess function names for all unicode encodings.
 //!
-//!  Note that just like in @ref rfString_ToStr() this is just a pointer to
+//!  Note that just like in @ref rfString_Cstr() this is just a pointer to
 //! the String's internal UTF8 buffer and as such should be read only. If there
 //! is a need to do anything other than that copy the buffer.
 //! @param s The string in question
 //! @return Returns a pointer to the String's internal UTF-8 uffer
+//! @see rfString_ToUTF16()
+//! @see rfString_ToUTF32()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
 i_DECLIMEX_ const char* rfString_ToUTF8(RF_String* s);
 #else
-#define rfString_ToUTF8(i_STRING_)  rfString_ToCstr(i_STRING_)
+#define rfString_ToUTF8(i_STRING_)  rfString_Cstr(i_STRING_)
 #endif
 
 //! @memberof RF_String
@@ -393,11 +471,13 @@ i_DECLIMEX_ const char* rfString_ToUTF8(RF_String* s);
 //! UTF-8 contents are encoded as UTF-16. The endianess of the buffer
 //! is that of the system. The returned buffer needs to be freed by the user
 //! later.
-//! @param[in] s The string in question
+//! @param[in] s The string in question. @inhtype{String,StringX}
 //! @param[out] length Give a reference to a uint32_t in this argument to receive the length of
 //! the returned UTF-16 buffer in 16-bit words
 //! @return Returns an allocated UTF-16 buffer. Needs to be freed by the user later.
-i_DECLIMEX_ uint16_t* rfString_ToUTF16(RF_String* s,uint32_t* length);
+//! @see rfString_ToUTF8()
+//! @see rfString_ToUTF32()
+i_DECLIMEX_ uint16_t* rfString_ToUTF16(const void* s,uint32_t* length);
 
 //! @memberof RF_String
 //! @brief Returns the strings contents as a UTF-32 buffer
@@ -407,20 +487,22 @@ i_DECLIMEX_ uint16_t* rfString_ToUTF16(RF_String* s,uint32_t* length);
 //! UTF-8 contents are encoded as UTF-32. The endianess of the buffer
 //! is that of the system. The returned buffer needs to be freed by the user
 //! later.
-//! @param[in] s The string in question
+//! @param[in] s The string in question. @inhtype{String,StringX}
 //! @param[out] length Give a reference to a uint32_t in this argument to receive the length
 //! of the returned UTF-32 buffer in codepoints. (32-bit) words
 //! @return Returns an allocated UTF-16 buffer. Needs to be freed by the user later.
-i_DECLIMEX_ uint32_t* rfString_ToUTF32(RF_String* s,uint32_t*length);
+//! @see rfString_ToUTF8()
+//! @see rfString_ToUTF16()
+i_DECLIMEX_ uint32_t* rfString_ToUTF32(const void* s,uint32_t*length);
 
 //! @}
-/*------------------------------------------------------------------------ RF_String retrieval functions-------------------------------------------------------------------------------*/
-//! @name String Retrieval
+
+
+
+
+/*------------------------------------------------------------------------ RF_String iteration functions-------------------------------------------------------------------------------*/
+//! @name String Iteration
 //! @{
-
-
-
-    //-- String iteration --/ /
 
 // Two macros to accomplish iteration of an RF_String from any given character going forwards. This macro should be used with its end pair.
 // We take advantage of the fact that an RF_String is always guaranteed to contain a valid UTF-8 sequence and thus no checks are performed.
@@ -445,6 +527,8 @@ i_DECLIMEX_ uint32_t* rfString_ToUTF32(RF_String* s,uint32_t*length);
 ** @param[in] string_ The string to iterate. Must be a pointer to string
 ** @param[in,out] startCharacterPos_ Here give an uint32_t which will be the character position from which to start the iteration. In each iteration this will hold the character index. If the given position is out of bounds then the iteration does not happen
 ** @param[in,out] characterUnicodeValue_ Here pass an uint32_t which in each iteration will hold the unicode code point of the character at position startCharacterPos_
+** @see rfString_Iterate_End()
+** @see rfString_IterateB_Start()
 **/
 #define rfString_Iterate_Start(string_,startCharacterPos_,characterUnicodeValue_)     {\
             /* b index sec is the byte index and j the character index*/\
@@ -473,6 +557,7 @@ i_DECLIMEX_ uint32_t* rfString_ToUTF32(RF_String* s,uint32_t*length);
 //! @isinherited{StringX}
 //! Look at #rfString_Iterate_Start for an example usage
 //! @param[in,out] startCharacterPos_ Here give the uint32_t given to #rfString_Iterate_Start
+//! @see rfString_Iterate_Start()
 #define rfString_Iterate_End(startCharacterPos_)  startCharacterPos_++;}byteIndex_++;}}
 
 //Two macros to accomplish iteration of an RF_String from any given character going backwards. This macro should be used with its end pair.
@@ -500,6 +585,8 @@ i_DECLIMEX_ uint32_t* rfString_ToUTF32(RF_String* s,uint32_t*length);
 ** @param[in] string_ The string to iterate. Must be a pointer to string
 ** @param[in,out] characterPos_ Here give an uint32_t which will be the character position from which to start the iteration. In each iteration this will hold the character index. If the given position is out of bounds then the iteration does not happen
 ** @param[in,out] characterUnicodeValue_ Here pass an uint32_t which in each iteration will hold the unicode code point of the character at position characterPos_
+** @see rfString_IterateB_End()
+** @see rfString_Iterate_Start()
 **/
 #define rfString_IterateB_Start(string_,characterPos_,characterUnicodeValue_)     {\
             /* b index is the byte index and j the character index*/\
@@ -530,7 +617,14 @@ i_DECLIMEX_ uint32_t* rfString_ToUTF32(RF_String* s,uint32_t*length);
 //! @isinherited{StringX}
 //! Look at #rfString_IterateB_Start for an example usage
 //! @param[in,out] characterPos_ Here give the uint32_t given to #rfString_IterateB_Start
+//! @see rfString_IteraB_Start()
 #define rfString_IterateB_End(characterPos_)  c_index_-- ;characterPos_--;}b_index_--;}}
+
+//! @}
+
+/*------------------------------------------------------------------------ RF_String Accessor functions-------------------------------------------------------------------------------*/
+//! @name Accessor functions
+//! @{
 
 //! @memberof RF_String
 //! @brief Finds the length of the string in characters.
@@ -538,15 +632,17 @@ i_DECLIMEX_ uint32_t* rfString_ToUTF32(RF_String* s,uint32_t*length);
 //! @isinherited{StringX}
 //! @param s The string whose number of characters to find. @inhtype{String,StringX}
 //! @return Returns the length of the sting in characters, not including the null termintion character
-i_DECLIMEX_ uint32_t rfString_Length(void * s);
+i_DECLIMEX_ uint32_t rfString_Length(const void * s);
 
 //! @memberof RF_String
 //! @brief Returns the cstring representation of the string
 //!
 //! @isinherited{StringX}
+//! Remember that this is just a pointer to the string data. It can't be modified. memcpy it if you need a copy of it.
 //! @param s The string whose cstring repesentation to get. @inhtype{String,StringX}
 //! @return Returns the a pointer to the array of bytes held inside the string in the UTF-8 encoding
-i_DECLIMEX_ char* rfString_Cstr(void* s);
+i_DECLIMEX_ char* rfString_Cstr(const void* s);
+
 
 //! @memberof RF_String
 //! @brief Retrieves the unicode code point of the parameter character.
@@ -556,7 +652,7 @@ i_DECLIMEX_ char* rfString_Cstr(void* s);
 //! @param thisstr The string whose character code point we need. @inhtype{String,StringX}
 //! @param c The character index whose unicode code point to return. Must be a positive (including zero) integer.
 //! @return Returns the code point as an uint32_t or the value RF_STRING_INDEX_OUT_OF_BOUNDS if the requested character index is out of bounds
-i_DECLIMEX_ uint32_t rfString_GetChar(void* thisstr,uint32_t c);
+i_DECLIMEX_ uint32_t rfString_GetChar(const void* thisstr,uint32_t c);
 
 //! @internal
 //! @memberof RF_String
@@ -572,7 +668,7 @@ i_DECLIMEX_ uint32_t rfString_GetChar(void* thisstr,uint32_t c);
 //!                 Moreover no check to see if this is not a continutation byte is made. All the checks must have been made before calling the function.
 //! @return Returns the code point of the byte position as an uint32_t
 //! @endinternal
-i_DECLIMEX_ uint32_t rfString_BytePosToCodePoint(void* thisstr,uint32_t bytepos);
+i_DECLIMEX_ uint32_t rfString_BytePosToCodePoint(const void* thisstr,uint32_t bytepos);
 
 //! @internal
 //! @memberof RF_String
@@ -591,7 +687,15 @@ i_DECLIMEX_ uint32_t rfString_BytePosToCodePoint(void* thisstr,uint32_t bytepos)
 //! the function will retrieve the first character position before the byte. If it is false, it will retrieve the first character position
 //! after the continuation byte.
 //! @endinternal
-i_DECLIMEX_ uint32_t rfString_BytePosToCharPos(void* thisstr,uint32_t bytepos,char before);
+i_DECLIMEX_ uint32_t rfString_BytePosToCharPos(const void* thisstr,uint32_t bytepos,char before);
+
+//! @}
+
+
+/*------------------------------------------------------------------------ RF_String retrieval functions-------------------------------------------------------------------------------*/
+//! @name String Retrieval
+//! @{
+
 
 //! @memberof RF_String
 //! @opcmpeq
@@ -603,9 +707,9 @@ i_DECLIMEX_ uint32_t rfString_BytePosToCharPos(void* thisstr,uint32_t bytepos,ch
 //! @param s2 The second string to compare @inhtype{String,StringX} @tmpSTR
 //! @return True in case the strings are equal and false otherwise
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ char rfString_Equal(void* s1,void* s2);
+i_DECLIMEX_ char rfString_Equal(const void* s1,const void* s2);
 #else
-i_DECLIMEX_ char i_rfString_Equal(void* s1,void* s2);
+i_DECLIMEX_ char i_rfString_Equal(const void* s1,const void* s2);
 #define rfString_Equal(i_STRING1_,i_STRING2_)   i_rfLMSX_WRAP2(char,i_rfString_Equal,i_STRING1_,i_STRING2_)
 #endif
 
@@ -617,9 +721,13 @@ i_DECLIMEX_ char i_rfString_Equal(void* s1,void* s2);
 //! It is returned inside @c ret.
 //! @param thisstr Te string whose substring we want @inhtype{String,StringX}
 //! @param startPos The starting character where the substring will begin from
-//! @param charsN The number of characters the substring will have
+//! @param charsN The number of characters the substring will have. If they exceed the end of the string then,
+//! a substring only until the end of the string shall be returned.
 //! @param ret Pass a reference to an RF_String here to receive the resulting substring.
-//! @return Returns @c true if a substring exists and @c sfalse otherwise
+//! @return Returns @c true if a substring exists and @c false otherwise
+//! @see rfString_Between()
+//! @see rfString_After()
+//! @see rfString_Before()
 i_DECLIMEX_ char rfString_Substr(const void* thisstr,uint32_t startPos,uint32_t charsN,RF_String* ret);
 
 //! @memberof RF_String
@@ -638,6 +746,7 @@ i_DECLIMEX_ char rfString_Substr(const void* thisstr,uint32_t startPos,uint32_t 
 //! + @c RF_MATCH_WORD: If you want the found substring to be exact. For example an exact search for @e "HELLO" in the string
 //!     @e "HELLOWORLD" would return a failure. Default search is to return any found substring.
 //! @return Returns the character position of the found substring or RF_FAILURE for not found
+//! @see rfString_Find_i()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
 i_DECLIMEX_ int32_t rfString_Find(const void* thisstr,const void* sstr,const char options);
 #else
@@ -667,12 +776,15 @@ i_DECLIMEX_ int32_t i_rfString_Find(const void* thisstr,const void* sstr,const c
 //! @param sstr The substring string we want to search for @inhtype{String,StringX} @tmpSTR
 //! @param startPos The starting character position of @c thisstr from which the search will begin for @c sstr
 //! @param length The character length of @c thisstr insde which you need to search for the substr @c sstr
+//! If the combination of @c startPos and @c length exceed the end of the string then the string shall only be
+//! searched until the end.
 //! @param options \rfoptional{0}. Bitflag options denoting some options for the search.Can have values:
 //! + @c RF_CASE_IGNORE: If you want the found substring to ignore the case and returns success for any occurence of the string in any case.
 //!     Default search option is to @b match the case. For now this works only for characters of the english language.
 //! + @c RF_MATCH_WORD: If you want the found substring to be exact. For example an exact search for @e "HELLO" in the string
 //!     @e "HELLOWORLD" would return a failure. Default search is to return any found substring.
-//! @return Returns the character position of the found substring or RF_FAILURE for not found
+//! @return Returns the character position of the found substring inside the original string or RF_FAILURE for not found
+//! @see rfString_Find()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
 i_DECLIMEX_ int32_t rfString_Find_i(const void* thisstr,const void* sstr,uint32_t startPos,uint32_t length,const char options);
 #else
@@ -711,11 +823,12 @@ i_DECLIMEX_ int32_t i_rfString_Find_i(const void* thisstr,const void* sstr,uint3
 //! + @c RF_MATCH_WORD: If you want the found substring to be exact. For example an exact search for @e "HELLO" in the string
 //!     @e "HELLOWORLD" would return a failure. Default search is to return any found substring.
 //! @return Returns true if the string does begin with @c sstr and false if not
+//! @see rfString_EndsWith()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
 i_DECLIMEX_ char rfString_BeginsWith(const void* thisstr,const void* sstr,const char options);
 #else
     #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfString_BeginsWith(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) (rfString_Find(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) == 0)
+        #define rfString_BeginsWith(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) (rfString_Find((i_THISSTR_),(i_SEARCHSTR_),(i_OPTIONS_)) == 0)
     #else
         #define rfString_BeginsWith(...) RF_SELECT_FUNC_IF_NARGGT2(i_NPSELECT_RF_STRING_BEGINSWITH,3,__VA_ARGS__)
         #define i_NPSELECT_RF_STRING_BEGINSWITH1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_BeginsWith() accepts from 2 to 3 arguments\"")
@@ -742,6 +855,7 @@ i_DECLIMEX_ char rfString_BeginsWith(const void* thisstr,const void* sstr,const 
 //! + @c RF_MATCH_WORD: If you want the found substring to be exact. For example an exact search for @e "HELLO" in the string
 //!     @e "HELLOWORLD" would return a failure. Default search is to return any found substring.
 //! @return Returns true if the string does end with @c sstr and false if not
+//! @see rfString_BeginsWith()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
 i_DECLIMEX_ char rfString_EndsWith(const void* thisstr,const void* sstr,const char options);
 #else
@@ -762,87 +876,6 @@ i_DECLIMEX_ char rfString_EndsWith(const void* thisstr,const void* sstr,const ch
 #endif
 
 //! @memberof RF_String
-//! @brief Returns the integer value of a String
-//!
-//! @isinherited{StringX}
-//! The parameter string must contains only numbers. If it contains anything else the function fails.
-//! @param thisstr The string whose integer value to return. @inhtype{String,StringX}
-//! @param[out] v A refence to an integer that will return the float value
-//! @return Returns true in case of succesfull conversion or false if no integer was represented by the string
-i_DECLIMEX_ char rfString_ToInt(void* thisstr,int32_t* v);
-
-//! @memberof RF_String
-//! @brief Returns the double value of a String
-//!
-//! @isinherited{StringX}
-//! The parameter string must contain only a number. If it contains anything else the function fails.
-//! @param thisstr The string whose floating point value to return. @inhtype{String,StringX}
-//! @param[out] f A refence to a double that will return the floating point number value
-//! @return Returns RF_SUCCESS in case of succesfull conversion or error if there was failure. Possible errors are:
-//! + @c RE_STRING_TOFLOAT: There was a conversion error. The string probably does not represent a float
-//! + @c RE_STRING_TOFLOAT_RANGE: The represented floating point number is of a range bigger than what can be
-//! represented by the system
-//! + @c RE_STRING_TOFLOAT_UNDERFLOW: Representing the string's floating point number in a double would cause underflow
-i_DECLIMEX_ int rfString_ToDouble(void* thisstr,double* f);
-
-//! @memberof RF_String
-//! @brief Returns a cstring version of the string
-//!
-//! @isinherited{StringX}
-//! Remember that this is just a pointer to the string data. It can't be modified. memcpy it if you need a copy of it.
-//! @param str The string whose cstring to return. @inhtype{String,StringX}
-//! @return Returns a c string version of the string
-i_DECLIMEX_ const char* rfString_ToCstr(const void* str);
-
-
-//! @memberof RF_String
-//! @cppignore
-//! @brief Creates and returns an allocated copy of the given string
-//!
-//! @isinherited{StringX}
-//! @note The Returned Substring needs to be freed by the user. BEWARE when assigning to a string using this function since if any previous string exists there IS NOT getting freed. You have to free it explicitly
-//! @param src The string to copy from. @inhtype{String,StringX}
-//! @return Returns a string copied from the previous one or null if the original string was null
-i_DECLIMEX_ RF_String* rfString_Copy_OUT(void* src);
-//! @memberof RF_String
-//! @cppignore
-//! @brief Copies all the contents of a string to another
-//!
-//! @isinherited{StringX}
-//! @param dst The string to copy in.
-//! @param src The string to copy from. @inhtype{String,StringX}
-//! If the value is bigger than the maximum number of characters then still all characters are copied.
-i_DECLIMEX_ void rfString_Copy_IN(RF_String* dst,void* src);
-//! @memberof RF_String
-//! @brief Copies a certain number of characters from a string
-//!
-//! @isinherited{StringX}
-//! Copies @c n characters from @c src String into the destination @c dst string.
-//! @param dst The string to copy in
-//! @param src The string to copy from. @inhtype{String,StringX}
-//! @param n The number of characters to copy from the @c src string
-//! If the value is bigger than the maximum number of characters then still all characters are copied.
-i_DECLIMEX_ void rfString_Copy_chars(RF_String* dst,void* src,uint32_t n);
-
-
-//! @memberof RF_String
-//! @brief Applies a limited version of sscanf after the specified substring
-//!
-//! @isinherited{StringX}
-//! @lmsFunction
-//! @param thisstr The current string. @inhtype{String,StringX}
-//! @param afterstr The substring after which to apply sscanf. @inhtype{String,StringX} @tmpSTR
-//! @param format The tokens parameter which give the format of scanf
-//! @param var A void* to pass in any variable we need to get a value
-//! @return Returns true if a value was read and false otherwise, substring not being found in the string or sscanf unable to read into the variable
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
-    i_DECLIMEX_ char rfString_ScanfAfter(void* thisstr,void* afterstr,const char* format,void* var);
-#else
-    i_DECLIMEX_ char i_rfString_ScanfAfter(void* thisstr,void* afterstr,const char* format,void* var);
-    #define rfString_ScanfAfter(i_THISSTR_,i_AFTERSTR_,i_FORMAT_,i_VAR_) i_rfLMSX_WRAP4(char,i_rfString_ScanfAfter,i_THISSTR_,i_AFTERSTR_,i_FORMAT_,i_VAR_)
-#endif
-
-//! @memberof RF_String
 //! @brief Counts how many times a substring occurs inside the string.
 //!
 //! @isinherited{StringX}
@@ -856,9 +889,9 @@ i_DECLIMEX_ void rfString_Copy_chars(RF_String* dst,void* src,uint32_t n);
 //!     @e "HELLOWORLD" would return a failure. Default search is to return any found substring.
 //! @return Returns the number of times cstr exists inside the string (0 is returned in case it's not found at all
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ int32_t rfString_Count(void* thisstr,void* sstr,const char options);
+i_DECLIMEX_ int32_t rfString_Count(const void* thisstr,const void* sstr,const char options);
 #else
-i_DECLIMEX_ int32_t i_rfString_Count(void* thisstr,void* sstr,const char* options);
+i_DECLIMEX_ int32_t i_rfString_Count(const void* thisstr,const void* sstr,const char* options);
     #ifdef RF_OPTION_DEFAULT_ARGUMENTS
         #define rfString_Count(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_COUNT,3,__VA_ARGS__)
         #define i_NPSELECT_RF_STRING_COUNT1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Count() accepts from 2 to 3 arguments\"")
@@ -872,39 +905,27 @@ i_DECLIMEX_ int32_t i_rfString_Count(void* thisstr,void* sstr,const char* option
     #endif
 #endif
 
+/*------------------------------------------------------------------------ RF_String Positional retrieval functions-------------------------------------------------------------------------------*/
+//! @name Positional String Retrieval Functions
+//! @{
 
 //! @memberof RF_String
-//! @brief Tokenizes the given string
+//! @brief Applies a limited version of sscanf after the specified substring
 //!
 //! @isinherited{StringX}
-//! Separates it into @c tokensN depending on how many substrings can be created from the @c sep separatior and stores them
-//! into the Array of RF_String* that should be passed to the function. The array gets initialized inside the function and
-//! <b>has to be freed explicitly</b> later by thg user. Also each String inside the array has to be Deinitialized too.
-//! Here is an example usage:
-//! @snippet Strings/tokenize.cpp Tokenize_C
-//! @cppsnippet Tokenize_CPP
-//! @param[in] thisstr The string to tokenize. @inhtype{String,StringX}
-//! @param[in] sep A string literal that will be used as a separator to tokenize the given string
-//! @param[out] tokensN The number of tokens that got created
-//! @param[out] tokens Pass a pointer to an array of RF_Strings. @keepptr
-//! @return Returns true in success and false in case the the separating character has not been found
-//! @internal @cppcode
-//! char String::Tokenize(char* sep,uint32_t* tokensN, String*** tokens)
-//! {
-//!     RF_String* t;
-//!     uint32_t i;
-//!     if(rfString_Tokenize(this->i_StringCHandle,sep,tokensN,&t)==false)
-//!         return false;
-//!
-//!     *tokens = (String**) malloc(sizeof(String*)* (*tokensN));
-//!     for(i=0;i<(*tokensN);i++)
-//!     {
-//!        (*tokens)[i] = new String((RF_String*)&t[i]);
-//!     }
-//!     return true;
-//! }
-//! @endcpp @endinternal
-i_DECLIMEX_ char rfString_Tokenize(void* thisstr,char* sep,uint32_t* tokensN,RF_String** tokens);
+//! @lmsFunction
+//! @param thisstr The current string. @inhtype{String,StringX}
+//! @param afterstr The substring after which to apply sscanf. @inhtype{String,StringX} @tmpSTR
+//! @param format The tokens parameter which give the format of scanf
+//! @param var A void* to pass in any variable we need to get a value
+//! @return Returns true if a value was read and false otherwise, substring not being found in the string or sscanf unable to read into the variable
+#if defined(RF_IAMHERE_FOR_DOXYGEN)
+    i_DECLIMEX_ char rfString_ScanfAfter(const void* thisstr,const void* afterstr,const char* format,void* var);
+#else
+    i_DECLIMEX_ char i_rfString_ScanfAfter(const void* thisstr,const void* afterstr,const char* format,void* var);
+    #define rfString_ScanfAfter(i_THISSTR_,i_AFTERSTR_,i_FORMAT_,i_VAR_) i_rfLMSX_WRAP4(char,i_rfString_ScanfAfter,i_THISSTR_,i_AFTERSTR_,i_FORMAT_,i_VAR_)
+#endif
+
 
 
 //! @memberof RF_String
@@ -925,10 +946,13 @@ i_DECLIMEX_ char rfString_Tokenize(void* thisstr,char* sep,uint32_t* tokensN,RF_
 //! + @c RF_MATCH_WORD: If you to find only exact matches of the substring. For example an exact search for @e "HELLO" in the string
 //!     @e "HELLOWORLD" would find nothing. Default is with this flag off.
 //! @return Returns true if the substring is found and initialized and false otherwise
+//! @see rfString_Before()
+//! @see rfString_After()
+//! @see rfStringX_MoveAfterPair()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ char rfString_Between(void* thisstr,void* lstr,void* rstr,RF_String* result,const char options);
+i_DECLIMEX_ char rfString_Between(const void* thisstr,const void* lstr,const void* rstr,RF_String* result,const char options);
 #else
-i_DECLIMEX_ char i_rfString_Between(void* thisstr,void* lstr,void* rstr,RF_String* result,const char* options);
+i_DECLIMEX_ char i_rfString_Between(const void* thisstr,const void* lstr,const void* rstr,RF_String* result,const char* options);
     #ifdef RF_OPTION_DEFAULT_ARGUMENTS
         #define rfString_Between(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_BETWEEN,5,__VA_ARGS__)
         #define i_NPSELECT_RF_STRING_BETWEEN1(...)  RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Between() accepts from 4 to 5 arguments\"")
@@ -970,11 +994,14 @@ i_DECLIMEX_ char i_rfString_Between(void* thisstr,void* lstr,void* rstr,RF_Strin
 //! @param ... The strings to search for. @inhtype{String,StringX} @tmpSTR
 //! @extraVarArgLim
 //! @return Returns true if the substring was initialized and false if none of the parameters were found or an invalid UTF-8 sequence was given. In the latter case an error is also logged.
+//! @see rfString_Before()
+//! @see rfString_Afterv()
+//! @see rfString_After()
 #ifdef RF_IAMHERE_FOR_DOXYGEN
-i_DECLIMEX_ char rfString_Beforev(void* thisstr,RF_String* result,const char options,const unsigned char parN, ...);
+i_DECLIMEX_ char rfString_Beforev(const void* thisstr,RF_String* result,const char options,const unsigned char parN, ...);
 #endif
 #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-    i_DECLIMEX_ char i_rfString_Beforev(void* thisstr,RF_String* result,const char* options,const unsigned char* parN, ...);
+    i_DECLIMEX_ char i_rfString_Beforev(const void* thisstr,RF_String* result,const char* options,const unsigned char* parN, ...);
     #define rfString_Beforev(...)  RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_BEFOREV,4,__VA_ARGS__)
     #define i_NPSELECT_RF_STRING_BEFOREV1(...)  RF_SELECT_FUNC_IF_NARGGT2(i_LIMSELECT_RF_STRING_BEFOREV,18,__VA_ARGS__)
     #define i_NPSELECT_RF_STRING_BEFOREV0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Beforev() needs to receive more than 4 arguments\"")
@@ -1013,11 +1040,14 @@ i_DECLIMEX_ char rfString_Beforev(void* thisstr,RF_String* result,const char opt
 //!     Default search option is to @b match the case. For now this works only for characters of the english language.
 //! + @c RF_MATCH_WORD: If you to find only exact matches of the substring. For example an exact search for @e "HELLO" in the string
 //!     @e "HELLOWORLD" would find nothing. Default is with this flag off.
-//! @return Returns true if the substring was initialized and false if none of the parameters were found or an invalid UTF-8 sequence was given. In the latter case an error is also logged.
+//! @return Returns true if the substring was initialized and false if none of the parameters were found or an invalid UTF-8 sequence was given.
+//! In the latter case an error is also logged.
+//! @see rfString_Beforev()
+//! @see rfString_After()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ char rfString_Before(void* thisstr,void* sstr,RF_String* result,const char options);
+i_DECLIMEX_ char rfString_Before(const void* thisstr,const void* sstr,RF_String* result,const char options);
 #else
-i_DECLIMEX_ char i_rfString_Before(void* thisstr,void* sstr,RF_String* result,const char* options);
+i_DECLIMEX_ char i_rfString_Before(const void* thisstr,const void* sstr,RF_String* result,const char* options);
     #ifdef RF_OPTION_DEFAULT_ARGUMENTS
         #define rfString_Before(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_BEFORE,4,__VA_ARGS__)
         #define i_NPSELECT_RF_STRING_BEFORE1(...)  RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Before() accepts from 3 to 4 arguments\"")
@@ -1049,10 +1079,13 @@ i_DECLIMEX_ char i_rfString_Before(void* thisstr,void* sstr,RF_String* result,co
 //! + @c RF_MATCH_WORD: If you to find only exact matches of the substring. For example an exact search for @e "HELLO" in the string
 //!     @e "HELLOWORLD" would find nothing. Default is with this flag off.
 //! @return Returns true for success and false if the substring is not found in the parameter string.
+//! @see rfString_Afterv()
+//! @see rfString_Before()
+//! @see rfStringX_MoveAfter()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ char rfString_After(void* thisstr,void* after,RF_String* out,const char options);
+i_DECLIMEX_ char rfString_After(const void* thisstr,const void* after,RF_String* out,const char options);
 #else
-i_DECLIMEX_ char i_rfString_After(void* thisstr,void* after,RF_String* out,const char* options);
+i_DECLIMEX_ char i_rfString_After(const void* thisstr,const void* after,RF_String* out,const char* options);
     #ifdef RF_OPTION_DEFAULT_ARGUMENTS
         #define rfString_After(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_AFTER,4,__VA_ARGS__)
         #define i_NPSELECT_RF_STRING_AFTER1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_After() accepts from 3 to 4 arguments\"")
@@ -1091,30 +1124,32 @@ i_DECLIMEX_ char i_rfString_After(void* thisstr,void* after,RF_String* out,const
 //! @param ... The substrings to search for. @inhtype{String,StringX} @tmpSTR
 //! @extraVarArgLim
 //! @return Returns true for success and false if the substring is not found in the parameter string.
+//! @see rfString_After()
+//! @see rfString_Beforev()
 #ifdef RF_IAMHERE_FOR_DOXYGEN
-i_DECLIMEX_ char rfString_Afterv(void* thisstr,RF_String* out,const char options,const unsigned char parN,...);
+i_DECLIMEX_ char rfString_Afterv(const void* thisstr,RF_String* out,const char options,const unsigned char parN,...);
 #endif
 #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-i_DECLIMEX_ char i_rfString_Afterv(void* thisstr,RF_String* out,const char* options,const unsigned char* parN,...);
+i_DECLIMEX_ char i_rfString_Afterv(const void* thisstr,RF_String* out,const char* options,const unsigned char* parN,...);
     #define rfString_Afterv(...)  RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_AFTERV,4,__VA_ARGS__)
     #define i_NPSELECT_RF_STRING_AFTERV1(...)  RF_SELECT_FUNC_IF_NARGGT2(i_LIMSELECT_RF_STRING_AFTERV,18,__VA_ARGS__)
     #define i_NPSELECT_RF_STRING_AFTERV0(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Afterv() needs to receive more than 4 arguments\"")
     #define i_LIMSELECT_RF_STRING_AFTERV1(...) RF_COMPILE_ERROR("message \"Extra Arguments Limit Reached: Function rfString_Afterv() received more extra arguments than the limit permits\"")
     #define i_LIMSELECT_RF_STRING_AFTERV0(...) RF_SELECT_FUNC(i_SELECT_RF_STRING_AFTERV,__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV5(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP5(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_((i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV6(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP6(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_((i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV7(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP7(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_((i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV8(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP8(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_((i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV9(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP9(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_((i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV10(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP10(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_((i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV11(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP11(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_((i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV12(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP12(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_((i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV13(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP13(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_((i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV14(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP14(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_((i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV15(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP15(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_((i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV16(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP16(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_((i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV17(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP17(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_((i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV18(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP18(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_((i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
+    #define i_SELECT_RF_STRING_AFTERV5(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP5(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
+    #define i_SELECT_RF_STRING_AFTERV6(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP6(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
+    #define i_SELECT_RF_STRING_AFTERV7(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP7(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
+    #define i_SELECT_RF_STRING_AFTERV8(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP8(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
+    #define i_SELECT_RF_STRING_AFTERV9(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP9(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
+    #define i_SELECT_RF_STRING_AFTERV10(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP10(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
+    #define i_SELECT_RF_STRING_AFTERV11(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP11(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
+    #define i_SELECT_RF_STRING_AFTERV12(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP12(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
+    #define i_SELECT_RF_STRING_AFTERV13(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP13(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
+    #define i_SELECT_RF_STRING_AFTERV14(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP14(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
+    #define i_SELECT_RF_STRING_AFTERV15(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP15(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
+    #define i_SELECT_RF_STRING_AFTERV16(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP16(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
+    #define i_SELECT_RF_STRING_AFTERV17(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP17(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
+    #define i_SELECT_RF_STRING_AFTERV18(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP18(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
 #else
     char rfString_Afterv(void* thisstr,RF_String* out,const char* options,const unsigned char* parN,...);
 #endif
@@ -1122,8 +1157,99 @@ i_DECLIMEX_ char i_rfString_Afterv(void* thisstr,RF_String* out,const char* opti
 
 
 //! @}
-/*------------------------------------------------------------------------ RF_String manipulation functions-------------------------------------------------------------------------------*/
-//! @name String Manipulation
+
+/*------------------------------------------------------------------------ RF_String Conversion functions-------------------------------------------------------------------------------*/
+//! @name String Conversion Functions
+//! @{
+
+//! @memberof RF_String
+//! @brief Returns the integer value of a String
+//!
+//! @isinherited{StringX}
+//! The parameter string must contains only numbers. If it contains anything else the function fails.
+//! @param thisstr The string whose integer value to return. @inhtype{String,StringX}
+//! @param[out] v A refence to an integer that will return the float value
+//! @return Returns true in case of succesfull conversion or false if no integer was represented by the string
+//! @see rfString_ToDouble()
+i_DECLIMEX_ char rfString_ToInt(const void* thisstr,int32_t* v);
+
+//! @memberof RF_String
+//! @brief Returns the double value of a String
+//!
+//! @isinherited{StringX}
+//! The parameter string must contain only a number. If it contains anything else the function fails.
+//! @param thisstr The string whose floating point value to return. @inhtype{String,StringX}
+//! @param[out] f A refence to a double that will return the floating point number value
+//! @return Returns RF_SUCCESS in case of succesfull conversion or error if there was failure. Possible errors are:
+//! + @c RE_STRING_TOFLOAT: There was a conversion error. The string probably does not represent a float
+//! + @c RE_STRING_TOFLOAT_RANGE: The represented floating point number is of a range bigger than what can be
+//! represented by the system
+//! + @c RE_STRING_TOFLOAT_UNDERFLOW: Representing the string's floating point number in a double would cause underflow
+//! @see rfString_ToInt()
+i_DECLIMEX_ int rfString_ToDouble(const void* thisstr,double* f);
+
+//! @memberof RF_String
+//! @brief Turns any uppercase characters of the string into lower case
+//!
+//! @isinherited{StringX}
+//! This function as of now only works with letter of the English alphabet.
+//! All the characters of the string that are uppercase shall be turned into lowercase
+//! @param thisstr The string for which to perform the uppercase to lowercase conversion
+//! @see rfString_ToUpper()
+i_DECLIMEX_ void rfString_ToLower(void* thisstr);
+
+//! @memberof RF_String
+//! @brief Turns any lowercase characters of the string into upper case
+//!
+//! @isinherited{StringX}
+//! This function as of now only works with letter of the English alphabet.
+//! All the characters of the string that are lowercase shall be turned into uppercase
+//! @param thisstr The string for which to perform the lowercase to uppercase conversion
+//! @see rfString_ToLower()
+i_DECLIMEX_ void rfString_ToUpper(void* thisstr);
+
+//! @memberof RF_String
+//! @brief Tokenizes the given string
+//!
+//! @isinherited{StringX}
+//! Separates it into @c tokensN depending on how many substrings can be created from the @c sep separatior and stores them
+//! into the Array of RF_String* that should be passed to the function. The array gets initialized inside the function and
+//! <b>has to be freed explicitly</b> later by thg user. Also each String inside the array has to be Deinitialized too.
+//! Here is an example usage:
+//! @snippet Strings/tokenize.cpp Tokenize_C
+//! @param[in] thisstr The string to tokenize. @inhtype{String,StringX}
+//! @param[in] sep A substring that will be used as a separator @inhtype{String,StringX}
+//! @param[out] tokensN The number of tokens that got created
+//! @param[out] tokens Pass a pointer to an array of RF_Strings. @keepptr
+//! @return Returns true in success and false in case the the separating character has not been found
+//! @internal @cppcode
+//! char String::Tokenize(char* sep,uint32_t* tokensN, String*** tokens)
+//! {
+//!     RF_String* t;
+//!     uint32_t i;
+//!     if(rfString_Tokenize(this->i_StringCHandle,sep,tokensN,&t)==false)
+//!         return false;
+//!
+//!     *tokens = (String**) malloc(sizeof(String*)* (*tokensN));
+//!     for(i=0;i<(*tokensN);i++)
+//!     {
+//!        (*tokens)[i] = new String((RF_String*)&t[i]);
+//!     }
+//!     return true;
+//! }
+//! @endcpp @endinternal
+#if defined(RF_IAMHERE_FOR_DOXYGEN)
+i_DECLIMEX_ char rfString_Tokenize(const void* thisstr,const void* sep,uint32_t* tokensN,RF_String** tokens);
+#else
+i_DECLIMEX_ char i_rfString_Tokenize(const void* thisstr,const void* sep,uint32_t* tokensN,RF_String** tokens);
+#define rfString_Tokenize(i_THISSTR_,i_SEP_,i_TOKENSN_,i_TOKENS_) i_rfLMSX_WRAP4(char,i_rfString_Tokenize,i_THISSTR_,i_SEP_,i_TOKENSN_,i_TOKENS_)
+#endif
+
+//! @}
+
+
+/*------------------------------------------------------------------------ RF_String appending functions-------------------------------------------------------------------------------*/
+//! @name Adding to a String
 //! @{
 
 //! @memberof RF_String
@@ -1134,10 +1260,13 @@ i_DECLIMEX_ char i_rfString_Afterv(void* thisstr,RF_String* out,const char* opti
 //! @lmsFunction
 //! @param thisstr The string to append to
 //! @param other The string to add to this string. @inhtype{String,StringX} @tmpSTR
+//! @see rfStringAppend_i()
+//! @see rfStringAppend_f()
+//! @see rfString_Prepend()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ void rfString_Append(RF_String* thisstr,void* other);
+i_DECLIMEX_ void rfString_Append(RF_String* thisstr,const void* other);
 #else
-i_DECLIMEX_ void i_rfString_Append(RF_String* thisstr,void* other);
+i_DECLIMEX_ void i_rfString_Append(RF_String* thisstr,const void* other);
 #define rfString_Append(i_THISSTR_,i_OTHERSTR_) i_rfLMS_WRAP2(void,i_rfString_Append,i_THISSTR_,i_OTHERSTR_)
 #endif
 
@@ -1148,6 +1277,8 @@ i_DECLIMEX_ void i_rfString_Append(RF_String* thisstr,void* other);
 //! @notinherited{StringX}
 //! @param thisstr The string to append to
 //! @param i The integer to add
+//! @see rfString_Append()
+//! @see rfString_Append_f()
 i_DECLIMEX_ void rfString_Append_i(RF_String* thisstr,const int32_t i);
 
 //! @memberof RF_String
@@ -1157,6 +1288,8 @@ i_DECLIMEX_ void rfString_Append_i(RF_String* thisstr,const int32_t i);
 //! @notinherited{StringX}
 //! @param thisstr The string to append to
 //! @param f The float to add
+//! @see rfString_Append()
+//! @see rfString_Append_i()
 i_DECLIMEX_ void rfString_Append_f(RF_String* thisstr,const float f);
 
 //! @memberof RF_String
@@ -1166,12 +1299,19 @@ i_DECLIMEX_ void rfString_Append_f(RF_String* thisstr,const float f);
 //! @lmsFunction
 //! @param thisstr The string to prepend to
 //! @param other The string to prepend to this string. @inhtype{String,StringX} @tmpSTR
+//! @see rfString_Append()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ void rfString_Prepend(RF_String* thisstr,void* other);
+i_DECLIMEX_ void rfString_Prepend(RF_String* thisstr,const void* other);
 #else
-i_DECLIMEX_ void i_rfString_Prepend(RF_String* thisstr,void* other);
+i_DECLIMEX_ void i_rfString_Prepend(RF_String* thisstr,const void* other);
 #define rfString_Prepend(i_THISSTR_,i_OTHERSTR_)    i_rfLMS_WRAP2(void,i_rfString_Prepend,i_THISSTR_,i_OTHERSTR_)
 #endif
+
+//! @}
+
+/*------------------------------------------------------------------------ RF_String Removal functions-------------------------------------------------------------------------------*/
+//! @name Removing from a String
+//! @{
 
 //! @memberof RF_String
 //! @brief Removes occurences of a substring
@@ -1191,10 +1331,12 @@ i_DECLIMEX_ void i_rfString_Prepend(RF_String* thisstr,void* other);
 //! + @c RF_MATCH_WORD: If you want the found substring to be exact. For example an exact search for @e "HELLO" in the string
 //!     @e "HELLOWORLD" would return a failure. Default search is to return any found substring.
 //! @return Returns true in case of success, and false if the substring was not even found inside the string
+//! @see rfString_Append()
+//! @see rfString_Trim()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ char rfString_Remove(void* thisstr,void* rstr,uint32_t number,const char options);
+i_DECLIMEX_ char rfString_Remove(void* thisstr,const void* rstr,uint32_t number,const char options);
 #else
-    i_DECLIMEX_ char i_rfString_Remove(void* thisstr,void* rstr,uint32_t* number,const char* options);
+    i_DECLIMEX_ char i_rfString_Remove(void* thisstr,const void* rstr,uint32_t* number,const char* options);
     #ifdef RF_OPTION_DEFAULT_ARGUMENTS
         #define rfString_Remove(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_REMOVE,4,__VA_ARGS__)
         #define i_NPSELECT_RF_STRING_REMOVE1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Remove() accepts from 2 to 4 arguments\"")
@@ -1221,9 +1363,9 @@ i_DECLIMEX_ char rfString_Remove(void* thisstr,void* rstr,uint32_t number,const 
 //! @param thisstr The string to remove from @inhtype{String,StringX}
 //! @param keepstr A string all of whose characters will be kept in @c thisstr @inhtype{String,StringX} @tmpSTR
 #ifdef RF_IAMHERE_FOR_DOXYGEN
-i_DECLIMEX_ void rfString_KeepOnly(void* thisstr,void* keepstr);
+i_DECLIMEX_ void rfString_KeepOnly(void* thisstr,const void* keepstr);
 #else
-i_DECLIMEX_ void i_rfString_KeepOnly(void* thisstr,void* keepstr);
+i_DECLIMEX_ void i_rfString_KeepOnly(void* thisstr,const void* keepstr);
 #define rfString_KeepOnly(i_THISSTR_,I_KEEPSTR_)    i_rfLMS_WRAP2(void,i_rfString_KeepOnly,i_THISSTR_,I_KEEPSTR_)
 #endif
 
@@ -1234,6 +1376,9 @@ i_DECLIMEX_ void i_rfString_KeepOnly(void* thisstr,void* keepstr);
 //! @param thisstr The string to prune from. @inhtype{String,StringX}
 //! @param n The number of characters to remove. Must be a positive integer.
 //! @return True if n characters got removed and false if there are not enough characters to remove. (in which case the string becomes empty)
+//! @see rfString_PruneEnd()
+//! @see rfString_PruneMiddleB()
+//! @see rfString_PruneMiddleF()
 i_DECLIMEX_ char rfString_PruneStart(void* thisstr,uint32_t n);
 
 //! @memberof RF_String
@@ -1243,6 +1388,9 @@ i_DECLIMEX_ char rfString_PruneStart(void* thisstr,uint32_t n);
 //! @param thisstr The string to prune from. @inhtype{String,StringX}
 //! @param n The number of characters to remove. Must be a positive integer.
 //! @return True if n characters got removed and false if there are not enough characters to remove. (in which case the string becomes empty)
+//! @see rfString_PruneStart()
+//! @see rfString_PruneMiddleB()
+//! @see rfString_PruneMiddleF()
 i_DECLIMEX_ char rfString_PruneEnd(void* thisstr,uint32_t n);
 
 //! @memberof RF_String
@@ -1254,6 +1402,9 @@ i_DECLIMEX_ char rfString_PruneEnd(void* thisstr,uint32_t n);
 //! @param p The position to remove the characters from. Must be a positive integer. Indexing starts from zero.
 //! @param n The number of characters to remove from the position and back.Must be a positive integer.
 //! @return Returns true in case of succesfull removal and false in any other case.
+//! @see rfString_PruneMiddleF()
+//! @see rfString_PruneStart()
+//! @see rfString_PruneEnd()
 i_DECLIMEX_ char rfString_PruneMiddleB(void* thisstr,uint32_t p,uint32_t n);
 //! @memberof RF_String
 //! @brief Removes characters from one point of the string to another going forward
@@ -1264,8 +1415,72 @@ i_DECLIMEX_ char rfString_PruneMiddleB(void* thisstr,uint32_t p,uint32_t n);
 //! @param p The position to remove the characters from. Must be a positive integer. Indexing starts from zero.
 //! @param n The number of characters to remove from the position and on. Must be a positive integer.
 //! @return Returns true in case of succesfull removal and false in any other case.
+//! @see rfString_PruneMiddleB()
+//! @see rfString_PruneStart()
+//! @see rfString_PruneEnd()
 i_DECLIMEX_ char rfString_PruneMiddleF(void* thisstr,uint32_t p,uint32_t n);
 
+//! @memberof RF_String
+//! @brief Removes all characters of a substring only from the start of the String
+//!
+//! @isinherited{StringX}
+//! Searches for and removes each individual character inside the @c sub substring from the
+//! given String @c thisstr starting from the beginning of the String and until it finds any other character
+//! @lmsFunction
+//! @param thisstr The string to search in. @inhtype{String,StringX}
+//! @param sub The substring to search for. @inhtype{String,StringX} @tmpSTR
+//! @return Returns true for success and false if none of @c sub characters were found inside the given String
+//! @see rfString_Trim()
+//! @see rfString_TrimEnd()
+#if defined(RF_IAMHERE_FOR_DOXYGEN)
+    i_DECLIMEX_ char rfString_TrimStart(void* thisstr,const void* sub);
+#else
+    i_DECLIMEX_ char i_rfString_TrimStart(void* thisstr,const void* sub);
+    #define rfString_TrimStart(i_THISSTR_,i_SUBSTR_) i_rfLMSX_WRAP2(char,i_rfString_TrimStart,i_THISSTR_,i_SUBSTR_)
+#endif
+//! @memberof RF_String
+//! @brief Removes all characters of a substring starting from the end of the String
+//!
+//! @isinherited{StringX}
+//! Searches for and removes each individual character inside the @c sub substring from the
+//! given String @c thisstr starting from the end of the String and until it finds any other character
+//! @lmsFunction
+//! @param thisstr The string to search in. @inhtype{String,StringX}
+//! @param sub The substring to search for. @inhtype{String,StringX} @tmpSTR
+//! @return Returns true for success and false if none of @c sub characters were found inside the given String
+//! @see rfString_Trim()
+//! @see rfString_TrimStart()
+#if defined(RF_IAMHERE_FOR_DOXYGEN)
+    i_DECLIMEX_ char rfString_TrimEnd(void* thisstr,const void* sub);
+#else
+    i_DECLIMEX_ char i_rfString_TrimEnd(void* thisstr,const void* sub);
+    #define rfString_TrimEnd(i_THISSTR_,i_SUBSTR_) i_rfLMSX_WRAP2(char,i_rfString_TrimEnd,i_THISSTR_,i_SUBSTR_)
+#endif
+
+//! @memberof RF_String
+//! @brief Removes all characters of a substring from both ends of the given String
+//!
+//! @isinherited{StringX}
+//! Searches for and removes each individual character inside the @c sub substring from the
+//! given String @c thisstr starting from both the beginning and the end of the String and until it finds any other character
+//! @lmsFunction
+//! @param thisstr The string to search in. @inhtype{String,StringX}
+//! @param sub The substring to search for. @inhtype{String,StringX} @tmpSTR
+//! @return Returns true for success and false if none of @c sub characters were found inside the given String
+//! @see rfString_TrimStart()
+//! @see rfString_TrimEnd()
+#if defined(RF_IAMHERE_FOR_DOXYGEN)
+    i_DECLIMEX_ char rfString_Trim(void* thisstr,const void* sub);
+#else
+    i_DECLIMEX_ char i_rfString_Trim(void* thisstr,const void* sub);
+    #define rfString_Trim(i_THISSTR_,i_SUBSTR_) i_rfLMSX_WRAP2(char,i_rfString_Trim,i_THISSTR_,i_SUBSTR_)
+#endif
+
+//! @}
+
+/*------------------------------------------------------------------------ RF_String Replacement functions-------------------------------------------------------------------------------*/
+//! @name Replacing parts of a String
+//! @{
 
 //! @memberof RF_String
 //! @brief Replace all occurences of a String
@@ -1284,10 +1499,11 @@ i_DECLIMEX_ char rfString_PruneMiddleF(void* thisstr,uint32_t p,uint32_t n);
 //! + @c RF_MATCH_WORD: If you to replace only exact matches of the substring. For example an exact replace for @e "HELLO" in the string
 //!     @e "HELLOWORLD" would replace nothing. Default is with this flag off.
 //! @return Returns true in case of success, and false if the substring was not even found inside the string
+//! @see rfStringX_Replace()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ char rfString_Replace(RF_String* thisstr,void* sstr,void* rstr,const uint32_t number,const char options);
+i_DECLIMEX_ char rfString_Replace(RF_String* thisstr,const void* sstr,const void* rstr,const uint32_t number,const char options);
 #else
-i_DECLIMEX_ char i_rfString_Replace(RF_String* thisstr,void* sstr,void* rstr,const uint32_t* number,const char* options);
+i_DECLIMEX_ char i_rfString_Replace(RF_String* thisstr,const void* sstr,const void* rstr,const uint32_t* number,const char* options);
     #ifdef RF_OPTION_DEFAULT_ARGUMENTS
         #define rfString_Replace(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_REPLACE,5,__VA_ARGS__)
         #define i_NPSELECT_RF_STRING_REPLACE1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Replace() accepts from 3 to 5 arguments\"")
@@ -1306,55 +1522,9 @@ i_DECLIMEX_ char i_rfString_Replace(RF_String* thisstr,void* sstr,void* rstr,con
     #endif
 #endif
 
-//! @memberof RF_String
-//! @brief Removes all characters of a substring only from the start of the String
-//!
-//! @isinherited{StringX}
-//! Searches for and removes each individual character inside the @c sub substring from the
-//! given String @c thisstr starting from the beginning of the String and until it finds any other character
-//! @lmsFunction
-//! @param thisstr The string to search in. @inhtype{String,StringX}
-//! @param sub The substring to search for. @inhtype{String,StringX} @tmpSTR
-//! @return Returns true for success and false if none of @c sub characters were found inside the given String
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
-    i_DECLIMEX_ char rfString_TrimStart(void* thisstr,void* sub);
-#else
-    i_DECLIMEX_ char i_rfString_TrimStart(void* thisstr,void* sub);
-    #define rfString_TrimStart(i_THISSTR_,i_SUBSTR_) i_rfLMSX_WRAP2(char,i_rfString_TrimStart,i_THISSTR_,i_SUBSTR_)
-#endif
-//! @memberof RF_String
-//! @brief Removes all characters of a substring starting from the end of the String
-//!
-//! @isinherited{StringX}
-//! Searches for and removes each individual character inside the @c sub substring from the
-//! given String @c thisstr starting from the end of the String and until it finds any other character
-//! @lmsFunction
-//! @param thisstr The string to search in. @inhtype{String,StringX}
-//! @param sub The substring to search for. @inhtype{String,StringX} @tmpSTR
-//! @return Returns true for success and false if none of @c sub characters were found inside the given String
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
-    i_DECLIMEX_ char rfString_TrimEnd(void* thisstr,void* sub);
-#else
-    i_DECLIMEX_ char i_rfString_TrimEnd(void* thisstr,void* sub);
-    #define rfString_TrimEnd(i_THISSTR_,i_SUBSTR_) i_rfLMSX_WRAP2(char,i_rfString_TrimEnd,i_THISSTR_,i_SUBSTR_)
-#endif
 
-//! @memberof RF_String
-//! @brief Removes all characters of a substring from both ends of the given String
-//!
-//! @isinherited{StringX}
-//! Searches for and removes each individual character inside the @c sub substring from the
-//! given String @c thisstr starting from both the beginning and the end of the String and until it finds any other character
-//! @lmsFunction
-//! @param thisstr The string to search in. @inhtype{String,StringX}
-//! @param sub The substring to search for. @inhtype{String,StringX} @tmpSTR
-//! @return Returns true for success and false if none of @c sub characters were found inside the given String
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
-    i_DECLIMEX_ char rfString_Trim(void* thisstr,void* sub);
-#else
-    i_DECLIMEX_ char i_rfString_Trim(void* thisstr,void* sub);
-    #define rfString_Trim(i_THISSTR_,i_SUBSTR_) i_rfLMSX_WRAP2(char,i_rfString_Trim,i_THISSTR_,i_SUBSTR_)
-#endif
+
+
 //! @}
 /*------------------------------------------------------------------------ RF_String File Descriptor I/O functions-------------------------------------------------------------------------------*/
 //! @name String File Descriptor I/O functions
@@ -1370,6 +1540,9 @@ i_DECLIMEX_ char i_rfString_Replace(RF_String* thisstr,void* sstr,void* rstr,con
 //! @param f A valid and open file pointer in read mode from which to read the string. The file's encoding must be UTF-8.A check for valide sequence of bytes is performed.
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this initialization
 //! @return The initialized string or null pointer in case of failure to read the file, or unexpected data (non-UTF8 encoded string)
+//! @see rfString_Init_fUTF8()
+//! @see rfString_Assign_fUTF8()
+//! @see rfString_Append_fUTF8()
 i_DECLIMEX_ RF_String* rfString_Create_fUTF8(FILE* f, char* eof);
 //! @memberof RF_String
 //! @brief Initializes a string from UTF-8 file parsing
@@ -1383,6 +1556,9 @@ i_DECLIMEX_ RF_String* rfString_Create_fUTF8(FILE* f, char* eof);
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this initialization
 //! @return Returns either a positive number for succesfull initialization that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF8() can produce.
+//! @see rfString_Create_fUTF8()
+//! @see rfString_Assign_fUTF8()
+//! @see rfString_Append_fUTF8()
 i_DECLIMEX_ int32_t rfString_Init_fUTF8(RF_String* str,FILE* f, char* eof);
 
 //! @memberof RF_String
@@ -1397,6 +1573,9 @@ i_DECLIMEX_ int32_t rfString_Init_fUTF8(RF_String* str,FILE* f, char* eof);
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this assignment
 //! @return Returns either a positive number for succesfull assignment that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF8() can produce.
+//! @see rfString_Init_fUTF8()
+//! @see rfString_Create_fUTF8()
+//! @see rfString_Append_fUTF8()
 i_DECLIMEX_ int32_t rfString_Assign_fUTF8(RF_String* str,FILE* f, char* eof);
 //! @memberof RF_String
 //! @brief Appends to a string from UTF-8 file parsing
@@ -1410,6 +1589,9 @@ i_DECLIMEX_ int32_t rfString_Assign_fUTF8(RF_String* str,FILE* f, char* eof);
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this appending
 //! @return Returns either a positive number for succesfull appending that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF8() can produce.
+//! @see rfString_Init_fUTF8()
+//! @see rfString_Create_fUTF8()
+//! @see rfString_Assign_fUTF8()
 i_DECLIMEX_ int32_t rfString_Append_fUTF8(RF_String* str,FILE* f, char* eof);
 
 //! @memberof RF_String
@@ -1424,6 +1606,9 @@ i_DECLIMEX_ int32_t rfString_Append_fUTF8(RF_String* str,FILE* f, char* eof);
 //! @c RF_LITTLE_ENDIAN and @c RF_BIG_ENDIAN.
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this initialization
 //! @return The initialized string or null pointer in case of failure to read the file
+//! @see rfString_Init_fUTF16()
+//! @see rfString_Append_fUTF16()
+//! @see rfString_Assign_fUTF16()
 i_DECLIMEX_ RF_String* rfString_Create_fUTF16(FILE* f, char endianess,char* eof);
 //! @memberof RF_String
 //! @brief Initializes a string from UTF-16 file parsing
@@ -1438,6 +1623,9 @@ i_DECLIMEX_ RF_String* rfString_Create_fUTF16(FILE* f, char endianess,char* eof)
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this initialization
 //! @return Returns either a positive number for succesfull initialization that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF16LE() can produce.
+//! @see rfString_Create_fUTF16()
+//! @see rfString_Append_fUTF16()
+//! @see rfString_Assign_fUTF16()
 i_DECLIMEX_ int32_t rfString_Init_fUTF16(RF_String* str,FILE* f, char endianess,char* eof);
 
 //! @memberof RF_String
@@ -1453,6 +1641,9 @@ i_DECLIMEX_ int32_t rfString_Init_fUTF16(RF_String* str,FILE* f, char endianess,
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this appending
 //! @return Returns either a positive number for succesfull appending that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF16LE() can produce.
+//! @see rfString_Init_fUTF16()
+//! @see rfString_Create_fUTF16()
+//! @see rfString_Assign_fUTF16()
 i_DECLIMEX_ int32_t rfString_Append_fUTF16(RF_String* str,FILE* f, char endianess,char* eof);
 //! @memberof RF_String
 //! @brief Assigns the contents of a UTF-16 file to an already initialized string
@@ -1467,6 +1658,9 @@ i_DECLIMEX_ int32_t rfString_Append_fUTF16(RF_String* str,FILE* f, char endianes
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this assignment
 //! @return Returns either a positive number for succesfull assignment that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF16LE() can produce.
+//! @see rfString_Init_fUTF16()
+//! @see rfString_Create_fUTF16()
+//! @see rfString_Append_fUTF16()
 i_DECLIMEX_ int32_t rfString_Assign_fUTF16(RF_String* str,FILE* f, char endianess,char* eof);
 
 //! @memberof RF_String
@@ -1481,6 +1675,9 @@ i_DECLIMEX_ int32_t rfString_Assign_fUTF16(RF_String* str,FILE* f, char endianes
 //! @c RF_LITTLE_ENDIAN and @c RF_BIG_ENDIAN.
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this initialization
 //! @return The initialized string or null pointer in case of failure to read the file
+//! @see rfString_Init_fUTF32()
+//! @see rfString_Append_fUTF32()
+//! @see rfString_Assign_fUTF32()
 i_DECLIMEX_ RF_String* rfString_Create_fUTF32(FILE* f,char endianess, char* eof);
 //! @memberof RF_String
 //! @brief Initializes a string from UTF-32 file parsing
@@ -1495,6 +1692,9 @@ i_DECLIMEX_ RF_String* rfString_Create_fUTF32(FILE* f,char endianess, char* eof)
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this initialization
 //! @return Returns either a positive number for succesfull initialization that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF32LE() can produce.
+//! @see rfString_Create_fUTF32()
+//! @see rfString_Append_fUTF32()
+//! @see rfString_Assign_fUTF32()
 i_DECLIMEX_ int32_t rfString_Init_fUTF32(RF_String* str,FILE* f,char endianess, char* eof);
 //! @memberof RF_String
 //! @brief Assigns the contents of a UTF-32 file to a string
@@ -1509,6 +1709,9 @@ i_DECLIMEX_ int32_t rfString_Init_fUTF32(RF_String* str,FILE* f,char endianess, 
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this assignment
 //! @return Returns either a positive number for succesfull assignment that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF32LE() can produce.
+//! @see rfString_Init_fUTF32()
+//! @see rfString_Create_fUTF32()
+//! @see rfString_Append_fUTF32()
 i_DECLIMEX_ int32_t rfString_Assign_fUTF32(RF_String* str,FILE* f,char endianess, char* eof);
 //! @memberof RF_String
 //! @brief Appends the contents of a UTF-32 file to a string
@@ -1523,6 +1726,9 @@ i_DECLIMEX_ int32_t rfString_Assign_fUTF32(RF_String* str,FILE* f,char endianess
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this appending
 //! @return Returns either a positive number for succesfull appending that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF32LE() can produce.
+//! @see rfString_Init_fUTF32()
+//! @see rfString_Create_fUTF32()
+//! @see rfString_Assign_fUTF32()
 i_DECLIMEX_ int32_t rfString_Append_fUTF32(RF_String* str,FILE* f,char endianess, char* eof);
 
 //! @memberof RF_String

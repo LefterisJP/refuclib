@@ -1,4 +1,4 @@
-/**
+/*
 ** Copyright (c) 2011-2012, Karapetsas Eleftherios
 ** All rights reserved.
 **
@@ -15,7 +15,7 @@
 **  SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-**/
+*/
 
 
 #ifndef RF_THREADC_H
@@ -147,7 +147,7 @@ i_DECLIMEX_ RF_Thread* rfThread_Create(uint32_t flags,void* (*ptr2onExecution)(v
 //! to save memory. If no value is given then the default is to create a thread with the same value as that given in compiling with refu builder.
 //! @return Returns true for success and false for failure of initialization
 #ifdef RF_IAMHERE_FOR_DOXYGEN
-i_DECLIMEX_ char rfThread_Init(RF_Thread* t,uint32_t flags,void* (*ptr2onExecution)(void*),void* data uint64_t lmsSize);
+i_DECLIMEX_ char rfThread_Init(RF_Thread* t,uint32_t flags,void* (*ptr2onExecution)(void*),void* data,uint64_t lmsSize);
 #else
 #ifdef RF_OPTION_DEFAULT_ARGUMENTS
     i_DECLIMEX_ char i_rfThread_Init(RF_Thread* t,uint32_t flags,void* (*ptr2onExecution)(void*),void* data,uint64_t lmsSize );

@@ -30,21 +30,22 @@ def checkConfigFile(root,configName,dynamic):
     os.rename(fname+"_temp",fname);
 
 
-def compileLib(verbose,dynamic,c):
+def compileLib(verbose,dynamic,config,compiler):
     """Compile the refu library by invoking the appropriate refu builder
         --verbose: A boolean flag denoting if the output should be verbose
         --dynamic: A boolean flag denoting whether a dynamic or a static library should be built
-        --c: The configuration instance
+        --config: The configuration instance
+        --compiler: The compiler instance
     """
     if(dynamic):
         print("--Compiling a dynamic version of the Refu library--")
     else:
         print("--Compiling a static version of the Refu library--")
     #make sure the refu builder will build correct library type
-    checkConfigFile(c.refuDir,c.configFName,dynamic);
+    checkConfigFile(config.refuDir,config.configFName,dynamic);
     #call the refu builder depending on the OS
     try:
-        with subprocess.Popen([os.path.join(c.refuDir,c.builderFName), '-v', '-f', c.configFName],cwd="..",stdout=subprocess.PIPE) as p:
+        with subprocess.Popen([os.path.join(config.refuDir,config.builderFName), '-v', '-f', config.configFName],cwd="..",stdout=subprocess.PIPE) as p:
             if(verbose):
                 print("\n\t==Builder Output Starts==\n")
                 for line in p.stdout:
@@ -66,6 +67,16 @@ def compileLib(verbose,dynamic,c):
     #if we get here it means success
     if(dynamic):
         print("--Dynamic version of the Refu library compiled Succesfully--\n\n");
+        #move it inside the Tests directory
+        try:
+            os.rename(os.path.join(config.refuDir,config.outputName+compiler.dynamicExtension),os.path.join(config.refuDir,"Tests",config.outputName+compiler.dynamicExtension))
+        except:
+            pass
     else:
         print("--Static version of the Refu library compiled Succesfully--\n\n");
+        #move it inside the Tests directory
+        try:
+            os.rename(os.path.join(config.refuDir,config.outputName+compiler.staticExtension),os.path.join(config.refuDir,"Tests",config.outputName+compiler.staticExtension))
+        except:
+            pass
     return True;
