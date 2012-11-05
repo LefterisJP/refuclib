@@ -21,27 +21,27 @@ def test(root,filename,config,logFile,testExec,verbose):
     #open the expected outputfile
     f = open(filename+".expect","r")
     try:
-        with subprocess.Popen(os.path.join(config.refuDir,"Tests",os.path.split(root)[1],testExec),cwd=root,stdout=subprocess.PIPE) as p:
-                count = 1;
-                for line in p.stdout:#for every line of the output
-                    line = line.decode("utf8");
-                    line = line.replace("\r\n","\n")
-                    expectedLine = f.readline();
-                    if(line!=expectedLine):
-                        if("*ERROR*:" in line):#it it's an expect error
-                            print("FAILED!\n\t"+line);
-                            logFile.write("FAILED!\n\t"+line);
-                        else:
-                            print("FAILED!\n\tCheck the logfile for Details.")
-                        #print("\t(Check logFile for details)\n")
-                        logFile.write("\n\t\tTest failed at expected output line \"[{0}]\"\n".format(count))
-                        logFile.write("\n\t\tExpected:\n\t\t\t{0}\n\t\tFound:\n\t\t\t{1}\n".format(expectedLine,line))
-                        return False;
-                    count=count+1
-                #wait till the subprocess ends
-                ret = p.poll();
-                while(ret == None):
-                    ret=p.poll();
+        p = subprocess.Popen(os.path.join(config.refuDir,"Tests",os.path.split(root)[1],testExec),cwd=root,stdout=subprocess.PIPE)
+        count = 1;
+        for line in p.stdout:#for every line of the output
+            line = line.decode("utf8");
+            line = line.replace("\r\n","\n")
+            expectedLine = f.readline();
+            if(line!=expectedLine):
+                if("*ERROR*:" in line):#it it's an expect error
+                    print("FAILED!\n\t"+line);
+                    logFile.write("FAILED!\n\t"+line);
+                else:
+                    print("FAILED!\n\tCheck the logfile for Details.")
+                #print("\t(Check logFile for details)\n")
+                logFile.write("\n\t\tTest failed at expected output line \"[{0}]\"\n".format(count))
+                logFile.write("\n\t\tExpected:\n\t\t\t{0}\n\t\tFound:\n\t\t\t{1}\n".format(expectedLine,line))
+                return False;
+            count=count+1
+        #wait till the subprocess ends
+        ret = p.poll();
+        while(ret == None):
+            ret=p.poll();
     except CalledProcessError as err:
         print("\tThere was an error while trying to run the compiled executable for test \"{0}\"".format(filename))
         print("\tThe output was:")
@@ -69,16 +69,16 @@ def debugTest(root,filename,config,logFile,testExec):
     print("\t**Testing \"{0}\" in Debug Mode**\n".format(filename))
     logFile.write("\t**Testing \"{0}\" in Debug Mode**\n".format(filename))
     try:
-        with subprocess.Popen(os.path.join(config.refuDir,"Tests",os.path.split(root)[1],testExec),cwd=root,stdout=subprocess.PIPE) as p:
-                for line in p.stdout:#for every line of the output
-                    line = line.decode("utf8");
-                    line = line.replace("\r\n","\n")
-                    print("\t"+line,end="")
-                    logFile.write(line)
-                #wait till the subprocess ends
-                ret = p.poll();
-                while(ret == None):
-                    ret=p.poll();
+        p = subprocess.Popen(os.path.join(config.refuDir,"Tests",os.path.split(root)[1],testExec),cwd=root,stdout=subprocess.PIPE)
+        for line in p.stdout:#for every line of the output
+            line = line.decode("utf8");
+            line = line.replace("\r\n","\n")
+            print("\t"+line,end="")
+            logFile.write(line)
+            #wait till the subprocess ends
+        ret = p.poll();
+        while(ret == None):
+            ret=p.poll();
     except CalledProcessError as err:
         print("\tThere was an error while trying to run the compiled executable for test \"{0}\" in debug mode".format(filename))
         print("\tThe output was:")

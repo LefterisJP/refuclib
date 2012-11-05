@@ -30,25 +30,25 @@ def compileTest(filename,dynamic,config,compiler,testExec,verbose,logFile):
     else:#for windows just provide the whole string
         cmdList = cmd;
     try:
-        with subprocess.Popen(cmdList,stdout=subprocess.PIPE,stderr=subprocess.PIPE) as p:
-            for line in p.stdout:
-                if(verbose):
-                    print("\t\t"+line.decode("utf8"));
-            #wait till the subprocess ends
-            ret = p.poll();
-            while(ret == None):
-                ret=p.poll();
-            if(ret!=0):
-                if(verbose):
-                    print("\t\tDuring compiling {0} the {1} compiler returned unsucessfully with return code {2}".format(filename,compiler.name,ret))
-                logFile.write("\t\tTesting of file \"{0}\" failed in the compilation stage\n".format(filename))
-                for line in p.stderr:
-                    line = line.decode("utf8");
-                    print("\t\t"+line)
-                    logFile.write("\t\t"+line);
-                print("\t-->Testing \"{0}\" ... FAILED to compile".format(filename))
-                logFile.write("\t-->Testing \"{0}\" ... FAILED to compile\n".format(filename))
-                return False;
+        p = subprocess.Popen(cmdList,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        for line in p.stdout:
+            if(verbose):
+                print("\t\t"+line.decode("utf8"));
+        #wait till the subprocess ends
+        ret = p.poll();
+        while(ret == None):
+            ret=p.poll();
+        if(ret!=0):
+            if(verbose):
+                print("\t\tDuring compiling {0} the {1} compiler returned unsucessfully with return code {2}".format(filename,compiler.name,ret))
+            logFile.write("\t\tTesting of file \"{0}\" failed in the compilation stage\n".format(filename))
+            for line in p.stderr:
+                line = line.decode("utf8");
+                print("\t\t"+line)
+                logFile.write("\t\t"+line);
+            print("\t-->Testing \"{0}\" ... FAILED to compile".format(filename))
+            logFile.write("\t-->Testing \"{0}\" ... FAILED to compile\n".format(filename))
+            return False;
     except CalledProcessError as err:
         print("\t\tThere was an error while invoking the compiler for test \"{0}\"".format(filename))
         print("\t\tThe compiler returned [{0}] and the output was:".format(err.returncode))

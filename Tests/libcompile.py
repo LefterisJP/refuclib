@@ -45,20 +45,20 @@ def compileLib(verbose,dynamic,config,compiler):
     checkConfigFile(config.refuDir,config.configFName,dynamic);
     #call the refu builder depending on the OS
     try:
-        with subprocess.Popen([os.path.join(config.refuDir,config.builderFName), '-v', '-f', config.configFName],cwd="..",stdout=subprocess.PIPE) as p:
-            if(verbose):
-                print("\n\t==Builder Output Starts==\n")
-                for line in p.stdout:
-                    line = line.decode("utf8")
-                    print("\t"+line,end="")
-                print("\n\t==Builder Output Ends==\n")
-            #wait until subprocess ends
+        p = subprocess.Popen([os.path.join(config.refuDir,config.builderFName), '-v', '-f', config.configFName],cwd="..",stdout=subprocess.PIPE)
+        if(verbose):
+            print("\n\t==Builder Output Starts==\n")
+            for line in p.stdout:
+                line = line.decode("utf8")
+                print("\t"+line,end="")
+            print("\n\t==Builder Output Ends==\n")
+        #wait until subprocess ends
+        ret = p.poll();
+        while(ret == None):
             ret = p.poll();
-            while(ret == None):
-                ret = p.poll();
-            if(ret!=0):
-                print("\tRefu builder returned unsucessfully with return code {0}".format(ret))
-                return False;
+        if(ret!=0):
+            print("\tRefu builder returned unsucessfully with return code {0}".format(ret))
+            return False;
     except CalledProcessError as err:
         print("\tThere was an error while invoking the refu builder to compile the library")
         print("\tRefu builder returned [{0}] and the output was:".format(err.returncode))
