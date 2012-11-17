@@ -3,6 +3,7 @@ from subprocess import CalledProcessError
 import os, os.path
 from testscompile import compileTest
 import shutil
+import time
 
 def test(root,filename,config,logFile,testExec,verbose):
     """
@@ -26,6 +27,9 @@ def test(root,filename,config,logFile,testExec,verbose):
         for line in p.stdout:#for every line of the output
             line = line.decode("utf8");
             line = line.replace("\r\n","\n")
+            if("passed >>" in line):
+                logFile.write("\t\t\t"+line+"\n");
+                continue;
             expectedLine = f.readline();
             if(line!=expectedLine):
                 if("*ERROR*:" in line):#it it's an expect error
@@ -53,8 +57,11 @@ def test(root,filename,config,logFile,testExec,verbose):
         print("OK!\n")
         logFile.write("OK!\n")
     else:
-        print("FAILED! Unexpected Return Value.\n")
-        logFile.write("FAILED! Unexpected Return Value.\n")
+        print("FAILED!\n\t\t Unexpected Return Value. Check the logfile for details")
+        line = line.partition("[")[2];
+        line = line.partition("]")[0];
+        print("\t\tTest ran until line [{0}]\n".format(line))
+        logFile.write("\t\tTEST FAILED! Unexpected Return Value.\n")
     return True;
 
 def debugTest(root,filename,config,logFile,testExec):
@@ -134,6 +141,10 @@ def runTests(config,compiler,dynamic,logFile,verbose,debug,tests):
                     pass
                 os.rename(os.path.join(".",testExec),os.path.join(root,testExec))
                 if(dynamic):#also if we are testing the dynamic lib, copy it to the test directory source so that the lib can be accessed
+                    try:
+                        os.remove(os.path.join(root,config.outputName+compiler.dynamicExtension))
+                    except:
+                        pass
                     shutil.copy(os.path.join(config.refuDir,"Tests",config.outputName+compiler.dynamicExtension),os.path.join(root,config.outputName+compiler.dynamicExtension))
                 #test it
                 if(debug):
@@ -147,6 +158,8 @@ def runTests(config,compiler,dynamic,logFile,verbose,debug,tests):
                     os.remove(os.path.join(root,testExec))
                 except:
                     pass
+                #adding some delay between tests until I figure out a better way to do this
+                time.sleep(0.10)
     #after all tests have concluded clean up
     print("\n",end="");
     logFile.write("\n");

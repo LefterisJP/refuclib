@@ -46,7 +46,7 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* enc
     {
         case RF_FILE_WRITE:
             t->mode = RF_FILE_READWRITE;
-            t->f = fopen(name->bytes,"r"i_PLUSB_WIN32"+");
+            t->f = fopen(name->bytes,"a"i_PLUSB_WIN32"+");
         break;
         case RF_FILE_READ:
             t->mode = RF_FILE_READ;

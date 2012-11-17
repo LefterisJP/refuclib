@@ -66,6 +66,24 @@ extern "C"
 #define RF_STRING_ITERATEB_END(i_char_,i_index_)  (i_char_)++;}(i_index_)--;}while((i_index_) != 0);
 
 
+//! A macro to easily reallocate a StringX's buffer. Should make the code clearer, BUT is not to be used in every occasion
+#define RF_STRINGX_REALLOC(STR_,REQSIZE_)    {\
+/*If the buffer size is not enough for the requires size*/\
+if(REQSIZE_ >= STR_->bSize)\
+{\
+    /*create the new size*/\
+    STR_->bSize = REQSIZE_*RF_OPTION_STRINGX_CAPACITY_M;\
+    /*Reallocate the buffer depending on whether its internal pointer has a value or not*/\
+    if(STR_->bIndex==0)\
+        RF_REALLOC(STR_->INH_String.bytes,char,STR_->bSize)\
+    else\
+    {\
+        STR_->INH_String.bytes-=STR_->bIndex;\
+        RF_REALLOC(STR_->INH_String.bytes,char,STR_->bSize)\
+        STR_->INH_String.bytes+=STR_->bIndex;\
+    }\
+}}
+
 //! @internal
 //! @memberof RF_String
 //! @brief Internal version of rfString_Find, used for byte position.

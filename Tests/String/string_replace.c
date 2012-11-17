@@ -5,6 +5,7 @@
 int main()
 {
 	RF_String s1,s2,s3;
+	RF_StringX sx1;
 
 
 	rfInit();
@@ -38,5 +39,17 @@ int main()
     EXPECT(true,rfString_Equal(&s3,RFS_("Ο Δημοσιογραφος Costas Vaxevanis has gone on trial in Athens για καταπατηση προσωπικων δικαιωματων\
  αφου δημοσιευσε τα ονοματα of 2,000 Greeks με λογαριασμους σε Ελβετικες τραπεζες")))
 
+
+	//Stringx replacing
+	EXPECT(true,rfStringX_Init(&sx1,"News from all over the world."))
+	EXPECTNOT(RF_FAILURE,rfStringX_MoveAfter(&sx1,RFS_("News ")))
+	EXPECT(true,rfStringX_Replace(&sx1,RFS_("."),RFS_(" || 投稿動画を参考に捜査…タクシー運転手殴った疑いで逮捕 ||"),0,0))
+	EXPECT(true,rfString_Equal(&sx1,RFS_("from all over the world || 投稿動画を参考に捜査…タクシー運転手殴った疑いで逮捕 ||")))
+	
+	EXPECT(true,rfStringX_ReplaceBetween(&sx1,RFS_("||"),RFS_(" "),RFS_("Φοβερη ειδηση που μολις βγηκε απο το το γραφειο ειδησεων. Η Μαρικα παντρευεται. Ναι δεν κανουμε\
+πλακα, η Μαρικα σοβαρα παντρευεται με τον Τοτο. Μιλαμε για νεα βιβλικων διαστασεων φιλε μου ||"),0,1))
+	EXPECT(true,rfString_Equal(&sx1,RFS_("from all over the world ||Φοβερη ειδηση που μολις βγηκε απο το το γραφειο ειδησεων. Η Μαρικα παντρευεται. Ναι δεν κανουμε\
+πλακα, η Μαρικα σοβαρα παντρευεται με τον Τοτο. Μιλαμε για νεα βιβλικων διαστασεων φιλε μου || 投稿動画を参考に捜査…タクシー運転手殴った疑いで逮捕 ||")))
+	
 	return 0;
 }

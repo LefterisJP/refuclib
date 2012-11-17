@@ -687,20 +687,15 @@ char i_NVrfStringX_Init_nc(struct RF_StringX* str,const char* lit)
 /*-------------------------------------------------------------------------Methods to copy/assign an RF_StringX-------------------------------------------------------------------------------*/
 
 // Assigns the value of the source string to the destination extended string.Both strings should already be initialized and hold a value. It is an error to give null parameters.
-void i_rfStringX_Assign(RF_StringX* dest,void* sourceP)
+void i_rfStringX_Assign(RF_StringX* dst,const void* sourceP)
 {
-    RF_String* source = (RF_String*)sourceP;
-    rfStringX_Reset(dest);//make sure that the destination's byte index is reset
+    const RF_String* source = (const RF_String*)sourceP;
+    rfStringX_Reset(dst);//make sure that the destination's byte index is reset
     //only if the new string value won't fit in the buffer reallocate the buffer
-    if(source->byteLength+1 >= dest->bSize)
-    {
-        dest->bSize = source->byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-        RF_REALLOC(dest->INH_String.bytes,char,dest->bSize);
-    }
-
+    RF_STRINGX_REALLOC(dst,source->byteLength+1)
     //now copy the value and the bytelength
-    memcpy(dest->INH_String.bytes,source->bytes,source->byteLength+1);
-    dest->INH_String.byteLength = source->byteLength;
+    memcpy(dst->INH_String.bytes,source->bytes,source->byteLength+1);
+    dst->INH_String.byteLength = source->byteLength;
 }
 
 //Assigns the value of a unicode character to the string
@@ -767,7 +762,7 @@ char rfStringX_Assign_char(RF_StringX* str,uint32_t codepoint)
 
 
 // Returns an RF_StringX version of the parameter RF_String
-RF_StringX* rfStringX_FromString_OUT(RF_String* s)
+RF_StringX* rfStringX_FromString_OUT(const RF_String* s)
 {
     //create the new string
     RF_StringX* ret;
@@ -781,7 +776,7 @@ RF_StringX* rfStringX_FromString_OUT(RF_String* s)
     return ret;
 }
 //Initializes an RF_StringX from an RF_string
-void rfStringX_FromString_IN(RF_StringX* dst,RF_String* src)
+void rfStringX_FromString_IN(RF_StringX* dst,const RF_String* src)
 {
     //allocate the stringX
     dst->bIndex = 0;
@@ -877,24 +872,17 @@ void rfStringX_Deinit(RF_StringX* s)
 /*-------------------------------------------------------------------------Functions to manipulate an RF_StringX-------------------------------------------------------------------------------*/
 
 // Appends the parameter String to this extended string.
-void i_rfStringX_Append(RF_StringX* thisstr,void* otherP)
+void i_rfStringX_Append(RF_StringX* thisstr,const void* otherP)
 {
-    RF_String* other = (RF_String*)otherP;
+    const RF_String* other = (const RF_String*)otherP;
     ///@note Here if a null addition is given lots of actions are done but the result is safe and the same string as the one entered.
     ///A check here would result in an additional check for every appending so I decided against it
-    //get this string's  buffer's remaining size
-    uint32_t remSize = RF_STRINGX_REMAINING_SIZE(thisstr);
 
     //calculate the new byte length
     thisstr->INH_String.byteLength += other->byteLength;
 
-    //if it does not fit inside the remaining size
-    if(remSize <= other->byteLength)
-    {
-        //reallocate this string to fit the new addition
-        thisstr->bSize = thisstr->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-        RF_REALLOC(thisstr->INH_String.bytes,char,thisstr->bSize);
-    }
+    //if it does not fit inside the remaining size, reallocate the buffer
+    RF_STRINGX_REALLOC(thisstr,thisstr->INH_String.byteLength+thisstr->bIndex+1)
 
     //add the string to this one
     strncat(thisstr->INH_String.bytes,other->bytes,other->byteLength);
@@ -912,19 +900,12 @@ void rfStringX_Append_i(RF_StringX* thisstr,const int32_t i)
 
     //get the size of the int32_t
     numLen= strlen(buff);
-    //get this string's  buffer's remaining size and the string's byte size
-    uint32_t remSize = RF_STRINGX_REMAINING_SIZE(thisstr);
 
     //get the new bytelength
     thisstr->INH_String.byteLength += numLen;
 
-    //if it does not fit inside the remaining size
-    if(remSize <= numLen)
-    {
-        //reallocate this string to fit the new addition
-        thisstr->bSize= thisstr->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-        RF_REALLOC(thisstr->INH_String.bytes,char,thisstr->bSize);
-    }
+    //if it does not fit inside the remaining size, reallocate the buffer
+    RF_STRINGX_REALLOC(thisstr,thisstr->INH_String.byteLength+thisstr->bIndex+1)
 
     //copy the value of the olds string and the number string into the new string
     strncat(thisstr->INH_String.bytes,buff,numLen);
@@ -945,18 +926,8 @@ void rfStringX_Append_f(RF_StringX* thisstr,const float f)
     len = strlen(buff);
     //calculate the new length
     thisstr->INH_String.byteLength += len;
-    //get this string's  buffer's remaining size and the string's byte size
-    uint32_t remSize = RF_STRINGX_REMAINING_SIZE(thisstr);
-
-    //if it does not fit inside the remaining size
-    if(remSize <= len)
-    {
-        //reallocate this string to fit the new addition
-        thisstr->bSize= thisstr->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-        //Reallocate this string to fit the new addition
-        RF_REALLOC(thisstr->INH_String.bytes,char,thisstr->bSize);
-    }
-
+    //if it does not fit in the buffer, reallocate it
+    RF_STRINGX_REALLOC(thisstr,thisstr->INH_String.byteLength+thisstr->bIndex+1)
 
     //copy the value of the olds string and the number string into the new string
     strncat(thisstr->INH_String.bytes,buff,len);
@@ -966,57 +937,38 @@ void rfStringX_Append_f(RF_StringX* thisstr,const float f)
 
 
 // Prepends the parameter String to this extended string
-void i_rfStringX_Prepend(RF_StringX* thisstr,void* otherP)
+void i_rfStringX_Prepend(RF_StringX* thisstr,const void* otherP)
 {
-    RF_String* other = (RF_String*)otherP;
+    const RF_String* other = (const RF_String*)otherP;
     int32_t i;//is not unsigned since it goes to -1 in the loop
-    //get this string's  buffer's remaining size and the string's byte size
-    uint32_t remSize = RF_STRINGX_REMAINING_SIZE(thisstr);
-
     //keep the previous byte length
     uint32_t size = thisstr->INH_String.byteLength;
     //get the new byte length
     thisstr->INH_String.byteLength += other->byteLength;
 
-    //if it does not fit inside the remaining size
-    if(remSize <= other->byteLength)
-    {
-        //reallocate this string to fit the new addition
-        thisstr->bSize= thisstr->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-        RF_REALLOC(thisstr->INH_String.bytes,char,thisstr->bSize);
-    }
-
+    //if the new string does not fit inside the buffer reallocate it
+    RF_STRINGX_REALLOC(thisstr,thisstr->INH_String.byteLength+thisstr->bIndex+1)
     //move the pre-existing string to the end of the buffer, by dislocating each byte by cstrlen
     for(i = size; i >= 0; i --)
         thisstr->INH_String.bytes[i+other->byteLength] = thisstr->INH_String.bytes[i];
-
     //and now add the new string to the start
     memcpy(thisstr->INH_String.bytes,other->bytes,other->byteLength);
 }
 
 // Inserts a string to this extended string at the parameter position.
-void i_rfStringX_Insert(RF_StringX* thisstr,uint32_t* posP,void* otherP)
+void i_rfStringX_Insert(RF_StringX* thisstr,uint32_t* posP,const void* otherP)
 {
-    RF_String* other = (RF_String*)otherP;
-    uint32_t length,bytePos,i,size,pos;
+    const RF_String* other = (const RF_String*)otherP;
+    uint32_t length,bytePos,size,pos,i;
     pos = *posP;
     char found = false;
-    //get this string's  buffer's remaining size and the string's byte size
-    uint32_t remSize = RF_STRINGX_REMAINING_SIZE(thisstr);
 
     //keep the original byte length here
     size = thisstr->INH_String.byteLength;
     //get the new byte length
     thisstr->INH_String.byteLength += other->byteLength;
-
-    //if the new String does not fit
-    if(remSize <= other->byteLength)
-    {
-        //reallocate this string to fit the additiona
-        thisstr->bSize = thisstr->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
-        RF_REALLOC(thisstr->INH_String.bytes,char,thisstr->bSize);
-    }
-
+    //check if the new string fits in the buffer and if not reallocate it
+    RF_STRINGX_REALLOC(thisstr,thisstr->INH_String.byteLength+thisstr->bIndex+1)
     //iterate this string to find the byte position of the character position
     RF_STRING_ITERATE_START(thisstr,length,i)
         if(length == pos)
@@ -1027,30 +979,22 @@ void i_rfStringX_Insert(RF_StringX* thisstr,uint32_t* posP,void* otherP)
             break;
         }
     RF_STRING_ITERATE_END(length,i);
-
     //if the position is not in the string do nothing
     if(found == false)
         return;
 
-    //copy the part of the string after the insertion in a temporary buffer
-    char* temp;
-    RF_MALLOC(temp,size-bytePos+1);
-    strcpy(temp,thisstr->INH_String.bytes+bytePos);
-
+    //move the string's contents to make room for the extra string insertion
+    memmove(thisstr->INH_String.bytes+other->byteLength+bytePos,thisstr->INH_String.bytes+bytePos,size-bytePos+1);//1 is for the null termination character
     //now insert the new string
-    strncpy(thisstr->INH_String.bytes+bytePos,other->bytes,other->byteLength);
-    //and to the remaining part insert the rest of the string stored in the temporary buffer
-    strcpy(thisstr->INH_String.bytes+(bytePos+other->byteLength),temp);
+    memcpy(thisstr->INH_String.bytes+bytePos,other->bytes,other->byteLength);
 
-    //finally do not forget to free the temporary buffer
-    free(temp);
 }
 
 // Replaces all of the specified sstr substring from the extended String with string rstr
-char i_rfStringX_Replace(RF_StringX* thisstr,void* sstrP,void* rstrP,const uint32_t* numP,const char* optionsP)
+char i_rfStringX_Replace(RF_StringX* thisstr,const void* sstrP,const void* rstrP,const uint32_t* numP,const char* optionsP)
 {
-    RF_String* sstr = (RF_String*)sstrP;
-    RF_String* rstr = (RF_String*)rstrP;
+    const RF_String* sstr = (const RF_String*)sstrP;
+    const RF_String* rstr = (const RF_String*)rstrP;
     uint32_t num = *numP;
     char options = *optionsP;
     //will keep the number of found instances of the substring
@@ -1103,12 +1047,10 @@ char i_rfStringX_Replace(RF_StringX* thisstr,void* sstrP,void* rstrP,const uint3
         diff = rstr->byteLength - sstr->byteLength;
         //will keep the original size in bytes
         orSize = thisstr->INH_String.byteLength +1;
+        //calculate the new byte length
+        thisstr->INH_String.byteLength += num*diff;
         //reallocate the string to fit the new bigger size if needed
-        if( orSize + num*diff > thisstr->bSize)
-        {
-            thisstr->bSize = (orSize + num*diff)*RF_OPTION_STRINGX_CAPACITY_M;
-            RF_REALLOC(thisstr->INH_String.bytes,char,thisstr->bSize)
-        }
+        RF_STRINGX_REALLOC(thisstr,thisstr->INH_String.byteLength+thisstr->bIndex+1)
         //now replace all the substrings one by one
         for(i = 0; i < num; i ++)
         {
@@ -1124,8 +1066,7 @@ char i_rfStringX_Replace(RF_StringX* thisstr,void* sstrP,void* rstrP,const uint3
             for(j = i+1; j < num; j ++)
                 bytePositions[j] = bytePositions[j]+diff;
         }
-        //finally let's keep the new byte length
-        thisstr->INH_String.byteLength = orSize-1;
+
     }
     else if( rstr->byteLength < sstr->byteLength) //replace string is smaller than the removed one
     {
@@ -1159,11 +1100,11 @@ char i_rfStringX_Replace(RF_StringX* thisstr,void* sstrP,void* rstrP,const uint3
 }
 
 //Replaces what exists between the ith left and right substrings of this extended String.Utilizes the internal string pointer.
-char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,void* leftP,void* rightP,void* rstrP,char* optionsP,uint32_t* iP)
+char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,const void* leftP,const void* rightP,const void* rstrP,char* optionsP,uint32_t* iP)
 {
-    RF_String* left = (RF_String*)leftP;
-    RF_String* right = (RF_String*)rightP;
-    RF_String* rstr = (RF_String*)rstrP;
+    const RF_String* left = (const RF_String*)leftP;
+    const RF_String* right = (const RF_String*)rightP;
+    const RF_String* rstr = (const RF_String*)rstrP;
     char options = *optionsP;
     uint32_t i = *iP;
     uint32_t j,move,start = thisstr->bIndex;
@@ -1244,9 +1185,9 @@ char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,void* leftP,void* rightP,voi
 
 
 //Moves the internal pointer right after the substring
-int32_t i_rfStringX_MoveAfter(RF_StringX* thisstr,void* subP,RF_StringX* result,const char* optionsP)
+int32_t i_rfStringX_MoveAfter(RF_StringX* thisstr,const void* subP,RF_StringX* result,const char* optionsP)
 {
-    RF_String* sub = (RF_String*)subP;
+    const RF_String* sub = (const RF_String*)subP;
     char options = *optionsP;
     int32_t move;
     //check for substring existence and return failure if not found
@@ -1651,7 +1592,7 @@ int32_t rfStringX_Init_fUTF32(RF_StringX* str,FILE* f,char endianess,char* eof)
     }//end of little endian
     else//big endian
     {
-        if((bytesN=rfFReadLine_UTF16BE(f,&str->INH_String.bytes,&str->INH_String.byteLength,eof)) < 0)
+        if((bytesN=rfFReadLine_UTF32BE(f,&str->INH_String.bytes,&str->INH_String.byteLength,eof)) < 0)
         {
             LOG_ERROR("Failure to initialize a StringX from reading a Big Endian UTF-32 file",bytesN);
             return bytesN;
@@ -1679,7 +1620,7 @@ int32_t rfStringX_Assign_fUTF32(RF_StringX* str,FILE* f,char endianess, char* eo
     }//end of little endian
     else//big endian
     {
-        if((bytesN=rfFReadLine_UTF16BE(f,&utf8,&utf8ByteLength,eof)) < 0)
+        if((bytesN=rfFReadLine_UTF32BE(f,&utf8,&utf8ByteLength,eof)) < 0)
         {
             LOG_ERROR("Failure to assign to a StringX from reading a Big Endian UTF-32 file",bytesN);
             return bytesN;
@@ -1716,7 +1657,7 @@ int32_t rfStringX_Append_fUTF32(RF_StringX* str,FILE* f,char endianess, char* eo
     }//end of little endian
     else//big endian
     {
-        if((bytesN=rfFReadLine_UTF16BE(f,&utf8,&utf8ByteLength,eof)) < 0)
+        if((bytesN=rfFReadLine_UTF32BE(f,&utf8,&utf8ByteLength,eof)) < 0)
         {
             LOG_ERROR("Failure to append to a StringX from reading a Big Endian UTF-32 file",bytesN);
             return bytesN;

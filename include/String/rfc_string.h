@@ -337,7 +337,7 @@ i_DECLIMEX_ char rfString_Init_UTF32(RF_String* str,const uint32_t* s);
 //!@}
 
 /*-------------------------------------------------------------------------Methods to assign to an RF_String-------------------------------------------------------------------------------*/
-//! @name Copying - Assigning to a String
+//! @name Assigning to a String
 //! @{
 
 //! @memberof RF_String

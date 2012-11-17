@@ -5,6 +5,7 @@
 int main()
 {
 	RF_String s1,s2,s3,s4;
+	RF_StringX sx1,sx2;
 
 
 	rfInit();
@@ -31,5 +32,20 @@ int main()
     rfString_Append(&s4,RFS_("ちなみに今日は%d日です。",26));
     EXPECT_MSG(true,rfString_Equal(&s4,RFS_("日本の首都は東京だと思います。ちなみに今日は26日です。")),"The Japanese strings did not get added correctly");
 
+	///RF_STringX testing
+	EXPECT(true,rfStringX_Init(&sx1,"I am on the train from Kita Senju to Kashiwa station."))
+	EXPECT(true,rfStringX_Init(&sx2,"Barack Obama has won a second term as US president after winning the crucial battleground of Ohio, taking him past the 270 margin."))
+	rfStringX_MoveForward(&sx1,8);
+	rfStringX_Append(&sx1,RFS_("研究室に行ってきます。"));
+	EXPECT(true,rfString_Equal(&sx1,RFS_("the train from Kita Senju to Kashiwa station.研究室に行ってきます。")))
+	rfStringX_Append_i(&sx1,567824);
+	rfStringX_Append(&sx1,RFS_(" "));
+	rfStringX_Append_f(&sx1,143.0);
+	EXPECT(true,rfString_Equal(&sx1,RFS_("the train from Kita Senju to Kashiwa station.研究室に行ってきます。567824 143.000000")))
+	rfStringX_Prepend(&sx2,RFS_("オバマ氏再選　ロムニー氏を振り切る　米大統領選 || "));
+	EXPECT(true,rfString_Equal(&sx2,RFS_("オバマ氏再選　ロムニー氏を振り切る　米大統領選 || Barack Obama has won a second term as US president after winning the crucial battleground of Ohio, taking him past the 270 margin.")))
+	rfStringX_MoveForward(&sx2,7);
+	rfStringX_Insert(&sx2,17,RFS_("|| Δεύτερη θητεία στην προεδρία των ΗΠΑ κατέκτησε ο Μπαράκ Ομπάμα "));
+	EXPECT(true,rfString_Equal(&sx2,RFS_("ロムニー氏を振り切る　米大統領選 || Δεύτερη θητεία στην προεδρία των ΗΠΑ κατέκτησε ο Μπαράκ Ομπάμα || Barack Obama has won a second term as US president after winning the crucial battleground of Ohio, taking him past the 270 margin.")))
 	return 0;
 }

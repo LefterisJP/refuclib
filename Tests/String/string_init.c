@@ -6,7 +6,7 @@ int main()
 {
 	RF_String s1,s2,s3,s4,s5,s6,s7;
 	RF_StringX* sx1,*sx2,sx3;
-	RF_StringX sx4,sx5,sx6,sx7,sx8;
+	RF_StringX sx4,sx5,sx6,sx7,sx8,*sx9;
 	RF_String* sp1;
 	const uint16_t utf16Buffer[] = {0xD834,0xDD1E,0x6771,0x0};
 	const uint32_t utf32Buffer[] = {0x6771,0x4EAC,0x0};
@@ -17,10 +17,11 @@ int main()
 	EXPECT(true,rfString_Init_f(&s3,1.6180));
 	EXPECT(true,rfString_Init_i(&s4,1024));
 	EXPECT(true,rfString_Init_cp(&s5,0x2708))
-	//expect all StringX initializations to return true
+	//expect all StringX initializations be succesfull
 	EXPECT(true,rfStringX_Init(&sx4,"Initializing a StringX"))
 	EXPECT(true,rfStringX_Init_f(&sx5,3.141592))
 	EXPECT(true,rfStringX_Init_i(&sx6,4096))
+	EXPECTNOT(0,(sx9=rfStringX_Create_cp(0x2708)))
 
 	//simply print the strings to see if they initialized correctly
 	printf("%s\n",rfString_Cstr(&s1));
@@ -37,11 +38,13 @@ int main()
 	//simply print the stringXs to see if the conversion happened correctly
 	printf("%s\n",rfString_Cstr(sx1));
 	printf("%s\n",rfString_Cstr(sx2));
+	rfStringX_MoveForward(&sx3,7);
 	printf("%s\n",rfString_Cstr(&sx3));
 
 
 	//check if we get the expected strings after initializations below
 	EXPECT_MSG(true,rfString_Equal(&s5,RFS_("✈")),"Initialization of string from codepoint failed")
+	EXPECT_MSG(true,rfString_Equal(sx9,RFS_("✈")),"Initialization of stringX from codepoint failed")
 	
 	//checking if the initialization of a string from utf-32 works
 	EXPECT_MSG(true,rfString_Init_UTF32(&s6,utf32Buffer),"Initializing a String from a utf32 buffer failed")
@@ -58,10 +61,15 @@ int main()
 	//checking if StringX initialization from utf-16 works
 	EXPECT(true,rfStringX_Init_UTF16(&sx7,utf16Buffer));
 	EXPECT(true,rfString_Equal(&sx7,RFS_("%s東",rfString_Cstr(sp1))))
-	///Testing assignments also since there are only 2 functions
+	
+	/*Testing assignments also since there are only 2 functions*/
+	
+	//expect succesfull assignments
 	rfString_Assign(sx2,RFS_("Having removed himself from the election campaign to concentrate on the storm, President Obama will now see at first hand just how destructive Hurricane Sandy has been. He'll travel to Atlantic City where the Republican governor, Chris Christie - normally a fierce critic - will show him scenes of widespread destruction along the Jersey Shore. They'll meet some of those who have lost homes, as well as the emergency teams who have been working around the clock since the weekend."));
 	printf("%s\n",rfString_Cstr(sx2));
-	//expect 1: testing assigning a unicode codepoint to a string (the +/-) sign
+	rfStringX_Assign(sx2, RFS_("Δοκιμαζουμε την αναθεση για StringX"));
+	EXPECT(true,rfString_Equal(sx2,RFS_("Δοκιμαζουμε την αναθεση για StringX")))
+	//expect true in all: testing assigning a unicode codepoint to a string (the +/-) sign
 	EXPECT(true,rfStringX_Assign_char(sx2,0xB1))
 	EXPECT(true,rfString_Equal(sx2,RFS_("±")));
 	return 0;

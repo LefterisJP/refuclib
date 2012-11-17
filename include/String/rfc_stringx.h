@@ -401,10 +401,11 @@ i_DECLIMEX_ char rfStringX_Init_UTF32(RF_StringX* str,const uint32_t* s);
 //! @lmsFunction
 //! @param dest The destination string, which should get assigned
 //! @param source The source string, whose values to copy. @inhtype{String,StringX} @tmpSTR
+//! @see rfStringX_Assign_char()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ void rfStringX_Assign(RF_StringX* dest,void* source);
+i_DECLIMEX_ void rfStringX_Assign(RF_StringX* dest,const void* source);
 #else
-i_DECLIMEX_ void i_rfStringX_Assign(RF_StringX* dest,void* source);
+i_DECLIMEX_ void i_rfStringX_Assign(RF_StringX* dest,const void* source);
 #define rfStringX_Assign(i_DESTINATION_,i_SOURCE_) i_rfLMS_WRAP2(void,i_rfStringX_Assign,i_DESTINATION_,i_SOURCE_)
 #endif
 
@@ -414,6 +415,7 @@ i_DECLIMEX_ void i_rfStringX_Assign(RF_StringX* dest,void* source);
 //! @param thisstr The string to assign to
 //! @param character The unicode character codepoint to assign to the String
 //! @return Returns @c true for succesfull assignment and @c false if the given @c character was not a valid unicode codepoint
+//! @see rfStringX_Assign()
 i_DECLIMEX_ char rfStringX_Assign_char(RF_StringX* thisstr,uint32_t character);
 
 //! @memberof RF_StringX
@@ -423,7 +425,10 @@ i_DECLIMEX_ char rfStringX_Assign_char(RF_StringX* thisstr,uint32_t character);
 //! Returns an RF_StringX version of the parameter RF_String
 //! @param s The RF_String from which to create the RF_StringX
 //! @return The RF_StringX version of the parameter string
-i_DECLIMEX_ RF_StringX* rfStringX_FromString_OUT(RF_String* s);
+//! @see rfStringX_FromString_IN()
+//! @see rfStringX_Copy_OUT()
+//! @see rfStringX_Copy_chars()
+i_DECLIMEX_ RF_StringX* rfStringX_FromString_OUT(const RF_String* s);
 //! @memberof RF_StringX
 //! @cppignore
 //! @brief Initializes an RF_StringX from an RF_string
@@ -431,7 +436,10 @@ i_DECLIMEX_ RF_StringX* rfStringX_FromString_OUT(RF_String* s);
 //! @param dst The RF_StringX that will get initialize
 //! @param src The RF_String to copy from
 //! @return The RF_StringX version of the parameter string
-i_DECLIMEX_ void rfStringX_FromString_IN(RF_StringX* dst,RF_String* src);
+//! @see rfStringX_FromString_OUT()
+//! @see rfStringX_Copy_IN()
+//! @see rfStringX_Copy_chars()
+i_DECLIMEX_ void rfStringX_FromString_IN(RF_StringX* dst,const RF_String* src);
 
 
 //! @memberof RF_StringX
@@ -439,27 +447,50 @@ i_DECLIMEX_ void rfStringX_FromString_IN(RF_StringX* dst,RF_String* src);
 //! @brief Creates a copy of an extended String and returns it
 //!
 //! @note The Returned Substring needs to be freed by the user.
-//! BEWARE when assigning to a string using this function since if any previous string exists there IS NOT getting freed. You have to free it explicitly
+//! BEWARE when assigning to a string using this function since if any previous string exists there IS NOT getting freed. You have to free it explicitly.
+//!
+//! Also note that the source RF_StringX is not @c const unline the RF_String copying functions.
+//! The reason for this is because we actually have to copy all of it, even if its internal pointer has been moved, in which case
+//! its contents are indeed tampered with in the function so as to allow reading the whole string. But despite that after the function finishes the contents
+//! of the source string are guaranteed to be the same.
 //! @param  s The  string to copy
 //! @return A copy of the string
+//! @see rfStringX_FromString_OUT()
+//! @see rfStringX_Copy_IN()
+//! @see rfStringX_Copy_chars()
 i_DECLIMEX_ RF_StringX* rfStringX_Copy_OUT(RF_StringX* s);
 //! @memberof RF_StringX
 //! @cppignore
 //! @brief Copies the given source RF_StringX into the destination RF_StringX
 //!
-//! @note The Returned Substring needs to be freed by the user. BEWARE when assigning to a string using this function since if any previous string exists there IS NOT getting freed. You have to free it explicitly
+//! @note The Returned Substring needs to be freed by the user.
+//! BEWARE when assigning to a string using this function since if any previous string exists there IS NOT getting freed. You have to free it explicitly
+//!
+//! Also note that the source RF_StringX is not @c const unline the RF_String copying functions.
+//! The reason for this is because we actually have to copy all of it, even if its internal pointer has been moved, in which case
+//! its contents are indeed tampered with in the function so as to allow reading the whole string. But despite that after the function finishes the contents
+//! of the source string are guaranteed to be the same.
 //! @param  dst The String to copy in.
-//! @param  src The String to copy from
-//! If the value is bigger than the maximum number of characters then still all characters are copied.
+//! @param  src The String to copy from.
+//! @see rfStringX_FromString_IN()
+//! @see rfStringX_Copy_OUT()
+//! @see rfStringX_Copy_chars()
 i_DECLIMEX_ void rfStringX_Copy_IN(RF_StringX* dst,RF_StringX* src);
 //! @memberof RF_StringX
 //! @brief Copies a certain number of characters from an RF_StringX
 //!
 //! Copies @c n characters from @c src StringX into the destination @c dst StringX.
+//!
+//! Also note that the source RF_StringX is not @c const unline the RF_String copying functions.
+//! The reason for this is because we actually have to copy all of it, even if its internal pointer has been moved, in which case
+//! its contents are indeed tampered with in the function so as to allow reading the whole string. But despite that after the function finishes the contents
+//! of the source string are guaranteed to be the same.
 //! @param  dst The String to copy in.
 //! @param  src The String to copy from
 //! @param n  The number of characters to copy from the @c src string.
 //! If the value is bigger than the maximum number of characters then still all characters are copied.
+//! @see rfStringX_Copy_OUT()
+//! @see rfStringX_Copy_IN()
 i_DECLIMEX_ void rfStringX_Copy_chars(RF_StringX* dst,RF_StringX* src,uint32_t n);
 
 
@@ -473,14 +504,16 @@ i_DECLIMEX_ void rfStringX_Copy_chars(RF_StringX* dst,RF_StringX* src,uint32_t n
 //!
 //! It is an error to give a NULL(0x0) string for deleting. Will most probably lead to a segmentation fault
 //! Use it for strings made with _Create
-//!@param s The exended String to destroy
+//! @param s The exended String to destroy
+//! @see rfStringX_Deinit()
 i_DECLIMEX_ void rfStringX_Destroy(RF_StringX* s);
 //! @memberof RF_StringX
 //! @brief Destroys only the contents of the Extended string without freeing the pointer itself.
 //!
 //! It is an error to give a NULL(0x0) string for deleting. Will most probably lead to a segmentation fault
 //! Use it for strings made with _Init
-//!@param s The exended String to destroy
+//! @param s The exended String to destroy
+//! @see rfStringX_Destroy()
 i_DECLIMEX_ void rfStringX_Deinit(RF_StringX* s);
 
 //! @}
@@ -495,10 +528,13 @@ i_DECLIMEX_ void rfStringX_Deinit(RF_StringX* s);
 //! @lmsFunction
 //! @param thisstr The extended string to append to
 //! @param other The string to add to this string. @inhtype{String,StringX} @tmpSTR
+//! @see rfStringX_Append_i()
+//! @see rfStringX_Append_f()
+//! @see rfStringsX_Prepend()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ void rfStringX_Append(RF_StringX* thisstr,void* other);
+i_DECLIMEX_ void rfStringX_Append(RF_StringX* thisstr,const void* other);
 #else
-i_DECLIMEX_ void i_rfStringX_Append(RF_StringX* thisstr,void* other);
+i_DECLIMEX_ void i_rfStringX_Append(RF_StringX* thisstr,const void* other);
 #define rfStringX_Append(i_THISSTR_,i_OTHERSTR_) i_rfLMS_WRAP2(void,i_rfStringX_Append,i_THISSTR_,i_OTHERSTR_)
 #endif
 
@@ -507,12 +543,18 @@ i_DECLIMEX_ void i_rfStringX_Append(RF_StringX* thisstr,void* other);
 //!
 //! @param thisstr The extended string to append to
 //! @param i The integer to add
+//! @see rfStringX_Append()
+//! @see rfStringX_Append_f()
+//! @see rfStringX_Prepend()
 i_DECLIMEX_ void rfStringX_Append_i(RF_StringX* thisstr,const int32_t i);
 //! @memberof RF_StringX
 //! @brief Appends a float to the extended string
 //!
 //! @param thisstr The extended string to append to
 //! @param f The float to add
+//! @see rfStringX_Append()
+//! @see rfStringX_Append_i()
+//! @see rfStringX_Prepend()
 i_DECLIMEX_ void rfStringX_Append_f(RF_StringX* thisstr,const float f);
 
 //! @memberof RF_StringX
@@ -521,10 +563,11 @@ i_DECLIMEX_ void rfStringX_Append_f(RF_StringX* thisstr,const float f);
 //! @lmsFunction
 //! @param thisstr The extended string to prepend to
 //! @param other The string to prepend to this string. @inhtype{String,StringX} @tmpSTR
+//! @see rfStringX_Append()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ void rfStringX_Prepend(RF_StringX* thisstr,void* other);
+i_DECLIMEX_ void rfStringX_Prepend(RF_StringX* thisstr,const void* other);
 #else
-i_DECLIMEX_ void i_rfStringX_Prepend(RF_StringX* thisstr,void* other);
+i_DECLIMEX_ void i_rfStringX_Prepend(RF_StringX* thisstr,const void* other);
 #define rfStringX_Prepend(i_THISSTR_,i_OTHERSTR_) i_rfLMS_WRAP2(void,i_rfStringX_Prepend,i_THISSTR_,i_OTHERSTR_)
 #endif
 
@@ -539,10 +582,12 @@ i_DECLIMEX_ void i_rfStringX_Prepend(RF_StringX* thisstr,void* other);
 //! @param thisstr The extended string to insert to
 //! @param pos     The character position in the string to add it. Should be a positive (or zero) integer. If the position is over the string's size nothing happens.
 //! @param other   The string to add. @inhtype{String,StringX} @tmpSTR
+//! @see rfStringX_Append()
+//! @see rfStringX_Prepend()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ void rfStringX_Insert(RF_StringX* thisstr,uint32_t pos,void* other);
+i_DECLIMEX_ void rfStringX_Insert(RF_StringX* thisstr,uint32_t pos,const void* other);
 #else
-i_DECLIMEX_ void i_rfStringX_Insert(RF_StringX* thisstr,uint32_t* pos,void* other);
+i_DECLIMEX_ void i_rfStringX_Insert(RF_StringX* thisstr,uint32_t* pos,const void* other);
 #define rfStringX_Insert(i_THISSTR_,I_POS_,i_OTHERSTR_) i_rfLMS_WRAP3(void,i_rfStringX_Insert,i_THISSTR_,i_RFUI32_(I_POS_),i_OTHERSTR_)
 #endif
 
@@ -562,10 +607,11 @@ i_DECLIMEX_ void i_rfStringX_Insert(RF_StringX* thisstr,uint32_t* pos,void* othe
 //! + @c RF_MATCH_WORD: If you to replace only exact matches of the substring. For example an exact replace for @e "HELLO" in the string
 //!     @e "HELLOWORLD" would replace nothing. Default is with this flag off.
 //! @return Returns true in case of success, and false if the substring was not even found inside the string
+//! @see rfStringX_ReplaceBetween()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ char rfStringX_Replace(RF_StringX* thisstr,void* sstr,void* rstr,uint32_t number,char options);
+i_DECLIMEX_ char rfStringX_Replace(RF_StringX* thisstr,const void* sstr,const void* rstr,uint32_t number,char options);
 #else
-i_DECLIMEX_ char i_rfStringX_Replace(RF_StringX* thisstr,void* sstr,void* rstr,const uint32_t* number,const char* options);
+i_DECLIMEX_ char i_rfStringX_Replace(RF_StringX* thisstr,const void* sstr,const void* rstr,const uint32_t* number,const char* options);
     #ifdef RF_OPTION_DEFAULT_ARGUMENTS
         #define rfStringX_Replace(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRINGX_REPLACE,5,__VA_ARGS__)
         #define i_NPSELECT_RF_STRINGX_REPLACE1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfStringX_Replace() accepts from 3 to 5 arguments\"")
@@ -591,7 +637,6 @@ i_DECLIMEX_ char i_rfStringX_Replace(RF_StringX* thisstr,void* sstr,void* rstr,c
 //! @lmsFunction
 //! @param thisstr The extended string to work on
 //! @param left The left substring that will define the new substring. @inhtype{String,StringX} @tmpSTR
-//! @param right The right substring that will define the new substring. @inhtype{String,StringX} @tmpSTR
 //! @param rstr The string to act as replacement. @inhtype{String,StringX} @tmpSTR
 //! @param options \rfoptional{0}. Bitflag options denoting some options for the string to replace. Give 0 for the defaults. Can have values:
 //! + @c RF_CASE_IGNORE: If you want to replace any occurence of the substring disregarding CAPS or not.
@@ -600,12 +645,13 @@ i_DECLIMEX_ char i_rfStringX_Replace(RF_StringX* thisstr,void* sstr,void* rstr,c
 //!     @e "HELLOWORLD" would replace nothing. Default is with this flag off.
 //! @param i \rfoptional{0}. The specific between occurence to replace. Should range between 1 and infinity. If 0 all occurences will be replaced
 //! @return Returns true if the replacing happened and false if either the left or the right strings were not found
+//! @see rfStringX_Replace()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ char rfStringX_ReplaceBetween(RF_StringX* thisstr,void* left,void* right,void* rstr,char options,uint32_t i);
+i_DECLIMEX_ char rfStringX_ReplaceBetween(RF_StringX* thisstr,const void* left,const void* right,const void* rstr,char options,uint32_t i);
 #else
-i_DECLIMEX_ char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,void* left,void* right,void* rstr,char* options,uint32_t* i);
+i_DECLIMEX_ char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,const void* left,const void* right,const void* rstr,char* options,uint32_t* i);
     #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfStringX_ReplaceBetween(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRINGX_REPLACEBETWEEN,5,__VA_ARGS__)
+        #define rfStringX_ReplaceBetween(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRINGX_REPLACEBETWEEN,6,__VA_ARGS__)
         #define i_NPSELECT_RF_STRINGX_REPLACEBETWEEN1(...)  RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfStringX_ReplaceBetween() accepts from 4 to 6 arguments\"")
         #define i_NPSELECT_RF_STRINGX_REPLACEBETWEEN0(...)  RF_SELECT_FUNC(i_SELECT_RF_STRINGX_REPLACEBETWEEN,__VA_ARGS__)
         #define i_SELECT_RF_STRINGX_REPLACEBETWEEN6(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_REPSTR_,i_OPTIONS_,i_OCCURENCE_)  \
@@ -644,10 +690,15 @@ i_DECLIMEX_ char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,void* left,void*
 //! + @c RF_MATCH_WORD: If you to replace only exact matches of the substring. For example an exact replace for @e "HELLO" in the string
 //!     @e "HELLOWORLD" would replace nothing. Default is with this flag off.
 //! @return Returns the number of positions (bytes) moved or RF_FAILURE if the substring was not found in the String
+//! @see rfStringX_MoveAfterv()
+//! @see rfStringX_MoveAfterPair()
+//! @see rfStringX_MoveForward()
+//! @see rfStringX_MoveBack()
+//! @see rfStringX_Reset()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ int32_t rfStringX_MoveAfter(RF_StringX* thisstr,void* sub,RF_StringX* result,const char options);
+i_DECLIMEX_ int32_t rfStringX_MoveAfter(RF_StringX* thisstr,const void* sub,RF_StringX* result,const char options);
 #else
-i_DECLIMEX_ int32_t i_rfStringX_MoveAfter(RF_StringX* thisstr,void* sub,RF_StringX* result,const char* options);
+i_DECLIMEX_ int32_t i_rfStringX_MoveAfter(RF_StringX* thisstr,const void* sub,RF_StringX* result,const char* options);
     #ifdef RF_OPTION_DEFAULT_ARGUMENTS
         #define rfStringX_MoveAfter(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRINGX_MOVEAFTER,4,__VA_ARGS__)
         #define i_NPSELECT_RF_STRINGX_MOVEAFTER1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfStringX_MoveAfter() accepts from 2 to 4 arguments\"")
@@ -672,6 +723,9 @@ i_DECLIMEX_ int32_t i_rfStringX_MoveAfter(RF_StringX* thisstr,void* sub,RF_Strin
 //! It never goes before the original start of the buffer so there is no worry of memory corruption.
 //! @param thisstr The extended string to work on
 //! @param n The number of characters to move the internal pointer
+//! @see rfStringX_MoveForward()
+//! @see rfStringX_MoveAfter()
+//! @see rfStringX_Reset()
 i_DECLIMEX_ void rfStringX_MoveBack(RF_StringX* thisstr,uint32_t n);
 //! @memberof RF_StringX
 //! @brief Moves the internal pointer n characters forward
@@ -680,11 +734,17 @@ i_DECLIMEX_ void rfStringX_MoveBack(RF_StringX* thisstr,uint32_t n);
 //! But since many times the buffer can be bigger than the string we can have it go to non-string buffer data so the user has to be careful.
 //! @param thisstr The extended string to work on
 //! @param n The number of character to move the internal pointer
+//! @see rfStringX_MoveBack()
+//! @see rfStringX_MoveAfter()
+//! @see rfStringX_Reset()
 i_DECLIMEX_ void rfStringX_MoveForward(RF_StringX* thisstr,uint32_t n);
 //! @memberof RF_StringX
 //! @brief Resets the internal pointer of the StringX
 //!
 //! @param thisstr The stringX whose internal pointer to reset
+//! @see rfStringX_MoveForward()
+//! @see rfStringX_MoveBack()
+//! @see rfStringX_MoveAfter()
 i_DECLIMEX_ void rfStringX_Reset(RF_StringX* thisstr);
 
 //! @memberof RF_StringX
@@ -709,6 +769,11 @@ i_DECLIMEX_ void rfStringX_Reset(RF_StringX* thisstr);
 //! @extraVarArgLim
 //! @param ... The strings to search for. @inhtype{String,StringX} @tmpSTR
 //! @return true if the substring got initialized and false if none of the parameters are found
+//! @see rfStringX_MoveAfter()
+//! @see rfStringX_MoveAfterPair()
+//! @see rfStringX_MoveForward()
+//! @see rfStringX_MoveBack()
+//! @see rfStringX_Reset()
 #ifdef RF_IAMHERE_FOR_DOXYGEN
 i_DECLIMEX_ char rfStringX_MoveAfterv(RF_StringX* thisstr,RF_StringX* result,const char options,const unsigned char parN, ...);
 #endif
@@ -755,8 +820,14 @@ i_DECLIMEX_ char rfStringX_MoveAfterv(RF_StringX* thisstr,RF_StringX* result,con
 //!     Default search option is to @b match the case. For now this works only for characters of the english language.
 //! + @c RF_MATCH_WORD: If you to find only exact matches of the substring. For example an exact search for @e "HELLO" in the string
 //!     @e "HELLOWORLD" would find nothing. Default is with this flag off.
-//! @param occurence \rfoptional{0} If this is not 0 then the function will search for the number of occurence given in this parameter. If it is not found then the function shall return false
+//! @param occurence \rfoptional{0} If this is not 0 then the function will search for the number of occurence given in this parameter.
+//! If it is 0 it will search for the first occurence. If it is not found then the function shall return false
 //! @return Returns true if the substring is found and false if not
+//! @see rfStringX_MoveAfter()
+//! @see rfStringX_MoveAfterv()
+//! @see rfStringX_MoveForward()
+//! @see rfStringX_MoveBack()
+//! @see rfStringX_Reset()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
 i_DECLIMEX_ char rfStringX_MoveAfterPair(RF_StringX* thisstr,void* left,void* right,RF_StringX* result,char options,uint32_t occurence);
 #else
@@ -796,6 +867,9 @@ i_DECLIMEX_ char i_rfStringX_MoveAfterPair(RF_StringX* thisstr,void* left,void* 
 //! @param f A valid and open file pointer in read mode from which to read the string. The file's encoding must be UTF-8.A check for valide sequence of bytes is performed.
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this initialization
 //! @return The initialized string or null pointer in case of failure to read the file, or unexpected data (non-UTF8 encoded string)
+//! @see rfStringX_Init_fUTF8()
+//! @see rfStringX_Assign_fUTF8()
+//! @see rfStringX_Append_fUTF8()
 i_DECLIMEX_ RF_StringX* rfStringX_Create_fUTF8(FILE* f, char* eof);
 //! @memberof RF_StringX
 //! @brief Initializes an extended string from UTF-8 file parsing
@@ -808,6 +882,9 @@ i_DECLIMEX_ RF_StringX* rfStringX_Create_fUTF8(FILE* f, char* eof);
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this initialization
 //! @return Returns either a positive number for succesfull initialization that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF8() can produce.
+//! @see rfStringX_Create_fUTF8()
+//! @see rfStringX_Assign_fUTF8()
+//! @see rfStringX_Append_fUTF8()
 i_DECLIMEX_ int32_t rfStringX_Init_fUTF8(RF_StringX* str,FILE* f, char* eof);
 
 //! @memberof RF_StringX
@@ -821,6 +898,9 @@ i_DECLIMEX_ int32_t rfStringX_Init_fUTF8(RF_StringX* str,FILE* f, char* eof);
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this assignment
 //! @return Returns either a positive number for succesfull assignment that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF8() can produce.
+//! @see rfStringX_Init_fUTF8()
+//! @see rfStringX_Create_fUTF8()
+//! @see rfStringX_Append_fUTF8()
 i_DECLIMEX_ int32_t rfStringX_Assign_fUTF8(RF_StringX* str,FILE* f, char* eof);
 //! @memberof RF_StringX
 //! @brief Appends to an extended string from UTF-8 file parsing
@@ -833,6 +913,9 @@ i_DECLIMEX_ int32_t rfStringX_Assign_fUTF8(RF_StringX* str,FILE* f, char* eof);
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this appending
 //! @return Returns either a positive number for succesfull appending that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF8() can produce.
+//! @see rfStringX_Init_fUTF8()
+//! @see rfStringX_Create_fUTF8()
+//! @see rfStringX_Assign_fUTF8()
 i_DECLIMEX_ int32_t rfStringX_Append_fUTF8(RF_StringX* str,FILE* f, char* eof);
 
 //! @memberof RF_StringX
@@ -846,6 +929,9 @@ i_DECLIMEX_ int32_t rfStringX_Append_fUTF8(RF_StringX* str,FILE* f, char* eof);
 //! @c RF_LITTLE_ENDIAN and @c RF_BIG_ENDIAN.
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this initialization
 //! @return The initialized string or null pointer in case of failure to read the file
+//! @see rfStringX_Init_fUTF16()
+//! @see rfStringX_Append_fUTF16()
+//! @see rfStringX_Assign_fUTF16()
 i_DECLIMEX_ RF_StringX* rfStringX_Create_fUTF16(FILE* f, char endianess,char* eof);
 //! @memberof RF_StringX
 //! @brief Initializes an extended string from UTF-16 file parsing
@@ -859,6 +945,9 @@ i_DECLIMEX_ RF_StringX* rfStringX_Create_fUTF16(FILE* f, char endianess,char* eo
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this initialization
 //! @return Returns either a positive number for succesfull initialization that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF16LE() can produce.
+//! @see rfStringX_Create_fUTF16()
+//! @see rfStringX_Append_fUTF16()
+//! @see rfStringX_Assign_fUTF16()
 i_DECLIMEX_ int32_t rfStringX_Init_fUTF16(RF_StringX* str,FILE* f, char endianess,char* eof);
 
 //! @memberof RF_StringX
@@ -873,6 +962,9 @@ i_DECLIMEX_ int32_t rfStringX_Init_fUTF16(RF_StringX* str,FILE* f, char endianes
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this appending
 //! @return Returns either a positive number for succesfull appending that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF16LE() can produce.
+//! @see rfStringX_Create_fUTF16()
+//! @see rfStringX_Init_fUTF16()
+//! @see rfStringX_Assign_fUTF16()
 i_DECLIMEX_ int32_t rfStringX_Append_fUTF16(RF_StringX* str,FILE* f, char endianess,char* eof);
 //! @memberof RF_StringX
 //! @brief Assigns the contents of a UTF-16 file to an already initialized StringX
@@ -886,6 +978,9 @@ i_DECLIMEX_ int32_t rfStringX_Append_fUTF16(RF_StringX* str,FILE* f, char endian
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this assignment
 //! @return Returns either a positive number for succesfull assignment that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF16LE() can produce.
+//! @see rfStringX_Create_fUTF16()
+//! @see rfStringX_Init_fUTF16()
+//! @see rfStringX_Append_fUTF16()
 i_DECLIMEX_ int32_t rfStringX_Assign_fUTF16(RF_StringX* str,FILE* f, char endianess,char* eof);
 
 //! @memberof RF_StringX
@@ -899,6 +994,9 @@ i_DECLIMEX_ int32_t rfStringX_Assign_fUTF16(RF_StringX* str,FILE* f, char endian
 //! @c RF_LITTLE_ENDIAN and @c RF_BIG_ENDIAN.
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this initialization
 //! @return The initialized string or null pointer in case of failure to read the file
+//! @see rfStringX_Init_fUTF32()
+//! @see rfStringX_Append_fUTF32()
+//! @see rfStringX_Assign_fUTF32()
 i_DECLIMEX_ RF_StringX* rfStringX_Create_fUTF32(FILE* f,char endianess, char* eof);
 //! @memberof RF_StringX
 //! @brief Initializes an extended string from UTF-32 file parsing
@@ -912,6 +1010,9 @@ i_DECLIMEX_ RF_StringX* rfStringX_Create_fUTF32(FILE* f,char endianess, char* eo
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this initialization
 //! @return Returns either a positive number for succesfull initialization that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF32LE() can produce.
+//! @see rfStringX_Create_fUTF32()
+//! @see rfStringX_Append_fUTF32()
+//! @see rfStringX_Assign_fUTF32()
 i_DECLIMEX_ int32_t rfStringX_Init_fUTF32(RF_StringX* str,FILE* f,char endianess, char* eof);
 //! @memberof RF_StringX
 //! @brief Assigns the contents of a UTF-32 file to an extended string
@@ -925,6 +1026,9 @@ i_DECLIMEX_ int32_t rfStringX_Init_fUTF32(RF_StringX* str,FILE* f,char endianess
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this assignment
 //! @return Returns either a positive number for succesfull assignment that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF32LE() can produce.
+//! @see rfStringX_Create_fUTF32()
+//! @see rfStringX_Init_fUTF32()
+//! @see rfStringX_Append_fUTF32()
 i_DECLIMEX_ int32_t rfStringX_Assign_fUTF32(RF_StringX* str,FILE* f,char endianess, char* eof);
 //! @memberof RF_StringX
 //! @brief Appends the contents of a UTF-32 file to an extended string
@@ -938,6 +1042,9 @@ i_DECLIMEX_ int32_t rfStringX_Assign_fUTF32(RF_StringX* str,FILE* f,char endiane
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this appending
 //! @return Returns either a positive number for succesfull appending that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF32LE() can produce.
+//! @see rfStringX_Create_fUTF32()
+//! @see rfStringX_Init_fUTF32()
+//! @see rfStringX_Assign_fUTF32()
 i_DECLIMEX_ int32_t rfStringX_Append_fUTF32(RF_StringX* str,FILE* f,char endianess, char* eof);
 
 //! @}

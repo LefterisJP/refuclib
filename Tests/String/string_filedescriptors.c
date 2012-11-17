@@ -7,6 +7,7 @@
 int main()
 {
 	RF_String s1,s2,s3,s4,s5,s6,s7,s8,s9,s10;
+	RF_StringX sx1,sx2,sx3,sx4,sx5,sx6,sx7,sx8,sx9,sx10;
     FILE* futf8,*futf16,*futf32,*f;
     char eof;
 	rfInit();
@@ -21,10 +22,10 @@ int main()
     //expect to see succesfull initialization
 	EXPECTGE(0,rfString_Init_fUTF8(&s1,futf8,&eof))
 	
-	
     //expect to see the first line of the file (as mentioned in the first comment let's just get rid of the bom here)
     EXPECT(true,rfString_PruneStart(&s1,1))
     printf("%s",rfString_Cstr(&s1));//ending newline is included since we don't use RF_TextFile
+    
     //assign the next line to the same string
     EXPECTGE(0,rfString_Assign_fUTF8(&s1,futf8,&eof))
     //append the next line to the same string
@@ -40,6 +41,29 @@ int main()
     //read from that same file and compare
     EXPECTGE(0,rfString_Init_fUTF8(&s2,f,&eof))
     EXPECT(true,rfString_Equal(&s1,&s2))
+	
+	///let's do the same for RF_StringX
+	fclose(f);
+	EXPECT(0,fseek(futf8,0,SEEK_SET))
+	
+	EXPECTGE(0,rfStringX_Init_fUTF8(&sx1,futf8,&eof))
+	EXPECT(true,rfString_PruneStart(&sx1,1))
+	printf("%s",rfString_Cstr(&sx1));//ending newline is included since we don't use RF_TextFile
+	EXPECTGE(0,rfStringX_Assign_fUTF8(&sx1,futf8,&eof))
+    //append the next line to the same string
+    EXPECTGE(0,rfStringX_Append_fUTF8(&sx1,futf8,&eof))
+	EXPECT_MSG(true,eof,"The end of file should have been reached and this flag should have been true")
+	//remove the appended newlines since we want to read it one-off from the other file
+    EXPECT(true,rfString_Remove(&sx1,RFS_("\n"),0,0))
+    //open an output file and write the string there
+    EXPECTNOT(0,(f = fopen("outputfile","w+b")))
+    EXPECT(RF_SUCCESS,rfString_Fwrite(&sx1,f,RF_UTF8))
+    EXPECT(0,fseek(f,0,SEEK_SET))
+
+    //read from that same file and compare
+    EXPECTGE(0,rfStringX_Init_fUTF8(&sx2,f,&eof))
+    EXPECT(true,rfString_Equal(&sx1,&sx2))
+	
     fclose(futf8);
     fclose(f);
 /// --> UTF16LE
@@ -67,6 +91,32 @@ int main()
     //read from that same file and compare
     EXPECTGE(0,rfString_Init_fUTF16(&s4,f,RF_LITTLE_ENDIAN,&eof))
     EXPECT(true,rfString_Equal(&s3,&s4));
+	
+	///do the same for RF_StringX
+	EXPECT(0,fseek(futf16,0,SEEK_SET))
+	fclose(f);
+	//expect to see succesfull initialization
+	EXPECTGE(0,rfStringX_Init_fUTF16(&sx3,futf16,RF_LITTLE_ENDIAN,&eof))
+    //expect to see the first line of the file (as mentioned in the first comment let's just get rid of the bom here)
+    EXPECT(true,rfString_PruneStart(&sx3,1));
+    printf("%s",rfString_Cstr(&sx3));//ending newline is included since we don't use RF_TextFile
+    //assign the next line to the same string
+    EXPECTGE(0,rfStringX_Assign_fUTF16(&sx3,futf16,RF_LITTLE_ENDIAN,&eof))
+    //append the next line to the same string and check for EOF
+    EXPECTGE(0,rfStringX_Append_fUTF16(&sx3,futf16,RF_LITTLE_ENDIAN,&eof))
+	EXPECT_MSG(true,eof,"The end of file should have been reached and this flag should have been true");
+	//remove the appended newlines since we want to read it one-off from the other file
+    EXPECT(true,rfString_Remove(&sx3,RFS_("\n"),0,0))
+
+    //open an output file and write the string there
+    EXPECTNOT(0,(f = fopen("outputfile","w+b")))
+    EXPECT(RF_SUCCESS,rfString_Fwrite(&sx3,f,RF_UTF16_LE))
+    EXPECT(0,fseek(f,0,SEEK_SET))
+
+    //read from that same file and compare
+    EXPECTGE(0,rfStringX_Init_fUTF16(&sx4,f,RF_LITTLE_ENDIAN,&eof))
+    EXPECT(true,rfString_Equal(&sx3,&sx4));
+	
     fclose(futf16);
     fclose(f);
 
@@ -94,6 +144,32 @@ int main()
     //read from that same file and compare
     EXPECTGE(0,rfString_Init_fUTF16(&s6,f,RF_BIG_ENDIAN,&eof))
     EXPECT(true,rfString_Equal(&s5,&s6))
+	
+	///do the same for RF_StringX
+	fclose(f);
+	EXPECT(0,fseek(futf16,0,SEEK_SET))
+	//expect to see succesfull initialization
+	EXPECTGE(0,rfStringX_Init_fUTF16(&sx5,futf16,RF_BIG_ENDIAN,&eof))
+    //expect to see the first line of the file (as mentioned in the first comment let's just get rid of the bom here)
+    EXPECT(true,rfString_PruneStart(&sx5,1))
+    printf("%s",rfString_Cstr(&sx5));//ending newline is included since we don't use RF_TextFile
+    //assign the next line to the same string
+    EXPECTGE(0,rfStringX_Assign_fUTF16(&sx5,futf16,RF_BIG_ENDIAN,&eof))
+    //append the next line to the same string
+    EXPECTGE(0,rfStringX_Append_fUTF16(&sx5,futf16,RF_BIG_ENDIAN,&eof))
+	EXPECT_MSG(true,eof,"The end of file should have been reached and this flag should have been true");
+	//remove the appended newlines since we want to read it one-off from the other file
+    EXPECT(true,rfString_Remove(&sx5,RFS_("\n"),0,0))
+
+    //open an output file and write the string there
+    EXPECTNOT(0,(f = fopen("outputfile","w+b")))
+    EXPECT(RF_SUCCESS,rfString_Fwrite(&s5,f,RF_UTF16_BE))
+    EXPECT(0,fseek(f,0,SEEK_SET))
+
+    //read from that same file and compare
+    EXPECTGE(0,rfStringX_Init_fUTF16(&sx6,f,RF_BIG_ENDIAN,&eof))
+    EXPECT(true,rfString_Equal(&sx5,&sx6))
+	
     fclose(futf16);
     fclose(f);
 
@@ -122,6 +198,32 @@ int main()
     //read from that same file and compare
     EXPECTGE(0,rfString_Init_fUTF32(&s8,f,RF_LITTLE_ENDIAN,&eof))
     EXPECT(true,rfString_Equal(&s7,&s8))
+	
+	///for RF_StringX
+    EXPECT(0,fseek(futf32,0,SEEK_SET))
+	fclose(f);
+	//expect to see succesfull initialization
+	EXPECTGE(0,rfStringX_Init_fUTF32(&sx7,futf32,RF_LITTLE_ENDIAN,&eof))
+    //expect to see the first line of the file (as mentioned in the first comment let's just get rid of the bom here)
+    EXPECT(true,rfString_PruneStart(&sx7,1))
+    printf("%s",rfString_Cstr(&sx7));//ending newline is included since we don't use RF_TextFile
+    //assign the next line to the same string
+    EXPECTGE(0,rfStringX_Assign_fUTF32(&sx7,futf32,RF_LITTLE_ENDIAN,&eof))
+    //append the next line to the same string
+    EXPECTGE(0,rfStringX_Append_fUTF32(&sx7,futf32,RF_LITTLE_ENDIAN,&eof))
+	EXPECT_MSG(true,eof,"The end of file should have been reached and this flag should have been true");
+	//remove the appended newlines since we want to read it one-off from the other file
+    EXPECT(true,rfString_Remove(&sx7,RFS_("\n"),0,0))
+
+    //open an output file and write the string there
+    EXPECTNOT(0,(f = fopen("outputfile","w+b")))
+    EXPECT(RF_SUCCESS,rfString_Fwrite(&sx7,f,RF_UTF32_LE))
+    EXPECT(0,fseek(f,0,SEEK_SET))
+
+    //read from that same file and compare
+    EXPECTGE(0,rfStringX_Init_fUTF32(&sx8,f,RF_LITTLE_ENDIAN,&eof))
+    EXPECT(true,rfString_Equal(&sx7,&sx8))
+	
     fclose(futf32);
     fclose(f);
 
@@ -150,7 +252,34 @@ int main()
     //read from that same file and compare
     EXPECTGE(0,rfString_Init_fUTF32(&s10,f,RF_BIG_ENDIAN,&eof))
     EXPECT(true,rfString_Equal(&s9,&s10))
-    fclose(futf32);
+    
+	
+	///for RF_StringX
+	EXPECT(0,fseek(futf32,0,SEEK_SET))
+	fclose(f);
+    //expect to see succesfull initialization
+	EXPECTGE(0,rfStringX_Init_fUTF32(&sx9,futf32,RF_BIG_ENDIAN,&eof))
+    //expect to see the first line of the file (as mentioned in the first comment let's just get rid of the bom here)
+    EXPECT(true,rfString_PruneStart(&sx9,1))
+    printf("%s",rfString_Cstr(&sx9));//ending newline is included since we don't use RF_TextFile
+    //assign the next line to the same string
+    EXPECTGE(0,rfStringX_Assign_fUTF32(&sx9,futf32,RF_BIG_ENDIAN,&eof))
+    //append the next line to the same string
+    EXPECTGE(0,rfStringX_Append_fUTF32(&sx9,futf32,RF_BIG_ENDIAN,&eof))
+	EXPECT_MSG(true,eof,"The end of file should have been reached and this flag should have been true");
+	//remove the appended newlines since we want to read it one-off from the other file
+    EXPECT(true,rfString_Remove(&sx9,RFS_("\n"),0,0))
+
+    //open an output file and write the string there
+    EXPECTNOT(0,(f = fopen("outputfile","w+b")))
+    EXPECT(RF_SUCCESS,rfString_Fwrite(&sx9,f,RF_UTF32_BE))
+    EXPECT(0,fseek(f,0,SEEK_SET))
+
+    //read from that same file and compare
+    EXPECTGE(0,rfStringX_Init_fUTF32(&sx10,f,RF_BIG_ENDIAN,&eof))
+    EXPECT(true,rfString_Equal(&sx9,&sx10))
+	
+	fclose(futf32);
     fclose(f);
 
     rfDeleteFile(RFS_("outputfile"));

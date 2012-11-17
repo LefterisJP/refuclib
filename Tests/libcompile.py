@@ -67,14 +67,23 @@ def compileLib(verbose,dynamic,config,compiler):
     #if we get here it means success
     if(dynamic):
         print("--Dynamic version of the Refu library compiled Succesfully--\n\n");
-        #move it inside the Tests directory
+
+        #remove any previous existing lib there and move it inside the Tests directory
+        try:
+            os.remove(os.path.join(config.refuDir,"Tests",config.outputName+compiler.dynamicExtension))
+        except:
+            pass
         try:
             os.rename(os.path.join(config.refuDir,config.outputName+compiler.dynamicExtension),os.path.join(config.refuDir,"Tests",config.outputName+compiler.dynamicExtension))
         except:
             pass
     else:
         print("--Static version of the Refu library compiled Succesfully--\n\n");
-        #move it inside the Tests directory
+        #remove any previous existing lib and then move this inside the Tests directory
+        try:
+            os.remove(os.path.join(config.refuDir,"Tests",config.outputName+compiler.staticExtension))
+        except:
+            pass
         try:
             os.rename(os.path.join(config.refuDir,config.outputName+compiler.staticExtension),os.path.join(config.refuDir,"Tests",config.outputName+compiler.staticExtension))
         except:
