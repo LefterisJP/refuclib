@@ -683,12 +683,15 @@ i_DECLIMEX_ char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,const void* left
 //! @lmsFunction
 //! @param thisstr The extended string to work on
 //! @param sub The substring after which to move inside the current String. @inhtype{String,StringX} @tmpSTR
-//! @param result \rfoptional{0} Give a reference to a StringX here to return the substring between the start of @c thisstr and the end of the moving. If 0 nothing is returned
+//! @param result \rfoptional{0} Pass a pointer to a @c String type to be initialized with the substring between the start of @c thisstr and the end of the moving.
+//! If the passed pointer is of RF_StringX type also pass the @c RF_STRINGX_ARGUMENT bitflag argument in the @c options argument
+//! If 0 nothing is returned @inhtype{String,StringX}
 //! @param options \rfoptional{0} Bitflag options denoting the method with which to search for the substrings inside the string. Give 0 for the defaults. Can have values:
 //! + @c RF_CASE_IGNORE: If you want to replace any occurence of the substring disregarding CAPS or not.
 //!     Default search option is to @b match the case. For now this works only for characters of the english language.
 //! + @c RF_MATCH_WORD: If you to replace only exact matches of the substring. For example an exact replace for @e "HELLO" in the string
 //!     @e "HELLOWORLD" would replace nothing. Default is with this flag off.
+//! + @c RF_STRINGX_ARGUMENT: Pass this bitflag option if the pointer you gave for initialization at @c result is of RF_StringX type
 //! @return Returns the number of positions (bytes) moved or RF_FAILURE if the substring was not found in the String
 //! @see rfStringX_MoveAfterv()
 //! @see rfStringX_MoveAfterPair()
@@ -696,9 +699,9 @@ i_DECLIMEX_ char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,const void* left
 //! @see rfStringX_MoveBack()
 //! @see rfStringX_Reset()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ int32_t rfStringX_MoveAfter(RF_StringX* thisstr,const void* sub,RF_StringX* result,const char options);
+i_DECLIMEX_ int32_t rfStringX_MoveAfter(RF_StringX* thisstr,const void* sub,void* result,const char options);
 #else
-i_DECLIMEX_ int32_t i_rfStringX_MoveAfter(RF_StringX* thisstr,const void* sub,RF_StringX* result,const char* options);
+i_DECLIMEX_ int32_t i_rfStringX_MoveAfter(RF_StringX* thisstr,const void* sub,void* result,const char* options);
     #ifdef RF_OPTION_DEFAULT_ARGUMENTS
         #define rfStringX_MoveAfter(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRINGX_MOVEAFTER,4,__VA_ARGS__)
         #define i_NPSELECT_RF_STRINGX_MOVEAFTER1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfStringX_MoveAfter() accepts from 2 to 4 arguments\"")
@@ -759,12 +762,15 @@ i_DECLIMEX_ void rfStringX_Reset(RF_StringX* thisstr);
 //! to @c char and @c unsigned char respectively
 //! @lmsFunction
 //! @param thisstr The extended string to work on
-//! @param result The extended string to initialize. This is an optional parameter. Give 0 for nothing returned
+//! @param result \rfoptional{0} Pass a pointer to a string type to have it initialized with the before part of the string before the found substring.
+//! If the passed pointer is of RF_StringX type also pass the @c RF_STRINGX_ARGUMENT bitflag argument in the @c options argument
+//! This is an optional parameter. Give 0 for nothing returned. @inhtype{String,StringX}
 //! @param options Bitflag options denoting the method with which to search for the substrings inside the string. Give 0 for the defaults. Can have values:
 //! + @c RF_CASE_IGNORE: If you want to replace any occurence of the substring disregarding CAPS or not.
 //!     Default search option is to @b match the case. For now this works only for characters of the english language.
 //! + @c RF_MATCH_WORD: If you to replace only exact matches of the substring. For example an exact replace for @e "HELLO" in the string
 //!     @e "HELLOWORLD" would replace nothing. Default is with this flag off.
+//! + @c RF_STRINGX_ARGUMENT: Pass this bitflag option if the pointer you gave for initialization at @c result is of RF_StringX type
 //! @param parN The number of parameters
 //! @extraVarArgLim
 //! @param ... The strings to search for. @inhtype{String,StringX} @tmpSTR
@@ -775,10 +781,10 @@ i_DECLIMEX_ void rfStringX_Reset(RF_StringX* thisstr);
 //! @see rfStringX_MoveBack()
 //! @see rfStringX_Reset()
 #ifdef RF_IAMHERE_FOR_DOXYGEN
-i_DECLIMEX_ char rfStringX_MoveAfterv(RF_StringX* thisstr,RF_StringX* result,const char options,const unsigned char parN, ...);
+i_DECLIMEX_ char rfStringX_MoveAfterv(RF_StringX* thisstr,void* result,const char options,const unsigned char parN, ...);
 #endif
 #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-    i_DECLIMEX_ char i_rfStringX_MoveAfterv(RF_StringX* thisstr,RF_StringX* result,const char* options,const unsigned char* parN, ...);
+    i_DECLIMEX_ char i_rfStringX_MoveAfterv(RF_StringX* thisstr,void* result,const char* options,const unsigned char* parN, ...);
     #define rfStringX_MoveAfterv(...)  RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRINGX_MOVEAFTERV,4,__VA_ARGS__)
     #define i_NPSELECT_RF_STRINGX_MOVEAFTERV1(...)  RF_SELECT_FUNC_IF_NARGGT2(i_LIMSELECT_RF_STRINGX_MOVEAFTERV,18,__VA_ARGS__)
     #define i_NPSELECT_RF_STRINGX_MOVEAFTERV0(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfStringX_MoveAfterv() needs to receive more than 4 arguments\"")
@@ -799,7 +805,7 @@ i_DECLIMEX_ char rfStringX_MoveAfterv(RF_StringX* thisstr,RF_StringX* result,con
     #define i_SELECT_RF_STRINGX_MOVEAFTERV17(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP17(char,i_rfStringX_MoveAfterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
     #define i_SELECT_RF_STRINGX_MOVEAFTERV18(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP18(char,i_rfStringX_MoveAfterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
 #else
-    char rfStringX_MoveAfterv(RF_StringX* thisstr,RF_StringX* result,const char* options,const unsigned char* parN, ...);
+    char rfStringX_MoveAfterv(RF_StringX* thisstr,void* result,const char* options,const unsigned char* parN, ...);
 #endif
 
 
@@ -814,12 +820,15 @@ i_DECLIMEX_ char rfStringX_MoveAfterv(RF_StringX* thisstr,RF_StringX* result,con
 //! @param thisstr The extended string to work on
 //! @param left The left substring that will define the new substring. @inhtype{String,StringX} @tmpSTR
 //! @param right The right substring that will define the new substring. @inhtype{String,StringX} @tmpSTR
-//! @param result \rfoptional{0} If this is not 0 then here the string between @c left and @c right will be returned here
+//! @param result \rfoptional{0} If this is not 0 then pass a pointer to a string type here to have it initialized with what's in between the @c left and @c right substring
+//! after which the internal string pointer gets moved.
+//! If the passed pointer is of RF_StringX type also pass the @c RF_STRINGX_ARGUMENT bitflag argument in the @c options argument
 //! @param options \rfoptional{0} Bitflag options denoting the method with which to search for the substring literals inside the string. Give 0 for the defaults. Can have values:
 //! + @c RF_CASE_IGNORE: If you want to search for any occurence of the substring disregarding CAPS or not.
 //!     Default search option is to @b match the case. For now this works only for characters of the english language.
 //! + @c RF_MATCH_WORD: If you to find only exact matches of the substring. For example an exact search for @e "HELLO" in the string
 //!     @e "HELLOWORLD" would find nothing. Default is with this flag off.
+//! + @c RF_STRINGX_ARGUMENT: Pass this bitflag option if the pointer you gave for initialization at @c result is of RF_StringX type
 //! @param occurence \rfoptional{0} If this is not 0 then the function will search for the number of occurence given in this parameter.
 //! If it is 0 it will search for the first occurence. If it is not found then the function shall return false
 //! @return Returns true if the substring is found and false if not
@@ -829,9 +838,9 @@ i_DECLIMEX_ char rfStringX_MoveAfterv(RF_StringX* thisstr,RF_StringX* result,con
 //! @see rfStringX_MoveBack()
 //! @see rfStringX_Reset()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ char rfStringX_MoveAfterPair(RF_StringX* thisstr,void* left,void* right,RF_StringX* result,char options,uint32_t occurence);
+i_DECLIMEX_ char rfStringX_MoveAfterPair(RF_StringX* thisstr,void* left,void* right,void* result,char options,uint32_t occurence);
 #else
-i_DECLIMEX_ char i_rfStringX_MoveAfterPair(RF_StringX* thisstr,void* left,void* right,RF_StringX* result,char* options,uint32_t* occurence);
+i_DECLIMEX_ char i_rfStringX_MoveAfterPair(RF_StringX* thisstr,void* left,void* right,void* result,char* options,uint32_t* occurence);
     #ifdef RF_OPTION_DEFAULT_ARGUMENTS
         #define rfStringX_MoveAfterPair(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRINGX_MOVEAFTERPAIR,6,__VA_ARGS__)
         #define i_NPSELECT_RF_STRINGX_MOVEAFTERPAIR1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfStringX_MoveAfterPair() accepts from 3 to 6 arguments\"")

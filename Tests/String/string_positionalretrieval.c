@@ -6,6 +6,7 @@ int main()
 {
 	RF_String s1,s2,s3,s4,s5;
 	RF_String ret,ret2;
+	RF_StringX retx1;
     int year;
 
 
@@ -58,11 +59,12 @@ int main()
     EXPECT(true,rfString_Equal(&ret,RFS_("結集を図ろうとしていることについて、「政策なんかどうでもいいという、ある種の暴論だ」と痛烈に批判した")))
     rfString_Deinit(&ret);
 
-    //expect true from all: meaning the found substring was the one we expected. Either after a space or a comma and then before the comma in the found substring
     EXPECT(true,rfString_Init(&s5,"神奈川県,福島県,和歌山県"))
-    EXPECT(true,rfString_Afterv(&s5,&ret,0,2,RFS_(" "),RFS_(",")))
-    EXPECT(true,rfString_Before(&ret,RFS_(","),&ret2,0))
+    EXPECT(true,rfString_Afterv(&s5,&retx1,RF_STRINGX_ARGUMENT,2,RFS_(" "),RFS_(",")))
+    EXPECT(true,rfString_Before(&retx1,RFS_(","),&ret2,0))
     EXPECT(true,rfString_Equal(&ret2,RFS_("福島県")))
+	rfStringX_MoveForward(&retx1,4);
+	EXPECT(true,rfString_Equal(&retx1,RFS_("和歌山県")))
 
 	return 0;
 }

@@ -60,7 +60,7 @@ int32_t i_rfXML_Init(RF_XML* ret,void* filenameP,char* openFlagP,char* encodingP
     char encoding,openFlag;
     RF_String* filename;
     RF_XMLTag* currentTag;
-    RF_StringX copyS;
+    RF_StringX copyS,check;
     encoding =  *encodingP;
     openFlag = *openFlagP;
     filename = (RF_String*)filenameP;
@@ -77,7 +77,6 @@ int32_t i_rfXML_Init(RF_XML* ret,void* filenameP,char* openFlagP,char* encodingP
     //initialize the text buffer reading string
     rfStringX_Init_txtbuff(&ret->s,""); ///cleanup1 - clean this string
     //Some Strings that will be used during parsing
-    RF_StringX check;
     ///depending on the type of opening the user requests
     if(RF_BITFLAG_ON(openFlag,XML_OPEN_IN_MEMORY) || RF_BITFLAG_ON(openFlag,XML_OPEN_IN_DISK))//existing file opening case
     {
@@ -115,7 +114,7 @@ int32_t i_rfXML_Init(RF_XML* ret,void* filenameP,char* openFlagP,char* encodingP
         {
             RF_XML_READLINE_GOTO(ret,"The root tag of the XML file could not be found",&ret->s,error,cleanup2);
             //get the tag name
-            if( rfStringX_MoveAfterPair(&ret->s,RFS_("<"),RFS_(">"),&check,0,0) == true)
+            if( rfStringX_MoveAfterPair(&ret->s,RFS_("<"),RFS_(">"),&check,RF_STRINGX_ARGUMENT,0) == true)
             {
                 if((error = rfTextFile_GetOffset(&ret->f,&ret->rootPos)) != RF_SUCCESS)
                 {
@@ -151,7 +150,7 @@ int32_t i_rfXML_Init(RF_XML* ret,void* filenameP,char* openFlagP,char* encodingP
         {
             ///Here there is a situation that we have to consider. The root tag might be without any contents and hence just closing right after being opened
             ///so we check for this situation here before proceeding
-            if(rfString_Between(&ret->s,RFS_("</"),RFS_(">"),&check,0) == true)
+            if(rfString_Between(&ret->s,RFS_("</"),RFS_(">"),&check,RF_STRINGX_ARGUMENT) == true)
             {
                 //if the root tag closed we are done
                 if( (currentTag == &ret->root) && rfString_Equal(&check,&ret->root.name))
@@ -341,7 +340,8 @@ int32_t i_rfXML_InsertStr(RF_XML* x,void* sP,char* flagsP)
     int32_t error;
     uint32_t i;
     uint64_t lineN;
-    RF_StringX strBuff,newLine,attributes,nS,tabs;
+    RF_StringX strBuff,newLine,nS,tabs;
+    RF_String attributes;
     RF_String* s = (RF_String*)sP;
     char flags = *flagsP;
     //if the file is open in memory (and hence not just on disk)
@@ -426,7 +426,7 @@ int32_t i_rfXML_InsertStr(RF_XML* x,void* sP,char* flagsP)
     }//end of the "end of tag" case
     else///insertion at start of tag
     {
-        RF_StringX before;
+        RF_String before;
         //move after the tag opening if found
         if(rfStringX_MoveAfter(&strBuff,RFS_("<%s",x->lastTag->name.bytes),&before,0) == RF_FAILURE)
         {
@@ -438,7 +438,7 @@ int32_t i_rfXML_InsertStr(RF_XML* x,void* sP,char* flagsP)
         {
             LOG_ERROR("The opening tag of the XML tag <%s> does not have a closing bracket",RE_XML_PARSE_FAILURE,x->lastTag->name.bytes)
             error = RE_XML_PARSE_FAILURE;
-            rfStringX_Deinit(&before);
+            rfString_Deinit(&before);
             goto cleanup2;
         }
         //create the new line that will replace the previous line, and also add the same level of tabs as the previous one
@@ -450,8 +450,8 @@ int32_t i_rfXML_InsertStr(RF_XML* x,void* sP,char* flagsP)
         if((error=rfTextFile_Replace(&x->f,x->lastLine,&newLine)) != RF_SUCCESS)
         {
             LOG_ERROR("Failed to replace a line of the XML file \"%s\" with the requested string",error,x->f.name.bytes);
-            rfStringX_Deinit(&attributes);
-            rfStringX_Deinit(&before);
+            rfString_Deinit(&attributes);
+            rfString_Deinit(&before);
             goto cleanup3;
         }
     }//end of the if for putting it either in start or end of tag

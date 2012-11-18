@@ -255,7 +255,8 @@ char i_rfXMLTag_PrintToFile(RF_XMLTag* t,RF_TextFile* f,RF_StringX* strBuff,uint
 int32_t i_rfXML_Parse(RF_XML* x,RF_XMLTag* currentTag)
 {
     int32_t parserState,error;
-    RF_StringX contents,check;
+    RF_StringX check;
+    RF_String contents;
     ///start parsing the bulk of the xml file
     parserState = TAG_TITLE;
     while(1)
@@ -267,7 +268,7 @@ int32_t i_rfXML_Parse(RF_XML* x,RF_XMLTag* currentTag)
             ///parser is expecting a tag's opening
             case TAG_TITLE:
                 //get the title and if no tag name is found in this line
-                if(rfStringX_MoveAfterPair(&x->s,RFS_("<"),RFS_(">"),&check,0,0) == false)
+                if(rfStringX_MoveAfterPair(&x->s,RFS_("<"),RFS_(">"),&check,RF_STRINGX_ARGUMENT,0) == false)
                 {
                     //if there is nothing else in this line go to the next
                     if(rfString_Equal(&x->s,RFS_(""))== true)
@@ -276,13 +277,13 @@ int32_t i_rfXML_Parse(RF_XML* x,RF_XMLTag* currentTag)
                         //back to the start of the loop
                         continue;
                     }
-                }//end of if no tag was found in the line
+                }
 
                 //if a space is found in the tag name it means that this tag has parameters
                 if(rfString_Find(&check,RFS_(" "),0) != RF_FAILURE)
                 {
                     char* until = "=\"";
-                    RF_StringX attr,attrV;
+                    RF_String attr,attrV;
                     //read the name. Whatever String is contained before space. No need for a failure check here since we know it does have " "
                     rfStringX_MoveAfter(&check,RFS_(" "),&contents,0);
                     //create the new tag with the name
@@ -295,10 +296,10 @@ int32_t i_rfXML_Parse(RF_XML* x,RF_XMLTag* currentTag)
                         rfStringX_MoveAfter(&check,RFS_("\""),&attrV,0);
                         rfXMLTag_AddAttribute(nTag,&attr,&attrV);
                         //free the strings
-                        rfStringX_Deinit(&attr);rfStringX_Deinit(&attrV);
+                        rfString_Deinit(&attr);rfString_Deinit(&attrV);
                     }
                     //free string
-                    rfStringX_Deinit(&contents);
+                    rfString_Deinit(&contents);
                 }
                 else//just create the new tag
                     nTag = rfXMLTag_Create(currentTag,&check);
@@ -331,7 +332,7 @@ int32_t i_rfXML_Parse(RF_XML* x,RF_XMLTag* currentTag)
                 if( opF != 0 && clF != 0)
                 {
                     //take everything before the tag opening or new line as content
-                    if(rfStringX_MoveAfter(&x->s,RFS_("<"),&check,0) != RF_FAILURE)
+                    if(rfStringX_MoveAfter(&x->s,RFS_("<"),&check,RF_STRINGX_ARGUMENT) != RF_FAILURE)
                     {
                         rfXMLTag_AddContent(currentTag,&check);
                         //here need to go back by 1 since we need to find '<' in the string in subsequent run
@@ -354,7 +355,7 @@ int32_t i_rfXML_Parse(RF_XML* x,RF_XMLTag* currentTag)
             break;
             ///parser is expecting a tag to close
             case TAG_CLOSING:
-                if(rfStringX_MoveAfterPair(&x->s,RFS_("</"),RFS_(">"),&check,0,0) != false)
+                if(rfStringX_MoveAfterPair(&x->s,RFS_("</"),RFS_(">"),&check,RF_STRINGX_ARGUMENT,0) != false)
                 {
                     ///success -- if the root tag closed we are done
                     if(currentTag == &x->root)
@@ -402,7 +403,8 @@ int32_t rfXML_GoNext_dsk(RF_XML* x,RF_XMLTag* t)
 {
     int32_t parserState,error,level;
     foff_rft prPos;
-    RF_StringX contents,check,copyS;
+    RF_StringX check,copyS;
+    RF_String contents;
     RF_XMLTag* startTag = x->currentTag;
     rfTextFile_GetOffset(&x->f,&prPos); /// cleanup1 -- go back to the file offset at function call
     level = 1;
@@ -421,7 +423,7 @@ int32_t rfXML_GoNext_dsk(RF_XML* x,RF_XMLTag* t)
             ///parser is expecting a tag's opening
             case TAG_TITLE:
                 //get the title and if no tag name is found in this line
-                if(rfStringX_MoveAfterPair(&x->s,RFS_("<"),RFS_(">"),&check,0,0) == false)
+                if(rfStringX_MoveAfterPair(&x->s,RFS_("<"),RFS_(">"),&check,RF_STRINGX_ARGUMENT,0) == false)
                 {
                     //if there is nothing else in this line go to the next
                     if(rfString_Equal(&x->s,RFS_(""))== true)
@@ -437,7 +439,7 @@ int32_t rfXML_GoNext_dsk(RF_XML* x,RF_XMLTag* t)
                 if(rfString_Find(&check,RFS_(" "),0) != RF_FAILURE)
                 {
                     char* until = "=\"";
-                    RF_StringX attr,attrV;
+                    RF_String attr,attrV;
                     //read the name. Whatever String is contained before space. No need for a failure check here since we know it does have " "
                     rfStringX_MoveAfter(&check,RFS_(" "),&contents,0);
                     //create the new tag with the name
@@ -451,10 +453,10 @@ int32_t rfXML_GoNext_dsk(RF_XML* x,RF_XMLTag* t)
                         rfStringX_MoveAfter(&check,RFS_("\""),&attrV,0);
                         rfXMLTag_AddAttribute(nTag,&attr,&attrV);
                         //free the strings
-                        rfStringX_Deinit(&attr);rfStringX_Deinit(&attrV);
+                        rfString_Deinit(&attr);rfString_Deinit(&attrV);
                     }
                     //free string
-                    rfStringX_Deinit(&contents);
+                    rfString_Deinit(&contents);
                 }
                 else//just create the new tag
                 {
@@ -481,7 +483,7 @@ int32_t rfXML_GoNext_dsk(RF_XML* x,RF_XMLTag* t)
                 if( opF != 0 && clF != 0)
                 {
                     //take everything before the tag opening or new line as content
-                    if(rfStringX_MoveAfter(&x->s,RFS_("<"),&check,0) != RF_FAILURE)
+                    if(rfStringX_MoveAfter(&x->s,RFS_("<"),&check,RF_STRINGX_ARGUMENT) != RF_FAILURE)
                     {
                         rfXMLTag_AddContent(x->currentTag,&check);
                         //here need to go back by 1 since we need to find '<' in the string in subsequent run
@@ -504,7 +506,7 @@ int32_t rfXML_GoNext_dsk(RF_XML* x,RF_XMLTag* t)
             break;
             ///parser is expecting a tag to close
             case TAG_CLOSING:
-                if(rfStringX_MoveAfterPair(&x->s,RFS_("</"),RFS_(">"),&check,0,0) != false)
+                if(rfStringX_MoveAfterPair(&x->s,RFS_("</"),RFS_(">"),&check,RF_STRINGX_ARGUMENT,0) != false)
                 {
                     level --;
                     //if the root closed then we fail and go back to the root
@@ -609,7 +611,8 @@ int32_t rfXML_GoIn_dsk(RF_XML* x,uint32_t i)
     int32_t parserState,error,level=0;
     uint32_t counter = 0;
     foff_rft prPos;
-    RF_StringX contents,check,copyS;
+    RF_StringX check,copyS;
+    RF_String contents;
     RF_XMLTag* startTag = x->currentTag;
     rfTextFile_GetOffset(&x->f,&prPos);
     //if the no childre flag is raised return failure
@@ -628,7 +631,7 @@ int32_t rfXML_GoIn_dsk(RF_XML* x,uint32_t i)
             ///parser is expecting a tag's opening
             case TAG_TITLE:
                 //get the title and if no tag name is found in this line
-                if(rfStringX_MoveAfterPair(&x->s,RFS_("<"),RFS_(">"),&check,0,0) == false)
+                if(rfStringX_MoveAfterPair(&x->s,RFS_("<"),RFS_(">"),&check,RF_STRINGX_ARGUMENT,0) == false)
                 {
                     //if there is nothing else in this line go to the next
                     if(rfString_Equal(&x->s,RFS_(""))== true)
@@ -646,7 +649,7 @@ int32_t rfXML_GoIn_dsk(RF_XML* x,uint32_t i)
                 if(rfString_Find(&check,RFS_(" "),0) != RF_FAILURE)
                 {
                     char* until = "=\"";
-                    RF_StringX attr,attrV;
+                    RF_String attr,attrV;
                     //read the name. Whatever String is contained before space. No need for a failure check here since we know it does have " "
                     rfStringX_MoveAfter(&check,RFS_(" "),&contents,0);
                     //create the new tag with the name
@@ -659,10 +662,10 @@ int32_t rfXML_GoIn_dsk(RF_XML* x,uint32_t i)
                         rfStringX_MoveAfter(&check,RFS_("\""),&attrV,0);
                         rfXMLTag_AddAttribute(nTag,&attr,&attrV);
                         //free the strings
-                        rfStringX_Deinit(&attr);rfStringX_Deinit(&attrV);
+                        rfString_Deinit(&attr);rfString_Deinit(&attrV);
                     }
                     //free string
-                    rfStringX_Deinit(&contents);
+                    rfString_Deinit(&contents);
                 }
                 else//just create the new tag
                 {
@@ -722,7 +725,7 @@ int32_t rfXML_GoIn_dsk(RF_XML* x,uint32_t i)
             break;
             ///parser is expecting a tag to close
             case TAG_CLOSING:
-                if(rfStringX_MoveAfterPair(&x->s,RFS_("</"),RFS_(">"),&check,0,0) != false)
+                if(rfStringX_MoveAfterPair(&x->s,RFS_("</"),RFS_(">"),&check,RF_STRINGX_ARGUMENT,0) != false)
                 {
                     level --;
                     //if the root closed then we fail and go back to the root

@@ -41,6 +41,8 @@ extern "C"
 #define RF_CASE_IGNORE  0x1
 //! An options for some string functions. Means that the exact string should be found/replaced e.t.c.
 #define RF_MATCH_WORD 0x2
+//! An option for some string functions denothing that some specific argument is of RF_StringX type
+#define RF_STRINGX_ARGUMENT 0x4
 
 
 // Denotes that a requested character/byte index in an RF_String is out of bounds
@@ -938,21 +940,23 @@ i_DECLIMEX_ int32_t i_rfString_Count(const void* thisstr,const void* sstr,const 
 //! @param thisstr This current string. @inhtype{String,StringX}
 //! @param[in] lstr The left substring that will define the new substring. @inhtype{String,StringX} @tmpSTR
 //! @param[in] rstr The right substring that will define the new substring. @inhtype{String,StringX} @tmpSTR
-//! @param[out] result The resulting substring.
+//! @param[out] result Pass a pointer to a String type to receive the string between @c lstr and @c rstr.
+//! If the passed pointer is of RF_StringX type also pass the @c RF_STRINGX_ARGUMENT bitflag argument in the @c options argument. This should NOT ever be null. @inhtype{String,StringX}
 //! @param options \rfoptional{0} Bitflag options denoting the method with which to search for the substring literals inside the string. Give 0 for the defaults.
 //! Can have values:
 //! + @c RF_CASE_IGNORE: If you want to search for any occurence of the substring disregarding CAPS or not.
 //!     Default search option is to @b match the case. For now this works only for characters of the english language.
 //! + @c RF_MATCH_WORD: If you to find only exact matches of the substring. For example an exact search for @e "HELLO" in the string
 //!     @e "HELLOWORLD" would find nothing. Default is with this flag off.
+//! + @c RF_STRINGX_ARGUMENT: Pass this bitflag option if the pointer you gave for initialization at @c result is of RF_StringX type
 //! @return Returns true if the substring is found and initialized and false otherwise
 //! @see rfString_Before()
 //! @see rfString_After()
 //! @see rfStringX_MoveAfterPair()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ char rfString_Between(const void* thisstr,const void* lstr,const void* rstr,RF_String* result,const char options);
+i_DECLIMEX_ char rfString_Between(const void* thisstr,const void* lstr,const void* rstr,void* result,const char options);
 #else
-i_DECLIMEX_ char i_rfString_Between(const void* thisstr,const void* lstr,const void* rstr,RF_String* result,const char* options);
+i_DECLIMEX_ char i_rfString_Between(const void* thisstr,const void* lstr,const void* rstr,void* result,const char* options);
     #ifdef RF_OPTION_DEFAULT_ARGUMENTS
         #define rfString_Between(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_BETWEEN,5,__VA_ARGS__)
         #define i_NPSELECT_RF_STRING_BETWEEN1(...)  RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Between() accepts from 4 to 5 arguments\"")
@@ -983,13 +987,15 @@ i_DECLIMEX_ char i_rfString_Between(const void* thisstr,const void* lstr,const v
 //! to @c char and @c unsigned char respectively
 //! @lmsFunction
 //! @param thisstr The string to operate in. @inhtype{String,StringX}
-//! @param result The resulting substring.
+//! @param[out] result Pass a pointer to a String type to receive the string from the start of @c thisstr until any of the given substrings are found.
+//! If the passed pointer is of RF_StringX type also pass the @c RF_STRINGX_ARGUMENT bitflag argument in the @c options argument. This should NOT ever be null. @inhtype{String,StringX}
 //! @param options Bitflag options denoting the method with which to search for the substring literals inside the string. Give 0 for the defaults.
 //!  Can have values:
 //! + @c RF_CASE_IGNORE: If you want to search for any occurence of the substring disregarding CAPS or not.
 //!     Default search option is to @b match the case. For now this works only for characters of the english language.
 //! + @c RF_MATCH_WORD: If you to find only exact matches of the substring. For example an exact search for @e "HELLO" in the string
 //!     @e "HELLOWORLD" would find nothing. Default is with this flag off.
+//! + @c RF_STRINGX_ARGUMENT: Pass this bitflag option if the pointer you gave for initialization at @c result is of RF_StringX type
 //! @param parN The number of strings to search for
 //! @param ... The strings to search for. @inhtype{String,StringX} @tmpSTR
 //! @extraVarArgLim
@@ -998,10 +1004,10 @@ i_DECLIMEX_ char i_rfString_Between(const void* thisstr,const void* lstr,const v
 //! @see rfString_Afterv()
 //! @see rfString_After()
 #ifdef RF_IAMHERE_FOR_DOXYGEN
-i_DECLIMEX_ char rfString_Beforev(const void* thisstr,RF_String* result,const char options,const unsigned char parN, ...);
+i_DECLIMEX_ char rfString_Beforev(const void* thisstr,void* result,const char options,const unsigned char parN, ...);
 #endif
 #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-    i_DECLIMEX_ char i_rfString_Beforev(const void* thisstr,RF_String* result,const char* options,const unsigned char* parN, ...);
+    i_DECLIMEX_ char i_rfString_Beforev(const void* thisstr,void* result,const char* options,const unsigned char* parN, ...);
     #define rfString_Beforev(...)  RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_BEFOREV,4,__VA_ARGS__)
     #define i_NPSELECT_RF_STRING_BEFOREV1(...)  RF_SELECT_FUNC_IF_NARGGT2(i_LIMSELECT_RF_STRING_BEFOREV,18,__VA_ARGS__)
     #define i_NPSELECT_RF_STRING_BEFOREV0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Beforev() needs to receive more than 4 arguments\"")
@@ -1023,7 +1029,7 @@ i_DECLIMEX_ char rfString_Beforev(const void* thisstr,RF_String* result,const ch
     #define i_SELECT_RF_STRING_BEFOREV17(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP17(char,i_rfString_Beforev,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
     #define i_SELECT_RF_STRING_BEFOREV18(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP18(char,i_rfString_Beforev,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
 #else
-   i_DECLIMEX_ char rfString_Beforev(void* thisstr,RF_String* result,const char* options,const unsigned char* parN, ...);
+   i_DECLIMEX_ char rfString_Beforev(void* thisstr,void* result,const char* options,const unsigned char* parN, ...);
 #endif
 
 //! @memberof RF_String
@@ -1033,21 +1039,23 @@ i_DECLIMEX_ char rfString_Beforev(const void* thisstr,RF_String* result,const ch
 //! @lmsFunction
 //! @param thisstr The string to operate in. @inhtype{String,StringX}
 //! @param sstr The substring that we want to find inside the string @inhtype{String,StringX} @tmpSTR
-//! @param result The resulting substring.
+//! @param[out] result Pass a pointer to a String type to receive the string from the start of @c thisstr until the given substring is found.
+//! If the passed pointer is of RF_StringX type also pass the @c RF_STRINGX_ARGUMENT bitflag argument in the @c options argument. This should NOT ever be null. @inhtype{String,StringX}
 //! @param options \rfoptional{0} Bitflag options denoting the method with which to search for the substring literals inside the string. Give 0 for the defaults.
 //! Can have values:
 //! + @c RF_CASE_IGNORE: If you want to search for any occurence of the substring disregarding CAPS or not.
 //!     Default search option is to @b match the case. For now this works only for characters of the english language.
 //! + @c RF_MATCH_WORD: If you to find only exact matches of the substring. For example an exact search for @e "HELLO" in the string
 //!     @e "HELLOWORLD" would find nothing. Default is with this flag off.
+//! + @c RF_STRINGX_ARGUMENT: Pass this bitflag option if the pointer you gave for initialization at @c result is of RF_StringX type
 //! @return Returns true if the substring was initialized and false if none of the parameters were found or an invalid UTF-8 sequence was given.
 //! In the latter case an error is also logged.
 //! @see rfString_Beforev()
 //! @see rfString_After()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ char rfString_Before(const void* thisstr,const void* sstr,RF_String* result,const char options);
+i_DECLIMEX_ char rfString_Before(const void* thisstr,const void* sstr,void* result,const char options);
 #else
-i_DECLIMEX_ char i_rfString_Before(const void* thisstr,const void* sstr,RF_String* result,const char* options);
+i_DECLIMEX_ char i_rfString_Before(const void* thisstr,const void* sstr,void* result,const char* options);
     #ifdef RF_OPTION_DEFAULT_ARGUMENTS
         #define rfString_Before(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_BEFORE,4,__VA_ARGS__)
         #define i_NPSELECT_RF_STRING_BEFORE1(...)  RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Before() accepts from 3 to 4 arguments\"")
@@ -1071,21 +1079,23 @@ i_DECLIMEX_ char i_rfString_Before(const void* thisstr,const void* sstr,RF_Strin
 //! @lmsFunction
 //! @param[in] thisstr The parameter string from which the substring will be formed. @inhtype{String,StringX}
 //! @param[in] after The substring to search for inside the parameter string. @inhtype{String,StringX} @tmpSTR
-//! @param[out] out Pass a reference to a String inside which the substring of the original string after the @c after substring will be placed
+//! @param[out] result Pass a pointer to a String type to receive the substring of @c thisstr after the @c after string has been found.
+//! If the passed pointer is of RF_StringX type also pass the @c RF_STRINGX_ARGUMENT bitflag argument in the @c options argument. This should NOT ever be null. @inhtype{String,StringX}
 //! @param options \rfoptional{0} Bitflag options denoting the method with which to search for the substring literals inside the string. Give 0 for the defaults.
 //! Can have values:
 //! + @c RF_CASE_IGNORE: If you want to search for any occurence of the substring disregarding CAPS or not.
 //!     Default search option is to @b match the case. For now this works only for characters of the english language.
 //! + @c RF_MATCH_WORD: If you to find only exact matches of the substring. For example an exact search for @e "HELLO" in the string
 //!     @e "HELLOWORLD" would find nothing. Default is with this flag off.
+//! + @c RF_STRINGX_ARGUMENT: Pass this bitflag option if the pointer you gave for initialization at @c result is of RF_StringX type
 //! @return Returns true for success and false if the substring is not found in the parameter string.
 //! @see rfString_Afterv()
 //! @see rfString_Before()
 //! @see rfStringX_MoveAfter()
 #if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ char rfString_After(const void* thisstr,const void* after,RF_String* out,const char options);
+i_DECLIMEX_ char rfString_After(const void* thisstr,const void* after,void* result,const char options);
 #else
-i_DECLIMEX_ char i_rfString_After(const void* thisstr,const void* after,RF_String* out,const char* options);
+i_DECLIMEX_ char i_rfString_After(const void* thisstr,const void* after,void* result,const char* options);
     #ifdef RF_OPTION_DEFAULT_ARGUMENTS
         #define rfString_After(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_AFTER,4,__VA_ARGS__)
         #define i_NPSELECT_RF_STRING_AFTER1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_After() accepts from 3 to 4 arguments\"")
@@ -1112,14 +1122,15 @@ i_DECLIMEX_ char i_rfString_After(const void* thisstr,const void* after,RF_Strin
 //! to @c char and @c unsigned char respectively
 //! @lmsFunction
 //! @param[in] thisstr The parameter string from which the substring will be formed. @inhtype{String,StringX}
-//! @param[out] out Pass a reference to a String inside which the substring of the original string
-//! after the found substring will be placed.
+//! @param[out] result Pass a pointer to a String type to receive the substring of @c thisstr after the the first of the given substrings has been found.
+//! If the passed pointer is of RF_StringX type also pass the @c RF_STRINGX_ARGUMENT bitflag argument in the @c options argument. This should NOT ever be null. @inhtype{String,StringX}
 //! @param options \rfoptional{0} Bitflag options denoting the method with which to search for the substring literals inside the string. Give 0 for the defaults.
 //! Can have values:
 //! + @c RF_CASE_IGNORE: If you want to search for any occurence of the substring disregarding CAPS or not.
 //!     Default search option is to @b match the case. For now this works only for characters of the english language.
 //! + @c RF_MATCH_WORD: If you to find only exact matches of the substring. For example an exact search for @e "HELLO" in the string
 //!     @e "HELLOWORLD" would find nothing. Default is with this flag off.
+//! + @c RF_STRINGX_ARGUMENT: Pass this bitflag option if the pointer you gave for initialization at @c result is of RF_StringX type
 //! @param parN The number of substrings to search for.
 //! @param ... The substrings to search for. @inhtype{String,StringX} @tmpSTR
 //! @extraVarArgLim
@@ -1127,10 +1138,10 @@ i_DECLIMEX_ char i_rfString_After(const void* thisstr,const void* after,RF_Strin
 //! @see rfString_After()
 //! @see rfString_Beforev()
 #ifdef RF_IAMHERE_FOR_DOXYGEN
-i_DECLIMEX_ char rfString_Afterv(const void* thisstr,RF_String* out,const char options,const unsigned char parN,...);
+i_DECLIMEX_ char rfString_Afterv(const void* thisstr,void* result,const char options,const unsigned char parN,...);
 #endif
 #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-i_DECLIMEX_ char i_rfString_Afterv(const void* thisstr,RF_String* out,const char* options,const unsigned char* parN,...);
+i_DECLIMEX_ char i_rfString_Afterv(const void* thisstr,void* result,const char* options,const unsigned char* parN,...);
     #define rfString_Afterv(...)  RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_AFTERV,4,__VA_ARGS__)
     #define i_NPSELECT_RF_STRING_AFTERV1(...)  RF_SELECT_FUNC_IF_NARGGT2(i_LIMSELECT_RF_STRING_AFTERV,18,__VA_ARGS__)
     #define i_NPSELECT_RF_STRING_AFTERV0(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Afterv() needs to receive more than 4 arguments\"")
@@ -1151,7 +1162,7 @@ i_DECLIMEX_ char i_rfString_Afterv(const void* thisstr,RF_String* out,const char
     #define i_SELECT_RF_STRING_AFTERV17(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP17(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
     #define i_SELECT_RF_STRING_AFTERV18(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP18(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
 #else
-    char rfString_Afterv(void* thisstr,RF_String* out,const char* options,const unsigned char* parN,...);
+    char rfString_Afterv(void* thisstr,void* result,const char* options,const unsigned char* parN,...);
 #endif
 
 

@@ -1346,7 +1346,7 @@ i_DECLIMEX_ char i_rfString_Tokenize(const void* str,const void* sepP,uint32_t* 
     return true;
 }
 //Initializes the given string as the first substring existing between the left and right parameter substrings.
-char i_rfString_Between(const void* thisstrP,const void* lstrP,const void* rstrP,RF_String* result,const char* optionsP)
+char i_rfString_Between(const void* thisstrP,const void* lstrP,const void* rstrP,void* resultP,const char* optionsP)
 {
     int32_t start,end;
     const RF_String* thisstr = (const RF_String*)thisstrP;
@@ -1369,19 +1369,33 @@ char i_rfString_Between(const void* thisstrP,const void* lstrP,const void* rstrP
     //free temp string
     rfString_Deinit(&temp);
     //initialize the string to return
-    result->byteLength = end;
-    RF_MALLOC(result->bytes,result->byteLength+1);
-    memcpy(result->bytes,thisstr->bytes+start+lstr->byteLength,result->byteLength+1);
-    result->bytes[end]= '\0';
+    if(options & RF_STRINGX_ARGUMENT)
+    {
+        RF_StringX* result = (RF_StringX*) resultP;
+        result->INH_String.byteLength = end;
+        result->bSize = result->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+        result->bIndex = 0;
+        RF_MALLOC(result->INH_String.bytes,result->bSize)
+        memcpy(result->INH_String.bytes,thisstr->bytes+start+lstr->byteLength,result->INH_String.byteLength+1);
+        result->INH_String.bytes[end]= '\0';
+    }
+    else
+    {
+        RF_String* result = (RF_String*) resultP;
+        result->byteLength = end;
+        RF_MALLOC(result->bytes,result->byteLength+1);
+        memcpy(result->bytes,thisstr->bytes+start+lstr->byteLength,result->byteLength+1);
+        result->bytes[end]= '\0';
+    }
     //success
     return true;
 }
 
 //Initializes the given string as the substring from the start until any of the given Strings are found.
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-char rfString_Beforev(const void* thisstrP,RF_String* result,const char* optionsP,const unsigned char* parNP, ...)
+char rfString_Beforev(const void* thisstrP,void* resultP,const char* optionsP,const unsigned char* parNP, ...)
 #else
-char i_rfString_Beforev(const void* thisstrP,RF_String* result,const char* optionsP,const unsigned char* parNP, ...)
+char i_rfString_Beforev(const void* thisstrP,void* resultP,const char* optionsP,const unsigned char* parNP, ...)
 #endif
 {
     const RF_String* thisstr = (const RF_String*)thisstrP;
@@ -1411,17 +1425,31 @@ char i_rfString_Beforev(const void* thisstrP,RF_String* result,const char* optio
     {
         return false;
     }
-    //if it is found initialize the substring
-    result->byteLength = minPos;
-    RF_MALLOC(result->bytes,minPos+1);
-    memcpy(result->bytes,thisstr->bytes,minPos);
-    result->bytes[minPos] = '\0';
+    //if it is found initialize the substring for return
+    if(options & RF_STRINGX_ARGUMENT)
+    {
+        RF_StringX* result = (RF_StringX*) resultP;
+        result->INH_String.byteLength = minPos;
+        result->bSize = result->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+        result->bIndex = 0;
+        RF_MALLOC(result->INH_String.bytes,result->bSize)
+        memcpy(result->INH_String.bytes,thisstr->bytes,minPos);
+        result->INH_String.bytes[minPos]= '\0';
+    }
+    else
+    {
+        RF_String* result = (RF_String*) resultP;
+        result->byteLength = minPos;
+        RF_MALLOC(result->bytes,minPos+1);
+        memcpy(result->bytes,thisstr->bytes,minPos);
+        result->bytes[minPos] = '\0';
+    }
     //success
     return true;
 }
 
 //Initializes the given string as the substring from the start until the given string is found
-char i_rfString_Before(const void* thisstrP,const void* sstrP,RF_String* result,const char* optionsP)
+char i_rfString_Before(const void* thisstrP,const void* sstrP,void* resultP,const char* optionsP)
 {
     const RF_String* thisstr = (const RF_String*)thisstrP;
     const RF_String* sstr = (const RF_String*) sstrP;
@@ -1432,18 +1460,32 @@ char i_rfString_Before(const void* thisstrP,const void* sstrP,RF_String* result,
     {
         return false;
     }
-    //if it is found get the result initialize the substring
-    result->byteLength = ret;
-    RF_MALLOC(result->bytes,result->byteLength+1);
-    memcpy(result->bytes,thisstr->bytes,result->byteLength);
-    result->bytes[result->byteLength] = '\0';
+    //if it is found initialize the substring for return
+    if(options & RF_STRINGX_ARGUMENT)
+    {
+        RF_StringX* result = (RF_StringX*) resultP;
+        result->INH_String.byteLength = ret;
+        result->bSize = result->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+        result->bIndex = 0;
+        RF_MALLOC(result->INH_String.bytes,result->bSize)
+        memcpy(result->INH_String.bytes,thisstr->bytes,result->INH_String.byteLength);
+        result->INH_String.bytes[result->INH_String.byteLength]= '\0';
+    }
+    else
+    {
+        RF_String* result = (RF_String*) resultP;
+        result->byteLength = ret;
+        RF_MALLOC(result->bytes,result->byteLength+1);
+        memcpy(result->bytes,thisstr->bytes,result->byteLength);
+        result->bytes[result->byteLength] = '\0';
+    }
     //success
     return true;
 }
 
 
 // Initializes the given String with the substring located after (and not including) the after substring inside the parameter string. If the substring is not located the function returns false.
-char i_rfString_After(const void* thisstrP,const void* afterP,RF_String* out,const char* optionsP)
+char i_rfString_After(const void* thisstrP,const void* afterP,void* resultP,const char* optionsP)
 {
     const RF_String* thisstr = (const RF_String*)thisstrP;
     const RF_String* after = (const RF_String*)afterP;
@@ -1455,7 +1497,16 @@ char i_rfString_After(const void* thisstrP,const void* afterP,RF_String* out,con
         return false;
     }
     //done so let's get it. Notice the use of the non-checking initialization
-    rfString_Init_nc(out,thisstr->bytes+bytePos+after->byteLength);
+    if(options & RF_STRINGX_ARGUMENT)
+    {
+        RF_StringX* result = (RF_StringX*) resultP;
+        rfStringX_Init_nc(result,thisstr->bytes+bytePos+after->byteLength);
+    }
+    else
+    {
+        RF_String* result = (RF_String*) resultP;
+        rfString_Init_nc(result,thisstr->bytes+bytePos+after->byteLength);
+    }
     //success
     return true;
 }
@@ -1463,9 +1514,9 @@ char i_rfString_After(const void* thisstrP,const void* afterP,RF_String* out,con
 
 //Initialize a string after the first of the given substrings found
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-char rfString_Afterv(const void* thisstrP,RF_String* result,const char* optionsP,const unsigned char* parNP,...)
+char rfString_Afterv(const void* thisstrP,void* resultP,const char* optionsP,const unsigned char* parNP,...)
 #else
-char i_rfString_Afterv(const void* thisstrP,RF_String* result,const char* optionsP,const unsigned char* parNP,...)
+char i_rfString_Afterv(const void* thisstrP,void* resultP,const char* optionsP,const unsigned char* parNP,...)
 #endif
 {
     const RF_String* thisstr = (const RF_String*)thisstrP;
@@ -1499,10 +1550,24 @@ char i_rfString_Afterv(const void* thisstrP,RF_String* result,const char* option
 
     //if it is found initialize the substring
     minPos += minPosLength;//go after the found substring
-    result->byteLength = thisstr->byteLength-minPos;
-    RF_MALLOC(result->bytes,result->byteLength);
-    memcpy(result->bytes,thisstr->bytes+minPos,result->byteLength);
-    result->bytes[result->byteLength] = '\0';
+    if(options & RF_STRINGX_ARGUMENT)
+    {
+        RF_StringX* result = (RF_StringX*) resultP;
+        result->INH_String.byteLength = thisstr->byteLength-minPos;
+        result->bSize = result->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+        result->bIndex = 0;
+        RF_MALLOC(result->INH_String.bytes,result->bSize)
+        memcpy(result->INH_String.bytes,thisstr->bytes+minPos,result->INH_String.byteLength);
+        result->INH_String.bytes[result->INH_String.byteLength]= '\0';
+    }
+    else
+    {
+        RF_String* result = (RF_String*) resultP;
+        result->byteLength = thisstr->byteLength-minPos;
+        RF_MALLOC(result->bytes,result->byteLength);
+        memcpy(result->bytes,thisstr->bytes+minPos,result->byteLength);
+        result->bytes[result->byteLength] = '\0';
+    }
     //success
     return true;
 }
