@@ -253,7 +253,7 @@ RF_Date* rfDate_Create_Now(char local)
 }
 
 // Sets this date as the current system date and time
-int32_t rfDate_SetToSystem(RF_Date* d)
+char rfDate_SetToSystem(RF_Date* d)
 {
     SYSTEMTIME st;
     RF_DATE_TO_SYSTEMTIME(d,st)
@@ -263,13 +263,13 @@ int32_t rfDate_SetToSystem(RF_Date* d)
         RF_WIN32_GETSYSERROR(strBuff)
         LOG_ERROR("Setting the system time from an RF_Date in Windows failed with Windows Error(%lu):\n%s",RE_DATE_SET_SYSTEMTIME,i_ERROR_CODE,strBuff);
         LocalFree(strBuff);
-        return RF_FAILURE;
+        return false;
     }
-    return RF_SUCCESS;
+    return true;
 }
 
 // Sets this date as the current local date and time
-int32_t rfDate_SetToLocal(RF_Date* d)
+char rfDate_SetToLocal(RF_Date* d)
 {
     SYSTEMTIME st;
     RF_DATE_TO_SYSTEMTIME(d,st)
@@ -279,8 +279,8 @@ int32_t rfDate_SetToLocal(RF_Date* d)
         RF_WIN32_GETSYSERROR(strBuff)
         LOG_ERROR("Setting the local time from an RF_Date in Windows failed with Windows Error(%lu):\n%s",RE_DATE_SET_SYSTEMTIME,i_ERROR_CODE,strBuff);
         LocalFree(strBuff);
-        return RF_FAILURE;
+        return false;
     }
-    return RF_SUCCESS;
+    return true;
 }
 #endif

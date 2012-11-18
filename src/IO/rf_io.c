@@ -46,9 +46,8 @@ int32_t rfFReadLine_UTF8(FILE* f,char** utf8,uint32_t* byteLength,uint32_t* buff
 
     if(bytesN < 0)//error check
     {
-        LOG_ERROR("Failed to read a UTF-8 file",bytesN);
         free(*utf8);
-        return bytesN;
+        RETURN_LOG_ERROR("Failed to read a UTF-8 file",bytesN)
     }
     //if the last character was a newline we are done
     if(*((*utf8)+bytesN-1) == (char)RF_LF)
@@ -79,9 +78,8 @@ int32_t rfFReadLine_UTF8(FILE* f,char** utf8,uint32_t* byteLength,uint32_t* buff
             (*byteLength)+=bytesN;
             if(bytesN < 0)//error check
             {
-                LOG_ERROR("StringX Initialization from file failed in file reading",bytesN);
                 free(*utf8);
-                return bytesN;
+                RETURN_LOG_ERROR("StringX Initialization from file failed in file reading",bytesN)
             }
             //if the last character was a newline break
             if(*((*utf8)+bIndex+bytesN-1) == (char)RF_LF)
@@ -126,7 +124,7 @@ int32_t rfFReadLine_UTF8(FILE* f,char** utf8,uint32_t* byteLength,uint32_t* buff
 int32_t rfFReadLine_UTF16LE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
 {
     char buff[RF_OPTION_FGETS_READBYTESN+5];
-    int32_t bytesN;
+    int32_t bytesN,error;
     uint32_t *codepoints,charsN,bIndex=0,buffSize=RF_OPTION_FGETS_READBYTESN+5,accum;
     char* tempBuff = 0,buffAllocated=false;
 
@@ -134,10 +132,7 @@ int32_t rfFReadLine_UTF16LE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
     accum = (uint32_t)bytesN;
     tempBuff = &buff[0];//point the tempBuff to the initial buffer for now
     if(bytesN < 0)//error check
-    {
-        LOG_ERROR("Failed to read from a Little Endian UTF-16 file",bytesN);
-        return bytesN;
-    }
+        RETURN_LOG_ERROR("Failed to read from a Little Endian UTF-16 file",bytesN)
     else if(bytesN >= RF_OPTION_FGETS_READBYTESN && (*eof)==false)//if the size does not fit in the buffer and if we did not reach the EOF
     {
         //allocate the temporary buffer and move the previous buffer's content inside it
@@ -153,9 +148,8 @@ int32_t rfFReadLine_UTF16LE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
             accum += bytesN;
             if(bytesN < 0)//error check
             {
-                LOG_ERROR("Failed to read from a Little Endian UTF-16 file",bytesN);
                 free(tempBuff);
-                return bytesN;
+                RETURN_LOG_ERROR("Failed to read from a Little Endian UTF-16 file",bytesN)
             }
             //realloc to have more space in the buffer for reading if needed
             if(accum+RF_OPTION_FGETS_READBYTESN+5 >= buffSize)
@@ -174,13 +168,12 @@ int32_t rfFReadLine_UTF16LE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
     //allocate the codepoints
     RF_MALLOC(codepoints,(bIndex+5)*2)
     //decode it into codepoints
-    if(rfUTF16_Decode(tempBuff,&charsN,codepoints)==false)
+    if((error=rfUTF16_Decode(tempBuff,&charsN,codepoints)) != RF_SUCCESS)
     {
         free(codepoints);
         if(buffAllocated==true)
             free(tempBuff);
-        LOG_ERROR("Failed to Decode UTF-16 from a File Descriptor",RE_UTF16_INVALID_SEQUENCE);
-        return RE_UTF16_INVALID_SEQUENCE;
+        RETURN_LOG_ERROR("Failed to Decode UTF-16 from a File Descriptor",error)
     }
     //now encode these codepoints into UTF8
     if(((*utf8)=rfUTF8_Encode(codepoints,charsN,byteLength)) == 0)
@@ -188,8 +181,7 @@ int32_t rfFReadLine_UTF16LE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
         free(codepoints);
         if(buffAllocated==true)
             free(tempBuff);
-        LOG_ERROR("Failed to encode the File Descriptor's UTF-16 bytestream to UTF-8",RE_UTF8_ENCODING);
-        return RE_UTF8_ENCODING;//error
+        RETURN_LOG_ERROR("Failed to encode the File Descriptor's UTF-16 bytestream to UTF-8",RE_UTF8_ENCODING)
     }
     //success
     free(codepoints);
@@ -208,14 +200,13 @@ int32_t rfFReadLine_UTF16LE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
     }
 #endif
 
-
     return bIndex;
 }
 //Reads a Big Endian UTF-16 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
 int32_t rfFReadLine_UTF16BE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
 {
     char buff[RF_OPTION_FGETS_READBYTESN+5];
-    int32_t bytesN;
+    int32_t bytesN,error;
     uint32_t *codepoints,charsN,bIndex=0,buffSize=RF_OPTION_FGETS_READBYTESN+5,accum;
     char* tempBuff = 0,buffAllocated=false;
 
@@ -223,10 +214,7 @@ int32_t rfFReadLine_UTF16BE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
     accum = (uint32_t)bytesN;
     tempBuff = &buff[0];//point the tempBuff to the initial buffer for now
     if(bytesN < 0)//error check
-    {
-        LOG_ERROR("Failed to read from a Big Endian UTF-16 file",bytesN);
-        return bytesN;
-    }
+        RETURN_LOG_ERROR("Failed to read from a Big Endian UTF-16 file",bytesN)
     else if(bytesN >= RF_OPTION_FGETS_READBYTESN && (*eof)==false)//if the size does not fit in the buffer and if we did not reach the EOF
     {
         //allocate the temporary buffer and move the previous buffer's content inside it
@@ -242,9 +230,8 @@ int32_t rfFReadLine_UTF16BE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
             accum+=bytesN;
             if(bytesN < 0)//error check
             {
-                LOG_ERROR("Failed to read from a Big Endian UTF-16 file",bytesN);
                 free(tempBuff);
-                return bytesN;
+                RETURN_LOG_ERROR("Failed to read from a Big Endian UTF-16 file",bytesN)
             }
             //realloc to have more space in the buffer for reading if needed
             if(accum+RF_OPTION_FGETS_READBYTESN+5 >= buffSize)
@@ -263,13 +250,12 @@ int32_t rfFReadLine_UTF16BE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
     //allocate the codepoints
     RF_MALLOC(codepoints,(bIndex+5)*2)
     //decode it into codepoints
-    if(rfUTF16_Decode(tempBuff,&charsN,codepoints)==false)
+    if((error=rfUTF16_Decode(tempBuff,&charsN,codepoints)) != RF_SUCCESS)
     {
         free(codepoints);
         if(buffAllocated==true)
             free(tempBuff);
-        LOG_ERROR("Failed to Decode UTF-16 from a File Descriptor",RE_UTF16_INVALID_SEQUENCE);
-        return RE_UTF16_INVALID_SEQUENCE;
+        RETURN_LOG_ERROR("Failed to Decode UTF-16 from a File Descriptor",error)
     }
     //now encode these codepoints into UTF8
     if(((*utf8)=rfUTF8_Encode(codepoints,charsN,byteLength)) == 0)
@@ -277,8 +263,7 @@ int32_t rfFReadLine_UTF16BE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
         free(codepoints);
         if(buffAllocated==true)
             free(tempBuff);
-        LOG_ERROR("Failed to encode the File Descriptor's UTF-16 bytestream to UTF-8",RE_UTF8_ENCODING);
-        return RE_UTF8_ENCODING;//error
+        RETURN_LOG_ERROR("Failed to encode the File Descriptor's UTF-16 bytestream to UTF-8",RE_UTF8_ENCODING)
     }
     //success
     free(codepoints);
@@ -309,10 +294,7 @@ int32_t rfFReadLine_UTF32BE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
     accum = (uint32_t)bytesN;
     tempBuff = &buff[0];//point the tempBuff to the initial buffer for now
     if(bytesN < 0)//error check
-    {
-        LOG_ERROR("Failed to read from a Big Endian UTF-32 file",bytesN);
-        return bytesN;
-    }
+        RETURN_LOG_ERROR("Failed to read from a Big Endian UTF-32 file",bytesN)
     else if(bytesN >= RF_OPTION_FGETS_READBYTESN && (*eof)==false)//if the size does not fit in the buffer and if we did not reach the EOF
     {
         //allocate the temporary buffer and move the previous buffer's content inside it
@@ -328,9 +310,8 @@ int32_t rfFReadLine_UTF32BE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
             accum+=bytesN;
             if(bytesN < 0)//error check
             {
-                LOG_ERROR("Failed to read from a Big Endian UTF-16 file",bytesN);
                 free(tempBuff);
-                return bytesN;
+                RETURN_LOG_ERROR("Failed to read from a Big Endian UTF-16 file",bytesN)
             }
             //realloc to have more space in the buffer for reading if needed
             if(accum+RF_OPTION_FGETS_READBYTESN+7 >= buffSize)
@@ -353,8 +334,7 @@ int32_t rfFReadLine_UTF32BE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
     {
         if(buffAllocated==true)
             free(tempBuff);
-        LOG_ERROR("Failed to encode the File Descriptor's UTF-32 bytestream to UTF-8",RE_UTF8_ENCODING);
-        return RE_UTF8_ENCODING;//error
+        RETURN_LOG_ERROR("Failed to encode the File Descriptor's UTF-32 bytestream to UTF-8",RE_UTF8_ENCODING)
     }
     //success
     if(buffAllocated==true)
@@ -384,10 +364,7 @@ int32_t rfFReadLine_UTF32LE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
     accum = (uint32_t) bytesN;
     tempBuff = &buff[0];//point the tempBuff to the initial buffer for now
     if(bytesN < 0)//error check
-    {
-        LOG_ERROR("Failed to read from a Little Endian UTF-32 file",bytesN);
-        return bytesN;
-    }
+        RETURN_LOG_ERROR("Failed to read from a Little Endian UTF-32 file",bytesN)
     else if(bytesN >= RF_OPTION_FGETS_READBYTESN && (*eof)==false)//if the size does not fit in the buffer and if we did not reach the EOF
     {
         //allocate the temporary buffer and move the previous buffer's content inside it
@@ -403,9 +380,8 @@ int32_t rfFReadLine_UTF32LE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
             accum +=bytesN;
             if(bytesN < 0)//error check
             {
-                LOG_ERROR("Failed to read from a Little Endian UTF-16 file",bytesN);
                 free(tempBuff);
-                return bytesN;
+                RETURN_LOG_ERROR("Failed to read from a Little Endian UTF-16 file",bytesN)
             }
             //realloc to have more space in the buffer for reading if needed
             if(accum+RF_OPTION_FGETS_READBYTESN+7 >= buffSize)
@@ -428,8 +404,7 @@ int32_t rfFReadLine_UTF32LE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
     {
         if(buffAllocated==true)
             free(tempBuff);
-        LOG_ERROR("Failed to encode the File Descriptor's UTF-32 bytestream to UTF-8",RE_UTF8_ENCODING);
-        return RE_UTF8_ENCODING;//error
+        RETURN_LOG_ERROR("Failed to encode the File Descriptor's UTF-32 bytestream to UTF-8",RE_UTF8_ENCODING)
     }
     //success
     if(buffAllocated==true)
@@ -466,8 +441,7 @@ int32_t rfFgets_UTF32BE(char* buff,uint32_t num,FILE* f,char* eofReached)
                 break;//EOF found
                 *eofReached = true;
             }
-            LOG_ERROR("Reading error while reading from a Big Endian UTF-32 file",error);
-            return error;
+            RETURN_LOG_ERROR("Reading error while reading from a Big Endian UTF-32 file",error)
         }
         size+= 4;
         //if we have read the number of characters requested by the function
@@ -488,10 +462,8 @@ int32_t rfFgets_UTF32BE(char* buff,uint32_t num,FILE* f,char* eofReached)
             *eofReached = true;
         }
         else
-        {
-            LOG_ERROR("Reading error while reading from a Big Endian UTF-32 file",error);
-            return error;
-        }
+            RETURN_LOG_ERROR("Reading error while reading from a Big Endian UTF-32 file",error)
+
     }
     else//undo the peek ahead of the file pointer
         fseek(f,-4,SEEK_CUR);
@@ -514,8 +486,7 @@ int32_t rfFgets_UTF32LE(char* buff,uint32_t num,FILE* f,char* eofReached)
                 break;//EOF found
                 *eofReached = true;
             }
-            LOG_ERROR("Reading error while reading from a Little Endian UTF-32 file",error);
-            return error;
+            RETURN_LOG_ERROR("Reading error while reading from a Little Endian UTF-32 file",error)
         }
         size+= 4;
         //if we have read the number of characters requested by the function
@@ -536,10 +507,8 @@ int32_t rfFgets_UTF32LE(char* buff,uint32_t num,FILE* f,char* eofReached)
             *eofReached = true;
         }
         else
-        {
-            LOG_ERROR("Reading error while reading from a Little Endian UTF-32 file",error);
-            return error;
-        }
+            RETURN_LOG_ERROR("Reading error while reading from a Little Endian UTF-32 file",error)
+
     }
     else//undo the peek ahead of the file pointer
         fseek(f,-4,SEEK_CUR);
@@ -676,14 +645,13 @@ int32_t rfFgets_UTF8(char* buff,uint32_t num,FILE* f,char* eofReached)
     }while(c !=(uint32_t) EOF && !RF_HEXEQ_UI(c,RF_LF));
     //null terminate the buffer for UTF8
     buff[size] = '\0';
+
     //finally check yet again for end of file right after the new line
     if( RF_HEXEQ_C(fgetc(f),EOF))
     {//check for error
         if(ferror(f) != 0)
-        {
-            LOG_ERROR("During reading a UTF-8 file there was a read error",RE_FILE_READ);
-            return RE_FILE_READ;
-        }
+            RETURN_LOG_ERROR("During reading a UTF-8 file there was a read error",RE_FILE_READ)
+
         //if not it's end of file, so note it and take the pointer back by 1
         *eofReached = true;
     }//undo the peek ahead of the file pointer
@@ -722,26 +690,21 @@ int32_t rfFgetc_UTF8(FILE* f,uint32_t *ret,char cp)
         {
             //also remember bytes 0xC0 and 0xC1 are invalid and could possibly be found in a starting byte of this type so check for them here
             if( RF_HEXEQ_C(c,0xC0) || RF_HEXEQ_C(c,0xC1))
-            {
-                LOG_ERROR("While decoding a UTF-8 file byte stream, an invalid byte was encountered",RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE);
-                return RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE;
-            }
+                RETURN_LOG_ERROR("While decoding a UTF-8 file byte stream, an invalid byte was encountered",RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE)
             //so now read the next byte
             if( (c2 = fgetc(f)) == EOF)
             {
                 i_READ_CHECK(f,"While reading a UTF-8 character from a file stream")
                 else
                 {
-                    LOG_ERROR("While decoding a UTF-8 file byte stream, EOF was encountered abruplty in-between bytes",RE_UTF8_INVALID_SEQUENCE_END);
+                    LOG_ERROR("While decoding a UTF-8 file byte stream, EOF was encountered abruplty in-between bytes",RE_UTF8_INVALID_SEQUENCE_END)
                     return RE_FILE_EOF;
                 }
             }
             //if this second byte is NOT a continuation byte
             if( !rfUTF8_IsContinuationByte(c2))
-            {
-                LOG_ERROR("While decoding a UTF-8 file byte stream, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE);
-                return RE_UTF8_INVALID_SEQUENCE_CONBYTE;
-            }
+                RETURN_LOG_ERROR("While decoding a UTF-8 file byte stream, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE)
+
             ///success
             if(cp == true)//return decoded codepoint
             {
@@ -769,25 +732,24 @@ int32_t rfFgetc_UTF8(FILE* f,uint32_t *ret,char cp)
                 i_READ_CHECK(f,"While reading a UTF-8 character from a file stream")
                 else
                 {
-                    LOG_ERROR("While decoding a UTF-8 file byte stream, EOF was encountered abruplty in-between bytes",RE_UTF8_INVALID_SEQUENCE_END);
+                    LOG_ERROR("While decoding a UTF-8 file byte stream, EOF was encountered abruplty in-between bytes",RE_UTF8_INVALID_SEQUENCE_END)
                     return RE_FILE_EOF;
                 }
+
             }
             if( (c3 = fgetc(f)) == EOF)
             {
                 i_READ_CHECK(f,"While reading a UTF-8 character from a file stream")
                 else
                 {
-                    LOG_ERROR("While decoding a UTF-8 file byte stream, EOF was encountered abruplty in-between bytes",RE_UTF8_INVALID_SEQUENCE_END);
+                    LOG_ERROR("While decoding a UTF-8 file byte stream, EOF was encountered abruplty in-between bytes",RE_UTF8_INVALID_SEQUENCE_END)
                     return RE_FILE_EOF;
                 }
             }
             //if the subsequent bytes are NOT  continuation bytes
             if( !rfUTF8_IsContinuationByte(c2) || !rfUTF8_IsContinuationByte(c3))
-            {
-                LOG_ERROR("While decoding a UTF-8 file byte stream, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE);
-                return RE_UTF8_INVALID_SEQUENCE_CONBYTE;
-            }
+                RETURN_LOG_ERROR("While decoding a UTF-8 file byte stream, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE)
+
             ///success
             if(cp == true)//if we need to decode the codepoint
             {
@@ -812,17 +774,15 @@ int32_t rfFgetc_UTF8(FILE* f,uint32_t *ret,char cp)
         {
             //in this type of starting byte a number of invalid bytes can be encountered. We have to check for them.
             if(RF_HEXGE_C(c,0xF5)) //invalid byte value are from 0xF5 to 0xFF
-            {
-                LOG_ERROR("While decoding a UTF-8 file byte stream, an invalid byte was encountered",RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE);
-                return RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE;
-            }
+                RETURN_LOG_ERROR("While decoding a UTF-8 file byte stream, an invalid byte was encountered",RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE)
+
             //so now read the next 3 bytes
             if( (c2 = fgetc(f)) == EOF)
             {
                 i_READ_CHECK(f,"While reading a UTF-8 character from a file stream")
                 else
                 {
-                    LOG_ERROR("While decoding a UTF-8 file byte stream, EOF was encountered abruplty in-between bytes",RE_UTF8_INVALID_SEQUENCE_END);
+                    LOG_ERROR("While decoding a UTF-8 file byte stream, EOF was encountered abruplty in-between bytes",RE_UTF8_INVALID_SEQUENCE_END)
                     return RE_FILE_EOF;
                 }
             }
@@ -831,25 +791,24 @@ int32_t rfFgetc_UTF8(FILE* f,uint32_t *ret,char cp)
                 i_READ_CHECK(f,"While reading a UTF-8 character from a file stream")
                 else
                 {
-                    LOG_ERROR("While decoding a UTF-8 file byte stream, EOF was encountered abruplty in-between bytes",RE_UTF8_INVALID_SEQUENCE_END);
+                    LOG_ERROR("While decoding a UTF-8 file byte stream, EOF was encountered abruplty in-between bytes",RE_UTF8_INVALID_SEQUENCE_END)
                     return RE_FILE_EOF;
                 }
+
             }
             if( (c4 = fgetc(f)) == EOF)
             {
                 i_READ_CHECK(f,"While reading a UTF-8 character from a file stream")
                 else
                 {
-                    LOG_ERROR("While decoding a UTF-8 file byte stream, EOF was encountered abruplty in-between bytes",RE_UTF8_INVALID_SEQUENCE_END);
+                    LOG_ERROR("While decoding a UTF-8 file byte stream, EOF was encountered abruplty in-between bytes",RE_UTF8_INVALID_SEQUENCE_END)
                     return RE_FILE_EOF;
                 }
             }
             //if the subsequent bytes are NOT  continuation bytes
             if( !rfUTF8_IsContinuationByte(c2) || !rfUTF8_IsContinuationByte(c3) || !rfUTF8_IsContinuationByte(c4))
-            {
-                LOG_ERROR("While decoding a UTF-8 file byte stream, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE);
-                return RE_UTF8_INVALID_SEQUENCE_CONBYTE;
-            }
+                RETURN_LOG_ERROR("While decoding a UTF-8 file byte stream, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE)
+
             ///success
             if(cp == true) //if we need to decode the codepoint
             {
@@ -874,8 +833,7 @@ int32_t rfFgetc_UTF8(FILE* f,uint32_t *ret,char cp)
      }//end of needing more than 1 byte
 
     //if we get here means the 1st byte belonged to none of the 4 cases
-    LOG_ERROR("While decoding a UTF-8 file byte stream, the first byte of a character was invalid UTF-8",RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE);
-    return RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE;
+    RETURN_LOG_ERROR("While decoding a UTF-8 file byte stream, the first byte of a character was invalid UTF-8",RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE)
 }
 
 //Gets a unicode character from a Big Endian UTF-16 file descriptor
@@ -899,10 +857,8 @@ int32_t rfFgetc_UTF16BE(FILE* f,uint32_t *c,char cp)
     if(RF_HEXGE_US(v1,0xD800) && RF_HEXLE_US(v1,0xDFFF))
     {
         if(RF_HEXL_US(v1,0xD800) || RF_HEXG_US(v1,0xDBFF))
-        {
-            LOG_ERROR("While reading a Big endian UTF-16 file stream the first byte encountered held an illegal value",RE_UTF16_INVALID_SEQUENCE);
-            return RE_UTF16_INVALID_SEQUENCE;
-        }
+            RETURN_LOG_ERROR("While reading a Big endian UTF-16 file stream the first byte encountered held an illegal value",RE_UTF16_INVALID_SEQUENCE)
+
         //then we also need to read its surrogate pair
         if(fread(&v2,2,1,f) != 1)
         {
@@ -916,10 +872,8 @@ int32_t rfFgetc_UTF16BE(FILE* f,uint32_t *c,char cp)
         if(swapE)//swap endianess if needed
             rfUTILS_SwapEndianUS(&v2);
         if(RF_HEXL_US(v2,0xDC00) || RF_HEXG_US(v2,0xDFFF))
-        {
-            LOG_ERROR("While reading a Big endian UTF-16 file stream the surrogate pair encountered held an illegal value",RE_UTF16_INVALID_SEQUENCE);
-            return RE_UTF16_INVALID_SEQUENCE;
-        }
+            RETURN_LOG_ERROR("While reading a Big endian UTF-16 file stream the surrogate pair encountered held an illegal value",RE_UTF16_INVALID_SEQUENCE)
+
         if(cp == true)//if the user wants the decoded codepoint
         {
             *c = 0;
@@ -958,10 +912,8 @@ int32_t rfFgetc_UTF16LE(FILE* f,uint32_t *c,char cp)
     if(RF_HEXGE_US(v1,0xD800) && RF_HEXLE_US(v1,0xDFFF))
     {
         if(RF_HEXL_US(v1,0xD800) || RF_HEXG_US(v1,0xDBFF))
-        {
-            LOG_ERROR("While reading a little endian UTF-16 file stream the first byte encountered held an illegal value",RE_UTF16_INVALID_SEQUENCE);
-            return RE_UTF16_INVALID_SEQUENCE;
-        }
+            RETURN_LOG_ERROR("While reading a little endian UTF-16 file stream the first byte encountered held an illegal value",RE_UTF16_INVALID_SEQUENCE)
+
         //then we also need to read its surrogate pair
         if(fread(&v2,2,1,f) != 1)
         {
@@ -975,10 +927,8 @@ int32_t rfFgetc_UTF16LE(FILE* f,uint32_t *c,char cp)
         if(swapE)//swap endianess if needed
             rfUTILS_SwapEndianUS(&v2);
         if(RF_HEXL_US(v2,0xDC00) || RF_HEXG_US(v2,0xDFFF))
-        {
-            LOG_ERROR("While reading a little endian UTF-16 file stream the surrogate pair encountered held an illegal value",RE_UTF16_INVALID_SEQUENCE);
-            return RE_UTF16_INVALID_SEQUENCE;
-        }
+            RETURN_LOG_ERROR("While reading a little endian UTF-16 file stream the surrogate pair encountered held an illegal value",RE_UTF16_INVALID_SEQUENCE)
+
         if(cp == true)//if the user wants the decoded codepoint
         {
             *c = 0;
@@ -1111,10 +1061,8 @@ int32_t rfFback_UTF16BE(FILE* f,uint32_t *c)
         if(swapE)//swap endianess if needed
             rfUTILS_SwapEndianUS(&v2);
         if(RF_HEXL_US(v2,0xD800) || RF_HEXG_US(v2,0xDBFF))
-        {
-            LOG_ERROR("While reading bytes backwards in a Big Endian UTF-16 file stream the encountered byte was supposed to be a surrogate pair but its pair is of illegal value",RE_UTF16_INVALID_SEQUENCE);
-            return RE_UTF16_INVALID_SEQUENCE;
-        }
+            RETURN_LOG_ERROR("While reading bytes backwards in a Big Endian UTF-16 file stream the encountered byte was supposed to be a surrogate pair but its pair is of illegal value",RE_UTF16_INVALID_SEQUENCE)
+
         //get the codepoint
         *c = 0;
         *c = v1&0x3ff;
@@ -1132,8 +1080,7 @@ int32_t rfFback_UTF16BE(FILE* f,uint32_t *c)
         return 2;
     }
     //else invald sequence
-    LOG_ERROR("While reading bytes backwards in a Big Endian UTF-16 file stream the encountered byte had an illegal value",RE_UTF16_INVALID_SEQUENCE);
-    return RE_UTF16_INVALID_SEQUENCE;
+    RETURN_LOG_ERROR("While reading bytes backwards in a Big Endian UTF-16 file stream the encountered byte had an illegal value",RE_UTF16_INVALID_SEQUENCE)
 }
 
 // Moves a unicode character backwards in a little endian UTF-16 file stream
@@ -1178,10 +1125,8 @@ int32_t rfFback_UTF16LE(FILE* f,uint32_t *c)
         if(swapE)//swap endianess if needed
             rfUTILS_SwapEndianUS(&v2);
         if(RF_HEXL_US(v2,0xD800) || RF_HEXG_US(v2,0xDBFF))
-        {
-            LOG_ERROR("While reading bytes backwards in a Little Endian UTF-16 file stream the encountered byte was supposed to be a surrogate pair but its pair is of illegal value",RE_UTF16_INVALID_SEQUENCE);
-            return RE_UTF16_INVALID_SEQUENCE;
-        }
+            RETURN_LOG_ERROR("While reading bytes backwards in a Little Endian UTF-16 file stream the encountered byte was supposed to be a surrogate pair but its pair is of illegal value",RE_UTF16_INVALID_SEQUENCE)
+
         //get the codepoint
         *c = 0;
         *c = v1&0x3ff;
@@ -1199,8 +1144,7 @@ int32_t rfFback_UTF16LE(FILE* f,uint32_t *c)
         return 2;
     }
     //else invald sequence
-    LOG_ERROR("While reading bytes backwards in a Little Endian UTF-16 file stream the encountered byte had an illegal value",RE_UTF16_INVALID_SEQUENCE);
-    return RE_UTF16_INVALID_SEQUENCE;
+    RETURN_LOG_ERROR("While reading bytes backwards in a Little Endian UTF-16 file stream the encountered byte had an illegal value",RE_UTF16_INVALID_SEQUENCE)
 }
 
 //Moves a unicode character backwards in a UTF-8 file stream
@@ -1258,8 +1202,7 @@ int32_t rfFback_UTF8(FILE* f,uint32_t *c)
             *c = bytes[0];
         break;
         default:
-            LOG_ERROR("During moving one unicode character back in a UTF-8 filestream moved an abnormal number of bytes",RE_UTF8_INVALID_SEQUENCE);
-            return RE_UTF8_INVALID_SEQUENCE;
+            RETURN_LOG_ERROR("During moving one unicode character back in a UTF-8 filestream moved an abnormal number of bytes",RE_UTF8_INVALID_SEQUENCE)
         break;
     }
     return i;

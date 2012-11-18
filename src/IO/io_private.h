@@ -29,18 +29,15 @@
     #define i_TEXTFILE_FSEEK_CHECK_CASE_EOVERFLOW_RESET(i_TEXTFILE_,i_TEXT_,i_PRLINE_,i_PREOF_,i_PROFF_) \
         case EOVERFLOW:\
             TEXTFILE_RESETPTR(i_TEXTFILE_,i_PRLINE_,i_PREOF_,i_PROFF_)\
-            LOG_ERROR("While "i_TEXT_" at Text File \"%s\" the file position is not representable by off_t",RE_FILE_POS_OVERFLOW,((i_TEXTFILE_)->name).bytes);\
-            return RE_FILE_POS_OVERFLOW;\
+            RETURN_LOG_ERROR("While "i_TEXT_" at Text File \"%s\" the file position is not representable by off_t",RE_FILE_POS_OVERFLOW,((i_TEXTFILE_)->name).bytes)\
         break;
     #define i_TEXTFILE_FSEEK_CHECK_CASE_EOVERFLOW(i_TEXTFILE_,i_TEXT_) \
         case EOVERFLOW:\
-            LOG_ERROR("While "i_TEXT_" at Text File \"%s\" the file position is not representable by off_t",RE_FILE_POS_OVERFLOW,((i_TEXTFILE_)->name).bytes);\
-            return RE_FILE_POS_OVERFLOW;\
+            RETURN_LOG_ERROR("While "i_TEXT_" at Text File \"%s\" the file position is not representable by off_t",RE_FILE_POS_OVERFLOW,((i_TEXTFILE_)->name).bytes)\
         break;
     #define i_FSEEK_CHECK_CASE_EOVERFLOW(i_TEXT_) \
         case EOVERFLOW:\
-            LOG_ERROR("While "i_TEXT_" the file position is not representable by off_t",RE_FILE_POS_OVERFLOW);\
-            return RE_FILE_POS_OVERFLOW;\
+            RETURN_LOG_ERROR("While "i_TEXT_" the file position is not representable by off_t",RE_FILE_POS_OVERFLOW)\
         break;
     #define i_FTELL_CHECK_CASE_EOVERFLOW(i_TEXT_) \
         case EOVERFLOW:\
@@ -48,14 +45,12 @@
         break;
     #define i_READ_CHECK_CASE_EOVERFLOW(i_TEXT_) \
         case EOVERFLOW:\
-        LOG_ERROR(i_TEXT_" reading failed due to attempted read beyond the maximum offset associated with the corresponding file stream",RE_FILE_POS_OVERFLOW);\
-        return RE_FILE_POS_OVERFLOW;\
+        RETURN_LOG_ERROR(i_TEXT_" reading failed due to attempted read beyond the maximum offset associated with the corresponding file stream",RE_FILE_POS_OVERFLOW)\
         break;
     #define i_READ_CHECK_CASE_EOVERFLOW_RESET(i_TEXT_) \
         case EOVERFLOW:\
         TEXTFILE_RESETPTR(i_TEXTFILE_,i_PRLINE_,i_PREOF_,i_PROFF_)\
-        LOG_ERROR(i_TEXT_" reading failed due to attempted read beyond the maximum offset associated with the corresponding file stream",RE_FILE_POS_OVERFLOW);\
-        return RE_FILE_POS_OVERFLOW;\
+        RETURN_LOG_ERROR(i_TEXT_" reading failed due to attempted read beyond the maximum offset associated with the corresponding file stream",RE_FILE_POS_OVERFLOW)\
         break;
 #else
     #define i_TEXTFILE_FSEEK_CHECK_CASE_EOVERFLOW_RESET(i_TEXTFILE_,i_TEXT_,i_PRLINE_,i_PREOF_,i_PROFF_)
@@ -74,16 +69,13 @@ switch(errno)\
 {\
     i_FTELL_CHECK_CASE_EOVERFLOW(i_TEXT_)\
     case EBADF:\
-        LOG_ERROR("While "i_TEXT_" the file descriptor was corrupt or not open",RE_FILE_BAD);\
-        return RE_FILE_BAD;\
+        RETURN_LOG_ERROR("While "i_TEXT_" the file descriptor was corrupt or not open",RE_FILE_BAD)\
     break;\
     case ESPIPE:\
-        LOG_ERROR(i_TEXT_" failed due to the file descriptor being a pipe or a socker and not a file",RE_FILE_NOTFILE);\
-        return RE_FILE_NOTFILE;\
+        RETURN_LOG_ERROR(i_TEXT_" failed due to the file descriptor being a pipe or a socker and not a file",RE_FILE_NOTFILE)\
     break;\
     default:\
-        LOG_ERROR(i_TEXT_" failed due to an unrecognized ftell() failure",RE_FILE_GETFILEPOS);\
-        return RE_FILE_GETFILEPOS;\
+        RETURN_LOG_ERROR(i_TEXT_" failed due to an unrecognized ftell() failure",RE_FILE_GETFILEPOS)\
     break;\
 }
 
@@ -114,41 +106,32 @@ switch(errno)\
     /*if EOVERFLOW errno is defined*/\
     i_FSEEK_CHECK_CASE_EOVERFLOW(i_TEXT_) \
     case EAGAIN:\
-        LOG_ERROR("While "i_TEXT_", the file was occupied by another thread and the no block flag was set",RE_FILE_WRITE_BLOCK);\
-        return RE_FILE_WRITE_BLOCK;\
+        RETURN_LOG_ERROR("While "i_TEXT_", the file was occupied by another thread and the no block flag was set",RE_FILE_WRITE_BLOCK)\
     break;\
     case EBADF:\
-        LOG_ERROR("While "i_TEXT_", the file descriptor was found to be corrupt",RE_FILE_BAD);\
-        return RE_FILE_BAD;\
+        RETURN_LOG_ERROR("While "i_TEXT_", the file descriptor was found to be corrupt",RE_FILE_BAD)\
     break;\
     case EFBIG:\
-        LOG_ERROR("While "i_TEXT_", the file's size exceeded the limit",RE_FILE_TOOBIG);\
-        return RE_FILE_TOOBIG;\
+        RETURN_LOG_ERROR("While "i_TEXT_", the file's size exceeded the limit",RE_FILE_TOOBIG)\
     break;\
     case EINTR:\
-        LOG_ERROR(i_TEXT_" failed due to a system interrupt",RE_INTERRUPT);\
-        return RE_INTERRUPT;\
+        RETURN_LOG_ERROR(i_TEXT_" failed due to a system interrupt",RE_INTERRUPT)\
     break;\
     case EIO:\
-        LOG_ERROR("While "i_TEXT_", a physical I/O error was encountered",RE_FILE_IO);\
-        return RE_FILE_IO;\
+        RETURN_LOG_ERROR("While "i_TEXT_", a physical I/O error was encountered",RE_FILE_IO)\
     break;\
     case ENOSPC:case ENOMEM:\
-        LOG_ERROR(i_TEXT_" failed due to the device containing the file having no free space",RE_FILE_NOSPACE);\
-        return RE_FILE_NOSPACE;\
+        RETURN_LOG_ERROR(i_TEXT_" failed due to the device containing the file having no free space",RE_FILE_NOSPACE)\
     break;\
     case ENXIO:\
-        LOG_ERROR(i_TEXT_" failed due to the device being non-existant",RE_FILE_NOTFILE);\
-        return RE_FILE_NOTFILE;\
+        RETURN_LOG_ERROR(i_TEXT_" failed due to the device being non-existant",RE_FILE_NOTFILE)\
     break;\
     case EPIPE:\
     case ESPIPE:\
-        LOG_ERROR(i_TEXT_" failed due to the file descriptor not being a file and being a Pipe",RE_FILE_NOTFILE);\
-        return RE_FILE_NOTFILE;\
+        RETURN_LOG_ERROR(i_TEXT_" failed due to the file descriptor not being a file and being a Pipe",RE_FILE_NOTFILE)\
     break;\
     default:\
-        LOG_ERROR(i_TEXT_" failed due to generic fseek() error",RE_FILE_GETFILEPOS);\
-        return RE_FILE_GETFILEPOS;\
+        RETURN_LOG_ERROR(i_TEXT_" failed due to generic fseek() error",RE_FILE_GETFILEPOS)\
     break;\
 }//end of error handling
 
@@ -161,28 +144,22 @@ if(ferror(i_FILE_)!=0){\
     {\
         i_READ_CHECK_CASE_EOVERFLOW(i_TEXT_)\
         case EAGAIN:\
-        LOG_ERROR(i_TEXT_" the file is blocked by another thread and the read operation would be delayed",RE_FILE_READ_BLOCK);\
-        return RE_FILE_READ_BLOCK;\
+            RETURN_LOG_ERROR(i_TEXT_" the file is blocked by another thread and the read operation would be delayed",RE_FILE_READ_BLOCK)\
         break;\
         case EBADF:\
-        LOG_ERROR(i_TEXT_" the file descriptor is not valid for reading",RE_FILE_MODE);\
-        return RE_FILE_MODE;\
+            RETURN_LOG_ERROR(i_TEXT_" the file descriptor is not valid for reading",RE_FILE_MODE)\
         break;\
         case EINTR:\
-        LOG_ERROR(i_TEXT_" reading failed due to a system interrupt",RE_INTERRUPT);\
-        return RE_INTERRUPT;\
+            RETURN_LOG_ERROR(i_TEXT_" reading failed due to a system interrupt",RE_INTERRUPT)\
         break;\
         case EIO:case ENXIO:\
-        LOG_ERROR(i_TEXT_" reading failed due a physical or implementation defined I/O error",RE_FILE_IO);\
-        return RE_FILE_IO;\
+            RETURN_LOG_ERROR(i_TEXT_" reading failed due a physical or implementation defined I/O error",RE_FILE_IO)\
         break;\
         case ENOMEM:\
-        LOG_ERROR(i_TEXT_" reading failed due to insufficient storage space",RE_FILE_NOSPACE);\
-        return RE_FILE_NOSPACE;\
+            RETURN_LOG_ERROR(i_TEXT_" reading failed due to insufficient storage space",RE_FILE_NOSPACE)\
         break;\
         default:\
-        LOG_ERROR(i_TEXT_" reading failed due to an unknown reading error",RE_FILE_READ);\
-        return RE_FILE_READ;\
+            RETURN_LOG_ERROR(i_TEXT_" reading failed due to an unknown reading error",RE_FILE_READ)\
         break;\
     }}
 
@@ -193,36 +170,28 @@ if(ferror(i_FILE_) != 0){\
     switch(errno)\
     {\
         case EAGAIN:\
-            LOG_ERROR("While "i_TEXT_", the write failed because the file was occupied by another thread and the no block flag was set",RE_FILE_WRITE_BLOCK);\
-            return RE_FILE_WRITE_BLOCK;\
+            RETURN_LOG_ERROR("While "i_TEXT_", the write failed because the file was occupied by another thread and the no block flag was set",RE_FILE_WRITE_BLOCK)\
         break;\
         case EBADF:\
-            LOG_ERROR("While "i_TEXT_", the file descriptor was found to be corrupt",RE_FILE_BAD);\
-            return RE_FILE_BAD;\
+            RETURN_LOG_ERROR("While "i_TEXT_", the file descriptor was found to be corrupt",RE_FILE_BAD)\
         break;\
         case EFBIG:\
-            LOG_ERROR("While "i_TEXT_", the file's size exceeded the limit",RE_FILE_TOOBIG);\
-            return RE_FILE_TOOBIG;\
+            RETURN_LOG_ERROR("While "i_TEXT_", the file's size exceeded the limit",RE_FILE_TOOBIG)\
         break;\
         case EINTR:\
-            LOG_ERROR(i_TEXT_", failed due to a system interrupt",RE_INTERRUPT);\
-            return RE_INTERRUPT;\
+            RETURN_LOG_ERROR(i_TEXT_", failed due to a system interrupt",RE_INTERRUPT)\
         break;\
         case EIO:\
-            LOG_ERROR("While "i_TEXT_", a physical I/O error was encountered",RE_FILE_IO);\
-            return RE_FILE_IO;\
+            RETURN_LOG_ERROR("While "i_TEXT_", a physical I/O error was encountered",RE_FILE_IO)\
         break;\
         case ENOSPC:\
         case ENOMEM:\
-            LOG_ERROR(i_TEXT_", failed due to the device containing the file having no free space",RE_FILE_NOSPACE);\
-            return RE_FILE_NOSPACE;\
+            RETURN_LOG_ERROR(i_TEXT_", failed due to the device containing the file having no free space",RE_FILE_NOSPACE)\
         break;\
         case ENXIO:\
-            LOG_ERROR(i_TEXT_", failed due to the device being non-existant",RE_FILE_NOTFILE);\
-            return RE_FILE_NOTFILE;\
+            RETURN_LOG_ERROR(i_TEXT_", failed due to the device being non-existant",RE_FILE_NOTFILE)\
         break;\
         default:\
-            LOG_ERROR("There was a generic write error when "i_TEXT_,RE_FILE_WRITE);\
-            return RE_FILE_WRITE;\
+            RETURN_LOG_ERROR("There was a generic write error when "i_TEXT_,RE_FILE_WRITE)\
         break;\
     }}

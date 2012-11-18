@@ -65,7 +65,7 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* enc
             t->f = fopen(name->bytes,"w"i_PLUSB_WIN32"+");
         break;
         default:
-             LOG_ERROR("Attempted to initialize textfile \"%s\" with illegal mode",RE_FILE_MODE,name->bytes);
+            LOG_ERROR("Attempted to initialize textfile \"%s\" with illegal mode",RE_FILE_MODE,name->bytes);
             rfString_Deinit(&t->name);
             return RE_FILE_MODE;
         break;
@@ -89,10 +89,7 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* enc
                 if( fread(&c,2,1,t->f)!=1)
                 {
                     i_READ_CHECK(t->f,"While opening UTF-16 text file");
-                    {
-                        LOG_ERROR("Attempted to open an empty UTF-16 text file for reading",RE_FILE_EOF)
-                        return RE_FILE_EOF;
-                    }
+                    RETURN_LOG_ERROR("Attempted to open an empty UTF-16 text file for reading",RE_FILE_EOF)
                 }
                 if(c == (int16_t)0xFEFF)
                 {
@@ -121,10 +118,7 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* enc
                         if(fread(&c,2,1,t->f)!=1)
                         {
                             i_READ_CHECK(t->f,"While reading a UTF-16 text file to determine endianess");
-                            {
-                                LOG_ERROR("EOF found very close to UTF-16 file's beginning while attempting to determine endianess",RE_FILE_EOF)
-                                return RE_FILE_EOF;
-                            }
+                            RETURN_LOG_ERROR("EOF found very close to UTF-16 file's beginning while attempting to determine endianess",RE_FILE_EOF)
                         }
                         bytesN+=2;
                         if(c == (int16_t) 0x0020)
@@ -157,10 +151,7 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* enc
                 if( fread(&c,4,1,t->f)!=1)
                 {
                     i_READ_CHECK(t->f,"While opening UTF-32 text file");
-                    {
-                        LOG_ERROR("Attempted to open an empty UTF-32 text file for reading",RE_FILE_EOF)
-                        return RE_FILE_EOF;
-                    }
+                    RETURN_LOG_ERROR("Attempted to open an empty UTF-32 text file for reading",RE_FILE_EOF)
                 }
                 if(c == (int32_t)0xFEFF)
                 {
@@ -189,10 +180,7 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* enc
                         if(fread(&c,4,1,t->f)!=1)
                         {
                             i_READ_CHECK(t->f,"While reading a UTF-32 text file to determine endianess");
-                            {
-                                LOG_ERROR("EOF found very close to UTF-32 file's beginning while attempting to determine endianess",RE_FILE_EOF)
-                                return RE_FILE_EOF;
-                            }
+                            RETURN_LOG_ERROR("EOF found very close to UTF-32 file's beginning while attempting to determine endianess",RE_FILE_EOF)
                         }
                         bytesN+=4;
                         if(c == (int32_t) 0x20)
@@ -252,10 +240,7 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* enc
                 if(fread(&c,2,1,t->f)!=1)
                 {
                     i_READ_CHECK(t->f,"While reading a UTF-16 text file to check for Byte Order Mark Existence");
-                    {
-                        LOG_ERROR("EOF found very close to a UTF-16 file's beginning while attempting to check for Byte Order Mark Existence",RE_FILE_EOF)
-                        return RE_FILE_EOF;
-                    }
+                    RETURN_LOG_ERROR("EOF found very close to a UTF-16 file's beginning while attempting to check for Byte Order Mark Existence",RE_FILE_EOF)
                 }
                 if(rfUTILS_Endianess()==RF_LITTLE_ENDIAN)
                     rfUTILS_SwapEndianUS(&c);
@@ -272,10 +257,7 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* enc
                 if(fread(&c,2,1,t->f)!=1)
                 {
                     i_READ_CHECK(t->f,"While reading a UTF-16 text file to check for Byte Order Mark Existence");
-                    {
-                        LOG_ERROR("EOF found very close to a UTF-16 file's beginning while attempting to check for Byte Order Mark Existence",RE_FILE_EOF)
-                        return RE_FILE_EOF;
-                    }
+                    RETURN_LOG_ERROR("EOF found very close to a UTF-16 file's beginning while attempting to check for Byte Order Mark Existence",RE_FILE_EOF)
                 }
                 if(rfUTILS_Endianess()==RF_BIG_ENDIAN)
                     rfUTILS_SwapEndianUS(&c);
@@ -292,10 +274,7 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* enc
                 if(fread(&c,4,1,t->f)!=1)
                 {
                     i_READ_CHECK(t->f,"While reading a UTF-32 text file to check for Byte Order Mark Existence");
-                    {
-                        LOG_ERROR("EOF found very close to a UTF-32 file's beginning while attempting to check for Byte Order Mark Existence",RE_FILE_EOF)
-                        return RE_FILE_EOF;
-                    }
+                    RETURN_LOG_ERROR("EOF found very close to a UTF-32 file's beginning while attempting to check for Byte Order Mark Existence",RE_FILE_EOF)
                 }
                 if(rfUTILS_Endianess()==RF_LITTLE_ENDIAN)
                     rfUTILS_SwapEndianUI(&c);
@@ -312,10 +291,7 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* enc
                 if(fread(&c,4,1,t->f)!=1)
                 {
                     i_READ_CHECK(t->f,"While reading a UTF-32 text file to check for Byte Order Mark Existence");
-                    {
-                        LOG_ERROR("EOF found very close to a UTF-32 file's beginning while attempting to check for Byte Order Mark Existence",RE_FILE_EOF)
-                        return RE_FILE_EOF;
-                    }
+                    RETURN_LOG_ERROR("EOF found very close to a UTF-32 file's beginning while attempting to check for Byte Order Mark Existence",RE_FILE_EOF)
                 }
                 if(rfUTILS_Endianess()==RF_BIG_ENDIAN)
                     rfUTILS_SwapEndianUI(&c);
@@ -502,8 +478,7 @@ int32_t rfTextFile_SetMode(RF_TextFile* t,char mode)
             t->f = temp;
         break;
         default:
-            LOG_ERROR("Provided illegal mode input",RE_INPUT);
-            return RE_INPUT;
+            RETURN_LOG_ERROR("Provided illegal mode input",RE_INPUT)
         break;
     }
     //success
@@ -542,40 +517,36 @@ int32_t i_rfTextFile_ReadLine3(RF_TextFile* t,RF_StringX* line,uint32_t characte
         case RF_UTF8:
             if( (bytesN = rfStringX_Assign_fUTF8(line,t->f,&eof)) < 0)
             {
-                LOG_ERROR("Reading line [%"PRIu64"] of a UTF-8 text file failed",bytesN,t->line);
                 rfFseek(t->f,startOff,SEEK_SET);
-                return bytesN;
+                RETURN_LOG_ERROR("Reading line [%"PRIu64"] of a UTF-8 text file failed",bytesN,t->line)
             }
         break;//end of utf-8
         case RF_UTF16_LE:
             if( (bytesN = rfStringX_Assign_fUTF16(line,t->f,RF_LITTLE_ENDIAN,&eof)) < 0)
             {
-                LOG_ERROR("Reading line [%"PRIu64"] of a Little Endian UTF-16 text file failed",bytesN,t->line);
                 rfFseek(t->f,startOff,SEEK_SET);
-                return bytesN;
+                RETURN_LOG_ERROR("Reading line [%"PRIu64"] of a Little Endian UTF-16 text file failed",bytesN,t->line)
             }
         break;
         case RF_UTF16_BE:
             if( (bytesN = rfStringX_Assign_fUTF16(line,t->f,RF_BIG_ENDIAN,&eof)) < 0)
             {
-                LOG_ERROR("Reading line [%"PRIu64"] of a Big Endian UTF-16 text file failed",bytesN,t->line);
                 rfFseek(t->f,startOff,SEEK_SET);
-                return bytesN;
+                RETURN_LOG_ERROR("Reading line [%"PRIu64"] of a Big Endian UTF-16 text file failed",bytesN,t->line)
             }
         break;//end of UTF-16 big endian
         case RF_UTF32_LE:
             if( (bytesN = rfStringX_Assign_fUTF32(line,t->f,RF_LITTLE_ENDIAN,&eof)) < 0)
             {
-                LOG_ERROR("Reading line [%"PRIu64"] of a Little Endian UTF-32 text file failed",bytesN,t->line);
                 rfFseek(t->f,startOff,SEEK_SET);
-                return bytesN;
+                RETURN_LOG_ERROR("Reading line [%"PRIu64"] of a Little Endian UTF-32 text file failed",bytesN,t->line);
             }
         break;
         case RF_UTF32_BE:
             if( (bytesN = rfStringX_Assign_fUTF32(line,t->f,RF_BIG_ENDIAN,&eof)) < 0)
             {
-                LOG_ERROR("Reading line [%"PRIu64"] of a Big Endian UTF-32 text file failed",bytesN,t->line);
-                return bytesN;
+                rfFseek(t->f,startOff,SEEK_SET);
+                RETURN_LOG_ERROR("Reading line [%"PRIu64"] of a Big Endian UTF-32 text file failed",bytesN,t->line)
             }
         break;
     }//switch closes
@@ -622,41 +593,36 @@ int32_t rfTextFile_ReadLine2(RF_TextFile* t,RF_StringX* line)
         case RF_UTF8:
             if( (bytesN = rfStringX_Assign_fUTF8(line,t->f,&eof)) < 0)
             {
-                LOG_ERROR("Reading line [%"PRIu64"] of a UTF-8 text file failed",bytesN,t->line);
                 rfFseek(t->f,startOff,SEEK_SET);
-                return bytesN;
+                RETURN_LOG_ERROR("Reading line [%"PRIu64"] of a UTF-8 text file failed",bytesN,t->line)
             }
         break;//end of utf-8
         case RF_UTF16_LE:
             if( (bytesN = rfStringX_Assign_fUTF16(line,t->f,RF_LITTLE_ENDIAN,&eof)) < 0)
             {
-                LOG_ERROR("Reading line [%"PRIu64"] of a Little Endian UTF-16 text file failed",bytesN,t->line);
                 rfFseek(t->f,startOff,SEEK_SET);
-                return bytesN;
+                RETURN_LOG_ERROR("Reading line [%"PRIu64"] of a Little Endian UTF-16 text file failed",bytesN,t->line)
             }
         break;
         case RF_UTF16_BE:
             if( (bytesN = rfStringX_Assign_fUTF16(line,t->f,RF_BIG_ENDIAN,&eof)) < 0)
             {
-                LOG_ERROR("Reading line [%"PRIu64"] of a Big Endian UTF-16 text file failed",bytesN,t->line);
                 rfFseek(t->f,startOff,SEEK_SET);
-                return bytesN;
+                RETURN_LOG_ERROR("Reading line [%"PRIu64"] of a Big Endian UTF-16 text file failed",bytesN,t->line)
             }
         break;//end of UTF-16 big endian
         case RF_UTF32_LE:
             if( (bytesN = rfStringX_Assign_fUTF32(line,t->f,RF_LITTLE_ENDIAN,&eof)) < 0)
             {
-                LOG_ERROR("Reading line [%"PRIu64"] of a Little Endian UTF-32 text file failed",bytesN,t->line);
                 rfFseek(t->f,startOff,SEEK_SET);
-                return bytesN;
+                RETURN_LOG_ERROR("Reading line [%"PRIu64"] of a Little Endian UTF-32 text file failed",bytesN,t->line)
             }
         break;
         case RF_UTF32_BE:
             if( (bytesN = rfStringX_Assign_fUTF32(line,t->f,RF_BIG_ENDIAN,&eof)) < 0)
             {
-                LOG_ERROR("Reading line [%"PRIu64"] of a Big Endian UTF-32 text file failed",bytesN,t->line);
                 rfFseek(t->f,startOff,SEEK_SET);
-                return bytesN;
+                RETURN_LOG_ERROR("Reading line [%"PRIu64"] of a Big Endian UTF-32 text file failed",bytesN,t->line)
             }
         break;
     }//switch closes
@@ -710,14 +676,12 @@ int32_t rfTextFile_GetLine_begin(RF_TextFile* t,uint64_t lineN,RF_StringX* line)
     {
         if(error == RE_FILE_EOF)
         {
-            LOG_ERROR("While searching for line [%"PRIu64"] in Text File \"%s\" the end of file was found before being able to reach that line",RE_FILE_EOF,lineN,t->name.bytes);
             TEXTFILE_RESETPTR_FROMSTART(t,prLine,prEof,prOff)
-            return RE_FILE_EOF;
+            RETURN_LOG_ERROR("While searching for line [%"PRIu64"] in Text File \"%s\" the end of file was found before being able to reach that line",RE_FILE_EOF,lineN,t->name.bytes);
         }
         //else there was an error at line reading
-        LOG_ERROR("While reading Text File's lines \"%s\" there was an error in file reading. File must be corrupt",RE_FILE_BAD,t->name.bytes);
         TEXTFILE_RESETPTR_FROMSTART(t,prLine,prEof,prOff)
-        return RE_FILE_BAD;
+        RETURN_LOG_ERROR("While reading Text File's lines \"%s\" there was an error in file reading. File must be corrupt",RE_FILE_BAD,t->name.bytes)
     }
     //success
     //now we are done so we can return the line number and the file pointer to their original positions, also free stuff
@@ -792,10 +756,8 @@ int32_t rfTextFile_MoveLines(RF_TextFile* t,int64_t linesN)
             TEXTFILE_RESETPTR_FROMSTART(t,prLine,prEof,prOff)
             //else there was an error at line reading
             if(error != RE_FILE_EOF)
-            {
-                LOG_ERROR("While reading Text File's lines forward \"%s\" there was an error in file reading. File must be corrupt",RE_FILE_BAD,t->name.bytes);
-                return RE_FILE_BAD;
-            }
+                RETURN_LOG_ERROR("While reading Text File's lines forward \"%s\" there was an error in file reading. File must be corrupt",RE_FILE_BAD,t->name.bytes)
+            //if it was EOF just return it
             return RE_FILE_EOF;
         }
         // SUCCESS getting here means we are done
@@ -822,9 +784,8 @@ int32_t rfTextFile_MoveLines(RF_TextFile* t,int64_t linesN)
             if((error = rfTextFile_ReadLine2(t,&buffer)) != RF_SUCCESS)
             {
                 //there was an error at line reading
-                LOG_ERROR("While reading Text File's lines forward \"%s\" there was an error in file reading. File must be corrupt",RE_FILE_BAD,t->name.bytes);
                 TEXTFILE_RESETPTR_FROMSTART(t,prLine,prEof,prOff)
-                return RE_FILE_BAD;
+                RETURN_LOG_ERROR("While reading Text File's lines forward \"%s\" there was an error in file reading. File must be corrupt",RE_FILE_BAD,t->name.bytes)
             }
 
         }
@@ -838,10 +799,8 @@ int32_t rfTextFile_MoveLines(RF_TextFile* t,int64_t linesN)
     while(t->line >= targetLine)
     {//start of moving back loop
         if((error=rfTextFile_MoveChars_b(t,1))!=RF_SUCCESS)
-        {
-            LOG_ERROR("Error while moving backwards in Text File \"%s\"",error,t->name.bytes);
-            return error;
-        }
+            RETURN_LOG_ERROR("Error while moving backwards in Text File \"%s\"",error,t->name.bytes)
+
     }//end of moving back loop
     //go 1 char forward to be at the line's start
     rfTextFile_MoveChars_f(t,1);
@@ -985,10 +944,8 @@ int32_t rfTextFile_MoveChars_b(RF_TextFile* t,uint64_t charsN)
 int32_t rfTextFile_GoToLine(RF_TextFile* t,uint64_t lineN)
 {
     if(lineN == 0)
-    {
-        LOG_ERROR("Illegal linesN value was given. 0 is not a legal value",RE_INPUT);
-        return RE_INPUT;
-    }
+        RETURN_LOG_ERROR("Illegal linesN value was given. 0 is not a legal value",RE_INPUT)
+
 
     if(lineN == 1)
     {
@@ -1029,7 +986,7 @@ int32_t rfTextFile_GoToOffset(RF_TextFile* t,foff_rft offset,int origin)
             {
                 if(error != RE_FILE_EOF)
                     LOG_ERROR("Moving forward in TextFile \"%s\" failed ",error,t->name.bytes)
-                TEXTFILE_RESETPTR_FROMSTART(t,prLine,prEof,prOff)
+
                 return error;
             }
             if((cOff = rfFtell(t->f)) == (foff_rft)-1)//get the current file position
@@ -1049,9 +1006,9 @@ int32_t rfTextFile_GoToOffset(RF_TextFile* t,foff_rft offset,int origin)
             {//keep going forward
                 if((error=rfTextFile_MoveChars_f(t,1)) != RF_SUCCESS)
                 {
+                    TEXTFILE_RESETPTR_FROMSTART(t,prLine,prEof,prOff)
                     if(error != RE_FILE_EOF)
                         LOG_ERROR("Moving forward in TextFile \"%s\" failed ",error,t->name.bytes)
-                    TEXTFILE_RESETPTR_FROMSTART(t,prLine,prEof,prOff)
                     return error;
                 }
                 if((cOff = rfFtell(t->f)) == (foff_rft)-1)//get the current file position
@@ -1068,9 +1025,8 @@ int32_t rfTextFile_GoToOffset(RF_TextFile* t,foff_rft offset,int origin)
             {//keep going backwards
                 if((error=rfTextFile_MoveChars_b(t,1)) != RF_SUCCESS)
                 {
-                    LOG_ERROR("Moving backwards in TextFile \"%s\" failed ",error,t->name.bytes)
                     TEXTFILE_RESETPTR_FROMSTART(t,prLine,prEof,prOff)
-                    return error;
+                    RETURN_LOG_ERROR("Moving backwards in TextFile \"%s\" failed ",error,t->name.bytes)
                 }
                 if((cOff = rfFtell(t->f)) == (foff_rft)-1)//get the current file position
                 {

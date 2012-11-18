@@ -29,6 +29,11 @@
 #include <Time/rfc_date.h>
 #endif
 
+#ifdef __cplusplus
+extern "C"
+{///opening bracket for calling from C++
+#endif
+
 /**
 ** @defgroup RF_TimeGRP Initialization function
 ** @addtogroup RF_TimeGRP
@@ -49,5 +54,9 @@ i_DECLIMEX_ void rfSleep(uint32_t seconds);
 i_DECLIMEX_ void rfSleep_ms(uint32_t milliseconds);
 
 //! @} //timegroup ends
+
+#ifdef __cplusplus
+}///closing bracket for calling from C++
+#endif
 
 #endif//include guards end

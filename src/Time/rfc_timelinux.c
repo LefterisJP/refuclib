@@ -299,7 +299,7 @@ RF_Date* rfDate_Create_Now(char local)
 }
 
 // Sets this date as the current system date and time
-int32_t rfDate_SetToSystem(RF_Date* d)
+char rfDate_SetToSystem(RF_Date* d)
 {
     struct tm tm;
     tm.tm_sec = d->seconds;
@@ -320,7 +320,7 @@ int32_t rfDate_SetToSystem(RF_Date* d)
     if(t == -1)
     {
         LOG_ERROR("Setting the system time from an RF_Date in Linux failed because mktime() returned -1",RE_DATE_SET_SYSTEMTIME)
-        return RF_FAILURE;
+        return false;
     }
     //now set the system time
     if(stime(&t) != 0)
@@ -332,20 +332,19 @@ int32_t rfDate_SetToSystem(RF_Date* d)
             break;
             case EPERM:
                 LOG_ERROR("Setting the system time from an RF_Date in Linux failed in stime().The calling process has insufficient privilege. Under Linux the CAP_SYS_TIME privilege is required.",RE_DATE_SET_SYSTEMTIME);
-                return RE_PERMISSION;
             break;
             default:
                 LOG_ERROR("Setting the system time from an RF_Date in Linux failed in stime(). errno has unexpected value of %d",RE_DATE_SET_SYSTEMTIME,errno);
             break;
         }
-        return RF_FAILURE;
+        return false;
     }
     //success
-    return RF_SUCCESS;
+    return true;
 }
 
 // Sets this date as the current local date and time
-int32_t rfDate_SetToLocal(RF_Date* d)
+char rfDate_SetToLocal(RF_Date* d)
 {
     struct tm tm;
     tm.tm_sec = d->seconds;
@@ -371,7 +370,7 @@ int32_t rfDate_SetToLocal(RF_Date* d)
     if(t == -1)
     {
         LOG_ERROR("Setting the Local System time from an RF_Date in Linux failed because mktime() returned -1",RE_DATE_SET_SYSTEMTIME)
-        return RF_FAILURE;
+        return false;
     }
     if (tz)
         setenv("TZ", tz, 1);
@@ -388,15 +387,14 @@ int32_t rfDate_SetToLocal(RF_Date* d)
             break;
             case EPERM:
                 LOG_ERROR("Setting the Local System time from an RF_Date in Linux failed in stime().The calling process has insufficient privilege. Under Linux the CAP_SYS_TIME privilege is required.",RE_DATE_SET_SYSTEMTIME);
-                return RE_PERMISSION;
             break;
             default:
                 LOG_ERROR("Setting the Local System time from an RF_Date in Linux failed in stime(). errno has unexpected value of %d",RE_DATE_SET_SYSTEMTIME,errno);
             break;
         }
-        return RF_FAILURE;
+        return false;
     }
     //success
-    return RF_SUCCESS;
+    return true;
 }
 #endif

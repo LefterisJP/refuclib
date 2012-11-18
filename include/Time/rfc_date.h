@@ -250,10 +250,8 @@ i_DECLIMEX_ void rfDate_SubSeconds(RF_Date* d,uint32_t seconds);
 //! it has super user privileges. If the application does not have super user privileges then the function will
 //! return @c RE_PERMISSION
 //! @param d The date to set as system date and time
-//! @return Returns @c RF_SUCCESS for successful setting of the system date and time. Otherwise it returns @c RF_FAILURE and an error is logged.
-//! In Linux it can also return @c RE_PERMISSION which denotes that the application that attempted to use this function does not have super user privileges
-//! and as such can not set the system time
-i_DECLIMEX_ int32_t rfDate_SetToSystem(RF_Date* d);
+//! @return Returns @c true for succesfull setting or @c false otherwise with appropriate error logging
+i_DECLIMEX_ char rfDate_SetToSystem(RF_Date* d);
 
 //! @memberof RF_Date
 //! @brief Sets this date as the current local date and time
@@ -265,10 +263,8 @@ i_DECLIMEX_ int32_t rfDate_SetToSystem(RF_Date* d);
 //! it has super user privileges. If the application does not have super user privileges then the function will
 //! return @c RE_PERMISSION
 //! @param d The date to set as system's local date and time
-//! @return Returns @c RF_SUCCESS for successful setting of the local system date and time. Otherwise it returns @c RF_FAILURE and an error is logged.
-//! In Linux it can also return @c RE_PERMISSION which denotes that the application that attempted to use this function does not have super user privileges
-//! and as such can not set the local system time
-i_DECLIMEX_ int32_t rfDate_SetToLocal(RF_Date* d);
+//! @return Returns @c true for succesfull setting or @c false otherwise with appropriate error logging
+i_DECLIMEX_ char rfDate_SetToLocal(RF_Date* d);
 
 //! @}
 //closing the System Methods doxygen group

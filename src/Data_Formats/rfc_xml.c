@@ -246,10 +246,7 @@ int32_t i_rfXML_ToFile(RF_XML* x, void* nameP,char* encodingP)
     if(name != 0)
     {
         if(rfTextFile_Init(&out,name,RF_FILE_NEW,encoding) != RF_SUCCESS)
-        {
-            LOG_ERROR("Failed to output XML to a file due to failure to open output file \"%s\" ",RE_XML_OPEN_FAILURE,name->bytes);
-            return RE_XML_OPEN_FAILURE;
-        }
+            RETURN_LOG_ERROR("Failed to output XML to a file due to failure to open output file \"%s\" ",RE_XML_OPEN_FAILURE,name->bytes)
     }
     else
     {
@@ -257,10 +254,8 @@ int32_t i_rfXML_ToFile(RF_XML* x, void* nameP,char* encodingP)
         temp=true;
         tmpNamePtr = tmpnam(tempFName);
         if(rfTextFile_Init(&out,RFS_(tmpNamePtr),RF_FILE_NEW,encoding) != RF_SUCCESS)
-        {
-            LOG_ERROR("Failed to output XML to a file due to failure to create a temporary output file",RE_XML_OPEN_FAILURE);
-            return RE_XML_OPEN_FAILURE;
-        }
+            RETURN_LOG_ERROR("Failed to output XML to a file due to failure to create a temporary output file",RE_XML_OPEN_FAILURE)
+
     }
     //write the xml version and <xml> open tag
     rfTextFile_Write(&out,RFS_("<?xml version=\"%f\"?>\n",x->version));
@@ -268,10 +263,9 @@ int32_t i_rfXML_ToFile(RF_XML* x, void* nameP,char* encodingP)
     rfStringX_Init_txtbuff(&strBuff,"");
     if(i_rfXMLTag_PrintToFile(&x->root,&out,&strBuff,level)==false)
     {
-        LOG_ERROR("Failed to write to the output XML file",RE_XML_WRITE);
         rfStringX_Deinit(&strBuff);
         rfTextFile_Deinit(&out);
-        return RE_XML_WRITE;
+        RETURN_LOG_ERROR("Failed to write to the output XML file",RE_XML_WRITE)
     }
     //get rid of the no longer needed stringx buffer
     rfStringX_Deinit(&strBuff);
@@ -310,10 +304,8 @@ int32_t i_rfXML_InsertTag(RF_XML* x, RF_XMLTag* t,char* flagsP)
     char flags = *flagsP;
     //get the tag's string form
     if(rfXMLTag_ToStr(t,&tempS)==false)
-    {
-        LOG_ERROR("Could not insert tag <%s> to the XML file because there was a failure in representing it as a String",RE_XML_TOSTR,t->name.bytes);
-        return RE_XML_TOSTR;
-    }
+        RETURN_LOG_ERROR("Could not insert tag <%s> to the XML file because there was a failure in representing it as a String",RE_XML_TOSTR,t->name.bytes)
+
     //insert it into the file, as long as it's not the first tag ( the root)
     if(RF_BITFLAG_ON(x->flags,XML_ROOT_INIT))
     {
@@ -326,9 +318,7 @@ int32_t i_rfXML_InsertTag(RF_XML* x, RF_XMLTag* t,char* flagsP)
         //and just write it in the file
         x->lastLine = x->f.line;
         if((error = rfTextFile_GetOffset(&x->f,&x->rootPos)) != RF_SUCCESS)
-        {
-            LOG_ERROR("During inserting the root to XML file \"%s\" there was a problem when getting the current file position",error,x->f.name.bytes);
-        }
+            RETURN_LOG_ERROR("During inserting the root to XML file \"%s\" there was a problem when getting the current file position",error,x->f.name.bytes)
         else
             error = rfTextFile_Write(&x->f,&tempS);
         x->rootPos-=1;
@@ -356,16 +346,12 @@ int32_t i_rfXML_InsertStr(RF_XML* x,void* sP,char* flagsP)
     char flags = *flagsP;
     //if the file is open in memory (and hence not just on disk)
     if(RF_BITFLAG_ON(x->flags,XML_IN_MEMORY))
-    {
-        LOG_ERROR("Attempted to insert a string in an XML file with the handler not being opened as a disk only handler",RE_XML_NOT_INDISK)
-        return RF_FAILURE;
-    }
+        RETURN_LOG_ERROR("Attempted to insert a string in an XML file with the handler not being opened as a disk only handler",RE_XML_NOT_INDISK)
+
     //if the last tag has not been initialized by an operation, and we do have a root
     if(x->lastTag == 0)
-    {
-        LOG_ERROR("Attempted to insert a string in the XML file without having performed an operation to properly place the file pointer",RE_XML_NOFILEOP)
-        return RE_XML_NOFILEOP;
-    }
+        RETURN_LOG_ERROR("Attempted to insert a string in the XML file without having performed an operation to properly place the file pointer",RE_XML_NOFILEOP)
+
     //init the buffer string
     rfStringX_Init_txtbuff(&strBuff,""); ///cleanup 1 -- deinit this string
     //get the previous line at the position
@@ -854,10 +840,8 @@ int32_t i_rfXML_GoToTag(RF_XML* x,void* tName,void* contents, uint32_t* attrNP, 
     uint32_t attrN = *attrNP;
     //do a check at the very beginning for if the handler is in disk and not in memory
     if(RF_BITFLAG_ON(x->flags,XML_IN_MEMORY))
-    {
-        LOG_ERROR("Attempted to move to a specific tag in the file while the XML handler was in memory and not in disk",RE_XML_NOT_INDISK);
-        return RF_FAILURE;
-    }
+        RETURN_LOG_ERROR("Attempted to move to a specific tag in the file while the XML handler was in memory and not in disk",RE_XML_NOT_INDISK)
+
     //allocate the variable number of attributes array
     if(attrN != 0)
     {
@@ -877,10 +861,9 @@ int32_t i_rfXML_GoToTag(RF_XML* x,void* tName,void* contents, uint32_t* attrNP, 
     x->level = 0;
     //go to the where the root is
     if((error=rfTextFile_GoToOffset(&x->f,x->rootPos,SEEK_SET)) != RF_SUCCESS)
-    {
-        LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%s\"",error,x->f.name.bytes);
-        return error;
-    }
+        RETURN_LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%s\"",error,x->f.name.bytes)
+
+
     //check if the root is the one we seek
     rfTextFile_ReadLine(&x->f,&x->s);
     if(rfString_Find(&x->s,RFS_("<%s",((RF_String*)tName)->bytes),0) != RF_FAILURE)
@@ -892,10 +875,8 @@ int32_t i_rfXML_GoToTag(RF_XML* x,void* tName,void* contents, uint32_t* attrNP, 
     else//go back to begin the search
     {
         if((error=rfTextFile_GoToOffset(&x->f,x->rootPos,SEEK_SET)) != RF_SUCCESS)
-        {
-            LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%s\"",error,x->f.name.bytes);
-            return error;
-        }
+            RETURN_LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%s\"",error,x->f.name.bytes)
+
     }
     ///start the search
     while(1)

@@ -92,8 +92,10 @@ i_DECLIMEX_ uint32_t* rfUTF8_Decode(const char* utf8,uint32_t utf8BLength,uint32
 //! The buffer must be allocated with the max amount of characters the UTF-16 byte stream can have, or the exact amount
 //! if somehow you already know that at the function's call. If all you know is the bytes number ofthe UTF-16 buffer
 //! then allocate this with @c UTF16BLENGTH*2.
-//! @return Returns @c true for successful decoding and @c false for an error during decoding along with logging the error that occured
-i_DECLIMEX_ char rfUTF16_Decode(const char* buff,uint32_t* length,uint32_t* codepoints);
+//! @return Returns @c RF_SUCCESS for succesfull UTF-16 decoding and error otherwise. Possible errors are:
+//! + @c RE_UTF16_INVALID_SEQUENCE: An invalid UTF-16 byte was found in @c buff
+//! + @c RE_UTF16_NO_SURRPAIR: A surrogate pair was expected somewhere in @c buff but it was not found
+i_DECLIMEX_ int32_t rfUTF16_Decode(const char* buff,uint32_t* length,uint32_t* codepoints);
 //! @brief Decodes a UTF-16 byte stream into codepoints also swapping endianess
 //!
 //! Takes in a UTF-16 endoded byte stream inside @c buff.
@@ -108,8 +110,10 @@ i_DECLIMEX_ char rfUTF16_Decode(const char* buff,uint32_t* length,uint32_t* code
 //! The buffer must be allocated with the max amount of characters the UTF-16 byte stream can have, or the exact amount
 //! if somehow you already know that at the function's call. If all you know is the bytes number ofthe UTF-16 buffer
 //! then allocate this with @c UTF16BLENGTH*2.
-//! @return Returns @c true for successful decoding and @c false for an error during decoding along with logging the error that occured
-i_DECLIMEX_ char rfUTF16_Decode_swap(const char* buff,uint32_t* length,uint32_t* codepoints);
+//! @return Returns @c RF_SUCCESS for succesfull UTF-16 decoding and error otherwise. Possible errors are:
+//! + @c RE_UTF16_INVALID_SEQUENCE: An invalid UTF-16 byte was found in @c buff
+//! + @c RE_UTF16_NO_SURRPAIR: A surrogate pair was expected somewhere in @c buff but it was not found
+i_DECLIMEX_ int32_t rfUTF16_Decode_swap(const char* buff,uint32_t* length,uint32_t* codepoints);
 
 //! @brief Encodes a buffer of unicode codepoints into UTF-16
 //!
@@ -127,7 +131,10 @@ i_DECLIMEX_ uint16_t* rfUTF16_Encode(const uint32_t* codepoints,uint32_t charsN,
 //! Parses a utf-8 byte sequence returning the byte length and verifying its validity
 //! @param[in] bytes A sequence of bytes encoded in the UTF-8 encoding
 //! @param[out] byteLength Pass a reference to an uint32_t to obtain the number of bytes that make up the sequence not including the '\0' byte
-//! @return Returns  RF_FAILURE if the sequence is not a valid UTF-8 sequence while at the same time logging the error encountered and RF_SUCCESS if everything goes on okay
+//! @return Returns  @c RF_SUCCESS if @c bytes is a valid UTF8 sequence and an error if there is a problem. Possible errors are:
+//! + @c RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE: An invalid UTF-8 byte was encountered inside @c bytes
+//! + @c RE_UTF8_INVALID_SEQUENCE_CONBYTE: Somewhere in @c bytes a continuation byte was expected but was not found
+//! + @c RE_UTF8_INVALID_SEQUENCE: General Invalid UTF-8 sequence error
 i_DECLIMEX_ int32_t rfUTF8_VerifySequence(const char* bytes,uint32_t* byteLength);
 
 //! @brief Finds the length of a UTF-32 buffer

@@ -27,6 +27,11 @@
 
 #define RF_MAX_FUNC_ARGS    32
 
+#ifdef __cplusplus
+extern "C"
+{///opening bracket for calling from C++
+#endif
+
 /** @brief The Local Memory stack
 **
 ** This structure represents the local memory stack of a thread
@@ -240,5 +245,9 @@ void* arg1,void* arg2,void* arg3,void* arg4,void* arg5,void* arg6,void* arg7,voi
     i_RP_PASTE2(i_rfRETURN_,i_RETTYPE_)(i_rfLMSWrapper18((void*(*)(void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*,void*))(i_FUNCNAME_),(void*)(i_ARG1_),(void*)(i_ARG2_),(void*)(i_ARG3_),(void*)(i_ARG4_),(void*)(i_ARG5_),(void*)(i_ARG6_),(void*)(i_ARG7_),(void*)(i_ARG8_),\
     (void*)(i_ARG9_),(void*)(i_ARG10_),(void*)(i_ARG11_),(void*)(i_ARG12_),(void*)(i_ARG13_),(void*)(i_ARG14_),(void*)(i_ARG15_),(void*)(i_ARG16_),(void*)(i_ARG17_),(void*)(i_ARG18_)))
 
+
+#ifdef __cplusplus
+} //closing bracket for C++ calling
+#endif
 
 #endif//include guards end

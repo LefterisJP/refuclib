@@ -21,6 +21,11 @@
 #define RF_NUMCONST_H
 #include <rf_setup.h>
 
+#ifdef __cplusplus
+extern "C"
+{///opening bracket for calling from C++
+#endif
+
 //! @brief Saves an int8_t into the local stack memory space
 //!
 //! This is an internal function and is not intended to be used by the user
@@ -76,5 +81,9 @@ i_DECLIMEX_ void* i_RFUI64_(uint64_t i);
 //! @param i The integer to save
 //! @return A pointer to the position of the integer
 i_DECLIMEX_ void* i_RFI_(int i);
+
+#ifdef __cplusplus
+}///closing bracket for calling from C++
+#endif
 
 #endif

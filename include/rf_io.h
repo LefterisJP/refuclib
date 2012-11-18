@@ -398,9 +398,10 @@ i_DECLIMEX_ int32_t rfFgets_UTF8(char* buff,uint32_t num,FILE* f,char* eof);
 //! If @c false the int passed at @c c will contain the value of the read bytes in UTF-8 without any decoding
 //! @return Returns the number of bytes read (either @c 1, @c 2, @c 3 or @c 4) or an error if the function
 //! fails for some reason. Possible error values are:
-//! + @c RE_FILE_EOF: The end of file has been found while reading. If the end of file is encountered
+//! + @c RE_FILE_EOF: The end of file has been found while reading.
+//! Also if the end of file is encountered
 //! in the middle of a UTF-8 encoded character where we would be expecting something different
-//! and @c RE_UTF8_INVALID_SEQUENCE_END error is also logged
+//! @c RE_UTF8_INVALID_SEQUENCE_END is logged.
 //! + @c RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE: If an invalid UTF-8 byte has been found
 //! + @c RE_UTF8_INVALID_SEQUENCE_CONBYTE: If during parsing the file we were expecting a continuation
 //! byte and did not find it
@@ -436,7 +437,7 @@ i_DECLIMEX_ int32_t rfFgetc_UTF8(FILE* f,uint32_t *c,char cp);
 //! + @c RE_UTF16_INVALID_SEQUENCE: Either the read word or its surrogate pair if 4 bytes were read held illegal values
 //! + @c RE_UTF16_NO_SURRPAIR: According to the first read word a surrogate pair was expected but none was found
 //! + @c RE_FILE_EOF: The end of file has been found while reading. If the end of file is encountered
-//! while we expect a UTF-16 surrogate pair an appropriate error is logged
+//! while we expect a UTF-16 surrogate an @c RE_UTF16_NO_SURRPAIR error is also logged.
 //! + @c RE_FILE_READ: If during reading the file there was an unknown read error
 //! + @c RE_FILE_READ_BLOCK: If the read operation failed due to the file descriptor being occupied by another thread
 //! + @c RE_FILE_MODE: If during reading the file the file descriptor's mode was not correctly set for reading
@@ -467,7 +468,7 @@ i_DECLIMEX_ int32_t rfFgetc_UTF16BE(FILE* f,uint32_t *c,char cp);
 //! + @c RE_UTF16_INVALID_SEQUENCE: Either the read word or its surrogate pair if 4 bytes were read held illegal values
 //! + @c RE_UTF16_NO_SURRPAIR: According to the first read word a surrogate pair was expected but none was found
 //! + @c RE_FILE_EOF: The end of file has been found while reading. If the end of file is encountered
-//! while we expect a UTF-16 surrogate pair an appropriate error is logged
+//! while we expect a UTF-16 surrogate an @c RE_UTF16_NO_SURRPAIR error is also logged.
 //! + @c RE_FILE_READ: If during reading the file there was an unknown read error
 //! + @c RE_FILE_READ_BLOCK: If the read operation failed due to the file descriptor being occupied by another thread
 //! + @c RE_FILE_MODE: If during reading the file the file descriptor's mode was not correctly set for reading

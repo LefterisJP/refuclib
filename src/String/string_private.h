@@ -103,26 +103,6 @@ if(REQSIZE_ >= STR_->bSize)\
 //! @return Returns the byte position of the found substring or RF_FAILURE for not found
 //! @endinternal
 int32_t rfString_FindBytePos(const void* thisstr,const void* sstr,char options);
-//! @internal
-//! @memberof RF_String
-//! @brief Finds if a substring literal exists inside another string.
-//!
-//! @isinherited{StringX}
-//! Finds the existence of lit String literal  inside this string, either matching case or not. The string literal <b>needs</b> to be in valid UTF-8.
-//! A valid UTF-8 sequence check is performed in this function. This is an internal version
-//! used by other functions to obtain the byte position instead of the character position.
-//! @param thisstr This string we want to search in. @inhtype{String,StringX}
-//! @param lit The string literal we want to search for. Needs to be in UTF-8 encoding
-//! @param options Bitflag options denoting some options for the search. Give 0 for the defaults. Can have values:
-//! + @c RF_CASE_IGNORE: If you want the found substring to ignore the case and returns success for any occurence of the string in any case.
-//!     Default search option is to @b match the case. For now this works only for characters of the english language.
-//! + @c RF_MATCH_WORD: If you want the found substring to be exact. For example an exact search for @e "HELLO" in the string
-//!     @e "HELLOWORLD" would return a failure. Default search is to return any found substring.
-//! @return Returns the byte position of the found substring or RF_FAILURE for not found
-//! @endinternal
-int32_t rfString_FindBytePos_s(const void* thisstr,const char* lit,char options);
-
-
 
 //! A macro to save code space that read the vsnprintf parameters
 //! @param i_SLIT The formatted string literal to read

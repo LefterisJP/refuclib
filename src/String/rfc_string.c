@@ -49,7 +49,7 @@ RF_String* i_rfString_Create(const char* s,...)
 
     //check for validity of the given sequence and get the character length
     uint32_t byteLength;
-    if( rfUTF8_VerifySequence(buff,&byteLength) == RF_FAILURE)
+    if( rfUTF8_VerifySequence(buff,&byteLength) != RF_SUCCESS)
     {
         LOG_ERROR("Error at String Allocation due to invalid UTF-8 byte sequence",RE_STRING_INIT_FAILURE);
         if(buffAllocated == true)
@@ -74,7 +74,7 @@ RF_String* i_NVrfString_Create(const char* s)
 {
     //check for validity of the given sequence and get the character length
     uint32_t byteLength;
-    if( rfUTF8_VerifySequence(s,&byteLength) == RF_FAILURE)
+    if( rfUTF8_VerifySequence(s,&byteLength) != RF_SUCCESS)
     {
         LOG_ERROR("Error at String Allocation due to invalid UTF-8 byte sequence",RE_STRING_INIT_FAILURE);
         return 0;
@@ -122,18 +122,18 @@ RF_String* i_rfString_CreateLocal1(const char* s,...)
 #endif
 #if (RF_OPTION_SOURCE_ENCODING  ==  RF_UTF16_LE)//decode the UTF16
     if(rfUTILS_Endianess() == RF_LITTLE_ENDIAN)
-        if(rfUTF16_Decode(buff,&characterLength,codepoints) == false)
+        if(rfUTF16_Decode(buff,&characterLength,codepoints) != RF_SUCCESS)
             goto cleanup;
     else
-        if(rfUTF16_Decode_swap(buff,&characterLength,codepoints)==false)
+        if(rfUTF16_Decode_swap(buff,&characterLength,codepoints) != RF_SUCCESS)
             goto cleanup;
 
 #elif RF_OPTION_SOURCE_ENCODING == RF_UTF16_BE//decode the UTF16
     if(rfUTILS_Endianess() == RF_LITTLE_ENDIAN)
-        if(rfUTF16_Decode_swap(buff,&characterLength,codepoints) == false)
+        if(rfUTF16_Decode_swap(buff,&characterLength,codepoints) != RF_SUCCESS)
             goto cleanup;
     else
-        if(rfUTF16_Decode(buff,&characterLength,codepoints)==false)
+        if(rfUTF16_Decode(buff,&characterLength,codepoints) != RF_SUCCESS)
             goto cleanup;
 #elif RF_OPTION_SOURCE_ENCODING == RF_UTF32_LE//copy the UTF32 into the codepoint
     memcpy(codepoints,buff,i);
@@ -170,7 +170,7 @@ RF_String* i_rfString_CreateLocal1(const char* s,...)
     ///progress normally since here we have a UTF-8 buffer
     //check for validity of the given sequence and get the character length
     uint32_t byteLength;
-    if( rfUTF8_VerifySequence(buff,&byteLength) == RF_FAILURE)
+    if( rfUTF8_VerifySequence(buff,&byteLength) != RF_SUCCESS)
     {
         LOG_ERROR("Error at String Allocation due to invalid UTF-8 byte sequence",RE_STRING_INIT_FAILURE);
         if(buffAllocated == true)
@@ -243,18 +243,18 @@ RF_String* i_NVrfString_CreateLocal(const char* s)
 #endif
 #if (RF_OPTION_SOURCE_ENCODING  ==  RF_UTF16_LE)//decode the UTF16
     if(rfUTILS_Endianess() == RF_LITTLE_ENDIAN)
-        if(rfUTF16_Decode(s,&characterLength,codepoints) == false)
+        if(rfUTF16_Decode(s,&characterLength,codepoints) != RF_SUCCESS)
             goto cleanup;
     else
-        if(rfUTF16_Decode_swap(s,&characterLength,codepoints)==false)
+        if(rfUTF16_Decode_swap(s,&characterLength,codepoints) != RF_SUCCESS)
             goto cleanup;
 
 #elif RF_OPTION_SOURCE_ENCODING == RF_UTF16_BE//decode the UTF16
     if(rfUTILS_Endianess() == RF_LITTLE_ENDIAN)
-        if(rfUTF16_Decode_swap(s,&characterLength,codepoints) == false)
+        if(rfUTF16_Decode_swap(s,&characterLength,codepoints) != RF_SUCCESS)
             goto cleanup;
     else
-        if(rfUTF16_Decode(s,&characterLength,codepoints)==false)
+        if(rfUTF16_Decode(s,&characterLength,codepoints) != RF_SUCCESS)
             goto cleanup;
 #elif RF_OPTION_SOURCE_ENCODING == RF_UTF32_LE//copy the UTF32 into the codepoint
     memcpy(codepoints,s,i);
@@ -288,9 +288,9 @@ RF_String* i_NVrfString_CreateLocal(const char* s)
     //check for validity of the given sequence and get the character length
     uint32_t byteLength;
 #if RF_OPTION_SOURCE_ENCODING == RF_UTF8
-    if( rfUTF8_VerifySequence(s,&byteLength) == RF_FAILURE)
+    if( rfUTF8_VerifySequence(s,&byteLength) != RF_SUCCESS)
 #else
-    if( rfUTF8_VerifySequence(buff,&byteLength) == RF_FAILURE)
+    if( rfUTF8_VerifySequence(buff,&byteLength) != RF_SUCCESS)
 #endif
     {
         LOG_ERROR("Error at String Allocation due to invalid UTF-8 byte sequence",RE_STRING_INIT_FAILURE);
@@ -337,7 +337,7 @@ cleanup:
 
 
 
-// Initializes a string with the given characters. Given characters have to be in UTF-8. A check for valide sequence of bytes is performed.<b>Can't be used with RF_StringX</b>
+// Initializes a string with the given characters. Given characters have to be in UTF-8. A check for valid sequence of bytes is performed.<b>Can't be used with RF_StringX</b>
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
 char rfString_Init(RF_String* str,const char* s,...)
 #else
@@ -347,7 +347,7 @@ char i_rfString_Init(RF_String* str,const char* s,...)
     READ_VSNPRINTF_ARGS(s,s,false)
     //check for validity of the given sequence and get the character length
     uint32_t byteLength;
-    if( rfUTF8_VerifySequence(buff,&byteLength) == RF_FAILURE)
+    if( rfUTF8_VerifySequence(buff,&byteLength) != RF_SUCCESS)
     {
         LOG_ERROR("Error at String Initialization due to invalid UTF-8 byte sequence",RE_STRING_INIT_FAILURE);
         if(buffAllocated==true)
@@ -370,7 +370,7 @@ char i_NVrfString_Init(RF_String* str,const char* s)
 {
     //check for validity of the given sequence and get the character length
     uint32_t byteLength;
-    if( rfUTF8_VerifySequence(s,&byteLength) == RF_FAILURE)
+    if( rfUTF8_VerifySequence(s,&byteLength) != RF_SUCCESS)
     {
         LOG_ERROR("Error at String Initialization due to invalid UTF-8 byte sequence",RE_STRING_INIT_FAILURE);
         return false;
@@ -563,7 +563,7 @@ char rfString_Init_UTF16(RF_String* str,const uint16_t* s)
     byteLength+=3;//for the last utf-16 null termination character
     RF_MALLOC(codepoints,byteLength*2) //allocate the codepoints
     //parse the given byte stream normally since it has to be in the endianess of the system
-    if(rfUTF16_Decode((char*)s,&characterLength,codepoints) == false)
+    if(rfUTF16_Decode((char*)s,&characterLength,codepoints) != RF_SUCCESS)
     {
         free(codepoints);
         LOG_ERROR("String initialization failed due to invalide UTF-16 sequence",RE_STRING_INIT_FAILURE);
@@ -1494,10 +1494,9 @@ char i_rfString_Afterv(const void* thisstrP,RF_String* result,const char* option
     }
     va_end(argList);
     //if it is not found
-    if(minPos == ULONG_MAX)
-    {
+    if(minPos == LONG_MAX)
         return false;
-    }
+
     //if it is found initialize the substring
     minPos += minPosLength;//go after the found substring
     result->byteLength = thisstr->byteLength-minPos;
@@ -2044,10 +2043,8 @@ int32_t rfString_Init_fUTF8(RF_String* str,FILE* f,char* eof)
     int32_t bytesN;
     uint32_t bufferSize;//unused
     if((bytesN=rfFReadLine_UTF8(f,&str->bytes,&str->byteLength,&bufferSize,eof)) < 0)
-    {
-        LOG_ERROR("Failed to initialize String from a UTF-8 file",bytesN);
-        return bytesN;
-    }
+        RETURN_LOG_ERROR("Failed to initialize String from a UTF-8 file",bytesN)
+
     //success
     return bytesN;
 }
@@ -2058,10 +2055,8 @@ int32_t rfString_Assign_fUTF8(RF_String* str,FILE* f,char* eof)
     uint32_t utf8ByteLength,utf8BufferSize;//bufferSize unused in this function
     char* utf8 = 0;
     if((bytesN=rfFReadLine_UTF8(f,&utf8,&utf8ByteLength,&utf8BufferSize,eof)) < 0)
-    {
-        LOG_ERROR("Failed to assign the contents of a UTF-8 file to a String",bytesN);
-        return bytesN;
-    }
+        RETURN_LOG_ERROR("Failed to assign the contents of a UTF-8 file to a String",bytesN)
+
     //success
     //assign it to the string
     if(str->byteLength <= utf8ByteLength)
@@ -2081,10 +2076,8 @@ int32_t rfString_Append_fUTF8(RF_String* str,FILE*f,char* eof)
     uint32_t utf8ByteLength,utf8BufferSize;//bufferSize unused in this function
     char* utf8 = 0;
     if((bytesN=rfFReadLine_UTF8(f,&utf8,&utf8ByteLength,&utf8BufferSize,eof)) < 0)
-    {
-        LOG_ERROR("Failed to assign the contents of a UTF-8 file to a String",bytesN);
-        return bytesN;
-    }
+        RETURN_LOG_ERROR("Failed to assign the contents of a UTF-8 file to a String",bytesN)
+
     //append the utf8 to the given string
     rfString_Append(str,RFS_(utf8));
     //free the file's utf8 buffer
@@ -2109,18 +2102,14 @@ int32_t rfString_Init_fUTF16(RF_String* str,FILE* f, char endianess,char* eof)
     if(endianess == RF_LITTLE_ENDIAN)
     {
         if((bytesN=rfFReadLine_UTF16LE(f,&str->bytes,&str->byteLength,eof)) < 0)
-        {
-            LOG_ERROR("Failure to initialize a String from reading a UTF-16 file",bytesN);
-            return bytesN;
-        }
+            RETURN_LOG_ERROR("Failure to initialize a String from reading a UTF-16 file",bytesN)
+
     }//end of little endian
     else//big endian
     {
         if((bytesN=rfFReadLine_UTF16BE(f,&str->bytes,&str->byteLength,eof)) < 0)
-        {
-            LOG_ERROR("Failure to initialize a String from reading a UTF-16 file",bytesN);
-            return bytesN;
-        }
+            LOG_ERROR("Failure to initialize a String from reading a UTF-16 file",bytesN)
+
     }//end of big endian case
     //success
     return bytesN;
@@ -2137,18 +2126,14 @@ int32_t rfString_Assign_fUTF16(RF_String* str,FILE* f, char endianess,char* eof)
     if(endianess == RF_LITTLE_ENDIAN)
     {
         if((bytesN=rfFReadLine_UTF16LE(f,&utf8,&utf8ByteLength,eof)) < 0)
-        {
-            LOG_ERROR("Failure to assign the contents of a Little Endian UTF-16 file to a String",bytesN);
-            return bytesN;
-        }
+            RETURN_LOG_ERROR("Failure to assign the contents of a Little Endian UTF-16 file to a String",bytesN)
+
     }//end of little endian
     else//big endian
     {
         if((bytesN=rfFReadLine_UTF16BE(f,&utf8,&utf8ByteLength,eof)) < 0)
-        {
-            LOG_ERROR("Failure to assign the contents of a Big Endian UTF-16 file to a String",bytesN);
-            return bytesN;
-        }
+            RETURN_LOG_ERROR("Failure to assign the contents of a Big Endian UTF-16 file to a String",bytesN)
+
     }//end of big endian case
     //success
     //assign it to the string
@@ -2173,18 +2158,14 @@ int32_t rfString_Append_fUTF16(RF_String* str,FILE* f, char endianess,char* eof)
     if(endianess == RF_LITTLE_ENDIAN)
     {
         if((bytesN=rfFReadLine_UTF16LE(f,&utf8,&utf8ByteLength,eof)) < 0)
-        {
-            LOG_ERROR("Failure to append the contents of a Little Endian UTF-16 file to a String",bytesN);
-            return bytesN;
-        }
+            RETURN_LOG_ERROR("Failure to append the contents of a Little Endian UTF-16 file to a String",bytesN)
+
     }//end of little endian
     else//big endian
     {
         if((bytesN=rfFReadLine_UTF16BE(f,&utf8,&utf8ByteLength,eof)) < 0)
-        {
-            LOG_ERROR("Failure to append the contents of a Big Endian UTF-16 file to a String",bytesN);
-            return bytesN;
-        }
+            RETURN_LOG_ERROR("Failure to append the contents of a Big Endian UTF-16 file to a String",bytesN)
+
     }//end of big endian case
     //success
     rfString_Append(str,RFS_(utf8));
@@ -2212,18 +2193,14 @@ int32_t rfString_Init_fUTF32(RF_String* str,FILE* f,char endianess,char* eof)
     if(endianess == RF_LITTLE_ENDIAN)
     {
         if((bytesN=rfFReadLine_UTF32LE(f,&str->bytes,&str->byteLength,eof)) <0)
-        {
-            LOG_ERROR("Failure to initialize a String from reading a Little Endian UTF-32 file",bytesN);
-            return bytesN;
-        }
+            RETURN_LOG_ERROR("Failure to initialize a String from reading a Little Endian UTF-32 file",bytesN)
+
     }//end of little endian
     else//big endian
     {
         if((bytesN=rfFReadLine_UTF32BE(f,&str->bytes,&str->byteLength,eof)) < 0)
-        {
-            LOG_ERROR("Failure to initialize a String from reading a Big Endian UTF-32 file",bytesN);
-            return bytesN;
-        }
+            RETURN_LOG_ERROR("Failure to initialize a String from reading a Big Endian UTF-32 file",bytesN)
+
     }//end of big endian case
     //success
     return bytesN;
@@ -2238,18 +2215,14 @@ int32_t rfString_Assign_fUTF32(RF_String* str,FILE* f,char endianess, char* eof)
     if(endianess == RF_LITTLE_ENDIAN)
     {
         if((bytesN=rfFReadLine_UTF32LE(f,&utf8,&utf8ByteLength,eof)) < 0)
-        {
-            LOG_ERROR("Failure to assign to a String from reading a Little Endian UTF-32 file",bytesN);
-            return bytesN;
-        }
+            RETURN_LOG_ERROR("Failure to assign to a String from reading a Little Endian UTF-32 file",bytesN)
+
     }//end of little endian
     else//big endian
     {
         if((bytesN=rfFReadLine_UTF32BE(f,&utf8,&utf8ByteLength,eof)) < 0)
-        {
-            LOG_ERROR("Failure to assign to a String from reading a Big Endian UTF-32 file",bytesN);
-            return bytesN;
-        }
+            RETURN_LOG_ERROR("Failure to assign to a String from reading a Big Endian UTF-32 file",bytesN)
+
     }//end of big endian case
     //success
     //assign it to the string
@@ -2273,18 +2246,14 @@ int32_t rfString_Append_fUTF32(RF_String* str,FILE* f,char endianess, char* eof)
     if(endianess == RF_LITTLE_ENDIAN)
     {
         if((bytesN=rfFReadLine_UTF32LE(f,&utf8,&utf8ByteLength,eof)) < 0)
-        {
-            LOG_ERROR("Failure to append to a String from reading a Little Endian UTF-32 file",bytesN);
-            return bytesN;
-        }
+            RETURN_LOG_ERROR("Failure to append to a String from reading a Little Endian UTF-32 file",bytesN)
+
     }//end of little endian
     else//big endian
     {
         if((bytesN=rfFReadLine_UTF32BE(f,&utf8,&utf8ByteLength,eof)) < 0)
-        {
-            LOG_ERROR("Failure to append to a String from reading a Big Endian UTF-32 file",bytesN);
-            return bytesN;
-        }
+            RETURN_LOG_ERROR("Failure to append to a String from reading a Big Endian UTF-32 file",bytesN)
+
     }//end of big endian case
     //success
     //append it

@@ -164,20 +164,16 @@ int32_t rfThread_Join(void* thread)
         switch(err)
         {
             case EINVAL:
-                LOG_ERROR("pthread_join failed due to the thread value not being joinable",RE_THREAD_NOTJOINABLE);
-                return RE_THREAD_NOTJOINABLE;
+                RETURN_LOG_ERROR("pthread_join failed due to the thread value not being joinable",RE_THREAD_NOTJOINABLE)
             break;
             case ESRCH:
-                LOG_ERROR("pthread_join failed due to the thread id not corresponding to any existing thread",RE_THREAD_INVALID);
-                return RE_THREAD_INVALID;
+                RETURN_LOG_ERROR("pthread_join failed due to the thread id not corresponding to any existing thread",RE_THREAD_INVALID)
             break;
             case EDEADLK:
-                LOG_ERROR("pthread_join failed due to a deadlock being detected",RE_THREAD_DEADLOCK);
-                return RE_THREAD_DEADLOCK;
+                RETURN_LOG_ERROR("pthread_join failed due to a deadlock being detected",RE_THREAD_DEADLOCK)
             break;
             default:
-                LOG_ERROR("pthread_join failed with unknonwn error code: %d",RE_THREAD_JOIN,err);
-                return RE_THREAD_JOIN;
+                RETURN_LOG_ERROR("pthread_join failed with unknonwn error code: %d",RE_THREAD_JOIN,err)
             break;
         }
     }
@@ -228,30 +224,24 @@ int32_t rfMutex_Init(RF_Mutex* m,uint32_t flags)
         switch(error)
         {
             case EAGAIN:
-                LOG_ERROR("Failed to initialize a posix mutex object because the system lacked the necessary resources (other than memory) to initialize another mutex",
-                          RE_INSUFFICIENT_RESOURCES);
-                return RE_INSUFFICIENT_RESOURCES;
+                RETURN_LOG_ERROR("Failed to initialize a posix mutex object because the system lacked the necessary resources (other than memory) to initialize another mutex",
+                          RE_INSUFFICIENT_RESOURCES)
             break;
             case ENOMEM:
-                LOG_ERROR("Failed to initialize a posix mutex object because of insufficient memory",RE_INSUFFICIENT_MEMORY);
-                return RE_INSUFFICIENT_MEMORY;
+                RETURN_LOG_ERROR("Failed to initialize a posix mutex object because of insufficient memory",RE_INSUFFICIENT_MEMORY)
             break;
             case EPERM:
-                LOG_ERROR("Failed to initialize a posix mutex object because The caller does not have the privilege to perform the operation",RE_PERMISSION);
-                return RE_PERMISSION;
+                RETURN_LOG_ERROR("Failed to initialize a posix mutex object because The caller does not have the privilege to perform the operation",RE_PERMISSION)
             break;
             case EBUSY:
-                LOG_ERROR("Failed to initialize a posix mutex object because the implementation detected that argument mutex has already been initialized and not destroyed",
-                          RE_MUTEX_INVALID);
-                return RE_MUTEX_INVALID;
+                RETURN_LOG_ERROR("Failed to initialize a posix mutex object because the implementation detected that argument mutex has already been initialized and not destroyed",
+                          RE_MUTEX_INVALID)
             break;
             case EINVAL:
-                LOG_ERROR("Failed to initialize a posix mutex object because the flags/attributes passed to the function are invalid",RE_MUTEX_INVALID);
-                return RE_MUTEX_INVALID;
+                RETURN_LOG_ERROR("Failed to initialize a posix mutex object because the flags/attributes passed to the function are invalid",RE_MUTEX_INVALID)
             break;
             default:
-                LOG_ERROR("Failed to initialize a posix mutex object with error code %d",RE_MUTEX_INIT,error);
-                return RE_MUTEX_INIT;
+                RETURN_LOG_ERROR("Failed to initialize a posix mutex object with error code %d",RE_MUTEX_INIT,error)
             break;
         }
     }
@@ -325,21 +315,17 @@ int32_t rfMutex_Lock(RF_Mutex* m)
        {
             break;
             case EINVAL:
-                LOG_ERROR("Error during locking a posix mutex because the calling thread's priority is higher than the mutex's current\
-                          priority ceiling or due to invalid argument",RE_MUTEX_LOCK_INVALID);
-                return RE_MUTEX_LOCK_INVALID;
+                RETURN_LOG_ERROR("Error during locking a posix mutex because the calling thread's priority is higher than the mutex's current\
+                          priority ceiling or due to invalid argument",RE_MUTEX_LOCK_INVALID)
             break;
             case EAGAIN:
-                LOG_ERROR("Error during locking a posix mutex because the maximum number of recursive locks for the mutex has been reached.",RE_MUTEX_LOCK_NUM);
-                return RE_MUTEX_LOCK_NUM;
+                RETURN_LOG_ERROR("Error during locking a posix mutex because the maximum number of recursive locks for the mutex has been reached.",RE_MUTEX_LOCK_NUM)
             break;
             case EDEADLK:
-                LOG_ERROR("Error during locking a posix mutex because the current thread already owns the mutex",RE_MUTEX_DEADLOCK);
-                return RE_MUTEX_DEADLOCK;
+                RETURN_LOG_ERROR("Error during locking a posix mutex because the current thread already owns the mutex",RE_MUTEX_DEADLOCK)
             break;
             default:
-                LOG_ERROR("Unknonwn Error during locking a posix mutex. Error code: %d",RE_MUTEX_LOCK,error);
-                return RE_MUTEX_LOCK;
+                RETURN_LOG_ERROR("Unknonwn Error during locking a posix mutex. Error code: %d",RE_MUTEX_LOCK,error)
             break;
        }
    }
@@ -355,10 +341,8 @@ int32_t rfMutex_TimedLock(RF_Mutex* m,uint32_t ms)
     //let's create the appropriate time structure
     struct timespec ts;
     if(clock_gettime(CLOCK_REALTIME, &ts) == -1)
-    {
-        LOG_ERROR("Getting the system time failed. Can't perform a posix mutex timedwait. Returning error",RE_MUTEX_LOCK);
-        return RE_MUTEX_LOCK;
-    }
+        RETURN_LOG_ERROR("Getting the system time failed. Can't perform a posix mutex timedwait. Returning error",RE_MUTEX_LOCK)
+
     //get the seconds
     time_t secs = ms/1000;
     //get the nano seconds
@@ -375,21 +359,17 @@ int32_t rfMutex_TimedLock(RF_Mutex* m,uint32_t ms)
                 return RE_MUTEX_TIMEOUT;
             break;
             case EINVAL:
-                LOG_ERROR("Error during timed locking a posix mutex because the calling thread's priority is higher\
-                          than the mutex's current priority ceiling or due to invalid argument",RE_MUTEX_LOCK_INVALID);
-                return RE_MUTEX_LOCK_INVALID;
+                RETURN_LOG_ERROR("Error during timed locking a posix mutex because the calling thread's priority is higher\
+                          than the mutex's current priority ceiling or due to invalid argument",RE_MUTEX_LOCK_INVALID)
             break;
             case EAGAIN:
-                LOG_ERROR("Error during timed locking a posix mutex because the maximum number of recursive locks for the mutex has been reached.",RE_MUTEX_LOCK_NUM);
-                return RE_MUTEX_LOCK_NUM;
+                RETURN_LOG_ERROR("Error during timed locking a posix mutex because the maximum number of recursive locks for the mutex has been reached.",RE_MUTEX_LOCK_NUM)
             break;
             case EDEADLK:
-                LOG_ERROR("Error during timed locking a posix mutex because the current thread already owns the mutex",RE_MUTEX_DEADLOCK);
-                return RE_MUTEX_DEADLOCK;
+                RETURN_LOG_ERROR("Error during timed locking a posix mutex because the current thread already owns the mutex",RE_MUTEX_DEADLOCK)
             break;
             default:
-                LOG_ERROR("Error during timed locking a posix mutex. Error code: %d",RE_MUTEX_LOCK,error);
-                return RE_MUTEX_LOCK;
+                RETURN_LOG_ERROR("Error during timed locking a posix mutex. Error code: %d",RE_MUTEX_LOCK,error)
             break;
         }
     }
@@ -405,25 +385,21 @@ int32_t rfMutex_TryLock(RF_Mutex* m)
    switch(error)
    {
         case EINVAL:
-            LOG_ERROR("Error during try locking a posix mutex because the calling thread's priority is higher than the\
-                      mutex's current priority ceiling or due to invalid argument",RE_MUTEX_LOCK_INVALID);
-            return RE_MUTEX_LOCK_INVALID;
+            RETURN_LOG_ERROR("Error during try locking a posix mutex because the calling thread's priority is higher than the\
+                      mutex's current priority ceiling or due to invalid argument",RE_MUTEX_LOCK_INVALID)
         break;
         //already locked
         case EBUSY:
             return RE_MUTEX_BUSY;
         break;
         case EAGAIN:
-            LOG_ERROR("Error during try locking a posix mutex because the maximum number of recursive locks for the mutex has been reached.",RE_MUTEX_LOCK_NUM);
-            return RE_MUTEX_LOCK_NUM;
+            RETURN_LOG_ERROR("Error during try locking a posix mutex because the maximum number of recursive locks for the mutex has been reached.",RE_MUTEX_LOCK_NUM)
         break;
         case EDEADLK:
-            LOG_ERROR("Error during try locking a posix mutex because the current thread already owns the mutex",RE_MUTEX_DEADLOCK);
-            return RE_MUTEX_DEADLOCK;
+            RETURN_LOG_ERROR("Error during try locking a posix mutex because the current thread already owns the mutex",RE_MUTEX_DEADLOCK)
         break;
         default:
-            LOG_ERROR("Error during try locking a posix mutex. Error code: %d",RE_MUTEX_LOCK,error);
-            return RE_MUTEX_LOCK;
+            RETURN_LOG_ERROR("Error during try locking a posix mutex. Error code: %d",RE_MUTEX_LOCK,error)
         break;
    }
    //succcess
@@ -436,10 +412,8 @@ int32_t rfMutex_Unlock(RF_Mutex* m)
     int32_t error;
     error = pthread_mutex_unlock(&m->mutexObj);
     if(error != 0 )
-    {
-        LOG_ERROR("Error during attempting to unlock a pthread_mutex. Error code: %d",RE_MUTEX_UNLOCK,error);
-        return RE_MUTEX_UNLOCK;
-    }
+        RETURN_LOG_ERROR("Error during attempting to unlock a pthread_mutex. Error code: %d",RE_MUTEX_UNLOCK,error)
+
     //success
     return RF_SUCCESS;
 }
@@ -467,27 +441,22 @@ int32_t rfSemaphore_Init(RF_Semaphore* s,uint32_t initialCount,uint32_t maxCount
         switch(errno)
         {
             case EINVAL:
-                LOG_ERROR("Failed to initialize a posix semaphore because the given initial count of %du\
-                          exceeds the maximum semaphore count for the system",RE_SEMAPHORE_MAXCOUNT,initialCount);
-                return RE_SEMAPHORE_MAXCOUNT;
+                RETURN_LOG_ERROR("Failed to initialize a posix semaphore because the given initial count of %du\
+                          exceeds the maximum semaphore count for the system",RE_SEMAPHORE_MAXCOUNT,initialCount)
             break;
             case ENOSPC:
-                LOG_ERROR("Failed to initialize a posix semaphore because a resource required to initialise the semaphore has been exhausted, \
-                          or the limit on semaphores (SEM_NSEMS_MAX) of the system has been reached",RE_INSUFFICIENT_RESOURCES);
-                return RE_INSUFFICIENT_RESOURCES;
+                RETURN_LOG_ERROR("Failed to initialize a posix semaphore because a resource required to initialise the semaphore has been exhausted, \
+                          or the limit on semaphores (SEM_NSEMS_MAX) of the system has been reached",RE_INSUFFICIENT_RESOURCES)
             break;
             case EPERM:
-                LOG_ERROR("Failed to initialize a posix semaphore because the process lacks the appropriate\
-                          privileges to initialise the semaphore. ",RE_PERMISSION);
-                return RE_PERMISSION;
+                RETURN_LOG_ERROR("Failed to initialize a posix semaphore because the process lacks the appropriate\
+                          privileges to initialise the semaphore. ",RE_PERMISSION)
             break;
             case ENOSYS:
-                LOG_ERROR("Failed to initialize a posix semaphore because the function sem_init is not supported in this system",RE_UNSUPPORTED);
-                return RE_UNSUPPORTED;
+                RETURN_LOG_ERROR("Failed to initialize a posix semaphore because the function sem_init is not supported in this system",RE_UNSUPPORTED)
             break;
             default:
-                 LOG_ERROR("Failed to initialize a posix semaphore with error code: %d",RE_SEMAPHORE_INIT,errno);
-                 return RE_SEMAPHORE_INIT;
+                 RETURN_LOG_ERROR("Failed to initialize a posix semaphore with error code: %d",RE_SEMAPHORE_INIT,errno)
             break;
         }
     }
@@ -554,24 +523,19 @@ int32_t rfSemaphore_Wait(RF_Semaphore* s)
         switch(ret)
         {
             case EINVAL:
-                LOG_ERROR("Failure during waiting for a posix semaphore because the semaphore argument is invalid",RE_SEMAPHORE_WAIT_INVALID);
-                return RE_SEMAPHORE_WAIT_INVALID;
+                RETURN_LOG_ERROR("Failure during waiting for a posix semaphore because the semaphore argument is invalid",RE_SEMAPHORE_WAIT_INVALID)
             break;
             case ENOSYS:
-                LOG_ERROR("Failure during waiting for a posix semaphore because the function sem_wait is not supported in this system",RE_UNSUPPORTED);
-                return RE_UNSUPPORTED;
+                RETURN_LOG_ERROR("Failure during waiting for a posix semaphore because the function sem_wait is not supported in this system",RE_UNSUPPORTED)
             break;
             case EDEADLK:
-                LOG_ERROR("Failure during waiting for a posix semaphore because a deadlock condition was detected",RE_SEMAPHORE_DEADLOCK);
-                return RE_SEMAPHORE_DEADLOCK;
+                RETURN_LOG_ERROR("Failure during waiting for a posix semaphore because a deadlock condition was detected",RE_SEMAPHORE_DEADLOCK)
             break;
             case EINTR:
-                LOG_ERROR("Failure during waiting for a posix semaphore because of a signal interruption",RE_INTERRUPT);
-                return RE_INTERRUPT;
+                RETURN_LOG_ERROR("Failure during waiting for a posix semaphore because of a signal interruption",RE_INTERRUPT)
             break;
             default:
-                LOG_ERROR("Failure during waiting for a posix semaphore with error code: %d",RE_SEMAPHORE_WAIT,ret);
-                return RE_SEMAPHORE_WAIT;
+                RETURN_LOG_ERROR("Failure during waiting for a posix semaphore with error code: %d",RE_SEMAPHORE_WAIT,ret)
             break;
         }
     }
@@ -585,10 +549,8 @@ int32_t rfSemaphore_TimedWait(RF_Semaphore* s,uint32_t ms)
     //let's create the appropriate time structure
     struct timespec ts;
     if(clock_gettime(CLOCK_REALTIME, &ts) == -1)
-    {
-        LOG_ERROR("Getting the system time failed. Can't perform a posix semaphore timedwait. Returning error",RE_SEMAPHORE_WAIT);
-        return RE_SEMAPHORE_WAIT;
-    }
+        RETURN_LOG_ERROR("Getting the system time failed. Can't perform a posix semaphore timedwait. Returning error",RE_SEMAPHORE_WAIT)
+
     //get the seconds
     time_t secs = ms/1000;
     //get the nano seconds
@@ -607,23 +569,19 @@ int32_t rfSemaphore_TimedWait(RF_Semaphore* s,uint32_t ms)
                 return RE_SEMAPHORE_TIMEOUT;
             break;
             case EINVAL:
-                LOG_ERROR("Failure during waiting for a posix semaphore because the semaphore argument is invalid",RE_SEMAPHORE_WAIT_INVALID);
-                return RE_SEMAPHORE_WAIT_INVALID;
+                RETURN_LOG_ERROR("Failure during waiting for a posix semaphore because the semaphore argument is invalid",RE_SEMAPHORE_WAIT_INVALID)
             break;
             case ENOSYS:
-                LOG_ERROR("Failure during waiting for a posix semaphore because the function sem_timedwait is not supported in this system",RE_UNSUPPORTED);
-                return RE_UNSUPPORTED;
+                RETURN_LOG_ERROR("Failure during waiting for a posix semaphore because the function sem_timedwait is not supported in this system",RE_UNSUPPORTED)
             break;
             case EDEADLK:
-                LOG_ERROR("Failure during waiting for a posix semaphore because a deadlock condition was detected",RE_SEMAPHORE_DEADLOCK);
-                return RE_SEMAPHORE_DEADLOCK;
+                RETURN_LOG_ERROR("Failure during waiting for a posix semaphore because a deadlock condition was detected",RE_SEMAPHORE_DEADLOCK)
             break;
             case EINTR:
-                LOG_ERROR("Failure during waiting for a posix semaphore because of a signal interruption",RE_INTERRUPT);
-                return RE_INTERRUPT;
+                RETURN_LOG_ERROR("Failure during waiting for a posix semaphore because of a signal interruption",RE_INTERRUPT)
             break;
             default:
-                LOG_ERROR("Failure during waiting for a posix semaphore with error code: %d",RE_SEMAPHORE_WAIT,ret);
+                RETURN_LOG_ERROR("Generic Failure during waiting for a posix semaphore with error code: %d",RE_SEMAPHORE_WAIT,ret)
             break;
         }
     }//if closes
@@ -644,24 +602,19 @@ int32_t rfSemaphore_TryWait(RF_Semaphore* s)
                 return RE_SEMAPHORE_BUSY;
             break;
             case EINVAL:
-                LOG_ERROR("Failure during waiting for a posix semaphore because the semaphore argument is invalid",RE_SEMAPHORE_WAIT_INVALID);
-                return RE_SEMAPHORE_WAIT_INVALID;
+                RETURN_LOG_ERROR("Failure during waiting for a posix semaphore because the semaphore argument is invalid",RE_SEMAPHORE_WAIT_INVALID)
             break;
             case ENOSYS:
-                LOG_ERROR("Failure during waiting for a posix semaphore because the function sem_wait is not supported in this system",RE_UNSUPPORTED);
-                return RE_UNSUPPORTED;
+                RETURN_LOG_ERROR("Failure during waiting for a posix semaphore because the function sem_wait is not supported in this system",RE_UNSUPPORTED)
             break;
             case EDEADLK:
-                LOG_ERROR("Failure during waiting for a posix semaphore because a deadlock condition was detected",RE_SEMAPHORE_DEADLOCK);
-                return RE_SEMAPHORE_DEADLOCK;
+                RETURN_LOG_ERROR("Failure during waiting for a posix semaphore because a deadlock condition was detected",RE_SEMAPHORE_DEADLOCK)
             break;
             case EINTR:
-                LOG_ERROR("Failure during waiting for a posix semaphore because of a signal interruption",RE_INTERRUPT);
-                return RE_INTERRUPT;
+                RETURN_LOG_ERROR("Failure during waiting for a posix semaphore because of a signal interruption",RE_INTERRUPT)
             break;
             default:
-                LOG_ERROR("Failure during waiting for a posix semaphore with error code: %d",RE_SEMAPHORE_WAIT,ret);
-                return RE_SEMAPHORE_WAIT;
+                RETURN_LOG_ERROR("Generic Failure during waiting for a posix semaphore with error code: %d",RE_SEMAPHORE_WAIT,ret)
             break;
         }
     }
@@ -678,16 +631,13 @@ int32_t rfSemaphore_Post(RF_Semaphore* s)
         switch(errno)
         {
             case EINVAL:
-                LOG_ERROR("Failure during posting to a posix semaphore due to the argument not being a valid semaphore",RE_SEMAPHORE_POST_INVALID);
-                return RE_SEMAPHORE_POST_INVALID;
+                RETURN_LOG_ERROR("Failure during posting to a posix semaphore due to the argument not being a valid semaphore",RE_SEMAPHORE_POST_INVALID)
             break;
             case ENOSYS:
-                LOG_ERROR("Failure during posting to a posix semaphore because the sem_post function is not supported by the system",RE_UNSUPPORTED);
-                return RE_UNSUPPORTED;
+                RETURN_LOG_ERROR("Failure during posting to a posix semaphore because the sem_post function is not supported by the system",RE_UNSUPPORTED)
             break;
             default:
-                LOG_ERROR("Failure during posting to a posix semaphore with error code: %d",RE_SEMAPHORE_POST,errno);
-                return RE_SEMAPHORE_POST;
+                RETURN_LOG_ERROR("Generic Failure during posting to a posix semaphore with error code: %d",RE_SEMAPHORE_POST,errno)
             break;
         }
     }

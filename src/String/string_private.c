@@ -153,17 +153,3 @@ int32_t rfString_FindBytePos(const void* str,const void* sstrP,char options)
     }//this string iteration ends
     return RF_FAILURE; //getting here means nothing was found
 }
-
-// Finds if a substring literal exists inside another string. Internal version which returns the byte position
-int32_t rfString_FindBytePos_s(const void* str,const char* lit,char options)
-{
-    RF_String litstr;
-    if(rfString_Init(&litstr,lit) == false)
-    {
-        LOG_ERROR("Error at FindBytePos_s due to invalid parameter UTF-8 byte sequence",RE_UTF8_INVALID_SEQUENCE);
-        return RF_FAILURE;
-    }
-    int32_t ret = rfString_FindBytePos(str,&litstr,options);
-    rfString_Deinit(&litstr);
-    return ret;
-}

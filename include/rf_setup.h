@@ -212,14 +212,18 @@ static const float FLOAT_MIN        =  FLT_MIN;
 ** @addtogroup RF_ErrorLoggingGRP
 ** @{
 **/
+#ifdef RF_OPTION_VERBOSE_ERRORS
 
 #ifndef RF_NO_C99
 //! @brief Logs an error to the refu standard error stream
 //!
+//! This macro logs an error to the refu error stream
 //! @param i_msg_ A string literal containing the message to be logged for the error in the file. Can contain printf format specifiers which will be translated into values from the variables passed as further parameters to the macro
 //! @param i_errorCode_ The error code to log. Must be an int32_t value
 //! @param ... This is an optional input. If you have given any printf-style format specifiers in the string literal passes @c i_msg_ then here give the variables from which the value will be taken
 #define LOG_ERROR(i_msg_,i_errorCode_,...)  i_PICK_LOG_ERROR_FUNC_GT(i_msg_,i_errorCode_,RF_NARG(__VA_ARGS__),__VA_ARGS__)
+//! This macro logs an error to the refu error stream and returns the error code from the function it was called from.
+#define RETURN_LOG_ERROR(i_msg_,i_errorCode_,...)  {LOG_ERROR(i_msg_,i_errorCode_,__VA_ARGS__) return i_errorCode_; }
 
 //This macro picks up the correct error logging function, by taking the number of extra arguments and checking if it is greater than 0
 #define i_PICK_LOG_ERROR_FUNC_GT(i_msg_,i_errorCode_,i_argN,...) i_PICK_LOG_ERROR_FUNC(i_msg_,i_errorCode_,RP_GT(i_argN,0),__VA_ARGS__)
@@ -234,11 +238,14 @@ static const float FLOAT_MIN        =  FLT_MIN;
 
 //! @brief Logs an error to the standard error stream in detail
 //!
-//! Detail means that it also saves the file and line number it occured
+//! This macro logs an error in detail to the refu error stream
+//! In detail means that it also saves the file and line number it occured
 //! @param i_msg_ A string literal containing the message to be logged for the error in the file. Can contain printf format specifiers which will be translated into values from the variables passed as further parameters to the macro
 //! @param i_errorCode_ The error code to log. Must be an int32_t value
 //! @param ... This is an optional input. If you have given any printf-style format specifiers in the string literal passes @c i_msg_ then here give the variables from which the value will be taken
 #define DLOG_ERROR(i_msg_,i_errorCode_, ...)  i_PICK_DLOG_ERROR_FUNC_GT(i_msg_,i_errorCode_,RF_NARG(__VA_ARGS__),__VA_ARGS__)
+//! This macro logs an error in detail to the refu error stream and returns the error code from the function it was called from.
+#define DRETURN_LOG_ERROR(i_msg_,i_errorCode_,...)  {DLOG_ERROR(i_msg_,i_errorCode_,__VA_ARGS__) return i_errorCode_; }
 //This macro picks up the correct error logging function, by taking the number of extra arguments and checking if it is greater than 0
 #define i_PICK_DLOG_ERROR_FUNC_GT(i_msg_,i_errorCode_,i_argN,...) i_PICK_DLOG_ERROR_FUNC(i_msg_,i_errorCode_,RP_GT(i_argN,0),__VA_ARGS__)
 //This macro picks up the correct error logging function, by pasting the results of the greater than comparison together to select the correct macro
@@ -272,7 +279,7 @@ MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),\
 #endif
 
 
-//! @brief Logs something in the standard information log
+//! @brief Logs a message in the standard information log
 //! @param i_msg_ A string literal containing the message to be logged in the file. Can contain printf format specifiers which will be translated into values from the variables passed as further parameters to the macro
 //! @param ... This is an optional input. If you have given any printf-style format specifiers in the string literal passes @c i_msg_ then here give the variables from which the value will be taken
 #define LOG_INFO(i_msg_,...)  i_PICK_LOG_INFO_FUNC_GT(i_msg_,RF_NARG(__VA_ARGS__),__VA_ARGS__)
@@ -283,13 +290,13 @@ MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),\
 #define i_PICK_LOG_INFO_FUNC(i_msg_,i_gt0,...) i_RP_PASTE2(i_LOG_INFO,i_gt0) (i_msg_,__VA_ARGS__)
 
 //Logs something to the standard refu log with var_args
-#define i_LOG_INFO1(i_msg_, ...)  {fprintf(rfStdLog,i_msg_"\n",__VA_ARGS__);fflush(rfStdLog);}
+#define i_LOG_INFO1(i_msg_, ...)  {fprintf(rfStdLog,"At \"%s\" >>> "i_msg_"\n",__FUNCTION__,__VA_ARGS__);fflush(rfStdLog);}
 //Logs something to the standard refu log without var_args
-#define i_LOG_INFO0(i_msg_, ...)   {fprintf(rfStdLog,i_msg_"\n");fflush(rfStdLog);}
+#define i_LOG_INFO0(i_msg_, ...)   {fprintf(rfStdLog,"At \"%s\" >>> "i_msg_"\n",__FUNCTION__);fflush(rfStdLog);}
 
-//! @brief Logs something in the standard information log with details
+//! @brief Logs a message in the standard information log with details
 //!
-//! Detail means that it also saves the file and line number it occured
+//! In detail means that it also saves the file and line number it occured
 //! @param i_msg_ A string literal containing the message to be logged in the file. Can contain printf format specifiers which will be translated into values from the variables passed as further parameters to the macro
 //! @param ... This is an optional input. If you have given any printf-style format specifiers in the string literal passes @c i_msg_ then here give the variables from which the value will be taken
 #define DLOG_INFO(i_msg_,...)  i_PICK_DLOG_INFO_FUNC_GT(i_msg_,RF_NARG(__VA_ARGS__),__VA_ARGS__)
@@ -311,6 +318,15 @@ void LOG_ERROR(const char* msg,int32_t errorCode,...);
 void DLOG_ERROR(const char* msg,int32_t errorCode,...);
 void LOG_INFO(const char* msg,...);
 void DLOG_INFO(const char* msg,...);
+#endif
+
+#else //non verbose errors
+    #define LOG_ERROR(i_msg_,i_errorCode_,...)
+    #define RETURN_LOG_ERROR(i_msg_,i_errorCode_,...) return i_errorCode_;
+    #define DLOG_ERROR(i_msg_,i_errorCode_,...)
+    #define RETURN_DLOG_ERROR(i_msg_,i_errorCode_,...) return i_errorCode_;
+    #define LOG_INFO(i_msg_,...)
+    #define DLOG_INFO(i_msg_,...)
 #endif
 
 //! @brief Returns the error code of the last error that occured

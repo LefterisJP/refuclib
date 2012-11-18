@@ -42,8 +42,7 @@ int32_t i_rfMakeDir(void* dirnameP,int* modeP)
             return RE_DIRECTORY_EXISTS;
         break;
         case ENOENT:
-            LOG_ERROR("Failed to create directory \"%s\" because the given path was not found",RE_DIRECTORY_INVALID,dirName->bytes);
-            return RE_DIRECTORY_INVALID;
+            RETURN_LOG_ERROR("Failed to create directory \"%s\" because the given path was not found",RE_DIRECTORY_INVALID,dirName->bytes)
         break;
     }
     //failure
@@ -66,26 +65,21 @@ int32_t i_rfRemoveDir(void* dirnameP)
         switch(errno)
         {
             case EACCES:
-                LOG_ERROR("Failed to access directory \"%s\" because of insufficient permissions",RE_PERMISSION,dirname->bytes);
-                return RE_PERMISSION;
+                RETURN_LOG_ERROR("Failed to access directory \"%s\" because of insufficient permissions",RE_PERMISSION,dirname->bytes)
             break;
             case ENAMETOOLONG:
-                LOG_ERROR("Can't access directory \"%s\" because its name is too long for the filesystem",RE_DIRECTORY_NAMELENGTH,dirname->bytes);
-                return RE_DIRECTORY_NAMELENGTH;
+                RETURN_LOG_ERROR("Can't access directory \"%s\" because its name is too long for the filesystem",RE_DIRECTORY_NAMELENGTH,dirname->bytes)
             break;
             case ENOENT:
             case ENOTDIR:
-                LOG_ERROR("Failed to access directory \"%s\" because the given path was not found or is not a directory",RE_DIRECTORY_INVALID,dirname->bytes);
-                return RE_DIRECTORY_INVALID;
+                RETURN_LOG_ERROR("Failed to access directory \"%s\" because the given path was not found or is not a directory",RE_DIRECTORY_INVALID,dirname->bytes)
             break;
             case ENFILE:
             case EMFILE:
-                LOG_ERROR("Failed to access directory \"%s\" because too many files are currently open in the system",RE_DIRECTORY_TOOMANY_FILES,dirname->bytes);
-                return RE_DIRECTORY_TOOMANY_FILES;
+                RETURN_LOG_ERROR("Failed to access directory \"%s\" because too many files are currently open in the system",RE_DIRECTORY_TOOMANY_FILES,dirname->bytes)
             break;
             default:
-                LOG_ERROR("Failed to access directory \"%s\" because of opendir() failure",RE_DIRECTORY_OPEN,dirname->bytes);
-                return RE_DIRECTORY_OPEN;
+                RETURN_LOG_ERROR("Failed to access directory \"%s\" because of opendir() failure",RE_DIRECTORY_OPEN,dirname->bytes)
             break;
         }
     }
@@ -129,16 +123,13 @@ int32_t i_rfRemoveDir(void* dirnameP)
         switch(errno)
         {
             case EBADF:
-                LOG_ERROR("During iteration of directory \"%s\" the directory value was invalid",RE_DIRECTORY_INVALID,dirname->bytes)
-                return RE_DIRECTORY_INVALID;
+                RETURN_LOG_ERROR("During iteration of directory \"%s\" the directory value was invalid",RE_DIRECTORY_INVALID,dirname->bytes)
             break;
             case ENOENT:
-                LOG_ERROR("During iteration of directory \"%s\" the current position of the directory stream was invalid",RE_DIRECTORY_STREAMPOS,dirname->bytes)
-                return RE_DIRECTORY_STREAMPOS;
+                RETURN_LOG_ERROR("During iteration of directory \"%s\" the current position of the directory stream was invalid",RE_DIRECTORY_STREAMPOS,dirname->bytes)
             break;
             default:
-                LOG_ERROR("During iteration of directory \"%s\" reading the directory failed",RE_DIRECTORY_READ,dirname->bytes)
-                return RE_DIRECTORY_READ;
+                RETURN_LOG_ERROR("During iteration of directory \"%s\" reading the directory failed",RE_DIRECTORY_READ,dirname->bytes)
             break;
         }
     }

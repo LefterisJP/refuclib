@@ -248,16 +248,12 @@ int32_t rfArrayV_Get(RF_ArrayV* a,uint32_t i,void* ret)
 {
     //check for index being out of bounds
     if(i >= a->size)
-    {
-        LOG_ERROR("Attempted to retrieve an object from an Array of Objects from an index that is out of bounds",RE_INDEX_OUT_OF_BOUNDS);
-        return RE_INDEX_OUT_OF_BOUNDS;
-    }
+        RETURN_LOG_ERROR("Attempted to retrieve an object from an Array of Objects from an index that is out of bounds",RE_INDEX_OUT_OF_BOUNDS)
+
     //check if the requested elements exists
     if(rfBinaryArray_Get_NC(&a->map,i)==false)//the _NC (no check) version is used here since we are sure i can't be an index out of bounds since it's checked for in the start of the function
-    {
-        LOG_ERROR("Attempted to retrieve an object from an Array of Objects from an uninitialized position",RE_ARRAY_UNINITIALIZED_OBJECT);
-        return RE_ARRAY_UNINITIALIZED_OBJECT;
-    }
+        RETURN_LOG_ERROR("Attempted to retrieve an object from an Array of Objects from an uninitialized position",RE_ARRAY_UNINITIALIZED_OBJECT)
+
     //now get the element
     memcpy(ret,a->data+ (a->elementSize*i) ,a->elementSize);
     return RF_SUCCESS;

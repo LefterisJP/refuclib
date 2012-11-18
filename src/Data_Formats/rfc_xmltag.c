@@ -379,8 +379,8 @@ char rfXMLTag_ToStr(RF_XMLTag *t ,RF_StringX* s)
     rfStringX_Init_buff(s,2048,"");
     if(rfXMLTag_ToStr_internal(t,s,level)==false)
     {
-        LOG_ERROR("Failed to represent an XML tag as a String",RE_XML_TOSTR);
         rfStringX_Deinit(&strBuff);
+        LOG_ERROR("Failed to represent an XML tag as a String",RE_XML_TOSTR);
         return false;
     }
     //success

@@ -166,16 +166,11 @@ int32_t rfUTF8_VerifySequence(const char* bytes,uint32_t * i)
         {
             //also remember bytes 0xC0 and 0xC1 are invalid and could possibly be found in a starting byte of this type so check for them here
             if( RF_HEXEQ_C(bytes[*i],0xC0) || RF_HEXEQ_C(bytes[*i],0xC1))
-            {
-                LOG_ERROR("While decoding a UTF-8 byte sequence, an invalid byte was encountered",RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE);
-                return RF_FAILURE;
-            }
+                RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, an invalid byte was encountered",RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE)
+
             //if the next byte is NOT a continuation byte
             if( !rfUTF8_IsContinuationByte(bytes[*i+1]))
-            {
-                LOG_ERROR("While decoding a UTF-8 byte sequence, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE);
-                return RF_FAILURE;
-            }
+                RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE)
 
             *i= *i+2;
         }
@@ -184,15 +179,11 @@ int32_t rfUTF8_VerifySequence(const char* bytes,uint32_t * i)
         {
             //if the string has invalid continuation bytes quit. They are in separate if checks to avoid checking outside of array bounds
             if(!rfUTF8_IsContinuationByte(bytes[*i+1]))
-            {
-                LOG_ERROR("While decoding a UTF-8 byte sequence, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE);
-                return RF_FAILURE;
-            }
+                RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE)
+
             if(!rfUTF8_IsContinuationByte(bytes[*i+2]))
-            {
-                LOG_ERROR("While decoding a UTF-8 byte sequence, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE);
-                return RF_FAILURE;
-            }
+                RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE)
+
             *i= *i+3;
         }
         //if the leading bits are in the form of 0b11110xxx then range is U+010000 to U+10FFFF (4 bytes)
@@ -200,34 +191,22 @@ int32_t rfUTF8_VerifySequence(const char* bytes,uint32_t * i)
         {
             //in this type of starting byte a number of invalid bytes can be encountered. We have to check for them.
             if(RF_HEXGE_C(bytes[*i],0xF5)) //invalid byte value are from 0xF5 to 0xFF
-            {
-                LOG_ERROR("While decoding a UTF-8 byte sequence, an invalid byte was encountered",RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE);
-                return RF_FAILURE;
-            }
+                RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, an invalid byte was encountered",RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE)
 
             //if the string has invalid continuation bytes quit. They are in separate if checks to avoid checking outside of array bounds
             if(!rfUTF8_IsContinuationByte(bytes[*i+1]))
-            {
-                LOG_ERROR("While decoding a UTF-8 byte sequence, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE);
-                return RF_FAILURE;
-            }
+                RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE)
+
             if(!rfUTF8_IsContinuationByte(bytes[*i+2]))
-            {
-                LOG_ERROR("While decoding a UTF-8 byte sequence, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE);
-                return RF_FAILURE;
-            }
+                RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE)
+
             if(!rfUTF8_IsContinuationByte(bytes[*i+3]))
-            {
-                LOG_ERROR("While decoding a UTF-8 byte sequence, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE);
-                return RF_FAILURE;
-            }
+                RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE)
+
             *i=*i+4;
         }
         else//we were expecting one of the 4 different start bytes and we did not find it, there is an error
-        {
-            LOG_ERROR("While decoding a UTF-8 byte sequence, the first byte of a character was not valid UTF-8",RE_UTF8_INVALID_SEQUENCE);
-            return RF_FAILURE;
-        }
+            RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, the first byte of a character was not valid UTF-8",RE_UTF8_INVALID_SEQUENCE)
 
     }//end of iterating the bytes
 
@@ -235,7 +214,7 @@ int32_t rfUTF8_VerifySequence(const char* bytes,uint32_t * i)
     return RF_SUCCESS;
 }
 //Decodes a UTF-16  byte stream into codepoints
-char rfUTF16_Decode(const char* buff,uint32_t* charactersN,uint32_t* codepoints)
+int32_t rfUTF16_Decode(const char* buff,uint32_t* charactersN,uint32_t* codepoints)
 {
     uint16_t v1,v2;
     uint32_t byteLength,U;
@@ -251,19 +230,16 @@ char rfUTF16_Decode(const char* buff,uint32_t* charactersN,uint32_t* codepoints)
         {
             //determine if it's a valid first pair(between 0xD800 and 0xDBFF)
             if(RF_HEXG_US(v1,0xDBFF))
-            {
-                LOG_ERROR("Invalid 16-bit integer found in the given sequence. Can't decode.",RE_UTF16_INVALID_SEQUENCE)
-                return false;
-            }
+                RETURN_LOG_ERROR("Invalid 16-bit integer found in the given sequence. Can't decode.",RE_UTF16_INVALID_SEQUENCE)
+
             v2 = *((uint16_t*) (buff+byteLength+2));
             //determine if the surrogate pair is valid. Between 0xDC00 and 0xDFFF
             if(RF_HEXL_US(v2,0xDC00) || RF_HEXG_US(v2,0xDFFF))
             {
                 if(v2 != 0)
-                    LOG_ERROR("Invalid surrogate pair found in the given sequence. Can't decode.",RE_UTF16_INVALID_SEQUENCE)
+                    RETURN_LOG_ERROR("Invalid surrogate pair found in the given sequence. Can't decode.",RE_UTF16_INVALID_SEQUENCE)
                 else
-                    LOG_ERROR("A surrogate pair was expected and it was not found. Can't decode",RE_UTF16_NO_SURRPAIR)
-                return false;
+                    RETURN_LOG_ERROR("A surrogate pair was expected and it was not found. Can't decode",RE_UTF16_NO_SURRPAIR)
             }
             /*now decode the surrogate pairs*/
             U = v2&(uint16_t)0x3ff;
@@ -285,10 +261,10 @@ char rfUTF16_Decode(const char* buff,uint32_t* charactersN,uint32_t* codepoints)
     }//end of byte iteration
     //null terminate the codepoints
     codepoints[*charactersN]=0;
-    return true;
+    return RF_SUCCESS;
 }
 //Decodes a  UTF-16 byte stream into codepoints also swapping endianess
-char rfUTF16_Decode_swap(const char* buff,uint32_t* charactersN,uint32_t* codepoints)
+int32_t rfUTF16_Decode_swap(const char* buff,uint32_t* charactersN,uint32_t* codepoints)
 {
     uint16_t v1,v2;
     uint32_t byteLength,U;
@@ -305,20 +281,17 @@ char rfUTF16_Decode_swap(const char* buff,uint32_t* charactersN,uint32_t* codepo
         {
             //determine if it's a valid first pair(between 0xD800 and 0xDBFF)
             if(RF_HEXG_US(v1,0xDBFF))
-            {
-                LOG_ERROR("Invalid 16-bit integer found in the given sequence. Can't decode.",RE_UTF16_INVALID_SEQUENCE);
-                return false;
-            }
+                RETURN_LOG_ERROR("Invalid 16-bit integer found in the given sequence. Can't decode.",RE_UTF16_INVALID_SEQUENCE)
+
             v2 = *((uint16_t*) (buff+byteLength+2));
             rfUTILS_SwapEndianUS(&v2);
             //determine if the surrogate pair is valid. Between 0xDC00 and 0xDFFF
             if(RF_HEXL_US(v2,0xDC00) || RF_HEXG_US(v2,0xDFFF))
             {
                 if(v2 != 0)
-                    LOG_ERROR("Invalid surrogate pair found in the given sequence. Can't decode.",RE_UTF16_INVALID_SEQUENCE)
+                    RETURN_LOG_ERROR("Invalid surrogate pair found in the given sequence. Can't decode.",RE_UTF16_INVALID_SEQUENCE)
                 else
-                    LOG_ERROR("A surrogate pair was expected and it was not found. Can't decode",RE_UTF16_NO_SURRPAIR)
-                return false;
+                    RETURN_LOG_ERROR("A surrogate pair was expected and it was not found. Can't decode",RE_UTF16_NO_SURRPAIR)
             }
             /*now decode the surrogate pairs*/
             U = v2&(uint16_t)0x3ff;

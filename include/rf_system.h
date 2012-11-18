@@ -97,6 +97,11 @@
     #define RFP_ISVTX S_ISVTX
 #endif
 
+#ifdef __cplusplus
+extern "C"
+{///opening bracket for calling from C++
+#endif
+
 //! @brief Creates a directory
 //!
 //! This is a wrapper of the mkdir and _mkdir functions. Creates a new directory with the given name.
@@ -215,6 +220,11 @@ i_DECLIMEX_ int32_t i_rfRenameFile(void* name,void* newName);
 #endif
 //! @}
 //end of system group
+
+#ifdef __cplusplus
+}///closing bracket for calling from C++
+#endif
+
 
 #else //end of the system module include
     #error Attempted to include Refu System functions module with the System module flag off. Rebuild the library with that option added if you need to include them

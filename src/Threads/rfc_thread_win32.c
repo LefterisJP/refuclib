@@ -137,10 +137,8 @@ int32_t rfThread_Join(void* thread)
     RF_Thread* t = (RF_Thread*)thread;
     //check if it's joinable
     if(RF_BITFLAG_ON(t->flags,RF_THREAD_DETACHED))
-    {
-        LOG_ERROR("Join failed due to the thread value not being joinable",RE_THREAD_NOTJOINABLE);
-        return RE_THREAD_NOTJOINABLE;
-    }
+        RETURN_LOG_ERROR("Join failed due to the thread value not being joinable",RE_THREAD_NOTJOINABLE)
+
     DWORD err = WaitForSingleObject(t->tHandle,INFINITE);
     if(err == WAIT_FAILED)
     {
@@ -275,12 +273,11 @@ int32_t rfMutex_Lock(RF_Mutex* m)
         switch(ret)
         {
             case WAIT_ABANDONED:
-                LOG_ERROR("During winapi mutex locking, ownership of the parameter mutex object was given succesfully to the caller,\
-                           but the mutex itself was not released properly by its previous owner. Check for incosistencies",RE_MUTEX_LOCK_INVALID);
-                return RE_MUTEX_LOCK_INVALID;
+                RETURN_LOG_ERROR("During winapi mutex locking, ownership of the parameter mutex object was given succesfully to the caller,\
+                           but the mutex itself was not released properly by its previous owner. Check for incosistencies",RE_MUTEX_LOCK_INVALID)
             break;
             case WAIT_TIMEOUT:
-                LOG_ERROR("During winapi mutex locking the timeout limit elapsed.This should never happen. Serious error!",RE_MUTEX_LOCK);
+                RETURN_LOG_ERROR("During winapi mutex locking the timeout limit elapsed.This should never happen. Serious error!",RE_MUTEX_LOCK)
             break;
             default:
             {
@@ -306,9 +303,8 @@ int32_t rfMutex_TimedLock(RF_Mutex* m,uint32_t ms)
         switch(ret)
         {
             case WAIT_ABANDONED:
-                LOG_ERROR("During winapi mutex locking, ownership of the parameter mutex object was given succesfully to the caller,\
-                           but the mutex itself was not released properly by its previous owner. Check for incosistencies",RE_MUTEX_LOCK_INVALID);
-                return RE_MUTEX_LOCK_INVALID;
+                RETURN_LOG_ERROR("During winapi mutex locking, ownership of the parameter mutex object was given succesfully to the caller,\
+                           but the mutex itself was not released properly by its previous owner. Check for incosistencies",RE_MUTEX_LOCK_INVALID)
             break;
             //means that waiting to lock the mutex timed out
             case WAIT_TIMEOUT:
@@ -339,9 +335,8 @@ int32_t rfMutex_TryLock(RF_Mutex* m)
         switch(ret)
         {
             case WAIT_ABANDONED:
-                LOG_ERROR("During winapi mutex locking, ownership of the parameter mutex object was given succesfully to the caller,\
-                           but the mutex itself was not released properly by its previous owner. Check for incosistencies",RE_MUTEX_LOCK_INVALID);
-                return RE_MUTEX_INVALID;
+                RETURN_LOG_ERROR("During winapi mutex locking, ownership of the parameter mutex object was given succesfully to the caller,\
+                           but the mutex itself was not released properly by its previous owner. Check for incosistencies",RE_MUTEX_LOCK_INVALID)
             break;
             //means that the mutex is busy (already locked) by another thread
             case WAIT_TIMEOUT:
@@ -443,13 +438,11 @@ int32_t rfSemaphore_Wait(RF_Semaphore* s)
         switch(ret)
         {
             case WAIT_ABANDONED:
-                LOG_ERROR("During winapi semaphore waiting ownership of the parameter mutex object was given succesfully to the caller,\
-                           but the semaphore itself was not released properly by its previous owner. Check for incosistencies",RE_SEMAPHORE_WAIT_INVALID);
-                return RE_SEMAPHORE_WAIT_INVALID;
+                RETURN_LOG_ERROR("During winapi semaphore waiting ownership of the parameter mutex object was given succesfully to the caller,\
+                           but the semaphore itself was not released properly by its previous owner. Check for incosistencies",RE_SEMAPHORE_WAIT_INVALID)
             break;
             case WAIT_TIMEOUT:
-                LOG_ERROR("During winapi semaphore waiting the timeout limit elapsed.This should never happen. Serious error!",RE_SEMAPHORE_WAIT_INVALID);
-                return RE_SEMAPHORE_WAIT_INVALID;
+                RETURN_LOG_ERROR("During winapi semaphore waiting the timeout limit elapsed.This should never happen. Serious error!",RE_SEMAPHORE_WAIT_INVALID)
             break;
             default:
             {
@@ -474,9 +467,8 @@ int32_t rfSemaphore_TimedWait(RF_Semaphore* s,uint32_t ms)
         switch(ret)
         {
             case WAIT_ABANDONED:
-                LOG_ERROR("During winapi semaphore waiting ownership of the parameter mutex object was given succesfully to the caller,\
-                           but the semaphore itself was not released properly by its previous owner. Check for incosistencies",RE_SEMAPHORE_WAIT_INVALID);
-                return RE_SEMAPHORE_WAIT_INVALID;
+                RETURN_LOG_ERROR("During winapi semaphore waiting ownership of the parameter mutex object was given succesfully to the caller,\
+                           but the semaphore itself was not released properly by its previous owner. Check for incosistencies",RE_SEMAPHORE_WAIT_INVALID)
             break;
             //the timeout limit was reached
             case WAIT_TIMEOUT:
@@ -506,9 +498,8 @@ int32_t rfSemaphore_TryWait(RF_Semaphore* s)
         switch(ret)
         {
             case WAIT_ABANDONED:
-                LOG_ERROR("During winapi semaphore waiting ownership of the parameter mutex object was given succesfully to the caller,\
-                           but the semaphore itself was not released properly by its previous owner. Check for incosistencies",RE_SEMAPHORE_WAIT_INVALID);
-                return RE_SEMAPHORE_WAIT_INVALID;
+                RETURN_LOG_ERROR("During winapi semaphore waiting ownership of the parameter mutex object was given succesfully to the caller,\
+                           but the semaphore itself was not released properly by its previous owner. Check for incosistencies",RE_SEMAPHORE_WAIT_INVALID)
             break;
             //the semaphore is busy/locked by another thread
             case WAIT_TIMEOUT:
