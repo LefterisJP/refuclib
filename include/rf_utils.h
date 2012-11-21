@@ -34,8 +34,6 @@ extern "C"
 #define RF_GET_BIT(__byte__,__n__)  ((__byte__& (0x01<<__n__) )>>__n__ )
 
 
-
-
 //! @internal
 //!Globals for Refu Utils
 typedef struct RF_UTILS

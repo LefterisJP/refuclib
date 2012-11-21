@@ -65,8 +65,8 @@ int main()
 	/*Testing assignments also since there are only 2 functions*/
 	
 	//expect succesfull assignments
-	rfString_Assign(sx2,RFS_("Having removed himself from the election campaign to concentrate on the storm, President Obama will now see at first hand just how destructive Hurricane Sandy has been. He'll travel to Atlantic City where the Republican governor, Chris Christie - normally a fierce critic - will show him scenes of widespread destruction along the Jersey Shore. They'll meet some of those who have lost homes, as well as the emergency teams who have been working around the clock since the weekend."));
-	printf("%s\n",rfString_Cstr(sx2));
+	rfString_Assign(&s1,RFS_("Having removed himself from the election campaign to concentrate on the storm, President Obama will now see at first hand just how destructive Hurricane Sandy has been. He'll travel to Atlantic City where the Republican governor, Chris Christie - normally a fierce critic - will show him scenes of widespread destruction along the Jersey Shore. They'll meet some of those who have lost homes, as well as the emergency teams who have been working around the clock since the weekend."));
+	EXPECT(true,rfString_Equal(&s1,RFS_("Having removed himself from the election campaign to concentrate on the storm, President Obama will now see at first hand just how destructive Hurricane Sandy has been. He'll travel to Atlantic City where the Republican governor, Chris Christie - normally a fierce critic - will show him scenes of widespread destruction along the Jersey Shore. They'll meet some of those who have lost homes, as well as the emergency teams who have been working around the clock since the weekend.")))
 	rfStringX_Assign(sx2, RFS_("Δοκιμαζουμε την αναθεση για StringX"));
 	EXPECT(true,rfString_Equal(sx2,RFS_("Δοκιμαζουμε την αναθεση για StringX")))
 	//expect true in all: testing assigning a unicode codepoint to a string (the +/-) sign

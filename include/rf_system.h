@@ -136,12 +136,8 @@ extern "C"
 //! + @c RE_DIRECTORY_PARENT_LINKS: The parent has too many entries for the new directory to be created.  (POSIX only)
 //! + @c RE_DIRECTORY_SPACE: There is not enough space in the parent  (POSIX only)
 //! + @c RE_DIRECTORY_ROPARENT: The parent directory of the directory is read only and can't be modified  (POSIX only)
-#ifdef RF_IAMHERE_FOR_DOXYGEN
 i_DECLIMEX_ int32_t rfMakeDir(void* dirname,int mode);
-#else
-i_DECLIMEX_ int32_t i_rfMakeDir(void* dirname,int* mode);
-#define rfMakeDir(i_DIRNAME_,i_MODE_)   i_rfLMSX_WRAP2(int32_t,i_rfMakeDir,i_DIRNAME_,i_RFI_(i_MODE_))
-#endif
+
 //! @brief Removes a directory and all its files recursively
 //!
 //! This functions deletes all the files and chil directories under the given directory and the directory itself.
@@ -171,12 +167,8 @@ i_DECLIMEX_ int32_t i_rfMakeDir(void* dirname,int* mode);
 //! + @c RE_FILE_IO One of the files of the directory or its children failed to get deleted because of physical I/O error
 //! + @c RE_FILE_NAMELENGTH One of the files of the directory or its children failed to get deleted because of its name being too long for the file system
 //! + @c RE_FILE_RO One of the files of the directory or its children failed to get deleted because the file is read only
-#ifdef RF_IAMHERE_FOR_DOXYGEN
 i_DECLIMEX_ int32_t rfRemoveDir(void* dirname);
-#else
-i_DECLIMEX_ int32_t i_rfRemoveDir(void* dirname);
-#define rfRemoveDir(i_DIRNAME_) i_rfLMSX_WRAP1(int32_t,i_rfRemoveDir,i_DIRNAME_)
-#endif
+
 
 //! @brief Deletes a file
 //!
@@ -191,12 +183,8 @@ i_DECLIMEX_ int32_t i_rfRemoveDir(void* dirname);
 //! + @c RE_FILE_IO One of the files of the directory or its children failed to get deleted because of physical I/O error
 //! + @c RE_FILE_NAMELENGTH One of the files of the directory or its children failed to get deleted because of its name being too long for the file system
 //! + @c RE_FILE_RO One of the files of the directory or its children failed to get deleted because the file is read only
-#ifdef RF_IAMHERE_FOR_DOXYGEN
 i_DECLIMEX_ int32_t rfDeleteFile(void* name);
-#else
-i_DECLIMEX_ int32_t i_rfDeleteFile(void* name);
-#define rfDeleteFile(i_NAME_) i_rfLMSX_WRAP1(int32_t,i_rfDeleteFile,i_NAME_)
-#endif
+
 
 //! @brief Renames a file
 //!
@@ -212,12 +200,8 @@ i_DECLIMEX_ int32_t i_rfDeleteFile(void* name);
 //! + @c RE_FILE_IO One of the files of the directory or its children failed to get deleted because of physical I/O error
 //! + @c RE_FILE_NAMELENGTH One of the files of the directory or its children failed to get deleted because of its name being too long for the file system
 //! + @c RE_FILE_RO One of the files of the directory or its children failed to get deleted because the file is read only
-#ifdef RF_IAMHERE_FOR_DOXYGEN
 i_DECLIMEX_ int32_t rfRenameFile(void* name,void* newName);
-#else
-i_DECLIMEX_ int32_t i_rfRenameFile(void* name,void* newName);
-#define rfRenameFile(i_NAME_,i_NEWNAME_)    i_rfLMSX_WRAP2(int32_t,i_rfRenameFile,i_NAME_,i_NEWNAME_)
-#endif
+
 //! @}
 //end of system group
 

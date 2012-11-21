@@ -22,16 +22,18 @@
 #include <rf_string.h>
 
 //Opens another process as a pipe
-FILE* i_rfPopen(void* commandP,const char* mode)
+FILE* rfPopen(void* commandP,const char* mode)
 {
+    FILE* ret = 0;
     RF_String* command = (RF_String*)commandP;
-    if( !(strcmp(mode,"r") || strcmp(mode,"w")))
-    {
-        LOG_ERROR("Invalide mode argument provided to rfPopen( )",RE_POPEN_INVALID_MODE);
-        return 0;
-    }
+    RF_ENTER_LOCAL_SCOPE()
+    if( (strcmp(mode,"r") || strcmp(mode,"w")))
+        LOG_ERROR("Invalide mode argument provided to rfPopen( )",RE_POPEN_INVALID_MODE)
+    else
+        ret = popen(command->bytes,mode);
 
-    return popen(command->bytes,mode);
+    RF_EXIT_LOCAL_SCOPE()
+    return ret;
 }
 
 

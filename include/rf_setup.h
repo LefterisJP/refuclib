@@ -224,6 +224,8 @@ static const float FLOAT_MIN        =  FLT_MIN;
 #define LOG_ERROR(i_msg_,i_errorCode_,...)  i_PICK_LOG_ERROR_FUNC_GT(i_msg_,i_errorCode_,RF_NARG(__VA_ARGS__),__VA_ARGS__)
 //! This macro logs an error to the refu error stream and returns the error code from the function it was called from.
 #define RETURN_LOG_ERROR(i_msg_,i_errorCode_,...)  {LOG_ERROR(i_msg_,i_errorCode_,__VA_ARGS__) return i_errorCode_; }
+//! This macro logs an error to the refu error stream and jumps to the specified goto label to exit a function
+#define RETURNGOTO_LOG_ERROR(i_msg_,i_errorCode_,i_retvar,i_label,...)  {LOG_ERROR(i_msg_,i_errorCode_,__VA_ARGS__) i_retvar=i_errorCode_;goto i_label; }
 
 //This macro picks up the correct error logging function, by taking the number of extra arguments and checking if it is greater than 0
 #define i_PICK_LOG_ERROR_FUNC_GT(i_msg_,i_errorCode_,i_argN,...) i_PICK_LOG_ERROR_FUNC(i_msg_,i_errorCode_,RP_GT(i_argN,0),__VA_ARGS__)
@@ -246,6 +248,9 @@ static const float FLOAT_MIN        =  FLT_MIN;
 #define DLOG_ERROR(i_msg_,i_errorCode_, ...)  i_PICK_DLOG_ERROR_FUNC_GT(i_msg_,i_errorCode_,RF_NARG(__VA_ARGS__),__VA_ARGS__)
 //! This macro logs an error in detail to the refu error stream and returns the error code from the function it was called from.
 #define DRETURN_LOG_ERROR(i_msg_,i_errorCode_,...)  {DLOG_ERROR(i_msg_,i_errorCode_,__VA_ARGS__) return i_errorCode_; }
+//! This macro logs an error to the refu error stream and jumps to the specified goto label to exit a function
+#define DRETURNGOTO_LOG_ERROR(i_msg_,i_errorCode_,i_retvar,i_label,...)  {DLOG_ERROR(i_msg_,i_errorCode_,__VA_ARGS__) i_retvar=i_errorCode_;goto i_label; }
+
 //This macro picks up the correct error logging function, by taking the number of extra arguments and checking if it is greater than 0
 #define i_PICK_DLOG_ERROR_FUNC_GT(i_msg_,i_errorCode_,i_argN,...) i_PICK_DLOG_ERROR_FUNC(i_msg_,i_errorCode_,RP_GT(i_argN,0),__VA_ARGS__)
 //This macro picks up the correct error logging function, by pasting the results of the greater than comparison together to select the correct macro

@@ -352,12 +352,8 @@ i_DECLIMEX_ char rfString_Init_UTF32(RF_String* str,const uint32_t* s);
 //! @param source The source string, whose values to copy. @inhtype{String,StringX} @tmpSTR
 //! @see rfString_Assign_char()
 //! @see rfStringX_Assign()
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
-void rfString_Assign(RF_String* dest,const void* source);
-#else
-i_DECLIMEX_ void i_rfString_Assign(RF_String* dest,const void* source);
-#define rfString_Assign(i_DESTINATION_,i_SOURCE_) i_rfLMS_WRAP2(void,i_rfString_Assign,i_DESTINATION_,i_SOURCE_)
-#endif
+i_DECLIMEX_ void rfString_Assign(RF_String* dest,const void* source);
+
 
 //! @memberof RF_String
 //! @brief Assigns the value of a unicode character to the string
@@ -708,12 +704,8 @@ i_DECLIMEX_ uint32_t rfString_BytePosToCharPos(const void* thisstr,uint32_t byte
 //! @param s1 The first string to compare @inhtype{String,StringX} @tmpSTR
 //! @param s2 The second string to compare @inhtype{String,StringX} @tmpSTR
 //! @return True in case the strings are equal and false otherwise
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
 i_DECLIMEX_ char rfString_Equal(const void* s1,const void* s2);
-#else
-i_DECLIMEX_ char i_rfString_Equal(const void* s1,const void* s2);
-#define rfString_Equal(i_STRING1_,i_STRING2_)   i_rfLMSX_WRAP2(char,i_rfString_Equal,i_STRING1_,i_STRING2_)
-#endif
+
 
 //! @memberof RF_String
 //! @brief Returns a substring of this string
@@ -749,22 +741,19 @@ i_DECLIMEX_ char rfString_Substr(const void* thisstr,uint32_t startPos,uint32_t 
 //!     @e "HELLOWORLD" would return a failure. Default search is to return any found substring.
 //! @return Returns the character position of the found substring or RF_FAILURE for not found
 //! @see rfString_Find_i()
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ int32_t rfString_Find(const void* thisstr,const void* sstr,const char options);
 #else
-i_DECLIMEX_ int32_t i_rfString_Find(const void* thisstr,const void* sstr,const char* options);
-    #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfString_Find(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_)  i_rfLMS_WRAP3(int32_t,i_rfString_Find,i_THISSTR_,i_SEARCHSTR_,i_RFI8_(i_OPTIONS_))
-    #else
-        #define rfString_Find(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_FIND,3,__VA_ARGS__)
-        #define i_NPSELECT_RF_STRING_FIND1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Find() accepts from 2 to 3 arguments\"")
-        #define i_NPSELECT_RF_STRING_FIND0(...) RF_SELECT_FUNC(i_SELECT_RF_STRING_FIND,__VA_ARGS__)
-        #define i_SELECT_RF_STRING_FIND2(i_THISSTR_,i_SEARCHSTR_) i_rfLMS_WRAP3(int32_t,i_rfString_Find,i_THISSTR_,i_SEARCHSTR_,i_RFI8_(0))
-        #define i_SELECT_RF_STRING_FIND3(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) i_rfLMS_WRAP3(int32_t,i_rfString_Find,i_THISSTR_,i_SEARCHSTR_,i_RFI8_(i_OPTIONS_))
-        #define i_SELECT_RF_STRING_FIND1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Find() accepts from 2 to 3 arguments\"")
-        #define i_SELECT_RF_STRING_FIND0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Find() accepts from 2 to 3 arguments\"")
-    #endif
+i_DECLIMEX_ int32_t i_rfString_Find(const void* thisstr,const void* sstr,const char options);
+#define rfString_Find(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_FIND,3,__VA_ARGS__)
+#define i_NPSELECT_RF_STRING_FIND1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Find() accepts from 2 to 3 arguments\"")
+#define i_NPSELECT_RF_STRING_FIND0(...) RF_SELECT_FUNC(i_SELECT_RF_STRING_FIND,__VA_ARGS__)
+#define i_SELECT_RF_STRING_FIND3(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) i_rfString_Find(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_)
+#define i_SELECT_RF_STRING_FIND2(i_THISSTR_,i_SEARCHSTR_) i_rfString_Find(i_THISSTR_,i_SEARCHSTR_,0)
+#define i_SELECT_RF_STRING_FIND1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Find() accepts from 2 to 3 arguments\"")
+#define i_SELECT_RF_STRING_FIND0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Find() accepts from 2 to 3 arguments\"")
 #endif
+
 
 //! @memberof RF_String
 //! @brief Finds if a substring exists inside a specific part of another string.
@@ -787,27 +776,21 @@ i_DECLIMEX_ int32_t i_rfString_Find(const void* thisstr,const void* sstr,const c
 //!     @e "HELLOWORLD" would return a failure. Default search is to return any found substring.
 //! @return Returns the character position of the found substring inside the original string or RF_FAILURE for not found
 //! @see rfString_Find()
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ int32_t rfString_Find_i(const void* thisstr,const void* sstr,uint32_t startPos,uint32_t length,const char options);
 #else
-i_DECLIMEX_ int32_t i_rfString_Find_i(const void* thisstr,const void* sstr,uint32_t* startPos,uint32_t* length,const char* options);
-    #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfString_Find_i(i_THISSTR_,i_SEARCHSTR_,i_STARTPOS_,i_LENGTH_,i_OPTIONS_)  \
-            i_rfLMS_WRAP5(int32_t,i_rfString_Find_i,i_THISSTR_,i_SEARCHSTR_,i_RFUI32_(i_STARTPOS_),i_RFUI32_(i_LENGTH_),i_RFI8_(i_OPTIONS_))
-    #else
-        #define rfString_Find_i(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_FIND_I,5,__VA_ARGS__)
-        #define i_NPSELECT_RF_STRING_FIND_I1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Find_i() accepts from 4 to 5 arguments\"")
-        #define i_NPSELECT_RF_STRING_FIND_I0(...) RF_SELECT_FUNC(i_SELECT_RF_STRING_FIND_I,__VA_ARGS__)
-        #define i_SELECT_RF_STRING_FIND_I4(i_THISSTR_,i_SEARCHSTR_,i_STARTPOS_,i_LENGTH_) \
-            i_rfLMS_WRAP5(int32_t,i_rfString_Find_i,i_THISSTR_,i_SEARCHSTR_,i_RFUI32_(i_STARTPOS_),i_RFUI32_(i_LENGTH_),i_RFI8_(0))
-        #define i_SELECT_RF_STRING_FIND_I5(i_THISSTR_,i_SEARCHSTR_,i_STARTPOS_,i_LENGTH_,i_OPTIONS_) \
-            i_rfLMS_WRAP5(int32_t,i_rfString_Find_i,i_THISSTR_,i_SEARCHSTR_,i_RFUI32_(i_STARTPOS_),i_RFUI32_(i_LENGTH_),i_RFI8_(i_OPTIONS_))
-        #define i_SELECT_RF_STRING_FIND_I3(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Find_i() accepts from 4 to 5 arguments\"")
-        #define i_SELECT_RF_STRING_FIND_I2(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Find_i() accepts from 4 to 5 arguments\"")
-        #define i_SELECT_RF_STRING_FIND_I1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Find_i() accepts from 4 to 5 arguments\"")
-        #define i_SELECT_RF_STRING_FIND_I0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Find_i() accepts from 4 to 5 arguments\"")
-    #endif
+i_DECLIMEX_ int32_t i_rfString_Find_i(const void* thisstr,const void* sstr,uint32_t startPos,uint32_t length,const char options);
+#define rfString_Find_i(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_FIND_I,5,__VA_ARGS__)
+#define i_NPSELECT_RF_STRING_FIND_I1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Find_i() accepts from 4 to 5 arguments\"")
+#define i_NPSELECT_RF_STRING_FIND_I0(...) RF_SELECT_FUNC(i_SELECT_RF_STRING_FIND_I,__VA_ARGS__)
+#define i_SELECT_RF_STRING_FIND_I5(i_THISSTR_,i_SEARCHSTR_,i_STARTPOS_,i_LENGTH_,i_OPTIONS_) i_rfString_Find_i(i_THISSTR_,i_SEARCHSTR_,i_STARTPOS_,i_LENGTH_,i_OPTIONS_)
+#define i_SELECT_RF_STRING_FIND_I4(i_THISSTR_,i_SEARCHSTR_,i_STARTPOS_,i_LENGTH_)            i_rfString_Find_i(i_THISSTR_,i_SEARCHSTR_,i_STARTPOS_,i_LENGTH_,0)
+#define i_SELECT_RF_STRING_FIND_I3(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Find_i() accepts from 4 to 5 arguments\"")
+#define i_SELECT_RF_STRING_FIND_I2(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Find_i() accepts from 4 to 5 arguments\"")
+#define i_SELECT_RF_STRING_FIND_I1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Find_i() accepts from 4 to 5 arguments\"")
+#define i_SELECT_RF_STRING_FIND_I0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Find_i() accepts from 4 to 5 arguments\"")
 #endif
+
 
 //! @memberof RF_String
 //! @brief Finds if a String begins with a particular substring
@@ -835,12 +818,13 @@ i_DECLIMEX_ char rfString_BeginsWith(const void* thisstr,const void* sstr,const 
         #define rfString_BeginsWith(...) RF_SELECT_FUNC_IF_NARGGT2(i_NPSELECT_RF_STRING_BEGINSWITH,3,__VA_ARGS__)
         #define i_NPSELECT_RF_STRING_BEGINSWITH1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_BeginsWith() accepts from 2 to 3 arguments\"")
         #define i_NPSELECT_RF_STRING_BEGINSWITH0(...) RF_SELECT_FUNC2(i_SELECT_RF_STRING_BEGINSWITH,__VA_ARGS__)
-        #define i_SELECT_RF_STRING_BEGINSWITH2(i_THISSTR_,i_SEARCHSTR_) (rfString_Find(i_THISSTR_,i_SEARCHSTR_) == 0)
         #define i_SELECT_RF_STRING_BEGINSWITH3(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) (rfString_Find(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) == 0)
+        #define i_SELECT_RF_STRING_BEGINSWITH2(i_THISSTR_,i_SEARCHSTR_) (rfString_Find(i_THISSTR_,i_SEARCHSTR_) == 0)
         #define i_SELECT_RF_STRING_BEGINSWITH1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_BeginsWith() accepts from 2 to 3 arguments\"")
         #define i_SELECT_RF_STRING_BEGINSWITH0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_BeginsWith() accepts from 2 to 3 arguments\"")
     #endif
 #endif
+
 //! @memberof RF_String
 //! @brief Finds if a String ends with a particular substring
 //!
@@ -868,10 +852,10 @@ i_DECLIMEX_ char rfString_EndsWith(const void* thisstr,const void* sstr,const ch
         #define rfString_EndsWith(...) RF_SELECT_FUNC_IF_NARGGT2(i_NPSELECT_RF_STRING_ENDSWITH,3,__VA_ARGS__)
         #define i_NPSELECT_RF_STRING_ENDSWITH1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_EndsWith() accepts from 2 to 3 arguments\"")
         #define i_NPSELECT_RF_STRING_ENDSWITH0(...) RF_SELECT_FUNC2(i_SELECT_RF_STRING_ENDSWITH,__VA_ARGS__)
-        #define i_SELECT_RF_STRING_ENDSWITH2(i_THISSTR_,i_SEARCHSTR_) \
-            (rfString_Find(i_THISSTR_,i_SEARCHSTR_) == (rfString_Length(i_THISSTR_)-rfString_Length(i_SEARCHSTR_)) )
         #define i_SELECT_RF_STRING_ENDSWITH3(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) \
             (rfString_Find(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) == (rfString_Length(i_THISSTR_)-rfString_Length(i_SEARCHSTR_)) )
+        #define i_SELECT_RF_STRING_ENDSWITH2(i_THISSTR_,i_SEARCHSTR_) \
+            (rfString_Find(i_THISSTR_,i_SEARCHSTR_) == (rfString_Length(i_THISSTR_)-rfString_Length(i_SEARCHSTR_)) )
         #define i_SELECT_RF_STRING_ENDSWITH1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_EndsWith() accepts from 2 to 3 arguments\"")
         #define i_SELECT_RF_STRING_ENDSWITH0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_EndsWith() accepts from 2 to 3 arguments\"")
     #endif
@@ -890,21 +874,17 @@ i_DECLIMEX_ char rfString_EndsWith(const void* thisstr,const void* sstr,const ch
 //! + @c RF_MATCH_WORD: If you want the found substring to be exact. For example an exact search for @e "HELLO" in the string
 //!     @e "HELLOWORLD" would return a failure. Default search is to return any found substring.
 //! @return Returns the number of times cstr exists inside the string (0 is returned in case it's not found at all
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ int32_t rfString_Count(const void* thisstr,const void* sstr,const char options);
 #else
-i_DECLIMEX_ int32_t i_rfString_Count(const void* thisstr,const void* sstr,const char* options);
-    #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfString_Count(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_COUNT,3,__VA_ARGS__)
-        #define i_NPSELECT_RF_STRING_COUNT1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Count() accepts from 2 to 3 arguments\"")
-        #define i_NPSELECT_RF_STRING_COUNT0(...) RF_SELECT_FUNC(i_SELECT_RF_STRING_COUNT,__VA_ARGS__)
-        #define i_SELECT_RF_STRING_COUNT2(i_THISSTR_,i_SEARCHSTR_)  i_rfLMSX_WRAP3(int32_t,i_rfString_Count,i_THISSTR_,i_SEARCHSTR_,i_RFI8_(0))
-        #define i_SELECT_RF_STRING_COUNT3(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) i_rfLMS_WRAP3(int32_t,i_rfString_Count,i_THISSTR_,i_SEARCHSTR_,i_RFI8_(i_OPTIONS_))
-        #define i_SELECT_RF_STRING_COUNT1(...)  RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Count() accepts from 2 to 3 arguments\"")
-        #define i_SELECT_RF_STRING_COUNT0(...)  RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Count() accepts from 2 to 3 arguments\"")
-    #else
-        #define rfString_Count(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) i_rfLMSX_WRAP3(int32_t,i_rfString_Count,i_THISSTR_,i_SEARCHSTR_,i_RFI8_(i_OPTIONS_))
-    #endif
+i_DECLIMEX_ int32_t i_rfString_Count(const void* thisstr,const void* sstr,const char options);
+#define rfString_Count(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_COUNT,3,__VA_ARGS__)
+#define i_NPSELECT_RF_STRING_COUNT1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Count() accepts from 2 to 3 arguments\"")
+#define i_NPSELECT_RF_STRING_COUNT0(...) RF_SELECT_FUNC(i_SELECT_RF_STRING_COUNT,__VA_ARGS__)
+#define i_SELECT_RF_STRING_COUNT3(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) i_rfString_Count(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_)
+#define i_SELECT_RF_STRING_COUNT2(i_THISSTR_,i_SEARCHSTR_)  i_rfString_Count(i_THISSTR_,i_SEARCHSTR_,0)
+#define i_SELECT_RF_STRING_COUNT1(...)  RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Count() accepts from 2 to 3 arguments\"")
+#define i_SELECT_RF_STRING_COUNT0(...)  RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Count() accepts from 2 to 3 arguments\"")
 #endif
 
 /*------------------------------------------------------------------------ RF_String Positional retrieval functions-------------------------------------------------------------------------------*/
@@ -921,14 +901,7 @@ i_DECLIMEX_ int32_t i_rfString_Count(const void* thisstr,const void* sstr,const 
 //! @param format The tokens parameter which give the format of scanf
 //! @param var A void* to pass in any variable we need to get a value
 //! @return Returns true if a value was read and false otherwise, substring not being found in the string or sscanf unable to read into the variable
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
-    i_DECLIMEX_ char rfString_ScanfAfter(const void* thisstr,const void* afterstr,const char* format,void* var);
-#else
-    i_DECLIMEX_ char i_rfString_ScanfAfter(const void* thisstr,const void* afterstr,const char* format,void* var);
-    #define rfString_ScanfAfter(i_THISSTR_,i_AFTERSTR_,i_FORMAT_,i_VAR_) i_rfLMSX_WRAP4(char,i_rfString_ScanfAfter,i_THISSTR_,i_AFTERSTR_,i_FORMAT_,i_VAR_)
-#endif
-
-
+i_DECLIMEX_ char rfString_ScanfAfter(const void* thisstr,const void* afterstr,const char* format,void* var);
 
 //! @memberof RF_String
 //! @brief Initializes the first substring, between two given strings
@@ -953,26 +926,21 @@ i_DECLIMEX_ int32_t i_rfString_Count(const void* thisstr,const void* sstr,const 
 //! @see rfString_Before()
 //! @see rfString_After()
 //! @see rfStringX_MoveAfterPair()
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ char rfString_Between(const void* thisstr,const void* lstr,const void* rstr,void* result,const char options);
 #else
-i_DECLIMEX_ char i_rfString_Between(const void* thisstr,const void* lstr,const void* rstr,void* result,const char* options);
-    #ifdef RF_OPTION_DEFAULT_ARGUMENTS
+i_DECLIMEX_ char i_rfString_Between(const void* thisstr,const void* lstr,const void* rstr,void* result,const char options);
         #define rfString_Between(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_BETWEEN,5,__VA_ARGS__)
         #define i_NPSELECT_RF_STRING_BETWEEN1(...)  RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Between() accepts from 4 to 5 arguments\"")
         #define i_NPSELECT_RF_STRING_BETWEEN0(...)  RF_SELECT_FUNC(i_SELECT_RF_STRING_BETWEEN,__VA_ARGS__)
-        #define i_SELECT_RF_STRING_BETWEEN4(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_RESULT_) \
-            i_rfLMSX_WRAP5(char,i_rfString_Between,i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_RESULT_,i_RFI8_(0))
         #define i_SELECT_RF_STRING_BETWEEN5(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_RESULT_,i_OPTIONS_) \
-            i_rfLMSX_WRAP5(char,i_rfString_Between,i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_RESULT_,i_RFI8_(i_OPTIONS_))
+            i_rfString_Between(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_RESULT_,i_OPTIONS_)
+        #define i_SELECT_RF_STRING_BETWEEN4(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_RESULT_) \
+            i_rfString_Between(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_RESULT_,0)
         #define i_SELECT_RF_STRING_BETWEEN3(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Between() accepts from 4 to 5 arguments\"")
         #define i_SELECT_RF_STRING_BETWEEN2(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Between() accepts from 4 to 5 arguments\"")
         #define i_SELECT_RF_STRING_BETWEEN1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Between() accepts from 4 to 5 arguments\"")
         #define i_SELECT_RF_STRING_BETWEEN0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Between() accepts from 4 to 5 arguments\"")
-    #else
-        #define rfString_Between(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_RESULT_,i_OPTIONS_) \
-            i_rfLMSX_WRAP5(char,i_rfString_Between,i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_RESULT_,i_RFI8_(i_OPTIONS_))
-    #endif
 #endif
 
 
@@ -982,9 +950,6 @@ i_DECLIMEX_ char i_rfString_Between(const void* thisstr,const void* lstr,const v
 //! @isinherited{StringX}
 //! The parameters that have to be given as variable argument <b>must</b> be of type RF_String* or RF_StringX* or even
 //! string initialized with the temporary string macro
-//! @rfNoDefArgsWarn1
-//! @warning if the library has been compiled with @c DEFAULT_ARGUMENTS off then arguments @c options and @c parN are actually pointers
-//! to @c char and @c unsigned char respectively
 //! @lmsFunction
 //! @param thisstr The string to operate in. @inhtype{String,StringX}
 //! @param[out] result Pass a pointer to a String type to receive the string from the start of @c thisstr until any of the given substrings are found.
@@ -998,39 +963,11 @@ i_DECLIMEX_ char i_rfString_Between(const void* thisstr,const void* lstr,const v
 //! + @c RF_STRINGX_ARGUMENT: Pass this bitflag option if the pointer you gave for initialization at @c result is of RF_StringX type
 //! @param parN The number of strings to search for
 //! @param ... The strings to search for. @inhtype{String,StringX} @tmpSTR
-//! @extraVarArgLim
 //! @return Returns true if the substring was initialized and false if none of the parameters were found or an invalid UTF-8 sequence was given. In the latter case an error is also logged.
 //! @see rfString_Before()
 //! @see rfString_Afterv()
-//! @see rfString_After()
-#ifdef RF_IAMHERE_FOR_DOXYGEN
 i_DECLIMEX_ char rfString_Beforev(const void* thisstr,void* result,const char options,const unsigned char parN, ...);
-#endif
-#ifdef RF_OPTION_DEFAULT_ARGUMENTS
-    i_DECLIMEX_ char i_rfString_Beforev(const void* thisstr,void* result,const char* options,const unsigned char* parN, ...);
-    #define rfString_Beforev(...)  RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_BEFOREV,4,__VA_ARGS__)
-    #define i_NPSELECT_RF_STRING_BEFOREV1(...)  RF_SELECT_FUNC_IF_NARGGT2(i_LIMSELECT_RF_STRING_BEFOREV,18,__VA_ARGS__)
-    #define i_NPSELECT_RF_STRING_BEFOREV0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Beforev() needs to receive more than 4 arguments\"")
-    #define i_LIMSELECT_RF_STRING_BEFOREV1(...) RF_COMPILE_ERROR("message \"Extra Arguments Limit Reached: Function rfString_Beforev() received more extra arguments than the limit permits\"")
-    #define i_LIMSELECT_RF_STRING_BEFOREV0(...) RF_SELECT_FUNC(i_SELECT_RF_STRING_BEFOREV,__VA_ARGS__)
-    #define i_SELECT_RF_STRING_BEFOREV5(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...)    \
-        i_rfLMSX_WRAP5(char,i_rfString_Beforev,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_BEFOREV6(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP6(char,i_rfString_Beforev,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_BEFOREV7(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP7(char,i_rfString_Beforev,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_BEFOREV8(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP8(char,i_rfString_Beforev,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_BEFOREV9(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP9(char,i_rfString_Beforev,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_BEFOREV10(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP10(char,i_rfString_Beforev,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_BEFOREV11(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP11(char,i_rfString_Beforev,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_BEFOREV12(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP12(char,i_rfString_Beforev,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_BEFOREV13(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP13(char,i_rfString_Beforev,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_BEFOREV14(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP14(char,i_rfString_Beforev,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_BEFOREV15(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP15(char,i_rfString_Beforev,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_BEFOREV16(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP16(char,i_rfString_Beforev,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_BEFOREV17(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP17(char,i_rfString_Beforev,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_BEFOREV18(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP18(char,i_rfString_Beforev,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-#else
-   i_DECLIMEX_ char rfString_Beforev(void* thisstr,void* result,const char* options,const unsigned char* parN, ...);
-#endif
+
 
 //! @memberof RF_String
 //! @brief Initializes the given string as the substring from the start until the given string is found
@@ -1052,22 +989,18 @@ i_DECLIMEX_ char rfString_Beforev(const void* thisstr,void* result,const char op
 //! In the latter case an error is also logged.
 //! @see rfString_Beforev()
 //! @see rfString_After()
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ char rfString_Before(const void* thisstr,const void* sstr,void* result,const char options);
 #else
-i_DECLIMEX_ char i_rfString_Before(const void* thisstr,const void* sstr,void* result,const char* options);
-    #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfString_Before(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_BEFORE,4,__VA_ARGS__)
-        #define i_NPSELECT_RF_STRING_BEFORE1(...)  RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Before() accepts from 3 to 4 arguments\"")
-        #define i_NPSELECT_RF_STRING_BEFORE0(...)  RF_SELECT_FUNC(i_SELECT_RF_STRING_BEFORE,__VA_ARGS__)
-        #define i_SELECT_RF_STRING_BEFORE3(i_THISSTR_,i_SEARCHSTR_,i_RESULT_) i_rfLMSX_WRAP4(char,i_rfString_Before,i_THISSTR_,i_SEARCHSTR_,i_RESULT_,i_RFI8_(0))
-        #define i_SELECT_RF_STRING_BEFORE4(i_THISSTR_,i_SEARCHSTR_,i_RESULT_,i_OPTIONS_) i_rfLMSX_WRAP4(char,i_rfString_Before,i_THISSTR_,i_SEARCHSTR_,i_RESULT_,i_RFI8_(i_OPTIONS_))
-        #define i_SELECT_RF_STRING_BEFORE2(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Before() accepts from 3 to 4 arguments\"")
-        #define i_SELECT_RF_STRING_BEFORE1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Before() accepts from 3 to 4 arguments\"")
-        #define i_SELECT_RF_STRING_BEFORE0(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Before() accepts from 3 to 4 arguments\"")
-    #else
-        #define rfString_Before(i_THISSTR_,i_SEARCHSTR_,i_RESULT_,i_OPTIONS_) i_rfLMSX_WRAP4(char,i_rfString_Before,i_THISSTR_,i_SEARCHSTR_,i_RESULT_,i_RFI8_(i_OPTIONS_))
-    #endif
+i_DECLIMEX_ char i_rfString_Before(const void* thisstr,const void* sstr,void* result,const char options);
+#define rfString_Before(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_BEFORE,4,__VA_ARGS__)
+#define i_NPSELECT_RF_STRING_BEFORE1(...)  RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Before() accepts from 3 to 4 arguments\"")
+#define i_NPSELECT_RF_STRING_BEFORE0(...)  RF_SELECT_FUNC(i_SELECT_RF_STRING_BEFORE,__VA_ARGS__)
+#define i_SELECT_RF_STRING_BEFORE4(i_THISSTR_,i_SEARCHSTR_,i_RESULT_,i_OPTIONS_) i_rfString_Before(i_THISSTR_,i_SEARCHSTR_,i_RESULT_,i_OPTIONS_)
+#define i_SELECT_RF_STRING_BEFORE3(i_THISSTR_,i_SEARCHSTR_,i_RESULT_) i_rfString_Before(i_THISSTR_,i_SEARCHSTR_,i_RESULT_,0)
+#define i_SELECT_RF_STRING_BEFORE2(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Before() accepts from 3 to 4 arguments\"")
+#define i_SELECT_RF_STRING_BEFORE1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Before() accepts from 3 to 4 arguments\"")
+#define i_SELECT_RF_STRING_BEFORE0(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Before() accepts from 3 to 4 arguments\"")
 #endif
 
 //! @memberof RF_String
@@ -1092,22 +1025,18 @@ i_DECLIMEX_ char i_rfString_Before(const void* thisstr,const void* sstr,void* re
 //! @see rfString_Afterv()
 //! @see rfString_Before()
 //! @see rfStringX_MoveAfter()
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ char rfString_After(const void* thisstr,const void* after,void* result,const char options);
 #else
-i_DECLIMEX_ char i_rfString_After(const void* thisstr,const void* after,void* result,const char* options);
-    #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfString_After(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_AFTER,4,__VA_ARGS__)
-        #define i_NPSELECT_RF_STRING_AFTER1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_After() accepts from 3 to 4 arguments\"")
-        #define i_NPSELECT_RF_STRING_AFTER0(...) RF_SELECT_FUNC(i_SELECT_RF_STRING_AFTER,__VA_ARGS__)
-        #define i_SELECT_RF_STRING_AFTER3(i_THISSTR_,i_AFTERSTR_,i_OUTSTR_) i_rfLMSX_WRAP4(char,i_rfString_After,i_THISSTR_,i_AFTERSTR_,i_OUTSTR_,i_RFI8_(0))
-        #define i_SELECT_RF_STRING_AFTER4(i_THISSTR_,i_AFTERSTR_,i_OUTSTR_,i_OPTIONS_) i_rfLMSX_WRAP4(char,i_rfString_After,i_THISSTR_,i_AFTERSTR_,i_OUTSTR_,i_RFI8_(i_OPTIONS_))
-        #define i_SELECT_RF_STRING_AFTER2(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_After() accepts from 3 to 4 arguments\"")
-        #define i_SELECT_RF_STRING_AFTER1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_After() accepts from 3 to 4 arguments\"")
-        #define i_SELECT_RF_STRING_AFTER0(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_After() accepts from 3 to 4 arguments\"")
-    #else
-        #define rfString_After(i_THISSTR_,i_AFTERSTR_,i_OUTSTR_,i_OPTIONS_) i_rfLMSX_WRAP4(char,i_rfString_After,i_THISSTR_,i_AFTERSTR_,i_OUTSTR_,i_RFI8_(i_OPTIONS_))
-    #endif
+i_DECLIMEX_ char i_rfString_After(const void* thisstr,const void* after,void* result,const char options);
+#define rfString_After(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_AFTER,4,__VA_ARGS__)
+#define i_NPSELECT_RF_STRING_AFTER1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_After() accepts from 3 to 4 arguments\"")
+#define i_NPSELECT_RF_STRING_AFTER0(...) RF_SELECT_FUNC(i_SELECT_RF_STRING_AFTER,__VA_ARGS__)
+#define i_SELECT_RF_STRING_AFTER4(i_THISSTR_,i_AFTERSTR_,i_OUTSTR_,i_OPTIONS_) i_rfString_After(i_THISSTR_,i_AFTERSTR_,i_OUTSTR_,i_OPTIONS_)
+#define i_SELECT_RF_STRING_AFTER3(i_THISSTR_,i_AFTERSTR_,i_OUTSTR_) i_rfString_After(i_THISSTR_,i_AFTERSTR_,i_OUTSTR_,0)
+#define i_SELECT_RF_STRING_AFTER2(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_After() accepts from 3 to 4 arguments\"")
+#define i_SELECT_RF_STRING_AFTER1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_After() accepts from 3 to 4 arguments\"")
+#define i_SELECT_RF_STRING_AFTER0(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_After() accepts from 3 to 4 arguments\"")
 #endif
 
 //! @memberof RF_String
@@ -1117,9 +1046,6 @@ i_DECLIMEX_ char i_rfString_After(const void* thisstr,const void* after,void* re
 //! Initializes the given String with the substring located after (and not including) the after substring inside the parameter string. If the substring is not located the function returns false.
 //! The parameters that have to be given as variable argument <b>must</b> be of type RF_String* or RF_StringX* or even
 //! string initializes with the temporary string macro
-//! @rfNoDefArgsWarn1
-//! @warning if the library has been compiled with @c DEFAULT_ARGUMENTS off then arguments @c options and @c parN are actually pointers
-//! to @c char and @c unsigned char respectively
 //! @lmsFunction
 //! @param[in] thisstr The parameter string from which the substring will be formed. @inhtype{String,StringX}
 //! @param[out] result Pass a pointer to a String type to receive the substring of @c thisstr after the the first of the given substrings has been found.
@@ -1133,37 +1059,10 @@ i_DECLIMEX_ char i_rfString_After(const void* thisstr,const void* after,void* re
 //! + @c RF_STRINGX_ARGUMENT: Pass this bitflag option if the pointer you gave for initialization at @c result is of RF_StringX type
 //! @param parN The number of substrings to search for.
 //! @param ... The substrings to search for. @inhtype{String,StringX} @tmpSTR
-//! @extraVarArgLim
 //! @return Returns true for success and false if the substring is not found in the parameter string.
 //! @see rfString_After()
 //! @see rfString_Beforev()
-#ifdef RF_IAMHERE_FOR_DOXYGEN
 i_DECLIMEX_ char rfString_Afterv(const void* thisstr,void* result,const char options,const unsigned char parN,...);
-#endif
-#ifdef RF_OPTION_DEFAULT_ARGUMENTS
-i_DECLIMEX_ char i_rfString_Afterv(const void* thisstr,void* result,const char* options,const unsigned char* parN,...);
-    #define rfString_Afterv(...)  RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_AFTERV,4,__VA_ARGS__)
-    #define i_NPSELECT_RF_STRING_AFTERV1(...)  RF_SELECT_FUNC_IF_NARGGT2(i_LIMSELECT_RF_STRING_AFTERV,18,__VA_ARGS__)
-    #define i_NPSELECT_RF_STRING_AFTERV0(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfString_Afterv() needs to receive more than 4 arguments\"")
-    #define i_LIMSELECT_RF_STRING_AFTERV1(...) RF_COMPILE_ERROR("message \"Extra Arguments Limit Reached: Function rfString_Afterv() received more extra arguments than the limit permits\"")
-    #define i_LIMSELECT_RF_STRING_AFTERV0(...) RF_SELECT_FUNC(i_SELECT_RF_STRING_AFTERV,__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV5(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP5(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV6(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP6(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV7(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP7(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV8(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP8(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV9(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP9(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV10(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP10(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV11(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP11(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV12(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP12(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV13(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP13(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV14(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP14(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV15(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP15(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV16(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP16(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV17(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP17(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-    #define i_SELECT_RF_STRING_AFTERV18(i_ARG1_,i_ARG2_,i_ARG3_,i_ARG4_,...) i_rfLMSX_WRAP18(char,i_rfString_Afterv,i_ARG1_,i_ARG2_,i_RFI8_(i_ARG3_),i_RFUI8_(i_ARG4_),__VA_ARGS__)
-#else
-    char rfString_Afterv(void* thisstr,void* result,const char* options,const unsigned char* parN,...);
-#endif
 
 
 
@@ -1228,6 +1127,7 @@ i_DECLIMEX_ void rfString_ToUpper(void* thisstr);
 //! <b>has to be freed explicitly</b> later by thg user. Also each String inside the array has to be Deinitialized too.
 //! Here is an example usage:
 //! @snippet Strings/tokenize.cpp Tokenize_C
+//! @lmsFunction
 //! @param[in] thisstr The string to tokenize. @inhtype{String,StringX}
 //! @param[in] sep A substring that will be used as a separator @inhtype{String,StringX}
 //! @param[out] tokensN The number of tokens that got created
@@ -1249,12 +1149,8 @@ i_DECLIMEX_ void rfString_ToUpper(void* thisstr);
 //!     return true;
 //! }
 //! @endcpp @endinternal
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
 i_DECLIMEX_ char rfString_Tokenize(const void* thisstr,const void* sep,uint32_t* tokensN,RF_String** tokens);
-#else
-i_DECLIMEX_ char i_rfString_Tokenize(const void* thisstr,const void* sep,uint32_t* tokensN,RF_String** tokens);
-#define rfString_Tokenize(i_THISSTR_,i_SEP_,i_TOKENSN_,i_TOKENS_) i_rfLMSX_WRAP4(char,i_rfString_Tokenize,i_THISSTR_,i_SEP_,i_TOKENSN_,i_TOKENS_)
-#endif
+
 
 //! @}
 
@@ -1274,12 +1170,8 @@ i_DECLIMEX_ char i_rfString_Tokenize(const void* thisstr,const void* sep,uint32_
 //! @see rfStringAppend_i()
 //! @see rfStringAppend_f()
 //! @see rfString_Prepend()
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
 i_DECLIMEX_ void rfString_Append(RF_String* thisstr,const void* other);
-#else
-i_DECLIMEX_ void i_rfString_Append(RF_String* thisstr,const void* other);
-#define rfString_Append(i_THISSTR_,i_OTHERSTR_) i_rfLMS_WRAP2(void,i_rfString_Append,i_THISSTR_,i_OTHERSTR_)
-#endif
+
 
 //! @memberof RF_String
 //! @opadd
@@ -1311,12 +1203,8 @@ i_DECLIMEX_ void rfString_Append_f(RF_String* thisstr,const float f);
 //! @param thisstr The string to prepend to
 //! @param other The string to prepend to this string. @inhtype{String,StringX} @tmpSTR
 //! @see rfString_Append()
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
 i_DECLIMEX_ void rfString_Prepend(RF_String* thisstr,const void* other);
-#else
-i_DECLIMEX_ void i_rfString_Prepend(RF_String* thisstr,const void* other);
-#define rfString_Prepend(i_THISSTR_,i_OTHERSTR_)    i_rfLMS_WRAP2(void,i_rfString_Prepend,i_THISSTR_,i_OTHERSTR_)
-#endif
+
 
 //! @}
 
@@ -1344,23 +1232,19 @@ i_DECLIMEX_ void i_rfString_Prepend(RF_String* thisstr,const void* other);
 //! @return Returns true in case of success, and false if the substring was not even found inside the string
 //! @see rfString_Append()
 //! @see rfString_Trim()
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ char rfString_Remove(void* thisstr,const void* rstr,uint32_t number,const char options);
 #else
-    i_DECLIMEX_ char i_rfString_Remove(void* thisstr,const void* rstr,uint32_t* number,const char* options);
-    #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfString_Remove(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_REMOVE,4,__VA_ARGS__)
-        #define i_NPSELECT_RF_STRING_REMOVE1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Remove() accepts from 2 to 4 arguments\"")
-        #define i_NPSELECT_RF_STRING_REMOVE0(...) RF_SELECT_FUNC(i_SELECT_RF_STRING_REMOVE,__VA_ARGS__)
-        #define i_SELECT_RF_STRING_REMOVE2(i_THISSTR_,i_REPSTR_) i_rfLMSX_WRAP4(char,i_rfString_Remove,i_THISSTR_,i_REPSTR_,i_RFUI32_(0),i_RFI8_(0))
-        #define i_SELECT_RF_STRING_REMOVE3(i_THISSTR_,i_REPSTR_,i_NUMBER_) i_rfLMSX_WRAP4(char,i_rfString_Remove,i_THISSTR_,i_REPSTR_,i_RFUI32_(i_NUMBER_),i_RFI8_(0))
-        #define i_SELECT_RF_STRING_REMOVE4(i_THISSTR_,i_REPSTR_,i_NUMBER_,i_OPTIONS_) \
-            i_rfLMSX_WRAP4(char,i_rfString_Remove,i_THISSTR_,i_REPSTR_,i_RFUI32_(i_NUMBER_),i_RFI8_(i_OPTIONS_))
-        #define i_SELECT_RF_STRING_REMOVE1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Remove() accepts from 2 to 4 arguments\"")
-        #define i_SELECT_RF_STRING_REMOVE0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Remove() accepts from 2 to 4 arguments\"")
-    #else
-        #define rfString_Remove(i_THISSTR_,i_REPSTR_,i_NUMBER_,i_OPTIONS_) i_rfLMSX_WRAP4(char,i_rfString_Remove,i_THISSTR_,i_REPSTR_,i_RFUI32_(i_NUMBER_),i_RFI8_(i_OPTIONS_))
-    #endif
+i_DECLIMEX_ char i_rfString_Remove(void* thisstr,const void* rstr,uint32_t number,const char options);
+#define rfString_Remove(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_REMOVE,4,__VA_ARGS__)
+#define i_NPSELECT_RF_STRING_REMOVE1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Remove() accepts from 2 to 4 arguments\"")
+#define i_NPSELECT_RF_STRING_REMOVE0(...) RF_SELECT_FUNC(i_SELECT_RF_STRING_REMOVE,__VA_ARGS__)
+#define i_SELECT_RF_STRING_REMOVE4(i_THISSTR_,i_REPSTR_,i_NUMBER_,i_OPTIONS_) \
+    i_rfString_Remove(i_THISSTR_,i_REPSTR_,i_NUMBER_,i_OPTIONS_)
+#define i_SELECT_RF_STRING_REMOVE3(i_THISSTR_,i_REPSTR_,i_NUMBER_) i_rfString_Remove(i_THISSTR_,i_REPSTR_,i_NUMBER_,0)
+#define i_SELECT_RF_STRING_REMOVE2(i_THISSTR_,i_REPSTR_) i_rfString_Remove(i_THISSTR_,i_REPSTR_,0,0)
+#define i_SELECT_RF_STRING_REMOVE1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Remove() accepts from 2 to 4 arguments\"")
+#define i_SELECT_RF_STRING_REMOVE0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Remove() accepts from 2 to 4 arguments\"")
 #endif
 
 //! @memberof RF_String
@@ -1373,12 +1257,8 @@ i_DECLIMEX_ char rfString_Remove(void* thisstr,const void* rstr,uint32_t number,
 //! @lmsFunction
 //! @param thisstr The string to remove from @inhtype{String,StringX}
 //! @param keepstr A string all of whose characters will be kept in @c thisstr @inhtype{String,StringX} @tmpSTR
-#ifdef RF_IAMHERE_FOR_DOXYGEN
 i_DECLIMEX_ void rfString_KeepOnly(void* thisstr,const void* keepstr);
-#else
-i_DECLIMEX_ void i_rfString_KeepOnly(void* thisstr,const void* keepstr);
-#define rfString_KeepOnly(i_THISSTR_,I_KEEPSTR_)    i_rfLMS_WRAP2(void,i_rfString_KeepOnly,i_THISSTR_,I_KEEPSTR_)
-#endif
+
 
 //! @memberof RF_String
 //! @brief Removes the first n characters from the start of the string.
@@ -1443,12 +1323,8 @@ i_DECLIMEX_ char rfString_PruneMiddleF(void* thisstr,uint32_t p,uint32_t n);
 //! @return Returns true for success and false if none of @c sub characters were found inside the given String
 //! @see rfString_Trim()
 //! @see rfString_TrimEnd()
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
-    i_DECLIMEX_ char rfString_TrimStart(void* thisstr,const void* sub);
-#else
-    i_DECLIMEX_ char i_rfString_TrimStart(void* thisstr,const void* sub);
-    #define rfString_TrimStart(i_THISSTR_,i_SUBSTR_) i_rfLMSX_WRAP2(char,i_rfString_TrimStart,i_THISSTR_,i_SUBSTR_)
-#endif
+i_DECLIMEX_ char rfString_TrimStart(void* thisstr,const void* sub);
+
 //! @memberof RF_String
 //! @brief Removes all characters of a substring starting from the end of the String
 //!
@@ -1461,12 +1337,7 @@ i_DECLIMEX_ char rfString_PruneMiddleF(void* thisstr,uint32_t p,uint32_t n);
 //! @return Returns true for success and false if none of @c sub characters were found inside the given String
 //! @see rfString_Trim()
 //! @see rfString_TrimStart()
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
-    i_DECLIMEX_ char rfString_TrimEnd(void* thisstr,const void* sub);
-#else
-    i_DECLIMEX_ char i_rfString_TrimEnd(void* thisstr,const void* sub);
-    #define rfString_TrimEnd(i_THISSTR_,i_SUBSTR_) i_rfLMSX_WRAP2(char,i_rfString_TrimEnd,i_THISSTR_,i_SUBSTR_)
-#endif
+i_DECLIMEX_ char rfString_TrimEnd(void* thisstr,const void* sub);
 
 //! @memberof RF_String
 //! @brief Removes all characters of a substring from both ends of the given String
@@ -1480,12 +1351,7 @@ i_DECLIMEX_ char rfString_PruneMiddleF(void* thisstr,uint32_t p,uint32_t n);
 //! @return Returns true for success and false if none of @c sub characters were found inside the given String
 //! @see rfString_TrimStart()
 //! @see rfString_TrimEnd()
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
-    i_DECLIMEX_ char rfString_Trim(void* thisstr,const void* sub);
-#else
-    i_DECLIMEX_ char i_rfString_Trim(void* thisstr,const void* sub);
-    #define rfString_Trim(i_THISSTR_,i_SUBSTR_) i_rfLMSX_WRAP2(char,i_rfString_Trim,i_THISSTR_,i_SUBSTR_)
-#endif
+i_DECLIMEX_ char rfString_Trim(void* thisstr,const void* sub);
 
 //! @}
 
@@ -1511,26 +1377,21 @@ i_DECLIMEX_ char rfString_PruneMiddleF(void* thisstr,uint32_t p,uint32_t n);
 //!     @e "HELLOWORLD" would replace nothing. Default is with this flag off.
 //! @return Returns true in case of success, and false if the substring was not even found inside the string
 //! @see rfStringX_Replace()
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ char rfString_Replace(RF_String* thisstr,const void* sstr,const void* rstr,const uint32_t number,const char options);
 #else
-i_DECLIMEX_ char i_rfString_Replace(RF_String* thisstr,const void* sstr,const void* rstr,const uint32_t* number,const char* options);
-    #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfString_Replace(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_REPLACE,5,__VA_ARGS__)
-        #define i_NPSELECT_RF_STRING_REPLACE1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Replace() accepts from 3 to 5 arguments\"")
-        #define i_NPSELECT_RF_STRING_REPLACE0(...) RF_SELECT_FUNC(i_SELECT_RF_STRING_REPLACE,__VA_ARGS__)
-        #define i_SELECT_RF_STRING_REPLACE3(i_THISSTR_,i_SEARCHSTR_,i_REPSTR_) i_rfLMSX_WRAP5(char,i_rfString_Replace,i_THISSTR_,i_SEARCHSTR_,i_REPSTR_,i_RFUI32_(0),i_RFI8_(0))
-        #define i_SELECT_RF_STRING_REPLACE4(i_THISSTR_,i_SEARCHSTR_,i_REPSTR_,i_NUMBER_) \
-            i_rfLMSX_WRAP5(char,i_rfString_Replace,i_THISSTR_,i_SEARCHSTR_,i_REPSTR_,i_RFUI32_(i_NUMBER_),i_RFI8_(0))
-        #define i_SELECT_RF_STRING_REPLACE5(i_THISSTR_,i_SEARCHSTR_,i_REPSTR_,i_NUMBER_,i_OPTIONS_) \
-            i_rfLMSX_WRAP5(char,i_rfString_Replace,i_THISSTR_,i_SEARCHSTR_,i_REPSTR_,i_RFUI32_(i_NUMBER_),i_RFI8_(i_OPTIONS_))
-        #define i_SELECT_RF_STRING_REPLACE2(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Replace() accepts from 3 to 5 arguments\"")
-        #define i_SELECT_RF_STRING_REPLACE1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Replace() accepts from 3 to 5 arguments\"")
-        #define i_SELECT_RF_STRING_REPLACE0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Replace() accepts from 3 to 5 arguments\"")
-    #else
-        #define rfString_Replace(i_THISSTR_,i_SEARCHSTR_,i_REPSTR_,i_NUMBER_,i_OPTIONS_) \
-            i_rfLMSX_WRAP5(char,i_rfString_Replace,i_THISSTR_,i_SEARCHSTR_,i_REPSTR_,i_RFUI32_(i_NUMBER_),i_RFI8_(i_OPTIONS_))
-    #endif
+i_DECLIMEX_ char i_rfString_Replace(RF_String* thisstr,const void* sstr,const void* rstr,const uint32_t number,const char options);
+#define rfString_Replace(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_REPLACE,5,__VA_ARGS__)
+#define i_NPSELECT_RF_STRING_REPLACE1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Replace() accepts from 3 to 5 arguments\"")
+#define i_NPSELECT_RF_STRING_REPLACE0(...) RF_SELECT_FUNC(i_SELECT_RF_STRING_REPLACE,__VA_ARGS__)
+#define i_SELECT_RF_STRING_REPLACE5(i_THISSTR_,i_SEARCHSTR_,i_REPSTR_,i_NUMBER_,i_OPTIONS_) \
+    i_rfString_Replace(i_THISSTR_,i_SEARCHSTR_,i_REPSTR_,i_NUMBER_,i_OPTIONS_)
+#define i_SELECT_RF_STRING_REPLACE4(i_THISSTR_,i_SEARCHSTR_,i_REPSTR_,i_NUMBER_) \
+    i_rfString_Replace(i_THISSTR_,i_SEARCHSTR_,i_REPSTR_,i_NUMBER_,0)
+#define i_SELECT_RF_STRING_REPLACE3(i_THISSTR_,i_SEARCHSTR_,i_REPSTR_) i_rfString_Replace(i_THISSTR_,i_SEARCHSTR_,i_REPSTR_,0,0)
+#define i_SELECT_RF_STRING_REPLACE2(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Replace() accepts from 3 to 5 arguments\"")
+#define i_SELECT_RF_STRING_REPLACE1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Replace() accepts from 3 to 5 arguments\"")
+#define i_SELECT_RF_STRING_REPLACE0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Replace() accepts from 3 to 5 arguments\"")
 #endif
 
 
@@ -1765,21 +1626,17 @@ i_DECLIMEX_ int32_t rfString_Append_fUTF32(RF_String* str,FILE* f,char endianess
 //! + @c RE_FILE_IO: Writting failed because of a physical I/O error
 //! + @c RE_FILE_NOSPACE: Writting failed because the device containing the file had no free space
 //! + @c RE_FILE_NOT_FILE: Writting failed because the given file descriptor @c f is either non existen or not a file
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
-    i_DECLIMEX_ int32_t rfString_Fwrite(void* s,FILE* f,char encoding);
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
+i_DECLIMEX_ int32_t rfString_Fwrite(void* s,FILE* f,char encoding);
 #else
-    i_DECLIMEX_ int32_t i_rfString_Fwrite(void* s,FILE* f,char* encoding);
-    #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfString_Fwrite(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_FWRITE,3,__VA_ARGS__)
-        #define i_NPSELECT_RF_STRING_FWRITE1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Fwrite() accepts from 2 to 3 arguments\"")
-        #define i_NPSELECT_RF_STRING_FWRITE0(...) RF_SELECT_FUNC(i_SELECT_RF_STRING_FWRITE,__VA_ARGS__)
-        #define i_SELECT_RF_STRING_FWRITE3(i_STR_,i_FILE_,i_ENCODING_) i_rfLMSX_WRAP3(int32_t,i_rfString_Fwrite,i_STR_,i_FILE_,i_RFI8_(i_ENCODING_))
-        #define i_SELECT_RF_STRING_FWRITE2(i_STR_,i_FILE_) i_rfLMSX_WRAP3(int32_t,i_rfString_Fwrite,i_STR_,i_FILE_,i_RFI8_(RF_UTF8))
-        #define i_SELECT_RF_STRING_FWRITE1(i_STR_,i_FILE_) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Fwrite() accepts from 2 to 3 arguments\"")
-        #define i_SELECT_RF_STRING_FWRITE0(i_STR_,i_FILE_) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Fwrite() accepts from 2 to 3 arguments\"")
-    #else
-        #define rfString_Fwrite_fUTF8(i_STR_,i_FILE_,i_ENCODING_) i_rfLMSX_WRAP3(int32_t,i_rfString_Fwrite,i_STR_,i_FILE_,i_RFI8_(i_ENCODING_))
-    #endif
+i_DECLIMEX_ int32_t i_rfString_Fwrite(void* s,FILE* f,char encoding);
+#define rfString_Fwrite(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_FWRITE,3,__VA_ARGS__)
+#define i_NPSELECT_RF_STRING_FWRITE1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Fwrite() accepts from 2 to 3 arguments\"")
+#define i_NPSELECT_RF_STRING_FWRITE0(...) RF_SELECT_FUNC(i_SELECT_RF_STRING_FWRITE,__VA_ARGS__)
+#define i_SELECT_RF_STRING_FWRITE3(i_STR_,i_FILE_,i_ENCODING_) i_rfString_Fwrite(i_STR_,i_FILE_,i_ENCODING_)
+#define i_SELECT_RF_STRING_FWRITE2(i_STR_,i_FILE_) i_rfString_Fwrite(i_STR_,i_FILE_,RF_UTF8))
+#define i_SELECT_RF_STRING_FWRITE1(i_STR_,i_FILE_) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Fwrite() accepts from 2 to 3 arguments\"")
+#define i_SELECT_RF_STRING_FWRITE0(i_STR_,i_FILE_) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfString_Fwrite() accepts from 2 to 3 arguments\"")
 #endif
 
 

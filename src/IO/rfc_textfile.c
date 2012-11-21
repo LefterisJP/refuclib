@@ -31,12 +31,16 @@
 #include "textfile_private.h"
 
 //Initializes a new text file
-int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* encodingP)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
+int32_t rfTextFile_Init(RF_TextFile* t,const void* nameP,char mode,char encoding)
+#else
+int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char mode,char encoding)
+#endif
 {
     int32_t error;
     RF_String* name = (RF_String*) nameP;
-    char encoding = *encodingP;
-    char mode = *modeP;
+    RF_ENTER_LOCAL_SCOPE()
+
     //save the name of the file
     rfString_Copy_IN(&t->name,name);
     t->hasBom = false;
@@ -67,14 +71,15 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* enc
         default:
             LOG_ERROR("Attempted to initialize textfile \"%s\" with illegal mode",RE_FILE_MODE,name->bytes);
             rfString_Deinit(&t->name);
-            return RE_FILE_MODE;
+            error = RE_FILE_MODE;
+            goto cleanup1;
         break;
     }//end of opening mode switch
     //if the file failed to open read errno
     if(t->f == 0)
-    {
-        i_TEXTFILE_FOPEN_CHECK(t,"Initialization of")
-    }
+        i_TEXTFILE_FOPEN_CHECK_GOTO(t,"Initialization of",error,cleanup1)
+
+
 
     //for an existing file, get endianess and check for Byte Order Mark (BOM)
     if(mode == RF_FILE_READ || mode == RF_FILE_READ || mode == RF_FILE_READWRITE)
@@ -88,8 +93,8 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* enc
                 int16_t c;
                 if( fread(&c,2,1,t->f)!=1)
                 {
-                    i_READ_CHECK(t->f,"While opening UTF-16 text file");
-                    RETURN_LOG_ERROR("Attempted to open an empty UTF-16 text file for reading",RE_FILE_EOF)
+                    i_READ_CHECK_GOTO(t->f,"While opening UTF-16 text file",error,cleanup1)
+                    RETURNGOTO_LOG_ERROR("Attempted to open an empty UTF-16 text file for reading",RE_FILE_EOF,error,cleanup1)
                 }
                 if(c == (int16_t)0xFEFF)
                 {
@@ -117,8 +122,8 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* enc
                     {
                         if(fread(&c,2,1,t->f)!=1)
                         {
-                            i_READ_CHECK(t->f,"While reading a UTF-16 text file to determine endianess");
-                            RETURN_LOG_ERROR("EOF found very close to UTF-16 file's beginning while attempting to determine endianess",RE_FILE_EOF)
+                            i_READ_CHECK_GOTO(t->f,"While reading a UTF-16 text file to determine endianess",error,cleanup1);
+                            RETURNGOTO_LOG_ERROR("EOF found very close to UTF-16 file's beginning while attempting to determine endianess",RE_FILE_EOF,error,cleanup1)
                         }
                         bytesN+=2;
                         if(c == (int16_t) 0x0020)
@@ -150,8 +155,8 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* enc
                 int32_t c;
                 if( fread(&c,4,1,t->f)!=1)
                 {
-                    i_READ_CHECK(t->f,"While opening UTF-32 text file");
-                    RETURN_LOG_ERROR("Attempted to open an empty UTF-32 text file for reading",RE_FILE_EOF)
+                    i_READ_CHECK_GOTO(t->f,"While opening UTF-32 text file",error,cleanup1)
+                    RETURNGOTO_LOG_ERROR("Attempted to open an empty UTF-32 text file for reading",RE_FILE_EOF,error,cleanup1)
                 }
                 if(c == (int32_t)0xFEFF)
                 {
@@ -179,8 +184,8 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* enc
                     {
                         if(fread(&c,4,1,t->f)!=1)
                         {
-                            i_READ_CHECK(t->f,"While reading a UTF-32 text file to determine endianess");
-                            RETURN_LOG_ERROR("EOF found very close to UTF-32 file's beginning while attempting to determine endianess",RE_FILE_EOF)
+                            i_READ_CHECK_GOTO(t->f,"While reading a UTF-32 text file to determine endianess",error,cleanup1);
+                            RETURNGOTO_LOG_ERROR("EOF found very close to UTF-32 file's beginning while attempting to determine endianess",RE_FILE_EOF,error,cleanup1)
                         }
                         bytesN+=4;
                         if(c == (int32_t) 0x20)
@@ -239,8 +244,8 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* enc
                 uint16_t c;
                 if(fread(&c,2,1,t->f)!=1)
                 {
-                    i_READ_CHECK(t->f,"While reading a UTF-16 text file to check for Byte Order Mark Existence");
-                    RETURN_LOG_ERROR("EOF found very close to a UTF-16 file's beginning while attempting to check for Byte Order Mark Existence",RE_FILE_EOF)
+                    i_READ_CHECK_GOTO(t->f,"While reading a UTF-16 text file to check for Byte Order Mark Existence",error,cleanup1);
+                    RETURNGOTO_LOG_ERROR("EOF found very close to a UTF-16 file's beginning while attempting to check for Byte Order Mark Existence",RE_FILE_EOF,error,cleanup1)
                 }
                 if(rfUTILS_Endianess()==RF_LITTLE_ENDIAN)
                     rfUTILS_SwapEndianUS(&c);
@@ -256,8 +261,8 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* enc
                 uint16_t c;
                 if(fread(&c,2,1,t->f)!=1)
                 {
-                    i_READ_CHECK(t->f,"While reading a UTF-16 text file to check for Byte Order Mark Existence");
-                    RETURN_LOG_ERROR("EOF found very close to a UTF-16 file's beginning while attempting to check for Byte Order Mark Existence",RE_FILE_EOF)
+                    i_READ_CHECK_GOTO(t->f,"While reading a UTF-16 text file to check for Byte Order Mark Existence",error,cleanup1);
+                    RETURNGOTO_LOG_ERROR("EOF found very close to a UTF-16 file's beginning while attempting to check for Byte Order Mark Existence",RE_FILE_EOF,error,cleanup1)
                 }
                 if(rfUTILS_Endianess()==RF_BIG_ENDIAN)
                     rfUTILS_SwapEndianUS(&c);
@@ -273,8 +278,8 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* enc
                 uint32_t c;
                 if(fread(&c,4,1,t->f)!=1)
                 {
-                    i_READ_CHECK(t->f,"While reading a UTF-32 text file to check for Byte Order Mark Existence");
-                    RETURN_LOG_ERROR("EOF found very close to a UTF-32 file's beginning while attempting to check for Byte Order Mark Existence",RE_FILE_EOF)
+                    i_READ_CHECK_GOTO(t->f,"While reading a UTF-32 text file to check for Byte Order Mark Existence",error,cleanup1);
+                    RETURNGOTO_LOG_ERROR("EOF found very close to a UTF-32 file's beginning while attempting to check for Byte Order Mark Existence",RE_FILE_EOF,error,cleanup1)
                 }
                 if(rfUTILS_Endianess()==RF_LITTLE_ENDIAN)
                     rfUTILS_SwapEndianUI(&c);
@@ -290,8 +295,8 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* enc
                 uint32_t c;
                 if(fread(&c,4,1,t->f)!=1)
                 {
-                    i_READ_CHECK(t->f,"While reading a UTF-32 text file to check for Byte Order Mark Existence");
-                    RETURN_LOG_ERROR("EOF found very close to a UTF-32 file's beginning while attempting to check for Byte Order Mark Existence",RE_FILE_EOF)
+                    i_READ_CHECK_GOTO(t->f,"While reading a UTF-32 text file to check for Byte Order Mark Existence",error,cleanup1);
+                    RETURNGOTO_LOG_ERROR("EOF found very close to a UTF-32 file's beginning while attempting to check for Byte Order Mark Existence",RE_FILE_EOF,error,cleanup1)
                 }
                 if(rfUTILS_Endianess()==RF_BIG_ENDIAN)
                     rfUTILS_SwapEndianUI(&c);
@@ -305,7 +310,8 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* enc
             default:
                 LOG_ERROR("Attempted to initialize TextFile \"%s\" with illegal encoding parameter",RE_FILE_ILLEGAL_ENCODING,name->bytes);
                 rfString_Deinit(&t->name);
-                return RE_FILE_ILLEGAL_ENCODING;
+                error = RE_FILE_ILLEGAL_ENCODING;
+                goto cleanup1;
             break;
         }
     }//end of existing file case
@@ -345,16 +351,14 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* enc
             default:
                 LOG_ERROR("Attempted to initialize a new TextFile \"%s\" with illegal encoding parameter",RE_FILE_ILLEGAL_ENCODING,name->bytes);
                 rfString_Deinit(&t->name);
-                return RE_FILE_ILLEGAL_ENCODING;
+                error = RE_FILE_ILLEGAL_ENCODING;
+                goto cleanup1;
             break;
         }//end of new file encoding switch
         //add a BOM if required
 #ifdef RF_OPTION_FILE_ADDBOM
         t->hasBom = true;
-        if((error=i_rfTextFile_AddBom(t->f,t)) != RF_SUCCESS)
-        {
-            return error;
-        }
+        error=i_rfTextFile_AddBom(t->f,t);//can fail and so this function will also fail
 #endif
     }//end of newfile case
 
@@ -362,18 +366,25 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char* modeP,char* enc
     t->eof =false;
     t->line = 1;
     t->previousOp = 0;
-    //succes
-    return RF_SUCCESS;
+
+cleanup1:
+    RF_EXIT_LOCAL_SCOPE()
+    return error;
 }
 //Create a new text file
-RF_TextFile* i_rfTextFile_Create(const void* name,char* modeP,char* encodingP)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
+RF_TextFile* rfTextFile_Create(const void* name,char mode,char encoding)
+#else
+RF_TextFile* i_rfTextFile_Create(const void* name,char mode,char encoding)
+#endif
 {
     RF_TextFile* ret;
-    char encoding = *encodingP;
-    char mode = *modeP;
+    RF_ENTER_LOCAL_SCOPE()
     RF_MALLOC(ret,sizeof(RF_TextFile));
     if(rfTextFile_Init(ret,name,mode,encoding) != RF_SUCCESS)
-        return 0;
+        ret = 0;
+
+    RF_EXIT_LOCAL_SCOPE()
     return ret;
 }
 
@@ -1045,14 +1056,16 @@ int32_t rfTextFile_GoToOffset(RF_TextFile* t,foff_rft offset,int origin)
 }
 
 // Writes an RF_String to the end of the text file
-int32_t i_rfTextFile_Write(RF_TextFile* t,void* stringP)
+int32_t rfTextFile_Write(RF_TextFile* t,void* stringP)
 {
     uint32_t linesN;
-    int32_t error;
+    int32_t error = RF_SUCCESS;
     char allocatedS = false;
     RF_String* s = (RF_String*)stringP;
+    RF_ENTER_LOCAL_SCOPE()
+
     //if the file mode is not write then turn it to writing
-    RF_TEXTFILE_CANWRITE(t)
+    RF_TEXTFILE_CANWRITE_GOTO(t,error,cleanup1)
     t->previousOp = RF_FILE_WRITE;
     //let's see how many lines it will be adding to the text file
     linesN = rfString_Count(s,RFS_("\n"),0);
@@ -1072,32 +1085,38 @@ int32_t i_rfTextFile_Write(RF_TextFile* t,void* stringP)
         LOG_ERROR("There was a file write error while writting string \"%s\" to Text File \"%s\"",error,s->bytes,t->name.bytes);
         if(allocatedS == true)
             rfString_Destroy(s);
-        return error;
+        goto cleanup1;
     }
     t->line += linesN;//also add as many lines as were inside the string
-    return RF_SUCCESS;
+
+cleanup1:
+    RF_EXIT_LOCAL_SCOPE()
+    return error;
 }
 
 
 //Inserts a line into a specific part of the Text File
-int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t* lineNP,void* stringP,char *afterP)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
+int32_t rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,char after)
+#else
+int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,char after)
+#endif
 {
     char tempFName[L_tmpnam+1], *tmpNamePtr;
-    char after,lineFound,allocatedS;
-    int32_t error;
-    uint64_t lineN;
+    char lineFound,allocatedS;
     foff_rft tOff;
     FILE* newFile;
     uint32_t linesCount;
     RF_StringX buffer;
+    int32_t error = RF_FAILURE;
     //get the function's arguments
     RF_String* string = (RF_String*)stringP;
-    after = *afterP;
-    lineN = *lineNP;
+    RF_ENTER_LOCAL_SCOPE()
+
     lineFound = allocatedS = false;
     //determine the target line
     if(lineN == 0)
-        return RF_FAILURE;
+        goto cleanup0;//failure
     if(after==false)
         lineN-=1;
 
@@ -1224,7 +1243,9 @@ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t* lineNP,void* stringP,char *
     if(allocatedS == true)
         rfString_Destroy(string);
     TEXTFILE_RESETPTR(t,lineN,false,tOff)//go to the beginning of the inserted lines
+
     ///success
+    RF_EXIT_LOCAL_SCOPE()
     return RF_SUCCESS;
 
     ///cleanup code
@@ -1236,6 +1257,8 @@ cleanup2:
 cleanup1:
     if(allocatedS == true)
         rfString_Destroy(string);
+cleanup0:
+    RF_EXIT_LOCAL_SCOPE()
     return error;
 }
 
@@ -1355,26 +1378,25 @@ cleanup1:
     return error;
 }
 //Replaces a line of the textfile with the given string
-int32_t i_rfTextFile_Replace(RF_TextFile* t,uint64_t* lineNP,void* stringP)
+int32_t rfTextFile_Replace(RF_TextFile* t,uint64_t lineN,void* stringP)
 {
     char tempFName[L_tmpnam+1], *tmpNamePtr;
     char lineFound,allocatedS;
-    int32_t error;
-    uint64_t lineN;
+    int32_t error = RF_FAILURE;
     FILE* newFile;
 #ifdef RF_NEWLINE_CRLF
     uint32_t linesCount;
 #endif
     RF_StringX buffer;
     foff_rft tOff;
-
-    //get the function's arguments
     RF_String* string = (RF_String*)stringP;
-    lineN = *lineNP;
+    RF_ENTER_LOCAL_SCOPE()
+
     lineFound = allocatedS = false;
     //determine the target line
     if(lineN == 0)
-        return RF_FAILURE;
+        goto cleanup0;//failure
+
 #ifdef RF_NEWLINE_CRLF
     //determine how many lines the given string has
     linesCount = rfString_Count(string,RFS_("\n"),0);
@@ -1477,7 +1499,9 @@ int32_t i_rfTextFile_Replace(RF_TextFile* t,uint64_t* lineNP,void* stringP)
         rfString_Destroy(string);
     //get the file pointer to the beginning of the newly replaced line
     TEXTFILE_RESETPTR_FROMSTART(t,lineN,false,tOff);
+
     ///success
+    RF_EXIT_LOCAL_SCOPE()
     return RF_SUCCESS;
     ///cleanup code
 cleanup3:
@@ -1488,6 +1512,8 @@ cleanup2:
 cleanup1:
     if(allocatedS == true)
         rfString_Destroy(string);
+cleanup0:
+    RF_EXIT_LOCAL_SCOPE()
     return error;
 }
 

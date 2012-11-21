@@ -22,11 +22,12 @@
 #include <string.h> //for memmove
 /********************************************************************START OF XML_TAG functions *************************************************************************/
 
-
+#ifdef RF_OPTION_DEFAULT_ARGUMENTS
 //Allocates and returns an XML Tag
 RF_XMLTag* rfXMLTag_Create2(RF_XMLTag* parent,void* name)
 {
     RF_XMLTag* x;
+    RF_ENTER_LOCAL_SCOPE()
     RF_MALLOC(x,sizeof(RF_XMLTag));
     //get the parent pointer and copy the name string
     x->parent = parent;
@@ -40,13 +41,22 @@ RF_XMLTag* rfXMLTag_Create2(RF_XMLTag* parent,void* name)
     //if the parent exists add this child to it
     if(parent!=0)
         rfXMLTag_AddTag_nocopy(parent,x);
+
+    RF_EXIT_LOCAL_SCOPE()
     return x;
 }
-RF_XMLTag* rfXMLTag_Createv(RF_XMLTag* parent,void* name,void* content,unsigned char* attrNP,...)
+#endif
+
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
+RF_XMLTag* rfXMLTag_Create(RF_XMLTag* parent,void* name,void* content,unsigned char attrN,...)
+#else
+RF_XMLTag* rfXMLTag_Createv(RF_XMLTag* parent,void* name,void* content,unsigned char attrN,...)
+#endif
 {
     RF_XMLTag* x;
     uint32_t i;
-    unsigned char attrN = * attrNP;
+    RF_ENTER_LOCAL_SCOPE()
+
     RF_MALLOC(x,sizeof(RF_XMLTag));
     //get the parent pointer and copy the name string
     x->parent = parent;
@@ -65,7 +75,7 @@ RF_XMLTag* rfXMLTag_Createv(RF_XMLTag* parent,void* name,void* content,unsigned 
         rfXMLTag_AddContent(x,content);
     //get the attributes
     va_list argList;
-    va_start(argList,attrNP);
+    va_start(argList,attrN);
     for(i = 0; i < attrN; i ++)
     {
        RF_String* attrName  = va_arg(argList,RF_String*);
@@ -73,15 +83,22 @@ RF_XMLTag* rfXMLTag_Createv(RF_XMLTag* parent,void* name,void* content,unsigned 
        rfXMLTag_AddAttribute(x,attrName,attrValue);
     }
     va_end(argList);
+
+    RF_EXIT_LOCAL_SCOPE()
     return x;
 }
 //Allocates and returns an XML Tag from local memory
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
+RF_XMLTag* rfXMLTag_CreateLocal(RF_XMLTag* parent,void* nameP,void* contentP,unsigned char attrN,...)
+#else
 RF_XMLTag* rfXMLTag_CreateLocalv(RF_XMLTag* parent,void* nameP,void* contentP,unsigned char attrN,...)
+#endif
 {
     RF_XMLTag* x;
     RF_String* name = (RF_String*)nameP;
     RF_String* content = (RF_String*)contentP;
     uint32_t i;
+
     x = rfLMS_Push(RF_LMS,sizeof(RF_XMLTag));
     if(x == 0)
     {
@@ -156,9 +173,12 @@ RF_XMLTag* rfXMLTag_CreateLocalv(RF_XMLTag* parent,void* nameP,void* contentP,un
     va_end(argList);
     return x;
 }
+#ifdef RF_OPTION_DEFAULT_ARGUMENTS
 //Initializes an XML Tag
 char rfXMLTag_Init3(RF_XMLTag* x,RF_XMLTag* parent,void* name)
 {
+    RF_ENTER_LOCAL_SCOPE()
+
     x->parent = parent;
     rfString_Copy_IN(&x->name,name);
     //initialize the lists
@@ -170,13 +190,23 @@ char rfXMLTag_Init3(RF_XMLTag* x,RF_XMLTag* parent,void* name)
     //if the parent exists add this child to it
     if(parent!=0)
         rfXMLTag_AddTag_nocopy(parent,x);
+
+    RF_EXIT_LOCAL_SCOPE()
     return true;
 }
+#endif
+
 //Initializes an XML Tag
-char rfXMLTag_Initv(RF_XMLTag* x,RF_XMLTag* parent,void* name,void* content,unsigned char* attrNP,...)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
+char rfXMLTag_Init(RF_XMLTag* x,RF_XMLTag* parent,void* name,void* content,unsigned char attrN,...)
+#else
+char rfXMLTag_Initv(RF_XMLTag* x,RF_XMLTag* parent,void* name,void* content,unsigned char attrN,...)
+#endif
 {
     uint32_t i;
-    unsigned char attrN = * attrNP;
+    va_list argList;
+    RF_ENTER_LOCAL_SCOPE()
+
     x->parent = parent;
     rfString_Copy_IN(&x->name,name);
     //initialize the lists
@@ -192,8 +222,7 @@ char rfXMLTag_Initv(RF_XMLTag* x,RF_XMLTag* parent,void* name,void* content,unsi
     if(content != 0 )
         rfXMLTag_AddContent(x,content);
     //get the attributes
-    va_list argList;
-    va_start(argList,attrNP);
+    va_start(argList,attrN);
     for(i = 0; i < attrN; i ++)
     {
        RF_String* attrName  = va_arg(argList,RF_String*);
@@ -201,6 +230,8 @@ char rfXMLTag_Initv(RF_XMLTag* x,RF_XMLTag* parent,void* name,void* content,unsi
        rfXMLTag_AddAttribute(x,attrName,attrValue);
     }
     va_end(argList);
+
+    RF_EXIT_LOCAL_SCOPE()
     return true;
 }
 
@@ -274,19 +305,25 @@ void rfXMLTag_AddTag_nocopy(RF_XMLTag* t,RF_XMLTag* c)
     rfListP_Add(&t->children,c);
 }
 // Adds an attribute to the tag
-void i_rfXMLTag_AddAttribute(RF_XMLTag* t,void* attribName,void* attribValue)
+void rfXMLTag_AddAttribute(RF_XMLTag* t,void* attribName,void* attribValue)
 {
+    RF_ENTER_LOCAL_SCOPE()
     RF_String* name = rfString_Copy_OUT(attribName);
     RF_String* value = rfString_Copy_OUT(attribValue);
+
     rfListP_Add(&t->attributes,name);
     rfListP_Add(&t->attribValues,value);
+
+    RF_EXIT_LOCAL_SCOPE()
 }
 
 //Adds content to the tag
-void i_rfXMLTag_AddContent(RF_XMLTag* t,void* c)
+void rfXMLTag_AddContent(RF_XMLTag* t,void* c)
 {
+    RF_ENTER_LOCAL_SCOPE()
     RF_String* content = rfString_Copy_OUT(c);
     rfStringX_Append(&t->contents,content);
+    RF_EXIT_LOCAL_SCOPE()
 }
 
 //Gets the ith child tag of this tag

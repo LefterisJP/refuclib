@@ -101,12 +101,8 @@ typedef struct RF_XML
 //! 3 spaces to be used for indentation. If not, then tabs will be used.
 //! @param encoding The encoding of the file. Can be one of @c RF_UTF8, @c RF_UTF16 and @c RF_UTF32
 //! @return An XML file handler or a null pointer in case of an error while the error itself is logged
-#ifdef RF_IAMHERE_FOR_DOXYGEN
 i_DECLIMEX_ RF_XML* rfXML_Create(void* filename,char openFlag,char encoding);
-#else
-i_DECLIMEX_ RF_XML* i_rfXML_Create(void* filename,char* openFlag,char* encoding);
-#define rfXML_Create(i_FNAME_,i_OPENFLAG_,i_ENCODING_)  i_rfLMS_WRAP3(RF_XML*,i_rfXML_Create,i_FNAME_,i_RFI8_(i_OPENFLAG_),i_RFI8_(i_ENCODING_))
-#endif
+
 //! @memberof RF_XML
 //! @brief Initializes an XML Handler
 //!
@@ -132,14 +128,7 @@ i_DECLIMEX_ RF_XML* i_rfXML_Create(void* filename,char* openFlag,char* encoding)
 //! + @c RE_XML_OPEN_TAG: If at any point in the file an expected tag opening could not be found. For more information look at the error log if this error occurs.
 //! + @c RE_XML_PARSE_FAILURE: Generic parsing failure. We were expecting something from the xml file and it was not found. Such as the version tag.
 //! + @c RE_XML_UNEXPECTED_EOF: If at some point in the file the End Of File is encountered prematurely. For more information and for where in the file the unexpected EOF was found check the error log
-#ifdef RF_IAMHERE_FOR_DOXYGEN
 i_DECLIMEX_ int32_t rfXML_Init(RF_XML* xml,void* filename,char openFlag,char encoding);
-#else
-i_DECLIMEX_ int32_t i_rfXML_Init(RF_XML* xml,void* filename,char* openFlag,char* encoding);
-#define rfXML_Init(i_XML_,i_FNAME_,i_OPENFLAG_,i_ENCODING_)  i_rfLMSX_WRAP4(int32_t,i_rfXML_Init,i_XML_,i_FNAME_,i_RFI8_(i_OPENFLAG_),i_RFI8_(i_ENCODING_))
-#endif
-
-
 
 //! @}
 
@@ -190,21 +179,17 @@ i_DECLIMEX_ void rfXML_Deinit(RF_XML* x);
 //!      error means that the deleting failed.
 //! + @c RE_FILE_RENAME: If no name has been given and the previous name is used, at some point during the outputting the a temporary file
 //!      is renamed as the originally parsed file. This error means that the renaming failed
-#ifdef RF_IAMHERE_FOR_DOXYGEN
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ int32_t rfXML_ToFile(RF_XML* x, void* name,char encoding);
 #else
-i_DECLIMEX_ int32_t i_rfXML_ToFile(RF_XML* x, void* name,char* encoding);
-    #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfXML_ToFile(...)   RF_SELECT_FUNC_IF_NARGGT(i_VSELECT_RF_XML_TOFILE,3,__VA_ARGS__)
-        #define i_VSELECT_RF_XML_TOFILE1(...)   RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_ToFile() accepts from 1 to 3 arguments\"")
-        #define i_VSELECT_RF_XML_TOFILE0(...)   RF_SELECT_FUNC(i_SELECT_RF_XML_TOFILE,__VA_ARGS__)
-        #define i_SELECT_RF_XML_TOFILE3(i_XML_,i_NAME_,i_ENCODING_) i_rfLMSX_WRAP3(int32_t,i_rfXML_ToFile,i_XML_,i_NAME_,i_RFI8_(i_ENCODING_))
-        #define i_SELECT_RF_XML_TOFILE2(i_XML_,i_NAME_)             i_rfLMSX_WRAP3(int32_t,i_rfXML_ToFile,i_XML_,i_NAME_,i_RFI8_(RF_UTF8))
-        #define i_SELECT_RF_XML_TOFILE1(i_XML_)                     i_rfLMSX_WRAP3(int32_t,i_rfXML_ToFile,i_XML_,0,i_RFI8_(RF_UTF8))
-        #define i_SELECT_RF_XML_TOFILE0(...)    RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_ToFile() accepts from 1 to 3 arguments\"")
-    #else
-        #define rfXML_ToFile(i_XML_,i_NAME_,i_ENCODING_)    i_rfLMSX_WRAP3(int32_t,i_rfXML_ToFile,i_XML_,i_NAME_,i_RFI8_(i_ENCODING_))
-    #endif
+i_DECLIMEX_ int32_t i_rfXML_ToFile(RF_XML* x, void* name,char encoding);
+#define rfXML_ToFile(...)   RF_SELECT_FUNC_IF_NARGGT(i_VSELECT_RF_XML_TOFILE,3,__VA_ARGS__)
+#define i_VSELECT_RF_XML_TOFILE1(...)   RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_ToFile() accepts from 1 to 3 arguments\"")
+#define i_VSELECT_RF_XML_TOFILE0(...)   RF_SELECT_FUNC(i_SELECT_RF_XML_TOFILE,__VA_ARGS__)
+#define i_SELECT_RF_XML_TOFILE3(i_XML_,i_NAME_,i_ENCODING_) i_rfXML_ToFile(i_XML_,i_NAME_,i_ENCODING_)
+#define i_SELECT_RF_XML_TOFILE2(i_XML_,i_NAME_)             i_rfXML_ToFile(i_XML_,i_NAME_,RF_UTF8)
+#define i_SELECT_RF_XML_TOFILE1(i_XML_)                     i_rfXML_ToFile(i_XML_,0,RF_UTF8)
+#define i_SELECT_RF_XML_TOFILE0(...)    RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_ToFile() accepts from 1 to 3 arguments\"")
 #endif
 
 #define XML_TAG_END 0x1
@@ -228,12 +213,8 @@ i_DECLIMEX_ int32_t i_rfXML_ToFile(RF_XML* x, void* name,char* encoding);
 //! @return Returns @c RF_SUCCCESS for succesfull insertion or:
 //! + @c RE_XML_TOSTR: For failure at representing XML Tag @c t as a string
 //! Also this function can return any of the errors returned by @ref rfXML_InsertStr()
-#ifdef RF_IAMHERE_FOR_DOXYGEN
 i_DECLIMEX_ int32_t rfXML_InsertTag(RF_XML* x, RF_XMLTag* t,char flags);
-#else
-i_DECLIMEX_ int32_t i_rfXML_InsertTag(RF_XML* x, RF_XMLTag* t,char* flags);
-#define rfXML_InsertTag(i_XML_,i_TAG_,i_FLAGS_) i_rfLMSX_WRAP3(int32_t,i_rfXML_InsertTag,i_XML_,i_TAG_,i_RFI8_(i_FLAGS_))
-#endif
+
 
 //! @memberof RF_XML
 //! @brief Inserts a string in the XML file
@@ -260,12 +241,8 @@ i_DECLIMEX_ int32_t i_rfXML_InsertTag(RF_XML* x, RF_XMLTag* t,char* flags);
 //! + @c RE_XML_OPEN_TAG: The opening of the expected XML tag was not found in the XML line where the insertion should happen
 //! + @c RE_XML_PARSE_FAILURE: If the current xml file line is not properly formed as it should be, so no insertion can happen
 //! Also this function can return any of the errors returned by the function @ref rfTextFile_Replace()
-#ifdef RF_IAMHERE_FOR_DOXYGEN
 i_DECLIMEX_ int32_t rfXML_InsertStr(RF_XML* x, void* s,char flags);
-#else
-i_DECLIMEX_ int32_t i_rfXML_InsertStr(RF_XML* x, void* s,char* flags);
-#define rfXML_InsertStr(i_XML_,i_STR_,i_FLAGS_) i_rfLMSX_WRAP3(int32_t,i_rfXML_InsertStr,i_XML_,i_STR_,i_RFI8_(i_FLAGS_))
-#endif
+
 
 
 //! @memberof RF_XML
@@ -279,12 +256,7 @@ i_DECLIMEX_ int32_t i_rfXML_InsertStr(RF_XML* x, void* s,char* flags);
 //! @param t The tag to add. @tmpXML
 //! @return Returns @c true for succesfull root insertion or @c false if the root was already initialized or this
 //! is not a handler in memory
-#ifdef RF_IAMHERE_FOR_DOXYGEN
 i_DECLIMEX_ char rfXML_AddRoot(RF_XML* x,RF_XMLTag* t);
-#else
-i_DECLIMEX_ char i_rfXML_AddRoot(RF_XML* x,RF_XMLTag* t);
-#define rfXML_AddRoot(i_XML_,i_TAG_)    i_rfLMSX_WRAP2(char,i_rfXML_AddRoot,i_XML_,i_TAG_)
-#endif
 
 //! @memberof RF_XML
 //! @brief Provides a pointer to the XML handle's root
@@ -315,11 +287,8 @@ i_DECLIMEX_ const RF_XMLTag* rfXML_GetRoot(RF_XML* x);
 //!
 //! By omitting all arguments after @c contents at function call a more lightweight version of the function is called
 //! If the library is compiled with no default arguments on
-//! then this function can be called in a limited fashion where there is only one
+//! then this function can be called explicitly as @ref rfXML_GetTag3()  in a limited fashion where there is only one
 //! version of the function called under the hood.
-//! @rfNoDefArgsWarn1
-//! @warning IF the library is compiled with @c DEFAULT_ARGUMENTS off then the argument @c attrN is
-//! actually a pointer to a @c uint32_t
 //! @lmsFunction
 //! @param x The XML handler
 //! @param tName The tag name of the tag we need.  @inhtype{String,StringX} @tmpSTR
@@ -327,9 +296,7 @@ i_DECLIMEX_ const RF_XMLTag* rfXML_GetRoot(RF_XML* x);
 //! The tag contents are not searched for as an exact match but are instead searched to see if they exists inside
 //! the tag. Can also be @c 0 which means that no specific content is going to be searched.
 //! By omitting all arguments after this at function call a much more lightweight version of the function is called @inhtype{String,StringX} @tmpSTR
-//! @param attrN \rfoptional{0} The number of attributes to pass to the function, default is 0 which means no attributes should be passed.
-//! The maximum number of extra arguments that can be given is @varFuncLimit and that means that this number divided by 2
-//! is the number of attributes this function can accept.
+//! @param attrN \rfoptional{0} The number of attributes to pass to the function, default is 0 which means no attributes should be passed..
 //! @param ... \rfoptional{nothing} The name and values of attributes to follow. Depending on the number given at
 //! @c attrN the function expects @c attrN pairs of attributes and values here. @inhtype{String,StringX} @tmpSTR
 //! @extraVarArgLim
@@ -337,46 +304,19 @@ i_DECLIMEX_ const RF_XMLTag* rfXML_GetRoot(RF_XML* x);
 //! If this is called when the handler has the file loaded in memory this will be a pointer to a Tag in the tree in
 //! memory so it should not be freed. If on the other hand it is on the disk this is a newly allocated tag that is returned
 //! just to show to the user that the Tag was found, so in that case freeing should be performed after use with @ref rfXMLTag_Destroy()
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ RF_XMLTag* rfXML_GetTag(RF_XML* x,void* tName,void* contents, uint32_t attrN, ...);
+i_DECLIMEX_ RF_XMLTag* rfXML_GetTag3(RF_XML* x,void* tName,void* contents);
 #else
-    #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-        i_DECLIMEX_ RF_XMLTag* i_rfXML_GetTag(RF_XML* x,void* tName,void* contents, uint32_t* attrN, ...);
-        i_DECLIMEX_ RF_XMLTag* i_NVrfXML_GetTag(RF_XML* x,void* tName,void* contents);
-        #define rfXML_GetTag(...)   RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_XML_GETTAG,4,__VA_ARGS__)
-        #define i_NPSELECT_RF_XML_GETTAG1(...) RF_SELECT_FUNC_IF_NARGGT2(i_LIMSELECT_RF_XML_GETTAG,18,__VA_ARGS__)
-        #define i_NPSELECT_RF_XML_GETTAG0(...) RF_SELECT_FUNC(i_SELECT_RF_XML_GETTAG,__VA_ARGS__)
-        #define i_LIMSELECT_RF_XML_GETTAG1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GetTag() received more extra arguments than the limit permits\"")
-        #define i_LIMSELECT_RF_XML_GETTAG0(...) RF_SELECT_FUNC(i_SELECT_RF_XML_GETTAG,__VA_ARGS__)
-        #define i_SELECT_RF_XML_GETTAG18(i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_ATTRN_,...) i_rfLMS_WRAP18(RF_XMLTag*,i_rfXML_GetTag,i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_RFUI32_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XML_GETTAG17(i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_ATTRN_,...) \
-            RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GetTag() received odd number of extra arguments. Only even number can be given \"")
-        #define i_SELECT_RF_XML_GETTAG16(i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_ATTRN_,...) i_rfLMS_WRAP16(RF_XMLTag*,i_rfXML_GetTag,i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_RFUI32_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XML_GETTAG15(i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_ATTRN_,...) \
-            RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GetTag() received odd number of extra arguments. Only even number can be given \"")
-        #define i_SELECT_RF_XML_GETTAG14(i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_ATTRN_,...) i_rfLMS_WRAP14(RF_XMLTag*,i_rfXML_GetTag,i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_RFUI32_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XML_GETTAG13(i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_ATTRN_,...) \
-            RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GetTag() received odd number of extra arguments. Only even number can be given \"")
-        #define i_SELECT_RF_XML_GETTAG12(i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_ATTRN_,...) i_rfLMS_WRAP12(RF_XMLTag*,i_rfXML_GetTag,i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_RFUI32_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XML_GETTAG11(i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_ATTRN_,...) \
-            RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GetTag() received odd number of extra arguments. Only even number can be given \"")
-        #define i_SELECT_RF_XML_GETTAG10(i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_ATTRN_,...) i_rfLMS_WRAP10(RF_XMLTag*,i_rfXML_GetTag,i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_RFUI32_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XML_GETTAG9(i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_ATTRN_,...) \
-            RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GetTag() received odd number of extra arguments. Only even number can be given \"")
-        #define i_SELECT_RF_XML_GETTAG8(i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_ATTRN_,...) i_rfLMS_WRAP8(RF_XMLTag*,i_rfXML_GetTag,i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_RFUI32_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XML_GETTAG7(i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_ATTRN_,...) \
-            RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GetTag() received odd number of extra arguments. Only even number can be given \"")
-        #define i_SELECT_RF_XML_GETTAG6(i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_ATTRN_,...) \
-             i_rfLMS_WRAP6(RF_XMLTag*,i_rfXML_GetTag,i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_RFUI32_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XML_GETTAG5(i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_ATTRN_,...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GetTag() received 1 extra argument. Only even number can be given \"")
-        #define i_SELECT_RF_XML_GETTAG4(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfXML_GetTag() accepts from 2 to N arguments. But if 4 arguments are given then at least 1 more must follow\"")
-        #define i_SELECT_RF_XML_GETTAG3(i_THISTAG_,i_TAGNAME_,i_CONTENTS_) i_rfLMS_WRAP3(RF_XMLTag*,i_NVrfXML_GetTag,i_THISTAG_,i_TAGNAME_,i_CONTENTS_)
-        #define i_SELECT_RF_XML_GETTAG2(i_THISTAG_,i_TAGNAME_) i_rfLMS_WRAP3(RF_XMLTag*,i_NVrfXML_GetTag,i_THISTAG_,i_TAGNAME_,0)
-        #define i_SELECT_RF_XML_GETTAG1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GetTag() accepts from 2 to N arguments.\"")
-        #define i_SELECT_RF_XML_GETTAG0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GetTag() accepts from 2 to N arguments.\"")
-    #else
-        i_DECLIMEX_ RF_XMLTag* rfXML_GetTag(RF_XML* x,void* tName,void* contents, uint32_t* attrN, ...);
-    #endif
+i_DECLIMEX_ RF_XMLTag* i_rfXML_GetTag(RF_XML* x,void* tName,void* contents, uint32_t attrN, ...);
+i_DECLIMEX_ RF_XMLTag* i_NVrfXML_GetTag(RF_XML* x,void* tName,void* contents);
+#define rfXML_GetTag(...)   RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_XML_GETTAG,3,__VA_ARGS__)
+#define i_NPSELECT_RF_XML_GETTAG1(...) i_rfXML_GetTag(__VA_ARGS__)
+#define i_NPSELECT_RF_XML_GETTAG0(...) RF_SELECT_FUNC(i_SELECT_RF_XML_GETTAG,__VA_ARGS__)
+#define i_SELECT_RF_XML_GETTAG3(i_THISTAG_,i_TAGNAME_,i_CONTENTS_)  i_NVrfXML_GetTag(i_THISTAG_,i_TAGNAME_,i_CONTENTS_)
+#define i_SELECT_RF_XML_GETTAG2(i_THISTAG_,i_TAGNAME_)              i_NVrfXML_GetTag(i_THISTAG_,i_TAGNAME_,0)
+#define i_SELECT_RF_XML_GETTAG1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GetTag() accepts from 2 to N arguments.\"")
+#define i_SELECT_RF_XML_GETTAG0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GetTag() accepts from 2 to N arguments.\"")
 #endif
 
 //! @memberof RF_XML
@@ -388,52 +328,21 @@ i_DECLIMEX_ RF_XMLTag* rfXML_GetTag(RF_XML* x,void* tName,void* contents, uint32
 //! Also if additional data such as attributes or content is also given the search takes them also into account.
 //!
 //! This function starts searching from the beginning of the file.
-//!
-//! @rfNoDefArgsWarn1
-//! @warning IF the library is compiled with @c DEFAULT_ARGUMENTS off then the argument @c attrN is
-//! actually a pointer to a @c uint32_t
 //! @lmsFunction
 //! @param x The XML handler
 //! @param tName The tag name of the tag we need.  @inhtype{String,StringX} @tmpSTR
 //! @param contents \rfoptional{0} The contents we want search for in the tag.
 //! The tag contents are not searched for as an exact match but are instead searched to see if they exists inside
-//! the tag. Can also be @c 0 which means that no specific content is going to be searched.
-//! By omitting all arguments after this at function call a much more lightweight version of the function is called @inhtype{String,StringX} @tmpSTR
+//! the tag. Can also be @c 0 which means that no specific content is going to be searched. @inhtype{String,StringX} @tmpSTR
 //! @param attrN \rfoptional{0} The number of attributes to pass to the function, default is 0 which means no attributes should be passed.
-//! The maximum number of extra arguments that can be given is @varFuncLimit and that means that this number divided by 2
-//! is the number of attributes this function can accept.
 //! @param ... \rfoptional{nothing} The name and values of attributes to follow. Depending on the number given at
 //! @c attrN the function expects @c attrN pairs of attributes and values here. @inhtype{String,StringX} @tmpSTR
-//! @extraVarArgLim
 //! @return Returns @c RF_SUCCESS for succesfull moving of the file pointer to the given tag and error otherwise.
 //! + @c RF_FAILURE: If the handler has the XML file open only in disk
 //! + @c RE_XML_EOF: If while searchign for the given tag the End of file was reached
 //! + All the errors that @ref fTextFile_GoToOffset() and @ref fTextFile_ReadLine() can return
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
 i_DECLIMEX_ int32_t rfXML_GoToTag(RF_XML* x,void* tName,void* contents, uint32_t attrN, ...);
-#else
-    #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-        i_DECLIMEX_ int32_t i_rfXML_GoToTag(RF_XML* x,void* tName,void* contents, uint32_t* attrN, ...);
-        #define rfXML_GoToTag(...)   RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_XML_GOTOTAG,4,__VA_ARGS__)
-        #define i_NPSELECT_RF_XML_GOTOTAG1(...) RF_SELECT_FUNC_IF_NARGGT2(i_LIMSELECT_RF_XML_GOTOTAG,8,__VA_ARGS__)
-        #define i_NPSELECT_RF_XML_GOTOTAG0(...) RF_SELECT_FUNC(i_SELECT_RF_XML_GOTOTAG,__VA_ARGS__)
-        #define i_LIMSELECT_RF_XML_GOTOTAG1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GoToTag() received more extra arguments than the limit permits\"")
-        #define i_LIMSELECT_RF_XML_GOTOTAG0(...) RF_SELECT_FUNC(i_SELECT_RF_XML_GOTOTAG,__VA_ARGS__)
-        #define i_SELECT_RF_XML_GOTOTAG8(i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_ATTRN_,...) \
-            i_rfLMSX_WRAP8(int32_t,i_rfXML_GoToTag,i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_RFUI32_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XML_GOTOTAG7(i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_ATTRN_,...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GoToTag() received 3 extra arguments. Only even number can be given \"")
-        #define i_SELECT_RF_XML_GOTOTAG6(i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_ATTRN_,...) \
-             i_rfLMSX_WRAP6(int32_t,i_rfXML_GoToTag,i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_RFUI32_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XML_GOTOTAG5(i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_ATTRN_,...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GoToTag() received 1 extra argument. Only even number can be given \"")
-        #define i_SELECT_RF_XML_GOTOTAG4(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfXML_GoToTag() accepts from 2 to N arguments. But if 4 arguments are given then at least 1 more must follow\"")
-        #define i_SELECT_RF_XML_GOTOTAG3(i_THISTAG_,i_TAGNAME_,i_CONTENTS_) i_rfLMSX_WRAP4(int32_t,i_rfXML_GoToTag,i_THISTAG_,i_TAGNAME_,i_CONTENTS_,i_RFUI32_(0))
-        #define i_SELECT_RF_XML_GOTOTAG2(i_THISTAG_,i_TAGNAME_) i_rfLMSX_WRAP4(int32_t,i_rfXML_GoToTag,i_THISTAG_,i_TAGNAME_,0,i_RFUI32_(0))
-        #define i_SELECT_RF_XML_GOTOTAG1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GoToTag() accepts from 2 to N arguments.\"")
-        #define i_SELECT_RF_XML_GOTOTAG0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GoToTag() accepts from 2 to N arguments.\"")
-    #else
-        i_DECLIMEX_ int32_t rfXML_GoToTag(RF_XML* x,void* tName,void* contents, uint32_t* attrN, ...);
-    #endif
-#endif
+
 
 
 //! @memberof RF_XML
@@ -448,27 +357,19 @@ i_DECLIMEX_ int32_t rfXML_GoToTag(RF_XML* x,void* tName,void* contents, uint32_t
 //! @param direct \rfoptional{true} Boolean flag denoting whether childName neeeds to be direct child (= @c true) or anywhere in its children(= @c false)
 //! @param rParent \rfoptional{false} Boolean flag denoting whether we want to return the parent or the child. Default is @c true, meaning the parent.
 //! @return A pointer to the tag object requested, or 0 if the tag can not be found or if the XML handle is not loaded in memory
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ RF_XMLTag* rfXML_GetTag_child(RF_XML* x,void* tName,void* childName,char direct,char rParent);
 #else
-i_DECLIMEX_ RF_XMLTag* i_rfXML_GetTag_child(RF_XML* x,void* tName,void* childName,char* direct,char* rParent);
-    #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfXML_GetTag_child(...) RF_SELECT_FUNC_IF_NARGGT(i_VSELECT_RF_XML_GETTAG_CHILD,5,__VA_ARGS__)
-        #define i_VSELECT_RF_XML_GETTAG_CHILD1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GetTag_child() accepts from 3 to 5 arguments\"")
-        #define i_VSELECT_RF_XML_GETTAG_CHILD0(...) RF_SELECT_FUNC(i_SELECT_RF_XML_GETTAG_CHILD,__VA_ARGS__)
-        #define i_SELECT_RF_XML_GETTAG_CHILD5(i_XML_,i_NAME_,i_CHILD_,i_DIRECT_,i_RPARENT_) \
-            i_rfLMS_WRAP5(RF_XMLTag*,i_rfXML_GetTag_child,i_XML_,i_NAME_,i_CHILD_,i_RFI8_(i_DIRECT_),i_RFI8_(i_RPARENT_))
-        #define i_SELECT_RF_XML_GETTAG_CHILD4(i_XML_,i_NAME_,i_CHILD_,i_DIRECT_) \
-            i_rfLMS_WRAP5(RF_XMLTag*,i_rfXML_GetTag_child,i_XML_,i_NAME_,i_CHILD_,i_RFI8_(i_DIRECT_),i_RFI8_(0))
-        #define i_SELECT_RF_XML_GETTAG_CHILD3(i_XML_,i_NAME_,i_CHILD_) \
-            i_rfLMS_WRAP5(RF_XMLTag*,i_rfXML_GetTag_child,i_XML_,i_NAME_,i_CHILD_,i_RFI8_(0),i_RFI8_(0))
-        #define i_SELECT_RF_XML_GETTAG_CHILD2(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GetTag_child() accepts from 3 to 5 arguments\"")
-        #define i_SELECT_RF_XML_GETTAG_CHILD1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GetTag_child() accepts from 3 to 5 arguments\"")
-        #define i_SELECT_RF_XML_GETTAG_CHILD0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GetTag_child() accepts from 3 to 5 arguments\"")
-    #else
-        #define rfXML_GetTag_child(i_XML_,i_NAME_,i_CHILD_,i_DIRECT_,i_RPARENT_) \
-             i_rfLMS_WRAP5(RF_XMLTag*,i_rfXML_GetTag_child,i_XML_,i_NAME_,i_CHILD_,i_RFI8_(i_DIRECT_),i_RFI8_(i_RPARENT_))
-    #endif
+i_DECLIMEX_ RF_XMLTag* i_rfXML_GetTag_child(RF_XML* x,void* tName,void* childName,char direct,char rParent);
+#define rfXML_GetTag_child(...) RF_SELECT_FUNC_IF_NARGGT(i_VSELECT_RF_XML_GETTAG_CHILD,5,__VA_ARGS__)
+#define i_VSELECT_RF_XML_GETTAG_CHILD1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GetTag_child() accepts from 3 to 5 arguments\"")
+#define i_VSELECT_RF_XML_GETTAG_CHILD0(...) RF_SELECT_FUNC(i_SELECT_RF_XML_GETTAG_CHILD,__VA_ARGS__)
+#define i_SELECT_RF_XML_GETTAG_CHILD5(i_XML_,i_NAME_,i_CHILD_,i_DIRECT_,i_RPARENT_)   i_rfXML_GetTag_child(i_XML_,i_NAME_,i_CHILD_,i_DIRECT_,i_RPARENT_)
+#define i_SELECT_RF_XML_GETTAG_CHILD4(i_XML_,i_NAME_,i_CHILD_,i_DIRECT_)              i_rfXML_GetTag_child(i_XML_,i_NAME_,i_CHILD_,i_DIRECT_,0)
+#define i_SELECT_RF_XML_GETTAG_CHILD3(i_XML_,i_NAME_,i_CHILD_)                        i_rfXML_GetTag_child(i_XML_,i_NAME_,i_CHILD_,0,0)
+#define i_SELECT_RF_XML_GETTAG_CHILD2(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GetTag_child() accepts from 3 to 5 arguments\"")
+#define i_SELECT_RF_XML_GETTAG_CHILD1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GetTag_child() accepts from 3 to 5 arguments\"")
+#define i_SELECT_RF_XML_GETTAG_CHILD0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXML_GetTag_child() accepts from 3 to 5 arguments\"")
 #endif
 
 //! @}

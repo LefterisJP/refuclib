@@ -687,15 +687,17 @@ char i_NVrfStringX_Init_nc(struct RF_StringX* str,const char* lit)
 /*-------------------------------------------------------------------------Methods to copy/assign an RF_StringX-------------------------------------------------------------------------------*/
 
 // Assigns the value of the source string to the destination extended string.Both strings should already be initialized and hold a value. It is an error to give null parameters.
-void i_rfStringX_Assign(RF_StringX* dst,const void* sourceP)
+void rfStringX_Assign(RF_StringX* dst,const void* sourceP)
 {
     const RF_String* source = (const RF_String*)sourceP;
+    RF_ENTER_LOCAL_SCOPE()
     rfStringX_Reset(dst);//make sure that the destination's byte index is reset
     //only if the new string value won't fit in the buffer reallocate the buffer
     RF_STRINGX_REALLOC(dst,source->byteLength+1)
     //now copy the value and the bytelength
     memcpy(dst->INH_String.bytes,source->bytes,source->byteLength+1);
     dst->INH_String.byteLength = source->byteLength;
+    RF_EXIT_LOCAL_SCOPE()
 }
 
 //Assigns the value of a unicode character to the string
@@ -872,20 +874,20 @@ void rfStringX_Deinit(RF_StringX* s)
 /*-------------------------------------------------------------------------Functions to manipulate an RF_StringX-------------------------------------------------------------------------------*/
 
 // Appends the parameter String to this extended string.
-void i_rfStringX_Append(RF_StringX* thisstr,const void* otherP)
+void rfStringX_Append(RF_StringX* thisstr,const void* otherP)
 {
     const RF_String* other = (const RF_String*)otherP;
+    RF_ENTER_LOCAL_SCOPE()
     ///@note Here if a null addition is given lots of actions are done but the result is safe and the same string as the one entered.
     ///A check here would result in an additional check for every appending so I decided against it
 
     //calculate the new byte length
     thisstr->INH_String.byteLength += other->byteLength;
-
     //if it does not fit inside the remaining size, reallocate the buffer
     RF_STRINGX_REALLOC(thisstr,thisstr->INH_String.byteLength+thisstr->bIndex+1)
-
     //add the string to this one
     strncat(thisstr->INH_String.bytes,other->bytes,other->byteLength);
+    RF_EXIT_LOCAL_SCOPE()
 }
 
 // Appends an integer to the extended string
@@ -937,15 +939,16 @@ void rfStringX_Append_f(RF_StringX* thisstr,const float f)
 
 
 // Prepends the parameter String to this extended string
-void i_rfStringX_Prepend(RF_StringX* thisstr,const void* otherP)
+void rfStringX_Prepend(RF_StringX* thisstr,const void* otherP)
 {
     const RF_String* other = (const RF_String*)otherP;
     int32_t i;//is not unsigned since it goes to -1 in the loop
     //keep the previous byte length
     uint32_t size = thisstr->INH_String.byteLength;
+    RF_ENTER_LOCAL_SCOPE()
+
     //get the new byte length
     thisstr->INH_String.byteLength += other->byteLength;
-
     //if the new string does not fit inside the buffer reallocate it
     RF_STRINGX_REALLOC(thisstr,thisstr->INH_String.byteLength+thisstr->bIndex+1)
     //move the pre-existing string to the end of the buffer, by dislocating each byte by cstrlen
@@ -953,15 +956,17 @@ void i_rfStringX_Prepend(RF_StringX* thisstr,const void* otherP)
         thisstr->INH_String.bytes[i+other->byteLength] = thisstr->INH_String.bytes[i];
     //and now add the new string to the start
     memcpy(thisstr->INH_String.bytes,other->bytes,other->byteLength);
+
+    RF_EXIT_LOCAL_SCOPE()
 }
 
 // Inserts a string to this extended string at the parameter position.
-void i_rfStringX_Insert(RF_StringX* thisstr,uint32_t* posP,const void* otherP)
+void rfStringX_Insert(RF_StringX* thisstr,uint32_t pos,const void* otherP)
 {
     const RF_String* other = (const RF_String*)otherP;
-    uint32_t length,bytePos,size,pos,i;
-    pos = *posP;
+    uint32_t length,bytePos,size,i;
     char found = false;
+    RF_ENTER_LOCAL_SCOPE()
 
     //keep the original byte length here
     size = thisstr->INH_String.byteLength;
@@ -979,31 +984,38 @@ void i_rfStringX_Insert(RF_StringX* thisstr,uint32_t* posP,const void* otherP)
             break;
         }
     RF_STRING_ITERATE_END(length,i);
-    //if the position is not in the string do nothing
-    if(found == false)
-        return;
+    //if the position is found in the string then insert
+    if(found != false)
+    {
+        //move the string's contents to make room for the extra string insertion
+        memmove(thisstr->INH_String.bytes+other->byteLength+bytePos,thisstr->INH_String.bytes+bytePos,size-bytePos+1);//1 is for the null termination character
+        //now insert the new string
+        memcpy(thisstr->INH_String.bytes+bytePos,other->bytes,other->byteLength);
+    }
 
-    //move the string's contents to make room for the extra string insertion
-    memmove(thisstr->INH_String.bytes+other->byteLength+bytePos,thisstr->INH_String.bytes+bytePos,size-bytePos+1);//1 is for the null termination character
-    //now insert the new string
-    memcpy(thisstr->INH_String.bytes+bytePos,other->bytes,other->byteLength);
-
+    RF_EXIT_LOCAL_SCOPE()
 }
 
 // Replaces all of the specified sstr substring from the extended String with string rstr
-char i_rfStringX_Replace(RF_StringX* thisstr,const void* sstrP,const void* rstrP,const uint32_t* numP,const char* optionsP)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
+char rfStringX_Replace(RF_StringX* thisstr,const void* sstrP,const void* rstrP,uint32_t num,const char options)
+#else
+char i_rfStringX_Replace(RF_StringX* thisstr,const void* sstrP,const void* rstrP,uint32_t num,const char options)
+#endif
 {
     const RF_String* sstr = (const RF_String*)sstrP;
     const RF_String* rstr = (const RF_String*)rstrP;
-    uint32_t num = *numP;
-    char options = *optionsP;
     //will keep the number of found instances of the substring
     uint32_t foundN = 0;
     uint32_t diff,i,j,start;
+    RF_ENTER_LOCAL_SCOPE()
+
     //if the substring string is not even found return false
     if(rfString_FindBytePos(thisstr,sstr,options) == RF_FAILURE)
+    {
+        RF_EXIT_LOCAL_SCOPE()
         return false;
-
+    }
     //create a buffer that will keep the byte positions
     uint32_t bSize = 50;
     int32_t * bytePositions;
@@ -1096,20 +1108,24 @@ char i_rfStringX_Replace(RF_StringX* thisstr,const void* sstrP,const void* rstrP
     }
 
     free(bytePositions);
+    RF_EXIT_LOCAL_SCOPE()
     return true;
 }
 
 //Replaces what exists between the ith left and right substrings of this extended String.Utilizes the internal string pointer.
-char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,const void* leftP,const void* rightP,const void* rstrP,char* optionsP,uint32_t* iP)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
+char rfStringX_ReplaceBetween(RF_StringX* thisstr,const void* leftP,const void* rightP,const void* rstrP,char options,uint32_t i)
+#else
+char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,const void* leftP,const void* rightP,const void* rstrP,char options,uint32_t i)
+#endif
 {
     const RF_String* left = (const RF_String*)leftP;
     const RF_String* right = (const RF_String*)rightP;
     const RF_String* rstr = (const RF_String*)rstrP;
-    char options = *optionsP;
-    uint32_t i = *iP;
     uint32_t j,move,start = thisstr->bIndex;
-    char found = false;
+    char found = false,ret=false;
     RF_String ss;
+    RF_ENTER_LOCAL_SCOPE()
 
     if(i==0)//if we want all occurences replaced
     {
@@ -1136,9 +1152,9 @@ char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,const void* leftP,const void
             thisstr->INH_String.bytes -= move;
             thisstr->bIndex = start;
             thisstr->INH_String.byteLength += move;
-            return true;
+            ret=true;
         }
-        return false;
+        goto cleanup1;
     }
 
     ///if we check for a specific instance
@@ -1153,7 +1169,7 @@ char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,const void* leftP,const void
             thisstr->bIndex = start;
             //and increase its bytelength
             thisstr->INH_String.byteLength += move;
-            return false; //and return failure
+            goto cleanup1;//falure
         }
     }
     //move after the pair of the inbetween substrings we actually want
@@ -1165,7 +1181,7 @@ char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,const void* leftP,const void
         thisstr->bIndex = start;
         //and increase its bytelength
         thisstr->INH_String.byteLength += move;
-        return false; //and return failure
+        goto cleanup1;//falure
     }
     ///success
     //move after the left part of the pair
@@ -1178,21 +1194,34 @@ char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,const void* leftP,const void
     thisstr->INH_String.bytes -= move;
     thisstr->bIndex = start;
     thisstr->INH_String.byteLength += move;
-    return true;
+
+    //success
+    ret=true;
+cleanup1:
+    RF_EXIT_LOCAL_SCOPE()
+    return ret;
 
 }
 /*-------------------------------------------------------------------------Functions to traverse an RF_StringX-------------------------------------------------------------------------------*/
 
 
 //Moves the internal pointer right after the substring
-int32_t i_rfStringX_MoveAfter(RF_StringX* thisstr,const void* subP,void* resultP,const char* optionsP)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
+int32_t rfStringX_MoveAfter(RF_StringX* thisstr,const void* subP,void* resultP,const char options)
+#else
+int32_t i_rfStringX_MoveAfter(RF_StringX* thisstr,const void* subP,void* resultP,const char options)
+#endif
 {
     const RF_String* sub = (const RF_String*)subP;
-    char options = *optionsP;
     int32_t move;
+    RF_ENTER_LOCAL_SCOPE()
+
     //check for substring existence and return failure if not found
     if( (move = rfString_FindBytePos(thisstr,sub,options)) == RF_FAILURE)
+    {
+        RF_EXIT_LOCAL_SCOPE()
         return RF_FAILURE;
+    }
     //if found, move the internal pointer
     move += sub->byteLength;
     thisstr->bIndex += move;
@@ -1223,6 +1252,7 @@ int32_t i_rfStringX_MoveAfter(RF_StringX* thisstr,const void* subP,void* resultP
         }
     }
     //return positions moved
+    RF_EXIT_LOCAL_SCOPE()
     return move;
 }
 
@@ -1287,24 +1317,19 @@ void rfStringX_Reset(RF_StringX* thisstr)
 }
 
 //Moves the internal pointer after the first occurence of any of the given substrings
-#ifdef RF_OPTION_DEFAULT_ARGUMENTS
-char i_rfStringX_MoveAfterv(RF_StringX* thisstr,void* resultP,const char* optionsP,const unsigned char* parNP, ...)
-#else
-char rfStringX_MoveAfterv(RF_StringX* thisstr,void* resultP,const char* optionsP,const unsigned char* parNP, ...)
-#endif
+char rfStringX_MoveAfterv(RF_StringX* thisstr,void* resultP,const char options,const unsigned char parN, ...)
 {
     uint32_t i,paramLen,move;
     int32_t minPos;
     int32_t thisPos;
-    char options = *optionsP;
-    unsigned char parN = *parNP;
     //will keep the argument list
     va_list argList;
+    RF_ENTER_LOCAL_SCOPE()
 
     // will keep the winning parameter length
     paramLen = 0;
     //get the parameter characters
-    va_start(argList,parNP);
+    va_start(argList,parN);
     minPos = LONG_MAX;
     for(i = 0; i < parN; i++)
     {
@@ -1325,7 +1350,10 @@ char rfStringX_MoveAfterv(RF_StringX* thisstr,void* resultP,const char* optionsP
 
     //if it is not found
     if(minPos == LONG_MAX)
+    {
+        RF_EXIT_LOCAL_SCOPE()
         return false;
+    }
 
     //move the internal pointer after the substring
     move = minPos + paramLen;
@@ -1356,17 +1384,23 @@ char rfStringX_MoveAfterv(RF_StringX* thisstr,void* resultP,const char* optionsP
             result->bytes[result->byteLength] = '\0';
         }
     }
+    //success
+    RF_EXIT_LOCAL_SCOPE()
     return true;
 }
 //Moves the internal string pointer after the substring formed by the @c left and @c right substrings
-char i_rfStringX_MoveAfterPair(RF_StringX* thisstr,void* leftP,void* rightP,void* result,char* optionsP,uint32_t* occurenceP)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
+char rfStringX_MoveAfterPair(RF_StringX* thisstr,const void* leftP,const void* rightP,void* result,char options,uint32_t occurence)
+#else
+char i_rfStringX_MoveAfterPair(RF_StringX* thisstr,const void* leftP,const void* rightP,void* result,char options,uint32_t occurence)
+#endif
 {
-    char options = *optionsP;
-    uint32_t occurence = *occurenceP;
     uint32_t i,move,start = thisstr->bIndex;
     char found = false;
-    RF_String* left = (RF_String*)leftP;
-    RF_String* right = (RF_String*)rightP;
+    const RF_String* left = (const RF_String*)leftP;
+    const RF_String* right = (const RF_String*)rightP;
+    RF_ENTER_LOCAL_SCOPE()
+
     //check the occurence parameter
     if(occurence == 0)
         occurence =1;
@@ -1377,7 +1411,10 @@ char i_rfStringX_MoveAfterPair(RF_StringX* thisstr,void* leftP,void* rightP,void
     {
         //attempt to get the in between string
         if(rfString_Between(thisstr,left,right,result,options) == false)
+        {
+            RF_EXIT_LOCAL_SCOPE()
             return false;
+        }
 
         //move after this occurence of the pair
         rfStringX_MoveAfter(thisstr,left,0,options);
@@ -1407,6 +1444,7 @@ char i_rfStringX_MoveAfterPair(RF_StringX* thisstr,void* leftP,void* rightP,void
         thisstr->INH_String.bytes -= move;
         thisstr->INH_String.byteLength += move;
         thisstr->bIndex = start;
+        RF_EXIT_LOCAL_SCOPE()
         return false;
     }
     //if we don't want to keep the result free it
@@ -1419,6 +1457,7 @@ char i_rfStringX_MoveAfterPair(RF_StringX* thisstr,void* leftP,void* rightP,void
     }
 
     //success
+    RF_EXIT_LOCAL_SCOPE()
     return true;
 }
 /*------------------------------------------------------------------------- File I/O RF_StringX Functions -------------------------------------------------------------------------------*/

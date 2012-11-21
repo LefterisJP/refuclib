@@ -40,10 +40,10 @@ if(rfFseek((i_TEXTFILE_)->f,i_PROFF_,SEEK_SET)!=0)\
 (i_TEXTFILE_)->eof = i_PREOF_;
 
 //! A macro to resume the text file pointer back to a saved position starting from the file's start and if there is an error keep it and go to cleanup code
-#define TEXTFILE_RESETPTR_FROMSTART_GOTO(i_TEXTFILE_,i_PRLINE_,i_PREOF_,i_PROFF_,i_ERROR_,i_GOTO_)\
+#define TEXTFILE_RESETPTR_FROMSTART_GOTO(i_TEXTFILE_,i_PRLINE_,i_PREOF_,i_PROFF_,i_ERROR_,i_LABEL_)\
 if(rfFseek((i_TEXTFILE_)->f,i_PROFF_,SEEK_SET)!=0)\
 {\
-    i_TEXTFILE_FSEEK_CHECK_GOTO(i_TEXTFILE_,"Resetting the file pointer to a given position",i_ERROR_,i_GOTO_)\
+    i_TEXTFILE_FSEEK_CHECK_GOTO(i_TEXTFILE_,"Resetting the file pointer to a given position",i_ERROR_,i_LABEL_)\
 }\
 (i_TEXTFILE_)->line = i_PRLINE_;\
 (i_TEXTFILE_)->eof = i_PREOF_;
@@ -97,7 +97,7 @@ if(rfFseek((i_TEXTFILE_)->f,i_ByTeOffSeT_,SEEK_SET) != 0)\
 }
 
 //! A macro to Take the file pointer to the beginning of the file and if there is an error, keep it and go to the cleanup code
-#define TEXTFILE_GOTOSTART_GOTO(i_TEXTFILE_,i_TEXT_,i_ERROR_,i_GOTO_) \
+#define TEXTFILE_GOTOSTART_GOTO(i_TEXTFILE_,i_TEXT_,i_ERROR_,i_LABEL_) \
 {\
 /*depending on the encoding of the file*/\
 int i_ByTeOffSeT_ = 0;\
@@ -121,11 +121,11 @@ switch((i_TEXTFILE_)->encoding)\
 /*First rewind back to the start so that read/write operations can be reset*/\
 if(rfFseek((i_TEXTFILE_)->f,0,SEEK_SET) != 0)\
 {\
-    i_TEXTFILE_FSEEK_CHECK_GOTO(t,i_TEXT_,i_ERROR_,i_GOTO_)\
+    i_TEXTFILE_FSEEK_CHECK_GOTO(t,i_TEXT_,i_ERROR_,i_LABEL_)\
 }\
 if(rfFseek((i_TEXTFILE_)->f,i_ByTeOffSeT_,SEEK_SET) != 0)\
 {\
-    i_TEXTFILE_FSEEK_CHECK_GOTO(t,i_TEXT_,i_ERROR_,i_GOTO_)\
+    i_TEXTFILE_FSEEK_CHECK_GOTO(t,i_TEXT_,i_ERROR_,i_LABEL_)\
 }\
 (i_TEXTFILE_)->previousOp = 0;\
 (i_TEXTFILE_)->line = 1;\
@@ -173,26 +173,27 @@ else if((i_TEXTFILE_)->mode == RF_FILE_READWRITE)\
 }}
 
 //! A macro to check if a textfile needs to change its mode in order to perform a read operation. If error occurs it keeps it and goes to the cleanup code
-#define RF_TEXTFILE_CANREAD_GOTO(i_TEXTFILE_,i_ERROR_,i_GOTO_) {\
+#define RF_TEXTFILE_CANREAD_GOTO(i_TEXTFILE_,i_ERROR_,i_LABEL_) {\
 /*Get current file position*/\
 foff_rft i_cPos_;\
 if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (foff_rft)-1)\
 {\
-    i_FTELL_CHECK_GOTO("Querying the current file position",i_ERROR_,i_GOTO_)\
+    i_FTELL_CHECK_GOTO("Querying the current file position",i_ERROR_,i_LABEL_)\
 }\
 /*if the file mode is writing then reopen in reading mode*/\
 if((i_TEXTFILE_)->mode == RF_FILE_WRITE)\
 {\
     if( ((i_TEXTFILE_)->f = freopen(((i_TEXTFILE_)->name).bytes,"r",(i_TEXTFILE_)->f)) == 0)\
     {\
-        i_TEXTFILE_FOPEN_CHECK_GOTO(i_TEXTFILE_,"Switching from writing to reading mode at",i_ERROR_,i_GOTO_)\
-        return  RE_FILE_MODE_CHANGE;\
+        i_TEXTFILE_FOPEN_CHECK_GOTO(i_TEXTFILE_,"Switching from writing to reading mode at",i_ERROR_,i_LABEL_)\
+        i_ERROR_ = RE_FILE_MODE_CHANGE;\
+        goto i_LABEL_;\
     }\
     (i_TEXTFILE_)->mode = RF_FILE_READ;\
     /*go to the saved file position*/\
     if( rfFseek((i_TEXTFILE_)->f,i_cPos_,SEEK_SET)!=0)\
     {\
-        i_TEXTFILE_FSEEK_CHECK_GOTO(t,"resetting the file pointer when switching from write to read mode",i_ERROR_,i_GOTO_)\
+        i_TEXTFILE_FSEEK_CHECK_GOTO(t,"resetting the file pointer when switching from write to read mode",i_ERROR_,i_LABEL_)\
     }\
 }/*else if the file is read/write mode and  the previous file operation was a write we gotta rewind*/\
 else if((i_TEXTFILE_)->mode == RF_FILE_READWRITE)\
@@ -201,11 +202,11 @@ else if((i_TEXTFILE_)->mode == RF_FILE_READWRITE)\
     {\
         if(rfFseek(t->f,0,SEEK_SET) != 0)\
         {\
-            i_TEXTFILE_FSEEK_CHECK_GOTO(t,"rewinding to enable reading",i_ERROR_,i_GOTO_)\
+            i_TEXTFILE_FSEEK_CHECK_GOTO(t,"rewinding to enable reading",i_ERROR_,i_LABEL_)\
         }\
         if(rfFseek(t->f,i_cPos_,SEEK_SET) != 0)\
         {\
-            i_TEXTFILE_FSEEK_CHECK_GOTO(t,"rewinding to enable reading",i_ERROR_,i_GOTO_)\
+            i_TEXTFILE_FSEEK_CHECK_GOTO(t,"rewinding to enable reading",i_ERROR_,i_LABEL_)\
         }\
     }\
 }}
@@ -248,26 +249,27 @@ else if((i_TEXTFILE_)->mode == RF_FILE_READWRITE)\
     }\
 }}
 //! A macro to check if a textfile needs to changes its mode in order to perform a write operation. If there is an error it keeps it and goes to cleanup code
-#define RF_TEXTFILE_CANWRITE_GOTO(i_TEXTFILE_,i_ERROR_,i_GOTO_){ \
+#define RF_TEXTFILE_CANWRITE_GOTO(i_TEXTFILE_,i_ERROR_,i_LABEL_){ \
 /*Get current file position*/\
 foff_rft i_cPos_;\
 if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (foff_rft)-1)\
 {\
-    i_FTELL_CHECK_GOTO("Querying the current file position",i_ERROR_,i_GOTO_)\
+    i_FTELL_CHECK_GOTO("Querying the current file position",i_ERROR_,i_LABEL_)\
 }\
 /*if the file mode is reading then reopen in writing mode*/\
 if((i_TEXTFILE_)->mode == RF_FILE_READ)\
 {\
     if( ((i_TEXTFILE_)->f = freopen(((i_TEXTFILE_)->name).bytes,"a",(i_TEXTFILE_)->f)) == 0)\
     {\
-        i_TEXTFILE_FOPEN_CHECK_GOTO(i_TEXTFILE_,"Switching from reading to writing mode at",i_ERROR_,i_GOTO_)\
-        return  RE_FILE_MODE_CHANGE;\
+        i_TEXTFILE_FOPEN_CHECK_GOTO(i_TEXTFILE_,"Switching from reading to writing mode at",i_ERROR_,i_LABEL_)\
+        i_ERROR_ =  RE_FILE_MODE_CHANGE;\
+        goto i_LABEL_;\
     }\
     (i_TEXTFILE_)->mode = RF_FILE_WRITE;\
     /*go to the saved file position*/\
     if( rfFseek((i_TEXTFILE_)->f,i_cPos_,SEEK_SET)!=0)\
     {\
-        i_TEXTFILE_FSEEK_CHECK_GOTO(t,"resetting the file pointer when switching from read to write mode",i_ERROR_,i_GOTO_)\
+        i_TEXTFILE_FSEEK_CHECK_GOTO(t,"resetting the file pointer when switching from read to write mode",i_ERROR_,i_LABEL_)\
     }\
 }/*else if the file is read/write mode and  the previous file operation was a read we gotta rewind*/\
 else if((i_TEXTFILE_)->mode == RF_FILE_READWRITE)\
@@ -276,11 +278,11 @@ else if((i_TEXTFILE_)->mode == RF_FILE_READWRITE)\
     {\
         if(rfFseek(t->f,0,SEEK_SET) != 0)\
         {\
-            i_TEXTFILE_FSEEK_CHECK_GOTO(t,"rewinding to enable writing",i_ERROR_,i_GOTO_)\
+            i_TEXTFILE_FSEEK_CHECK_GOTO(t,"rewinding to enable writing",i_ERROR_,i_LABEL_)\
         }\
         if(rfFseek(t->f,i_cPos_,SEEK_SET) != 0)\
         {\
-            i_TEXTFILE_FSEEK_CHECK(t,"rewinding to enable writing",i_ERROR_,i_GOTO_)\
+            i_TEXTFILE_FSEEK_CHECK_GOTO(t,"rewinding to enable writing",i_ERROR_,i_LABEL_)\
         }\
     }\
 }}
@@ -324,7 +326,7 @@ switch(errno)\
 }//end of error handling
 
 //! A macro that checks errno after an fseek() call FOR A TEXTFILE sets the error and goes to cleanup and error return
-#define i_TEXTFILE_FSEEK_CHECK_GOTO(i_TEXTFILE_,i_TEXT_,i_ERROR_,i_GOTO_) \
+#define i_TEXTFILE_FSEEK_CHECK_GOTO(i_TEXTFILE_,i_TEXT_,i_ERROR_,i_LABEL_) \
 /*Depending on the errno*/\
 switch(errno)\
 {\
@@ -368,7 +370,7 @@ switch(errno)\
         i_ERROR_ = RE_FILE_GETFILEPOS;\
     break;\
 }\
-goto i_GOTO_;
+goto i_LABEL_;
 
 //! A macro that checks errno after an fopen() call for textfiles, and returns appropriate error
 #define i_TEXTFILE_FOPEN_CHECK(i_TEXTFILE_,i_TEXT_) \
@@ -410,7 +412,7 @@ switch(errno)\
 }
 
 //! A macro that checks errno after an fopen() call for textfiles, keeps the error and goes to cleanup code
-#define i_TEXTFILE_FOPEN_CHECK_GOTO(i_TEXTFILE_,i_TEXT_,i_ERROR_,i_GOTO_) \
+#define i_TEXTFILE_FOPEN_CHECK_GOTO(i_TEXTFILE_,i_TEXT_,i_ERROR_,i_LABEL_) {\
 /*depending on errno*/\
 switch(errno)\
 {\
@@ -454,10 +456,10 @@ switch(errno)\
         i_ERROR_ = RF_FAILURE;\
     break;\
 }\
-goto i_GOTO_;
+goto i_LABEL_;}
 
 
-//! A macro to check the result of file writting functions for TextFiles
+//! A macro to check the result of file writting functions for TextFiles and if there is an error return it
 #define i_TEXTFILE_WRITE_CHECK(i_TEXTFILE_,i_TEXT_)\
 /*depending or errno*/\
 if(ferror((i_TEXTFILE_)->f) != 0){\
@@ -489,4 +491,47 @@ if(ferror((i_TEXTFILE_)->f) != 0){\
             RETURN_LOG_ERROR("There was a generic write error when "i_TEXT_" to Text File \"%s\"",RE_FILE_WRITE,(i_TEXTFILE_)->name.bytes)\
         break;\
     }}\
+
+//! A macro to check the result of file writting functions for TextFiles and if there is an error jump to a label
+#define i_TEXTFILE_WRITE_CHECK_GOTO(i_TEXTFILE_,i_TEXT_,i_ERROR_,i_LABEL_)\
+/*depending or errno*/\
+if(ferror((i_TEXTFILE_)->f) != 0){\
+    switch(errno)\
+    {\
+        case EAGAIN:\
+            LOG_ERROR("While "i_TEXT_" to Text File \"%s\", the write failed because the file was occupied by another thread and the no block flag was set",RE_FILE_WRITE_BLOCK,(i_TEXTFILE_)->name.bytes)\
+            i_ERROR_ = RE_FILE_WRITE_BLOCK;\
+        break;\
+        case EBADF:\
+            LOG_ERROR("While "i_TEXT_" to Text File \"%s\", the file descriptor was found to be corrupt",RE_FILE_BAD,(i_TEXTFILE_)->name.bytes)\
+            i_ERROR_ = RE_FILE_BAD;\
+        break;\
+        case EFBIG:\
+            LOG_ERROR("While "i_TEXT_" to Text File \"%s\", the file's size exceeded the limit",RE_FILE_TOOBIG,(i_TEXTFILE_)->name.bytes)\
+            i_ERROR_ = RE_FILE_TOOBIG;\
+        break;\
+        case EINTR:\
+            LOG_ERROR(i_TEXT_" to Text File \"%s\" failed due to a system interrupt",RE_INTERRUPT,(i_TEXTFILE_)->name.bytes)\
+            i_ERROR_ = RE_INTERRUPT;\
+        break;\
+        case EIO:\
+            LOG_ERROR("While "i_TEXT_" to Text File \"%s\", a physical I/O error was encountered",RE_FILE_IO,(i_TEXTFILE_)->name.bytes)\
+            i_ERROR_ = RE_FILE_IO;\
+        break;\
+        case ENOSPC:\
+        case ENOMEM:\
+            LOG_ERROR(i_TEXT_"to Text File \"%s\" failed due to the device containing the file having no free space",RE_FILE_NOSPACE,(i_TEXTFILE_)->name.bytes)\
+            i_ERROR_ = RE_FILE_NOSPACE;\
+        break;\
+        case ENXIO:\
+            LOG_ERROR(i_TEXT_" to Text File \"%s\" failed due to the device being non-existant",RE_FILE_NOTFILE,(i_TEXTFILE_)->name.bytes)\
+            i_ERROR_ = RE_FILE_NOTFILE;\
+        break;\
+        default:\
+            LOG_ERROR("There was a generic write error when "i_TEXT_" to Text File \"%s\"",RE_FILE_WRITE,(i_TEXTFILE_)->name.bytes)\
+            i_ERROR_ = RE_FILE_WRITE;\
+        break;\
+    }\
+    goto i_LABEL_;\
+    }\
 

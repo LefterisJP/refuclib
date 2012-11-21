@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <modules>
 <Core>
-rf_setup.c rf_localmem.c rf_numconst.c Utils/rf_utils.c
+rf_setup.c rf_localmem.c Utils/rf_utils.c
 </Core>
 <String>
 	<macro>RF_MODULE_STRINGS</macro>

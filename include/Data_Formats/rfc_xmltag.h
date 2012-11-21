@@ -76,7 +76,6 @@ typedef struct RF_XMLTag
 //! @param attrN \rfoptional{0} The number of attributes this tag will have. The number you give here will basically
 //! also be the number of additional arguments to follow. The additional arguments to follow should be @c attrN*2
 //! an AttributeName and an AttributeValue for each attribute
-//! @extraVarArgLim
 //! @param ... Attribute names and values should follow as strings.
 //! @inhtype{String,StringX} @slitToStr
 //! @return The newly initialized XML tag
@@ -97,41 +96,21 @@ i_DECLIMEX_ RF_XMLTag* RFXML_(RF_XMLTag* parent,void* name,void* content,unsigne
 //! @param attrN \rfoptional{0} The number of attributes this tag will have. The number you give here will basically
 //! also be the number of additional arguments to follow. The additional arguments to follow should be @c attrN*2
 //! an AttributeName and an AttributeValue for each attribute
-//! @extraVarArgLim
 //! @param ... Attribute names and values should follow as strings.
 //! @inhtype{String,StringX} @slitToStr
 //! @return The newly initialized XML tag
 //! @endinternal
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ RF_XMLTag* rfXMLTag_CreateLocal(RF_XMLTag* parent,void* name,void* content,unsigned char attrN,...);
 #else
 i_DECLIMEX_ RF_XMLTag* rfXMLTag_CreateLocalv(RF_XMLTag* parent,void* name,void* content,unsigned char attrN,...);
-    #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfXMLTag_CreateLocal(...)    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_XMLTAG_CREATELOCAL,4,__VA_ARGS__)
-        #define i_NPSELECT_RF_XMLTAG_CREATELOCAL1(...)  RF_SELECT_FUNC_IF_NARGGT2(i_LIMSELECT_RF_XMLTAG_CREATELOCAL,18,__VA_ARGS__)
-        #define i_NPSELECT_RF_XMLTAG_CREATELOCAL0(...)  RF_SELECT_FUNC(i_SELECT_RF_XMLTAG_CREATELOCAL,__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_CREATELOCAL3(i_PARENT_,i_NAME_,i_CONTENT_)   rfXMLTag_CreateLocalv(i_PARENT_,i_NAME_,i_CONTENT_,0)
-        #define i_SELECT_RF_XMLTAG_CREATELOCAL2(i_PARENT_,i_NAME_)              rfXMLTag_CreateLocalv(i_PARENT_,i_NAME_,0,0)
-        #define i_SELECT_RF_XMLTAG_CREATELOCAL1(...)    RF_COMPILE_ERROR("message \"Illegal Arguments Number: macro RFXML_() receives from 2 to N arguments\"")
-        #define i_SELECT_RF_XMLTAG_CREATELOCAL0(...)    RF_COMPILE_ERROR("message \"Illegal Arguments Number: macro RFXML_() receives from 2 to N arguments\"")
-        #define i_LIMSELECT_RF_XMLTAG_CREATELOCAL1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: macro RFXML_() can't receive more than N arguments\"")
-        #define i_LIMSELECT_RF_XMLTAG_CREATELOCAL0(...) RF_SELECT_FUNC(i_SELECT_RF_XMLTAG_CREATELOCAL,__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_CREATELOCAL4(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: macro RFXML_() accepts from 2 to N arguments. But if 4 arguments are given then at least 2 more must follow\"")
-        #define i_SELECT_RF_XMLTAG_CREATELOCAL5(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: macro RFXML_() accepts from 2 to N arguments. But if 5 arguments are given then at least 1 more must follow\"")
-        #define i_SELECT_RF_XMLTAG_CREATELOCAL6(i_PARENT_,i_NAME_,i_CONTENT_,i_ATTRN_,...) rfXMLTag_CreateLocalv(i_PARENT_,i_NAME_,i_CONTENT_,i_ATTRN_,__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_CREATELOCAL7(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: macro RFXML_() needs an even number of extra arguments\"")
-        #define i_SELECT_RF_XMLTAG_CREATELOCAL8(i_PARENT_,i_NAME_,i_CONTENT_,i_ATTRN_,...) i_rfLMS_WRAP8(RF_XMLTag*,rfXMLTag_CreateLocalv,i_PARENT_,i_NAME_,i_CONTENT_,i_RFUI8_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_CREATELOCAL9(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: macro RFXML_() needs an even number of extra arguments\"")
-        #define i_SELECT_RF_XMLTAG_CREATELOCAL10(i_PARENT_,i_NAME_,i_CONTENT_,i_ATTRN_,...) i_rfLMS_WRAP10(RF_XMLTag*,rfXMLTag_CreateLocalv,i_PARENT_,i_NAME_,i_CONTENT_,i_RFUI8_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_CREATELOCAL11(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: macro RFXML_() needs an even number of extra arguments\"")
-        #define i_SELECT_RF_XMLTAG_CREATELOCAL12(i_PARENT_,i_NAME_,i_CONTENT_,i_ATTRN_,...) i_rfLMS_WRAP12(RF_XMLTag*,rfXMLTag_CreateLocalv,i_PARENT_,i_NAME_,i_CONTENT_,i_RFUI8_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_CREATELOCAL13(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: macro RFXML_() needs an even number of extra arguments\"")
-        #define i_SELECT_RF_XMLTAG_CREATELOCAL14(i_PARENT_,i_NAME_,i_CONTENT_,i_ATTRN_,...) i_rfLMS_WRAP14(RF_XMLTag*,rfXMLTag_CreateLocalv,i_PARENT_,i_NAME_,i_CONTENT_,i_RFUI8_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_CREATELOCAL15(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: macro RFXML_() needs an even number of extra arguments\"")
-        #define i_SELECT_RF_XMLTAG_CREATELOCAL16(i_PARENT_,i_NAME_,i_CONTENT_,i_ATTRN_,...) i_rfLMS_WRAP16(RF_XMLTag*,rfXMLTag_CreateLocalv,i_PARENT_,i_NAME_,i_CONTENT_,i_RFUI8_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_CREATELOCAL17(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: macro RFXML_() needs an even number of extra arguments\"")
-        #define i_SELECT_RF_XMLTAG_CREATELOCAL18(i_PARENT_,i_NAME_,i_CONTENT_,i_ATTRN_,...) i_rfLMS_WRAP18(RF_XMLTag*,rfXMLTag_CreateLocalv,i_PARENT_,i_NAME_,i_CONTENT_,i_RFUI8_(i_ATTRN_),__VA_ARGS__)
-    #endif
+#define rfXMLTag_CreateLocal(...)    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_XMLTAG_CREATELOCAL,4,__VA_ARGS__)
+#define i_NPSELECT_RF_XMLTAG_CREATELOCAL1(...)  rfXMLTag_CreateLocalv(__VA_ARGS__)
+#define i_NPSELECT_RF_XMLTAG_CREATELOCAL0(...)  RF_SELECT_FUNC(i_SELECT_RF_XMLTAG_CREATELOCAL,__VA_ARGS__)
+#define i_SELECT_RF_XMLTAG_CREATELOCAL3(i_PARENT_,i_NAME_,i_CONTENT_)   rfXMLTag_CreateLocalv(i_PARENT_,i_NAME_,i_CONTENT_,0)
+#define i_SELECT_RF_XMLTAG_CREATELOCAL2(i_PARENT_,i_NAME_)              rfXMLTag_CreateLocalv(i_PARENT_,i_NAME_,0,0)
+#define i_SELECT_RF_XMLTAG_CREATELOCAL1(...)    RF_COMPILE_ERROR("message \"Illegal Arguments Number: macro RFXML_() receives from 2 to N arguments\"")
+#define i_SELECT_RF_XMLTAG_CREATELOCAL0(...)    RF_COMPILE_ERROR("message \"Illegal Arguments Number: macro RFXML_() receives from 2 to N arguments\"")
 #endif
 
 
@@ -139,13 +118,6 @@ i_DECLIMEX_ RF_XMLTag* rfXMLTag_CreateLocalv(RF_XMLTag* parent,void* name,void* 
 //! @memberof RF_XMLTag
 //! @brief Allocates and returns an XML Tag
 //!
-//! There are 2 versions of this function. If there are no @c DEFAULT_ARGUMENTS on then you should choose
-//! the correct version yourself. @c rfXMLTag_Create2() only uses the name of the tag to create a new tag
-//! while the @c rfXMLTag_Createv() function also accepts contents and attributes.
-//!
-//! If on the other hand the library has been compiled with @c DEFAULT_ARGUMENTS on as is recommended then
-//! just by using this function @ref rfXMLTag_Create() and providing the appropriate number of arguments the
-//! proper function will be chosen automatically.
 //! @lmsFunction
 //! @param parent A pointer to the parent tag of this tag
 //! @param name Give the name of the tag as an @ref RF_String. @inhtype{String,StringX} @tmpSTR
@@ -159,48 +131,23 @@ i_DECLIMEX_ RF_XMLTag* rfXMLTag_CreateLocalv(RF_XMLTag* parent,void* name,void* 
 //! @param ... Attribute names and values should follow as strings.
 //! @inhtype{String,StringX} @tmpSTR
 //! @return The newly initialized XML tag
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ RF_XMLTag* rfXMLTag_Create(RF_XMLTag* parent,void* name,void* content,unsigned char attrN,...);
 #else
 i_DECLIMEX_ RF_XMLTag* rfXMLTag_Create2(RF_XMLTag* parent,void* name);
-i_DECLIMEX_ RF_XMLTag* rfXMLTag_Createv(RF_XMLTag* parent,void* name,void* content,unsigned char* attrN,...);
-    #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfXMLTag_Create(...)    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_XMLTAG_CREATE,4,__VA_ARGS__)
-        #define i_NPSELECT_RF_XMLTAG_CREATE1(...)  RF_SELECT_FUNC_IF_NARGGT2(i_LIMSELECT_RF_XMLTAG_CREATE,18,__VA_ARGS__)
-        #define i_NPSELECT_RF_XMLTAG_CREATE0(...)  RF_SELECT_FUNC(i_SELECT_RF_XMLTAG_CREATE,__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_CREATE3(i_PARENT_,i_NAME_,i_CONTENT_)   i_rfLMS_WRAP4(RF_XMLTag*,rfXMLTag_Createv,i_PARENT_,i_NAME_,i_CONTENT_,i_RFUI8_(0))
-        #define i_SELECT_RF_XMLTAG_CREATE2(i_PARENT_,i_NAME_)               i_rfLMS_WRAP2(RF_XMLTag*,rfXMLTag_Create2,i_PARENT_,i_NAME_)
-        #define i_SELECT_RF_XMLTAG_CREATE1(...)    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Create() receives from 2 to N arguments\"")
-        #define i_SELECT_RF_XMLTAG_CREATE0(...)    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Create() receives from 2 to N arguments\"")
-        #define i_LIMSELECT_RF_XMLTAG_CREATE1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Create() can't receive more than N arguments\"")
-        #define i_LIMSELECT_RF_XMLTAG_CREATE0(...) RF_SELECT_FUNC(i_SELECT_RF_XMLTAG_CREATE,__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_CREATE4(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Create() accepts from 2 to N arguments. But if 4 arguments are given then at least 2 more must follow\"")
-        #define i_SELECT_RF_XMLTAG_CREATE5(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Create() accepts from 2 to N arguments. But if 5 arguments are given then at least 1 more must follow\"")
-        #define i_SELECT_RF_XMLTAG_CREATE6(i_PARENT_,i_NAME_,i_CONTENT_,i_ATTRN_,...)  i_rfLMS_WRAP6(RF_XMLTag*,rfXMLTag_Createv,i_PARENT_,i_NAME_,i_CONTENT_,i_RFUI8_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_CREATE7(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Create() needs an even number of extra arguments\"")
-        #define i_SELECT_RF_XMLTAG_CREATE8(i_PARENT_,i_NAME_,i_CONTENT_,i_ATTRN_,...) i_rfLMS_WRAP8(RF_XMLTag*,rfXMLTag_Createv,i_PARENT_,i_NAME_,i_CONTENT_,i_RFUI8_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_CREATE9(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Create() needs an even number of extra arguments\"")
-        #define i_SELECT_RF_XMLTAG_CREATE10(i_PARENT_,i_NAME_,i_CONTENT_,i_ATTRN_,...) i_rfLMS_WRAP10(RF_XMLTag*,rfXMLTag_Createv,i_PARENT_,i_NAME_,i_CONTENT_,i_RFUI8_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_CREATE11(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Create() needs an even number of extra arguments\"")
-        #define i_SELECT_RF_XMLTAG_CREATE12(i_PARENT_,i_NAME_,i_CONTENT_,i_ATTRN_,...) i_rfLMS_WRAP12(RF_XMLTag*,rfXMLTag_Createv,i_PARENT_,i_NAME_,i_CONTENT_,i_RFUI8_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_CREATE13(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Create() needs an even number of extra arguments\"")
-        #define i_SELECT_RF_XMLTAG_CREATE14(i_PARENT_,i_NAME_,i_CONTENT_,i_ATTRN_,...) i_rfLMS_WRAP14(RF_XMLTag*,rfXMLTag_Createv,i_PARENT_,i_NAME_,i_CONTENT_,i_RFUI8_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_CREATE15(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Create() needs an even number of extra arguments\"")
-        #define i_SELECT_RF_XMLTAG_CREATE16(i_PARENT_,i_NAME_,i_CONTENT_,i_ATTRN_,...) i_rfLMS_WRAP16(RF_XMLTag*,rfXMLTag_Createv,i_PARENT_,i_NAME_,i_CONTENT_,i_RFUI8_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_CREATE17(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Create() needs an even number of extra arguments\"")
-        #define i_SELECT_RF_XMLTAG_CREATE18(i_PARENT_,i_NAME_,i_CONTENT_,i_ATTRN_,...) i_rfLMS_WRAP18(RF_XMLTag*,rfXMLTag_Createv,i_PARENT_,i_NAME_,i_CONTENT_,i_RFUI8_(i_ATTRN_),__VA_ARGS__)
-    #endif
+i_DECLIMEX_ RF_XMLTag* rfXMLTag_Createv(RF_XMLTag* parent,void* name,void* content,unsigned char attrN,...);
+#define rfXMLTag_Create(...)    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_XMLTAG_CREATE,4,__VA_ARGS__)
+#define i_NPSELECT_RF_XMLTAG_CREATE1(...)  rfXMLTag_Createv(__VA_ARGS__)
+#define i_NPSELECT_RF_XMLTAG_CREATE0(...)  RF_SELECT_FUNC(i_SELECT_RF_XMLTAG_CREATE,__VA_ARGS__)
+#define i_SELECT_RF_XMLTAG_CREATE3(i_PARENT_,i_NAME_,i_CONTENT_)   rfXMLTag_Createv(i_PARENT_,i_NAME_,i_CONTENT_,0)
+#define i_SELECT_RF_XMLTAG_CREATE2(i_PARENT_,i_NAME_)               rfXMLTag_Create2(i_PARENT_,i_NAME_)
+#define i_SELECT_RF_XMLTAG_CREATE1(...)    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Create() receives from 2 to N arguments\"")
+#define i_SELECT_RF_XMLTAG_CREATE0(...)    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Create() receives from 2 to N arguments\"")
 #endif
+
 //! @memberof RF_XMLTag
 //! @brief Initializes an XML Tag
 //!
-//! There are 2 versions of this function. If there are no @c DEFAULT_ARGUMENTS on then you should choose
-//! the correct version yourself. @c rfXMLTag_Init3() only uses the name of the tag to create a new tag
-//! while the @c rfXMLTag_Initv() function also accepts contents and attributes.
-//!
-//! If on the other hand the library has been compiled with @c DEFAULT_ARGUMENTS on as is recommended then
-//! just by using this function @ref rfXMLTag_Init() and providing the appropriate number of arguments the
-//! proper function will be chosen automatically.
 //! @lmsFunction
 //! @param parent A pointer to the parent tag of this tag
 //! @param name Give the name of the tag as an @ref RF_String. @inhtype{String,StringX} @tmpSTR
@@ -210,41 +157,22 @@ i_DECLIMEX_ RF_XMLTag* rfXMLTag_Createv(RF_XMLTag* parent,void* name,void* conte
 //! @param attrN \rfoptional{0} The number of attributes this tag will have. The number you give here will basically
 //! also be the number of additional arguments to follow. The additional arguments to follow should be @c attrN*2
 //! an AttributeName and an AttributeValue for each attribute
-//! @extraVarArgLim
 //! @param ... Attribute names and values should follow as strings.
 //! @inhtype{String,StringX} @tmpSTR
 //! @return true for success and false otherwise
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ char rfXMLTag_Init(RF_XMLTag* x,RF_XMLTag* parent,void* name);
 #else
 i_DECLIMEX_ char rfXMLTag_Init3(RF_XMLTag* x,RF_XMLTag* parent,void* name);
-i_DECLIMEX_ char rfXMLTag_Initv(RF_XMLTag* x,RF_XMLTag* parent,void* name,void* content,unsigned char* attrN,...);
-    #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfXMLTag_Init(...)    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_XMLTAG_INIT,5,__VA_ARGS__)
-        #define i_NPSELECT_RF_XMLTAG_INIT1(...)  RF_SELECT_FUNC_IF_NARGGT2(i_LIMSELECT_RF_XMLTAG_INIT,18,__VA_ARGS__)
-        #define i_NPSELECT_RF_XMLTAG_INIT0(...)  RF_SELECT_FUNC(i_SELECT_RF_XMLTAG_INIT,__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_INIT4(i_TAG_,i_PARENT_,i_NAME_,i_CONTENT_)    i_rfLMSX_WRAP4(char,rfXMLTag_Initv,i_TAG_,i_PARENT_,i_NAME_,i_CONTENT_,i_RFUI8_(0))
-        #define i_SELECT_RF_XMLTAG_INIT3(i_TAG_,i_PARENT_,i_NAME_)    i_rfLMSX_WRAP3(char,rfXMLTag_Init3,i_TAG_,i_PARENT_,i_NAME_)
-        #define i_SELECT_RF_XMLTAG_INIT2(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Init() receives from 3 to N arguments arguments\"")
-        #define i_SELECT_RF_XMLTAG_INIT1(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Init() receives from 3 to N arguments arguments\"")
-        #define i_SELECT_RF_XMLTAG_INIT0(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Init() receives from 3 to N arguments arguments\"")
-        #define i_LIMSELECT_RF_XMLTAG_INIT1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Init() can't receive more than N arguments\"")
-        #define i_LIMSELECT_RF_XMLTAG_INIT0(...) RF_SELECT_FUNC(i_SELECT_RF_XMLTAG_INIT,__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_INIT5(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Init() accepts from 3 to N arguments. But if 5 arguments are given then at least 2 more must follow\"")
-        #define i_SELECT_RF_XMLTAG_INIT6(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Init() accepts from 3 to N arguments. But if 6 arguments are given then at least 1 more must follow\"")
-        #define i_SELECT_RF_XMLTAG_INIT7(i_TAG_,i_PARENT_,i_NAME_,i_CONTENT_,i_ATTRN_,...) i_rfLMSX_WRAP7(char,rfXMLTag_Initv,i_TAG_,i_PARENT_,i_NAME_,i_CONTENT_,i_RFUI8_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_INIT8(...)  RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Init() acepts an even number of extra arguments\"")
-        #define i_SELECT_RF_XMLTAG_INIT9(i_TAG_,i_PARENT_,i_NAME_,i_CONTENT_,i_ATTRN_,...) i_rfLMSX_WRAP9(char,rfXMLTag_Initv,i_TAG_,i_PARENT_,i_NAME_,i_CONTENT_,i_RFUI8_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_INIT10(...)  RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Init() acepts an even number of extra arguments\"")
-        #define i_SELECT_RF_XMLTAG_INIT11(i_TAG_,i_PARENT_,i_NAME_,i_CONTENT_,i_ATTRN_,...) i_rfLMSX_WRAP11(char,rfXMLTag_Initv,i_TAG_,i_PARENT_,i_NAME_,i_CONTENT_,i_RFUI8_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_INIT12(...)  RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Init() acepts an even number of extra arguments\"")
-        #define i_SELECT_RF_XMLTAG_INIT13(i_TAG_,i_PARENT_,i_NAME_,i_CONTENT_,i_ATTRN_,...) i_rfLMSX_WRAP13(char,rfXMLTag_Initv,i_TAG_,i_PARENT_,i_NAME_,i_CONTENT_,i_RFUI8_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_INIT14(...)  RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Init() acepts an even number of extra arguments\"")
-        #define i_SELECT_RF_XMLTAG_INIT15(i_TAG_,i_PARENT_,i_NAME_,i_CONTENT_,i_ATTRN_,...) i_rfLMSX_WRAP15(char,rfXMLTag_Initv,i_TAG_,i_PARENT_,i_NAME_,i_CONTENT_,i_RFUI8_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_INIT16(...)  RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Init() acepts an even number of extra arguments\"")
-        #define i_SELECT_RF_XMLTAG_INIT17(i_TAG_,i_PARENT_,i_NAME_,i_CONTENT_,i_ATTRN_,...) i_rfLMSX_WRAP17(char,rfXMLTag_Initv,i_TAG_,i_PARENT_,i_NAME_,i_CONTENT_,i_RFUI8_(i_ATTRN_),__VA_ARGS__)
-        #define i_SELECT_RF_XMLTAG_INIT18(...)  RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Init() acepts an even number of extra arguments\"")
-    #endif
+i_DECLIMEX_ char rfXMLTag_Initv(RF_XMLTag* x,RF_XMLTag* parent,void* name,void* content,unsigned char attrN,...);
+#define rfXMLTag_Init(...)    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_XMLTAG_INIT,5,__VA_ARGS__)
+#define i_NPSELECT_RF_XMLTAG_INIT1(...)  rfXMLTag_Initv(__VA_ARGS__)
+#define i_NPSELECT_RF_XMLTAG_INIT0(...)  RF_SELECT_FUNC(i_SELECT_RF_XMLTAG_INIT,__VA_ARGS__)
+#define i_SELECT_RF_XMLTAG_INIT4(i_TAG_,i_PARENT_,i_NAME_,i_CONTENT_)   rfXMLTag_Initv(i_TAG_,i_PARENT_,i_NAME_,i_CONTENT_,0)
+#define i_SELECT_RF_XMLTAG_INIT3(i_TAG_,i_PARENT_,i_NAME_)              rfXMLTag_Init3(i_TAG_,i_PARENT_,i_NAME_)
+#define i_SELECT_RF_XMLTAG_INIT2(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Init() receives from 3 to N arguments arguments\"")
+#define i_SELECT_RF_XMLTAG_INIT1(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Init() receives from 3 to N arguments arguments\"")
+#define i_SELECT_RF_XMLTAG_INIT0(...)   RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfXMLTag_Init() receives from 3 to N arguments arguments\"")
 #endif
 
 
@@ -304,12 +232,7 @@ i_DECLIMEX_ void rfXMLTag_AddTag_nocopy(RF_XMLTag* t,RF_XMLTag* c);
 //! @param t The tag
 //! @param attribName Give the name of the attribute as an @ref RF_String. @inhtype{String,StringX} @tmpSTR
 //! @param attribValue Give the value of the attribute as an @ref RF_String. @inhtype{String,StringX} @tmpSTR
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
 i_DECLIMEX_ void rfXMLTag_AddAttribute(RF_XMLTag* t,void* attribName,void* attribValue);
-#else
-i_DECLIMEX_ void i_rfXMLTag_AddAttribute(RF_XMLTag* t,void* attribName,void* attribValue);
-#define rfXMLTag_AddAttribute(i_THISTAG_,i_ATTRIBNAME_,i_ATTRIBVALUE_) i_rfLMS_WRAP3(void,i_rfXMLTag_AddAttribute,i_THISTAG_,i_ATTRIBNAME_,i_ATTRIBVALUE_)
-#endif
 
 //! @memberof RF_XMLTag
 //! @brief Adds contents to the tag
@@ -318,12 +241,7 @@ i_DECLIMEX_ void i_rfXMLTag_AddAttribute(RF_XMLTag* t,void* attribName,void* att
 //! @param t The tag
 //! @param c Give an @ref RF_String to add as contents to the tag. An internal
 //! copy of the String is made, so there is no need to worry about freeing it later. @inhtype{String,StringX} @tmpSTR
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
 i_DECLIMEX_ void rfXMLTag_AddContent(RF_XMLTag* t,void* content);
-#else
-i_DECLIMEX_ void i_rfXMLTag_AddContent(RF_XMLTag* t,void* content);
-#define rfXMLTag_AddContent(i_THISTAG_,i_CONTENT_)  i_rfLMS_WRAP2(void,i_rfXMLTag_AddContent,i_THISTAG_,i_CONTENT_)
-#endif
 
 //! @memberof RF_XMLTag
 //! @brief Gets a particular child tag

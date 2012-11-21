@@ -141,26 +141,20 @@ typedef struct RF_TextFile
 //! + @c RE_FILE_READ_BLOCK: If the read operation failed due to the file descriptor being occupied by another thread
 //! + @c RE_FILE_POS_OVERFLOW: If during reading, the current file position can't be represented by the system
 //! + @c RE_FILE_IO: If there was a physical I/O error
-#ifdef RF_IAMHERE_FOR_DOXYGEN
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ int32_t rfTextFile_Init(RF_TextFile* t,const void* name,char mode,char encoding);
 #else
-i_DECLIMEX_ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* name,char* mode,char* encoding);
-    #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfTextFile_Init(...)  RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_TEXTFILE_INIT,4,__VA_ARGS__)
-        #define i_NPSELECT_RF_TEXTFILE_INIT1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Init() accepts from 3 to 4 arguments\"")
-        #define i_NPSELECT_RF_TEXTFILE_INIT0(...) RF_SELECT_FUNC(i_SELECT_RF_TEXTFILE_INIT,__VA_ARGS__)
-        #define i_SELECT_RF_TEXTFILE_INIT4(i_TEXTFILE_,i_NAME_,i_MODE_,i_ENCODING_) \
-            i_rfLMSX_WRAP4(int32_t,i_rfTextFile_Init,i_TEXTFILE_,i_NAME_,i_RFI8_(i_MODE_),i_RFI8_(i_ENCODING_))
-        #define i_SELECT_RF_TEXTFILE_INIT3(i_TEXTFILE_,i_NAME_,i_MODE_) \
-            i_rfLMSX_WRAP4(int32_t,i_rfTextFile_Init,i_TEXTFILE_,i_NAME_,i_RFI8_(i_MODE_),i_RFI8_(RF_UTF8))
-        #define i_SELECT_RF_TEXTFILE_INIT2(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Init() accepts from 3 to 4 arguments\"")
-        #define i_SELECT_RF_TEXTFILE_INIT1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Init() accepts from 3 to 4 arguments\"")
-        #define i_SELECT_RF_TEXTFILE_INIT0(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Init() accepts from 3 to 4 arguments\"")
-    #else
-        #define rfTextFile_Init(i_TEXTFILE_,i_NAME_,i_MODE_,i_ENCODING_)    \
-            i_rfLMSX_WRAP4(int32_t,i_rfTextFile_Init,i_TEXTFILE_,i_NAME_,i_RFI8_(i_MODE_),i_RFI8_(i_ENCODING_))
-    #endif
+i_DECLIMEX_ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* name,char mode,char encoding);
+#define rfTextFile_Init(...)  RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_TEXTFILE_INIT,4,__VA_ARGS__)
+#define i_NPSELECT_RF_TEXTFILE_INIT1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Init() accepts from 3 to 4 arguments\"")
+#define i_NPSELECT_RF_TEXTFILE_INIT0(...) RF_SELECT_FUNC(i_SELECT_RF_TEXTFILE_INIT,__VA_ARGS__)
+#define i_SELECT_RF_TEXTFILE_INIT4(i_TEXTFILE_,i_NAME_,i_MODE_,i_ENCODING_) i_rfTextFile_Init(i_TEXTFILE_,i_NAME_,i_MODE_,i_ENCODING_)
+#define i_SELECT_RF_TEXTFILE_INIT3(i_TEXTFILE_,i_NAME_,i_MODE_) i_rfTextFile_Init(i_TEXTFILE_,i_NAME_,i_MODE_,RF_UTF8)
+#define i_SELECT_RF_TEXTFILE_INIT2(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Init() accepts from 3 to 4 arguments\"")
+#define i_SELECT_RF_TEXTFILE_INIT1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Init() accepts from 3 to 4 arguments\"")
+#define i_SELECT_RF_TEXTFILE_INIT0(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Init() accepts from 3 to 4 arguments\"")
 #endif
+
 //! @memberof RF_TextFile
 //! @brief Creates a new text file
 //!
@@ -191,24 +185,17 @@ i_DECLIMEX_ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* name,char* mode
 //! + @c RF_UTF32: For Unicode UTF-32 encoding of unknown endianess. Will attempt to read the Byte Order Mark (BOM) character at the file's
 //! beginning to determine the endianess and if that fails, search for a space character in the text file.
 //! @return Returns the newly allocated TextFile or 0 if there was a failure to initialize. In that case the reason is logged in the error log
-#ifdef RF_IAMHERE_FOR_DOXYGEN
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ RF_TextFile* rfTextFile_Create(const void* name,char mode,char encoding);
 #else
-i_DECLIMEX_ RF_TextFile* i_rfTextFile_Create(const void* name,char* mode,char* encoding);
-    #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfTextFile_Create(...)  RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_TEXTFILE_CREATE,3,__VA_ARGS__)
-        #define i_NPSELECT_RF_TEXTFILE_CREATE1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Create() accepts from 2 to 3 arguments\"")
-        #define i_NPSELECT_RF_TEXTFILE_CREATE0(...) RF_SELECT_FUNC(i_SELECT_RF_TEXTFILE_CREATE,__VA_ARGS__)
-        #define i_SELECT_RF_TEXTFILE_CREATE3(i_NAME_,i_MODE_,i_ENCODING_) \
-            i_rfLMS_WRAP3(RF_TextFile*,i_rfTextFile_Create,i_NAME_,i_RFI8_(i_MODE_),i_RFI8_(i_ENCODING_))
-        #define i_SELECT_RF_TEXTFILE_CREATE2(i_NAME_,i_MODE_) \
-            i_rfLMS_WRAP3(RF_TextFile*,i_rfTextFile_Create,i_NAME_,i_RFI8_(i_MODE_),i_RFI8_(RF_UTF8))
-        #define i_SELECT_RF_TEXTFILE_CREATE1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Create() accepts from 2 to 3 arguments\"")
-        #define i_SELECT_RF_TEXTFILE_CREATE0(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Create() accepts from 2 to 3 arguments\"")
-    #else
-        #define rfTextFile_Create(i_NAME_,i_MODE_,i_ENCODING_) \
-            i_rfLMS_WRAP3(RF_TextFile*,i_rfTextFile_Create,i_NAME_,i_RFI8_(i_MODE_),i_RFI8_(i_ENCODING_))
-    #endif
+i_DECLIMEX_ RF_TextFile* i_rfTextFile_Create(const void* name,char mode,char encoding);
+#define rfTextFile_Create(...)  RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_TEXTFILE_CREATE,3,__VA_ARGS__)
+#define i_NPSELECT_RF_TEXTFILE_CREATE1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Create() accepts from 2 to 3 arguments\"")
+#define i_NPSELECT_RF_TEXTFILE_CREATE0(...) RF_SELECT_FUNC(i_SELECT_RF_TEXTFILE_CREATE,__VA_ARGS__)
+#define i_SELECT_RF_TEXTFILE_CREATE3(i_NAME_,i_MODE_,i_ENCODING_)   i_rfTextFile_Create(i_NAME_,i_MODE_,i_ENCODING_)
+#define i_SELECT_RF_TEXTFILE_CREATE2(i_NAME_,i_MODE_)               i_rfTextFile_Create(i_NAME_,i_MODE_,RF_UTF8)
+#define i_SELECT_RF_TEXTFILE_CREATE1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Create() accepts from 2 to 3 arguments\"")
+#define i_SELECT_RF_TEXTFILE_CREATE0(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Create() accepts from 2 to 3 arguments\"")
 #endif
 
 //! @}
@@ -585,12 +572,8 @@ i_DECLIMEX_ int32_t rfTextFile_GetLine(RF_TextFile* t,uint64_t lineN,RF_StringX*
 //! + @c RE_FILE_NOSPACE: There was no space on the device holding the file, left for a write operation at the point we attempted to write.
 //! + @c RE_FILE_NOTFILE: The device we attempted to write to is non-existent
 //! + @c RE_FILE_WRITE: There was a generic write error
-#ifdef RF_IAMHERE_FOR_DOXYGEN
 i_DECLIMEX_ int32_t rfTextFile_Write(RF_TextFile* t,void* string);
-#else
-i_DECLIMEX_ int32_t i_rfTextFile_Write(RF_TextFile* t,void* string);
-#define rfTextFile_Write(i_FILE_,i_STR_) i_rfLMSX_WRAP2(int32_t,i_rfTextFile_Write,i_FILE_,i_STR_)
-#endif
+
 
 //! @memberof RF_TextFile
 //! @brief Inserts a line into a specific part of the Text File
@@ -638,25 +621,18 @@ i_DECLIMEX_ int32_t i_rfTextFile_Write(RF_TextFile* t,void* string);
 //! + @c RE_FILE_EOF: If the end of file is reached before finding the required line
 //! + @c RE_FILE_DELETE: If after finishing the operation of insertion the temporary file could not be deleted
 //! + @c RE_FILE_RENAME: If while trying to rename the temporary file to replace this one the renaming failed
-#ifdef RF_IAMHERE_FOR_DOXYGEN
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ int32_t rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* string,char after);
 #else
-i_DECLIMEX_ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t* lineN,void* string,char* after);
-    #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfTextFile_Insert(...)  RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_TEXTFILE_INSERT,4,__VA_ARGS__)
-        #define i_NPSELECT_RF_TEXTFILE_INSERT1(...)  RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Insert() accepts from 3 to 4 arguments\"")
-        #define i_NPSELECT_RF_TEXTFILE_INSERT0(...)  RF_SELECT_FUNC(i_SELECT_RF_TEXTFILE_INSERT,__VA_ARGS__)
-        #define i_SELECT_RF_TEXTFILE_INSERT4(i_TEXTFILE_,i_LINEN_,i_STR_,i_AFTER_) \
-            i_rfLMSX_WRAP4(int32_t,i_rfTextFile_Insert,i_TEXTFILE_,i_RFUI64_(i_LINEN_),i_STR_,i_RFI8_(i_AFTER_))
-        #define i_SELECT_RF_TEXTFILE_INSERT3(i_TEXTFILE_,i_LINEN_,i_STR_) \
-            i_rfLMSX_WRAP4(int32_t,i_rfTextFile_Insert,i_TEXTFILE_,i_RFUI64_(i_LINEN_),i_STR_,i_RFI8_(true))
-        #define i_SELECT_RF_TEXTFILE_INSERT2(...)   RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Insert() accepts from 3 to 4 arguments\"")
-        #define i_SELECT_RF_TEXTFILE_INSERT1(...)   RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Insert() accepts from 3 to 4 arguments\"")
-        #define i_SELECT_RF_TEXTFILE_INSERT0(...)   RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Insert() accepts from 3 to 4 arguments\"")
-    #else
-        #define rfTextFile_Insert(i_TEXTFILE_,i_LINEN_,i_STR_,i_AFTER_) \
-            i_rfLMSX_WRAP4(int32_t,i_rfTextFile_Insert,i_TEXTFILE_,i_RFUI64_(i_LINEN_),i_STR_,i_RFI8_(i_AFTER_))
-    #endif
+i_DECLIMEX_ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* string,char after);
+#define rfTextFile_Insert(...)  RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_TEXTFILE_INSERT,4,__VA_ARGS__)
+#define i_NPSELECT_RF_TEXTFILE_INSERT1(...)  RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Insert() accepts from 3 to 4 arguments\"")
+#define i_NPSELECT_RF_TEXTFILE_INSERT0(...)  RF_SELECT_FUNC(i_SELECT_RF_TEXTFILE_INSERT,__VA_ARGS__)
+#define i_SELECT_RF_TEXTFILE_INSERT4(i_TEXTFILE_,i_LINEN_,i_STR_,i_AFTER_)    i_rfTextFile_Insert(i_TEXTFILE_,i_LINEN_,i_STR_,i_AFTER_)
+#define i_SELECT_RF_TEXTFILE_INSERT3(i_TEXTFILE_,i_LINEN_,i_STR_)             i_rfTextFile_Insert(i_TEXTFILE_,i_LINEN_,i_STR_,true)
+#define i_SELECT_RF_TEXTFILE_INSERT2(...)   RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Insert() accepts from 3 to 4 arguments\"")
+#define i_SELECT_RF_TEXTFILE_INSERT1(...)   RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Insert() accepts from 3 to 4 arguments\"")
+#define i_SELECT_RF_TEXTFILE_INSERT0(...)   RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Insert() accepts from 3 to 4 arguments\"")
 #endif
 
 //! @memberof RF_TextFile
@@ -726,13 +702,9 @@ i_DECLIMEX_ int32_t rfTextFile_Remove(RF_TextFile* t,uint64_t lineN);
 //! + @c RE_FILE_EOF: If the end of file is reached before finding the required line
 //! + @c RE_FILE_DELETE: If after finishing the operation of insertion the temporary file could not be deleted
 //! + @c RE_FILE_RENAME: If while trying to rename the temporary file to replace this one the renaming failed
-#ifdef RF_IAMHERE_FOR_DOXYGEN
 i_DECLIMEX_ int32_t rfTextFile_Replace(RF_TextFile* t,uint64_t lineN,void* string);
-#else
-i_DECLIMEX_ int32_t i_rfTextFile_Replace(RF_TextFile* t,uint64_t* lineN,void* string);
-#define rfTextFile_Replace(i_TEXTFILE_,i_LINEN_,i_STR_) \
-i_rfLMSX_WRAP3(int32_t,i_rfTextFile_Replace,i_TEXTFILE_,i_RFUI64_(i_LINEN_),i_STR_)
-#endif
+
+
 
 //! @}
 #ifdef __cplusplus

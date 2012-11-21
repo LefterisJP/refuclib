@@ -1,4 +1,4 @@
-/**
+/*
 ** Copyright (c) 2011-2012, Karapetsas Eleftherios
 ** All rights reserved.
 **
@@ -15,7 +15,7 @@
 **  SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-**/
+*/
 
 #include <stdio.h>
 #include <string.h>
@@ -37,32 +37,31 @@
 #define MAX_LINE_BUFFER_SIZE    128000
 
 // Allocates and returns a new XML file handler
-RF_XML* i_rfXML_Create(void* filename,char* openFlagP,char* encodingP)
+RF_XML* rfXML_Create(void* filename,char openFlag,char encoding)
 {
-    char encoding = *encodingP;
-    char openFlag = *openFlagP;
     RF_XML* ret;
+    RF_ENTER_LOCAL_SCOPE()
     RF_MALLOC(ret,sizeof (RF_XML));
     //initialize it
     if(rfXML_Init(ret,filename,openFlag,encoding)!= RF_SUCCESS)
     {
         free(ret);
-        return 0;
+        ret = 0;
     }
-    //else success
+
+    RF_EXIT_LOCAL_SCOPE()
     return ret;
 }
 
 // Initialize a new XML file
-int32_t i_rfXML_Init(RF_XML* ret,void* filenameP,char* openFlagP,char* encodingP)
+int32_t rfXML_Init(RF_XML* ret,void* filenameP,char openFlag,char encoding)
 {
-    int32_t error;
-    char encoding,openFlag;
     RF_String* filename;
     RF_XMLTag* currentTag;
     RF_StringX copyS,check;
-    encoding =  *encodingP;
-    openFlag = *openFlagP;
+    int32_t error = RF_SUCCESS;
+    RF_ENTER_LOCAL_SCOPE()
+
     filename = (RF_String*)filenameP;
     // A pointer to the tag being currently parsed
     currentTag = 0;
@@ -158,14 +157,15 @@ int32_t i_rfXML_Init(RF_XML* ret,void* filenameP,char* openFlagP,char* encodingP
                     rfStringX_Deinit(&check);
                     //denote that the whole file is now in memory
                     RF_BITFLAG_SET(ret->flags,XML_IN_MEMORY);
-                    return RF_SUCCESS;
+                    goto cleanup0;//success
                 }//else just free the check string
                 rfStringX_Deinit(&check);
             }
             //now parse the rest of the file and put it in memory if needed
+            RF_EXIT_LOCAL_SCOPE()
             return i_rfXML_Parse(ret,currentTag);
         }//else we just opened the file in disk so success
-        return RF_SUCCESS;
+        goto cleanup0;//success
 
     }//end of existing file opening case
     else if(RF_BITFLAG_ON(openFlag,XML_NEW_IN_DISK) || RF_BITFLAG_ON(openFlag,XML_NEW_IN_MEMORY))///new file case
@@ -183,7 +183,7 @@ int32_t i_rfXML_Init(RF_XML* ret,void* filenameP,char* openFlagP,char* encodingP
             RF_BITFLAG_SET(ret->flags,XML_SPACES);
         //add the xml opening tag
         rfTextFile_Write(&ret->f,RFS_("<?xml version=\"1.0\"?>\n"));
-        return RF_SUCCESS;
+        goto cleanup0;//success
     }
     //else
     LOG_ERROR("Invalid opening flag provided during XML handler initialization",RE_XML_ILLEGAL_OPENFLAG);
@@ -197,6 +197,8 @@ cleanup2:
     rfTextFile_Deinit(&ret->f);
 cleanup1:
     rfStringX_Deinit(&ret->s);
+cleanup0:
+    RF_EXIT_LOCAL_SCOPE()
     return error;
 }
 
@@ -229,14 +231,20 @@ void rfXML_Deinit(RF_XML* x)
 
 
 //Outputs the XML to a file
-int32_t i_rfXML_ToFile(RF_XML* x, void* nameP,char* encodingP)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
+int32_t rfXML_ToFile(RF_XML* x, void* nameP,char encoding)
+#else
+int32_t i_rfXML_ToFile(RF_XML* x, void* nameP,char encoding)
+#endif
 {
+    int32_t ret = RF_FAILURE;
+    RF_ENTER_LOCAL_SCOPE()
     //check for file not read in memory
     if(RF_BITFLAG_ON(x->flags,XML_IN_MEMORY)==false)
-        return RF_FAILURE;
+        goto cleanup1;
     char tempFName[L_tmpnam+1], *tmpNamePtr=0;
     //open the output file
-    char encoding = *encodingP, temp = false;
+    char  temp = false;
     RF_String* name = (RF_String*)nameP;
     int level = 0;
     RF_TextFile out;
@@ -245,7 +253,7 @@ int32_t i_rfXML_ToFile(RF_XML* x, void* nameP,char* encodingP)
     if(name != 0)
     {
         if(rfTextFile_Init(&out,name,RF_FILE_NEW,encoding) != RF_SUCCESS)
-            RETURN_LOG_ERROR("Failed to output XML to a file due to failure to open output file \"%s\" ",RE_XML_OPEN_FAILURE,name->bytes)
+            RETURNGOTO_LOG_ERROR("Failed to output XML to a file due to failure to open output file \"%s\" ",RE_XML_OPEN_FAILURE,ret,cleanup1,name->bytes)
     }
     else
     {
@@ -253,7 +261,7 @@ int32_t i_rfXML_ToFile(RF_XML* x, void* nameP,char* encodingP)
         temp=true;
         tmpNamePtr = tmpnam(tempFName);
         if(rfTextFile_Init(&out,RFS_(tmpNamePtr),RF_FILE_NEW,encoding) != RF_SUCCESS)
-            RETURN_LOG_ERROR("Failed to output XML to a file due to failure to create a temporary output file",RE_XML_OPEN_FAILURE)
+            RETURNGOTO_LOG_ERROR("Failed to output XML to a file due to failure to create a temporary output file",RE_XML_OPEN_FAILURE,ret,cleanup1)
 
     }
     //write the xml version and <xml> open tag
@@ -264,7 +272,7 @@ int32_t i_rfXML_ToFile(RF_XML* x, void* nameP,char* encodingP)
     {
         rfStringX_Deinit(&strBuff);
         rfTextFile_Deinit(&out);
-        RETURN_LOG_ERROR("Failed to write to the output XML file",RE_XML_WRITE)
+        RETURNGOTO_LOG_ERROR("Failed to write to the output XML file",RE_XML_WRITE,ret,cleanup1)
     }
     //get rid of the no longer needed stringx buffer
     rfStringX_Deinit(&strBuff);
@@ -276,14 +284,16 @@ int32_t i_rfXML_ToFile(RF_XML* x, void* nameP,char* encodingP)
         if(rfDeleteFile(&x->f.name) != RF_SUCCESS)
         {
             rfTextFile_Deinit(&out);
-            return RE_FILE_DELETE;
+            ret = RE_FILE_DELETE;
+            goto cleanup1;
         }
         //rename the temp file to be the new file
         fclose(out.f);
         if(rfRenameFile(RFS_(tmpNamePtr),&x->f.name) != RF_SUCCESS)
         {
             rfTextFile_Deinit(&out);
-            return RE_FILE_RENAME;
+            ret = RE_FILE_RENAME;
+            goto cleanup1;
         }
         x->f.f = fopen(x->f.name.bytes,"r"i_PLUSB_WIN32"+");
         //also move to its beginning
@@ -291,19 +301,24 @@ int32_t i_rfXML_ToFile(RF_XML* x, void* nameP,char* encodingP)
         out.f = 0;
     }
     //success
+    ret = RF_SUCCESS;
     rfTextFile_Deinit(&out);
-    return RF_SUCCESS;
+
+cleanup1:
+    RF_EXIT_LOCAL_SCOPE()
+    return ret;
 }
 
 // Inserts an XML tag in the XML file
-int32_t i_rfXML_InsertTag(RF_XML* x, RF_XMLTag* t,char* flagsP)
+int32_t rfXML_InsertTag(RF_XML* x, RF_XMLTag* t,char flags)
 {
     RF_StringX tempS;
     int32_t error;
-    char flags = *flagsP;
+    RF_ENTER_LOCAL_SCOPE()
+
     //get the tag's string form
     if(rfXMLTag_ToStr(t,&tempS)==false)
-        RETURN_LOG_ERROR("Could not insert tag <%s> to the XML file because there was a failure in representing it as a String",RE_XML_TOSTR,t->name.bytes)
+        RETURNGOTO_LOG_ERROR("Could not insert tag <%s> to the XML file because there was a failure in representing it as a String",RE_XML_TOSTR,error,cleanup1,t->name.bytes)
 
     //insert it into the file, as long as it's not the first tag ( the root)
     if(RF_BITFLAG_ON(x->flags,XML_ROOT_INIT))
@@ -317,7 +332,7 @@ int32_t i_rfXML_InsertTag(RF_XML* x, RF_XMLTag* t,char* flagsP)
         //and just write it in the file
         x->lastLine = x->f.line;
         if((error = rfTextFile_GetOffset(&x->f,&x->rootPos)) != RF_SUCCESS)
-            RETURN_LOG_ERROR("During inserting the root to XML file \"%s\" there was a problem when getting the current file position",error,x->f.name.bytes)
+            RETURNGOTO_LOG_ERROR("During inserting the root to XML file \"%s\" there was a problem when getting the current file position",error,error,cleanup1,x->f.name.bytes)
         else
             error = rfTextFile_Write(&x->f,&tempS);
         x->rootPos-=1;
@@ -331,11 +346,13 @@ int32_t i_rfXML_InsertTag(RF_XML* x, RF_XMLTag* t,char* flagsP)
         x->currentTag = x->lastTag;
     }
     rfStringX_Deinit(&tempS);
+cleanup1:
+    RF_EXIT_LOCAL_SCOPE()
     return error;
 }
 
 //Inserts a string in the XML file
-int32_t i_rfXML_InsertStr(RF_XML* x,void* sP,char* flagsP)
+int32_t rfXML_InsertStr(RF_XML* x,void* sP,char flags)
 {
     int32_t error;
     uint32_t i;
@@ -343,32 +360,27 @@ int32_t i_rfXML_InsertStr(RF_XML* x,void* sP,char* flagsP)
     RF_StringX strBuff,newLine,nS,tabs;
     RF_String attributes;
     RF_String* s = (RF_String*)sP;
-    char flags = *flagsP;
+    RF_ENTER_LOCAL_SCOPE()
+
     //if the file is open in memory (and hence not just on disk)
     if(RF_BITFLAG_ON(x->flags,XML_IN_MEMORY))
-        RETURN_LOG_ERROR("Attempted to insert a string in an XML file with the handler not being opened as a disk only handler",RE_XML_NOT_INDISK)
+        RETURNGOTO_LOG_ERROR("Attempted to insert a string in an XML file with the handler not being opened as a disk only handler",RE_XML_NOT_INDISK,error,cleanup0)
 
     //if the last tag has not been initialized by an operation, and we do have a root
     if(x->lastTag == 0)
-        RETURN_LOG_ERROR("Attempted to insert a string in the XML file without having performed an operation to properly place the file pointer",RE_XML_NOFILEOP)
+        RETURNGOTO_LOG_ERROR("Attempted to insert a string in the XML file without having performed an operation to properly place the file pointer",RE_XML_NOFILEOP,error,cleanup0)
 
     //init the buffer string
     rfStringX_Init_txtbuff(&strBuff,""); ///cleanup 1 -- deinit this string
     //get the previous line at the position
     //rfTextFile_GetLine(&x->f,x->lastLine,&strBuff);
     if((error=rfTextFile_GoToLine(&x->f,x->lastLine)) != RF_SUCCESS)
-    {
-        LOG_ERROR("Could not move to the beginning of the last tag's line",error);
-        goto cleanup1;
-    }
+        RETURNGOTO_LOG_ERROR("Could not move to the beginning of the last tag's line",error,error,cleanup1)
     if((error=rfTextFile_ReadLine(&x->f,&strBuff)) != RF_SUCCESS)
-    {
-        LOG_ERROR("Could not read the last tag's line",error);
-        goto cleanup1;
-    }
+        RETURNGOTO_LOG_ERROR("Could not read the last tag's line",error,error,cleanup1)
+
     //keep the line number of the added tag that will become the last line if all goes well
     lineN = x->lastLine+1;
-
     //create a new insertion string since it may be initialized in the local stack so can't replace anything in the original
     rfStringX_FromString_IN(&nS,s);
     //change all the newlines to newlines plus the proper amount of tabs +1 or spaces + 3 so that they are indented properly
@@ -429,17 +441,12 @@ int32_t i_rfXML_InsertStr(RF_XML* x,void* sP,char* flagsP)
         RF_String before;
         //move after the tag opening if found
         if(rfStringX_MoveAfter(&strBuff,RFS_("<%s",x->lastTag->name.bytes),&before,0) == RF_FAILURE)
-        {
-            LOG_ERROR("The opening of the expected XML tag <%s> was not found in the current XML line",RE_XML_OPEN_TAG,x->lastTag->name.bytes)
-            error = RE_XML_OPEN_TAG;
-            goto cleanup2;
-        }
+            RETURNGOTO_LOG_ERROR("The opening of the expected XML tag <%s> was not found in the current XML line",RE_XML_OPEN_TAG,error,cleanup2,x->lastTag->name.bytes)
+
         if(rfStringX_MoveAfter(&strBuff,RFS_(">"),&attributes,0)==RF_FAILURE)
         {
-            LOG_ERROR("The opening tag of the XML tag <%s> does not have a closing bracket",RE_XML_PARSE_FAILURE,x->lastTag->name.bytes)
-            error = RE_XML_PARSE_FAILURE;
             rfString_Deinit(&before);
-            goto cleanup2;
+            RETURNGOTO_LOG_ERROR("The opening tag of the XML tag <%s> does not have a closing bracket",RE_XML_PARSE_FAILURE,error,cleanup2,x->lastTag->name.bytes)
         }
         //create the new line that will replace the previous line, and also add the same level of tabs as the previous one
         if(RF_BITFLAG_ON(x->flags,XML_SPACES)) ///cleanup3 - the newline string
@@ -449,10 +456,9 @@ int32_t i_rfXML_InsertStr(RF_XML* x,void* sP,char* flagsP)
         rfString_TrimEnd(&newLine,RFS_("\n\t "));
         if((error=rfTextFile_Replace(&x->f,x->lastLine,&newLine)) != RF_SUCCESS)
         {
-            LOG_ERROR("Failed to replace a line of the XML file \"%s\" with the requested string",error,x->f.name.bytes);
             rfString_Deinit(&attributes);
             rfString_Deinit(&before);
-            goto cleanup3;
+            RETURNGOTO_LOG_ERROR("Failed to replace a line of the XML file \"%s\" with the requested string",error,error,cleanup3,x->f.name.bytes);
         }
     }//end of the if for putting it either in start or end of tag
     ///success (error would have RF_SUCCESS) here if all went well
@@ -469,10 +475,8 @@ int32_t i_rfXML_InsertStr(RF_XML* x,void* sP,char* flagsP)
         rfTextFile_GoToLine(&x->f,x->lastLine);
     }
 
-
+    //success
     error = RF_SUCCESS;
-
-//errors
 cleanup3:
     rfStringX_Deinit(&newLine);
 cleanup2:
@@ -480,23 +484,29 @@ cleanup2:
     rfStringX_Deinit(&nS);
 cleanup1:
     rfStringX_Deinit(&strBuff);
+cleanup0:
+    RF_EXIT_LOCAL_SCOPE()
     return error;
 }
 
 
 
 //Adds the root tag in an XML file initialized in memory
-char i_rfXML_AddRoot(RF_XML* x,RF_XMLTag* t)
+char rfXML_AddRoot(RF_XML* x,RF_XMLTag* t)
 {
+    char ret=true;
+    RF_ENTER_LOCAL_SCOPE()
     if(RF_BITFLAG_ON(x->flags,XML_ROOT_INIT))
-        return false;
+        ret = false;
     if(!RF_BITFLAG_ON(x->flags,XML_IN_MEMORY))
-        return false;
+        ret = false;
     //copy the root
     rfXMLTag_Copy_IN(&x->root,t);
     //denote it's initialized now
     RF_BITFLAG_SET(x->flags,XML_ROOT_INIT);
-    return true;
+
+    RF_EXIT_LOCAL_SCOPE()
+    return ret;
 }
 
 //Provides a pointer to the XML handle's root
@@ -507,9 +517,9 @@ const RF_XMLTag* rfXML_GetRoot(RF_XML* x)
 
 //Returns a tag if it exists in the xml data either in the disk or in memory. Scans the xml tree recursively searching for the first tag matching the given name,attributes and contents
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-RF_XMLTag* rfXML_GetTag(RF_XML* x,void* tName,void* contents, uint32_t* attrNP, ...)
+RF_XMLTag* rfXML_GetTag(RF_XML* x,void* tName,void* contents, uint32_t attrN, ...)
 #else
-RF_XMLTag* i_rfXML_GetTag(RF_XML* x,void* tName,void* contents, uint32_t* attrNP, ...)
+RF_XMLTag* i_rfXML_GetTag(RF_XML* x,void* tName,void* contents, uint32_t attrN, ...)
 #endif
 {
     uint32_t i;
@@ -518,7 +528,8 @@ RF_XMLTag* i_rfXML_GetTag(RF_XML* x,void* tName,void* contents, uint32_t* attrNP
     RF_String** sAttribValues=0;
     RF_XMLTag* tempTag;//the tag to return
     char ffwhile;
-    uint32_t attrN = *attrNP;
+    RF_ENTER_LOCAL_SCOPE()
+
     RF_BITFLAG_UNSET(x->flags,XML_SEARCH_DONE);
     //allocate the variable number of attributes array
     if(attrN != 0)
@@ -528,7 +539,7 @@ RF_XMLTag* i_rfXML_GetTag(RF_XML* x,void* tName,void* contents, uint32_t* attrNP
     }
     //get variable number of attributes
     va_list argList;
-    va_start(argList,attrNP);
+    va_start(argList,attrN);
     for(i = 0; i < attrN; i ++)
     {
        sAttribs[i]      = va_arg(argList,RF_String*);
@@ -547,7 +558,8 @@ RF_XMLTag* i_rfXML_GetTag(RF_XML* x,void* tName,void* contents, uint32_t* attrNP
         if((error=rfTextFile_GoToOffset(&x->f,x->rootPos,SEEK_SET)) != RF_SUCCESS)
         {
             LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%s\"",error,x->f.name.bytes);
-            return 0;
+            tempTag = 0;
+            goto cleanup1;
         }
         //check if the root is the one we seek
         rfTextFile_ReadLine(&x->f,&x->s);
@@ -562,7 +574,8 @@ RF_XMLTag* i_rfXML_GetTag(RF_XML* x,void* tName,void* contents, uint32_t* attrNP
             if((error=rfTextFile_GoToOffset(&x->f,x->rootPos,SEEK_SET)) != RF_SUCCESS)
             {
                 LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%s\"",error,x->f.name.bytes);
-                return 0;
+                tempTag = 0;
+                goto cleanup1;
             }
         }
         //allocate the temporary tag that will serve as the return value
@@ -689,19 +702,29 @@ RF_XMLTag* i_rfXML_GetTag(RF_XML* x,void* tName,void* contents, uint32_t* attrNP
     //temporary test to see if the level should be -1 of what it is after this function
     if(x->level !=0)
         x->level--;
+
+cleanup1:
+    RF_EXIT_LOCAL_SCOPE()
     return tempTag;
 }
 #ifdef RF_OPTION_DEFAULT_ARGUMENTS
 RF_XMLTag* i_NVrfXML_GetTag(RF_XML* x,void* tName,void* contents)
+#else
+RF_XMLTag* rfXML_GetTag3(RF_XML* x,void* tName,void* contents)
+#endif
 {
     char ffwhile;
     int32_t error;
     RF_XMLTag* tempTag;
+    RF_ENTER_LOCAL_SCOPE()
+
     if(RF_BITFLAG_ON(x->flags,XML_IN_MEMORY))
     {
         RF_BITFLAG_UNSET(x->flags,XML_SEARCH_DONE);
         //search for the tag with the given name starting from the root
-        return rfXML_SearchSmall(x,&x->root,tName,contents);
+        tempTag = rfXML_SearchSmall(x,&x->root,tName,contents);
+        //will go to return from here
+
     }//end of the only in memory case
     else
     {//go to the where the root is
@@ -709,7 +732,8 @@ RF_XMLTag* i_NVrfXML_GetTag(RF_XML* x,void* tName,void* contents)
         if((error=rfTextFile_GoToOffset(&x->f,x->rootPos,SEEK_SET)) != RF_SUCCESS)
         {
             LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%s\"",error,x->f.name.bytes);
-            return 0;
+            tempTag = 0;
+            goto cleanup1;
         }
         //check if the root is the one we seek
         rfTextFile_ReadLine(&x->f,&x->s);
@@ -717,14 +741,16 @@ RF_XMLTag* i_NVrfXML_GetTag(RF_XML* x,void* tName,void* contents)
         {
             x->lastTag = &x->root;
             x->lastLine = x->f.line-1;
-            return rfXMLTag_Copy_OUT(&x->root);
+            tempTag = rfXMLTag_Copy_OUT(&x->root);
+            goto cleanup1;
         }
         else//go back to start the search
         {
             if((error=rfTextFile_GoToOffset(&x->f,x->rootPos,SEEK_SET)) != RF_SUCCESS)
             {
                 LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%s\"",error,x->f.name.bytes);
-                return 0;
+                tempTag = 0;
+                goto cleanup1;
             }
         }
         //allocate the temporary tag that will serve as the return value
@@ -804,32 +830,40 @@ RF_XMLTag* i_NVrfXML_GetTag(RF_XML* x,void* tName,void* contents)
                 break;
             }
         }//search loop
-
-        return tempTag;
     }//end of the only in disk case
+
+cleanup1:
+    RF_EXIT_LOCAL_SCOPE()
+    return tempTag;
 }
-#endif
+
 //Returns a tag if it exists in the xml data. Scans the xml tree recursively searching for the first tag matching tName having childName child somewhere in its children
-RF_XMLTag* i_rfXML_GetTag_child(RF_XML* x,void* tName,void* childName,char* directP,char* rParentP)
+#ifndef RF_OPTION_DEFAULT_ARGUMENTS
+RF_XMLTag* rfXML_GetTag_child(RF_XML* x,void* tName,void* childName,char direct,char rParent)
+#else
+RF_XMLTag* i_rfXML_GetTag_child(RF_XML* x,void* tName,void* childName,char direct,char rParent)
+#endif
 {
-    char direct,rParent;
+    RF_XMLTag* ret=0;
+    RF_ENTER_LOCAL_SCOPE()
+
     //if the handle is not loaded in memory return 0
     if(!RF_BITFLAG_ON(x->flags,XML_IN_MEMORY))
+    {
+        RF_EXIT_LOCAL_SCOPE()
         return 0;
-    direct = *directP;
-    rParent = *rParentP;
+    }
     RF_BITFLAG_UNSET(x->flags,XML_SEARCH_DONE);
-    return i_rfXML_SearchChild(x,&x->root,tName,childName,direct,rParent);
+    ret = i_rfXML_SearchChild(x,&x->root,tName,childName,direct,rParent);
+
+    RF_EXIT_LOCAL_SCOPE()
+    return ret;
 }
 
 
 
 //Returns a tag if it exists in the xml data either in the disk or in memory. Scans the xml tree recursively searching for the first tag matching the given name,attributes and contents
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
-int32_t rfXML_GoToTag(RF_XML* x,void* tName,void* contents, uint32_t* attrNP, ...)
-#else
-int32_t i_rfXML_GoToTag(RF_XML* x,void* tName,void* contents, uint32_t* attrNP, ...)
-#endif
+int32_t rfXML_GoToTag(RF_XML* x,void* tName,void* contents, uint32_t attrN, ...)
 {
     uint32_t i;
     int32_t error;
@@ -837,10 +871,11 @@ int32_t i_rfXML_GoToTag(RF_XML* x,void* tName,void* contents, uint32_t* attrNP, 
     RF_String** sAttribValues=0;
     RF_XMLTag t;
     char ffwhile;
-    uint32_t attrN = *attrNP;
+    RF_ENTER_LOCAL_SCOPE()
+
     //do a check at the very beginning for if the handler is in disk and not in memory
     if(RF_BITFLAG_ON(x->flags,XML_IN_MEMORY))
-        RETURN_LOG_ERROR("Attempted to move to a specific tag in the file while the XML handler was in memory and not in disk",RE_XML_NOT_INDISK)
+        RETURNGOTO_LOG_ERROR("Attempted to move to a specific tag in the file while the XML handler was in memory and not in disk",RE_XML_NOT_INDISK,error,cleanup1)
 
     //allocate the variable number of attributes array
     if(attrN != 0)
@@ -850,7 +885,7 @@ int32_t i_rfXML_GoToTag(RF_XML* x,void* tName,void* contents, uint32_t* attrNP, 
     }
     //get variable number of attributes
     va_list argList;
-    va_start(argList,attrNP);
+    va_start(argList,attrN);
     for(i = 0; i < attrN; i ++)
     {
        sAttribs[i]      = va_arg(argList,RF_String*);
@@ -861,7 +896,7 @@ int32_t i_rfXML_GoToTag(RF_XML* x,void* tName,void* contents, uint32_t* attrNP, 
     x->level = 0;
     //go to the where the root is
     if((error=rfTextFile_GoToOffset(&x->f,x->rootPos,SEEK_SET)) != RF_SUCCESS)
-        RETURN_LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%s\"",error,x->f.name.bytes)
+        RETURNGOTO_LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%s\"",error,error,cleanup1,x->f.name.bytes)
 
 
     //check if the root is the one we seek
@@ -870,12 +905,14 @@ int32_t i_rfXML_GoToTag(RF_XML* x,void* tName,void* contents, uint32_t* attrNP, 
     {
         x->lastTag = &x->root;
         x->lastLine = x->f.line-1;
-        return RF_SUCCESS;
+        //success
+        error = RF_SUCCESS;
+        goto cleanup1;
     }
     else//go back to begin the search
     {
         if((error=rfTextFile_GoToOffset(&x->f,x->rootPos,SEEK_SET)) != RF_SUCCESS)
-            RETURN_LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%s\"",error,x->f.name.bytes)
+            RETURNGOTO_LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%s\"",error,error,cleanup1,x->f.name.bytes)
 
     }
     ///start the search
@@ -997,6 +1034,9 @@ int32_t i_rfXML_GoToTag(RF_XML* x,void* tName,void* contents, uint32_t* attrNP, 
     //temporary test to see if the level should be -1 of what it is after this function
     if(x->level !=0)
         x->level--;
+
+cleanup1:
+    RF_EXIT_LOCAL_SCOPE()
     return error;
 }
 

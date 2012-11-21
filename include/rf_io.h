@@ -658,12 +658,8 @@ i_DECLIMEX_ int32_t rfFback_UTF8(FILE* f,uint32_t *c);
 //! Anything else will result in an error
 //! @return For success popen will return a FILE descriptor that can be used to either read or write from the pipe.
 //! If there was an error @c 0 is returned and an error is logged.
-#ifdef RF_IAMHERE_FOR_DOXYGEN
 i_DECLIMEX_ FILE* rfPopen(void* command,const char* mode);
-#else
-i_DECLIMEX_ FILE* i_rfPopen(void* command,const char* mode);
-#define rfPopen(i_CMD_,i_MODE_) i_rfLMS_WRAP2(FILE*,i_rfPopen,i_CMD_,i_MODE_)
-#endif
+
 
 //! @brief Closes a pipe
 //!
