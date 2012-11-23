@@ -37,8 +37,8 @@ int32_t rfTextFile_Init(RF_TextFile* t,const void* nameP,char mode,char encoding
 int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char mode,char encoding)
 #endif
 {
-    int32_t error;
     RF_String* name = (RF_String*) nameP;
+    int32_t error=RF_SUCCESS;
     RF_ENTER_LOCAL_SCOPE()
 
     //save the name of the file
@@ -82,9 +82,9 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char mode,char encodi
 
 
     //for an existing file, get endianess and check for Byte Order Mark (BOM)
-    if(mode == RF_FILE_READ || mode == RF_FILE_READ || mode == RF_FILE_READWRITE)
+    if(mode == RF_FILE_READ || mode == RF_FILE_READWRITE)
     {
-        //check for correct input of the encoding parameter
+        //check for correct input of the encoding argument
         switch(encoding)
         {
             case RF_UTF16://if we are reading the file in UTF-16 we need to find endianess
@@ -358,7 +358,7 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char mode,char encodi
         //add a BOM if required
 #ifdef RF_OPTION_FILE_ADDBOM
         t->hasBom = true;
-        error=i_rfTextFile_AddBom(t->f,t);//can fail and so this function will also fail
+        error=i_rfTextFile_AddBom(t);//can fail and so this function will also fail
 #endif
     }//end of newfile case
 
@@ -581,6 +581,8 @@ int32_t i_rfTextFile_ReadLine3(RF_TextFile* t,RF_StringX* line,uint32_t characte
 int32_t rfTextFile_ReadLine2(RF_TextFile* t,RF_StringX* line)
 {
     int32_t bytesN;
+    char eof = false;
+
     //check if we can read from this textfile
     RF_TEXTFILE_CANREAD(t)
     t->previousOp = RF_FILE_READ;
@@ -597,7 +599,6 @@ int32_t rfTextFile_ReadLine2(RF_TextFile* t,RF_StringX* line)
     line->INH_String.bytes -= line->bIndex;
     line->INH_String.byteLength += line->bIndex;
     line->bIndex = 0;
-    char eof = false;
     //depending on the encoding
     switch(t->encoding)
     {
@@ -1143,7 +1144,7 @@ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,char aft
     newFile = fopen(tmpNamePtr,"w"i_PLUSB_WIN32);
     if(t->hasBom)
     {
-        if((error=i_rfTextFile_AddBom(newFile,t))!= RF_SUCCESS)
+        if((error=i_rfFile_AddBom(newFile,t->encoding))!= RF_SUCCESS)
         {
             LOG_ERROR("Failed to add BOM to the newly created temporary file",error);
             goto cleanup2;
@@ -1167,9 +1168,10 @@ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,char aft
             goto cleanup2;
         }
     }
+
     //initialize a string reading buffer
     rfStringX_Init_buff(&buffer,RF_OPTION_FGETS_READBYTESN+1,"");///cleanup3 - for the string buffer deinitialization
-    //read every line of this file from the beginning;
+    //read every line of this file from the beginning
     while((error =rfTextFile_ReadLine2(t,&buffer))==RF_SUCCESS)
     {
         //write the read line to the other file
@@ -1294,7 +1296,7 @@ int32_t rfTextFile_Remove(RF_TextFile* t,uint64_t lineN)
     newFile = fopen(tmpNamePtr,"w"i_PLUSB_WIN32); ///need to cleanup the temporary file -- cleanup2
     if(t->hasBom)
     {
-        if((error=i_rfTextFile_AddBom(newFile,t))!= RF_SUCCESS)
+        if((error=i_rfFile_AddBom(newFile,t->encoding))!= RF_SUCCESS)
         {
             LOG_ERROR("Failed to add BOM to the newly created temporary file",error);
             goto cleanup2;
@@ -1420,7 +1422,7 @@ int32_t rfTextFile_Replace(RF_TextFile* t,uint64_t lineN,void* stringP)
     newFile = fopen(tmpNamePtr,"w"i_PLUSB_WIN32);
     if(t->hasBom)
     {
-        if((error=i_rfTextFile_AddBom(newFile,t))!= RF_SUCCESS)
+        if((error=i_rfFile_AddBom(newFile,t->encoding))!= RF_SUCCESS)
         {
             LOG_ERROR("Failed to add BOM to the newly created temporary file",error);
             goto cleanup2;

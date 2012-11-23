@@ -26,12 +26,55 @@
 #include <errno.h>
 
 // Adds a Byte order mark to the file at the current position. Only to be used at the start of the file
-int32_t i_rfTextFile_AddBom(FILE* f,RF_TextFile* t)
+int32_t i_rfTextFile_AddBom(RF_TextFile* t)
 {
     switch(t->encoding)
     {
         case RF_UTF8:
             t->hasBom = true;
+            fputc(0xEF,t->f);
+            fputc(0xBB,t->f);
+            fputc(0xBF,t->f);
+            i_WRITE_CHECK(t->f,"Appending the UTF-8 BOM")
+        break;
+        case RF_UTF16_LE:
+            t->hasBom = true;
+            fputc(0xFF,t->f);
+            fputc(0xFE,t->f);
+            i_WRITE_CHECK(t->f,"Appending the UTF-16 Litte Endian BOM")
+        break;
+        case RF_UTF16_BE:
+            t->hasBom = true;
+            fputc(0xFE,t->f);
+            fputc(0xFF,t->f);
+            i_WRITE_CHECK(t->f,"Appending the UTF-16 Big Endian BOM")
+        break;
+        case RF_UTF32_LE:
+            t->hasBom = true;
+            fputc(0xFF,t->f);
+            fputc(0xFE,t->f);
+            fputc(0x00,t->f);
+            fputc(0x00,t->f);
+            i_WRITE_CHECK(t->f,"Appending the UTF-32 Little Endian BOM")
+        break;
+        case RF_UTF32_BE:
+            t->hasBom = true;
+            fputc(0x00,t->f);
+            fputc(0x00,t->f);
+            fputc(0xFE,t->f);
+            fputc(0xFF,t->f);
+            i_WRITE_CHECK(t->f,"Appending the UTF-32 Big Endian BOM")
+        break;
+    }
+    return RF_SUCCESS;
+}
+
+//Adds a Byte order mark to the file at the current position. Only to be used at the start of the file
+int32_t i_rfFile_AddBom(FILE*f,char encoding)
+{
+    switch(encoding)
+    {
+        case RF_UTF8:
             fputc(0xEF,f);
             fputc(0xBB,f);
             fputc(0xBF,f);
@@ -48,18 +91,18 @@ int32_t i_rfTextFile_AddBom(FILE* f,RF_TextFile* t)
             i_WRITE_CHECK(f,"Appending the UTF-16 Big Endian BOM")
         break;
         case RF_UTF32_LE:
-            fputc(0xFF,t->f);
-            fputc(0xFE,t->f);
-            fputc(0x00,t->f);
-            fputc(0x00,t->f);
-            i_WRITE_CHECK(t->f,"Appending the UTF-32 Little Endian BOM")
+            fputc(0xFF,f);
+            fputc(0xFE,f);
+            fputc(0x00,f);
+            fputc(0x00,f);
+            i_WRITE_CHECK(f,"Appending the UTF-32 Little Endian BOM")
         break;
         case RF_UTF32_BE:
-            fputc(0x00,t->f);
-            fputc(0x00,t->f);
-            fputc(0xFE,t->f);
-            fputc(0xFF,t->f);
-            i_WRITE_CHECK(t->f,"Appending the UTF-32 Big Endian BOM")
+            fputc(0x00,f);
+            fputc(0x00,f);
+            fputc(0xFE,f);
+            fputc(0xFF,f);
+            i_WRITE_CHECK(f,"Appending the UTF-32 Big Endian BOM")
         break;
     }
     return RF_SUCCESS;

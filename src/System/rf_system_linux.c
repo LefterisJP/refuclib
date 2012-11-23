@@ -221,6 +221,7 @@ used by some other proccess or by the system",RE_PERMISSION,dirname->bytes)
         ret = RF_LastError;
     }
 
+cleanup1:
     RF_EXIT_LOCAL_SCOPE()
     return ret;
 }

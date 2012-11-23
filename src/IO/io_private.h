@@ -51,7 +51,7 @@
     #define i_FTELL_CHECK_GOTO_CASE_EOVERFLOW(i_TEXT_,i_ERROR_) \
         case EOVERFLOW:\
             LOG_ERROR("While "i_TEXT_" the file position is not representable by the the system's type by off_t",RE_FILE_POS_OVERFLOW)\
-            i_ERROR = RE_FILE_POS_OVERFLOW;\
+            i_ERROR_ = RE_FILE_POS_OVERFLOW;\
         break;
     #define i_READ_CHECK_CASE_EOVERFLOW(i_TEXT_) \
         case EOVERFLOW:\

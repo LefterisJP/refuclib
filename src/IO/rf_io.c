@@ -33,9 +33,9 @@ int32_t rfFReadLine_UTF8(FILE* f,char** utf8,uint32_t* byteLength,uint32_t* buff
 {
     int32_t bytesN;
     uint32_t bIndex=0;
-#ifdef RF_NEWLINE_CRLF
+//#ifdef RF_NEWLINE_CRLF
     char newLineFound = false;
-#endif
+//#endif
     //allocate the utf8 buffer
     *bufferSize = RF_OPTION_FGETS_READBYTESN+4;
     RF_MALLOC(*utf8,*bufferSize)
@@ -52,14 +52,14 @@ int32_t rfFReadLine_UTF8(FILE* f,char** utf8,uint32_t* byteLength,uint32_t* buff
     //if the last character was a newline we are done
     if(*((*utf8)+bytesN-1) == (char)RF_LF)
     {
-#ifdef RF_NEWLINE_CRLF
+//#ifdef RF_NEWLINE_CRLF
         if(*((*utf8)+bytesN-2) == (char)RF_CR)
         {
             *((*utf8)+bytesN-2) = RF_LF;
             *((*utf8)+bytesN-1) = '\0';
             (*byteLength)-=1;
         }
-#endif
+//#endif
         return bytesN;
     }
 
@@ -84,13 +84,13 @@ int32_t rfFReadLine_UTF8(FILE* f,char** utf8,uint32_t* byteLength,uint32_t* buff
             //if the last character was a newline break
             if(*((*utf8)+bIndex+bytesN-1) == (char)RF_LF)
             {
-#ifdef RF_NEWLINE_CRLF
+//#ifdef RF_NEWLINE_CRLF
                 newLineFound = true;
-#endif
+//#endif
                 break;
             }
         }//end of reading loop
-#ifdef RF_NEWLINE_CRLF
+//#ifdef RF_NEWLINE_CRLF
         if(newLineFound==true)
             if(*((*utf8)+bIndex+bytesN-2) == (char)RF_CR)
             {
@@ -99,12 +99,12 @@ int32_t rfFReadLine_UTF8(FILE* f,char** utf8,uint32_t* byteLength,uint32_t* buff
                 (*byteLength)-=1;
             }
 
-#endif
+//#endif
         return bIndex;
     }//end of size not fitting the initial buffer case
     else
     {
-#ifdef RF_NEWLINE_CRLF
+//#ifdef RF_NEWLINE_CRLF
         //if the last character was a newline
         if(*((*utf8)+bytesN-1) == (char)RF_LF)
         {
@@ -115,7 +115,7 @@ int32_t rfFReadLine_UTF8(FILE* f,char** utf8,uint32_t* byteLength,uint32_t* buff
                 (*byteLength)-=1;
             }
         }
-#endif
+//#endif
         //case of size fully fitting the buffer
         return bytesN;
     }
@@ -187,7 +187,7 @@ int32_t rfFReadLine_UTF16LE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
     free(codepoints);
     if(buffAllocated==true)
         free(tempBuff);
-#ifdef RF_NEWLINE_CRLF
+//#ifdef RF_NEWLINE_CRLF
     //if the last character was a newline
     if(*((*utf8)+(*byteLength)-1) == (char)RF_LF)
     {
@@ -198,8 +198,7 @@ int32_t rfFReadLine_UTF16LE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
             (*byteLength)-=1;
         }
     }
-#endif
-
+//#endif
     return bIndex;
 }
 //Reads a Big Endian UTF-16 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
@@ -269,7 +268,7 @@ int32_t rfFReadLine_UTF16BE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
     free(codepoints);
     if(buffAllocated==true)
         free(tempBuff);
-#ifdef RF_NEWLINE_CRLF
+//#ifdef RF_NEWLINE_CRLF
     //if the last character was a newline
     if(*((*utf8)+(*byteLength)-1) == (char)RF_LF)
     {
@@ -280,7 +279,7 @@ int32_t rfFReadLine_UTF16BE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
             (*byteLength)-=1;
         }
     }
-#endif
+//#endif
     return bIndex;
 }
 //Reads a Big Endian UTF-32 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
@@ -339,7 +338,7 @@ int32_t rfFReadLine_UTF32BE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
     //success
     if(buffAllocated==true)
         free(tempBuff);
-#ifdef RF_NEWLINE_CRLF
+//#ifdef RF_NEWLINE_CRLF
     //if the last character was a newline
     if(*((*utf8)+(*byteLength)-1) == (char)RF_LF)
     {
@@ -350,7 +349,7 @@ int32_t rfFReadLine_UTF32BE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
             (*byteLength)-=1;
         }
     }
-#endif
+//#endif
     return bIndex;
 }
 //Reads a Little Endian UTF-32 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
@@ -409,7 +408,7 @@ int32_t rfFReadLine_UTF32LE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
     //success
     if(buffAllocated==true)
         free(tempBuff);
-#ifdef RF_NEWLINE_CRLF
+//#ifdef RF_NEWLINE_CRLF
     //if the last character was a newline
     if(*((*utf8)+(*byteLength)-1) == (char)RF_LF)
     {
@@ -420,7 +419,7 @@ int32_t rfFReadLine_UTF32LE(FILE* f,char** utf8,uint32_t* byteLength,char* eof)
             (*byteLength)-=1;
         }
     }
-#endif
+//#endif
     return bIndex;
 }
 
@@ -896,11 +895,12 @@ int32_t rfFgetc_UTF16LE(FILE* f,uint32_t *c,char cp)
 {
     char swapE=false;
     uint16_t v1,v2;
+    int error;
     //check if we need to be swapping
     if(rfUTILS_Endianess() == RF_BIG_ENDIAN)
             swapE = true;
     //read the first 2 bytes
-    if(fread(&v1,2,1,f) != 1)
+    if((error=fread(&v1,2,1,f)) != 1)
     {
         i_READ_CHECK(f,"While reading a UTF-16 from a Little Endian File stream")
         else

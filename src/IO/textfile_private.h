@@ -25,8 +25,10 @@
 
 struct RF_TextFile;
 
+//! Adds a Byte order mark to the text file at the current position. Only to be used at the start of the file
+int32_t i_rfTextFile_AddBom(struct RF_TextFile* t);
 //! Adds a Byte order mark to the file at the current position. Only to be used at the start of the file
-int32_t i_rfTextFile_AddBom(FILE* f,struct RF_TextFile* t);
+int32_t i_rfFile_AddBom(FILE*f,char encoding);
 
 /// ================ Macros for usage only inside RF_TextFile functions ================= ///
 
@@ -68,28 +70,28 @@ int i_ByTeOffSeT_ = 0;\
 switch((i_TEXTFILE_)->encoding)\
 {\
     case RF_UTF8:\
-     if(t->hasBom == true)\
+     if((i_TEXTFILE_)->hasBom == true)\
         i_ByTeOffSeT_=3;\
     break;\
     case RF_UTF16_BE:\
     case RF_UTF16_LE:\
-        if(t->hasBom == true)\
+        if((i_TEXTFILE_)->hasBom == true)\
             i_ByTeOffSeT_=2;\
     break;\
     case RF_UTF32_BE:\
     case RF_UTF32_LE:\
-        if(t->hasBom == true)\
-            i_ByTeOffSeT_=3;\
+        if((i_TEXTFILE_)->hasBom == true)\
+            i_ByTeOffSeT_=4;\
     break;\
 }\
 /*First rewind back to the start so that read/write operations can be reset*/\
 if(rfFseek((i_TEXTFILE_)->f,0,SEEK_SET) != 0)\
 {\
-    i_TEXTFILE_FSEEK_CHECK(t,i_TEXT_)\
+    i_TEXTFILE_FSEEK_CHECK((i_TEXTFILE_),i_TEXT_)\
 }\
 if(rfFseek((i_TEXTFILE_)->f,i_ByTeOffSeT_,SEEK_SET) != 0)\
 {\
-    i_TEXTFILE_FSEEK_CHECK(t,i_TEXT_)\
+    i_TEXTFILE_FSEEK_CHECK((i_TEXTFILE_),i_TEXT_)\
 }\
 (i_TEXTFILE_)->previousOp = 0;\
 (i_TEXTFILE_)->line = 1;\
@@ -104,18 +106,18 @@ int i_ByTeOffSeT_ = 0;\
 switch((i_TEXTFILE_)->encoding)\
 {\
     case RF_UTF8:\
-     if(t->hasBom == true)\
+     if((i_TEXTFILE_)->hasBom == true)\
         i_ByTeOffSeT_=3;\
     break;\
     case RF_UTF16_BE:\
     case RF_UTF16_LE:\
-        if(t->hasBom == true)\
+        if((i_TEXTFILE_)->hasBom == true)\
             i_ByTeOffSeT_=2;\
     break;\
     case RF_UTF32_BE:\
     case RF_UTF32_LE:\
-        if(t->hasBom == true)\
-            i_ByTeOffSeT_=3;\
+        if((i_TEXTFILE_)->hasBom == true)\
+            i_ByTeOffSeT_=4;\
     break;\
 }\
 /*First rewind back to the start so that read/write operations can be reset*/\
@@ -145,7 +147,7 @@ if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (foff_rft)-1)\
 /*if the file mode is writing then reopen in reading mode*/\
 if((i_TEXTFILE_)->mode == RF_FILE_WRITE)\
 {\
-    if( ((i_TEXTFILE_)->f = freopen(((i_TEXTFILE_)->name).bytes,"r",(i_TEXTFILE_)->f)) == 0)\
+    if( ((i_TEXTFILE_)->f = freopen(((i_TEXTFILE_)->name).bytes,"r"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0)\
     {\
         i_TEXTFILE_FOPEN_CHECK(i_TEXTFILE_,"Switching from writing to reading mode at")\
         return  RE_FILE_MODE_CHANGE;\
@@ -183,7 +185,7 @@ if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (foff_rft)-1)\
 /*if the file mode is writing then reopen in reading mode*/\
 if((i_TEXTFILE_)->mode == RF_FILE_WRITE)\
 {\
-    if( ((i_TEXTFILE_)->f = freopen(((i_TEXTFILE_)->name).bytes,"r",(i_TEXTFILE_)->f)) == 0)\
+    if( ((i_TEXTFILE_)->f = freopen(((i_TEXTFILE_)->name).bytes,"r"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0)\
     {\
         i_TEXTFILE_FOPEN_CHECK_GOTO(i_TEXTFILE_,"Switching from writing to reading mode at",i_ERROR_,i_LABEL_)\
         i_ERROR_ = RE_FILE_MODE_CHANGE;\
@@ -222,7 +224,7 @@ if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (foff_rft)-1)\
 /*if the file mode is reading then reopen in writing mode*/\
 if((i_TEXTFILE_)->mode == RF_FILE_READ)\
 {\
-    if( ((i_TEXTFILE_)->f = freopen(((i_TEXTFILE_)->name).bytes,"a",(i_TEXTFILE_)->f)) == 0)\
+    if( ((i_TEXTFILE_)->f = freopen(((i_TEXTFILE_)->name).bytes,"a"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0)\
     {\
         i_TEXTFILE_FOPEN_CHECK(i_TEXTFILE_,"Switching from reading to writing mode at")\
         return  RE_FILE_MODE_CHANGE;\
@@ -259,7 +261,7 @@ if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (foff_rft)-1)\
 /*if the file mode is reading then reopen in writing mode*/\
 if((i_TEXTFILE_)->mode == RF_FILE_READ)\
 {\
-    if( ((i_TEXTFILE_)->f = freopen(((i_TEXTFILE_)->name).bytes,"a",(i_TEXTFILE_)->f)) == 0)\
+    if( ((i_TEXTFILE_)->f = freopen(((i_TEXTFILE_)->name).bytes,"a"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0)\
     {\
         i_TEXTFILE_FOPEN_CHECK_GOTO(i_TEXTFILE_,"Switching from reading to writing mode at",i_ERROR_,i_LABEL_)\
         i_ERROR_ =  RE_FILE_MODE_CHANGE;\
