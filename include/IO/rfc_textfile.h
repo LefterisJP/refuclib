@@ -81,6 +81,8 @@ typedef struct RF_TextFile
     char previousOp;
     //! A boolean flag denoting if the TextFile has a Byte Order Mark in the beginning or not
     char hasBom;
+    //! A flag denoting what kind of EOL pattern this particular text file observes
+    char eol;
 }RF_TextFile;
 
 //! @name Creation functions
@@ -125,6 +127,17 @@ typedef struct RF_TextFile
 //! + @c RF_UTF32_LE: For Unicode UTF-32 encoding in Little Endian endianess
 //! + @c RF_UTF32: For Unicode UTF-32 encoding of unknown endianess. Will attempt to read the Byte Order Mark (BOM) character at the file's
 //! beginning to determine the endianess and if that fails, search for a space character in the text file.
+//!
+//!
+//! @param eol \rfoptional{@c RF_EOL_DEFAULT} The End Of Line type that this textfile uses. The value of @c RF_EOL_AUTO should
+//! not be given if this is a newly created file. If that is done an invalid argument error is logged and the file is
+//! initialized with @c RF_EOL_LF. In addition if the auto-detection fails for some reason the default @c RF_EOL_LF will be used
+//! and appropriate error logging will be performed. The default value @c RF_EOL_DEFAULT is equal to Unix-style encoding of @c RF_EOL_LF. Possible values are:
+//! + @c RF_EOL_AUTO: For the function to attempt and auto detect the line endings used by the file
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RE_EOL_CR: For Macintosh-style line endings, taking @c '\r' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//!
 //! @return Returns RF_SUCCESS if the initialization was succesfull. Otherwise it can return:
 //! + @c RE_FILEMODE: If an illegal @c mode value was given
 //! + @c RE_FILE_PERMISSION: If the file or some part of its path require permissions for the operation requested in mode that the calling program does not satisfy
@@ -142,17 +155,18 @@ typedef struct RF_TextFile
 //! + @c RE_FILE_POS_OVERFLOW: If during reading, the current file position can't be represented by the system
 //! + @c RE_FILE_IO: If there was a physical I/O error
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-i_DECLIMEX_ int32_t rfTextFile_Init(RF_TextFile* t,const void* name,char mode,char encoding);
+i_DECLIMEX_ int32_t rfTextFile_Init(RF_TextFile* t,const void* name,char mode,char encoding,char eol);
 #else
-i_DECLIMEX_ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* name,char mode,char encoding);
-#define rfTextFile_Init(...)  RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_TEXTFILE_INIT,4,__VA_ARGS__)
-#define i_NPSELECT_RF_TEXTFILE_INIT1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Init() accepts from 3 to 4 arguments\"")
+i_DECLIMEX_ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* name,char mode,char encoding,char eol);
+#define rfTextFile_Init(...)  RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_TEXTFILE_INIT,5,__VA_ARGS__)
+#define i_NPSELECT_RF_TEXTFILE_INIT1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Init() accepts from 3 to 5 arguments\"")
 #define i_NPSELECT_RF_TEXTFILE_INIT0(...) RF_SELECT_FUNC(i_SELECT_RF_TEXTFILE_INIT,__VA_ARGS__)
-#define i_SELECT_RF_TEXTFILE_INIT4(i_TEXTFILE_,i_NAME_,i_MODE_,i_ENCODING_) i_rfTextFile_Init(i_TEXTFILE_,i_NAME_,i_MODE_,i_ENCODING_)
-#define i_SELECT_RF_TEXTFILE_INIT3(i_TEXTFILE_,i_NAME_,i_MODE_) i_rfTextFile_Init(i_TEXTFILE_,i_NAME_,i_MODE_,RF_UTF8)
-#define i_SELECT_RF_TEXTFILE_INIT2(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Init() accepts from 3 to 4 arguments\"")
-#define i_SELECT_RF_TEXTFILE_INIT1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Init() accepts from 3 to 4 arguments\"")
-#define i_SELECT_RF_TEXTFILE_INIT0(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Init() accepts from 3 to 4 arguments\"")
+#define i_SELECT_RF_TEXTFILE_INIT5(i_TEXTFILE_,i_NAME_,i_MODE_,i_ENCODING_,i_EOL_) i_rfTextFile_Init(i_TEXTFILE_,i_NAME_,i_MODE_,i_ENCODING_,i_EOL_)
+#define i_SELECT_RF_TEXTFILE_INIT4(i_TEXTFILE_,i_NAME_,i_MODE_,i_ENCODING_)        i_rfTextFile_Init(i_TEXTFILE_,i_NAME_,i_MODE_,i_ENCODING_,RF_EOL_DEFAULT)
+#define i_SELECT_RF_TEXTFILE_INIT3(i_TEXTFILE_,i_NAME_,i_MODE_)                    i_rfTextFile_Init(i_TEXTFILE_,i_NAME_,i_MODE_,RF_UTF8,RF_EOL_DEFAULT)
+#define i_SELECT_RF_TEXTFILE_INIT2(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Init() accepts from 3 to 5 arguments\"")
+#define i_SELECT_RF_TEXTFILE_INIT1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Init() accepts from 3 to 5 arguments\"")
+#define i_SELECT_RF_TEXTFILE_INIT0(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Init() accepts from 3 to 5 arguments\"")
 #endif
 
 //! @memberof RF_TextFile
@@ -184,18 +198,29 @@ i_DECLIMEX_ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* name,char mode,
 //! + @c RF_UTF32_LE: For Unicode UTF-32 encoding in Little Endian endianess
 //! + @c RF_UTF32: For Unicode UTF-32 encoding of unknown endianess. Will attempt to read the Byte Order Mark (BOM) character at the file's
 //! beginning to determine the endianess and if that fails, search for a space character in the text file.
+//!
+//! @param eol \rfoptional{@c RF_EOL_DEFAULT} The End Of Line type that this textfile uses. The value of @c RF_EOL_AUTO should
+//! not be given if this is a newly created file. If that is done an invalid argument error is logged and the file is
+//! initialized with @c RF_EOL_LF. In addition if the auto-detection fails for some reason the default @c RF_EOL_LF will be used
+//! and appropriate error logging will be performed. The default value @c RF_EOL_DEFAULT is equal to Unix-style encoding of @c RF_EOL_LF. Possible values are:
+//! + @c RF_EOL_AUTO: For the function to attempt and auto detect the line endings used by the file
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RE_EOL_CR: For Macintosh-style line endings, taking @c '\r' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//!
 //! @return Returns the newly allocated TextFile or 0 if there was a failure to initialize. In that case the reason is logged in the error log
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-i_DECLIMEX_ RF_TextFile* rfTextFile_Create(const void* name,char mode,char encoding);
+i_DECLIMEX_ RF_TextFile* rfTextFile_Create(const void* name,char mode,char encoding,char eol);
 #else
-i_DECLIMEX_ RF_TextFile* i_rfTextFile_Create(const void* name,char mode,char encoding);
-#define rfTextFile_Create(...)  RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_TEXTFILE_CREATE,3,__VA_ARGS__)
-#define i_NPSELECT_RF_TEXTFILE_CREATE1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Create() accepts from 2 to 3 arguments\"")
+i_DECLIMEX_ RF_TextFile* i_rfTextFile_Create(const void* name,char mode,char encoding,char eol);
+#define rfTextFile_Create(...)  RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_TEXTFILE_CREATE,4,__VA_ARGS__)
+#define i_NPSELECT_RF_TEXTFILE_CREATE1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Create() accepts from 2 to 4 arguments\"")
 #define i_NPSELECT_RF_TEXTFILE_CREATE0(...) RF_SELECT_FUNC(i_SELECT_RF_TEXTFILE_CREATE,__VA_ARGS__)
-#define i_SELECT_RF_TEXTFILE_CREATE3(i_NAME_,i_MODE_,i_ENCODING_)   i_rfTextFile_Create(i_NAME_,i_MODE_,i_ENCODING_)
-#define i_SELECT_RF_TEXTFILE_CREATE2(i_NAME_,i_MODE_)               i_rfTextFile_Create(i_NAME_,i_MODE_,RF_UTF8)
-#define i_SELECT_RF_TEXTFILE_CREATE1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Create() accepts from 2 to 3 arguments\"")
-#define i_SELECT_RF_TEXTFILE_CREATE0(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Create() accepts from 2 to 3 arguments\"")
+#define i_SELECT_RF_TEXTFILE_CREATE4(i_NAME_,i_MODE_,i_ENCODING_,i_EOL_)    i_rfTextFile_Create(i_NAME_,i_MODE_,i_ENCODING_,i_EOL_)
+#define i_SELECT_RF_TEXTFILE_CREATE3(i_NAME_,i_MODE_,i_ENCODING_)           i_rfTextFile_Create(i_NAME_,i_MODE_,i_ENCODING_,RF_EOL_DEFAULT)
+#define i_SELECT_RF_TEXTFILE_CREATE2(i_NAME_,i_MODE_)                       i_rfTextFile_Create(i_NAME_,i_MODE_,RF_UTF8,RF_EOL_DEFAULT)
+#define i_SELECT_RF_TEXTFILE_CREATE1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Create() accepts from 2 to 4 arguments\"")
+#define i_SELECT_RF_TEXTFILE_CREATE0(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Create() accepts from 2 to 4 arguments\"")
 #endif
 
 //! @}

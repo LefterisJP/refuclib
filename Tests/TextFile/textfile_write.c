@@ -13,7 +13,7 @@ void writeTest(char encoding,RF_StringX* buff)
 	RF_TextFile outF,inF;
 	uint32_t i=0; 
 	
-	EXPECT(RF_SUCCESS,rfTextFile_Init(&outF,RFS_("writefile"),RF_FILE_NEW,encoding))
+	EXPECT(RF_SUCCESS,rfTextFile_Init(&outF,RFS_("writefile"),RF_FILE_NEW,encoding,RF_EOL_LF))
 	EXPECT(RF_SUCCESS,rfTextFile_Write(&outF,RFS_("फ्रांस की एक अदालत ने पूर्व राष्ट्रपति निकोला सार्कोज़ी से ग़ैर-क़ानूनी राजनीतिक चंदे के आरोप को लेकर बारह घंटे लंबी पूछताछ की है और कहा है कि वो संदेह के दायरे में हैं.\n")))
 	EXPECT(RF_SUCCESS,rfTextFile_Write(&outF,RFS_("Οργή στους συγγενείς των θυμάτων προκάλεσε η αθωωτική απόφαση του Κακουργιοδικείου στους υπεύθυνους της αεροπορικής εταιρείας «Ήλιος», αεροσκάφος της οποίας συνετρίβη στις 14 Αυγούστου του 2005 στο Γραμματικό Αττικής, με 121 θύματα.\n")))
 	EXPECT(RF_SUCCESS,rfTextFile_Write(&outF,RFS_("今回初めて「児童生徒の生命・身体の安全がおびやかされるような重大事案」について詳細な報告を求めたところ、全国で２７８件あった\n")))
@@ -22,7 +22,7 @@ void writeTest(char encoding,RF_StringX* buff)
 	rfTextFile_Deinit(&outF);
 	
 	//checking if the file was correctly written
-	EXPECT(RF_SUCCESS,rfTextFile_Init(&inF,RFS_("writefile"),RF_FILE_READ,encoding))
+	EXPECT(RF_SUCCESS,rfTextFile_Init(&inF,RFS_("writefile"),RF_FILE_READ,encoding,RF_EOL_LF))
 	while(rfTextFile_ReadLine(&inF,buff) == RF_SUCCESS)
 	{
 		EXPECT(true,rfString_Equal(buff,&lines[i]))

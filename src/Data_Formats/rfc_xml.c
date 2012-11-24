@@ -171,7 +171,7 @@ int32_t rfXML_Init(RF_XML* ret,void* filenameP,char openFlag,char encoding)
     else if(RF_BITFLAG_ON(openFlag,XML_NEW_IN_DISK) || RF_BITFLAG_ON(openFlag,XML_NEW_IN_MEMORY))///new file case
     {
         ret->version = 1;
-        if(rfTextFile_Init(&ret->f,filename,RF_FILE_READWRITE_NEW,encoding) != RF_SUCCESS)
+        if(rfTextFile_Init(&ret->f,filename,RF_FILE_READWRITE_NEW,encoding,RF_EOL_DEFAULT) != RF_SUCCESS)
         {
             LOG_ERROR("XML File \"%s\" could not be opened, aborted object creation",RE_XML_OPEN_FAILURE,filename->bytes);
             error = RE_XML_OPEN_FAILURE;

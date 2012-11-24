@@ -40,6 +40,13 @@ extern "C"
     #define i_PLUSB_WIN32   ""
 #endif
 
+//! The different end of line types for text files
+#define RF_EOL_AUTO     0
+#define RF_EOL_LF       1
+#define RF_EOL_CRLF     2
+#define RF_EOL_CR       3
+#define RF_EOL_DEFAULT  RF_EOL_LF //the default value is LF only (Unix-style)
+
 //! This is the type that represents the file offset
 #ifdef _MSC_VER
 typedef __int64 foff_rft;
@@ -70,11 +77,15 @@ typedef off64_t foff_rft;
 //! _set_fmode(). For more information take a look at the msdn pages here:
 //! http://msdn.microsoft.com/en-us/library/ktss1a9b.aspx
 //!
-//! When the compile flag @c RF_NEWLINE_CRLF is defined (the default case at Windows) then this function
-//! shall not be adding any CR character that is found in the file behind a newline character since this is
-//! the Windows line ending scheme. Beware though that the returned  read bytes value shall still count the CR character inside.
+//! Depending on the argument value given at @c eol the extra @c '\r' characters or any others for more
+//! exotic file line endings will be skipped and not appear in the returned buffer.
 //!
 //! @param[in] f The file descriptor to read
+//! @param[in] eol The End Of Line type that this file uses. Legal values are:
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//! + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as the end of line signal
+//!
 //! @param[out] utf8 Give here a refence to an unitialized char* that will be allocated inside the function
 //! and contain the utf8 byte buffer. Needs to be freed by the caller explicitly later
 //! @param[out] byteLength Give an @c uint32_t here to receive the length of the @c utf8 buffer in bytes
@@ -83,7 +94,7 @@ typedef off64_t foff_rft;
 //! with reading this line
 //! @return Returns either a positive number for success that represents the number of bytes read from @c f and and error in case something goes wrong.
 //! The possible errors to return are the same as rfFgets_UTF8()
-i_DECLIMEX_ int32_t rfFReadLine_UTF8(FILE* f,char** utf8,uint32_t* byteLength,uint32_t* bufferSize,char* eof);
+i_DECLIMEX_ int32_t rfFReadLine_UTF8(FILE* f,char eol,char** utf8,uint32_t* byteLength,uint32_t* bufferSize,char* eof);
 //! @brief Reads a Big Endian UTF-16 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
 //!
 //! The file descriptor at @c f must have been opened in <b>binary</b> and not text mode. That means that if under
@@ -92,11 +103,15 @@ i_DECLIMEX_ int32_t rfFReadLine_UTF8(FILE* f,char** utf8,uint32_t* byteLength,ui
 //! _set_fmode(). For more information take a look at the msdn pages here:
 //! http://msdn.microsoft.com/en-us/library/ktss1a9b.aspx
 //!
-//! When the compile flag @c RF_NEWLINE_CRLF is defined (the default case at Windows) then this function
-//! shall not be adding any CR character that is found in the file behind a newline character since this is
-//! the Windows line ending scheme. Beware though that the returned  read bytes value shall still count the CR character inside.
+//! Depending on the argument value given at @c eol the extra @c '\r' characters or any others for more
+//! exotic file line endings will be skipped and not appear in the returned buffer.
 //!
 //! @param[in] f The file descriptor to read
+//! @param[in] eol The End Of Line type that this file uses. Legal values are:
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//! + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as the end of line signal
+//!
 //! @param[out] utf8 Give here a refence to an unitialized char* that will be allocated inside the function
 //! and contain the utf8 byte buffer. Needs to be freed by the caller explicitly later
 //! @param[out] byteLength Give an @c uint32_t here to receive the length of the @c utf8 buffer in bytes
@@ -106,7 +121,7 @@ i_DECLIMEX_ int32_t rfFReadLine_UTF8(FILE* f,char** utf8,uint32_t* byteLength,ui
 //! + Any error that can be returned by @ref rfFgets_UTF16BE()
 //! + @c RE_UTF16_INVALID_SEQUENCE: Failed to decode the UTF-16 byte stream of the file descriptor
 //! + @c RE_UTF8_ENCODING: Failed to encode the UTF-16 of the file descriptor into UTF-8
-i_DECLIMEX_ int32_t rfFReadLine_UTF16BE(FILE* f,char** utf8,uint32_t* byteLength,char* eof);
+i_DECLIMEX_ int32_t rfFReadLine_UTF16BE(FILE* f,char eol,char** utf8,uint32_t* byteLength,char* eof);
 //! @brief Reads a Little Endian UTF-16 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
 //!
 //! The file descriptor at @c f must have been opened in <b>binary</b> and not text mode. That means that if under
@@ -115,11 +130,15 @@ i_DECLIMEX_ int32_t rfFReadLine_UTF16BE(FILE* f,char** utf8,uint32_t* byteLength
 //! _set_fmode(). For more information take a look at the msdn pages here:
 //! http://msdn.microsoft.com/en-us/library/ktss1a9b.aspx
 //!
-//! When the compile flag @c RF_NEWLINE_CRLF is defined (the default case at Windows) then this function
-//! shall not be adding any CR character that is found in the file behind a newline character since this is
-//! the Windows line ending scheme. Beware though that the returned read bytes value shall still count the CR character inside.
+//! Depending on the argument value given at @c eol the extra @c '\r' characters or any others for more
+//! exotic file line endings will be skipped and not appear in the returned buffer.
 //!
 //! @param[in] f The file descriptor to read
+//! @param[in] eol The End Of Line type that this file uses. Legal values are:
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//! + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as the end of line signal
+//!
 //! @param[out] utf8 Give here a refence to an unitialized char* that will be allocated inside the function
 //! and contain the utf8 byte buffer. Needs to be freed by the caller explicitly later
 //! @param[out] byteLength Give an @c uint32_t here to receive the length of the @c utf8 buffer in bytes
@@ -129,7 +148,7 @@ i_DECLIMEX_ int32_t rfFReadLine_UTF16BE(FILE* f,char** utf8,uint32_t* byteLength
 //! + Any error that can be returned by @ref rfFgets_UTF16LE()
 //! + @c RE_UTF16_INVALID_SEQUENCE: Failed to decode the UTF-16 byte stream of the file descriptor
 //! + @c RE_UTF8_ENCODING: Failed to encode the UTF-16 of the file descriptor into UTF-8
-i_DECLIMEX_ int32_t rfFReadLine_UTF16LE(FILE* f,char** utf8,uint32_t* byteLength,char* eof);
+i_DECLIMEX_ int32_t rfFReadLine_UTF16LE(FILE* f,char eol,char** utf8,uint32_t* byteLength,char* eof);
 
 //! @brief Reads a Big Endian UTF-32 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
 //!
@@ -139,11 +158,15 @@ i_DECLIMEX_ int32_t rfFReadLine_UTF16LE(FILE* f,char** utf8,uint32_t* byteLength
 //! _set_fmode(). For more information take a look at the msdn pages here:
 //! http://msdn.microsoft.com/en-us/library/ktss1a9b.aspx
 //!
-//! When the compile flag @c RF_NEWLINE_CRLF is defined (the default case at Windows) then this function
-//! shall not be adding any CR character that is found in the file behind a newline character since this is
-//! the Windows line ending scheme. Beware though that the returned read bytes value shall still count the CR character inside.
+//! Depending on the argument value given at @c eol the extra @c '\r' characters or any others for more
+//! exotic file line endings will be skipped and not appear in the returned buffer.
 //!
 //! @param[in] f The file descriptor to read
+//! @param[in] eol The End Of Line type that this file uses. Legal values are:
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//! + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as the end of line signal
+//!
 //! @param[out] utf8 Give here a refence to an unitialized char* that will be allocated inside the function
 //! and contain the utf8 byte buffer. Needs to be freed by the caller explicitly later
 //! @param[out] byteLength Give an @c uint32_t here to receive the length of the @c utf8 buffer in bytes
@@ -152,7 +175,7 @@ i_DECLIMEX_ int32_t rfFReadLine_UTF16LE(FILE* f,char** utf8,uint32_t* byteLength
 //! @return Returns either a positive number for success that represents the number of bytes read from @c f and and error in case something goes wrong.
 //! + Any error that can be returned by @ref rfFgets_UTF32BE()
 //! + @c RE_UTF8_ENCODING: Failed to encode the UTF-16 of the file descriptor into UTF-8
-i_DECLIMEX_ int32_t rfFReadLine_UTF32BE(FILE* f,char** utf8,uint32_t* byteLength,char* eof);
+i_DECLIMEX_ int32_t rfFReadLine_UTF32BE(FILE* f,char eol,char** utf8,uint32_t* byteLength,char* eof);
 //! @brief Reads a Little Endian UTF-32 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
 //!
 //! The file descriptor at @c f must have been opened in <b>binary</b> and not text mode. That means that if under
@@ -161,11 +184,15 @@ i_DECLIMEX_ int32_t rfFReadLine_UTF32BE(FILE* f,char** utf8,uint32_t* byteLength
 //! _set_fmode(). For more information take a look at the msdn pages here:
 //! http://msdn.microsoft.com/en-us/library/ktss1a9b.aspx
 //!
-//! When the compile flag @c RF_NEWLINE_CRLF is defined (the default case at Windows) then this function
-//! shall not be adding any CR character that is found in the file behind a newline character since this is
-//! the Windows line ending scheme. Beware though that the returned read bytes value shall still count the CR character inside.
+//! Depending on the argument value given at @c eol the extra @c '\r' characters or any others for more
+//! exotic file line endings will be skipped and not appear in the returned buffer.
 //!
 //! @param[in] f The file descriptor to read
+//! @param[in] eol The End Of Line type that this file uses. Legal values are:
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//! + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as the end of line signal
+//!
 //! @param[out] utf8 Give here a refence to an unitialized char* that will be allocated inside the function
 //! and contain the utf8 byte buffer. Needs to be freed by the caller explicitly later
 //! @param[out] byteLength Give an @c uint32_t here to receive the length of the @c utf8 buffer in bytes
@@ -174,13 +201,15 @@ i_DECLIMEX_ int32_t rfFReadLine_UTF32BE(FILE* f,char** utf8,uint32_t* byteLength
 //! @return Returns either a positive number for success that represents the number of bytes read from @c f and and error in case something goes wrong.
 //! + Any error that can be returned by @ref rfFgets_UTF32LE()
 //! + @c RE_UTF8_ENCODING: Failed to encode the UTF-16 of the file descriptor into UTF-8
-i_DECLIMEX_ int32_t rfFReadLine_UTF32LE(FILE* f,char** utf8,uint32_t* byteLength,char* eof);
+i_DECLIMEX_ int32_t rfFReadLine_UTF32LE(FILE* f,char eol,char** utf8,uint32_t* byteLength,char* eof);
 
 //! @brief Gets a number of bytes from a BIG endian UTF-32 file descriptor
 //!
 //! This is a function that's similar to c library fgets but it also returns the number of bytes read. Reads in from the file until @c num bytes
 //! have been read or new line or EOF character has been encountered.
 //!
+//! The character pattern that shall be considered as newline signal depends on the value the user passes to the @c eol argument.
+//!
 //! The function will read until @c num characters are read and if @c num
 //! would take us to the middle of a UTF32 character then the next character shall also be read
 //! and the function will return the number of bytes read.
@@ -192,9 +221,6 @@ i_DECLIMEX_ int32_t rfFReadLine_UTF32LE(FILE* f,char** utf8,uint32_t* byteLength
 //! If right after the last character read comes the EOF, the function
 //! shall detect so and assign @c true to @c eof.
 //!
-//! In Windows where file endings are in the form of 2 bytes CR-LF (Carriage return - NewLine) this function
-//! shall just ignore the carriage returns and not return it inside the return buffer at @c buff.
-//!
 //! The file descriptor at @c f must have been opened in <b>binary</b> and not text mode. That means that if under
 //! Windows make sure to call fopen with "wb", "rb" e.t.c. instead of the simple "w", "r" e.t.c. since the initial
 //! default value under Windows is text mode. Alternatively you can set the initial value using _get_fmode() and
@@ -205,6 +231,11 @@ i_DECLIMEX_ int32_t rfFReadLine_UTF32LE(FILE* f,char** utf8,uint32_t* byteLength
 //! @param[in] num The maximum number of bytes to read from within the file NOT including the null terminating character(which in itelf is 4 bytes). Should be a multiple of 4
 //! @param[in] f A valid FILE descriptor from which to read the bytes
 //! @param[out] eof Pass a reference to a char to receive a true/false value for whether EOF has been reached.
+//! @param[in] eol The End Of Line type that this file uses. Legal values are:
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//! + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as the end of line signal
+//!
 //! @return Returns the actual number of bytes read or an error if there was a problem.
 //! The possible errors are:
 //! + @c RE_FILE_READ: If during reading the file there was an unknown read error
@@ -214,12 +245,14 @@ i_DECLIMEX_ int32_t rfFReadLine_UTF32LE(FILE* f,char** utf8,uint32_t* byteLength
 //! + @c RE_INTERRUPT: If during reading, there was a system interrupt
 //! + @c RE_FILE_IO: If there was a physical I/O error
 //! + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
-i_DECLIMEX_ int32_t rfFgets_UTF32BE(char* buff,uint32_t num,FILE* f,char* eof);
+i_DECLIMEX_ int32_t rfFgets_UTF32BE(char* buff,uint32_t num,FILE* f,char* eof,char eol);
 //! @brief Gets a number of bytes from a Little endian UTF-32 file descriptor
 //!
 //! This is a function that's similar to c library fgets but it also returns the number of bytes read. Reads in from the file until @c num bytes
 //! have been read or new line or EOF character has been encountered.
 //!
+//! The character pattern that shall be considered as newline signal depends on the value the user passes to the @c eol argument.
+//!
 //! The function will read until @c num characters are read and if @c num
 //! would take us to the middle of a UTF32 character then the next character shall also be read
 //! and the function will return the number of bytes read.
@@ -231,9 +264,6 @@ i_DECLIMEX_ int32_t rfFgets_UTF32BE(char* buff,uint32_t num,FILE* f,char* eof);
 //! If right after the last character read comes the EOF, the function
 //! shall detect so and assign @c true to @c eof.
 //!
-//! In Windows where file endings are in the form of 2 bytes CR-LF (Carriage return - NewLine) this function
-//! shall just ignore the carriage returns and not return it inside the return buffer at @c buff.
-//!
 //! The file descriptor at @c f must have been opened in <b>binary</b> and not text mode. That means that if under
 //! Windows make sure to call fopen with "wb", "rb" e.t.c. instead of the simple "w", "r" e.t.c. since the initial
 //! default value under Windows is text mode. Alternatively you can set the initial value using _get_fmode() and
@@ -244,6 +274,11 @@ i_DECLIMEX_ int32_t rfFgets_UTF32BE(char* buff,uint32_t num,FILE* f,char* eof);
 //! @param[in] num The maximum number of bytes to read from within the file NOT including the null terminating character(which in itelf is 4 bytes). Should be a multiple of 4
 //! @param[in] f A valid FILE descriptor from which to read the bytes
 //! @param[out] eof Pass a reference to a char to receive a true/false value for whether EOF has been reached.
+//! @param[in] eol The End Of Line type that this file uses. Legal values are:
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//! + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as the end of line signal
+//!
 //! @return Returns the actual number of bytes read or an error if there was a problem.
 //! The possible errors are:
 //! + @c RE_FILE_READ: If during reading the file there was an unknown read error
@@ -253,12 +288,14 @@ i_DECLIMEX_ int32_t rfFgets_UTF32BE(char* buff,uint32_t num,FILE* f,char* eof);
 //! + @c RE_INTERRUPT: If during reading, there was a system interrupt
 //! + @c RE_FILE_IO: If there was a physical I/O error
 //! + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
-i_DECLIMEX_ int32_t rfFgets_UTF32LE(char* buff,uint32_t num,FILE* f,char* eof);
+i_DECLIMEX_ int32_t rfFgets_UTF32LE(char* buff,uint32_t num,FILE* f,char* eof,char eol);
 
 //! @brief Gets a number of bytes from a BIG endian UTF-16 file descriptor
 //!
 //! This is a function that's similar to c library fgets but it also returns the number of bytes read. Reads in from the file until @c num bytes
 //! have been read or new line or EOF character has been encountered.
+//!
+//! The character pattern that shall be considered as newline signal depends on the value the user passes to the @c eol argument.
 //!
 //! The function will read until @c num characters are read and if @c num
 //! would take us to the middle of a UTF16 character then the next character shall also be read
@@ -270,9 +307,6 @@ i_DECLIMEX_ int32_t rfFgets_UTF32LE(char* buff,uint32_t num,FILE* f,char* eof);
 //!
 //! If right after the last character read comes the EOF, the function
 //! shall detect so and assign @c true to @c eof.
-//!
-//! In Windows where file endings are in the form of 2 bytes CR-LF (Carriage return - NewLine) this function
-//! shall just ignore the carriage returns and not return it inside the return buffer at @c buff.
 //!
 //! The file descriptor at @c f must have been opened in <b>binary</b> and not text mode. That means that if under
 //! Windows make sure to call fopen with "wb", "rb" e.t.c. instead of the simple "w", "r" e.t.c. since the initial
@@ -284,6 +318,11 @@ i_DECLIMEX_ int32_t rfFgets_UTF32LE(char* buff,uint32_t num,FILE* f,char* eof);
 //! @param[in] num The maximum number of bytes to read from within the file NOT including the null terminating character(which in itelf is 2 bytes). Should be a multiple of 2
 //! @param[in] f A valid FILE descriptor from which to read the bytes
 //! @param[out] eof Pass a reference to a char to receive a true/false value for whether EOF has been reached.
+//! @param[in] eol The End Of Line type that this file uses. Legal values are:
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//! + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as the end of line signal
+//!
 //! @return Returns the actual number of bytes read or an error if there was a problem.
 //! The possible errors are:
 //! + @c RE_FILE_READ: If during reading the file there was an unknown read error
@@ -293,11 +332,13 @@ i_DECLIMEX_ int32_t rfFgets_UTF32LE(char* buff,uint32_t num,FILE* f,char* eof);
 //! + @c RE_INTERRUPT: If during reading, there was a system interrupt
 //! + @c RE_FILE_IO: If there was a physical I/O error
 //! + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
-i_DECLIMEX_ int32_t rfFgets_UTF16BE(char* buff,uint32_t num,FILE* f,char* eof);
+i_DECLIMEX_ int32_t rfFgets_UTF16BE(char* buff,uint32_t num,FILE* f,char* eof,char eol);
 //! @brief Gets a number of bytes from a Little endian UTF-16 file descriptor
 //!
 //! This is a function that's similar to c library fgets but it also returns the number of bytes read. Reads in from the file until @c num bytes
 //! have been read or new line or EOF character has been encountered.
+//!
+//! The character pattern that shall be considered as newline signal depends on the value the user passes to the @c eol argument.
 //!
 //! The function will read until @c num characters are read and if @c num
 //! would take us to the middle of a UTF16 character then the next character shall also be read
@@ -310,9 +351,6 @@ i_DECLIMEX_ int32_t rfFgets_UTF16BE(char* buff,uint32_t num,FILE* f,char* eof);
 //! If right after the last character read comes the EOF, the function
 //! shall detect so and assign @c true to @c eof.
 //!
-//! In Windows where file endings are in the form of 2 bytes CR-LF (Carriage return - NewLine) this function
-//! shall just ignore the carriage returns and not return it inside the return buffer at @c buff.
-//!
 //! The file descriptor at @c f must have been opened in <b>binary</b> and not text mode. That means that if under
 //! Windows make sure to call fopen with "wb", "rb" e.t.c. instead of the simple "w", "r" e.t.c. since the initial
 //! default value under Windows is text mode. Alternatively you can set the initial value using _get_fmode() and
@@ -323,6 +361,11 @@ i_DECLIMEX_ int32_t rfFgets_UTF16BE(char* buff,uint32_t num,FILE* f,char* eof);
 //! @param[in] num The maximum number of bytes to read from within the file NOT including the null terminating character(which in itelf is 2 bytes). Should be a multiple of 2
 //! @param[in] f A valid FILE descriptor from which to read the bytes
 //! @param[out] eof Pass a reference to a char to receive a true/false value for whether EOF has been reached.
+//! @param[in] eol The End Of Line type that this file uses. Legal values are:
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//! + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as the end of line signal
+//!
 //! @return Returns the actual number of bytes read or an error if there was a problem.
 //! The possible errors are:
 //! + @c RE_FILE_READ: If during reading the file there was an unknown read error
@@ -332,11 +375,13 @@ i_DECLIMEX_ int32_t rfFgets_UTF16BE(char* buff,uint32_t num,FILE* f,char* eof);
 //! + @c RE_INTERRUPT: If during reading, there was a system interrupt
 //! + @c RE_FILE_IO: If there was a physical I/O error
 //! + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
-i_DECLIMEX_ int32_t rfFgets_UTF16LE(char* buff,uint32_t num,FILE* f,char* eof);
+i_DECLIMEX_ int32_t rfFgets_UTF16LE(char* buff,uint32_t num,FILE* f,char* eof,char eol);
 //! @brief Gets a number of bytes from a UTF-8 file descriptor
 //!
 //! This is a function that's similar to c library fgets but it also returns the number of bytes read. Reads in from the file until @c num characters
 //! have been read or new line or EOF character has been encountered.
+//!
+//! The character pattern that shall be considered as newline signal depends on the value the user passes to the @c eol argument.
 //!
 //! The function  automatically adds a null termination character at the end of
 //! @c buff but this character is not included in the returned actual number of bytes.
@@ -350,9 +395,6 @@ i_DECLIMEX_ int32_t rfFgets_UTF16LE(char* buff,uint32_t num,FILE* f,char* eof);
 //! If right after the last character read comes the EOF, the function
 //! shall detect so and assign @c true to @c eof.
 //!
-//! In Windows where file endings are in the form of 2 bytes CR-LF (Carriage return - NewLine) this function
-//! shall just ignore the carriage returns and not return it inside the return buffer at @c buff.
-//!
 //! The file descriptor at @c f must have been opened in <b>binary</b> and not text mode. That means that if under
 //! Windows make sure to call fopen with "wb", "rb" e.t.c. instead of the simple "w", "r" e.t.c. since the initial
 //! default value under Windows is text mode. Alternatively you can set the initial value using _get_fmode() and
@@ -363,6 +405,11 @@ i_DECLIMEX_ int32_t rfFgets_UTF16LE(char* buff,uint32_t num,FILE* f,char* eof);
 //! @param[in] num The maximum number of bytes to read from within the file NOT including the null terminating character(which in itelf is 1 byte)
 //! @param[in] f A valid FILE descriptor from which to read the bytes
 //! @param[out] eof Pass a reference to a char to receive a true/false value for whether EOF has been reached.
+//! @param[in] eol The End Of Line type that this file uses. Legal values are:
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//! + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as the end of line signal
+//!
 //! @return Returns the actual number of bytes read or an error if there was a problem.
 //! The possible errors are:
 //! + @c RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE: If an invalid UTF-8 byte has been found
@@ -377,7 +424,7 @@ i_DECLIMEX_ int32_t rfFgets_UTF16LE(char* buff,uint32_t num,FILE* f,char* eof);
 //! + @c RE_INTERRUPT: If during reading, there was a system interrupt
 //! + @c RE_FILE_IO: If there was a physical I/O error
 //! + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
-i_DECLIMEX_ int32_t rfFgets_UTF8(char* buff,uint32_t num,FILE* f,char* eof);
+i_DECLIMEX_ int32_t rfFgets_UTF8(char* buff,uint32_t num,FILE* f,char* eof,char eol);
 
 //! @brief  Gets a unicode character from a UTF-8 file descriptor
 //!

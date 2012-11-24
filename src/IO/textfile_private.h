@@ -30,6 +30,11 @@ int32_t i_rfTextFile_AddBom(struct RF_TextFile* t);
 //! Adds a Byte order mark to the file at the current position. Only to be used at the start of the file
 int32_t i_rfFile_AddBom(FILE*f,char encoding);
 
+//! Handles the EOL encoding for this textfile by either setting the desired encoding pattern or auto detecting it
+char TextFile_HandleEol(struct RF_TextFile* t,char eol);
+//! Takes a textfile's inner FILE* to the beginning of the file depending on the encoding and BOM existence. Can fail and returns an appropriate error
+int32_t TextFile_GoToStart(struct RF_TextFile* t);
+
 /// ================ Macros for usage only inside RF_TextFile functions ================= ///
 
 //! A macro to resume the text file pointer back to a saved position starting from the file's start and if there is an error return it
@@ -60,81 +65,6 @@ if(rfFseek((i_TEXTFILE_)->f,i_tomove_,SEEK_CUR)!=0)\
 (i_TEXTFILE_)->line = i_PRLINE_;\
 (i_TEXTFILE_)->eof = i_PREOF_;\
 }
-
-
-//! A macro to Take the file pointer to the beginning of the file
-#define TEXTFILE_GOTOSTART(i_TEXTFILE_,i_TEXT_) \
-{\
-/*depending on the encoding of the file*/\
-int i_ByTeOffSeT_ = 0;\
-switch((i_TEXTFILE_)->encoding)\
-{\
-    case RF_UTF8:\
-     if((i_TEXTFILE_)->hasBom == true)\
-        i_ByTeOffSeT_=3;\
-    break;\
-    case RF_UTF16_BE:\
-    case RF_UTF16_LE:\
-        if((i_TEXTFILE_)->hasBom == true)\
-            i_ByTeOffSeT_=2;\
-    break;\
-    case RF_UTF32_BE:\
-    case RF_UTF32_LE:\
-        if((i_TEXTFILE_)->hasBom == true)\
-            i_ByTeOffSeT_=4;\
-    break;\
-}\
-/*First rewind back to the start so that read/write operations can be reset*/\
-if(rfFseek((i_TEXTFILE_)->f,0,SEEK_SET) != 0)\
-{\
-    i_TEXTFILE_FSEEK_CHECK((i_TEXTFILE_),i_TEXT_)\
-}\
-if(rfFseek((i_TEXTFILE_)->f,i_ByTeOffSeT_,SEEK_SET) != 0)\
-{\
-    i_TEXTFILE_FSEEK_CHECK((i_TEXTFILE_),i_TEXT_)\
-}\
-(i_TEXTFILE_)->previousOp = 0;\
-(i_TEXTFILE_)->line = 1;\
-(i_TEXTFILE_)->eof = false;\
-}
-
-//! A macro to Take the file pointer to the beginning of the file and if there is an error, keep it and go to the cleanup code
-#define TEXTFILE_GOTOSTART_GOTO(i_TEXTFILE_,i_TEXT_,i_ERROR_,i_LABEL_) \
-{\
-/*depending on the encoding of the file*/\
-int i_ByTeOffSeT_ = 0;\
-switch((i_TEXTFILE_)->encoding)\
-{\
-    case RF_UTF8:\
-     if((i_TEXTFILE_)->hasBom == true)\
-        i_ByTeOffSeT_=3;\
-    break;\
-    case RF_UTF16_BE:\
-    case RF_UTF16_LE:\
-        if((i_TEXTFILE_)->hasBom == true)\
-            i_ByTeOffSeT_=2;\
-    break;\
-    case RF_UTF32_BE:\
-    case RF_UTF32_LE:\
-        if((i_TEXTFILE_)->hasBom == true)\
-            i_ByTeOffSeT_=4;\
-    break;\
-}\
-/*First rewind back to the start so that read/write operations can be reset*/\
-if(rfFseek((i_TEXTFILE_)->f,0,SEEK_SET) != 0)\
-{\
-    i_TEXTFILE_FSEEK_CHECK_GOTO(t,i_TEXT_,i_ERROR_,i_LABEL_)\
-}\
-if(rfFseek((i_TEXTFILE_)->f,i_ByTeOffSeT_,SEEK_SET) != 0)\
-{\
-    i_TEXTFILE_FSEEK_CHECK_GOTO(t,i_TEXT_,i_ERROR_,i_LABEL_)\
-}\
-(i_TEXTFILE_)->previousOp = 0;\
-(i_TEXTFILE_)->line = 1;\
-(i_TEXTFILE_)->eof = false;\
-}
-
-
 
 //! A macro to check if a textfile needs to change its mode in order to perform a read operation. If an error occurs it returns it
 #define RF_TEXTFILE_CANREAD(i_TEXTFILE_) {\

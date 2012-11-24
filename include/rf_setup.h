@@ -665,6 +665,10 @@ enum {
         RE_FILE_MODE_CHANGE, //Occures if an attempt to change the file handler's opening mode, from writting to reading or vice versa failed
         RE_FILE_MOVEPOS, //Occurs if an illegal movement of the internal file pointer is attempted
 
+        /* TextFile Errors */
+        RE_TEXTFILE_EOL_DETECT, //Occurs if there was a failure to auto-detect the End Of Line pattern during the initialization of a TextFile
+
+
         /* System Errors */
         RE_DIRECTORY_EXISTS, //Failure at creating a directory because it already exists
         RE_DIRECTORY_INVALID, // Failure to create a directory because the path was invalid

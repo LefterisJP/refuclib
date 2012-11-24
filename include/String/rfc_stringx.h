@@ -811,11 +811,16 @@ i_DECLIMEX_ char i_rfStringX_MoveAfterPair(RF_StringX* thisstr,const void* left,
 //! Given file character stream must be encoded in UTF-8. A check for valide sequence of bytes is performed.
 //! @param f A valid and open file pointer in read mode from which to read the string. The file's encoding must be UTF-8.A check for valide sequence of bytes is performed.
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this initialization
+//! @param[in] eol The End Of Line type that this file uses. Can be one of:
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RF_EOL_CR: For Macintosh-style line endings, taking @c '\r' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//!
 //! @return The initialized string or null pointer in case of failure to read the file, or unexpected data (non-UTF8 encoded string)
 //! @see rfStringX_Init_fUTF8()
 //! @see rfStringX_Assign_fUTF8()
 //! @see rfStringX_Append_fUTF8()
-i_DECLIMEX_ RF_StringX* rfStringX_Create_fUTF8(FILE* f, char* eof);
+i_DECLIMEX_ RF_StringX* rfStringX_Create_fUTF8(FILE* f, char* eof,char eol);
 //! @memberof RF_StringX
 //! @brief Initializes an extended string from UTF-8 file parsing
 //!
@@ -825,12 +830,17 @@ i_DECLIMEX_ RF_StringX* rfStringX_Create_fUTF8(FILE* f, char* eof);
 //! @param str The extended string to initialize
 //! @param f A valid and open file pointer in read mode from which to read the string. The file's encoding must be UTF-8.A check for valide sequence of bytes is performed.
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this initialization
+//! @param[in] eol The End Of Line type that this file uses. Can be one of:
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RF_EOL_CR: For Macintosh-style line endings, taking @c '\r' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//!
 //! @return Returns either a positive number for succesfull initialization that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF8() can produce.
 //! @see rfStringX_Create_fUTF8()
 //! @see rfStringX_Assign_fUTF8()
 //! @see rfStringX_Append_fUTF8()
-i_DECLIMEX_ int32_t rfStringX_Init_fUTF8(RF_StringX* str,FILE* f, char* eof);
+i_DECLIMEX_ int32_t rfStringX_Init_fUTF8(RF_StringX* str,FILE* f, char* eof,char eol);
 
 //! @memberof RF_StringX
 //! @brief Assigns to an extended string from UTF-8 file parsing
@@ -841,12 +851,17 @@ i_DECLIMEX_ int32_t rfStringX_Init_fUTF8(RF_StringX* str,FILE* f, char* eof);
 //! @param str The extended string to assign to
 //! @param f A valid and open file pointer in read mode from which to read the string. The file's encoding must be UTF-8.A check for valide sequence of bytes is performed.
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this assignment
+//! @param[in] eol The End Of Line type that this file uses. Can be one of:
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RF_EOL_CR: For Macintosh-style line endings, taking @c '\r' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//!
 //! @return Returns either a positive number for succesfull assignment that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF8() can produce.
 //! @see rfStringX_Init_fUTF8()
 //! @see rfStringX_Create_fUTF8()
 //! @see rfStringX_Append_fUTF8()
-i_DECLIMEX_ int32_t rfStringX_Assign_fUTF8(RF_StringX* str,FILE* f, char* eof);
+i_DECLIMEX_ int32_t rfStringX_Assign_fUTF8(RF_StringX* str,FILE* f, char* eof,char eol);
 //! @memberof RF_StringX
 //! @brief Appends to an extended string from UTF-8 file parsing
 //!
@@ -856,12 +871,17 @@ i_DECLIMEX_ int32_t rfStringX_Assign_fUTF8(RF_StringX* str,FILE* f, char* eof);
 //! @param str The extended string to append to
 //! @param f A valid and open file pointer in read mode from which to read the string. The file's encoding must be UTF-8.A check for valide sequence of bytes is performed.
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this appending
+//! @param[in] eol The End Of Line type that this file uses. Can be one of:
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RF_EOL_CR: For Macintosh-style line endings, taking @c '\r' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//!
 //! @return Returns either a positive number for succesfull appending that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF8() can produce.
 //! @see rfStringX_Init_fUTF8()
 //! @see rfStringX_Create_fUTF8()
 //! @see rfStringX_Assign_fUTF8()
-i_DECLIMEX_ int32_t rfStringX_Append_fUTF8(RF_StringX* str,FILE* f, char* eof);
+i_DECLIMEX_ int32_t rfStringX_Append_fUTF8(RF_StringX* str,FILE* f, char* eof,char eol);
 
 //! @memberof RF_StringX
 //! @cppnotctor
@@ -873,11 +893,16 @@ i_DECLIMEX_ int32_t rfStringX_Append_fUTF8(RF_StringX* str,FILE* f, char* eof);
 //! @param endianess A flag that determines in what endianess the UTF-16 file is encoded in. Possible values here are
 //! @c RF_LITTLE_ENDIAN and @c RF_BIG_ENDIAN.
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this initialization
+//! @param[in] eol The End Of Line type that this file uses. Can be one of:
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RF_EOL_CR: For Macintosh-style line endings, taking @c '\r' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//!
 //! @return The initialized string or null pointer in case of failure to read the file
 //! @see rfStringX_Init_fUTF16()
 //! @see rfStringX_Append_fUTF16()
 //! @see rfStringX_Assign_fUTF16()
-i_DECLIMEX_ RF_StringX* rfStringX_Create_fUTF16(FILE* f, char endianess,char* eof);
+i_DECLIMEX_ RF_StringX* rfStringX_Create_fUTF16(FILE* f, char endianess,char* eof,char eol);
 //! @memberof RF_StringX
 //! @brief Initializes an extended string from UTF-16 file parsing
 //!
@@ -888,12 +913,17 @@ i_DECLIMEX_ RF_StringX* rfStringX_Create_fUTF16(FILE* f, char endianess,char* eo
 //! @param endianess A flag that determines in what endianess the UTF-16 file is encoded in. Possible values here are
 //! @c RF_LITTLE_ENDIAN and @c RF_BIG_ENDIAN.
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this initialization
+//! @param[in] eol The End Of Line type that this file uses. Can be one of:
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RF_EOL_CR: For Macintosh-style line endings, taking @c '\r' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//!
 //! @return Returns either a positive number for succesfull initialization that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF16LE() can produce.
 //! @see rfStringX_Create_fUTF16()
 //! @see rfStringX_Append_fUTF16()
 //! @see rfStringX_Assign_fUTF16()
-i_DECLIMEX_ int32_t rfStringX_Init_fUTF16(RF_StringX* str,FILE* f, char endianess,char* eof);
+i_DECLIMEX_ int32_t rfStringX_Init_fUTF16(RF_StringX* str,FILE* f, char endianess,char* eof,char eol);
 
 //! @memberof RF_StringX
 //! @brief Appends the contents of a UTF-16 file to the Extended String
@@ -905,12 +935,17 @@ i_DECLIMEX_ int32_t rfStringX_Init_fUTF16(RF_StringX* str,FILE* f, char endianes
 //! @param endianess A flag that determines in what endianess the UTF-16 file is encoded in. Possible values here are
 //! @c RF_LITTLE_ENDIAN and @c RF_BIG_ENDIAN.
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this appending
+//! @param[in] eol The End Of Line type that this file uses. Can be one of:
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RF_EOL_CR: For Macintosh-style line endings, taking @c '\r' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//!
 //! @return Returns either a positive number for succesfull appending that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF16LE() can produce.
 //! @see rfStringX_Create_fUTF16()
 //! @see rfStringX_Init_fUTF16()
 //! @see rfStringX_Assign_fUTF16()
-i_DECLIMEX_ int32_t rfStringX_Append_fUTF16(RF_StringX* str,FILE* f, char endianess,char* eof);
+i_DECLIMEX_ int32_t rfStringX_Append_fUTF16(RF_StringX* str,FILE* f, char endianess,char* eof,char eol);
 //! @memberof RF_StringX
 //! @brief Assigns the contents of a UTF-16 file to an already initialized StringX
 //!
@@ -921,12 +956,17 @@ i_DECLIMEX_ int32_t rfStringX_Append_fUTF16(RF_StringX* str,FILE* f, char endian
 //! @param endianess A flag that determines in what endianess the UTF-16 file is encoded in. Possible values here are
 //! @c RF_LITTLE_ENDIAN and @c RF_BIG_ENDIAN.
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this assignment
+//! @param[in] eol The End Of Line type that this file uses. Can be one of:
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RF_EOL_CR: For Macintosh-style line endings, taking @c '\r' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//!
 //! @return Returns either a positive number for succesfull assignment that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF16LE() can produce.
 //! @see rfStringX_Create_fUTF16()
 //! @see rfStringX_Init_fUTF16()
 //! @see rfStringX_Append_fUTF16()
-i_DECLIMEX_ int32_t rfStringX_Assign_fUTF16(RF_StringX* str,FILE* f, char endianess,char* eof);
+i_DECLIMEX_ int32_t rfStringX_Assign_fUTF16(RF_StringX* str,FILE* f, char endianess,char* eof,char eol);
 
 //! @memberof RF_StringX
 //! @cppnotctor
@@ -938,11 +978,16 @@ i_DECLIMEX_ int32_t rfStringX_Assign_fUTF16(RF_StringX* str,FILE* f, char endian
 //! @param endianess A flag that determines in what endianess the UTF-32 file is encoded in. Possible values here are
 //! @c RF_LITTLE_ENDIAN and @c RF_BIG_ENDIAN.
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this initialization
+//! @param[in] eol The End Of Line type that this file uses. Can be one of:
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RF_EOL_CR: For Macintosh-style line endings, taking @c '\r' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//!
 //! @return The initialized string or null pointer in case of failure to read the file
 //! @see rfStringX_Init_fUTF32()
 //! @see rfStringX_Append_fUTF32()
 //! @see rfStringX_Assign_fUTF32()
-i_DECLIMEX_ RF_StringX* rfStringX_Create_fUTF32(FILE* f,char endianess, char* eof);
+i_DECLIMEX_ RF_StringX* rfStringX_Create_fUTF32(FILE* f,char endianess, char* eof,char eol);
 //! @memberof RF_StringX
 //! @brief Initializes an extended string from UTF-32 file parsing
 //!
@@ -953,12 +998,17 @@ i_DECLIMEX_ RF_StringX* rfStringX_Create_fUTF32(FILE* f,char endianess, char* eo
 //! @param endianess A flag that determines in what endianess the UTF-32 file is encoded in. Possible values here are
 //! @c RF_LITTLE_ENDIAN and @c RF_BIG_ENDIAN.
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this initialization
+//! @param[in] eol The End Of Line type that this file uses. Can be one of:
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RF_EOL_CR: For Macintosh-style line endings, taking @c '\r' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//!
 //! @return Returns either a positive number for succesfull initialization that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF32LE() can produce.
 //! @see rfStringX_Create_fUTF32()
 //! @see rfStringX_Append_fUTF32()
 //! @see rfStringX_Assign_fUTF32()
-i_DECLIMEX_ int32_t rfStringX_Init_fUTF32(RF_StringX* str,FILE* f,char endianess, char* eof);
+i_DECLIMEX_ int32_t rfStringX_Init_fUTF32(RF_StringX* str,FILE* f,char endianess, char* eof,char eol);
 //! @memberof RF_StringX
 //! @brief Assigns the contents of a UTF-32 file to an extended string
 //!
@@ -969,12 +1019,17 @@ i_DECLIMEX_ int32_t rfStringX_Init_fUTF32(RF_StringX* str,FILE* f,char endianess
 //! @param endianess A flag that determines in what endianess the UTF-32 file is encoded in. Possible values here are
 //! @c RF_LITTLE_ENDIAN and @c RF_BIG_ENDIAN.
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this assignment
+//! @param[in] eol The End Of Line type that this file uses. Can be one of:
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RF_EOL_CR: For Macintosh-style line endings, taking @c '\r' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//!
 //! @return Returns either a positive number for succesfull assignment that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF32LE() can produce.
 //! @see rfStringX_Create_fUTF32()
 //! @see rfStringX_Init_fUTF32()
 //! @see rfStringX_Append_fUTF32()
-i_DECLIMEX_ int32_t rfStringX_Assign_fUTF32(RF_StringX* str,FILE* f,char endianess, char* eof);
+i_DECLIMEX_ int32_t rfStringX_Assign_fUTF32(RF_StringX* str,FILE* f,char endianess, char* eof,char eol);
 //! @memberof RF_StringX
 //! @brief Appends the contents of a UTF-32 file to an extended string
 //!
@@ -985,12 +1040,17 @@ i_DECLIMEX_ int32_t rfStringX_Assign_fUTF32(RF_StringX* str,FILE* f,char endiane
 //! @param endianess A flag that determines in what endianess the UTF-32 file is encoded in. Possible values here are
 //! @c RF_LITTLE_ENDIAN and @c RF_BIG_ENDIAN.
 //! @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file was reached with this appending
+//! @param[in] eol The End Of Line type that this file uses. Can be one of:
+//! + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
+//! + @c RF_EOL_CR: For Macintosh-style line endings, taking @c '\r' as the end of line signal
+//! + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
+//!
 //! @return Returns either a positive number for succesfull appending that represents the bytes read from the file.
 //! If there was a problem an error is returned. Possible errors are any of those that @ref rfFReadLine_UTF32LE() can produce.
 //! @see rfStringX_Create_fUTF32()
 //! @see rfStringX_Init_fUTF32()
 //! @see rfStringX_Assign_fUTF32()
-i_DECLIMEX_ int32_t rfStringX_Append_fUTF32(RF_StringX* str,FILE* f,char endianess, char* eof);
+i_DECLIMEX_ int32_t rfStringX_Append_fUTF32(RF_StringX* str,FILE* f,char endianess, char* eof,char eol);
 
 //! @}
 // close the RF_StringX file I/O name group

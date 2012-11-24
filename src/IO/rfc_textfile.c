@@ -32,9 +32,9 @@
 
 //Initializes a new text file
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-int32_t rfTextFile_Init(RF_TextFile* t,const void* nameP,char mode,char encoding)
+int32_t rfTextFile_Init(RF_TextFile* t,const void* nameP,char mode,char encoding,char eol)
 #else
-int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char mode,char encoding)
+int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char mode,char encoding,char eol)
 #endif
 {
     RF_String* name = (RF_String*) nameP;
@@ -314,12 +314,32 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char mode,char encodi
                 goto cleanup1;
             break;
         }
+        //finally handle the line encoding for the existingfile case
+        if(TextFile_HandleEol(t,eol)==false)
+            LOG_ERROR("During initializing TextFile \"%s\" auto-detecting the End Of Line Pattern failed. Considering default of Unix-Style LF Endings",RE_TEXTFILE_EOL_DETECT,rfString_Cstr(&t->name))
+
     }//end of existing file case
     else//new file case
     {
+        //check the eol argument
+        switch(eol)
+        {
+            case RF_EOL_LF:
+            case RF_EOL_CR:
+            case RF_EOL_CRLF:
+                t->eol = eol;
+            break;
+            case RF_EOL_AUTO:
+                t->eol = RF_EOL_LF;
+                LOG_ERROR("User asked for auto detection of the EOL pattern while a new file is being created. Set it to RF_EOL_LF as default but please set your choice from the calling function correctly",RE_INPUT)
+            break;
+            default:
+                LOG_ERROR("An illegal eol value has been given to the initialization of TextFile \"%s\"",RE_INPUT,rfString_Cstr(&t->name))
+                return false;
+            break;
+        }
         switch(encoding)
         {
-
             case RF_UTF16:
                 if(rfUTILS_Endianess() == RF_LITTLE_ENDIAN)
                 {
@@ -373,15 +393,15 @@ cleanup1:
 }
 //Create a new text file
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-RF_TextFile* rfTextFile_Create(const void* name,char mode,char encoding)
+RF_TextFile* rfTextFile_Create(const void* name,char mode,char encoding,char eol)
 #else
-RF_TextFile* i_rfTextFile_Create(const void* name,char mode,char encoding)
+RF_TextFile* i_rfTextFile_Create(const void* name,char mode,char encoding,char eol)
 #endif
 {
     RF_TextFile* ret;
     RF_ENTER_LOCAL_SCOPE()
     RF_MALLOC(ret,sizeof(RF_TextFile));
-    if(rfTextFile_Init(ret,name,mode,encoding) != RF_SUCCESS)
+    if(rfTextFile_Init(ret,name,mode,encoding,eol) != RF_SUCCESS)
         ret = 0;
 
     RF_EXIT_LOCAL_SCOPE()
@@ -526,35 +546,35 @@ int32_t i_rfTextFile_ReadLine3(RF_TextFile* t,RF_StringX* line,uint32_t characte
     switch(t->encoding)
     {
         case RF_UTF8:
-            if( (bytesN = rfStringX_Assign_fUTF8(line,t->f,&eof)) < 0)
+            if( (bytesN = rfStringX_Assign_fUTF8(line,t->f,&eof,t->eol)) < 0)
             {
                 rfFseek(t->f,startOff,SEEK_SET);
                 RETURN_LOG_ERROR("Reading line [%"PRIu64"] of a UTF-8 text file failed",bytesN,t->line)
             }
         break;//end of utf-8
         case RF_UTF16_LE:
-            if( (bytesN = rfStringX_Assign_fUTF16(line,t->f,RF_LITTLE_ENDIAN,&eof)) < 0)
+            if( (bytesN = rfStringX_Assign_fUTF16(line,t->f,RF_LITTLE_ENDIAN,&eof,t->eol)) < 0)
             {
                 rfFseek(t->f,startOff,SEEK_SET);
                 RETURN_LOG_ERROR("Reading line [%"PRIu64"] of a Little Endian UTF-16 text file failed",bytesN,t->line)
             }
         break;
         case RF_UTF16_BE:
-            if( (bytesN = rfStringX_Assign_fUTF16(line,t->f,RF_BIG_ENDIAN,&eof)) < 0)
+            if( (bytesN = rfStringX_Assign_fUTF16(line,t->f,RF_BIG_ENDIAN,&eof,t->eol)) < 0)
             {
                 rfFseek(t->f,startOff,SEEK_SET);
                 RETURN_LOG_ERROR("Reading line [%"PRIu64"] of a Big Endian UTF-16 text file failed",bytesN,t->line)
             }
         break;//end of UTF-16 big endian
         case RF_UTF32_LE:
-            if( (bytesN = rfStringX_Assign_fUTF32(line,t->f,RF_LITTLE_ENDIAN,&eof)) < 0)
+            if( (bytesN = rfStringX_Assign_fUTF32(line,t->f,RF_LITTLE_ENDIAN,&eof,t->eol)) < 0)
             {
                 rfFseek(t->f,startOff,SEEK_SET);
                 RETURN_LOG_ERROR("Reading line [%"PRIu64"] of a Little Endian UTF-32 text file failed",bytesN,t->line);
             }
         break;
         case RF_UTF32_BE:
-            if( (bytesN = rfStringX_Assign_fUTF32(line,t->f,RF_BIG_ENDIAN,&eof)) < 0)
+            if( (bytesN = rfStringX_Assign_fUTF32(line,t->f,RF_BIG_ENDIAN,&eof,t->eol)) < 0)
             {
                 rfFseek(t->f,startOff,SEEK_SET);
                 RETURN_LOG_ERROR("Reading line [%"PRIu64"] of a Big Endian UTF-32 text file failed",bytesN,t->line)
@@ -603,35 +623,35 @@ int32_t rfTextFile_ReadLine2(RF_TextFile* t,RF_StringX* line)
     switch(t->encoding)
     {
         case RF_UTF8:
-            if( (bytesN = rfStringX_Assign_fUTF8(line,t->f,&eof)) < 0)
+            if( (bytesN = rfStringX_Assign_fUTF8(line,t->f,&eof,t->eol)) < 0)
             {
                 rfFseek(t->f,startOff,SEEK_SET);
                 RETURN_LOG_ERROR("Reading line [%"PRIu64"] of a UTF-8 text file failed",bytesN,t->line)
             }
         break;//end of utf-8
         case RF_UTF16_LE:
-            if( (bytesN = rfStringX_Assign_fUTF16(line,t->f,RF_LITTLE_ENDIAN,&eof)) < 0)
+            if( (bytesN = rfStringX_Assign_fUTF16(line,t->f,RF_LITTLE_ENDIAN,&eof,t->eol)) < 0)
             {
                 rfFseek(t->f,startOff,SEEK_SET);
                 RETURN_LOG_ERROR("Reading line [%"PRIu64"] of a Little Endian UTF-16 text file failed",bytesN,t->line)
             }
         break;
         case RF_UTF16_BE:
-            if( (bytesN = rfStringX_Assign_fUTF16(line,t->f,RF_BIG_ENDIAN,&eof)) < 0)
+            if( (bytesN = rfStringX_Assign_fUTF16(line,t->f,RF_BIG_ENDIAN,&eof,t->eol)) < 0)
             {
                 rfFseek(t->f,startOff,SEEK_SET);
                 RETURN_LOG_ERROR("Reading line [%"PRIu64"] of a Big Endian UTF-16 text file failed",bytesN,t->line)
             }
         break;//end of UTF-16 big endian
         case RF_UTF32_LE:
-            if( (bytesN = rfStringX_Assign_fUTF32(line,t->f,RF_LITTLE_ENDIAN,&eof)) < 0)
+            if( (bytesN = rfStringX_Assign_fUTF32(line,t->f,RF_LITTLE_ENDIAN,&eof,t->eol)) < 0)
             {
                 rfFseek(t->f,startOff,SEEK_SET);
                 RETURN_LOG_ERROR("Reading line [%"PRIu64"] of a Little Endian UTF-32 text file failed",bytesN,t->line)
             }
         break;
         case RF_UTF32_BE:
-            if( (bytesN = rfStringX_Assign_fUTF32(line,t->f,RF_BIG_ENDIAN,&eof)) < 0)
+            if( (bytesN = rfStringX_Assign_fUTF32(line,t->f,RF_BIG_ENDIAN,&eof,t->eol)) < 0)
             {
                 rfFseek(t->f,startOff,SEEK_SET);
                 RETURN_LOG_ERROR("Reading line [%"PRIu64"] of a Big Endian UTF-32 text file failed",bytesN,t->line)
@@ -661,14 +681,17 @@ int32_t rfTextFile_GetLine_begin(RF_TextFile* t,uint64_t lineN,RF_StringX* line)
     //in the very beginning keep the previous file position
     prLine = t->line;
     if(lineN == 0)
-        return RE_INPUT;
+        RETURN_LOG_ERROR("Invalid input given for the lineN argument. It can never be zero",RE_INPUT)
+
     if((prOff = rfFtell(t->f)) == (foff_rft)-1)
     {
         i_FTELL_CHECK("Querying current file pointer at function start")
     }
     prEof = t->eof;
     //now get the position to the beginning of the file
-    TEXTFILE_GOTOSTART(t,"Resetting the file pointer")
+    if((error=TextFile_GoToStart(t))!= RF_SUCCESS)
+        RETURN_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%s\" to the beginning",error,rfString_Cstr(&t->name))
+
     ///since we got here start reading the file again, line by line until we get to the requested line
     //initialize the buffer string for readline
     rfStringX_Init_buff(&buffer,RF_OPTION_FGETS_READBYTESN,"");
@@ -788,7 +811,10 @@ int32_t rfTextFile_MoveLines(RF_TextFile* t,int64_t linesN)
     ///special case , target line is the very first one, or is closer to the beginning of the file than here
     if(targetLine == 1 || targetLine < prLine/2)
     {
-        TEXTFILE_GOTOSTART(t,"Resetting the file pointer")
+        //now get the position to the beginning of the file
+        if((error=TextFile_GoToStart(t))!= RF_SUCCESS)
+            RETURN_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%s\" to the beginning",error,rfString_Cstr(&t->name))
+
         //read as many lines as needed
         rfStringX_Init_buff(&buffer,RF_OPTION_FGETS_READBYTESN,"");
         for(i=1;i<targetLine; i ++)
@@ -955,14 +981,16 @@ int32_t rfTextFile_MoveChars_b(RF_TextFile* t,uint64_t charsN)
 // Moves the file pointer to the start of the given line
 int32_t rfTextFile_GoToLine(RF_TextFile* t,uint64_t lineN)
 {
+    int32_t error;
+
     if(lineN == 0)
         RETURN_LOG_ERROR("Illegal linesN value was given. 0 is not a legal value",RE_INPUT)
-
 
     if(lineN == 1)
     {
         //go to the file's beginning
-        TEXTFILE_GOTOSTART(t,"Going to the file's beginning")
+        if((error=TextFile_GoToStart(t))!= RF_SUCCESS)
+            RETURN_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%s\" to the beginning",error,rfString_Cstr(&t->name))
         return RF_SUCCESS;
     }
     else if(lineN == t->line)
@@ -990,7 +1018,8 @@ int32_t rfTextFile_GoToOffset(RF_TextFile* t,foff_rft offset,int origin)
         if(offset < 0)//illegal values combination
             return RE_INPUT;
         //go to the start of the file
-        TEXTFILE_GOTOSTART(t,"Resetting the file pointer");
+        if((error=TextFile_GoToStart(t))!= RF_SUCCESS)
+            RETURN_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%s\" to the beginning",error,rfString_Cstr(&t->name))
         do
         {
             //keep going forward
@@ -1070,16 +1099,17 @@ int32_t rfTextFile_Write(RF_TextFile* t,void* stringP)
     t->previousOp = RF_FILE_WRITE;
     //let's see how many lines it will be adding to the text file
     linesN = rfString_Count(s,RFS_("\n"),0);
-#ifdef RF_NEWLINE_CRLF
-    //if we consider CRLF the file line ending then change all newlines to CRLF
-    if(linesN != 0)
+    //if we don't have the default RF_String Unix style line ending
+    if(t->eol != RF_EOL_LF && linesN != 0)
     {
         allocatedS = true;
         //making a new one since stringP can be on the local stack and we can't use replace since that would act on the local stack
         s = rfString_Copy_OUT((RF_String*)stringP);
-        rfString_Replace(s,RFS_("\n"),RFS_("\xD\n"),0,0);
+        if(t->eol==RF_EOL_CRLF)
+            rfString_Replace(s,RFS_("\n"),RFS_("\xD\n"),0,0);
+        else
+            rfString_Replace(s,RFS_("\n"),RFS_("\xD"),0,0);
     }
-#endif
     //depending on the encoding of the file
     if((error=rfString_Fwrite(s,t->f,t->encoding))!=RF_SUCCESS)
     {
@@ -1124,18 +1154,22 @@ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,char aft
 
     //determine how many lines the given string has
     linesCount = rfString_Count(string,RFS_("\n"),0)+1;
-#ifdef RF_NEWLINE_CRLF /// cleanup 1 - For the string
-    //if we consider CRLF the file line ending then change all newlines to CRLF
+    /// cleanup 1 - For the string
+    //if we don't have the RF_String default Unix style line ending
     //making a new one since stringP can be on the local stack and we can't use replace since that would act on the local stack
-    if(linesCount>1)
+    if(t->eol != RF_EOL_LF && linesCount>1)
     {
         allocatedS = true;
         string = rfString_Copy_OUT((RF_String*)stringP);
-        rfString_Replace(string,RFS_("\n"),RFS_("\xD\n"),0,0);
+        if(t->eol == RF_EOL_CRLF)
+            rfString_Replace(string,RFS_("\n"),RFS_("\xD\n"),0,0);
+        else
+            rfString_Replace(string,RFS_("\n"),RFS_("\xD"),0,0);
     }
-#endif
+
     //go to the beginning of this file
-    TEXTFILE_GOTOSTART_GOTO(t,"Resetting the file pointer",error,cleanup1);
+    if((error=TextFile_GoToStart(t))!= RF_SUCCESS)
+        RETURNGOTO_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%s\" to the beginning",error,error,cleanup1,rfString_Cstr(&t->name))
     //check if this file can read
     RF_TEXTFILE_CANREAD_GOTO(t,error,cleanup1)
     t->previousOp = RF_FILE_READ;
@@ -1158,11 +1192,16 @@ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,char aft
         {
             i_FTELL_CHECK_GOTO("Reading the file position",error,cleanup2);
         }
-#ifdef RF_NEWLINE_CRLF
-        if((error=rfString_Fwrite(RFS_("%s\xD\n",string->bytes),newFile,t->encoding))!= RF_SUCCESS)
-#else
-        if((error=rfString_Fwrite(RFS_("%s\n",string->bytes),newFile,t->encoding))!= RF_SUCCESS)
-#endif
+
+        //now depending on the EOL pattern write the line
+        if(t->eol == RF_EOL_CRLF)
+            error=rfString_Fwrite(RFS_("%s\xD\n",string->bytes),newFile,t->encoding);
+        else if(t->eol == RF_EOL_CR)
+            error=rfString_Fwrite(RFS_("%s\xD",string->bytes),newFile,t->encoding);
+        else
+            error=rfString_Fwrite(RFS_("%s\n",string->bytes),newFile,t->encoding);
+        //and check for errors
+        if(error != RF_SUCCESS)
         {
             LOG_ERROR("There was a file write error while inserting string \"%s\" at the beginning of Text File \"%s\"",error,string->bytes,t->name.bytes);
             goto cleanup2;
@@ -1174,12 +1213,15 @@ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,char aft
     //read every line of this file from the beginning
     while((error =rfTextFile_ReadLine2(t,&buffer))==RF_SUCCESS)
     {
-        //write the read line to the other file
-#ifdef RF_NEWLINE_CRLF
-        if((error=rfString_Fwrite(RFS_("%s\xD\n",rfString_Cstr(&buffer)),newFile,t->encoding))!= RF_SUCCESS)
-#else
-        if((error=rfString_Fwrite(RFS_("%s\n",rfString_Cstr(&buffer)),newFile,t->encoding))!= RF_SUCCESS)
-#endif
+        //now depending on the EOL pattern write the line to the other file
+        if(t->eol == RF_EOL_CRLF)
+            error=rfString_Fwrite(RFS_("%s\xD\n",rfString_Cstr(&buffer)),newFile,t->encoding);
+        else if(t->eol == RF_EOL_CR)
+            error=rfString_Fwrite(RFS_("%s\xD",rfString_Cstr(&buffer)),newFile,t->encoding);
+        else
+            error=rfString_Fwrite(RFS_("%s\n",rfString_Cstr(&buffer)),newFile,t->encoding);
+        //and check for errors
+        if(error!=RF_SUCCESS)
         {
             LOG_ERROR("There was a file write error while inserting string \"%s\" at line [%"PRIu64"] inside Text File \"%s\"",error,string->bytes,lineN,t->name.bytes);
             goto cleanup3;
@@ -1192,12 +1234,15 @@ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,char aft
             {
                 i_FTELL_CHECK_GOTO("Reading the file position",error,cleanup3);
             }
-            //write the given line to the other file
-#ifdef RF_NEWLINE_CRLF
-            if((error=rfString_Fwrite(RFS_("%s\xD\n",string->bytes),newFile,t->encoding))!= RF_SUCCESS)
-#else
-            if((error=rfString_Fwrite(RFS_("%s\n",string->bytes),newFile,t->encoding))!= RF_SUCCESS)
-#endif
+            //write the given line to the other file depending on the EOL pattern
+            if(t->eol == RF_EOL_CRLF)
+                error=rfString_Fwrite(RFS_("%s\xD\n",string->bytes),newFile,t->encoding);
+            else if(t->eol == RF_EOL_CR)
+                error=rfString_Fwrite(RFS_("%s\xD",string->bytes),newFile,t->encoding);
+            else
+                error=rfString_Fwrite(RFS_("%s\n",string->bytes),newFile,t->encoding);
+            //and check for errors
+            if(error != RF_SUCCESS)
             {
                 LOG_ERROR("There was a file write error while inserting string \"%s\" at line [%"PRIu64"] inside Text File \"%s\"",error,string->bytes,lineN,t->name.bytes);
                 goto cleanup3;
@@ -1287,7 +1332,8 @@ int32_t rfTextFile_Remove(RF_TextFile* t,uint64_t lineN)
        i_FTELL_CHECK("Querying current file pointer at function start")
     }
     //go to the beginning of this file
-    TEXTFILE_GOTOSTART(t,"Resetting the file pointer") ///Go back to the staring file position -- cleanup1
+    if((error=TextFile_GoToStart(t))!= RF_SUCCESS)///Go back to the staring file position -- cleanup1
+        RETURN_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%s\" to the beginning",error,rfString_Cstr(&t->name))
     //check if this file can read
     RF_TEXTFILE_CANREAD_GOTO(t,error,cleanup1)
     t->previousOp = RF_FILE_READ;
@@ -1310,11 +1356,15 @@ int32_t rfTextFile_Remove(RF_TextFile* t,uint64_t lineN)
         //only if this line is not the one to remove write the line to the temporary file
         if(t->line-1 != lineN)//-1 is since right after the ReadLine2 function the current line changes
         {
-#ifdef RF_NEWLINE_CRLF
-            if((error = rfString_Fwrite(RFS_("%s\xD\n",rfString_Cstr(&buffer)),newFile,t->encoding))!= RF_SUCCESS)
-#else
-            if((error = rfString_Fwrite(RFS_("%s\n",rfString_Cstr(&buffer)),newFile,t->encoding))!= RF_SUCCESS)
-#endif
+            //depending on the EOL pattern write the line to the file
+            if(t->eol == RF_EOL_CRLF)
+                error = rfString_Fwrite(RFS_("%s\xD\n",rfString_Cstr(&buffer)),newFile,t->encoding);
+            else if(t->eol == RF_EOL_CR)
+                error = rfString_Fwrite(RFS_("%s\xD",rfString_Cstr(&buffer)),newFile,t->encoding);
+            else
+                error = rfString_Fwrite(RFS_("%s\n",rfString_Cstr(&buffer)),newFile,t->encoding);
+            //and check for errors
+            if(error != RF_SUCCESS)
             {
                 LOG_ERROR("While attempting to remove line [%"PRIu64"] of TextFile \"%s\" a write error occured",error,lineN,t->name.bytes);
                 goto cleanup3;
@@ -1386,9 +1436,8 @@ int32_t rfTextFile_Replace(RF_TextFile* t,uint64_t lineN,void* stringP)
     char lineFound,allocatedS;
     int32_t error = RF_FAILURE;
     FILE* newFile;
-#ifdef RF_NEWLINE_CRLF
     uint32_t linesCount;
-#endif
+
     RF_StringX buffer;
     foff_rft tOff;
     RF_String* string = (RF_String*)stringP;
@@ -1399,21 +1448,25 @@ int32_t rfTextFile_Replace(RF_TextFile* t,uint64_t lineN,void* stringP)
     if(lineN == 0)
         goto cleanup0;//failure
 
-#ifdef RF_NEWLINE_CRLF
+
     //determine how many lines the given string has
     linesCount = rfString_Count(string,RFS_("\n"),0);
     /// cleanup 1 - For this string
-    //if we consider CRLF the file line ending then change all newlines to CRLF
+    //if we don't have the RF_String default Unix style line ending
     //making a new one since stringP can be on the local stack and we can't use replace since that would act on the local stack
-    if(linesCount>0)
+    if(t->eol != RF_EOL_LF && linesCount>0)
     {
         allocatedS = true;
         string = rfString_Copy_OUT((RF_String*)stringP);
-        rfString_Replace(string,RFS_("\n"),RFS_("\xD\n"),0,0);
+        if(t->eol == RF_EOL_CRLF)
+            rfString_Replace(string,RFS_("\n"),RFS_("\xD\n"),0,0);
+        else
+            rfString_Replace(string,RFS_("\n"),RFS_("\xD"),0,0);
     }
-#endif
+
     //go to the beginning of this file
-    TEXTFILE_GOTOSTART_GOTO(t,"Resetting the file pointer",error,cleanup1); ///cleanup2 - For the moving back of the file pointer to where it was in the function's beginning
+    if((error=TextFile_GoToStart(t))!= RF_SUCCESS)///cleanup2 - For the moving back of the file pointer to where it was in the function's beginning
+        RETURNGOTO_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%s\" to the beginning",error,error,cleanup1,rfString_Cstr(&t->name))
     //check if this file can read
     RF_TEXTFILE_CANREAD_GOTO(t,error,cleanup1)
     t->previousOp = RF_FILE_READ;
@@ -1436,11 +1489,15 @@ int32_t rfTextFile_Replace(RF_TextFile* t,uint64_t lineN,void* stringP)
         //write the read line to the other file if this is not the line to replace
         if(t->line-1 != lineN)//-1 is since right after the ReadLine2 function the current line changes
         {
-#ifdef RF_NEWLINE_CRLF
-            if((error = rfString_Fwrite(RFS_("%s\xD\n",rfString_Cstr(&buffer)),newFile,t->encoding))!= RF_SUCCESS)
-#else
-            if((error = rfString_Fwrite(RFS_("%s\n",rfString_Cstr(&buffer)),newFile,t->encoding))!= RF_SUCCESS)
-#endif
+            //depending on the EOL pattern write to the file
+            if(t->eol == RF_EOL_CRLF)
+                error = rfString_Fwrite(RFS_("%s\xD\n",rfString_Cstr(&buffer)),newFile,t->encoding);
+            else if(t->eol == RF_EOL_CR)
+                error = rfString_Fwrite(RFS_("%s\xD",rfString_Cstr(&buffer)),newFile,t->encoding);
+            else
+                error = rfString_Fwrite(RFS_("%s\n",rfString_Cstr(&buffer)),newFile,t->encoding);
+            //and check for errors
+            if(error != RF_SUCCESS)
             {
                 LOG_ERROR("While attempting to replace line [%"PRIu64"] of TextFile \"%s\" a write error occured",error,lineN,t->name.bytes);
                 goto cleanup3;
@@ -1453,11 +1510,15 @@ int32_t rfTextFile_Replace(RF_TextFile* t,uint64_t lineN,void* stringP)
             {
                 i_FTELL_CHECK_GOTO("Reading the file position",error,cleanup3);
             }
-#ifdef RF_NEWLINE_CRLF
-            if((error = rfString_Fwrite(RFS_("%s\xD\n",string->bytes),newFile,t->encoding))!= RF_SUCCESS)
-#else
-            if((error = rfString_Fwrite(RFS_("%s\n",string->bytes),newFile,t->encoding))!= RF_SUCCESS)
-#endif
+            //write the line to replace depending on the EOL patter
+            if(t->eol == RF_EOL_CRLF)
+                error = rfString_Fwrite(RFS_("%s\xD\n",string->bytes),newFile,t->encoding);
+            else if(t->eol == RF_EOL_CR)
+                error = rfString_Fwrite(RFS_("%s\xD",string->bytes),newFile,t->encoding);
+            else
+                error = rfString_Fwrite(RFS_("%s\n",string->bytes),newFile,t->encoding);
+            //and check for errors
+            if(error != RF_SUCCESS)
             {
                 LOG_ERROR("While attempting to replace line [%"PRIu64"] of TextFile \"%s\" a write error occured",error,lineN,t->name.bytes);
                 goto cleanup3;

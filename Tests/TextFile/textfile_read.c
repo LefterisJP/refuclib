@@ -16,7 +16,7 @@ int main()
 	EXPECT(true,rfStringX_Init_buff(&line,4096,""))
 	
 	//utf8 file
-	EXPECT(RF_SUCCESS,rfTextFile_Init(&f,RFS_("utf8textfile"),RF_FILE_READ,RF_UTF8))
+	EXPECT(RF_SUCCESS,rfTextFile_Init(&f,RFS_("utf8textfile"),RF_FILE_READ,RF_UTF8,RF_EOL_LF))
 	EXPECT(RF_SUCCESS,rfTextFile_ReadLine2(&f,&line))
 	EXPECT(true,rfString_Equal(&line,RFS_("This is a UTF-8 File")))
 	EXPECT(RF_SUCCESS,rfTextFile_ReadLine2(&f,&line))
@@ -33,7 +33,7 @@ int main()
 	rfTextFile_Deinit(&f);
 	
 	//utf16 le file
-	EXPECT(RF_SUCCESS,rfTextFile_Init(&f,RFS_("utf16letextfile"),RF_FILE_READ,RF_UTF16_LE))
+	EXPECT(RF_SUCCESS,rfTextFile_Init(&f,RFS_("utf16letextfile"),RF_FILE_READ,RF_UTF16_LE,RF_EOL_LF))
 	EXPECT(RF_SUCCESS,rfTextFile_ReadLine2(&f,&line))
 	EXPECT(true,rfString_Equal(&line,RFS_("This is a Little Endian UTF-16 File")))
 	EXPECT(RF_SUCCESS,rfTextFile_ReadLine2(&f,&line))
@@ -50,7 +50,7 @@ int main()
 	rfTextFile_Deinit(&f);
 	
 	//utf16 be file
-	EXPECT(RF_SUCCESS,rfTextFile_Init(&f,RFS_("utf16betextfile"),RF_FILE_READ,RF_UTF16_BE))
+	EXPECT(RF_SUCCESS,rfTextFile_Init(&f,RFS_("utf16betextfile"),RF_FILE_READ,RF_UTF16_BE,RF_EOL_LF))
 	EXPECT(RF_SUCCESS,rfTextFile_ReadLine2(&f,&line))
 	EXPECT(true,rfString_Equal(&line,RFS_("This is a Big Endian UTF-16 File")))
 	EXPECT(RF_SUCCESS,rfTextFile_ReadLine2(&f,&line))
@@ -67,7 +67,7 @@ int main()
 	rfTextFile_Deinit(&f);
 	
 	//utf32 le file
-	EXPECT(RF_SUCCESS,rfTextFile_Init(&f,RFS_("utf32letextfile"),RF_FILE_READ,RF_UTF32_LE))
+	EXPECT(RF_SUCCESS,rfTextFile_Init(&f,RFS_("utf32letextfile"),RF_FILE_READ,RF_UTF32_LE,RF_EOL_LF))
 	EXPECT(RF_SUCCESS,rfTextFile_ReadLine2(&f,&line))
 	EXPECT(true,rfString_Equal(&line,RFS_("This is a Little Endian UTF-32 File")))
 	EXPECT(RF_SUCCESS,rfTextFile_ReadLine2(&f,&line))
@@ -84,7 +84,7 @@ int main()
 	rfTextFile_Deinit(&f);
 	
 	//utf32 be file
-	EXPECT(RF_SUCCESS,rfTextFile_Init(&f,RFS_("utf32betextfile"),RF_FILE_READ,RF_UTF32_BE))
+	EXPECT(RF_SUCCESS,rfTextFile_Init(&f,RFS_("utf32betextfile"),RF_FILE_READ,RF_UTF32_BE,RF_EOL_LF))
 	EXPECT(RF_SUCCESS,rfTextFile_ReadLine2(&f,&line))
 	EXPECT(true,rfString_Equal(&line,RFS_("This is a Big Endian UTF-32 File")))
 	EXPECT(RF_SUCCESS,rfTextFile_ReadLine2(&f,&line))

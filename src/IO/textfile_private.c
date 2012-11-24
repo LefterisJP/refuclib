@@ -24,6 +24,7 @@
 #include "textfile_private.h"
 #include <IO/rfc_textfile.h>
 #include <errno.h>
+#include <string.h> //for strstr()
 
 // Adds a Byte order mark to the file at the current position. Only to be used at the start of the file
 int32_t i_rfTextFile_AddBom(RF_TextFile* t)
@@ -106,4 +107,139 @@ int32_t i_rfFile_AddBom(FILE*f,char encoding)
         break;
     }
     return RF_SUCCESS;
+}
+
+// Takes a textfile's inner FILE* to the beginning of the file depending on the encoding and BOM existence. Can fail and returns an appropriate error
+int32_t TextFile_GoToStart(RF_TextFile* t)
+{
+    //depending on the encoding of the file
+    int byteOffset = 0;
+    switch(t->encoding)
+    {
+        case RF_UTF8:
+         if(t->hasBom == true)
+            byteOffset=3;
+        break;
+        case RF_UTF16_BE:
+        case RF_UTF16_LE:
+            if(t->hasBom == true)
+                byteOffset=2;
+        break;
+        case RF_UTF32_BE:
+        case RF_UTF32_LE:
+            if(t->hasBom == true)
+                byteOffset=4;
+        break;
+    }
+    //First rewind back to the start so that read/write operations can be reset
+    if(rfFseek(t->f,0,SEEK_SET) != 0)
+    {
+        i_TEXTFILE_FSEEK_CHECK(t,"During attempting to rewind to the beginning of a TextFile's inner file pointer")
+    }
+    if(rfFseek(t->f,byteOffset,SEEK_SET) != 0)
+    {
+        i_TEXTFILE_FSEEK_CHECK(t,"During attempting to go over the BOM of a TextFile")
+    }
+    t->previousOp = 0;
+    t->line = 1;
+    t->eof = false;
+    return RF_SUCCESS;
+}
+
+
+// Handles the EOL encoding for this textfile by either setting the desired encoding pattern or auto detecting it
+char TextFile_HandleEol(RF_TextFile* t,char eol)
+{
+    char ret;
+    uint32_t c,n;
+    int32_t error=RF_SUCCESS;
+    ret=true;
+    //set the eol and if we need to auto detect it then do it
+    switch(eol)
+    {
+        case RF_EOL_AUTO:
+        case RF_EOL_LF:
+        case RF_EOL_CR:
+        case RF_EOL_CRLF:
+            t->eol = eol;
+        break;
+        default:
+            LOG_ERROR("An illegal eol value has been given to the initialization of TextFile \"%s\"",RE_INPUT,rfString_Cstr(&t->name))
+            t->eol = RF_EOL_DEFAULT;
+            return false;
+        break;
+    }
+    if(eol == RF_EOL_AUTO)
+    {
+        t->eol = RF_EOL_DEFAULT;//set it as newline by default
+        do//begin the reading loop
+        {
+            switch(t->encoding)
+            {
+               case RF_UTF8:
+                    error = rfFgetc_UTF8(t->f,&c,true);
+               break;
+               case RF_UTF16_LE:
+                    error = rfFgetc_UTF16LE(t->f,&c,true);
+               break;
+               case RF_UTF16_BE:
+                    error = rfFgetc_UTF16BE(t->f,&c,true);
+               break;
+               case RF_UTF32_LE:
+                    error = rfFgetc_UTF32LE(t->f,&c);
+               break;
+               case RF_UTF32_BE:
+                    error = rfFgetc_UTF32BE(t->f,&c);
+               break;
+            }
+            //check for reading problem
+            if(error < 0)
+                break;
+
+            //if you find a carriage return
+            if(c == RF_CR)
+            {   //check the next character and decide the EOL pattern accordingly
+                switch(t->encoding)
+                {
+                   case RF_UTF8:
+                        error = rfFgetc_UTF8(t->f,&n,true);
+                   break;
+                   case RF_UTF16_LE:
+                        error = rfFgetc_UTF16LE(t->f,&n,true);
+                   break;
+                   case RF_UTF16_BE:
+                        error = rfFgetc_UTF16BE(t->f,&n,true);
+                   break;
+                   case RF_UTF32_LE:
+                        error = rfFgetc_UTF32LE(t->f,&n);//careful, this returns RF_SUCCESS(=0) for success and negative for error
+                   break;
+                   case RF_UTF32_BE:
+                        error = rfFgetc_UTF32BE(t->f,&n);//careful, this returns RF_SUCCESS(=0) for success and negative for error
+                   break;
+                }
+                //check for reading problem
+                if(error < 0)
+                    break;
+
+                t->eol = RF_EOL_CR;
+                if(n == RF_LF)
+                    t->eol = RF_EOL_CRLF;
+                //break from the reading loop
+                break;
+            }
+            else if(c == RF_LF)//else if we find a line feed character without having found a CR then it should be the default case of Unix style endings
+                break;
+        }while(error >=0 );//end of reading loop
+        if(error < 0 && error != RE_FILE_EOF)
+            ret = false;
+
+        //and now go back to the beginning of the text file
+        if((error=TextFile_GoToStart(t))!= RF_SUCCESS)
+        {
+            LOG_ERROR("Failed to move the internal file pointer to the beginning after EOL pattern auto-detection",error)
+            ret=false;
+        }
+    }
+
+    return ret;
 }
