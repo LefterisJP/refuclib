@@ -62,11 +62,27 @@ extern "C"
 //!
 //! @warning This function allocates the UTF-8 buffer internally and the user of this function either
 //! has to store it or free it after use.
-//! @param[in] codepoints The buffer of code points. Must be given as a buffer of @c int32_t.
+//! @param[in] codepoints The buffer of code points. Must be given as a buffer of @c uint32_t.
 //! @param[in] charsN The number of codepoints inside the buffer, that is how many characters are in there
 //! @param[out] utf8Length Pass a pointer to @c uint32_t to receive inside it the bytelength of the allcoated utf8 buffer without the null termination counted
 //! @return Returns the allocated UTF-8 encoded byte buffer for success or @c 0 if there was an error
 i_DECLIMEX_ char* rfUTF8_Encode(const uint32_t* codepoints,uint32_t charsN,uint32_t* utf8Length);
+
+//! @brief Takes a unicode codepoint and turns them into a UTF-8 byte
+//!
+//! This function accepts a buffer of unicode codepoints in @c codepoints and also requires to know
+//! the size of that buffer in characters as the @c charsN argument.
+//!
+//! If successfull it will return the number of bytes in the encoded utf8 buffer
+//! inside the variable given at argument @c utf8Length and return the allocated UTF-8 encoded
+//! byte buffer.
+//!
+//! @warning This function allocates the UTF-8 buffer internally and the user of this function either
+//! has to store it or free it after use.
+//! @param[in] codepoint The codepoint to encode. Must be given as a @c uint32_t
+//! @param[out] utf8 Pass a buffer of at least 5 bytes here to receive the null terminated utf8 bytes
+//! @return Returns the number of byte used forthe utf8 conversion for success or @c 0 for error at encoding with additional error logging
+i_DECLIMEX_ char rfUTF8_Encode_single(const uint32_t codepoint,char* utf8);
 
 //! @brief Takes a utf8 buffer and decodes it into unicode codepoints
 //!

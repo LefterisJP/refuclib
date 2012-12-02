@@ -29,11 +29,11 @@
     #define i_TEXTFILE_FSEEK_CHECK_CASE_EOVERFLOW_RESET(i_TEXTFILE_,i_TEXT_,i_PRLINE_,i_PREOF_,i_PROFF_) \
         case EOVERFLOW:\
             TEXTFILE_RESETPTR(i_TEXTFILE_,i_PRLINE_,i_PREOF_,i_PROFF_)\
-            RETURN_LOG_ERROR("While "i_TEXT_" at Text File \"%s\" the file position is not representable by off_t",RE_FILE_POS_OVERFLOW,((i_TEXTFILE_)->name).bytes)\
+            RETURN_LOG_ERROR("While "i_TEXT_" at Text File \"%S\" the file position is not representable by off_t",RE_FILE_POS_OVERFLOW,&(i_TEXTFILE_)->name)\
         break;
     #define i_TEXTFILE_FSEEK_CHECK_CASE_EOVERFLOW(i_TEXTFILE_,i_TEXT_) \
         case EOVERFLOW:\
-            RETURN_LOG_ERROR("While "i_TEXT_" at Text File \"%s\" the file position is not representable by off_t",RE_FILE_POS_OVERFLOW,((i_TEXTFILE_)->name).bytes)\
+            RETURN_LOG_ERROR("While "i_TEXT_" at Text File \"%S\" the file position is not representable by off_t",RE_FILE_POS_OVERFLOW,&(i_TEXTFILE_)->name)\
         break;
     #define i_FSEEK_CHECK_CASE_EOVERFLOW(i_TEXT_) \
         case EOVERFLOW:\

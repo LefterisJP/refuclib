@@ -16,19 +16,34 @@
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
+#include <IO/rfc_textfile.h>
 
-#include <errno.h>
-#include <string.h> //for strstr
+#include "io.ph"//for private I/O macros
+#include "textfile.ph"//for the private textfile functionality
 
 #include <rf_setup.h>
-#include <IO/rfc_textfile.h>
+#include <rf_error.h>
+#include <rf_memory.h>
+
+//needed string functions
+#include <String/common.h>//for RFS_()
+#include <String/core.h> //for rfString_Destroy(),and copying functions
+#include <String/corex.h> //for rfStringX_Assign functions
+#include <String/retrieval.h> //for rfString_Count() and others
+#include <String/conversion.h> //for rfString_Cstr()
+#include <String/manipulation.h>
+#include <String/filesx.h> //for rfStringX file functions
+#include <String/files.h> //for rfStringX file functions
+
+#include <IO/rf_unicode.h> //for rfReadLine family of functions
 #include <rf_utils.h>
 #include <rf_io.h>
 #include <rf_system.h>
 #include <IO/rf_unicode.h> //for unicode stuff
-#include "../String/string_private.h"//for the READ_VNPRINTF_ARGS macro
-#include "io_private.h"
-#include "textfile_private.h"
+
+
+#include <errno.h>
+#include <string.h> //for strstr
 
 //Initializes a new text file
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
@@ -69,7 +84,7 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char mode,char encodi
             t->f = fopen(name->bytes,"w"i_PLUSB_WIN32"+");
         break;
         default:
-            LOG_ERROR("Attempted to initialize textfile \"%s\" with illegal mode",RE_FILE_MODE,name->bytes);
+            LOG_ERROR("Attempted to initialize textfile \"%S\" with illegal mode",RE_FILE_MODE,name);
             rfString_Deinit(&t->name);
             error = RE_FILE_MODE;
             goto cleanup1;
@@ -308,7 +323,7 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char mode,char encodi
             }
             break;
             default:
-                LOG_ERROR("Attempted to initialize TextFile \"%s\" with illegal encoding parameter",RE_FILE_ILLEGAL_ENCODING,name->bytes);
+                LOG_ERROR("Attempted to initialize TextFile \"%S\" with illegal encoding parameter",RE_FILE_ILLEGAL_ENCODING,name);
                 rfString_Deinit(&t->name);
                 error = RE_FILE_ILLEGAL_ENCODING;
                 goto cleanup1;
@@ -316,7 +331,7 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char mode,char encodi
         }
         //finally handle the line encoding for the existingfile case
         if(TextFile_HandleEol(t,eol)==false)
-            LOG_ERROR("During initializing TextFile \"%s\" auto-detecting the End Of Line Pattern failed. Considering default of Unix-Style LF Endings",RE_TEXTFILE_EOL_DETECT,rfString_Cstr(&t->name))
+            LOG_ERROR("During initializing TextFile \"%S\" auto-detecting the End Of Line Pattern failed. Considering default of Unix-Style LF Endings",RE_TEXTFILE_EOL_DETECT,&t->name)
 
     }//end of existing file case
     else//new file case
@@ -334,7 +349,7 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char mode,char encodi
                 LOG_ERROR("User asked for auto detection of the EOL pattern while a new file is being created. Set it to RF_EOL_LF as default but please set your choice from the calling function correctly",RE_INPUT)
             break;
             default:
-                LOG_ERROR("An illegal eol value has been given to the initialization of TextFile \"%s\"",RE_INPUT,rfString_Cstr(&t->name))
+                LOG_ERROR("An illegal eol value has been given to the initialization of TextFile \"%S\"",RE_INPUT,&t->name)
                 return false;
             break;
         }
@@ -369,7 +384,7 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char mode,char encodi
                 t->encoding = encoding;
             break;
             default:
-                LOG_ERROR("Attempted to initialize a new TextFile \"%s\" with illegal encoding parameter",RE_FILE_ILLEGAL_ENCODING,name->bytes);
+                LOG_ERROR("Attempted to initialize a new TextFile \"%S\" with illegal encoding parameter",RE_FILE_ILLEGAL_ENCODING,name);
                 rfString_Deinit(&t->name);
                 error = RE_FILE_ILLEGAL_ENCODING;
                 goto cleanup1;
@@ -690,7 +705,7 @@ int32_t rfTextFile_GetLine_begin(RF_TextFile* t,uint64_t lineN,RF_StringX* line)
     prEof = t->eof;
     //now get the position to the beginning of the file
     if((error=TextFile_GoToStart(t))!= RF_SUCCESS)
-        RETURN_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%s\" to the beginning",error,rfString_Cstr(&t->name))
+        RETURN_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%S\" to the beginning",error,&t->name)
 
     ///since we got here start reading the file again, line by line until we get to the requested line
     //initialize the buffer string for readline
@@ -712,11 +727,11 @@ int32_t rfTextFile_GetLine_begin(RF_TextFile* t,uint64_t lineN,RF_StringX* line)
         if(error == RE_FILE_EOF)
         {
             TEXTFILE_RESETPTR_FROMSTART(t,prLine,prEof,prOff)
-            RETURN_LOG_ERROR("While searching for line [%"PRIu64"] in Text File \"%s\" the end of file was found before being able to reach that line",RE_FILE_EOF,lineN,t->name.bytes);
+            RETURN_LOG_ERROR("While searching for line [%"PRIu64"] in Text File \"%S\" the end of file was found before being able to reach that line",RE_FILE_EOF,lineN,&t->name);
         }
         //else there was an error at line reading
         TEXTFILE_RESETPTR_FROMSTART(t,prLine,prEof,prOff)
-        RETURN_LOG_ERROR("While reading Text File's lines \"%s\" there was an error in file reading. File must be corrupt",RE_FILE_BAD,t->name.bytes)
+        RETURN_LOG_ERROR("While reading Text File's lines \"%S\" there was an error in file reading. File must be corrupt",RE_FILE_BAD,&t->name)
     }
     //success
     //now we are done so we can return the line number and the file pointer to their original positions, also free stuff
@@ -791,7 +806,7 @@ int32_t rfTextFile_MoveLines(RF_TextFile* t,int64_t linesN)
             TEXTFILE_RESETPTR_FROMSTART(t,prLine,prEof,prOff)
             //else there was an error at line reading
             if(error != RE_FILE_EOF)
-                RETURN_LOG_ERROR("While reading Text File's lines forward \"%s\" there was an error in file reading. File must be corrupt",RE_FILE_BAD,t->name.bytes)
+                RETURN_LOG_ERROR("While reading Text File's lines forward \"%S\" there was an error in file reading. File must be corrupt",RE_FILE_BAD,&t->name)
             //if it was EOF just return it
             return RE_FILE_EOF;
         }
@@ -813,7 +828,7 @@ int32_t rfTextFile_MoveLines(RF_TextFile* t,int64_t linesN)
     {
         //now get the position to the beginning of the file
         if((error=TextFile_GoToStart(t))!= RF_SUCCESS)
-            RETURN_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%s\" to the beginning",error,rfString_Cstr(&t->name))
+            RETURN_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%S\" to the beginning",error,&t->name)
 
         //read as many lines as needed
         rfStringX_Init_buff(&buffer,RF_OPTION_FGETS_READBYTESN,"");
@@ -823,7 +838,7 @@ int32_t rfTextFile_MoveLines(RF_TextFile* t,int64_t linesN)
             {
                 //there was an error at line reading
                 TEXTFILE_RESETPTR_FROMSTART(t,prLine,prEof,prOff)
-                RETURN_LOG_ERROR("While reading Text File's lines forward \"%s\" there was an error in file reading. File must be corrupt",RE_FILE_BAD,t->name.bytes)
+                RETURN_LOG_ERROR("While reading Text File's lines forward \"%S\" there was an error in file reading. File must be corrupt",RE_FILE_BAD,&t->name)
             }
 
         }
@@ -837,7 +852,7 @@ int32_t rfTextFile_MoveLines(RF_TextFile* t,int64_t linesN)
     while(t->line >= targetLine)
     {//start of moving back loop
         if((error=rfTextFile_MoveChars_b(t,1))!=RF_SUCCESS)
-            RETURN_LOG_ERROR("Error while moving backwards in Text File \"%s\"",error,t->name.bytes)
+            RETURN_LOG_ERROR("Error while moving backwards in Text File \"%S\"",error,&t->name)
 
     }//end of moving back loop
     //go 1 char forward to be at the line's start
@@ -875,7 +890,7 @@ int32_t rfTextFile_MoveChars_f(RF_TextFile* t,uint64_t charsN)
                 if((error=rfFgetc_UTF8(t->f,&c,true)) < 0)
                 {
                     if(error != RE_FILE_EOF)
-                        LOG_ERROR("There was an error while moving forward in textfile \"%s\"",error,t->name.bytes);
+                        LOG_ERROR("There was an error while moving forward in textfile \"%S\"",error,&t->name);
                     return error;
                 }
             break;
@@ -883,7 +898,7 @@ int32_t rfTextFile_MoveChars_f(RF_TextFile* t,uint64_t charsN)
                 if((error=rfFgetc_UTF16LE(t->f,&c,true)) < 0)
                 {
                     if(error != RE_FILE_EOF)
-                        LOG_ERROR("There was an error while moving forward in textfile \"%s\"",error,t->name.bytes);
+                        LOG_ERROR("There was an error while moving forward in textfile \"%S\"",error,&t->name);
                     return error;
                 }
             break;
@@ -891,7 +906,7 @@ int32_t rfTextFile_MoveChars_f(RF_TextFile* t,uint64_t charsN)
                 if((error=rfFgetc_UTF16BE(t->f,&c,true)) < 0)
                 {
                     if(error != RE_FILE_EOF)
-                        LOG_ERROR("There was an error while moving forward in textfile \"%s\"",error,t->name.bytes);
+                        LOG_ERROR("There was an error while moving forward in textfile \"%S\"",error,&t->name);
                     return error;
                 }
             break;
@@ -899,14 +914,14 @@ int32_t rfTextFile_MoveChars_f(RF_TextFile* t,uint64_t charsN)
                 if((error=rfFgetc_UTF32LE(t->f,&c)) < 0)
                 {
                     if(error != RE_FILE_EOF)
-                        LOG_ERROR("There was an error while moving forward in textfile \"%s\"",error,t->name.bytes);
+                        LOG_ERROR("There was an error while moving forward in textfile \"%S\"",error,&t->name);
                     return error;
                 }
             case RF_UTF32_BE:
                 if((error=rfFgetc_UTF32BE(t->f,&c)) < 0)
                 {
                     if(error != RE_FILE_EOF)
-                        LOG_ERROR("There was an error while moving forward in textfile \"%s\"",error,t->name.bytes);
+                        LOG_ERROR("There was an error while moving forward in textfile \"%S\"",error,&t->name);
                     return error;
                 }
             break;
@@ -933,7 +948,7 @@ int32_t rfTextFile_MoveChars_b(RF_TextFile* t,uint64_t charsN)
                 if((error=rfFback_UTF8(t->f,&c)) < 0)
                 {
                     if(error != RE_FILE_EOF)
-                        LOG_ERROR("There was an error while moving backwards in textfile \"%s\"",error,t->name.bytes);
+                        LOG_ERROR("There was an error while moving backwards in textfile \"%S\"",error,&t->name);
                     return error;
                 }
             break;
@@ -941,7 +956,7 @@ int32_t rfTextFile_MoveChars_b(RF_TextFile* t,uint64_t charsN)
                 if((error=rfFback_UTF16LE(t->f,&c)) < 0)
                 {
                     if(error != RE_FILE_EOF)
-                        LOG_ERROR("There was an error while moving backwards in textfile \"%s\"",error,t->name.bytes);
+                        LOG_ERROR("There was an error while moving backwards in textfile \"%S\"",error,&t->name);
                     return error;
                 }
             break;
@@ -949,7 +964,7 @@ int32_t rfTextFile_MoveChars_b(RF_TextFile* t,uint64_t charsN)
                 if((error=rfFback_UTF16BE(t->f,&c)) < 0)
                 {
                     if(error != RE_FILE_EOF)
-                        LOG_ERROR("There was an error while moving backwards in textfile \"%s\"",error,t->name.bytes);
+                        LOG_ERROR("There was an error while moving backwards in textfile \"%S\"",error,&t->name);
                     return error;
                 }
             break;
@@ -957,14 +972,14 @@ int32_t rfTextFile_MoveChars_b(RF_TextFile* t,uint64_t charsN)
                 if((error=rfFback_UTF32LE(t->f,&c)) < 0)
                 {
                     if(error != RE_FILE_EOF)
-                        LOG_ERROR("There was an error while moving backwards in textfile \"%s\"",error,t->name.bytes);
+                        LOG_ERROR("There was an error while moving backwards in textfile \"%S\"",error,&t->name);
                     return error;
                 }
             case RF_UTF32_BE:
                 if((error=rfFback_UTF32BE(t->f,&c)) < 0)
                 {
                     if(error != RE_FILE_EOF)
-                        LOG_ERROR("There was an error while moving backwards in textfile \"%s\"",error,t->name.bytes);
+                        LOG_ERROR("There was an error while moving backwards in textfile \"%S\"",error,&t->name);
                     return error;
                 }
             break;
@@ -990,7 +1005,7 @@ int32_t rfTextFile_GoToLine(RF_TextFile* t,uint64_t lineN)
     {
         //go to the file's beginning
         if((error=TextFile_GoToStart(t))!= RF_SUCCESS)
-            RETURN_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%s\" to the beginning",error,rfString_Cstr(&t->name))
+            RETURN_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%S\" to the beginning",error,&t->name)
         return RF_SUCCESS;
     }
     else if(lineN == t->line)
@@ -1019,14 +1034,14 @@ int32_t rfTextFile_GoToOffset(RF_TextFile* t,foff_rft offset,int origin)
             return RE_INPUT;
         //go to the start of the file
         if((error=TextFile_GoToStart(t))!= RF_SUCCESS)
-            RETURN_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%s\" to the beginning",error,rfString_Cstr(&t->name))
+            RETURN_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%S\" to the beginning",error,&t->name)
         do
         {
             //keep going forward
             if((error=rfTextFile_MoveChars_f(t,1)) != RF_SUCCESS)
             {
                 if(error != RE_FILE_EOF)
-                    LOG_ERROR("Moving forward in TextFile \"%s\" failed ",error,t->name.bytes)
+                    LOG_ERROR("Moving forward in TextFile \"%S\" failed ",error,&t->name)
 
                 return error;
             }
@@ -1049,7 +1064,7 @@ int32_t rfTextFile_GoToOffset(RF_TextFile* t,foff_rft offset,int origin)
                 {
                     TEXTFILE_RESETPTR_FROMSTART(t,prLine,prEof,prOff)
                     if(error != RE_FILE_EOF)
-                        LOG_ERROR("Moving forward in TextFile \"%s\" failed ",error,t->name.bytes)
+                        LOG_ERROR("Moving forward in TextFile \"%S\" failed ",error,&t->name)
                     return error;
                 }
                 if((cOff = rfFtell(t->f)) == (foff_rft)-1)//get the current file position
@@ -1067,7 +1082,7 @@ int32_t rfTextFile_GoToOffset(RF_TextFile* t,foff_rft offset,int origin)
                 if((error=rfTextFile_MoveChars_b(t,1)) != RF_SUCCESS)
                 {
                     TEXTFILE_RESETPTR_FROMSTART(t,prLine,prEof,prOff)
-                    RETURN_LOG_ERROR("Moving backwards in TextFile \"%s\" failed ",error,t->name.bytes)
+                    RETURN_LOG_ERROR("Moving backwards in TextFile \"%S\" failed ",error,&t->name)
                 }
                 if((cOff = rfFtell(t->f)) == (foff_rft)-1)//get the current file position
                 {
@@ -1113,7 +1128,7 @@ int32_t rfTextFile_Write(RF_TextFile* t,void* stringP)
     //depending on the encoding of the file
     if((error=rfString_Fwrite(s,t->f,t->encoding))!=RF_SUCCESS)
     {
-        LOG_ERROR("There was a file write error while writting string \"%s\" to Text File \"%s\"",error,s->bytes,t->name.bytes);
+        LOG_ERROR("There was a file write error while writting string \"%S\" to Text File \"%S\"",error,s,&t->name);
         if(allocatedS == true)
             rfString_Destroy(s);
         goto cleanup1;
@@ -1135,7 +1150,7 @@ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,char aft
 {
     char tempFName[L_tmpnam+1], *tmpNamePtr;
     char lineFound,allocatedS;
-    foff_rft tOff;
+    foff_rft tOff=0;
     FILE* newFile;
     uint32_t linesCount;
     RF_StringX buffer;
@@ -1169,7 +1184,7 @@ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,char aft
 
     //go to the beginning of this file
     if((error=TextFile_GoToStart(t))!= RF_SUCCESS)
-        RETURNGOTO_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%s\" to the beginning",error,error,cleanup1,rfString_Cstr(&t->name))
+        RETURNGOTO_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%S\" to the beginning",error,error,cleanup1,&t->name)
     //check if this file can read
     RF_TEXTFILE_CANREAD_GOTO(t,error,cleanup1)
     t->previousOp = RF_FILE_READ;
@@ -1195,15 +1210,15 @@ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,char aft
 
         //now depending on the EOL pattern write the line
         if(t->eol == RF_EOL_CRLF)
-            error=rfString_Fwrite(RFS_("%s\xD\n",string->bytes),newFile,t->encoding);
+            error=rfString_Fwrite(RFS_("%S\xD\n",string),newFile,t->encoding);
         else if(t->eol == RF_EOL_CR)
-            error=rfString_Fwrite(RFS_("%s\xD",string->bytes),newFile,t->encoding);
+            error=rfString_Fwrite(RFS_("%S\xD",string),newFile,t->encoding);
         else
-            error=rfString_Fwrite(RFS_("%s\n",string->bytes),newFile,t->encoding);
+            error=rfString_Fwrite(RFS_("%S\n",string),newFile,t->encoding);
         //and check for errors
         if(error != RF_SUCCESS)
         {
-            LOG_ERROR("There was a file write error while inserting string \"%s\" at the beginning of Text File \"%s\"",error,string->bytes,t->name.bytes);
+            LOG_ERROR("There was a file write error while inserting string \"%S\" at the beginning of Text File \"%S\"",error,string,&t->name);
             goto cleanup2;
         }
     }
@@ -1215,15 +1230,15 @@ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,char aft
     {
         //now depending on the EOL pattern write the line to the other file
         if(t->eol == RF_EOL_CRLF)
-            error=rfString_Fwrite(RFS_("%s\xD\n",rfString_Cstr(&buffer)),newFile,t->encoding);
+            error=rfString_Fwrite(RFS_("%S\xD\n",&buffer),newFile,t->encoding);
         else if(t->eol == RF_EOL_CR)
-            error=rfString_Fwrite(RFS_("%s\xD",rfString_Cstr(&buffer)),newFile,t->encoding);
+            error=rfString_Fwrite(RFS_("%S\xD",&buffer),newFile,t->encoding);
         else
-            error=rfString_Fwrite(RFS_("%s\n",rfString_Cstr(&buffer)),newFile,t->encoding);
+            error=rfString_Fwrite(RFS_("%S\n",&buffer),newFile,t->encoding);
         //and check for errors
         if(error!=RF_SUCCESS)
         {
-            LOG_ERROR("There was a file write error while inserting string \"%s\" at line [%"PRIu64"] inside Text File \"%s\"",error,string->bytes,lineN,t->name.bytes);
+            LOG_ERROR("There was a file write error while inserting string \"%S\" at line [%"PRIu64"] inside Text File \"%S\"",error,string,lineN,&t->name);
             goto cleanup3;
         }
         //also if this is the place to put the line, do it
@@ -1236,15 +1251,15 @@ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,char aft
             }
             //write the given line to the other file depending on the EOL pattern
             if(t->eol == RF_EOL_CRLF)
-                error=rfString_Fwrite(RFS_("%s\xD\n",string->bytes),newFile,t->encoding);
+                error=rfString_Fwrite(RFS_("%S\xD\n",string),newFile,t->encoding);
             else if(t->eol == RF_EOL_CR)
-                error=rfString_Fwrite(RFS_("%s\xD",string->bytes),newFile,t->encoding);
+                error=rfString_Fwrite(RFS_("%S\xD",string),newFile,t->encoding);
             else
-                error=rfString_Fwrite(RFS_("%s\n",string->bytes),newFile,t->encoding);
+                error=rfString_Fwrite(RFS_("%S\n",string),newFile,t->encoding);
             //and check for errors
             if(error != RF_SUCCESS)
             {
-                LOG_ERROR("There was a file write error while inserting string \"%s\" at line [%"PRIu64"] inside Text File \"%s\"",error,string->bytes,lineN,t->name.bytes);
+                LOG_ERROR("There was a file write error while inserting string \"%S\" at line [%"PRIu64"] inside Text File \"%S\"",error,string,lineN,&t->name);
                 goto cleanup3;
             }
         }
@@ -1256,12 +1271,12 @@ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,char aft
     {
         if(error == RE_FILE_EOF)
         {
-            LOG_ERROR("While attempting to find line [%"PRIu64"] of TextFile \"%s\" premature End Of File was encountered",RE_FILE_EOF,lineN,t->name.bytes);
+            LOG_ERROR("While attempting to find line [%"PRIu64"] of TextFile \"%S\" premature End Of File was encountered",RE_FILE_EOF,lineN,&t->name);
             goto cleanup2;
         }//or else if there was an error
         else
         {
-            LOG_ERROR("While attempting to find line [%"PRIu64"] of TextFile \"%s\" a file reading error was encountered",error,lineN,t->name.bytes);
+            LOG_ERROR("While attempting to find line [%"PRIu64"] of TextFile \"%S\" a file reading error was encountered",error,lineN,&t->name);
             goto cleanup2;
         }
     }
@@ -1333,7 +1348,7 @@ int32_t rfTextFile_Remove(RF_TextFile* t,uint64_t lineN)
     }
     //go to the beginning of this file
     if((error=TextFile_GoToStart(t))!= RF_SUCCESS)///Go back to the staring file position -- cleanup1
-        RETURN_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%s\" to the beginning",error,rfString_Cstr(&t->name))
+        RETURN_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%S\" to the beginning",error,&t->name)
     //check if this file can read
     RF_TEXTFILE_CANREAD_GOTO(t,error,cleanup1)
     t->previousOp = RF_FILE_READ;
@@ -1358,15 +1373,15 @@ int32_t rfTextFile_Remove(RF_TextFile* t,uint64_t lineN)
         {
             //depending on the EOL pattern write the line to the file
             if(t->eol == RF_EOL_CRLF)
-                error = rfString_Fwrite(RFS_("%s\xD\n",rfString_Cstr(&buffer)),newFile,t->encoding);
+                error = rfString_Fwrite(RFS_("%S\xD\n",&buffer),newFile,t->encoding);
             else if(t->eol == RF_EOL_CR)
-                error = rfString_Fwrite(RFS_("%s\xD",rfString_Cstr(&buffer)),newFile,t->encoding);
+                error = rfString_Fwrite(RFS_("%S\xD",&buffer),newFile,t->encoding);
             else
-                error = rfString_Fwrite(RFS_("%s\n",rfString_Cstr(&buffer)),newFile,t->encoding);
+                error = rfString_Fwrite(RFS_("%S\n",&buffer),newFile,t->encoding);
             //and check for errors
             if(error != RF_SUCCESS)
             {
-                LOG_ERROR("While attempting to remove line [%"PRIu64"] of TextFile \"%s\" a write error occured",error,lineN,t->name.bytes);
+                LOG_ERROR("While attempting to remove line [%"PRIu64"] of TextFile \"%S\" a write error occured",error,lineN,&t->name);
                 goto cleanup3;
             }
         }
@@ -1381,12 +1396,12 @@ int32_t rfTextFile_Remove(RF_TextFile* t,uint64_t lineN)
     {
         if(error == RE_FILE_EOF)
         {
-            LOG_ERROR("While attempting to find line [%"PRIu64"] of TextFile \"%s\" for removal premature End Of File was encountered",RE_FILE_EOF,lineN,t->name.bytes);
+            LOG_ERROR("While attempting to find line [%"PRIu64"] of TextFile \"%S\" for removal premature End Of File was encountered",RE_FILE_EOF,lineN,&t->name);
             goto cleanup2;
         }//or else if there was an error
         else
         {
-            LOG_ERROR("While attempting to find line [%"PRIu64"] of TextFile \"%s\" for removal a file reading error was encountered",error,lineN,t->name.bytes);
+            LOG_ERROR("While attempting to find line [%"PRIu64"] of TextFile \"%S\" for removal a file reading error was encountered",error,lineN,&t->name);
             goto cleanup2;
         }
     }
@@ -1439,7 +1454,7 @@ int32_t rfTextFile_Replace(RF_TextFile* t,uint64_t lineN,void* stringP)
     uint32_t linesCount;
 
     RF_StringX buffer;
-    foff_rft tOff;
+    foff_rft tOff=0;
     RF_String* string = (RF_String*)stringP;
     RF_ENTER_LOCAL_SCOPE()
 
@@ -1466,7 +1481,7 @@ int32_t rfTextFile_Replace(RF_TextFile* t,uint64_t lineN,void* stringP)
 
     //go to the beginning of this file
     if((error=TextFile_GoToStart(t))!= RF_SUCCESS)///cleanup2 - For the moving back of the file pointer to where it was in the function's beginning
-        RETURNGOTO_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%s\" to the beginning",error,error,cleanup1,rfString_Cstr(&t->name))
+        RETURNGOTO_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%S\" to the beginning",error,error,cleanup1,&t->name)
     //check if this file can read
     RF_TEXTFILE_CANREAD_GOTO(t,error,cleanup1)
     t->previousOp = RF_FILE_READ;
@@ -1491,15 +1506,15 @@ int32_t rfTextFile_Replace(RF_TextFile* t,uint64_t lineN,void* stringP)
         {
             //depending on the EOL pattern write to the file
             if(t->eol == RF_EOL_CRLF)
-                error = rfString_Fwrite(RFS_("%s\xD\n",rfString_Cstr(&buffer)),newFile,t->encoding);
+                error = rfString_Fwrite(RFS_("%S\xD\n",&buffer),newFile,t->encoding);
             else if(t->eol == RF_EOL_CR)
-                error = rfString_Fwrite(RFS_("%s\xD",rfString_Cstr(&buffer)),newFile,t->encoding);
+                error = rfString_Fwrite(RFS_("%S\xD",&buffer),newFile,t->encoding);
             else
-                error = rfString_Fwrite(RFS_("%s\n",rfString_Cstr(&buffer)),newFile,t->encoding);
+                error = rfString_Fwrite(RFS_("%S\n",&buffer),newFile,t->encoding);
             //and check for errors
             if(error != RF_SUCCESS)
             {
-                LOG_ERROR("While attempting to replace line [%"PRIu64"] of TextFile \"%s\" a write error occured",error,lineN,t->name.bytes);
+                LOG_ERROR("While attempting to replace line [%"PRIu64"] of TextFile \"%S\" a write error occured",error,lineN,&t->name);
                 goto cleanup3;
             }
         }
@@ -1512,15 +1527,15 @@ int32_t rfTextFile_Replace(RF_TextFile* t,uint64_t lineN,void* stringP)
             }
             //write the line to replace depending on the EOL patter
             if(t->eol == RF_EOL_CRLF)
-                error = rfString_Fwrite(RFS_("%s\xD\n",string->bytes),newFile,t->encoding);
+                error = rfString_Fwrite(RFS_("%S\xD\n",string),newFile,t->encoding);
             else if(t->eol == RF_EOL_CR)
-                error = rfString_Fwrite(RFS_("%s\xD",string->bytes),newFile,t->encoding);
+                error = rfString_Fwrite(RFS_("%S\xD",string),newFile,t->encoding);
             else
-                error = rfString_Fwrite(RFS_("%s\n",string->bytes),newFile,t->encoding);
+                error = rfString_Fwrite(RFS_("%S\n",string),newFile,t->encoding);
             //and check for errors
             if(error != RF_SUCCESS)
             {
-                LOG_ERROR("While attempting to replace line [%"PRIu64"] of TextFile \"%s\" a write error occured",error,lineN,t->name.bytes);
+                LOG_ERROR("While attempting to replace line [%"PRIu64"] of TextFile \"%S\" a write error occured",error,lineN,&t->name);
                 goto cleanup3;
             }
         }
@@ -1532,12 +1547,12 @@ int32_t rfTextFile_Replace(RF_TextFile* t,uint64_t lineN,void* stringP)
     {
         if(error == RE_FILE_EOF)
         {
-            LOG_ERROR("While attempting to find line [%"PRIu64"] of TextFile \"%s\" for replacement, premature End Of File was encountered",RE_FILE_EOF,lineN,t->name.bytes);
+            LOG_ERROR("While attempting to find line [%"PRIu64"] of TextFile \"%S\" for replacement, premature End Of File was encountered",RE_FILE_EOF,lineN,&t->name)
             goto cleanup2;
         }//or else if there was an error
         else
         {
-            LOG_ERROR("While attempting to find line [%"PRIu64"] of TextFile \"%s\" for replacement, a file reading error was encountered",error,lineN,t->name.bytes);
+            LOG_ERROR("While attempting to find line [%"PRIu64"] of TextFile \"%S\" for replacement, a file reading error was encountered",error,lineN,&t->name)
             goto cleanup2;
         }
     }

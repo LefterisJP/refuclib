@@ -99,7 +99,7 @@ i_DECLIMEX_ void rfTimer_Destroy(RF_Timer* t);
 //! @brief Queries a timer
 //!
 //! Using this function the timer can be queried. There is a choice between querying with the previously given resolution or with a new resolution. If no change in resolution is
-//! requested then provide 0 (@c RF_NONE) for the resolution. Otherwise provide one of   @c RF_TIMER_SECONDS, @c RF_TIMER_MILLISECONDS, @c RF_TIMER_MICROSEONDS or @c RF_TIMER_NANOSECONDS.
+//! requested then provide 0 for the resolution. Otherwise provide one of   @c RF_TIMER_SECONDS, @c RF_TIMER_MILLISECONDS, @c RF_TIMER_MICROSEONDS or @c RF_TIMER_NANOSECONDS.
 //! If an illegal resolution value is given here then an error is logged and the query's result is given in the previously saved resolution. For an example query usage look at the following
 //! snippet from the overall timer example.
 //! @snippet Time/timer1.c  QUERY

@@ -24,8 +24,8 @@
 #ifdef RF_MODULE_DF_XML //XML module check
 
 #include <stdarg.h>
-//include the ReFu string
-#include <rf_string.h>
+
+#include <RFstring.h>
 #include <Data_Structures/rfc_list.h>// For RF_ListP
 #include <rf_localmem.h>
 

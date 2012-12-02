@@ -1,4 +1,4 @@
-/**
+/*
 ** Copyright (c) 2011-2012, Karapetsas Eleftherios
 ** All rights reserved.
 **
@@ -16,28 +16,22 @@
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **
+**
+**
+** -- String/common.ph
 ** This is the private header file of the C RF_String
 ** containing functions and macros that don't need to be exposed
 ** to the user
-**/
+*/
+#ifndef RF_STRING_COMMON_PH
+#define RF_STRING_COMMON_PH
 
-
-#ifndef RF_STRINGC_PRIVATE_H
-#define RF_STRINGC_PRIVATE_H
-
-#include <rf_setup.h>
-#include <rf_utils.h>
-#include <rf_io.h> //for the IO functions such as rfIO_Fgets_UTF8 e.t.c.
-
-#include <stdlib.h> //for malloc e.t.c.
-#include <string.h> //for c string functions (strlen, memcpy e.t.c)
-#include <stdarg.h> //for variable arguments
+#include <rf_setup.h> //for int32_t declaration
 
 #ifdef __cplusplus
 extern "C"
 {///opening bracket for calling from C++
 #endif
-
 
     /********************* ==Internal Use Only== String Iteration (For API use iteration refer to rfString_Iterate() group of macros *************************************/
 
@@ -103,87 +97,6 @@ if(REQSIZE_ >= STR_->bSize)\
 //! @return Returns the byte position of the found substring or RF_FAILURE for not found
 //! @endinternal
 int32_t rfString_FindBytePos(const void* thisstr,const void* sstr,char options);
-
-//! A macro to save code space that read the vsnprintf parameters
-//! @param i_SLIT The formatted string literal to read
-//! @param i_LPARAM The last named parameter of the arguments list
-//! @param i_ERRRETURN What to return in case of vsnprintf failure
-//! This outputs the final string in the char* buff which can have either been
-//! or not been malloced depending on the buffAllocated flag. Also its length is
-//! byteswritten
-#define READ_VSNPRINTF_ARGS(i_SLIT,i_LPARAM,i_ERRRETURN) \
-    int bytesWritten;\
-    char buffer[RF_OPTION_VSPRINTF_BUFF];\
-    char buffAllocated = false;\
-    char * buff;\
-    /*get the arguments*/\
-    va_list args;\
-    va_start(args, i_LPARAM);\
-    bytesWritten = vsnprintf(buffer,RF_OPTION_VSPRINTF_BUFF,i_SLIT, args);\
-    va_end(args);\
-    /*check for error*/\
-    if(bytesWritten < 0)\
-    {\
-        LOG_ERROR("Error due to vsprintf() failure",RE_STRING_VSPRINTF)\
-        return i_ERRRETURN;\
-    }\
-    /*check if the write happened corectly. If not allocate a correct buffer*/\
-    if(bytesWritten >= RF_OPTION_VSPRINTF_BUFF)\
-    {\
-        RF_MALLOC(buff,bytesWritten+1)\
-        va_start(args, i_LPARAM);\
-        bytesWritten = vsnprintf(buff,bytesWritten+1,i_SLIT, args);\
-        if(bytesWritten < 0 )\
-        {\
-            LOG_ERROR("Error due to vsprintf() failure",RE_STRING_VSPRINTF)\
-            free(buff);\
-            return i_ERRRETURN;\
-        }\
-        va_end(args);\
-        /*also note that we allocated the buffer*/\
-        buffAllocated = true;\
-    }\
-    else/*else just make the pointer point to the array*/\
-    {\
-        buff = &buffer[0];\
-    }
-
-#define READ_VSNPRINTF_ARGS_NR(i_SLIT,i_LPARAM) \
-    int bytesWritten;\
-    char buffer[RF_OPTION_VSPRINTF_BUFF];\
-    char buffAllocated = false;\
-    char * buff;\
-    /*get the arguments*/\
-    va_list args;\
-    va_start(args,i_LPARAM);\
-    bytesWritten = vsnprintf(buffer,RF_OPTION_VSPRINTF_BUFF,i_SLIT, args);\
-    va_end(args);\
-    /*check for error*/\
-    if(bytesWritten < 0)\
-    {\
-        LOG_ERROR("Error due to vsprintf() failure",RE_STRING_VSPRINTF)\
-        return ;\
-    }\
-    /*check if the write happened corectly. If not allocate a correct buffer*/\
-    if(bytesWritten >= RF_OPTION_VSPRINTF_BUFF)\
-    {\
-        RF_MALLOC(buff,bytesWritten+1)\
-        va_start(args,i_LPARAM);\
-        bytesWritten = vsnprintf(buff,bytesWritten+1,i_SLIT, args);\
-        if(bytesWritten < 0 )\
-        {\
-            LOG_ERROR("Error due to vsprintf() failure",RE_STRING_VSPRINTF)\
-            free(buff);\
-            return ;\
-        }\
-        va_end(args);\
-        /*also note that we allocated the buffer*/\
-        buffAllocated = true;\
-    }\
-    else/*else just make the pointer point to the array*/\
-        buff = &buffer[0];
-
-
 
 #ifdef __cplusplus
 }///closing bracket for calling from C++

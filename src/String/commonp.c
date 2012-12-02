@@ -1,4 +1,4 @@
-/**
+/*
 ** Copyright (c) 2011-2012, Karapetsas Eleftherios
 ** All rights reserved.
 **
@@ -18,10 +18,15 @@
 **
 **
 ** This is the source file where private string functions are implemented
-**/
+*/
+#include "common.ph"
 
-#include "string_private.h"
-#include <String/rfc_string.h>
+#include <String/string_decl.h>
+#include <String/common.h>
+
+#include <rf_utils.h> //for RF_BITFLAG_ON() macro
+
+#include <string.h> //c stdlib string functions
 
 // Internal version of rfString_Find, used for byte position.
 int32_t rfString_FindBytePos(const void* str,const void* sstrP,char options)

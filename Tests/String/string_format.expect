@@ -1,0 +1,22 @@
+Decimal    +1337
+Left-justify 2012    More stuff follow
+Left-justify 20120000This time the padding is zeroes
+Right justify with zeros for padding 000-1986
+1337 in hex is 539
+15 in hex is 0xf
+Hex with upper flag and padding:     0xDEADBEEF
+Left justify hex:0xbaadf00d     and stuff follow
+Printing a double 1.618033
+Negative double: -0.456
+Special double: inf
+Special double: INF
+Special double: nan
+Special double: NAN
+No digits after radix case 1: 163
+No digits after radix case 2: 0.0
+Printing in scientific notation 1.345430e+2
+42
+Force radix printing 4.2E+1
+Negative -5.67e+2
+
+

@@ -26,7 +26,7 @@
 
 
 #include <rf_io.h>
-#include <String/rfc_stringx.h>
+#include <String/stringx_decl.h>//for the declaration of RF_String and RF_StringX
 
 
 #ifdef __cplusplus
@@ -114,7 +114,7 @@ typedef struct RF_TextFile
 //! This parameter serves as but a hint of what operation should follow the initialization. The reason is that each
 //! of the functions that operate on an @ref RF_TextFile check the current mode and if it is not the legal mode for
 //! that operation the file is reopened with the proper mode, or has its file pointer rewinded and then put back if it is in read/write mode.
-//! @warning You should note though, that there is a considerable overhead in reopening the file in a different mode
+//! You should note though, that there is a considerable overhead in reopening the file in a different mode
 //! so you should make sure to pack the reading and writing operations in different places, or just use a different @ref RF_TextFile handler
 //! for writing and a different one for reading.
 //! @param encoding \rfoptional{@c RF_UTF8} The encoding of the file. Default is @c RF_UTF8. Can be one of:
@@ -185,7 +185,7 @@ i_DECLIMEX_ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* name,char mode,
 //! This parameter serves as but a hint of what operation should follow the initialization. The reason is that each
 //! of the functions that operate on an @ref RF_TextFile check the current mode and if it is not the legal mode for
 //! that operation the file is reopened with the proper mode, or has its file pointer rewinded and then put back if it is in read/write mode.
-//! @warning You should note though, that there is a considerable overhead in reopening the file in a different mode
+//! You should note though, that there is a considerable overhead in reopening the file in a different mode
 //! so you should make sure to pack the reading and writing operations in different places, or just use a different @ref RF_TextFile handler
 //! for writing and a different one for reading.
 //! @param encoding \rfoptional{@c RF_UTF8} The encoding of the file. Default is @c RF_UTF8. Can be one of:
@@ -264,6 +264,9 @@ i_DECLIMEX_ void rfTextFile_Destroy(RF_TextFile* t);
 
 //! @}
 
+//! @name Conversion Functions
+//! @{
+
 //! @memberof RF_TextFile
 //! @brief Changes the file access mode of the TextFile
 //!
@@ -286,8 +289,9 @@ i_DECLIMEX_ void rfTextFile_Destroy(RF_TextFile* t);
 //! + @c RF_FAILURE: For a general unrecognized error
 i_DECLIMEX_ int32_t rfTextFile_SetMode(RF_TextFile* t,char mode);
 
+//! @}
 
-//! @name Retrieval functions
+//! @name Traversal Functions
 //! @{
 
 //! @memberof RF_TextFile
@@ -371,7 +375,7 @@ i_DECLIMEX_ int32_t rfTextFile_MoveChars(RF_TextFile* t,int64_t charsN);
 //! If the End of file is encountered while attempting to move a character forward then the function
 //! will return @c RE_FILE_EOF
 //!
-//! @warning If a file reading error occurs at this function, unlike other functions of RF_TextFile
+//! If a file reading error occurs at this function, unlike other functions of RF_TextFile
 //! this one will not attempt to reset the pointer back to its original position
 //! @param[in] t The Text File to operate on
 //! @param[in] charsN The number of characters to move forward.
@@ -382,7 +386,7 @@ i_DECLIMEX_ int32_t rfTextFile_MoveChars_f(RF_TextFile* t,uint64_t charsN);
 //! @memberof RF_TextFile
 //! @brief Moves the internal file pointer backward by an amount of characters
 //!
-//! @warning If a file reading error occurs at this function, unlike other functions of RF_TextFile
+//! If a file reading error occurs at this function, unlike other functions of RF_TextFile
 //! this one will not attempt to reset the pointer back to its original position
 //! @param[in] t The Text File to operate on
 //! @param[in] charsN The number of characters to move backward
@@ -458,6 +462,11 @@ i_DECLIMEX_ int32_t rfTextFile_GoToLine(RF_TextFile* t,uint64_t lineN);
 //! + @c RE_FILE_EOF: If the end of file is reached while attempting to move to the requested @c lineN
 //! + @c RE_INPUT: If @c origin is not a legal value or the combination of @c offset and @c origin does not make sense
 i_DECLIMEX_ int32_t rfTextFile_GoToOffset(RF_TextFile* t,foff_rft offset,int origin);
+
+//! @}
+
+//! @name Retrieval Functions
+//! @{
 
 //! @memberof RF_TextFile
 //! @brief Reads the next line of the text file
@@ -570,7 +579,7 @@ i_DECLIMEX_ int32_t rfTextFile_GetLine(RF_TextFile* t,uint64_t lineN,RF_StringX*
 
 //! @}
 
-//! @name File Editing Functions
+//! @name Writing Functions
 //! @{
 
 //! @memberof RF_TextFile
@@ -729,9 +738,9 @@ i_DECLIMEX_ int32_t rfTextFile_Remove(RF_TextFile* t,uint64_t lineN);
 //! + @c RE_FILE_RENAME: If while trying to rename the temporary file to replace this one the renaming failed
 i_DECLIMEX_ int32_t rfTextFile_Replace(RF_TextFile* t,uint64_t lineN,void* string);
 
-
-
 //! @}
+
+
 #ifdef __cplusplus
 }//closing bracket for calling from C++
 #endif

@@ -16,13 +16,14 @@
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
-
 #include <IO/rf_unicode.h>
 
-#include <stdlib.h>//malloc
-#include <string.h>//memcpy
+#include <rf_error.h>
+#include <rf_memory.h>
+
 #include <rf_utils.h> //endianess
 
+#include <string.h>//memcpy
 
 /*--------------------------------------------------------------------Unicode related convenience macros-------------------------------------------------------------------------------*/
 //Takes a buffer of unicode character and turns them into a UTF-8 encoded string
@@ -91,6 +92,61 @@ char* rfUTF8_Encode(const uint32_t* codepoints,uint32_t charsN,uint32_t* byteLen
     utf8[*byteLength] = '\0';
     return utf8;
 }
+//akes a unicode codepoint and turns them into a UTF-8 byte
+char rfUTF8_Encode_single(const uint32_t codepoint,char* utf8)
+{
+    int i = 0;
+    /*If the code point requires only 1 byte*/
+    if(RF_HEXLE_UI(codepoint,0x007f))
+    {
+        utf8[0] = codepoint;
+        i=1;
+    }
+    /*If the code point requires two bytes*/
+    else if( RF_HEXGE_UI(codepoint,0x0080) && RF_HEXLE_UI(codepoint,0x07ff))
+    {
+        /*get the first 6 bits of the msb byte and encode them to the second byte*/
+        utf8[1] = (codepoint & 0x3F)|(0x02<<6);
+        /*get the 5 following bits and encode them in the first byte*/
+        utf8[0] = ((codepoint & 0x7C0) >> 6)  | (0x6<<5);
+        i=2;
+    }
+    /*if we need 3 bytes to encode it*/
+    else if( RF_HEXGE_UI(codepoint,0x0800) && RF_HEXLE_UI(codepoint,0x0ffff))
+    {
+        /*get the first bits of the msb byte and encode them to the third byte*/
+        utf8[2] = (codepoint & 0x3F)|(0x02<<6);
+        /*get the 6 following bits and encode them in the second byte*/
+        utf8[1] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
+        /*get the 4 following bits and encode them in the first byte*/
+        utf8[0] = (((codepoint & 0xF000))>>12) | (0xE<<4);
+        i=3;
+    }
+    /*if we need 4 bytes to encode it*/
+    else if( RF_HEXGE_UI(codepoint,0x10000) && RF_HEXLE_UI(codepoint,0x10ffff))
+    {
+        /*get the first bits of the msb byte and encode them to the fourth byte*/
+        utf8[3] = (codepoint & 0x3F)|(0x02<<6);
+        /*get the 6 following bits and encode them in the third byte*/
+        utf8[2] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
+        /*get the 6 following bits and encode them in the second byte*/
+        utf8[1] = (((codepoint & 0x3F000))>>12) | (0x02<<6);
+        /*get the 3 following bits and encode them in the first byte*/
+        utf8[0] = (((codepoint & 0x1C0000))>>18) | (0x1E<<3);
+        i=4;
+    }
+    else
+    {
+        LOG_ERROR("Attempted to encode an invalid unicode code point into a string",RE_UTF8_INVALID_CODE_POINT);
+        utf8[0] = '\0';
+        return 0;
+    }
+
+    ///success
+    utf8[i] = '\0';
+    return i-1;
+}
+
 //Takes a utf8 buffer and decodes it into unicode codepoints
 uint32_t* rfUTF8_Decode(const char* utf8,uint32_t utf8Length,uint32_t* charsN)
 {

@@ -16,7 +16,6 @@
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
-
 #include <rf_options.h>
 #ifdef RF_MODULE_TIME_TIMER//module checks
 #include <Time/rfc_timer.h>
@@ -25,13 +24,18 @@
 #include <Time/rfc_date.h>
 #endif
 
-#include <rf_utils.h>
 #include <rf_time.h> //for the refu sleep functions
+#include "common.ph"//private time macros
+
+#include <rf_error.h>
+#include <rf_memory.h>
+#include <rf_utils.h>
+
 #include <unistd.h> //for linux sleep() functions
 #include <errno.h>//for linux errno
-#include <stdlib.h> //for malloc e.t.c.
-//include private time related macros that don't need to be visible to anyone else
-#include "time_private.h"
+#include <stdlib.h> //for setenv()
+
+
 
 /*-------------------------------------------------------Sleep functions-----------------------------------------------------------------------------------------*/
 
@@ -83,13 +87,14 @@ char rfTimer_Init(RF_Timer* t,char resolution)
 // Allocates and returns a timer object
 RF_Timer* rfTimer_Create(char resolution)
 {
+    RF_Timer* ret;
     //check if we can have high res timer
     if(rfUTILS.hasHighResTimer == false)
     {
         LOG_ERROR("Error creating a timer, the system does not support a high resolution timer",RE_TIMER_HIGHRES_UNSUPPORTED);
         return 0;
     }
-    RF_Timer* ret = malloc(sizeof(RF_Timer));
+    RF_MALLOC(ret,sizeof(RF_Timer))
     //query the timer
     if( clock_gettime( rfUTILS.timerType, &ret->lastQuery) == -1 ) /// Do We really need this if check here? In refu_init we do check that the timer type works
     {
@@ -180,28 +185,6 @@ double rfTimer_Query(RF_Timer* t,char resolution)
 	    break;
 	}
 
-/*
-    //calculate the result depending on the desired resolution
-    switch(t->resolution)
-    {
-        case RF_TIMER_SECONDS:
-            result = (double)(query.tv_sec-t->lastQuery.tv_sec)+
-                     ((double)(query.tv_nsec-t->lastQuery.tv_nsec)/1E9);
-        break;
-        case RF_TIMER_MILLISECONDS:
-            result = ((double)(query.tv_sec-t->lastQuery.tv_sec))*1E3 +
-                      ((double)(query.tv_nsec-t->lastQuery.tv_nsec)/1E6);
-        break;
-        case RF_TIMER_MICROSECONDS:
-            result = ((double)(query.tv_sec-t->lastQuery.tv_sec))*1E6 +
-                      ((double)(query.tv_nsec-t->lastQuery.tv_nsec)/1E3);
-        break;
-        case RF_TIMER_NANOSECONDS:
-            result = ((double)(query.tv_sec-t->lastQuery.tv_sec))*1E9 +
-                      (double)(query.tv_nsec-t->lastQuery.tv_nsec);
-        break;
-    }
-*/
     t->lastQuery = query;
     return result;
 
@@ -246,16 +229,6 @@ char rfDate_Init_Now(RF_Date* d,char local)
     //check for leap year
     LEAP_YEAR_CHECK(d->year,d->isLeap)
 
-    /*test
-    d->seconds = 0;
-    d->minutes = 0;
-    d->hours = 0;
-    d->wDay = 5; //is the same as the #defines
-    d->mDay = 18;//because linux has it 1-31
-    d->yDay = 136;
-    d->month = 5;//because linux has it from 0 to 11
-    d->year = 2012;//since in Linux it's the number of year since 1900
-*/
     //success
     return true;
 }
@@ -263,7 +236,8 @@ char rfDate_Init_Now(RF_Date* d,char local)
 //Creates a date
 RF_Date* rfDate_Create_Now(char local)
 {
-    RF_Date* ret = malloc(sizeof(RF_Date));
+    RF_Date* ret;
+    RF_MALLOC(ret,sizeof(RF_Date))
     struct tm* date;
     //get the time
     time_t t = time(NULL);

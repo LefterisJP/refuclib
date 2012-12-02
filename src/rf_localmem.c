@@ -16,9 +16,11 @@
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
-
 #include <rf_localmem.h>
+
 #include <rf_setup.h>
+#include <rf_memory.h>
+#include <rf_error.h>
 
 #include <stdlib.h>//for exit()
 #include <string.h>//for memset()

@@ -16,22 +16,20 @@
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h> //for malloc
-
-
-
-
 #include <Data_Formats/rfc_xml.h>
+#include "common.ph" //for the private xml functionality
+
+#include <rf_setup.h>
+#include <rf_error.h>
+#include <rf_memory.h>
+
+
 #include <rf_system.h>
 #include <rf_utils.h> //for bitflags manipulations
-#include <rf_setup.h>
-#include "xml_private.h" //for the private xml functionality
 #include <rf_io.h>
-#include <String/rfc_stringx.h>
+#include <String/rf_stringx.h>
 
+#include <string.h>
 
 //! Defines the maximul buffer size for string read from a file
 #define MAX_LINE_BUFFER_SIZE    128000
@@ -85,7 +83,7 @@ int32_t rfXML_Init(RF_XML* ret,void* filenameP,char openFlag,char encoding)
 
         if(rfTextFile_Init(&ret->f,filename,RF_FILE_READ,encoding) != RF_SUCCESS)
         {
-            LOG_ERROR("XML File \"%s\" could not be opened, aborted object creation",RE_XML_OPEN_FAILURE,filename->bytes);
+            LOG_ERROR("XML File \"%S\" could not be opened, aborted object creation",RE_XML_OPEN_FAILURE,filename);
             error = RE_XML_OPEN_FAILURE;
             goto cleanup1;
         }
@@ -173,7 +171,7 @@ int32_t rfXML_Init(RF_XML* ret,void* filenameP,char openFlag,char encoding)
         ret->version = 1;
         if(rfTextFile_Init(&ret->f,filename,RF_FILE_READWRITE_NEW,encoding,RF_EOL_DEFAULT) != RF_SUCCESS)
         {
-            LOG_ERROR("XML File \"%s\" could not be opened, aborted object creation",RE_XML_OPEN_FAILURE,filename->bytes);
+            LOG_ERROR("XML File \"%S\" could not be opened, aborted object creation",RE_XML_OPEN_FAILURE,filename);
             error = RE_XML_OPEN_FAILURE;
             goto cleanup1;
         }
@@ -253,7 +251,7 @@ int32_t i_rfXML_ToFile(RF_XML* x, void* nameP,char encoding)
     if(name != 0)
     {
         if(rfTextFile_Init(&out,name,RF_FILE_NEW,encoding) != RF_SUCCESS)
-            RETURNGOTO_LOG_ERROR("Failed to output XML to a file due to failure to open output file \"%s\" ",RE_XML_OPEN_FAILURE,ret,cleanup1,name->bytes)
+            RETURNGOTO_LOG_ERROR("Failed to output XML to a file due to failure to open output file \"%S\" ",RE_XML_OPEN_FAILURE,ret,cleanup1,name)
     }
     else
     {
@@ -318,7 +316,7 @@ int32_t rfXML_InsertTag(RF_XML* x, RF_XMLTag* t,char flags)
 
     //get the tag's string form
     if(rfXMLTag_ToStr(t,&tempS)==false)
-        RETURNGOTO_LOG_ERROR("Could not insert tag <%s> to the XML file because there was a failure in representing it as a String",RE_XML_TOSTR,error,cleanup1,t->name.bytes)
+        RETURNGOTO_LOG_ERROR("Could not insert tag <%S> to the XML file because there was a failure in representing it as a String",RE_XML_TOSTR,error,cleanup1,&t->name)
 
     //insert it into the file, as long as it's not the first tag ( the root)
     if(RF_BITFLAG_ON(x->flags,XML_ROOT_INIT))
@@ -332,7 +330,7 @@ int32_t rfXML_InsertTag(RF_XML* x, RF_XMLTag* t,char flags)
         //and just write it in the file
         x->lastLine = x->f.line;
         if((error = rfTextFile_GetOffset(&x->f,&x->rootPos)) != RF_SUCCESS)
-            RETURNGOTO_LOG_ERROR("During inserting the root to XML file \"%s\" there was a problem when getting the current file position",error,error,cleanup1,x->f.name.bytes)
+            RETURNGOTO_LOG_ERROR("During inserting the root to XML file \"%S\" there was a problem when getting the current file position",error,error,cleanup1,&x->f.name)
         else
             error = rfTextFile_Write(&x->f,&tempS);
         x->rootPos-=1;
@@ -389,35 +387,35 @@ int32_t rfXML_InsertStr(RF_XML* x,void* sP,char flags)
     {
         for(i=0;i<x->level;i++)
             rfStringX_Append(&tabs,RFS_("   "));
-        rfStringX_Replace(&nS,RFS_("\n"),RFS_("\n%s   ",rfString_Cstr(&tabs)),0,0);
+        rfStringX_Replace(&nS,RFS_("\n"),RFS_("\n%S   ",&tabs),0,0);
     }
     else
     {
         for(i=0;i<x->level;i++)
             rfStringX_Append(&tabs,RFS_("\t"));
-        rfStringX_Replace(&nS,RFS_("\n"),RFS_("\n%s\t",rfString_Cstr(&tabs)),0,0);
+        rfStringX_Replace(&nS,RFS_("\n"),RFS_("\n%S\t",&tabs),0,0);
     }
 
     if(RF_BITFLAG_ON(flags,XML_TAG_END))///insertion at end of tag
     {
         RF_String before;
         //read until you get to the line that the tag closes
-        while(rfString_Find(&strBuff,RFS_("</%s>",x->lastTag->name.bytes),0) == RF_FAILURE)
+        while(rfString_Find(&strBuff,RFS_("</%S>",&x->lastTag->name),0) == RF_FAILURE)
         {
             if((error=rfTextFile_ReadLine(&x->f,&strBuff)) != RF_SUCCESS)
             {
                 if(error==RE_FILE_EOF)
-                    LOG_ERROR("During attempting to find the closing of tag </%s> end of file was encountered",error,x->lastTag->name.bytes)
+                    LOG_ERROR("During attempting to find the closing of tag </%S> end of file was encountered",error,&x->lastTag->name)
                 else
-                    LOG_ERROR("During attempting to find the closing of tag </%s> a read error happened",error,x->lastTag->name.bytes)
+                    LOG_ERROR("During attempting to find the closing of tag </%S> a read error happened",error,&x->lastTag->name)
                 goto cleanup2;
             }
         }
         //move after the tag closing if found
-        rfString_Before(&strBuff,RFS_("</%s>",x->lastTag->name.bytes),&before,0);
-        if(rfStringX_MoveAfter(&strBuff,RFS_("</%s>",x->lastTag->name.bytes),0,0) == RF_FAILURE)
+        rfString_Before(&strBuff,RFS_("</%S>",&x->lastTag->name),&before,0);
+        if(rfStringX_MoveAfter(&strBuff,RFS_("</%S>",&x->lastTag->name),0,0) == RF_FAILURE)
         {
-            LOG_ERROR("The opening of the expected XML tag <%s> was not found in the current XML line",RE_XML_OPEN_TAG,x->lastTag->name.bytes)
+            LOG_ERROR("The opening of the expected XML tag <%S> was not found in the current XML line",RE_XML_OPEN_TAG,&x->lastTag->name)
             error = RE_XML_OPEN_TAG;
             rfString_Deinit(&before);
             goto cleanup2;
@@ -425,13 +423,13 @@ int32_t rfXML_InsertStr(RF_XML* x,void* sP,char flags)
         rfString_TrimEnd(&nS,RFS_("\n\t "));
         //create the new line that will replace the previous line, and also add the same level of tabs as the previous one
         if(RF_BITFLAG_ON(x->flags,XML_SPACES))///cleanup3 - the newline string
-            rfStringX_Init(&newLine,"%s   %s\n%s</%s>%s",before.bytes,rfString_Cstr(&nS),rfString_Cstr(&tabs),x->lastTag->name.bytes,rfString_Cstr(&strBuff));
+            rfStringX_Init(&newLine,"%S   %S\n%S</%S>%S",&before,&nS,&tabs,&x->lastTag->name,&strBuff);
         else
-            rfStringX_Init(&newLine,"%s\t%s\n%s</%s>%s",before.bytes,rfString_Cstr(&nS),rfString_Cstr(&tabs),x->lastTag->name.bytes,rfString_Cstr(&strBuff));
+            rfStringX_Init(&newLine,"%S\t%S\n%S</%S>%S",&before,&nS,&tabs,&x->lastTag->name,&strBuff);
         rfString_TrimEnd(&newLine,RFS_("\n\t"));
         if((error=rfTextFile_Replace(&x->f,x->f.line-1,&newLine)) != RF_SUCCESS)
         {
-            LOG_ERROR("Failed to replace a line of the XML file \"%s\" with the requested string",error,x->f.name.bytes);
+            LOG_ERROR("Failed to replace a line of the XML file \"%S\" with the requested string",error,&x->f.name);
             rfString_Deinit(&before);
             goto cleanup3;
         }
@@ -440,25 +438,25 @@ int32_t rfXML_InsertStr(RF_XML* x,void* sP,char flags)
     {
         RF_String before;
         //move after the tag opening if found
-        if(rfStringX_MoveAfter(&strBuff,RFS_("<%s",x->lastTag->name.bytes),&before,0) == RF_FAILURE)
-            RETURNGOTO_LOG_ERROR("The opening of the expected XML tag <%s> was not found in the current XML line",RE_XML_OPEN_TAG,error,cleanup2,x->lastTag->name.bytes)
+        if(rfStringX_MoveAfter(&strBuff,RFS_("<%S",&x->lastTag->name),&before,0) == RF_FAILURE)
+            RETURNGOTO_LOG_ERROR("The opening of the expected XML tag <%S> was not found in the current XML line",RE_XML_OPEN_TAG,error,cleanup2,&x->lastTag->name)
 
         if(rfStringX_MoveAfter(&strBuff,RFS_(">"),&attributes,0)==RF_FAILURE)
         {
             rfString_Deinit(&before);
-            RETURNGOTO_LOG_ERROR("The opening tag of the XML tag <%s> does not have a closing bracket",RE_XML_PARSE_FAILURE,error,cleanup2,x->lastTag->name.bytes)
+            RETURNGOTO_LOG_ERROR("The opening tag of the XML tag <%S> does not have a closing bracket",RE_XML_PARSE_FAILURE,error,cleanup2,&x->lastTag->name)
         }
         //create the new line that will replace the previous line, and also add the same level of tabs as the previous one
         if(RF_BITFLAG_ON(x->flags,XML_SPACES)) ///cleanup3 - the newline string
-            rfStringX_Init(&newLine,"%s<%s%s>\n%s   %s%s",rfString_Cstr(&before),x->lastTag->name.bytes,rfString_Cstr(&attributes),rfString_Cstr(&tabs),rfString_Cstr(&nS),rfString_Cstr(&strBuff));
+            rfStringX_Init(&newLine,"%S<%S%S>\n%S   %S%S",&before,&x->lastTag->name,&attributes,&tabs,&nS,&strBuff);
         else
-            rfStringX_Init(&newLine,"%s<%s%s>\n%s\t%s%s",rfString_Cstr(&before),x->lastTag->name.bytes,rfString_Cstr(&attributes),rfString_Cstr(&tabs),rfString_Cstr(&nS),rfString_Cstr(&strBuff));
+            rfStringX_Init(&newLine,"%S<%S%S>\n%S\t%S%S",&before,&x->lastTag->name,&attributes,&tabs,&nS,&strBuff);
         rfString_TrimEnd(&newLine,RFS_("\n\t "));
         if((error=rfTextFile_Replace(&x->f,x->lastLine,&newLine)) != RF_SUCCESS)
         {
             rfString_Deinit(&attributes);
             rfString_Deinit(&before);
-            RETURNGOTO_LOG_ERROR("Failed to replace a line of the XML file \"%s\" with the requested string",error,error,cleanup3,x->f.name.bytes);
+            RETURNGOTO_LOG_ERROR("Failed to replace a line of the XML file \"%S\" with the requested string",error,error,cleanup3,&x->f.name);
         }
     }//end of the if for putting it either in start or end of tag
     ///success (error would have RF_SUCCESS) here if all went well
@@ -557,13 +555,13 @@ RF_XMLTag* i_rfXML_GetTag(RF_XML* x,void* tName,void* contents, uint32_t attrN, 
         x->level = 0;
         if((error=rfTextFile_GoToOffset(&x->f,x->rootPos,SEEK_SET)) != RF_SUCCESS)
         {
-            LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%s\"",error,x->f.name.bytes);
+            LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%S\"",error,&x->f.name);
             tempTag = 0;
             goto cleanup1;
         }
         //check if the root is the one we seek
         rfTextFile_ReadLine(&x->f,&x->s);
-        if(rfString_Find(&x->s,RFS_("<%s",((RF_String*)tName)->bytes),0) != RF_FAILURE)
+        if(rfString_Find(&x->s,RFS_("<%S",tName),0) != RF_FAILURE)
         {
             x->lastTag = &x->root;
             x->lastLine = x->f.line-1;
@@ -573,7 +571,7 @@ RF_XMLTag* i_rfXML_GetTag(RF_XML* x,void* tName,void* contents, uint32_t attrN, 
         {
             if((error=rfTextFile_GoToOffset(&x->f,x->rootPos,SEEK_SET)) != RF_SUCCESS)
             {
-                LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%s\"",error,x->f.name.bytes);
+                LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%S\"",error,&x->f.name);
                 tempTag = 0;
                 goto cleanup1;
             }
@@ -617,7 +615,7 @@ RF_XMLTag* i_rfXML_GetTag(RF_XML* x,void* tName,void* contents, uint32_t attrN, 
                     //reached the end of the file and found nothing
                     if(error != RE_XML_EOF)
                     {
-                        LOG_ERROR("XML Parsing error occured during attempting to retrieve tag <%s> from file \"%s\"",RE_XML_PARSE_FAILURE,((RF_String*)tName)->bytes,x->f.name.bytes);
+                        LOG_ERROR("XML Parsing error occured during attempting to retrieve tag <%S> from file \"%S\"",RE_XML_PARSE_FAILURE,tName,&x->f.name);
                     }
                     ffwhile = true;//just to get to the end of the function
                     break;
@@ -686,7 +684,7 @@ RF_XMLTag* i_rfXML_GetTag(RF_XML* x,void* tName,void* contents, uint32_t attrN, 
             }
             else
             {
-                LOG_ERROR("XML Parsing error occured during attempting to retrieve tag <%s> from file \"%s\"",RE_XML_PARSE_FAILURE,((RF_String*)tName)->bytes,x->f.name.bytes);
+                LOG_ERROR("XML Parsing error occured during attempting to retrieve tag <%S> from file \"%S\"",RE_XML_PARSE_FAILURE,tName,&x->f.name);
                 free(tempTag);//notice freeing and not deinitializing here
                 tempTag = 0;
                 break;
@@ -731,13 +729,13 @@ RF_XMLTag* rfXML_GetTag3(RF_XML* x,void* tName,void* contents)
         x->level = 0;
         if((error=rfTextFile_GoToOffset(&x->f,x->rootPos,SEEK_SET)) != RF_SUCCESS)
         {
-            LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%s\"",error,x->f.name.bytes);
+            LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%S\"",error,&x->f.name);
             tempTag = 0;
             goto cleanup1;
         }
         //check if the root is the one we seek
         rfTextFile_ReadLine(&x->f,&x->s);
-        if(rfString_Find(&x->s,RFS_("<%s",((RF_String*)tName)->bytes),0) != RF_FAILURE)
+        if(rfString_Find(&x->s,RFS_("<%S",tName,0)) != RF_FAILURE)
         {
             x->lastTag = &x->root;
             x->lastLine = x->f.line-1;
@@ -748,7 +746,7 @@ RF_XMLTag* rfXML_GetTag3(RF_XML* x,void* tName,void* contents)
         {
             if((error=rfTextFile_GoToOffset(&x->f,x->rootPos,SEEK_SET)) != RF_SUCCESS)
             {
-                LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%s\"",error,x->f.name.bytes);
+                LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%S\"",error,&x->f.name);
                 tempTag = 0;
                 goto cleanup1;
             }
@@ -775,7 +773,7 @@ RF_XMLTag* rfXML_GetTag3(RF_XML* x,void* tName,void* contents)
                     //reached the end of the file and found nothing
                     if(error != RE_XML_EOF)
                     {
-                        LOG_ERROR("XML Parsing error occured during attempting to retrieve tag <%s> from file \"%s\"",RE_XML_PARSE_FAILURE,((RF_String*)tName)->bytes,x->f.name.bytes);
+                        LOG_ERROR("XML Parsing error occured during attempting to retrieve tag <%S> from file \"%S\"",RE_XML_PARSE_FAILURE,tName,&x->f.name);
                     }
                     ffwhile = true;
                     break;
@@ -824,7 +822,7 @@ RF_XMLTag* rfXML_GetTag3(RF_XML* x,void* tName,void* contents)
             }
             else
             {
-                LOG_ERROR("XML Parsing error occured during attempting to retrieve tag <%s> from file \"%s\"",RE_XML_PARSE_FAILURE,((RF_String*)tName)->bytes,x->f.name.bytes);
+                LOG_ERROR("XML Parsing error occured during attempting to retrieve tag <%S> from file \"%S\"",RE_XML_PARSE_FAILURE,tName,&x->f.name);
                 free(tempTag);//notice freeing and not deinitializing here
                 tempTag = 0;
                 break;
@@ -896,12 +894,12 @@ int32_t rfXML_GoToTag(RF_XML* x,void* tName,void* contents, uint32_t attrN, ...)
     x->level = 0;
     //go to the where the root is
     if((error=rfTextFile_GoToOffset(&x->f,x->rootPos,SEEK_SET)) != RF_SUCCESS)
-        RETURNGOTO_LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%s\"",error,error,cleanup1,x->f.name.bytes)
+        RETURNGOTO_LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%S\"",error,error,cleanup1,&x->f.name)
 
 
     //check if the root is the one we seek
     rfTextFile_ReadLine(&x->f,&x->s);
-    if(rfString_Find(&x->s,RFS_("<%s",((RF_String*)tName)->bytes),0) != RF_FAILURE)
+    if(rfString_Find(&x->s,RFS_("<%S",tName,0)) != RF_FAILURE)
     {
         x->lastTag = &x->root;
         x->lastLine = x->f.line-1;
@@ -912,7 +910,7 @@ int32_t rfXML_GoToTag(RF_XML* x,void* tName,void* contents, uint32_t attrN, ...)
     else//go back to begin the search
     {
         if((error=rfTextFile_GoToOffset(&x->f,x->rootPos,SEEK_SET)) != RF_SUCCESS)
-            RETURNGOTO_LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%s\"",error,error,cleanup1,x->f.name.bytes)
+            RETURNGOTO_LOG_ERROR("There was an error while attempting to go to the position of the root of the XML file\"%S\"",error,error,cleanup1,&x->f.name)
 
     }
     ///start the search
@@ -950,7 +948,7 @@ int32_t rfXML_GoToTag(RF_XML* x,void* tName,void* contents, uint32_t attrN, ...)
                 //reached the end of the file and found nothing
                 if(error != RE_XML_EOF)
                 {
-                    LOG_ERROR("XML Parsing error occured during attempting to retrieve tag <%s> from file \"%s\"",RE_XML_PARSE_FAILURE,((RF_String*)tName)->bytes,x->f.name.bytes);
+                    LOG_ERROR("XML Parsing error occured during attempting to retrieve tag <%S> from file \"%S\"",RE_XML_PARSE_FAILURE,tName,&x->f.name);
                 }
                 ffwhile = true;//just to get to the end of the function
                 break;
@@ -1021,7 +1019,7 @@ int32_t rfXML_GoToTag(RF_XML* x,void* tName,void* contents, uint32_t attrN, ...)
         }
         else
         {
-            LOG_ERROR("XML Parsing error occured during attempting to retrieve tag <%s> from file \"%s\"",RE_XML_PARSE_FAILURE,((RF_String*)tName)->bytes,x->f.name.bytes);
+            LOG_ERROR("XML Parsing error occured during attempting to retrieve tag <%S> from file \"%S\"",RE_XML_PARSE_FAILURE,tName,&x->f.name);
             break;
         }
     }//search loop

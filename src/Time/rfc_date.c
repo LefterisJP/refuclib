@@ -21,8 +21,11 @@
 #include <limits.h> //for the limit of ullong
 
 #include <Time/rfc_date.h>
-#include "time_private.h"
+#include "common.ph"//private time macros
+
 #include <rf_setup.h>
+#include <rf_memory.h>
+#include <rf_error.h>
 
 //some definitions of accumulated days in the year after each month, used in various calculations
 #define ACCUM_DAYS_JANUARY      31

@@ -1,5 +1,5 @@
 ﻿#include <IO/rfc_textfile.h>
-#include <rf_string.h>
+#include <RFstring.h>
 #include <stdio.h>
 
 

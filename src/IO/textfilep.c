@@ -1,4 +1,4 @@
-/**
+/*
 ** Copyright (c) 2011-2012, Karapetsas Eleftherios
 ** All rights reserved.
 **
@@ -19,10 +19,15 @@
 **
 ** In this source file the private text file functionality
 ** is implemented
-**/
+*/
+#include "textfile.ph"
 
-#include "textfile_private.h"
+#include <rf_error.h>
+
 #include <IO/rfc_textfile.h>
+#include <String/conversion.h> //for rfString_Cstr()
+#include <IO/rf_unicode.h> //for the unicode macros
+
 #include <errno.h>
 #include <string.h> //for strstr()
 
@@ -164,7 +169,7 @@ char TextFile_HandleEol(RF_TextFile* t,char eol)
             t->eol = eol;
         break;
         default:
-            LOG_ERROR("An illegal eol value has been given to the initialization of TextFile \"%s\"",RE_INPUT,rfString_Cstr(&t->name))
+            LOG_ERROR("An illegal eol value has been given to the initialization of TextFile \"%S\"",RE_INPUT,&t->name)
             t->eol = RF_EOL_DEFAULT;
             return false;
         break;

@@ -16,14 +16,15 @@
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
 #ifndef RF_LOCAL_MEMORY_H
 #define RF_LOCAL_MEMORY_H
 
 
 #include <rf_setup.h>
-#include <limits.h> //for ULONG_MAX
 #include <Preprocessor/rf_xmacro_argcount.h>
+
+#include <limits.h> //for ULONG_MAX
+#include <string.h> //for size_t
 
 #define RF_MAX_FUNC_ARGS    32
 

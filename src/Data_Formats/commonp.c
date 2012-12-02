@@ -19,11 +19,12 @@
 **
 ** In this source file the private xml functionality is implemented
 **/
+#include "common.ph"
 
-#include "xml_private.h"
+#include <rf_error.h>
 
-#include <rf_xml.h>
-#include <rf_string.h>
+#include <RFxml.h>
+#include <RFstring.h>
 #include <IO/rfc_textfile.h>
 #include <rf_utils.h>
 
@@ -210,16 +211,16 @@ char i_rfXMLTag_PrintToFile(RF_XMLTag* t,RF_TextFile* f,RF_StringX* strBuff,uint
     for(i = 0; i < level; i ++)
         rfTextFile_Write(f,RFS_("\t"));
     //create the tag string
-    rfStringX_Assign(strBuff,RFS_("<%s",t->name.bytes));
+    rfStringX_Assign(strBuff,RFS_("<%S",&t->name));
     for(i = 0; i < t->attributes.size; i ++)
     {
-        rfStringX_Append(strBuff,RFS_(" %s=\"%s\"",((RF_String*)rfListP_Get(&t->attributes,i))->bytes,((RF_String*)rfListP_Get(&t->attribValues,i))->bytes));
+        rfStringX_Append(strBuff,RFS_(" %S=\"%S\"",rfListP_Get(&t->attributes,i),rfListP_Get(&t->attribValues,i)));
     }
     rfStringX_Append(strBuff,RFS_(">\n"));
     //print it
     if(rfTextFile_Write(f,strBuff) != RF_SUCCESS)
     {
-        LOG_ERROR("Failed to write tag \"<%s>\" to the XML output file",RE_XML_WRITE,t->name.bytes);
+        LOG_ERROR("Failed to write tag \"<%S>\" to the XML output file",RE_XML_WRITE,&t->name);
         return false;
     }
     //also print the tag's contents(if any)
@@ -227,14 +228,14 @@ char i_rfXMLTag_PrintToFile(RF_XMLTag* t,RF_TextFile* f,RF_StringX* strBuff,uint
     {
         for(i= 0; i< level; i ++)
             rfTextFile_Write(f,RFS_("\t"));
-        rfTextFile_Write(f,RFS_("%s\n",rfString_Cstr(&t->contents)));
+        rfTextFile_Write(f,RFS_("%S\n",&t->contents));
     }
     //recursively call this function for all the children of this tag
     for(i=0;i < t->children.size; i++)
     {
         if(i_rfXMLTag_PrintToFile((RF_XMLTag*)rfListP_Get(&t->children,i),f,strBuff,level+1) == false)
         {
-            LOG_ERROR("Failed to write tag's \"<%s>\" No. %d child",RE_XML_WRITE,t->name.bytes,i+1)
+            LOG_ERROR("Failed to write tag's \"<%S>\" No. %d child",RE_XML_WRITE,&t->name,i+1)
             return false;
         }
     }
@@ -242,9 +243,9 @@ char i_rfXMLTag_PrintToFile(RF_XMLTag* t,RF_TextFile* f,RF_StringX* strBuff,uint
     //prepend the required number of tabs
     for(i = 0; i < level; i ++)
         rfTextFile_Write(f,RFS_("\t"));
-    if(rfTextFile_Write(f,RFS_("</%s>\n",t->name.bytes)) != RF_SUCCESS)
+    if(rfTextFile_Write(f,RFS_("</%S>\n",&t->name)) != RF_SUCCESS)
     {
-        LOG_ERROR("Failed to write tag's \"<%s>\" closing to the XML output file",RE_XML_WRITE,t->name.bytes);
+        LOG_ERROR("Failed to write tag's \"<%S>\" closing to the XML output file",RE_XML_WRITE,&t->name);
         return false;
     }
     //success
@@ -318,8 +319,8 @@ int32_t i_rfXML_Parse(RF_XML* x,RF_XMLTag* currentTag)
                     //here do a separate eof check
                     if(error == RE_FILE_EOF)
                     {
-                        LOG_ERROR("While the parser was parsing the contents of <%s> tag the end of file was found unexpectedly. The expected </%s> closing tag was not found",RE_XML_UNEXPECTED_EOF,
-                                 currentTag->name.bytes,currentTag->name.bytes);
+                        LOG_ERROR("While the parser was parsing the contents of <%S> tag the end of file was found unexpectedly. The expected </%S> closing tag was not found",RE_XML_UNEXPECTED_EOF,
+                                 &currentTag->name,&currentTag->name);
                         error = RE_XML_UNEXPECTED_EOF;
                         goto cleanup1;
                     }
@@ -368,7 +369,7 @@ int32_t i_rfXML_Parse(RF_XML* x,RF_XMLTag* currentTag)
                     //if we find a closing tag we don't expect
                     if( rfString_Equal(&currentTag->name,&check) == false)
                     {
-                        LOG_ERROR("Expected to find </%s> tag but found </%s>. Aborting XML file parsing.",RE_XML_PARSE_FAILURE,currentTag->name.bytes,rfString_Cstr(&check));
+                        LOG_ERROR("Expected to find </%S> tag but found </%S>. Aborting XML file parsing.",RE_XML_PARSE_FAILURE,&currentTag->name,&check)
                         rfStringX_Deinit(&check);
                         rfXML_Deinit(x);
                         return RE_XML_PARSE_FAILURE;
@@ -382,7 +383,7 @@ int32_t i_rfXML_Parse(RF_XML* x,RF_XMLTag* currentTag)
                 }
                 else
                 {
-                    LOG_ERROR("Expected to find </%s> but did not encounter it. Aborting XML file parsing.",RE_XML_PARSE_FAILURE,currentTag->name.bytes);
+                    LOG_ERROR("Expected to find </%S> but did not encounter it. Aborting XML file parsing.",RE_XML_PARSE_FAILURE,&currentTag->name);
                     rfStringX_Deinit(&check);
                     rfXML_Deinit(x);
                     return RE_XML_PARSE_FAILURE;
@@ -523,7 +524,7 @@ int32_t rfXML_GoNext_dsk(RF_XML* x,RF_XMLTag* t)
                     //if we find a closing tag we don't expect
                     if( rfString_Equal(&x->currentTag->name,&check) == false)
                     {
-                        LOG_ERROR("Expected to find </%s> tag but found </%s>. Aborting XML file parsing.",RE_XML_PARSE_FAILURE,x->currentTag->name.bytes,rfString_Cstr(&check));
+                        LOG_ERROR("Expected to find </%S> tag but found </%S>. Aborting XML file parsing.",RE_XML_PARSE_FAILURE,&x->currentTag->name,&check);
                         error = RE_XML_PARSE_FAILURE;
                         goto cleanup3;
                     }
@@ -583,7 +584,7 @@ int32_t rfXML_GoNext_dsk(RF_XML* x,RF_XMLTag* t)
                 }
                 else
                 {
-                    LOG_ERROR("Expected to find </%s> but did not encounter it. Aborting XML file parsing.",RE_XML_PARSE_FAILURE,x->currentTag->name.bytes);
+                    LOG_ERROR("Expected to find </%S> but did not encounter it. Aborting XML file parsing.",RE_XML_PARSE_FAILURE,&x->currentTag->name);
                     error = RE_XML_PARSE_FAILURE;
                     goto cleanup3;
                 }
@@ -738,7 +739,7 @@ int32_t rfXML_GoIn_dsk(RF_XML* x,uint32_t i)
                     //if we find a closing tag we don't expect
                     if( rfString_Equal(&x->currentTag->name,&check) == false)
                     {
-                        LOG_ERROR("Expected to find </%s> tag but found </%s>. Aborting XML file parsing.",RE_XML_PARSE_FAILURE,x->currentTag->name.bytes,rfString_Cstr(&check));
+                        LOG_ERROR("Expected to find </%S> tag but found </%S>. Aborting XML file parsing.",RE_XML_PARSE_FAILURE,&x->currentTag->name,&check)
                         error = RE_XML_PARSE_FAILURE;
                         goto cleanup3;
                     }
@@ -758,7 +759,7 @@ int32_t rfXML_GoIn_dsk(RF_XML* x,uint32_t i)
                 }
                 else
                 {
-                    LOG_ERROR("Expected to find </%s> but did not encounter it. Aborting XML file parsing.",RE_XML_PARSE_FAILURE,x->currentTag->name.bytes);
+                    LOG_ERROR("Expected to find </%S> but did not encounter it. Aborting XML file parsing.",RE_XML_PARSE_FAILURE,&x->currentTag->name);
                     error = RE_XML_PARSE_FAILURE;
                     goto cleanup3;
                 }
@@ -810,7 +811,7 @@ int32_t rfXML_GoOut_dsk(RF_XML* x,char after)
         while(1)
         {
             //if the tag's parent opening tag is found in this line
-            if(rfString_Find(&x->s,RFS_("<%s",x->currentTag->parent->name.bytes))!= RF_FAILURE)
+            if(rfString_Find(&x->s,RFS_("<%S",&x->currentTag->parent->name))!= RF_FAILURE)
             {
 
                 x->currentTag = x->currentTag->parent;
@@ -825,9 +826,9 @@ int32_t rfXML_GoOut_dsk(RF_XML* x,char after)
                 if( (error = rfTextFile_MoveLines(&x->f,-2) != RF_SUCCESS))
                 {
                     if(error == RF_FAILURE)
-                        LOG_ERROR("While moving backwards in the XML file \"%s\" could not find the expected opening of tag <%s>",RE_XML_PARSE_FAILURE,x->f.name.bytes,x->currentTag->parent->name.bytes);
+                        LOG_ERROR("While moving backwards in the XML file \"%S\" could not find the expected opening of tag <%S>",RE_XML_PARSE_FAILURE,&x->f.name,&x->currentTag->parent->name);
                     //else
-                    LOG_ERROR("Could not traverse the XML file \"%s\" backwards",RE_XML_PARSE_FAILURE,x->f.name.bytes);
+                    LOG_ERROR("Could not traverse the XML file \"%S\" backwards",RE_XML_PARSE_FAILURE,&x->f.name);
                     error = RE_XML_PARSE_FAILURE;
                     goto cleanup1;
                 }
@@ -839,12 +840,12 @@ int32_t rfXML_GoOut_dsk(RF_XML* x,char after)
         while(1)
         {
             //if the tag's parent closing tag is found in this line
-            if(rfString_Find(&x->s,RFS_("</%s>",x->currentTag->parent->name.bytes))!= RF_FAILURE)
+            if(rfString_Find(&x->s,RFS_("</%S>",&x->currentTag->parent->name))!= RF_FAILURE)
             {
                 x->currentTag = x->currentTag->parent;
                 x->lastTag = x->currentTag;
                 x->lastLine = x->f.line-1;
-                rfStringX_MoveAfter(&x->s,RFS_("</%s>",x->currentTag->name.bytes),0,0);
+                rfStringX_MoveAfter(&x->s,RFS_("</%S>",&x->currentTag->name),0,0);
                 //free the copy and success
                 rfStringX_Deinit(&copyS);
                 x->level--;

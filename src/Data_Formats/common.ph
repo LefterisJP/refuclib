@@ -1,4 +1,4 @@
-/**
+/*
 ** Copyright (c) 2011-2012, Karapetsas Eleftherios
 ** All rights reserved.
 **
@@ -16,10 +16,11 @@
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **
+** -- Data_Formats/common.ph
 ** This is a private header defining only functions
-** and macros that are private and only accessible
-** to the XML functions
-**/
+** and macros that are private and accessible
+** only to the XML functions
+*/
 
 
 
@@ -40,11 +41,6 @@
 //#define XML_SPACES        0x10
 
 enum parserStates { TAG_TITLE=1,TAG_ATTRIBUTES,TAG_CONTENTS, TAG_CLOSING};
-
-
-
-
-
 
 
 

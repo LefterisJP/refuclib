@@ -16,14 +16,15 @@
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
-
-#include <stdlib.h>//for malloc,free and other stdlib functions
-#include <string.h> //for memcpy
+#include <Data_Structures/rfc_array.h>
+#include "common.ph"//for the common macro def
 
 #include <rf_setup.h>
-#include <Data_Structures/rfc_array.h>
-#include "datastructures_private.h"
+#include <rf_error.h>
+#include <rf_memory.h>
 
+
+#include <string.h> //for memcpy
 
 /***********************************************************************RF_ArrayV Functions**************************************************************************************/
 

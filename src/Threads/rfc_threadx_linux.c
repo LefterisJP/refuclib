@@ -1,9 +1,11 @@
 #include <Threads/rfc_threadx.h>
-//include the local memory stack
-#include <rf_localmem.h>
-#include <rf_utils.h>
-#include <stdlib.h>
-#include <string.h>
+
+#include <rf_error.h>
+#include <rf_memory.h>
+#include <rf_utils.h> //for RF_BITFLAG_ON()
+
+#include <rf_localmem.h>//for LMS initialization
+#include <rf_stdio.h>//stdio buffer thread-specific initialization
 
 //  The function that serves as the starting address for a RF_ThreadX in Linux
 void* RF_THREADX_FUNCTION(void* param)
@@ -14,6 +16,8 @@ void* RF_THREADX_FUNCTION(void* param)
     //initialize the local memory stack of the thread
     RF_LocalMemoryStack lms;
     rfLMS_Init(&lms,thread->INH_Thread.lmsSize);
+    //initialize the stdio for this thread
+    rfInitStdio();
     //run the thread function
     ret = thread->INH_Thread.ptr2onExecution(thread);
     //free the local memory stack and return

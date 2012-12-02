@@ -17,15 +17,24 @@
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef REFU_STRING_H
-#define REFU_STRING_H
+#ifndef RF_STRINGX_H
+#define RF_STRINGX_H
 
-//include the C RF_String and RF_StringX
-#include <String/rfc_stringx.h>
-//if this is c++ include the c++ wrapper too
-#ifdef __cplusplus
-#ifdef REFU_CPP
-    #include <String/cppstring.h>
-#endif// end of REFU_CPP
-#endif//end of cpp
-#endif //end OF ifndef guards
+#include <rf_options.h> //read in the options
+#ifdef RF_MODULE_STRINGS//string module check
+
+#include <String/stringx_decl.h>
+#include <String/common.h>
+
+#include <String/corex.h>
+#include <String/manipulationx.h>
+#include <String/traversalx.h>
+#include <String/filesx.h>
+#include <String/format.h>
+
+
+#else //end of the strings module include
+    #error Attempted to include Refu String manipulation with the String module flag off. Rebuild the library with that option added if you need to include them
+#endif
+
+#endif//inclue guards end

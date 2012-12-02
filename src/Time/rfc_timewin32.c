@@ -26,9 +26,13 @@
 #ifdef RF_MODULE_TIME_DATE
 #include <Time/rfc_date.h>
 #endif
-#include <rf_utils.h>
-#include "time_private.h"
+
 #include <rf_time.h> //for the refu sleep functions
+#include "common.ph"//private time macros
+
+#include <rf_error.h>
+#include <rf_utils.h>
+#include <rf_memory.h>
 
 /*-------------------------------------------------------Sleep functions-----------------------------------------------------------------------------------------*/
 
@@ -91,13 +95,14 @@ char rfTimer_Init(RF_Timer* t,char resolution)
 // Allocates and returns a timer object
 RF_Timer* rfTimer_Create(char resolution)
 {
+    RF_Timer* ret;
     //check if we can actually have such a timer
     if(rfUTILS.hasHighResTimer==false)
     {
         LOG_ERROR("Creating a timer failed due to the system not supporting high resolution performance counter. Windows ONLY",RE_TIMER_HIGHRES_UNSUPPORTED);
         return 0;
     }
-    RF_Timer* ret = malloc(sizeof(RF_Timer));
+    RF_MALLOC(ret,sizeof(RF_Timer))
     //query the timer
     if(QueryPerformanceCounter((LARGE_INTEGER*)&ret->lastQuery) == 0)
     {
@@ -235,7 +240,8 @@ char rfDate_Init_Now(RF_Date* d,char local)
 //Creates a date
 RF_Date* rfDate_Create_Now(char local)
 {
-    RF_Date* ret = malloc(sizeof(RF_Date));
+    RF_Date* ret;
+    RF_MALLOC(ret,sizeof(RF_Date))
     //get the time
     SYSTEMTIME st;
     if(local == true)

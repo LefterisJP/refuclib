@@ -16,10 +16,12 @@
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
-
-#include <stdlib.h> //for mallloc
-#include <string.h> //for memcpy
 #include <Data_Structures/rfc_binaryarray.h>
+
+#include <rf_error.h>
+#include <rf_memory.h>
+
+#include <string.h> //for memcpy
 
 // Allocates and returns a binary array
 RF_BinaryArray* rfBinaryArray_Create(uint32_t size)

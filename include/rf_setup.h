@@ -28,8 +28,9 @@
 #ifndef REFU_SETUP_H
 #define REFU_SETUP_H
 
-#include <stdio.h>
-#include <float.h>
+
+#include <float.h> //for FLOAT_EPSILON, used in the safe floats comparisons
+//both the includes below are used in all the default arguments cases
 #include "Preprocessor/rf_xmacro_argcount.h" //for RF_NARG argument count macro
 #include "Preprocessor/rf_xmacro_gt.h"    //for the greater than macro token comparison
 
@@ -49,7 +50,7 @@ extern "C"
 //include the options file that should have been created from building
 #include "rf_options.h"
 
-// Definition of the DLL/share library export macro
+/* ---------------------------------------------------------- The needed export-import macros ------------------------------------------------------------ */
 #ifdef REFU_WIN32_VERSION //windows case is the only one that needs special decl
     #ifdef REFU_DYNAMIC_LIB //export  case
         #define i_DECLIMEX_  __declspec(dllexport)
@@ -64,7 +65,7 @@ extern "C"
     #define i_DECLIMEX_
 #endif
 
-//include the exact c data types
+/* ------------------------------------------------------------ Exact data types ------------------------------------------------------------ */
 #ifndef _MSC_VER
     #define __STDC_FORMAT_MACROS //also request the printf format macros
     #include <inttypes.h>
@@ -79,19 +80,14 @@ extern "C"
     typedef __int64 int64_t;
 #endif
 
-//! This is the last error code that occured
-extern int32_t  i_DECLIMEX_ RF_LastError;
-//! The standard log used by the library
-extern i_DECLIMEX_ FILE* rfStdLog;
-//! The standard error used by the library
-extern i_DECLIMEX_ FILE* rfStdErr;
-
-///Macros for endianess
+/* ------------------------------------------------------------ Macro Flags for System endianess ------------------------------------------------------------ */
 //! Defines little endian system
 #define RF_LITTLE_ENDIAN    0
 //! Defines big endian system
 #define RF_BIG_ENDIAN       1
 
+
+/* ------------------------------------------------------------ Library initialization ------------------------------------------------------------ */
 
 /**
 ** @defgroup RF_GeneralGRP Initialization function
@@ -132,58 +128,52 @@ i_DECLIMEX_  void rfInit(char* errstr,char* logstr,uint64_t size);
 #endif
 #endif
 //! @}
-//clsoing RF_GeneralGRP doxygen group
+//closing RF_GeneralGRP doxygen group
 
-
-
-
-
-//! Sets all checks on
-#define REFU_PEDANTIC_MODE
-//! If this is on the String class is quite talkative and LOGS any undesired behaviour that might have happened. Helps with debugging
-//! and in most cases should not be in a release library
-#define VERBOSE_STRING
-//! @def When this flag is on the Exceptions are also logging themselves on the error log
-#define VERBOSE_EXCEPTION
-
-
-
-//static const float MFLT_EPSILON= FLT_EPSILON;
-//The system's epsilon tends to be too small some times so lets choose an arbirtrary small floating epsilon
-//! Smallest floating point of the system, last known working value was 0.0001. Changed it to FLT_EPSILON to see if it works now.
-//static const float FLOAT_EPSILON    = 0.0001;
-static const float FLOAT_EPSILON    = FLT_EPSILON ;//from cfloat.h
-static const float DOUBLE_EPSILON   = DBL_EPSILON;
-//! Maximum finite value representable by a float
-static const float FLOAT_MAX        =  FLT_MAX;
-//! Minimum positive value representable by a float
-static const float FLOAT_MIN        =  FLT_MIN;
-
-
+/* ------------------------------------------------ A macro that hopefully generates a compile error  ------------------------------------------------------- */
 #if defined(__GNUC__) || defined(__TINYC__) //GCC and TCC
-
-    //produces an error message
     #define RF_COMPILE_ERROR(i_ERROR_STR)   ;_Pragma(i_ERROR_STR);\
                                         COMPILE_ERROR
-
-    //thread specific storage specifier
-    #define i_THREAD__ __thread
 #elif _MSC_VER //MSVC
-
-    //produces an error message
     #define __STR2__(x) #x
     #define __STR1__(x) __STR2__(x)
     #define __LOC__ __FILE__ "("__STR1__(__LINE__)") : Error E0000: #pragma VSERROR: "
     #define RF_COMPILE_ERROR(x)  message(__LOC__ x)
+#else
+    #error Unsupported Compiler
+#endif
 
-    //thread specific storage specifier
+/* ------------------------------------------------ Thread specific keyword  ------------------------------------------------------- */
+#if defined(__GNUC__) || defined(__TINYC__) //GCC and TCC
+    #define i_THREAD__ __thread
+#elif _MSC_VER //MSVC
     #define i_THREAD__ __declspec(thread)
 #else
     #error Unsupported Compiler
 #endif
 
+/* ------------------------------------------------ Inline functions handling ------------------------------------------------------- */
+//kudos to this SO answer by Jens Gustedt http://stackoverflow.com/questions/5229343/how-to-declare-an-inline-function-in-c99-multi-file-project
+#ifdef __GNUC__ //GCC
+    #if !__GNUC_STDC_INLINE__ //old way to inline
+        #define i_INLINE_DECL   static inline
+        #define i_INLINE_INS    static inline
+    #else //C99 way to inline
+        #define i_INLINE_DECL   inline
+        #define i_INLINE_INS    extern inline
+    #endif
+#else //GCC-end
+    #error todo
+#endif
 
-
+/* --------------------------------------------- Safe Float and Double comparisons ------------------------------------------------------- */
+// Smallest floating point of the system, last known working value was 0.0001. Changed it to FLT_EPSILON to see if it works now.
+static const float FLOAT_EPSILON    = FLT_EPSILON ;//from cfloat.h
+static const float DOUBLE_EPSILON   = DBL_EPSILON;
+// Maximum finite value representable by a float
+static const float FLOAT_MAX        =  FLT_MAX;
+// Minimum positive value representable by a float
+static const float FLOAT_MIN        =  FLT_MIN;
 //!  Returns true if float a > float b
 #define FLCMP_G(a__,b__)  (a__)-(b__) > FLOAT_EPSILON
 //!  Retuns true if float a >= float b
@@ -207,199 +197,7 @@ static const float FLOAT_MIN        =  FLT_MIN;
 #define DBLCMP_EQ(a__,b__)   fabs(a__-b__)<DOUBLE_EPSILON
 
 
-/**
-** @defgroup RF_ErrorLoggingGRP Error Logging
-** @addtogroup RF_ErrorLoggingGRP
-** @{
-**/
-#ifdef RF_OPTION_VERBOSE_ERRORS
-
-#ifndef RF_NO_C99
-//! @brief Logs an error to the refu standard error stream
-//!
-//! This macro logs an error to the refu error stream
-//! @param i_msg_ A string literal containing the message to be logged for the error in the file. Can contain printf format specifiers which will be translated into values from the variables passed as further parameters to the macro
-//! @param i_errorCode_ The error code to log. Must be an int32_t value
-//! @param ... This is an optional input. If you have given any printf-style format specifiers in the string literal passes @c i_msg_ then here give the variables from which the value will be taken
-#define LOG_ERROR(i_msg_,i_errorCode_,...)  i_PICK_LOG_ERROR_FUNC_GT(i_msg_,i_errorCode_,RF_NARG(__VA_ARGS__),__VA_ARGS__)
-//! This macro logs an error to the refu error stream and returns the error code from the function it was called from.
-#define RETURN_LOG_ERROR(i_msg_,i_errorCode_,...)  {LOG_ERROR(i_msg_,i_errorCode_,__VA_ARGS__) return i_errorCode_; }
-//! This macro logs an error to the refu error stream and jumps to the specified goto label to exit a function
-#define RETURNGOTO_LOG_ERROR(i_msg_,i_errorCode_,i_retvar,i_label,...)  {LOG_ERROR(i_msg_,i_errorCode_,__VA_ARGS__) i_retvar=i_errorCode_;goto i_label; }
-
-//This macro picks up the correct error logging function, by taking the number of extra arguments and checking if it is greater than 0
-#define i_PICK_LOG_ERROR_FUNC_GT(i_msg_,i_errorCode_,i_argN,...) i_PICK_LOG_ERROR_FUNC(i_msg_,i_errorCode_,RP_GT(i_argN,0),__VA_ARGS__)
-//This macro picks up the correct error logging function, by pasting the results of the greater than comparison together to select the correct macro
-#define i_PICK_LOG_ERROR_FUNC(i_msg_,i_errorCode_,i_gt0,...) i_RP_PASTE2(i_LOG_ERROR,i_gt0) (i_msg_,i_errorCode_,__VA_ARGS__)
-
-//Logs an error to the refu standard error stream with varargs
-#define i_LOG_ERROR1(i_msg_,i_errorCode_, ...)  {fprintf(rfStdErr,"At \"%s\" >>> "i_msg_"\n",__FUNCTION__,__VA_ARGS__);RF_LastError = i_errorCode_;fflush(rfStdErr);}
-//Logs an error to the refu standard error stream without varargs
-#define i_LOG_ERROR0(i_msg_,i_errorCode_, ...)  {fprintf(rfStdErr,"At \"%s\" >>> "i_msg_"\n",__FUNCTION__);RF_LastError = i_errorCode_;fflush(rfStdErr);}
-
-
-//! @brief Logs an error to the standard error stream in detail
-//!
-//! This macro logs an error in detail to the refu error stream
-//! In detail means that it also saves the file and line number it occured
-//! @param i_msg_ A string literal containing the message to be logged for the error in the file. Can contain printf format specifiers which will be translated into values from the variables passed as further parameters to the macro
-//! @param i_errorCode_ The error code to log. Must be an int32_t value
-//! @param ... This is an optional input. If you have given any printf-style format specifiers in the string literal passes @c i_msg_ then here give the variables from which the value will be taken
-#define DLOG_ERROR(i_msg_,i_errorCode_, ...)  i_PICK_DLOG_ERROR_FUNC_GT(i_msg_,i_errorCode_,RF_NARG(__VA_ARGS__),__VA_ARGS__)
-//! This macro logs an error in detail to the refu error stream and returns the error code from the function it was called from.
-#define DRETURN_LOG_ERROR(i_msg_,i_errorCode_,...)  {DLOG_ERROR(i_msg_,i_errorCode_,__VA_ARGS__) return i_errorCode_; }
-//! This macro logs an error to the refu error stream and jumps to the specified goto label to exit a function
-#define DRETURNGOTO_LOG_ERROR(i_msg_,i_errorCode_,i_retvar,i_label,...)  {DLOG_ERROR(i_msg_,i_errorCode_,__VA_ARGS__) i_retvar=i_errorCode_;goto i_label; }
-
-//This macro picks up the correct error logging function, by taking the number of extra arguments and checking if it is greater than 0
-#define i_PICK_DLOG_ERROR_FUNC_GT(i_msg_,i_errorCode_,i_argN,...) i_PICK_DLOG_ERROR_FUNC(i_msg_,i_errorCode_,RP_GT(i_argN,0),__VA_ARGS__)
-//This macro picks up the correct error logging function, by pasting the results of the greater than comparison together to select the correct macro
-#define i_PICK_DLOG_ERROR_FUNC(i_msg_,i_errorCode_,i_gt0,...) i_RP_PASTE2(i_DLOG_ERROR,i_gt0) (i_msg_,i_errorCode_,__VA_ARGS__)
-
-// Logs an error to the refu standard error stream in detail with varargs
-#define i_DLOG_ERROR1(i_msg_,i_errorCode_, ...)   {fprintf(rfStdErr,i_msg_ "\nLogged At File=%s at line %d inside %s()function\n",__VA_ARGS__,__FILE__, __LINE__,__FUNCTION__ ); RF_LastError = i_errorCode_;fflush(rfStdErr);}
-// Logs an error to the refu standard error stream in detail without varargs
-#define i_DLOG_ERROR0(i_msg_,i_errorCode_, ...)   {fprintf(rfStdErr,i_msg_ "\nLogged At File=%s at line %d inside %s()function\n",__FILE__, __LINE__,__FUNCTION__ );RF_LastError = i_errorCode_; fflush(rfStdErr);}
-
-
-#ifdef REFU_WIN32_VERSION
-//! @brief Gets Windows Last System error
-//!
-//! Gets Windows Last System error and turns it into a char* that later needs to be freed by the user using the @c LocalFree() function
-//! @param i_STRBUFF The String buffer
-#define RF_WIN32_GETSYSERROR(i_STRBUFF) \
-/*The buffer to hold the string*/\
-char* i_STRBUFF;\
-/*The DWORD to hold the error code*/\
-DWORD i_ERROR_CODE = GetLastError();\
-FormatMessage(\
-FORMAT_MESSAGE_ALLOCATE_BUFFER |\
-FORMAT_MESSAGE_FROM_SYSTEM |\
-FORMAT_MESSAGE_IGNORE_INSERTS,\
-NULL,\
-i_ERROR_CODE,\
-MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),\
-(LPTSTR) &i_STRBUFF,\
-0, NULL );
-#endif
-
-
-//! @brief Logs a message in the standard information log
-//! @param i_msg_ A string literal containing the message to be logged in the file. Can contain printf format specifiers which will be translated into values from the variables passed as further parameters to the macro
-//! @param ... This is an optional input. If you have given any printf-style format specifiers in the string literal passes @c i_msg_ then here give the variables from which the value will be taken
-#define LOG_INFO(i_msg_,...)  i_PICK_LOG_INFO_FUNC_GT(i_msg_,RF_NARG(__VA_ARGS__),__VA_ARGS__)
-
-//This macro picks up the correct logging function, by taking the number of extra arguments and checking if it is greater than 0
-#define i_PICK_LOG_INFO_FUNC_GT(i_msg_,i_argN,...) i_PICK_LOG_INFO_FUNC(i_msg_,RP_GT(i_argN,0),__VA_ARGS__)
-//This macro picks up the correct logging function, by pasting the results of the greater than comparison together to select the correct macro
-#define i_PICK_LOG_INFO_FUNC(i_msg_,i_gt0,...) i_RP_PASTE2(i_LOG_INFO,i_gt0) (i_msg_,__VA_ARGS__)
-
-//Logs something to the standard refu log with var_args
-#define i_LOG_INFO1(i_msg_, ...)  {fprintf(rfStdLog,"At \"%s\" >>> "i_msg_"\n",__FUNCTION__,__VA_ARGS__);fflush(rfStdLog);}
-//Logs something to the standard refu log without var_args
-#define i_LOG_INFO0(i_msg_, ...)   {fprintf(rfStdLog,"At \"%s\" >>> "i_msg_"\n",__FUNCTION__);fflush(rfStdLog);}
-
-//! @brief Logs a message in the standard information log with details
-//!
-//! In detail means that it also saves the file and line number it occured
-//! @param i_msg_ A string literal containing the message to be logged in the file. Can contain printf format specifiers which will be translated into values from the variables passed as further parameters to the macro
-//! @param ... This is an optional input. If you have given any printf-style format specifiers in the string literal passes @c i_msg_ then here give the variables from which the value will be taken
-#define DLOG_INFO(i_msg_,...)  i_PICK_DLOG_INFO_FUNC_GT(i_msg_,RF_NARG(__VA_ARGS__),__VA_ARGS__)
-
-//This macro picks up the correct logging function, by taking the number of extra arguments and checking if it is greater than 0
-#define i_PICK_DLOG_INFO_FUNC_GT(i_msg_,i_argN,...) i_PICK_DLOG_INFO_FUNC(i_msg_,RP_GT(i_argN,0),__VA_ARGS__)
-//This macro picks up the correct logging function, by pasting the results of the greater than comparison together to select the correct macro
-#define i_PICK_DLOG_INFO_FUNC(i_msg_,i_gt0,...) i_RP_PASTE2(i_DLOG_INFO,i_gt0) (i_msg_,__VA_ARGS__)
-
-//Logs something in detail to the standard refu log with var_args
-#define i_DLOG_INFO1(i_msg_, ...)   {fprintf(rfStdLog,i_msg_ "\nLogged At File=%s at line %d inside %s()function\n",__VA_ARGS__,__FILE__, __LINE__,__FUNCTION__ ); fflush(rfStdLog);}
-// Logs something in detail to the standard refu log without var_args
-#define i_DLOG_INFO0(i_msg_, ...)   {fprintf(rfStdLog,i_msg_ "\nLogged At File=%s at line %d inside %s()function\n",__FILE__, __LINE__,__FUNCTION__ ); fflush(rfStdLog);}
-
-
-#else// if the library is compiled with no C99 features on
-///In this case the logs differ quite a lot since the function name and file and line can't be logged. So in MSVC's case this is simply reduced to error message logging
-void LOG_ERROR(const char* msg,int32_t errorCode,...);
-void DLOG_ERROR(const char* msg,int32_t errorCode,...);
-void LOG_INFO(const char* msg,...);
-void DLOG_INFO(const char* msg,...);
-#endif
-
-#else //non verbose errors
-    #define LOG_ERROR(i_msg_,i_errorCode_,...)
-    #define RETURN_LOG_ERROR(i_msg_,i_errorCode_,...) return i_errorCode_;
-    #define DLOG_ERROR(i_msg_,i_errorCode_,...)
-    #define RETURN_DLOG_ERROR(i_msg_,i_errorCode_,...) return i_errorCode_;
-    #define LOG_INFO(i_msg_,...)
-    #define DLOG_INFO(i_msg_,...)
-#endif
-
-//! @brief Returns the error code of the last error that occured
-#define RF_GETLASTERROR()  RF_LastError
-//! @brief Returns the standard refu log file descriptor
-#define RF_GET_LOG()      rfStdLog
-//! @brief Returns the standard refu error file descriptor
-#define RF_GET_ERR()      rfStdErr
-
-
-//!@}
-//end of the Doxygen RF_ErrorLoggingGRP group
-
-//Here are some macro wrappers of malloc,calloc and realloc that depending on the flag RF_OPTION_SAFE_MEMORY_ALLOCATION check their return value or not
-
-//for realloc I check no matter what since it's a bit more complicated case than the other twoo
-//! Wrapper macro of the malloc() function that does check for memory allocation failure
-//! @param REALLOC_RETURN_ Give the pointer that you need to realloc here
-//! @param TYPE_ give the type of the pointer here
-//! @param SIZE_ Give the size parameter of realloc here
-#define RF_REALLOC(REALLOC_RETURN_,TYPE_,SIZE_)  { TYPE_* i_TEMPPTR_ = realloc( (REALLOC_RETURN_),(SIZE_));\
-                                                  if(i_TEMPPTR_ == NULL)\
-                                                  {\
-                                                    DLOG_ERROR("realloc() failure",RE_REALLOC_FAILURE);\
-                                                    exit(RE_REALLOC_FAILURE);\
-                                                  }\
-                                                  REALLOC_RETURN_ = i_TEMPPTR_;\
-                                                  }
-
-#ifdef RF_OPTION_SAFE_MEMORY_ALLOCATION
-//! Wrapper macro of the malloc() function that does check for memory allocation failure
-//! @param MALLOC_RETURN_ Give the pointer of that you want to point to malloc's return here
-//! @param MALLOC_SIZE_   Give the size parameter of malloc here
-    #define RF_MALLOC(MALLOC_RETURN_,MALLOC_SIZE_)  { MALLOC_RETURN_ = malloc( (MALLOC_SIZE_) );\
-                                                     if(MALLOC_RETURN_ == NULL)\
-                                                     {\
-                                                        DLOG_ERROR(" malloc() failure",RE_MALLOC_FAILURE);\
-                                                        exit(RE_MALLOC_FAILURE);\
-                                                     } }
-
-//! Wrapper macro of the calloc() function that does check for memory allocation failure
-//! @param CALLOC_RETURN_ Give the pointer of that you want to point to calloc's return here
-//! @param CALLOC_NUM_    Give the number parameter of calloc here
-//! @param MALLOC_SIZE_   Give the size parameter of calloc here
-    #define RF_CALLOC(CALLOC_RETURN_,CALLOC_NUM_,CALLOC_SIZE_)  { CALLOC_RETURN_ = calloc( (CALLOC_NUM_), (CALLOC_SIZE_) );\
-                                                     if(CALLOC_RETURN_ == NULL)\
-                                                     {\
-                                                        DLOG_ERROR(" calloc() failure",RE_CALLOC_FAILURE);\
-                                                        exit(RE_CALLOC_FAILURE);\
-                                                     } }
-
-#else
-//! Wrapper macro of the malloc() function that does NOT check for memory allocation failure
-//! @param MALLOC_RETURN_ Give the pointer of that you want to point to malloc's return here
-//! @param MALLOC_SIZE_   Give the size parameter of malloc here
-    #define RF_MALLOC(MALLOC_RETURN_,MALLOC_SIZE_)  { MALLOC_RETURN_ = malloc( (MALLOC_SIZE_) );}
-
-//! Wrapper macro of the calloc() function that does NOT check for memory allocation failure
-//! @param CALLOC_RETURN_ Give the pointer of that you want to point to calloc's return here
-//! @param CALLOC_NUM_    Give the number parameter of calloc here
-//! @param MALLOC_SIZE_   Give the size parameter of calloc here
-    #define RF_CALLOC(CALLOC_RETURN_,CALLOC_NUM_,CALLOC_SIZE_)  { CALLOC_RETURN_ = calloc( (CALLOC_NUM_), (CALLOC_SIZE_) );}
-#endif
-
-    /** Comparisons with hex values macros. USE THEM. They make sure that a value becomes what you expect it to be, depending on the macro. They simply do a cast for you, nothing more.
-        Main reason they were created is because I wanted the to become practise so that I always do safe comparisons from now on by using them and never simple comparsions**/
-
-
+/* --------------------------------------------- Safe Hex Literal comparisons ------------------------------------------------------- */
 ///chars
 
 //! A convenience macro to allow us to compare easily char bytes with hex values for equality.
@@ -485,18 +283,15 @@ void DLOG_INFO(const char* msg,...);
 
 
 
-//! Flag denoting that any argument is sacceptable
-#define RF_ANY  0
-//! Flag denoting that no value should be changed.
-#define RF_NONE 0
+/* --------------------------------------------- Function Return codes ------------------------------------------------------- */
 // Return codes These should always be considered as 0 for success and negative for some very generic error. More specific error codes are declared for the functiosn they are found in.
-// These error codes should always fit in a char
+// These error codes should always fit in an int32_t
 #define RF_SUCCESS                      0
 #define RF_FAILURE                      -1
 
-//! This macro defines the highest error value used by the refu library.
-//! As a user it is is safe to define errors with values more negative
-//! than this
+// This macro defines the highest error value used by the refu library.
+// As a user it is is safe to define errors with values more negative
+// than this
 #define RF_HIGHEST_ERROR    RE_STRING_INIT_FAILURE
 /// These are the various error codes of the refu library. Should be returned inside an int32_t. They are all guaranteed to be negative while RF_SUCCESS is 0 so in most cases.
 /// Notice that in contrast with almost anything else in the library the error codes start with RE_ for REFU ERROR instead of RF_
@@ -520,6 +315,10 @@ enum {
         RE_INPUT, //When a function has been given illegal input
         RE_INDEX_OUT_OF_BOUNDS, //When a given index for an operation is out of bounds
 
+        /* String Format errors */
+        RE_FORMAT_UNEXPECTEDCHAR, //When during parsing the format string a legal control character is encountered at an unexpected position
+        RE_FORMAT_ILLEGALCHAR,  // Occurs when during parsing the format string an illegal control character is encountered
+        RE_FORMAT_ILLEGALPRECISION, //Occurs if after the precision character '.' an unexpected character is encountered
         /*OS related errors */
         RE_INTERRUPT, //Means that there was an interrupt signal
         RE_INSUFFICIENT_RESOURCES,//Insufficient system resources to perform the operaiton
@@ -637,6 +436,9 @@ enum {
         RE_SOCKET_BIND_PORT,//Error at binding port for listening
         RE_NET_LISTEN,//Error at listening at a specific port
 
+        /* stdio Errors */
+        RE_STDIO_INIT, //Failure to initialize the stdio
+
         /* I/O and File Errors */
         RE_FILE_INIT, //Failure at creating or intiializing a file
         RE_FILE_MODE, //Failure at file creation due to illegal mode given at a function or a mode that does not match the current operation
@@ -699,4 +501,4 @@ enum {
 }///closing bracket for calling from C++
 #endif
 
-#endif
+#endif//include guards end

@@ -16,9 +16,11 @@
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
-
 #include <Data_Formats/rfc_xmltag.h>
-#include <stdlib.h>//for malloc
+
+#include <rf_error.h>
+#include <rf_memory.h>
+
 #include <string.h> //for memmove
 /********************************************************************START OF XML_TAG functions *************************************************************************/
 
@@ -377,10 +379,10 @@ char rfXMLTag_ToStr_internal(RF_XMLTag* t,RF_StringX* strBuff,uint32_t level)
     for(i = 0; i < level; i ++)
         rfStringX_Append(strBuff,RFS_("\t"));
     //create the tag string
-    rfStringX_Append(strBuff,RFS_("<%s",t->name.bytes));
+    rfStringX_Append(strBuff,RFS_("<%S",&t->name));
     for(i = 0; i < t->attributes.size; i ++)
     {
-        rfStringX_Append(strBuff,RFS_(" %s=\"%s\"",((RF_String*)rfListP_Get(&t->attributes,i))->bytes,((RF_String*)rfListP_Get(&t->attribValues,i))->bytes));
+        rfStringX_Append(strBuff,RFS_(" %S=\"%S\"",rfListP_Get(&t->attributes,i),rfListP_Get(&t->attribValues,i)));
     }
     rfStringX_Append(strBuff,RFS_(">\n"));
     //also print the tag's contents(if any)
@@ -388,14 +390,14 @@ char rfXMLTag_ToStr_internal(RF_XMLTag* t,RF_StringX* strBuff,uint32_t level)
     {
         for(i= 0; i< level; i ++)
             rfStringX_Append(strBuff,RFS_("\t"));
-        rfStringX_Append(strBuff,RFS_("%s\n",rfString_Cstr(&t->contents)));
+        rfStringX_Append(strBuff,RFS_("%S\n",&t->contents));
     }
     //recursively call this function for all the children of this tag
     for(i=0;i < t->children.size; i++)
     {
         if(rfXMLTag_ToStr_internal((RF_XMLTag*)rfListP_Get(&t->children,i),strBuff,level+1) == false)
         {
-            LOG_ERROR("Failed to convert tag's \"<%s>\" No. %d child to a String",RE_XML_TOSTR,t->name.bytes,i+1)
+            LOG_ERROR("Failed to convert tag's \"<%S>\" No. %d child to a String",RE_XML_TOSTR,&t->name,i+1)
             return false;
         }
     }
@@ -403,7 +405,7 @@ char rfXMLTag_ToStr_internal(RF_XMLTag* t,RF_StringX* strBuff,uint32_t level)
     //prepend the required number of tabs
     for(i = 0; i < level; i ++)
         rfStringX_Append(strBuff,RFS_("\t"));
-    rfStringX_Append(strBuff,RFS_("</%s>\n",t->name.bytes));
+    rfStringX_Append(strBuff,RFS_("</%S>\n",&t->name));
     //success
     return true;
 }

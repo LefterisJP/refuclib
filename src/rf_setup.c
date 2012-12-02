@@ -21,21 +21,20 @@
 #include <stdio.h>
 #include <time.h> //for time() for random seed
 #include <stdlib.h> //for srand()
-#include "../include/rf_setup.h"
-#include "../include/rf_utils.h" //for detecting endianess
+#include <rf_setup.h>
+#include <rf_utils.h> //for detecting endianess
 
 #ifdef REFU_WIN32_VERSION
     #include <windows.h>
 #endif
 
-//for the local memory stack
-#include <rf_localmem.h>
+#include <rf_localmem.h>//for the local memory stack
+#include <rf_error.h> //for RF_LastError
+#include <rf_stdio.h>
 #include <string.h> //for strcmp
 
 
-int32_t  RF_LastError;
-FILE* rfStdLog;
-FILE* rfStdErr;
+
 
 //Initializes the ReFu library
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
@@ -46,11 +45,13 @@ void i_rfInit(char* errstr,char* logstr,uint64_t lmsSize)
 {
     //initialize last error and open the log files or redirect to the standard stream
     RF_LastError = 0;
+    //initialize the refu stdio
+    rfInitStdio();
+
     if(strcmp(errstr,"stderr") == 0)
         rfStdErr = stderr;
     else if(strcmp(errstr,"stdout")== 0)
         rfStdErr = stdout;
-
     else//just open the given file
     {
         rfStdErr = fopen(errstr,"w");
@@ -106,54 +107,4 @@ void i_rfInit(char* errstr,char* logstr,uint64_t lmsSize)
     rfLMS_Init(&RF_MainLMS,lmsSize);
 }
 
-#ifdef RF_NO_C99 // if the library is compiled with no C99 features on
-///In this case the logs differ quite a lot since the function name and file and line can't be logged. So in MSVC's case this is simply reduced to error message logging
-void LOG_ERROR(const char* msg,int32_t errorCode,...)
-{
-    //get the variable arguments list and print the given formatted message
-    va_list argptr;
-    va_start(argptr, msg);
-    vfprintf(rfStdErr, msg, argptr);
-    va_end(argptr);
-    //close with a newline
-    fprintf(rfStdErr,"\n");
-    fflush(rfStdErr);
-    //remember the set error
-    RF_LastError = errorCode;
-}
-void DLOG_ERROR(const char* msg,int32_t errorCode,...)
-{
-    //get the variable arguments list and print the given formatted message
-    va_list argptr;
-    va_start(argptr, msg);
-    vfprintf(rfStdErr, msg, argptr);
-    va_end(argptr);
-    //close with a newline
-    fprintf(rfStdErr,"\n");
-    fflush(rfStdErr);
-    //remember the set error
-    RF_LastError = errorCode;
-}
-void LOG_INFO(const char* msg,...)
-{
-    //get the variable arguments list and print the given formatted message
-    va_list argptr;
-    va_start(argptr, msg);
-    vfprintf(rfStdErr, msg, argptr);
-    va_end(argptr);
-    //close with a newline
-    fprintf(rfStdErr,"\n");
-    fflush(rfStdErr);
-}
-void DLOG_INFO(const char* msg,...)
-{
-    //get the variable arguments list and print the given formatted message
-    va_list argptr;
-    va_start(argptr, msg);
-    vfprintf(rfStdErr, msg, argptr);
-    va_end(argptr);
-    //close with a newline
-    fprintf(rfStdErr,"\n");
-    fflush(rfStdErr);
-}
-#endif
+

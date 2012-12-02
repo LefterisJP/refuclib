@@ -1,6 +1,10 @@
 #include <Threads/rfc_threadx.h>
-//include the local memory stack
-#include <rf_localmem.h>
+
+#include <rf_localmem.h>//for LMS initialization
+#include <rf_stdio.h>//stdio buffer thread-specific initialization
+
+#include <rf_error.h>
+#include <rf_memory.h>
 
 /***************************************************************************************RF_THREADX FUNCTIONS*****************************************************************/
 
@@ -13,6 +17,8 @@ DWORD WINAPI RF_THREADX_FUNCTION(LPVOID  t)
     //initialize the local memory stack of the thread
     RF_LocalMemoryStack lms;
     rfLMS_Init(&lms,thread->INH_Thread.lmsSize);
+    //initialize the stdio for this thread
+    rfInitStdio();
     //in RF_ThreadX the parameter to the main thread function is a pointer to the thread itself
     ret = (DWORD) thread->INH_Thread.ptr2onExecution(thread);
     //free the local memory stack and return

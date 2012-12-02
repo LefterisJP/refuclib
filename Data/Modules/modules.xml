@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <modules>
 <Core>
-rf_setup.c rf_localmem.c Utils/rf_utils.c
+rf_setup.c rf_localmem.c Utils/rf_utils.c rf_error.c rf_stdio.c Math/rf_math.c Numeric/Integer/conversion.c Numeric/Float/dtoa.c
 </Core>
 <String>
 	<macro>RF_MODULE_STRINGS</macro>
 	<dependencies>IO</dependencies>
-String/string_private.c String/rfc_string.c String/rfc_stringx.c</String>
+String/core.c String/conversion.c String/common.c String/commonp.c String/corex.c String/files.c String/filesx.c String/format.c String/manipulation.c String/manipulationx.c String/retrieval.c String/traversalx.c</String>
 <IO>
 	<macro>RF_MODULE_IO</macro>
 	IO/rf_io.c IO/rf_unicode.c
@@ -16,7 +16,7 @@ String/string_private.c String/rfc_string.c String/rfc_stringx.c</String>
 <Textfile>
 	<macro>RF_MODULE_IO_TEXTFILE</macro>
 	<dependencies>String</dependencies>
-IO/rfc_textfile.c IO/textfile_private.c  
+IO/rfc_textfile.c IO/textfilep.c  
 </Textfile>
 <Data_Structures>
 	<List>
@@ -42,7 +42,7 @@ IO/rfc_textfile.c IO/textfile_private.c
 <Xml>
 	<macro>RF_MODULE_DF_XML</macro>
 	<dependencies>Textfile String List</dependencies>
-Data_Formats/rfc_xml.c Data_Formats/rfc_xmltag.c Data_Formats/xml_private.c
+Data_Formats/rfc_xml.c Data_Formats/rfc_xmltag.c Data_Formats/commonp.c
 </Xml>
 <Threads>
 	<Threads_Simple>

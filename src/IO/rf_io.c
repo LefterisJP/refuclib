@@ -16,15 +16,17 @@
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
-
 #include <rf_io.h>
+#include "io.ph"//for private I/O macros
+
+#include <rf_error.h>
+#include <rf_memory.h>
 
 #include <rf_utils.h>
-#include <stdio.h>
-#include "io_private.h"
-#include <errno.h>
 #include <IO/rf_unicode.h> //for rfUTF8_IsContinuationbyte
-#include <stdlib.h>//for malloc
+
+#include <errno.h>
+#include <stdio.h> // for FILE*
 #include <string.h>//for memcpy e.t.c.
 
 

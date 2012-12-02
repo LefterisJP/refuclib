@@ -17,21 +17,21 @@
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
-
-#include <stdlib.h>//for malloc
-
 #include <Threads/rfc_thread.h>
 
 #include <rf_options.h>
 #ifdef RF_MODULE_THREADX//module check
     #include <Threads/rfc_threadx.h>
 #endif
-#include <rf_utils.h>
 
-//include the local memory stack
-#include <rf_localmem.h>
+#include <rf_error.h>
+#include <rf_memory.h>
 
-//#include <windows.h> //for DWORD
+#include <rf_utils.h> //for RF_BITFLAG_ON()
+#include <rf_localmem.h>//for LMS initialization
+#include <rf_stdio.h>//stdio buffer thread-specific initialization
+
+
 
 //The function that serves as the starting address for a thread in win32
 DWORD WINAPI RF_THREAD_FUNCTION(LPVOID  t)
@@ -42,6 +42,8 @@ DWORD WINAPI RF_THREAD_FUNCTION(LPVOID  t)
     //initialize the local memory stack of the thread
     RF_LocalMemoryStack lms;
     rfLMS_Init(&lms,thread->lmsSize);
+    //initialize the stdio for this thread
+    rfInitStdio();
     //in RF_Thread the parameter to the main thread function is a pointer to the data passed at init
     ret = (DWORD)thread->ptr2onExecution(thread->data);
     //free the local memory stack and return

@@ -16,11 +16,14 @@
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
-
 #include <rf_io.h>
-#include <string.h>
-#include <rf_string.h>
 
+#include <rf_error.h>
+
+#include <String/string_decl.h> //since all we need is the struct members
+#include <rf_localmem.h> //for the local scope macros
+
+#include <string.h> //for strcmp
 //Opens another process as a pipe
 FILE* rfPopen(void* commandP,const char* mode)
 {

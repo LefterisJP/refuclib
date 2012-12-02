@@ -19,7 +19,8 @@
 **  Internal header for textfiles
 **/
 #include <rf_io.h>
-#include "io_private.h"
+#include "io.ph" //for the private io header
+
 
 /// ================ Functions for usage only inside RF_TextFile functions ================= ///
 
@@ -77,7 +78,7 @@ if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (foff_rft)-1)\
 /*if the file mode is writing then reopen in reading mode*/\
 if((i_TEXTFILE_)->mode == RF_FILE_WRITE)\
 {\
-    if( ((i_TEXTFILE_)->f = freopen(((i_TEXTFILE_)->name).bytes,"r"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0)\
+    if( ((i_TEXTFILE_)->f = freopen((i_TEXTFILE_)->name.bytes,"r"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0)\
     {\
         i_TEXTFILE_FOPEN_CHECK(i_TEXTFILE_,"Switching from writing to reading mode at")\
         return  RE_FILE_MODE_CHANGE;\
@@ -115,7 +116,7 @@ if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (foff_rft)-1)\
 /*if the file mode is writing then reopen in reading mode*/\
 if((i_TEXTFILE_)->mode == RF_FILE_WRITE)\
 {\
-    if( ((i_TEXTFILE_)->f = freopen(((i_TEXTFILE_)->name).bytes,"r"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0)\
+    if( ((i_TEXTFILE_)->f = freopen((i_TEXTFILE_)->name.bytes,"r"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0)\
     {\
         i_TEXTFILE_FOPEN_CHECK_GOTO(i_TEXTFILE_,"Switching from writing to reading mode at",i_ERROR_,i_LABEL_)\
         i_ERROR_ = RE_FILE_MODE_CHANGE;\
@@ -154,7 +155,7 @@ if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (foff_rft)-1)\
 /*if the file mode is reading then reopen in writing mode*/\
 if((i_TEXTFILE_)->mode == RF_FILE_READ)\
 {\
-    if( ((i_TEXTFILE_)->f = freopen(((i_TEXTFILE_)->name).bytes,"a"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0)\
+    if( ((i_TEXTFILE_)->f = freopen((i_TEXTFILE_)->name.bytes,"a"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0)\
     {\
         i_TEXTFILE_FOPEN_CHECK(i_TEXTFILE_,"Switching from reading to writing mode at")\
         return  RE_FILE_MODE_CHANGE;\
@@ -191,7 +192,7 @@ if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (foff_rft)-1)\
 /*if the file mode is reading then reopen in writing mode*/\
 if((i_TEXTFILE_)->mode == RF_FILE_READ)\
 {\
-    if( ((i_TEXTFILE_)->f = freopen(((i_TEXTFILE_)->name).bytes,"a"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0)\
+    if( ((i_TEXTFILE_)->f = freopen((i_TEXTFILE_)->name.bytes,"a"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0)\
     {\
         i_TEXTFILE_FOPEN_CHECK_GOTO(i_TEXTFILE_,"Switching from reading to writing mode at",i_ERROR_,i_LABEL_)\
         i_ERROR_ =  RE_FILE_MODE_CHANGE;\
@@ -228,32 +229,32 @@ switch(errno)\
     /*if EOVERFLOW errno is defined*/\
     i_TEXTFILE_FSEEK_CHECK_CASE_EOVERFLOW(i_TEXTFILE_,i_TEXT_) \
     case EAGAIN:\
-        RETURN_LOG_ERROR("While "i_TEXT_" at Text File \"%s\", the file was occupied by another thread and the no block flag was set",RE_FILE_WRITE_BLOCK,((i_TEXTFILE_)->name).bytes)\
+        RETURN_LOG_ERROR("While "i_TEXT_" at Text File \"%S\", the file was occupied by another thread and the no block flag was set",RE_FILE_WRITE_BLOCK,(i_TEXTFILE_)->name)\
     break;\
     case EBADF:\
-        RETURN_LOG_ERROR("While "i_TEXT_" at Text File \"%s\", the file descriptor was found to be corrupt",RE_FILE_BAD,((i_TEXTFILE_)->name).bytes)\
+        RETURN_LOG_ERROR("While "i_TEXT_" at Text File \"%S\", the file descriptor was found to be corrupt",RE_FILE_BAD,(i_TEXTFILE_)->name)\
     break;\
     case EFBIG:\
-        RETURN_LOG_ERROR("While "i_TEXT_" backwards at Text File \"%s\", the file's size exceeded the limit",RE_FILE_TOOBIG,((i_TEXTFILE_)->name).bytes)\
+        RETURN_LOG_ERROR("While "i_TEXT_" backwards at Text File \"%S\", the file's size exceeded the limit",RE_FILE_TOOBIG,(i_TEXTFILE_)->name)\
     break;\
     case EINTR:\
-        RETURN_LOG_ERROR(i_TEXT_"at Text File \"%s\" failed due to a system interrupt",RE_INTERRUPT,((i_TEXTFILE_)->name).bytes)\
+        RETURN_LOG_ERROR(i_TEXT_"at Text File \"%S\" failed due to a system interrupt",RE_INTERRUPT,(i_TEXTFILE_)->name)\
     break;\
     case EIO:\
-        RETURN_LOG_ERROR("While "i_TEXT_" at Text File \"%s\", a physical I/O error was encountered",RE_FILE_IO,((i_TEXTFILE_)->name).bytes)\
+        RETURN_LOG_ERROR("While "i_TEXT_" at Text File \"%S\", a physical I/O error was encountered",RE_FILE_IO,(i_TEXTFILE_)->name)\
     break;\
     case ENOSPC:case ENOMEM:\
-        RETURN_LOG_ERROR(i_TEXT_" at Text File \"%s\" failed due to the device containing the file having no free space",RE_FILE_NOSPACE,((i_TEXTFILE_)->name).bytes)\
+        RETURN_LOG_ERROR(i_TEXT_" at Text File \"%S\" failed due to the device containing the file having no free space",RE_FILE_NOSPACE,(i_TEXTFILE_)->name)\
     break;\
     case ENXIO:\
-        RETURN_LOG_ERROR(i_TEXT_" at Text File \"%s\" failed due to the device being non-existant",RE_FILE_NOTFILE,((i_TEXTFILE_)->name).bytes)\
+        RETURN_LOG_ERROR(i_TEXT_" at Text File \"%S\" failed due to the device being non-existant",RE_FILE_NOTFILE,(i_TEXTFILE_)->name)\
     break;\
     case EPIPE:\
     case ESPIPE:\
-        RETURN_LOG_ERROR(i_TEXT_" at Text File \"%s\" failed due to the file descriptor not being a file and being a Pipe",RE_FILE_NOTFILE,((i_TEXTFILE_)->name).bytes)\
+        RETURN_LOG_ERROR(i_TEXT_" at Text File \"%S\" failed due to the file descriptor not being a file and being a Pipe",RE_FILE_NOTFILE,(i_TEXTFILE_)->name)\
     break;\
     default:\
-        RETURN_LOG_ERROR("There was a generic error when "i_TEXT_" at Text File using fseek() \"%s\"",RE_FILE_GETFILEPOS,((i_TEXTFILE_)->name).bytes)\
+        RETURN_LOG_ERROR("There was a generic error when "i_TEXT_" at Text File using fseek() \"%S\"",RE_FILE_GETFILEPOS,(i_TEXTFILE_)->name)\
     break;\
 }//end of error handling
 
@@ -265,40 +266,40 @@ switch(errno)\
     /*if EOVERFLOW errno is defined*/\
     i_TEXTFILE_FSEEK_CHECK_CASE_EOVERFLOW(i_TEXTFILE_,i_TEXT_) \
     case EAGAIN:\
-        LOG_ERROR("While "i_TEXT_" at Text File \"%s\", the file was occupied by another thread and the no block flag was set",RE_FILE_WRITE_BLOCK,((i_TEXTFILE_)->name).bytes);\
+        LOG_ERROR("While "i_TEXT_" at Text File \"%S\", the file was occupied by another thread and the no block flag was set",RE_FILE_WRITE_BLOCK,(i_TEXTFILE_)->name);\
         i_ERROR_ = RE_FILE_WRITE_BLOCK;\
     break;\
     case EBADF:\
-        LOG_ERROR("While "i_TEXT_" at Text File \"%s\", the file descriptor was found to be corrupt",RE_FILE_BAD,((i_TEXTFILE_)->name).bytes);\
+        LOG_ERROR("While "i_TEXT_" at Text File \"%S\", the file descriptor was found to be corrupt",RE_FILE_BAD,(i_TEXTFILE_)->name);\
         i_ERROR_ = RE_FILE_BAD;\
     break;\
     case EFBIG:\
-        LOG_ERROR("While "i_TEXT_" backwards at Text File \"%s\", the file's size exceeded the limit",RE_FILE_TOOBIG,((i_TEXTFILE_)->name).bytes);\
+        LOG_ERROR("While "i_TEXT_" backwards at Text File \"%S\", the file's size exceeded the limit",RE_FILE_TOOBIG,(i_TEXTFILE_)->name);\
         i_ERROR_ = RE_FILE_TOOBIG;\
     break;\
     case EINTR:\
-        LOG_ERROR(i_TEXT_"at Text File \"%s\" failed due to a system interrupt",RE_INTERRUPT,((i_TEXTFILE_)->name).bytes);\
+        LOG_ERROR(i_TEXT_"at Text File \"%S\" failed due to a system interrupt",RE_INTERRUPT,(i_TEXTFILE_)->name);\
         i_ERROR_ = RE_INTERRUPT;\
     break;\
     case EIO:\
-        LOG_ERROR("While "i_TEXT_" at Text File \"%s\", a physical I/O error was encountered",RE_FILE_IO,((i_TEXTFILE_)->name).bytes);\
+        LOG_ERROR("While "i_TEXT_" at Text File \"%S\", a physical I/O error was encountered",RE_FILE_IO,(i_TEXTFILE_)->name);\
         i_ERROR_ = RE_FILE_IO;\
     break;\
     case ENOSPC:case ENOMEM:\
-        LOG_ERROR(i_TEXT_" at Text File \"%s\" failed due to the device containing the file having no free space",RE_FILE_NOSPACE,((i_TEXTFILE_)->name).bytes);\
+        LOG_ERROR(i_TEXT_" at Text File \"%S\" failed due to the device containing the file having no free space",RE_FILE_NOSPACE,(i_TEXTFILE_)->name);\
         i_ERROR_ = RE_FILE_NOSPACE;\
     break;\
     case ENXIO:\
-        LOG_ERROR(i_TEXT_" at Text File \"%s\" failed due to the device being non-existant",RE_FILE_NOTFILE,((i_TEXTFILE_)->name).bytes);\
+        LOG_ERROR(i_TEXT_" at Text File \"%S\" failed due to the device being non-existant",RE_FILE_NOTFILE,(i_TEXTFILE_)->name);\
         i_ERROR_ = RE_FILE_NOTFILE;\
     break;\
     case EPIPE:\
     case ESPIPE:\
-        LOG_ERROR(i_TEXT_" at Text File \"%s\" failed due to the file descriptor not being a file and being a Pipe",RE_FILE_NOTFILE,((i_TEXTFILE_)->name).bytes);\
+        LOG_ERROR(i_TEXT_" at Text File \"%S\" failed due to the file descriptor not being a file and being a Pipe",RE_FILE_NOTFILE,(i_TEXTFILE_)->name);\
         i_ERROR_ = RE_FILE_NOTFILE;\
     break;\
     default:\
-        LOG_ERROR("There was a generic error when "i_TEXT_" at Text File using fseek() \"%s\"",RE_FILE_GETFILEPOS,((i_TEXTFILE_)->name).bytes);\
+        LOG_ERROR("There was a generic error when "i_TEXT_" at Text File using fseek() \"%S\"",RE_FILE_GETFILEPOS,(i_TEXTFILE_)->name);\
         i_ERROR_ = RE_FILE_GETFILEPOS;\
     break;\
 }\
@@ -311,34 +312,34 @@ switch(errno)\
 {\
     case EACCES:\
     case EROFS:\
-        RETURN_LOG_ERROR(i_TEXT_" textfile \"%s\" failed due to either the file or some part of its path having permissions that do not allow the application to process it in\
-                  the requested mode",RE_FILE_PERMISSION,((i_TEXTFILE_)->name).bytes)\
+        RETURN_LOG_ERROR(i_TEXT_" textfile \"%S\" failed due to either the file or some part of its path having permissions that do not allow the application to process it in\
+                  the requested mode",RE_FILE_PERMISSION,(i_TEXTFILE_)->name)\
     break;\
     case EINTR:\
-        RETURN_LOG_ERROR(i_TEXT_" texfile \"%s\" failed due to an interrupt signal",RE_INTERRUPT,((i_TEXTFILE_)->name).bytes)\
+        RETURN_LOG_ERROR(i_TEXT_" texfile \"%S\" failed due to an interrupt signal",RE_INTERRUPT,(i_TEXTFILE_)->name)\
     break;\
     case EISDIR:\
     case ENOENT:\
     case ENOTDIR:\
     case ENXIO:\
-        RETURN_LOG_ERROR(i_TEXT_" texfile \"%s\" failed due to the given name not belonging to a file.",RE_FILE_NOTFILE,((i_TEXTFILE_)->name).bytes)\
+        RETURN_LOG_ERROR(i_TEXT_" texfile \"%S\" failed due to the given name not belonging to a file.",RE_FILE_NOTFILE,(i_TEXTFILE_)->name)\
     break;\
     case EMFILE:\
     case ENFILE:\
-        RETURN_LOG_ERROR(i_TEXT_" texfile \"%s\" failed due to the process having reached the maximum number of open files/file descriptors allowed by the system",RE_FILE_MAXFILES,((i_TEXTFILE_)->name).bytes)\
+        RETURN_LOG_ERROR(i_TEXT_" texfile \"%S\" failed due to the process having reached the maximum number of open files/file descriptors allowed by the system",RE_FILE_MAXFILES,(i_TEXTFILE_)->name)\
     break;\
     case ENAMETOOLONG:\
-        RETURN_LOG_ERROR(i_TEXT_" texfile \"%s\" failed due to the the name of or the directory's path exceeding the system limits",RE_FILE_NAMELENGTH,((i_TEXTFILE_)->name).bytes)\
+        RETURN_LOG_ERROR(i_TEXT_" texfile \"%S\" failed due to the the name of or the directory's path exceeding the system limits",RE_FILE_NAMELENGTH,(i_TEXTFILE_)->name)\
     break;\
     case ENOSPC:\
     case ENOMEM:\
-        RETURN_LOG_ERROR(i_TEXT_" \"%s\" failed due to insufficient space for creating the file in the directory",RE_FILE_NOSPACE,((i_TEXTFILE_)->name).bytes)\
+        RETURN_LOG_ERROR(i_TEXT_" \"%S\" failed due to insufficient space for creating the file in the directory",RE_FILE_NOSPACE,(i_TEXTFILE_)->name)\
     break;\
     case RE_FILE_TOOBIG:\
-        RETURN_LOG_ERROR(i_TEXT_" \"%s\" failed due its size exceeding the maximu size of a file that can be handled",RE_FILE_TOOBIG,((i_TEXTFILE_)->name).bytes)\
+        RETURN_LOG_ERROR(i_TEXT_" \"%S\" failed due its size exceeding the maximu size of a file that can be handled",RE_FILE_TOOBIG,(i_TEXTFILE_)->name)\
     break;\
     default:\
-        LOG_ERROR(i_TEXT_" of texfile \"%s\" failed",RE_FILE_INIT,((i_TEXTFILE_)->name).bytes);\
+        LOG_ERROR(i_TEXT_" of texfile \"%S\" failed",RE_FILE_INIT,(i_TEXTFILE_)->name);\
         return RF_FAILURE;\
     break;\
 }
@@ -350,41 +351,41 @@ switch(errno)\
 {\
     case EACCES:\
     case EROFS:\
-        LOG_ERROR(i_TEXT_" textfile \"%s\" failed due to either the file or some part of its path having permissions that do not allow the application to process it in\
-                  the requested mode",RE_FILE_PERMISSION,((i_TEXTFILE_)->name).bytes);\
+        LOG_ERROR(i_TEXT_" textfile \"%S\" failed due to either the file or some part of its path having permissions that do not allow the application to process it in\
+                  the requested mode",RE_FILE_PERMISSION,(i_TEXTFILE_)->name);\
         i_ERROR_ = RE_FILE_PERMISSION;\
     break;\
     case EINTR:\
-        LOG_ERROR(i_TEXT_" texfile \"%s\" failed due to an interrupt signal",RE_INTERRUPT,((i_TEXTFILE_)->name).bytes);\
+        LOG_ERROR(i_TEXT_" texfile \"%S\" failed due to an interrupt signal",RE_INTERRUPT,(i_TEXTFILE_)->name);\
         i_ERROR_ = RE_FILE_NOTFILE;\
     break;\
     case EISDIR:\
     case ENOENT:\
     case ENOTDIR:\
     case ENXIO:\
-        LOG_ERROR(i_TEXT_" texfile \"%s\" failed due to the given name not belonging to a file.",RE_FILE_NOTFILE,((i_TEXTFILE_)->name).bytes);\
+        LOG_ERROR(i_TEXT_" texfile \"%S\" failed due to the given name not belonging to a file.",RE_FILE_NOTFILE,(i_TEXTFILE_)->name);\
         i_ERROR_ = RE_FILE_NOTFILE;\
     break;\
     case EMFILE:\
     case ENFILE:\
-        LOG_ERROR(i_TEXT_" texfile \"%s\" failed due to the process having reached the maximum number of open files/file descriptors allowed by the system",RE_FILE_MAXFILES,((i_TEXTFILE_)->name).bytes);\
+        LOG_ERROR(i_TEXT_" texfile \"%S\" failed due to the process having reached the maximum number of open files/file descriptors allowed by the system",RE_FILE_MAXFILES,(i_TEXTFILE_)->name);\
         i_ERROR_ = RE_FILE_MAXFILES;\
     break;\
     case ENAMETOOLONG:\
-        LOG_ERROR(i_TEXT_" texfile \"%s\" failed due to the the name of or the directory's path exceeding the system limits",RE_FILE_NAMELENGTH,((i_TEXTFILE_)->name).bytes);\
+        LOG_ERROR(i_TEXT_" texfile \"%S\" failed due to the the name of or the directory's path exceeding the system limits",RE_FILE_NAMELENGTH,(i_TEXTFILE_)->name);\
         i_ERROR_ = RE_FILE_NAMELENGTH;\
     break;\
     case ENOSPC:\
     case ENOMEM:\
-        LOG_ERROR(i_TEXT_" \"%s\" failed due to insufficient space for creating the file in the directory",RE_FILE_NOSPACE,((i_TEXTFILE_)->name).bytes);\
+        LOG_ERROR(i_TEXT_" \"%S\" failed due to insufficient space for creating the file in the directory",RE_FILE_NOSPACE,(i_TEXTFILE_)->name);\
         i_ERROR_ = RE_FILE_NOSPACE;\
     break;\
     case RE_FILE_TOOBIG:\
-        LOG_ERROR(i_TEXT_" \"%s\" failed due its size exceeding the maximu size of a file that can be handled",RE_FILE_TOOBIG,((i_TEXTFILE_)->name).bytes);\
+        LOG_ERROR(i_TEXT_" \"%S\" failed due its size exceeding the maximu size of a file that can be handled",RE_FILE_TOOBIG,(i_TEXTFILE_)->name);\
         i_ERROR_ = RE_FILE_TOOBIG;\
     break;\
     default:\
-        LOG_ERROR(i_TEXT_" of texfile \"%s\" failed",RE_FILE_INIT,((i_TEXTFILE_)->name).bytes);\
+        LOG_ERROR(i_TEXT_" of texfile \"%S\" failed",RE_FILE_INIT,(i_TEXTFILE_)->name);\
         i_ERROR_ = RF_FAILURE;\
     break;\
 }\
@@ -398,29 +399,29 @@ if(ferror((i_TEXTFILE_)->f) != 0){\
     switch(errno)\
     {\
         case EAGAIN:\
-            RETURN_LOG_ERROR("While "i_TEXT_" to Text File \"%s\", the write failed because the file was occupied by another thread and the no block flag was set",RE_FILE_WRITE_BLOCK,(i_TEXTFILE_)->name.bytes)\
+            RETURN_LOG_ERROR("While "i_TEXT_" to Text File \"%S\", the write failed because the file was occupied by another thread and the no block flag was set",RE_FILE_WRITE_BLOCK,(i_TEXTFILE_)->name)\
         break;\
         case EBADF:\
-            RETURN_LOG_ERROR("While "i_TEXT_" to Text File \"%s\", the file descriptor was found to be corrupt",RE_FILE_BAD,(i_TEXTFILE_)->name.bytes)\
+            RETURN_LOG_ERROR("While "i_TEXT_" to Text File \"%S\", the file descriptor was found to be corrupt",RE_FILE_BAD,(i_TEXTFILE_)->name)\
         break;\
         case EFBIG:\
-            RETURN_LOG_ERROR("While "i_TEXT_" to Text File \"%s\", the file's size exceeded the limit",RE_FILE_TOOBIG,(i_TEXTFILE_)->name.bytes)\
+            RETURN_LOG_ERROR("While "i_TEXT_" to Text File \"%S\", the file's size exceeded the limit",RE_FILE_TOOBIG,(i_TEXTFILE_)->name)\
         break;\
         case EINTR:\
-            RETURN_LOG_ERROR(i_TEXT_" to Text File \"%s\" failed due to a system interrupt",RE_INTERRUPT,(i_TEXTFILE_)->name.bytes)\
+            RETURN_LOG_ERROR(i_TEXT_" to Text File \"%S\" failed due to a system interrupt",RE_INTERRUPT,(i_TEXTFILE_)->name)\
         break;\
         case EIO:\
-            RETURN_LOG_ERROR("While "i_TEXT_" to Text File \"%s\", a physical I/O error was encountered",RE_FILE_IO,(i_TEXTFILE_)->name.bytes)\
+            RETURN_LOG_ERROR("While "i_TEXT_" to Text File \"%S\", a physical I/O error was encountered",RE_FILE_IO,(i_TEXTFILE_)->name)\
         break;\
         case ENOSPC:\
         case ENOMEM:\
-            RETURN_LOG_ERROR(i_TEXT_"to Text File \"%s\" failed due to the device containing the file having no free space",RE_FILE_NOSPACE,(i_TEXTFILE_)->name.bytes)\
+            RETURN_LOG_ERROR(i_TEXT_"to Text File \"%S\" failed due to the device containing the file having no free space",RE_FILE_NOSPACE,(i_TEXTFILE_)->name)\
         break;\
         case ENXIO:\
-            RETURN_LOG_ERROR(i_TEXT_" to Text File \"%s\" failed due to the device being non-existant",RE_FILE_NOTFILE,(i_TEXTFILE_)->name.bytes)\
+            RETURN_LOG_ERROR(i_TEXT_" to Text File \"%S\" failed due to the device being non-existant",RE_FILE_NOTFILE,(i_TEXTFILE_)->name)\
         break;\
         default:\
-            RETURN_LOG_ERROR("There was a generic write error when "i_TEXT_" to Text File \"%s\"",RE_FILE_WRITE,(i_TEXTFILE_)->name.bytes)\
+            RETURN_LOG_ERROR("There was a generic write error when "i_TEXT_" to Text File \"%S\"",RE_FILE_WRITE,(i_TEXTFILE_)->name)\
         break;\
     }}\
 
@@ -431,36 +432,36 @@ if(ferror((i_TEXTFILE_)->f) != 0){\
     switch(errno)\
     {\
         case EAGAIN:\
-            LOG_ERROR("While "i_TEXT_" to Text File \"%s\", the write failed because the file was occupied by another thread and the no block flag was set",RE_FILE_WRITE_BLOCK,(i_TEXTFILE_)->name.bytes)\
+            LOG_ERROR("While "i_TEXT_" to Text File \"%S\", the write failed because the file was occupied by another thread and the no block flag was set",RE_FILE_WRITE_BLOCK,(i_TEXTFILE_)->name)\
             i_ERROR_ = RE_FILE_WRITE_BLOCK;\
         break;\
         case EBADF:\
-            LOG_ERROR("While "i_TEXT_" to Text File \"%s\", the file descriptor was found to be corrupt",RE_FILE_BAD,(i_TEXTFILE_)->name.bytes)\
+            LOG_ERROR("While "i_TEXT_" to Text File \"%S\", the file descriptor was found to be corrupt",RE_FILE_BAD,(i_TEXTFILE_)->name)\
             i_ERROR_ = RE_FILE_BAD;\
         break;\
         case EFBIG:\
-            LOG_ERROR("While "i_TEXT_" to Text File \"%s\", the file's size exceeded the limit",RE_FILE_TOOBIG,(i_TEXTFILE_)->name.bytes)\
+            LOG_ERROR("While "i_TEXT_" to Text File \"%S\", the file's size exceeded the limit",RE_FILE_TOOBIG,(i_TEXTFILE_)->name)\
             i_ERROR_ = RE_FILE_TOOBIG;\
         break;\
         case EINTR:\
-            LOG_ERROR(i_TEXT_" to Text File \"%s\" failed due to a system interrupt",RE_INTERRUPT,(i_TEXTFILE_)->name.bytes)\
+            LOG_ERROR(i_TEXT_" to Text File \"%S\" failed due to a system interrupt",RE_INTERRUPT,(i_TEXTFILE_)->name)\
             i_ERROR_ = RE_INTERRUPT;\
         break;\
         case EIO:\
-            LOG_ERROR("While "i_TEXT_" to Text File \"%s\", a physical I/O error was encountered",RE_FILE_IO,(i_TEXTFILE_)->name.bytes)\
+            LOG_ERROR("While "i_TEXT_" to Text File \"%S\", a physical I/O error was encountered",RE_FILE_IO,(i_TEXTFILE_)->name)\
             i_ERROR_ = RE_FILE_IO;\
         break;\
         case ENOSPC:\
         case ENOMEM:\
-            LOG_ERROR(i_TEXT_"to Text File \"%s\" failed due to the device containing the file having no free space",RE_FILE_NOSPACE,(i_TEXTFILE_)->name.bytes)\
+            LOG_ERROR(i_TEXT_"to Text File \"%S\" failed due to the device containing the file having no free space",RE_FILE_NOSPACE,(i_TEXTFILE_)->name)\
             i_ERROR_ = RE_FILE_NOSPACE;\
         break;\
         case ENXIO:\
-            LOG_ERROR(i_TEXT_" to Text File \"%s\" failed due to the device being non-existant",RE_FILE_NOTFILE,(i_TEXTFILE_)->name.bytes)\
+            LOG_ERROR(i_TEXT_" to Text File \"%S\" failed due to the device being non-existant",RE_FILE_NOTFILE,(i_TEXTFILE_)->name)\
             i_ERROR_ = RE_FILE_NOTFILE;\
         break;\
         default:\
-            LOG_ERROR("There was a generic write error when "i_TEXT_" to Text File \"%s\"",RE_FILE_WRITE,(i_TEXTFILE_)->name.bytes)\
+            LOG_ERROR("There was a generic write error when "i_TEXT_" to Text File \"%S\"",RE_FILE_WRITE,(i_TEXTFILE_)->name)\
             i_ERROR_ = RE_FILE_WRITE;\
         break;\
     }\
