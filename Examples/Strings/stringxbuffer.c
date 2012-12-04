@@ -1,7 +1,8 @@
-#include <rf_string.h>
+#include <RFstring.h>
+#include <rf_stdio.h>
 //! [STRINGS]
 //These are some strings, used for the purpose of the example. Suppose they came by reading an external file
-const char* strings[] =
+static const char* strings[] =
 {
     "One string",
     "Another String",
@@ -18,16 +19,16 @@ char parseLine(RF_StringX* str,uint32_t line)
     //read in the string from the "file" and put that along with its line into the given StringX
     rfStringX_Assign(str,RFS_("\"%s\" line %u", strings[line],line));
 	//print the parsed string
-	printf("%s\n",rfString_ToCstr(str);
+	rfPrintf("%S\n",str);
 }
 //! [PARSE_LINE]
 //! [PARSE_LINE_BAD]
 char parseLine(RF_String* str,uint32_t line)
 {
     //read in the string from the "file" and initialize a new String with its content and the added line
-	rfString_Init(str,RFS_("\"%s\" line %u", strings[line],line));
+	rfString_Init(str,"\"%s\" line %u", strings[line],line);
 	//print the parsed string
-	printf("%s\n",rfString_ToCstr(str);
+	rfPrintf("%S\n",str);
 	//gotta deinit or else memory leak will happen
 	rfString_Deinit(str);//deallocation
 }

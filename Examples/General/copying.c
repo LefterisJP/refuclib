@@ -1,4 +1,4 @@
-#include <rf_string.h>
+#include <RFstring.h>
 int main()
 {
     RF_String s1,*s2,s3;

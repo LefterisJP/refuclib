@@ -38,6 +38,13 @@
 #include <rf_setup.h>
 #include <String/string_decl.h>
 
+#ifdef __cplusplus
+extern "C"
+{///opening bracket for calling from C++
+#endif
+
+
+
 //! @memberof RF_String
 //! @brief Create a termporary String from a String literal
 //!
@@ -83,6 +90,11 @@ i_DECLIMEX_ RF_String* i_NVrfString_CreateLocal(const char* s);
 #define i_rfString_CreateLocal(...)  RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATELOCAL,1,__VA_ARGS__)
 #define i_SELECT_RF_STRING_CREATELOCAL1(...) i_NVrfString_CreateLocal(__VA_ARGS__)
 #define i_SELECT_RF_STRING_CREATELOCAL0(...) i_rfString_CreateLocal1(__VA_ARGS__)
+
+
+#ifdef __cplusplus
+}//closing bracket for calling from C++
+#endif
 
 
 #endif//include guards end

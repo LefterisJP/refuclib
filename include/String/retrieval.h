@@ -419,10 +419,7 @@ i_DECLIMEX_ char i_rfString_After(const void* thisstr,const void* after,void* re
 i_DECLIMEX_ char rfString_Afterv(const void* thisstr,void* result,const char options,const unsigned char parN,...);
 
 
-
 //! @}
-
-
 
 #ifdef __cplusplus
 }///closing bracket for calling from C++

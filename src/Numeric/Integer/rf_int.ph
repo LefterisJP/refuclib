@@ -44,7 +44,14 @@ i_INLINE_DECL int intToStr(int64_t i,char* buff)
     int64_t num = i;
     char hasSign=0;
     int j = 0,k=0;
-    if(i<0)
+    //zero is a special case
+    if(i == 0)
+    {
+        buff[0] = '0';
+        buff[1] = '\0';
+        return 1;
+    }
+    else if(i<0)
     {
         num*=-1;
         buff[0] = '-';
@@ -71,6 +78,13 @@ i_INLINE_DECL int uintToStr(uint64_t i,char* buff)
 {
     uint64_t num = i;
     int j = 0,k=0;
+    //zero is a special case
+    if(i == 0)
+    {
+        buff[0] = '0';
+        buff[1] = '\0';
+        return 1;
+    }
     //turn the string into a number
     while(num != 0)
     {

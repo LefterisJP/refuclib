@@ -20,11 +20,21 @@
 #define RF_STDIO_H
 
 #include <rf_setup.h> //for i_DECLIMEX_
-
 #include <stdio.h> //for FILE*
+
+#ifdef __cplusplus
+extern "C"
+{///opening bracket for calling from C++
+#endif
 
 //! Initializes the stdio buffer that is needed by all Refu stdio functions
 char rfInitStdio();
+
+/**
+** @defgroup RF_stdioGRP stdio
+** @addtogroup RF_stdioGRP
+** @{
+**/
 
 //! @brief Prints a formatted string to the stdout
 //!
@@ -41,8 +51,14 @@ i_DECLIMEX_ int rfPrintf(const char * format, ...);
 //! @param f The file descriptor into which to output the formatted string
 //! @param format The formatted string to print
 //! @param ... Extra arguments to output to the string
-//! @return The number of @c bytes written to the @c
+//! @return The number of @c bytes written to @c f
 i_DECLIMEX_ int rfFPrintf(FILE* f,const char * format, ...);
 
+//!@}
+//end of the Doxygen RF_stdioGRP group
 
+#ifdef __cplusplus
+}///closing bracket for calling from C++
 #endif
+
+#endif//include guards end

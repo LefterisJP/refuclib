@@ -1,5 +1,5 @@
-#include <rf_string.h>
-
+#include <RFstring.h>
+#include <rf_stdio.h>
 int main()
 {	
 	RF_String s1,s2;
@@ -14,6 +14,6 @@ int main()
 	//appending a string literal to another string
 	rfString_Append(&s1,RFS_("and finally I am the %drd",3));
 	//printf it to the stdout
-	printf("%s",rfString_Cstr(&s1));
+	rfPrintf("%S",&s1);
 	return 0;
 }

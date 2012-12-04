@@ -29,10 +29,6 @@ extern "C"
 #endif
 
 
-#ifdef __cplusplus
-}///closing bracket for calling from C++
-#endif
-
 /*-------------------------------------------------------------------------Methods to create an RF_StringX-------------------------------------------------------------------------------*/
 //! @name RF_StringX Creation
 //! @{
@@ -444,5 +440,9 @@ i_DECLIMEX_ void rfStringX_Destroy(RF_StringX* s);
 i_DECLIMEX_ void rfStringX_Deinit(RF_StringX* s);
 
 //! @}
+
+#ifdef __cplusplus
+}///closing bracket for calling from C++
+#endif
 
 #endif//include guards end

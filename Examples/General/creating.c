@@ -1,4 +1,4 @@
-#include <rf_string.h>
+#include <RFstring.h>
 #include <Data_Structures/rfc_list.h>
 //! [LIB_INIT]
 int main()
