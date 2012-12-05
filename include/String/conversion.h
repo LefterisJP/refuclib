@@ -20,7 +20,6 @@
 #define RF_STRING_CONVERSION_H
 
 
-#include <rf_setup.h> //for the macro flags
 #include <String/string_decl.h>
 
 #ifdef __cplusplus

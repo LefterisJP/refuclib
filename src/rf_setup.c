@@ -18,8 +18,6 @@
 **/
 
 
-#include <stdio.h>
-#include <time.h> //for time() for random seed
 #include <stdlib.h> //for srand()
 #include <rf_setup.h>
 #include <rf_utils.h> //for detecting endianess

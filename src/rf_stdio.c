@@ -4,7 +4,6 @@
 #include <String/rf_stringx.h>
 #include <String/format.h>
 #include <String/files.h> //for rfString_Fwrite()
-#include <String/common.h> //for RFS_()
 
 #include <IO/rf_unicode.h> //for the unicode macros
 

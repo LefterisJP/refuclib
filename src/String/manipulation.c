@@ -11,8 +11,6 @@
 #include <rf_localmem.h> //for local memory stack
 #include <IO/rf_unicode.h> //for unicode functions
 
-#include <string.h> //for some c stdlib string functions
-
 /*------------------------------------------------------------------------ RF_String manipulation functions-------------------------------------------------------------------------------*/
 
 

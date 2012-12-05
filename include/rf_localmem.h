@@ -21,7 +21,6 @@
 
 
 #include <rf_setup.h>
-#include <Preprocessor/rf_xmacro_argcount.h>
 
 #include <limits.h> //for ULONG_MAX
 #include <string.h> //for size_t

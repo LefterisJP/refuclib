@@ -1,7 +1,5 @@
 #include <String/common.h>
 
-#include <String/string_decl.h> //for the string declaration
-
 #include <rf_error.h>
 
 #include <IO/rf_unicode.h> //for rfUTF8_VerifySequence()

@@ -1,18 +1,14 @@
 #include <String/retrieval.h>
 
 #include <String/core.h> //for rfString_Deinit(), rfString_BytePosToCharPos() and others
-#include <String/common.h> //for some common string macro definition
 #include "common.ph" //for required string private macros and functions
 #include <String/rf_stringx.h>
 
-#include <IO/rf_unicode.h> //for rfUTF8_IsContinuationByte()
 #include <rf_utils.h> //for RF_BITFLAG_ON
 #include <rf_localmem.h> //for local scope macros
 
 #include <rf_memory.h>
 
-#include <stdarg.h>
-#include <string.h> //for some c std lib string functions
 /*------------------------------------------------------------------------ RF_String accessor functions-------------------------------------------------------------------------------*/
 
 // Finds the length of the string in characters

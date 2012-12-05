@@ -21,7 +21,6 @@
 */
 #include "common.ph"
 
-#include <String/string_decl.h>
 #include <String/common.h>
 
 #include <rf_utils.h> //for RF_BITFLAG_ON() macro

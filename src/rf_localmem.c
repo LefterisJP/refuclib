@@ -18,13 +18,8 @@
 **/
 #include <rf_localmem.h>
 
-#include <rf_setup.h>
 #include <rf_memory.h>
 #include <rf_error.h>
-
-#include <stdlib.h>//for exit()
-#include <string.h>//for memset()
-#include <limits.h>//for some variable type value limits
 
 //define The main thread's local stack memory
 RF_LocalMemoryStack RF_MainLMS;

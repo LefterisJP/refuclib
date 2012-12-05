@@ -19,8 +19,6 @@
 #ifndef RF_STRING_MANIPULATIONX_H
 #define RF_STRING_MANIPULATIONX_H
 
-
-#include <rf_setup.h> //for the macro flags
 #include <String/stringx_decl.h>
 
 #ifdef __cplusplus

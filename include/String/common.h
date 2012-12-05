@@ -35,7 +35,6 @@
 #define RF_FORMATFLAG_PADZEROES  0x10
 #define RF_FORMATFLAG_UPPER      0x20
 
-#include <rf_setup.h>
 #include <String/string_decl.h>
 
 #ifdef __cplusplus

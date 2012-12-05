@@ -12,7 +12,7 @@
 #include <rf_memory.h>
 
 #include <stdarg.h> //for the va_ macros
-#include <string.h> //for memset(),memcpy() and others
+
 
 
 /*-------------------------------------------------------------------------Functions to traverse an RF_StringX-------------------------------------------------------------------------------*/

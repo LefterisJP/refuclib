@@ -8,15 +8,12 @@
 #include <rf_memory.h>
 
 #include <rf_localmem.h>//for local scope macros
-#include <IO/rf_unicode.h> //for unicode macros
-#include <rf_io.h> //for rfReadLine family of functions
 #include <rf_utils.h> //for Endianess swapping functions
 //! @todo I don't like the connection with the src/ of io.ph ... figure out a better way
 //for i_WRITE_CHECK() macro
 #include "../IO/io.ph"
 
 #include <errno.h> //needed for the same macro as above
-#include <string.h> //for memset()
 
 /*------------------------------------------------------------------------ RF_String File I/O functions-------------------------------------------------------------------------------*/
 

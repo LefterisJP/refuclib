@@ -7,11 +7,8 @@
 #include <rf_error.h>
 #include <rf_memory.h>
 
-#include <IO/rf_unicode.h> //for the rfReadLine family of functions
 #include <rf_localmem.h> //for the local memory scope macros
-#include <rf_io.h> //for the rfReadLine family of functions
 
-#include <string.h> //for some stdlib c string functions and memcpy()
 /*------------------------------------------------------------------------- File I/O RF_StringX Functions -------------------------------------------------------------------------------*/
 
 //Allocates and returns an extended string from file parsing. The file's encoding must be UTF-8.If for some reason (like EOF reached) no string can be read then null is returned

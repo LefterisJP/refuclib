@@ -20,13 +20,11 @@
 #define RF_STRING_FILES_H
 
 
-#include <rf_setup.h> //for the macro flags
 #include <String/string_decl.h>
 
 #include <rf_io.h> //for RF_EOL macros
 #include <IO/rf_unicode.h> //for the unicode macros RF_UTF8 and friends
 
-#include <stdio.h> //for FILE*
 
 #ifdef __cplusplus
 extern "C"

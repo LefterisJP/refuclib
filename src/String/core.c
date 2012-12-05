@@ -7,8 +7,6 @@
 #include <rf_localmem.h>//for local stack pushing
 #include "../stdio.ph" //for the ioBuffer RF_StringX
 
-#include <stdlib.h> //free,malloc, memcpy e.t.c.
-
 #include <rf_error.h>
 #include <rf_memory.h>
 /*-------------------------------------------------------------------------Methods to create an RF_String-------------------------------------------------------------------------------*/

@@ -7,8 +7,6 @@
 #include <rf_error.h>
 
 #include <rf_localmem.h> //for local scope macros
-#include <limits.h> //for INT_MAX and others
-
 
 
 //the specifiers that can appear in a format string

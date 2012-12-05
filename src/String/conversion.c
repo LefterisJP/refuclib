@@ -10,8 +10,6 @@
 
 #include <rf_memory.h>
 
-#include <string.h> //for some c stdlib string functions
-#include <stdlib.h> //for some conversion functions like strtod()
 #include <errno.h> //for errno
 #include <math.h> //for HUGE_VAL
 

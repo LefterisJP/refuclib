@@ -19,14 +19,7 @@
 #ifndef RF_ERROR_H
 #define RF_ERROR_H
 
-#include <rf_options.h> //check whether we got verbose or not
 #include <rf_stdio.h> //for rfFpintf() used in the error logging macros
-
-//both the includes below are used in the LOG_ERROR variadic macros
-#include "Preprocessor/rf_xmacro_argcount.h" //for RF_NARG argument count macro
-#include "Preprocessor/rf_xmacro_gt.h"    //for the greater than macro token comparison
-
-
 
 /**
 ** @defgroup RF_ErrorLoggingGRP Error Logging

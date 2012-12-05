@@ -82,7 +82,7 @@
 //! @param sign If the sign of the result is negative, the integer pointed to by sign shall be non-zero; otherwise, it shall be 0.
 //! @param rve If not null, *rve is set to point to the end of the return value
 //! @return A null terminated string containing the digits of @c d. No memory is allocated, unless it is a pathological case.
-char* dtoa(double d, int mode, int ndigits,int *decpt, int *sign, char **rve);
+char* doubleToStr(double d, int mode, int ndigits,int *decpt, int *sign, char **rve);
 
 
 

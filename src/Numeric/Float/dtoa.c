@@ -527,8 +527,8 @@ BCinfo { int dp0, dp1, dplen, dsign, e0, inexact, nd, nd0, rounding, scale, uflc
 #define Kmax 7
 
 #ifdef __cplusplus
-extern "C" double strtod(const char *s00, char **se);
-extern "C" char *dtoa(double d, int mode, int ndigits,
+extern "C" double strToDouble(const char *s00, char **se);     //-EDIT- changed the names to avoid compile errors in compilers
+extern "C" char *doubleToStr(double d, int mode, int ndigits,    // where stdlib.h may already contain a definition of these functions
 			int *decpt, int *sign, char **rve);
 #endif
 
@@ -2475,7 +2475,7 @@ retlow1:
 #endif /* NO_STRTOD_BIGCOMP */
 
  double
-strtod
+strToDouble //-EDIT- renaming the functions to compile correctly even for compilers whose stdlib.h already defines them
 #ifdef KR_headers
 	(s00, se) CONST char *s00; char **se;
 #else
@@ -3647,7 +3647,7 @@ freedtoa(char *s)
  */
 
  char *
-dtoa
+doubleToStr //-EDIT- renaming the functions to compile correctly even for compilers whose stdlib.h already defines them
 #ifdef KR_headers
 	(dd, mode, ndigits, decpt, sign, rve)
 	double dd; int mode, ndigits, *decpt, *sign; char **rve;

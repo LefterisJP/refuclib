@@ -10,10 +10,6 @@
 #include <rf_localmem.h> //for the local scope macros
 #include <rf_utils.h> //for endianess detection
 
-#include <stdlib.h> //for malloc,free() and friends
-#include <string.h> //for some c stdlib string functions
-#include <stdarg.h>
-
 #include <rf_error.h>
 #include <rf_memory.h>
 /*-------------------------------------------------------------------------Methods to create an RF_StringX-------------------------------------------------------------------------------*/

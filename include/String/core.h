@@ -19,8 +19,6 @@
 #ifndef RF_STRING_CORE_H
 #define RF_STRING_CORE_H
 
-
-#include <rf_setup.h> //for the macro flags
 #include <String/string_decl.h>
 #ifdef __cplusplus
 extern "C"

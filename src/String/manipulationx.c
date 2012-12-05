@@ -13,7 +13,7 @@
 #include <IO/rf_unicode.h> //for unicode functions
 
 #include "../Numeric/Integer/rf_int.ph" //for the integer int and uint conversions
-#include "../Numeric/Float/rf_float.ph" //for dtoa()
+#include "../Numeric/Float/rf_float.ph" //for doubleToStr()
 
 #include <string.h>//various stdlibc string functions
 /*-------------------------------------------------------------------------Functions to manipulate an RF_StringX-------------------------------------------------------------------------------*/
@@ -274,7 +274,7 @@ void rfStringX_Append_double(RF_StringX* thisstr,double f,int width,int precisio
 {
     char* result,*end,*str,hasSign;
     int decpt,sign,len,start;
-    result=dtoa(f,3,precision,&decpt,&sign,&end);
+    result=doubleToStr(f,3,precision,&decpt,&sign,&end);
     len = end-result+1;
     str = thisstr->INH_String.bytes+thisstr->INH_String.byteLength;
     start = thisstr->INH_String.byteLength;
@@ -415,7 +415,7 @@ void rfStringX_Append_double_scientific(RF_StringX* thisstr,double f,int width,i
 {
     char* result,*str,*end,hasSign=0;
     int decpt,sign,len,start;
-    result=dtoa(f,3,999,&decpt,&sign,&end);//for scientific notation calling dtoa() with 999 precision because there might be cases where
+    result=doubleToStr(f,3,999,&decpt,&sign,&end);//for scientific notation calling doubleToStr() with 999 precision because there might be cases where
     len=0;                                 //in normal notation the given precision would be enough but since the radix moves in scientific we would be left with less data than we need
     start = thisstr->INH_String.byteLength;
     str = thisstr->INH_String.bytes+thisstr->INH_String.byteLength;
