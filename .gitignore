@@ -38,6 +38,7 @@ Examples/Doxygen_Html
 *.pyc
 *.layout
 *.backup
+*.cbp
 Tests/TestsLog
 TODO
 
