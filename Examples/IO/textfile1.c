@@ -1,4 +1,6 @@
-#include <IO/rfc_textfile.h>
+#include <RFtextfile.h>
+#include <RFstring.h>
+#include <refu.h>
 
 int main()
 {

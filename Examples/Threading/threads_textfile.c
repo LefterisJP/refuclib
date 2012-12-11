@@ -1,6 +1,7 @@
-#include <rf_threads.h>
-#include <rf_string.h>
-#include <IO/rfc_textfile.h>
+#include <RFthread.h>
+#include <RFstring.h>
+#include <RFtextfile.h>
+#include <refu.h>
 
 char condition = false;
 //! [THREAD_DATA]

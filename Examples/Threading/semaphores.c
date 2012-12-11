@@ -1,5 +1,9 @@
-#include <rf_threads.h>
-#include <rf_time.h>
+#include <RFthread.h>
+#include <RFsemaphore.h>
+#include <RFstring.h>
+#include <RFtextfile.h>
+#include <RFtimer.h>
+#include <refu.h>
 
 //! [THREAD_DATA]
 //Packing all the data to give as input to the Thread in a structure

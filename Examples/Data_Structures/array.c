@@ -1,5 +1,6 @@
-#include <Data_Structures/rfc_array.h>
-#include <IO/rfc_textfile.h>
+#include <RFarray.h>
+#include <RFtextfile.h>
+#include <refu.h>
 
 //! [PRINT_ARRAY]
 void printArray(RF_ArrayV* array)

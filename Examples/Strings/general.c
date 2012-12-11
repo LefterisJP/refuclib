@@ -1,5 +1,7 @@
 #include <RFstring.h>
-#include <rf_stdio.h>
+#include <RFprintf.h>
+#include <refu.h>
+
 int main()
 {	
 	RF_String s1,s2;

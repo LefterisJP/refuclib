@@ -1,9 +1,11 @@
-#include <rf_time.h>
+#include <RFdate.h>
+#include <stdio.h>
+#include <refu.h>
 
 int main()
 {
 //! [ALL]
-	initRefu("refuErrorLog.txt","refuInfoLog.txt");
+	rfInit("refuErrorLog.txt","refuInfoLog.txt");
 	//initialize the date as the current local time
     RF_Date date,oDate,result;
     rfDate_Init_Now(&date,true);

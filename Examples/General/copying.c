@@ -1,4 +1,6 @@
 #include <RFstring.h>
+#include <refu.h>
+
 int main()
 {
     RF_String s1,*s2,s3;

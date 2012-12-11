@@ -1,9 +1,11 @@
-#include <rf_time.h>
+#include <RFdate.h>
+#include <stdio.h>
+#include <refu.h>
 
 
 int main()
 {
-	initRefu("refuErrorLog.txt","refuInfoLog.txt");
+	rfInit("refuErrorLog.txt","refuInfoLog.txt");
     RF_Date date,oDate,result;
     rfDate_Init_Now(&date,true);
     printf("The starting date is (%u) %u/%u/%u\t%u:%u \n",date.wDay,date.mDay,date.month,date.year,date.hours,date.minutes);

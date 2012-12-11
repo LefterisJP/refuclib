@@ -1,6 +1,8 @@
-#include <IO/rf_unicode.h>
+#include <String/rf_unicode.h>
 #include <string.h>
 #include <stdlib.h>
+#include <refu.h>
+
 int main()
 {
 	uint32_t* codepoints,charsN,utf16Length;

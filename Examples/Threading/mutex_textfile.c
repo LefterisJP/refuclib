@@ -1,6 +1,8 @@
-#include <rf_threads.h>
-#include <rf_string.h>
-#include <IO/rfc_textfile.h>
+#include <RFthread.h>
+#include <RFmutex.h>
+#include <RFstring.h>
+#include <RFtextfile.h>
+#include <refu.h>
 
 //! [THREAD_DATA]
 //Packing all the data to give as input to the Thread in a structure

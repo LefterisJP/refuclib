@@ -1,9 +1,11 @@
-#include <rf_time.h>
+#include <RFtimer.h>
+#include <stdio.h>
+#include <refu.h>
 
 int main()
 {
     int i;
-    initRefu("refuErrorLog.txt","refuInfoLog.txt");
+    rfInit("refuErrorLog.txt","refuInfoLog.txt");
 //! [ALL]
     float a;
 	//initialize a timer with initial resolution at milliseconds

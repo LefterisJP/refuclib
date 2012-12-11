@@ -1,4 +1,5 @@
 #include <RFstring.h>
+#include <refu.h>
 
 int main()
 {
@@ -12,7 +13,7 @@ int main()
 	rfString_Init(&temp2," the great classic composers");
 	//append the temporary strings
 	rfString_Append(&s,&temp1);
-	rfString_Append(&s,&temp
+	rfString_Append(&s,&temp);
 	//finally we also need to deinitialize the temporary strings
 	rfString_Deinit(&temp1);
 	rfString_Deinit(&temp2);

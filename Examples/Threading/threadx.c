@@ -1,6 +1,8 @@
-#include <rf_threads.h>
-#include <IO/rfc_textfile.h>
-#include <rf_time.h>
+#include <RFthread.h>
+#include <RFstring.h>
+#include <RFtextfile.h>
+#include <RFtimer.h>
+#include <refu.h>
 
 #define THREADS_NUM 5
 

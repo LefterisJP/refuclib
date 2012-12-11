@@ -1,6 +1,6 @@
-#include <rf_string.h>
-#include <rf_localmem.h> //must include this for the local scope macros
-
+#include <RFstring.h>
+#include <RFlocalmem.h> //must include this for the local scope macros
+#include <refu.h>
 
 //an example of a function that will not work well with temporary strings
 int myFunction_bad(RF_String* s)

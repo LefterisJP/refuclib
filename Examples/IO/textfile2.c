@@ -1,5 +1,7 @@
-#include <IO/rfc_textfile.h>
-#include <rf_string.h>
+#include <RFtextfile.h>
+#include <RFstring.h>
+#include <refu.h>
+
 //! [PRINT_LINES]
 //A function to print all the lines of a text file
 void printLines(RF_TextFile* t,RF_StringX* lineBuffer,const char* text)

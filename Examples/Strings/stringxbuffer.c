@@ -1,5 +1,7 @@
 #include <RFstring.h>
-#include <rf_stdio.h>
+#include <RFprintf.h>
+#include <refu.h>
+
 //! [STRINGS]
 //These are some strings, used for the purpose of the example. Suppose they came by reading an external file
 static const char* strings[] =
