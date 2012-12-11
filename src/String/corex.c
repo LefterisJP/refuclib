@@ -1,18 +1,39 @@
+//*---------------------Corrensponding Header inclusion---------------------------------
+#include <Definitions/types.h> //for fixed size types needed in various places
+#include <String/string_decl.h>//for RF_String
+#include <String/stringx_decl.h> //for RF_StringX
+#include <Definitions/imex.h> //for the import export macro
+#include <Definitions/defarg.h> //for enabling default arguments
 #include <String/corex.h>
-
-
+//*---------------------Module related inclusion----------------------------------------
 #include <String/traversalx.h> //for rfStringX_Reset()
+#include <stdarg.h> //needed for the va_list argument in rfStringX_Formatv() and also in the functions below
 #include <String/format.h> //for the String formatting function
 #include "common.ph" //for RF_STRINGX_REALLOC()
-#include "../stdio.ph" //for the ioBuffer RF_StringX
+//*---------------------Outside module inclusion----------------------------------------
+//for endianess detection functionality
+    #include <String/unicode.h> //for unicode functions such as rfUTF8_VerifySequence()
+    #include <Utils/endianess.h> //for endianess detection
+//for error logging
+    #include <stdio.h>//for FILE* used inside printf.h
+    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
+    #include <Utils/error.h>
 
-#include <IO/rf_unicode.h> //for unicode functions such as rfUTF8_VerifySequence()
-#include <rf_localmem.h> //for the local scope macros
-#include <rf_utils.h> //for endianess detection
+#include <Definitions/retcodes.h> //for error codes
+//for the ioBuffer
+    #include <Definitions/threadspecific.h> // for the thread specific keyword used in the ioBuffer
+    #include "../IO/buff.ph" //for the ioBuffer StringX
 
-#include <rf_error.h>
-#include <rf_memory.h>
-/*-------------------------------------------------------------------------Methods to create an RF_StringX-------------------------------------------------------------------------------*/
+#include <Utils/constcmp.h> //for RF_HEXLE_UI() macro and others
+//for the local scope macros
+    #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
+    #include <string.h> //for memset()
+    #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
+    #include <Utils/localscope.h>//for local scope macros
+//for memory allocation macros
+    #include <stdlib.h> //for malloc, calloc,realloc and exit()
+    #include <Utils/memory.h> //for refu memory allocation
+//*----------------------------End of Includes------------------------------------------
 
 //Allocates and returns an extended String. Given characters have to be in UTF-8. A check for valide sequence of bytes is performed.
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
@@ -139,7 +160,7 @@ RF_StringX* rfStringX_Create_cp(uint32_t codepoint)
     //if we need 2 bytes to encode it
     else if( RF_HEXGE_UI(codepoint,0x0080) && RF_HEXLE_UI(codepoint,0x07ff))
     {
-        if(rfUTILS_Endianess() == RF_LITTLE_ENDIAN)
+        if(rfEndianess() == RF_LITTLE_ENDIAN)
         {
             //get the first bits of the first byte and encode them to the first byte
             ret->INH_String.bytes[1] = (codepoint & 0x3F)|(0x02<<6);
@@ -159,7 +180,7 @@ RF_StringX* rfStringX_Create_cp(uint32_t codepoint)
     //if we need 3 bytes to encode it
     else if( RF_HEXGE_UI(codepoint,0x0800) && RF_HEXLE_UI(codepoint,0x0ffff))
     {
-        if(rfUTILS_Endianess() == RF_LITTLE_ENDIAN)
+        if(rfEndianess() == RF_LITTLE_ENDIAN)
         {
             //get the first bits of the first byte and encode them to the first byte
             ret->INH_String.bytes[2] = (codepoint & 0x3F)|(0x02<<6);
@@ -183,7 +204,7 @@ RF_StringX* rfStringX_Create_cp(uint32_t codepoint)
     //if we need 4 bytes to encode it
     else if( RF_HEXGE_UI(codepoint,0x10000) && RF_HEXLE_UI(codepoint,0x10ffff))
     {
-        if(rfUTILS_Endianess() == RF_LITTLE_ENDIAN)
+        if(rfEndianess() == RF_LITTLE_ENDIAN)
         {
             //get the first bits of the first byte and encode them to the first byte
             ret->INH_String.bytes[3] = (codepoint & 0x3F)|(0x02<<6);

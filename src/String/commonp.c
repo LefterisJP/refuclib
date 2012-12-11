@@ -19,13 +19,19 @@
 **
 ** This is the source file where private string functions are implemented
 */
+//*---------------------Corrensponding Header inclusion---------------------------------
+#include <Definitions/types.h> //for fixed size types needed in various places
 #include "common.ph"
+//*---------------------Module related inclusion----------------------------------------
+#include <String/string_decl.h>
+#include <String/flags.h>
+//*---------------------Outside module inclusion----------------------------------------
+#include <Utils/bits.h> //for RF_BITFLAG_ON() macro
+#include <Definitions/retcodes.h>//for true/false and other retcodes
+//*---------------------libc Headers inclusion------------------------------------------
+#include <string.h>
+//*----------------------------End of Includes------------------------------------------
 
-#include <String/common.h>
-
-#include <rf_utils.h> //for RF_BITFLAG_ON() macro
-
-#include <string.h> //c stdlib string functions
 
 // Internal version of rfString_Find, used for byte position.
 int32_t rfString_FindBytePos(const void* str,const void* sstrP,char options)

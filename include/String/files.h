@@ -15,15 +15,23 @@
 **  SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**
+** --String/files.h
+** This header includes FILE descriptor functionality for RF_String
+**
+---------------------For internal library include make sure to have----------------------------
+#include <stdio.h> //for FILE*
+#include <IO/common.h> //for RF_EOL macros
+#include <Definitions/imex.h> //for the import export macro
+#include <Definitions/types.h> //for fixed size types needed in various places
+#include <String/unicode.h> //for the unicode macros RF_UTF8 and friends
+#include <String/string_decl.h>//for RF_String
+#include <Definitions/defarg.h> //for enabling default arguments
+#include <String/files.h>
+---------------------For internal library include make sure to have----------------------------
 */
 #ifndef RF_STRING_FILES_H
 #define RF_STRING_FILES_H
-
-
-#include <String/string_decl.h>
-
-#include <rf_io.h> //for RF_EOL macros
-#include <IO/rf_unicode.h> //for the unicode macros RF_UTF8 and friends
 
 
 #ifdef __cplusplus

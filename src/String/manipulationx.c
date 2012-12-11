@@ -1,22 +1,41 @@
+//*---------------------Corrensponding Header inclusion---------------------------------
+#include <Definitions/types.h> //for fixed size types needed in various places
+#include <String/string_decl.h>//for RF_String
+#include <String/stringx_decl.h> //for RF_StringX
+#include <Definitions/imex.h> //for the import export macro
+#include <Definitions/defarg.h> //for enabling default arguments
 #include <String/manipulationx.h>
-
+//*---------------------Module related inclusion----------------------------------------
+#include <String/flags.h> //for the flags
 #include <String/core.h> //for rfString_Deinit
-#include <String/common.h> //for the common string flags
 #include <String/retrieval.h> //for rfString_Between and others
 #include <String/traversalx.h> //for rfStringX_MoveAfter() and other functions
 #include "common.ph" //for private string functions and macros
-
-#include <rf_memory.h>
-#include <rf_error.h>
-
-#include <rf_localmem.h> //for local scope macros
-#include <IO/rf_unicode.h> //for unicode functions
-
-#include "../Numeric/Integer/rf_int.ph" //for the integer int and uint conversions
+//*---------------------Outside module inclusion----------------------------------------
+#include <String/unicode.h> //for unicode functions
+//for the integer int and uint conversions
+    #include <Definitions/inline.h> //for the inline declaration
+    #include <Definitions/retcodes.h> //for return codes and true/false definition
+    #include "../Numeric/Integer/rf_int.ph" //for the integer int and uint conversions
+//for the float conversions
 #include "../Numeric/Float/rf_float.ph" //for doubleToStr()
+//for error logging macros
+    #include <stdio.h>//for FILE* used inside printf.h
+    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
+    #include <Utils/error.h>
+//for memory allocation macros
+    #include <stdlib.h> //for malloc, calloc,realloc and exit()
+    #include <Utils/memory.h> //for refu memory allocation
 
-#include <string.h>//various stdlibc string functions
-/*-------------------------------------------------------------------------Functions to manipulate an RF_StringX-------------------------------------------------------------------------------*/
+#include <Utils/constcmp.h> //for RF_HEXEQ_C() and other macros
+//for local scope macros
+    #include <Definitions/threadspecific.h> //for the thread specific attribute
+    #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
+    #include <string.h> //for memset()
+    #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
+    #include <Utils/localscope.h>//for local scope macros
+//*----------------------------End of Includes------------------------------------------
+
 
 // Appends the parameter String to this extended string.
 void rfStringX_Append(RF_StringX* thisstr,const void* otherP)
@@ -701,30 +720,25 @@ char i_rfStringX_Replace(RF_StringX* thisstr,const void* sstrP,const void* rstrP
     //act depending on the size difference of rstr and sstr
     if(rstr->byteLength > sstr->byteLength) //replace string is bigger than the removed one
     {
-        int32_t orSize;
+        int32_t reqSize;
         diff = rstr->byteLength - sstr->byteLength;
-        //will keep the original size in bytes
-        orSize = thisstr->INH_String.byteLength +1;
-        //calculate the new byte length
-        thisstr->INH_String.byteLength += num*diff;
+        //calculate the required bytelength
+        reqSize = thisstr->INH_String.byteLength + num*diff;
         //reallocate the string to fit the new bigger size if needed
-        RF_STRINGX_REALLOC(thisstr,thisstr->INH_String.byteLength+thisstr->bIndex+1)
+        RF_STRINGX_REALLOC(thisstr,reqSize+thisstr->bIndex+1)
         //now replace all the substrings one by one
         for(i = 0; i < num; i ++)
         {
-            //move all of the contents of the string to fit the replacement
-            for(j =orSize+diff-1; j > bytePositions[i]+sstr->byteLength; j -- )
-                thisstr->INH_String.bytes[j] = thisstr->INH_String.bytes[j-diff];
-
+            //make space in the string for the replacement
+            memmove(thisstr->INH_String.bytes+bytePositions[i]+sstr->byteLength+diff,thisstr->INH_String.bytes+bytePositions[i]+sstr->byteLength,thisstr->INH_String.byteLength+1-(bytePositions[i]+sstr->byteLength));
             //copy in the replacement
-            strncpy(thisstr->INH_String.bytes+bytePositions[i],rstr->bytes,rstr->byteLength);
-            //also increase the original size (since now we moved the whole string by one replacement)
-            orSize += diff;
+            memcpy(thisstr->INH_String.bytes+bytePositions[i],rstr->bytes,rstr->byteLength);
+            //also increase the bytelength (since now we moved the whole string by one replacement)
+            thisstr->INH_String.byteLength += diff;
             //also increase all the subsequent found byte positions since there is a change of string size
             for(j = i+1; j < num; j ++)
                 bytePositions[j] = bytePositions[j]+diff;
         }
-
     }
     else if( rstr->byteLength < sstr->byteLength) //replace string is smaller than the removed one
     {
@@ -735,16 +749,15 @@ char i_rfStringX_Replace(RF_StringX* thisstr,const void* sstrP,const void* rstrP
         for(i =0; i < num; i ++)
         {
             //copy in the replacement
-            strncpy(thisstr->INH_String.bytes+bytePositions[i],rstr->bytes,rstr->byteLength);
+            memcpy(thisstr->INH_String.bytes+bytePositions[i],rstr->bytes,rstr->byteLength);
             //move all of the contents of the string to fit the replacement
-            for(j =bytePositions[i]+rstr->byteLength; j < thisstr->INH_String.byteLength; j ++ )
-                thisstr->INH_String.bytes[j] = thisstr->INH_String.bytes[j+diff];
+            memmove(thisstr->INH_String.bytes+bytePositions[i]+rstr->byteLength,thisstr->INH_String.bytes+bytePositions[i]+sstr->byteLength,thisstr->INH_String.byteLength+1-(bytePositions[i]+sstr->byteLength));
+            //reduce bytelength
+            thisstr->INH_String.byteLength-=diff;
             //also decrease all the subsequent found byte positions since there is a change of string size
             for(j = i+1; j < num; j ++)
                 bytePositions[j] = bytePositions[j]-diff;
         }
-        //finally let's keep the new byte length
-        thisstr->INH_String.byteLength -= diff*num;
         //just note that reallocating downwards is not necessary
     }
     else //replace and remove strings are equal

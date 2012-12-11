@@ -19,8 +19,6 @@
 #ifndef RF_STRINGX_DECL_H
 #define RF_STRINGX_DECL_H
 
-#include <String/string_decl.h> //for RF_String declaration
-
 /**
 ** @internal
 ** @date 16/05/2010

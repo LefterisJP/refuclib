@@ -23,9 +23,7 @@
 ** used by data structures of the refu library. Only one for now
 **/
 
-#ifndef RF_DATASTRUCTS_COMMON_H
-#define RF_DATASTRUCTS_COMMON_H
 //! The size of a pointer from an array or a list of pointers
 #define RF_PTRMEMORYLOC_SIZE  sizeof(void*)
-#endif
+
 

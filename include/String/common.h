@@ -15,27 +15,21 @@
 **  SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**
+** --String/common.h
+** This header includes common String functionality common for all strings
+**
+---------------------For internal library include make sure to have----------------------------
+#include <Definitions/types.h> //for fixed size types needed in various places
+#include <String/string_decl.h>//for RF_String
+#include <Definitions/imex.h> //for the import export macro
+#include <Definitions/defarg.h> //for enabling default arguments
+#include <String/common.h>
+---------------------For internal library include make sure to have----------------------------
 */
 #ifndef RF_STRING_COMMON_H
 #define RF_STRING_COMMON_H
 
-//! An option for some string functions. Means that the case should not be exactly matched in the string replacing,finding e.t.c.
-#define RF_CASE_IGNORE  0x1
-//! An options for some string functions. Means that the exact string should be found/replaced e.t.c.
-#define RF_MATCH_WORD 0x2
-//! An option for some string functions denothing that some specific argument is of RF_StringX type
-#define RF_STRINGX_ARGUMENT 0x4
-
-
-//flags for string formatting
-#define RF_FORMATFLAG_LJUSTIFY   0x1
-#define RF_FORMATFLAG_SIGN       0x2
-#define RF_FORMATFLAG_NOSIGN     0x4
-#define RF_FORMATFLAG_SHARP      0x8
-#define RF_FORMATFLAG_PADZEROES  0x10
-#define RF_FORMATFLAG_UPPER      0x20
-
-#include <String/string_decl.h>
 
 #ifdef __cplusplus
 extern "C"

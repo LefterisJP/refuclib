@@ -20,11 +20,22 @@
 ** This is a private header defining only functions
 ** and macros that are private and accessible
 ** only to the XML functions
+**
+---------------------For internal library include make sure to have----------------------------
+#include <Definitions/types.h> //for fixed size data types
+#include <Definitions/imex.h> //for import export macro
+#include <Definitions/defarg.h> //for enabling default arguments
+#include <String/string_decl.h> //for RF_String used in RF_XMLTag
+#include <String/stringx_decl.h> //for RF_StringX used in RF_XMLTag
+#include <Data_Structures/list_decl.h> //for RF_ListP used in RF_XMLTag
+#include <Data_Formats/xmltag_decl.h>//for RF_XMLTag
+#include <IO/common.h> //for foff_rft used in RF_XML
+#include <stdio.h> //for FILE* used in RF_TextFile
+#include <IO/textfile_decl.h> //for RF_TextFile used in RF_XML
+#include <Data_Formats/xml_decl.h>//for RF_XML
+#include "common.ph"
+---------------------For internal library include make sure to have----------------------------
 */
-
-
-
-#include <rf_setup.h>
 
 // --------------------- //
 //      XML Bitflags    //
@@ -108,11 +119,7 @@ enum parserStates { TAG_TITLE=1,TAG_ATTRIBUTES,TAG_CONTENTS, TAG_CLOSING};
 
 ///=== Private XML functions ===///
 
-struct RF_XML;
-struct RF_XMLTag;
-struct RF_String;
-struct RF_StringX;
-struct RF_TextFile;
+
 
 //! Runs through the xml tree searching for a tag recursively by name and/or contents
 //! @param x The XML file handler
@@ -120,7 +127,7 @@ struct RF_TextFile;
 //! @param tName The name of the tag we are searching for
 //! @param contents The contents of the tag we are searching for. Can be zero.
 //! @return Returns the tag if it was found or NULL if not
-struct RF_XMLTag* rfXML_SearchSmall(struct RF_XML* x,struct RF_XMLTag* t,void* tName,void* contents);
+RF_XMLTag* rfXML_SearchSmall(RF_XML* x,RF_XMLTag* t,void* tName,void* contents);
 
 //! Runs through the xml tree searching for a tag recursively by name ,attributes and contents
 //! @param t The currently searching tag
@@ -128,7 +135,7 @@ struct RF_XMLTag* rfXML_SearchSmall(struct RF_XML* x,struct RF_XMLTag* t,void* t
 //! @param contents The contents we want the tag to have
 //! @param attrN The number of attributes
 //! @return Returns the tag if it was found or NULL if not
-struct RF_XMLTag* rfXML_SearchFull(struct RF_XML* x,struct RF_XMLTag* t,void* tNameP,void* contentsP,uint32_t attrN,struct RF_String** sAttribs,struct RF_String** sAttribValues);
+RF_XMLTag* rfXML_SearchFull(RF_XML* x,RF_XMLTag* t,void* tNameP,void* contentsP,uint32_t attrN,RF_String** sAttribs,RF_String** sAttribValues);
 
 
 //! Runs through the tree searching for a tag tName with a child childName somewhere in its children
@@ -139,7 +146,7 @@ struct RF_XMLTag* rfXML_SearchFull(struct RF_XML* x,struct RF_XMLTag* t,void* tN
 //! @param direct Boolean flag denoting whether childName neeeds to be direct child (=true) or anywhere in its childre(=false)
 //! @param rParent Boolean flag denoting whether we want to return the parent or the child.
 //! @return Returns the tag if it was found or NULL if not
-struct RF_XMLTag* i_rfXML_SearchChild(struct RF_XML* x,struct RF_XMLTag* t,void* tNameP,void* childNameP,char direct,char rParent);
+RF_XMLTag* i_rfXML_SearchChild(RF_XML* x,RF_XMLTag* t,void* tNameP,void* childNameP,char direct,char rParent);
 
 
 //! Runs through the tree recursively printing the tags
@@ -148,11 +155,11 @@ struct RF_XMLTag* i_rfXML_SearchChild(struct RF_XML* x,struct RF_XMLTag* t,void*
 //! @param strBuff An already initialize RF_StringX buffer
 //! @param level The level of the tag in the xml tree. Is used for the /t tabs
 //! @return Returns true for succesful writting of the @c t XML tag and false otherwise
-char i_rfXMLTag_PrintToFile(struct RF_XMLTag* t,struct RF_TextFile* f,struct RF_StringX* strBuff,uint32_t level);
+char i_rfXMLTag_PrintToFile(RF_XMLTag* t,RF_TextFile* f,RF_StringX* strBuff,uint32_t level);
 
 
 //internal full file parsing function, intended to be used only from the start of the file to parse the entirety of the file
-int32_t i_rfXML_Parse(struct RF_XML* x,struct RF_XMLTag* currentTag);
+int32_t i_rfXML_Parse(RF_XML* x,RF_XMLTag* currentTag);
 
 
 
@@ -178,7 +185,7 @@ int32_t i_rfXML_Parse(struct RF_XML* x,struct RF_XMLTag* currentTag);
 //! + @c RE_XML_EOF: If the root tag closed, so it's impossible to return another tag
 //! + @c RE_XML_UNEXPECTED_EOF: If the end of file was unexpectedly encountered during parsing
 //! + @c RE_XML_PARSE_FAILURE: If something unexpected was found during file parsing
-int32_t rfXML_GoNext_dsk(struct RF_XML* x,struct RF_XMLTag* t);
+int32_t rfXML_GoNext_dsk(RF_XML* x,RF_XMLTag* t);
 
 //! @memberof RF_XML
 //! @brief Moves to a child under the current tag in the file
@@ -191,7 +198,7 @@ int32_t rfXML_GoNext_dsk(struct RF_XML* x,struct RF_XMLTag* t);
 //! + @c RE_XML_EOF: If the root tag closed, so it's impossible to return another tag
 //! + @c RE_XML_UNEXPECTED_EOF: If the end of file was unexpectedly encountered during parsing
 //! + @c RE_XML_PARSE_FAILURE: If something unexpected was found during file parsing
-int32_t rfXML_GoIn_dsk(struct RF_XML* x,uint32_t i);
+int32_t rfXML_GoIn_dsk(RF_XML* x,uint32_t i);
 
 //! @memberof RF_XML
 //! @brief Moves out of the current tag's position in the file
@@ -210,6 +217,6 @@ int32_t rfXML_GoIn_dsk(struct RF_XML* x,uint32_t i);
 //! + @c RE_XML_EOF: If the root tag closed, so it's impossible to return another tag
 //! + @c RE_XML_UNEXPECTED_EOF: If the end of file was unexpectedly encountered during parsing
 //! + @c RE_XML_PARSE_FAILURE: If something unexpected was found during file parsing
-int32_t rfXML_GoOut_dsk(struct RF_XML* x,char after);
+int32_t rfXML_GoOut_dsk(RF_XML* x,char after);
 
 

@@ -1,5 +1,6 @@
 ﻿#include <RFstring.h>
-#include <stdio.h>
+#include <RFprintf.h>
+#include <refu.h>
 
 #include "../refu_tests.h"
 int main()
@@ -13,7 +14,7 @@ int main()
     //expect true and then the string without the \r
     EXPECT(true,rfString_Init(&s1,"If remove\r\ndoes not work correctly here\r\nthe test will surely\r\nfail!\r\n"))
     EXPECT(true,rfString_Remove(&s1,RFS_("\r")))
-    printf("%s\n",rfString_Cstr(&s1));
+    rfPrintf("%S\n",&s1);
 
     //expect true for all confirming that by removing we got left only with what we should be
     EXPECT(true,rfString_Init(&s2,"歌舞伎俳優の中村橋吾さん（３３）が都内の路上で見知らぬ男に突然顔を殴られる被害に遭っていたことが、警視庁への取材でわかった。同庁は暴行事件として調べている。"))
@@ -38,7 +39,7 @@ int main()
     //expect the trimmed string: "This is a nice string but has lots of tabs, spaces and newlines on either end"
     EXPECT(true,rfString_Init(&s5,"   \t\t\t  This is a nice string but has lots of tabs, spaces and newlines on either end \n\n\n"))
     EXPECT(true,rfString_Trim(&s5,RFS_(" \n\t")))
-    printf("%s\n",rfString_Cstr(&s5));
+    rfPrintf("%S\n",&s5);
 
     //Trim all the hiragana and full width stop from the end of the string and check the string afterwards
     EXPECT(true,rfString_Init(&s6,"警視庁への取材でわかった。"))
@@ -47,7 +48,7 @@ int main()
     //expect the string trimmed of all spaces,tabs and number-bullet points in the beginning
     EXPECT(true,rfString_Init(&s7,"  \t\t  3)This is the 3rd bullet point of something"))
     EXPECT(true,rfString_TrimStart(&s7,RFS_(" \t123456789)")))
-    printf("%s\n",rfString_Cstr(&s7));
+    rfPrintf("%S\n",&s7);
 
 	return 0;
 }

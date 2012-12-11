@@ -1,7 +1,9 @@
+//*---------------------Corrensponding Header inclusion---------------------------------
+#include <Definitions/inline.h> //for the inline declaration
+#include <Definitions/types.h> //for fixed size data types
+#include <Definitions/retcodes.h> //for return codes and true/false definition
 #include "rf_int.ph"
-
-
-
+//*----------------------------End of Includes------------------------------------------
 
 
 

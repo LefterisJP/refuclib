@@ -1,15 +1,36 @@
+//*---------------------Corrensponding Header inclusion---------------------------------
+#include <Definitions/types.h> //for fixed size types needed in various places
+#include <String/string_decl.h>//for RF_String
+#include <Definitions/imex.h> //for the import export macro
+#include <Definitions/defarg.h> //for enabling default arguments
+#include <Utils/constcmp.h> //for RF_HEXEQ_C() used in rfUTF8_IsContinuationByte() which itself is used in the iteration macros
 #include <String/core.h>
-
+//*---------------------Module related inclusion----------------------------------------
+#include <String/stringx_decl.h> //for RF_StringX
+#include <stdarg.h> //needed for the va_list argument in rfStringX_Formatv() and also in the functions below
 #include <String/format.h> //for the String formatting function
 #include "common.ph"//for private string iteration
+//*---------------------Outside module inclusion----------------------------------------
+#include <String/unicode.h> //for rfUTF8_VerifySequence()
 
-#include <IO/rf_unicode.h> //for rfUTF8_VerifySequence()
-#include <rf_localmem.h>//for local stack pushing
-#include "../stdio.ph" //for the ioBuffer RF_StringX
+#include <Definitions/retcodes.h> //for error codes
+//for error logging
+    #include <stdio.h>//for FILE* used inside printf.h
+    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
+    #include <Utils/error.h>
+//for the io buffer
+    #include <Definitions/threadspecific.h> // for the thread specific keyword used in the ioBuffer
+    #include "../IO/buff.ph" //for the ioBuffer StringX
+//for the local scope macros
+    #include <Utils/localmem_decl.h> //for RF_LocalMemoryStack
+    #include <string.h> //for memset()
+    #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
+    #include <Utils/localscope.h>//for local scope macros
+//for memory allocation macros
+    #include <stdlib.h> //for malloc, calloc,realloc and exit()
+    #include <Utils/memory.h> //for refu memory allocation
+//*----------------------------End of Includes------------------------------------------
 
-#include <rf_error.h>
-#include <rf_memory.h>
-/*-------------------------------------------------------------------------Methods to create an RF_String-------------------------------------------------------------------------------*/
 
 //Allocates and returns a string with the given characters a refu string with the given characters. Given characters have to be in UTF-8. A check for valide sequence of bytes is performed.
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS

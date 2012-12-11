@@ -1,15 +1,36 @@
+//*---------------------Corrensponding Header inclusion---------------------------------
+#include <Definitions/types.h> //for fixed size types needed in various places
+#include <String/string_decl.h>//for RF_String
+#include <Definitions/imex.h> //for the import export macro
+#include <Definitions/defarg.h> //for enabling default arguments
 #include <String/retrieval.h>
-
+//*---------------------Module related inclusion----------------------------------------
+#include <String/flags.h> //for String macro flags
 #include <String/core.h> //for rfString_Deinit(), rfString_BytePosToCharPos() and others
+#include <String/unicode.h> //rfUTF8_IsContinuationByte()
+#include <String/stringx_decl.h> //for RF_StringX
+#include <String/corex.h> //for rfStringX_Init_unsafe()
 #include "common.ph" //for required string private macros and functions
-#include <String/rf_stringx.h>
+//*---------------------Outside module inclusion----------------------------------------
+#include <Utils/bits.h> //for RF_BITFLAG_ON
 
-#include <rf_utils.h> //for RF_BITFLAG_ON
-#include <rf_localmem.h> //for local scope macros
-
-#include <rf_memory.h>
-
-/*------------------------------------------------------------------------ RF_String accessor functions-------------------------------------------------------------------------------*/
+#include <Utils/constcmp.h> //for RF_HEXEQ_C() macro and others
+//for the local scope macros
+    #include <Definitions/threadspecific.h> //for the thread specific attribute
+    #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
+    #include <string.h> //for memset()
+    #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
+    #include <Utils/localscope.h>
+//for the memory allocation macros
+    #include <stdlib.h> //for malloc, calloc,realloc and exit()
+    #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
+    #include <stdio.h>//for FILE* used inside printf.h
+    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
+    #include <Utils/error.h> //for LOG_ERROR() macros
+    #include <Utils/memory.h> //for refu memory allocation
+//*---------------------libc Headers inclusion------------------------------------------
+#include <stdarg.h>
+//*----------------------------End of Includes------------------------------------------
 
 // Finds the length of the string in characters
 uint32_t rfString_Length(const void* str)

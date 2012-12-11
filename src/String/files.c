@@ -1,21 +1,38 @@
+//*---------------------Corrensponding Header inclusion---------------------------------
+#include <stdio.h> //for FILE*
+#include <IO/common.h> //for RF_EOL macros
+#include <Definitions/imex.h> //for the import export macro
+#include <Definitions/types.h> //for fixed size types needed in various places
+#include <String/unicode.h> //for the unicode macros RF_UTF8 and friends
+#include <String/string_decl.h>//for RF_String
+#include <Definitions/defarg.h> //for enabling default arguments
 #include <String/files.h>
-
+//*---------------------Module related inclusion----------------------------------------
 #include <String/conversion.h> //for unicode conversions
 #include <String/manipulation.h> //for rfString_Append()
 #include <String/common.h> //for RFS_()
+//*---------------------Outside module inclusion----------------------------------------
+//for error logging macros
+    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
+    #include <Utils/error.h>
+//for memory allocation macros
+    #include <stdlib.h> //for malloc, calloc,realloc and exit()
+    #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
+    #include <Utils/memory.h> //for refu memory allocation
 
-#include <rf_error.h>
-#include <rf_memory.h>
-
-#include <rf_localmem.h>//for local scope macros
-#include <rf_utils.h> //for Endianess swapping functions
-//! @todo I don't like the connection with the src/ of io.ph ... figure out a better way
-//for i_WRITE_CHECK() macro
-#include "../IO/io.ph"
-
+#include <Utils/endianess.h> //for Endianess swapping functions
+#include <IO/file.h> //for rfReadLine family  of functions
+#include "../IO/io.ph" //for IO_WRITE_CHECK() macro
+//for local scope macros
+    #include <Definitions/threadspecific.h> //for the thread specific attribute
+    #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
+    #include <string.h> //for memset()
+    #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
+    #include <Utils/localscope.h>//for local scope macros
+//*---------------------libc Headers inclusion------------------------------------------
 #include <errno.h> //needed for the same macro as above
+//*----------------------------End of Includes------------------------------------------
 
-/*------------------------------------------------------------------------ RF_String File I/O functions-------------------------------------------------------------------------------*/
 
 //Allocates and returns a string from file parsing. The file's encoding must be UTF-8.If for some reason (like EOF reached) no string can be read then null is returned
 RF_String* rfString_Create_fUTF8(FILE* f, char* eof,char eol)
@@ -280,11 +297,11 @@ int32_t i_rfString_Fwrite(void* sP,FILE* f,char encoding)
         break;
         case RF_UTF16_LE:
             utf16 = rfString_ToUTF16(s,&length);
-            if(rfUTILS_Endianess() != RF_LITTLE_ENDIAN)
+            if(rfEndianess() != RF_LITTLE_ENDIAN)
             {
                 for(i=0;i<length;i++)
                 {
-                    rfUTILS_SwapEndianUS(&utf16[i]);
+                    rfSwapEndianUS(&utf16[i]);
                 }
             }
             if(fwrite(utf16,2,length,f) != length)
@@ -297,11 +314,11 @@ int32_t i_rfString_Fwrite(void* sP,FILE* f,char encoding)
         break;
         case RF_UTF16_BE:
             utf16 = rfString_ToUTF16(s,&length);
-            if(rfUTILS_Endianess() != RF_BIG_ENDIAN)
+            if(rfEndianess() != RF_BIG_ENDIAN)
             {
                 for(i=0;i<length;i++)
                 {
-                    rfUTILS_SwapEndianUS(&utf16[i]);
+                    rfSwapEndianUS(&utf16[i]);
                 }
             }
             if(fwrite(utf16,2,length,f) != length)
@@ -314,11 +331,11 @@ int32_t i_rfString_Fwrite(void* sP,FILE* f,char encoding)
         break;
         case RF_UTF32_LE:
             utf32 = rfString_ToUTF32(s,&length);
-            if(rfUTILS_Endianess() != RF_LITTLE_ENDIAN)
+            if(rfEndianess() != RF_LITTLE_ENDIAN)
             {
                 for(i=0;i<length;i++)
                 {
-                    rfUTILS_SwapEndianUI(&utf32[i]);
+                    rfSwapEndianUI(&utf32[i]);
                 }
             }
             if(fwrite(utf32,4,length,f) != length)
@@ -331,11 +348,11 @@ int32_t i_rfString_Fwrite(void* sP,FILE* f,char encoding)
         break;
         case RF_UTF32_BE:
             utf32 = rfString_ToUTF32(s,&length);
-            if(rfUTILS_Endianess() != RF_BIG_ENDIAN)
+            if(rfEndianess() != RF_BIG_ENDIAN)
             {
                 for(i=0;i<length;i++)
                 {
-                    rfUTILS_SwapEndianUI(&utf32[i]);
+                    rfSwapEndianUI(&utf32[i]);
                 }
             }
             if(fwrite(utf32,4,length,f) != length)

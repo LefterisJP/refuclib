@@ -1,5 +1,6 @@
 ﻿#include <RFstring.h>
-#include <stdio.h>
+#include <RFprintf.h>
+#include <refu.h>
 
 #include "../refu_tests.h"
 int main()
@@ -24,22 +25,22 @@ int main()
 	EXPECTNOT(0,(sx9=rfStringX_Create_cp(0x2708)))
 
 	//simply print the strings to see if they initialized correctly
-	printf("%s\n",rfString_Cstr(&s1));
-	printf("%s\n",rfString_Cstr(&s2));
-	printf("%s\n",rfString_Cstr(&s3));
-	printf("%s\n",rfString_Cstr(&s4));
-	printf("%s\n",rfString_Cstr(&sx4));
-	printf("%s\n",rfString_Cstr(&sx5));
-	printf("%s\n",rfString_Cstr(&sx6));
+	rfPrintf("%S\n",&s1);
+	rfPrintf("%S\n",&s2);
+	rfPrintf("%S\n",&s3);
+	rfPrintf("%S\n",&s4);
+	rfPrintf("%S\n",&sx4);
+	rfPrintf("%S\n",&sx5);
+	rfPrintf("%S\n",&sx6);
 	//testing conversions from String to StringX (this atm can never be zero but since it's a test anyway ...)
 	EXPECTNOT(0,(sx1 = rfStringX_FromString_OUT(&s1)))
 	EXPECTNOT(0,(sx2 = rfStringX_Create_buff(4096,"This is a StringX initialiation with a buffer")))
 	rfStringX_FromString_IN(&sx3,&s2);
 	//simply print the stringXs to see if the conversion happened correctly
-	printf("%s\n",rfString_Cstr(sx1));
-	printf("%s\n",rfString_Cstr(sx2));
+	rfPrintf("%S\n",sx1);
+	rfPrintf("%S\n",sx2);
 	rfStringX_MoveForward(&sx3,7);
-	printf("%s\n",rfString_Cstr(&sx3));
+	rfPrintf("%S\n",&sx3);
 
 
 	//check if we get the expected strings after initializations below
@@ -57,10 +58,10 @@ int main()
     //checking if the initialization of a string from trans-BMP utf-16 works (G-clef music symbol)+東
     EXPECT(true,rfString_Init_UTF16(&s7,utf16Buffer))
     EXPECTNOT(0,(sp1 = rfString_Create_cp(0x1D11E)))
-    EXPECT(true,rfString_Equal(&s7,RFS_("%s東",rfString_Cstr(sp1))))
+    EXPECT(true,rfString_Equal(&s7,RFS_("%S東",sp1)))
 	//checking if StringX initialization from utf-16 works
 	EXPECT(true,rfStringX_Init_UTF16(&sx7,utf16Buffer));
-	EXPECT(true,rfString_Equal(&sx7,RFS_("%s東",rfString_Cstr(sp1))))
+	EXPECT(true,rfString_Equal(&sx7,RFS_("%S東",sp1)))
 	
 	/*Testing assignments also since there are only 2 functions*/
 	

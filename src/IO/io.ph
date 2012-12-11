@@ -1,4 +1,4 @@
-/**
+/*
 ** Copyright (c) 2011-2012, Karapetsas Eleftherios
 ** All rights reserved.
 **
@@ -16,9 +16,10 @@
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **
-**
+** --IO/io.ph
 ** Just an internal header to hold the various macros
 ** used only by the RF_TextFile functions
+**
 */
 
 

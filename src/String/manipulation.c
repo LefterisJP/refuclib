@@ -1,17 +1,33 @@
+//*---------------------Corrensponding Header inclusion---------------------------------
+#include <Definitions/types.h> //for fixed size types needed in various places
+#include <String/string_decl.h>//for RF_String
+#include <Definitions/imex.h> //for the import export macro
+#include <Definitions/defarg.h> //for enabling default arguments
 #include <String/manipulation.h>
-
+//*---------------------Module related inclusion----------------------------------------
+#include <String/stringx_decl.h> //for RF_StringX
+#include <String/corex.h> //for rfStringX_Deinit() and rfStringX_FromString_IN
+#include <Utils/constcmp.h> //for RF_HEXEQ_C() used in the iteration macros
 #include <String/core.h> //for string iterations
 #include <String/retrieval.h> //for rfString_Length()
 #include "common.ph" //for required string private macros and functions
-#include <String/rf_stringx.h> //for RF_Stringx functions
-
-#include <rf_memory.h>
-#include <rf_error.h>
-
-#include <rf_localmem.h> //for local memory stack
-#include <IO/rf_unicode.h> //for unicode functions
-
-/*------------------------------------------------------------------------ RF_String manipulation functions-------------------------------------------------------------------------------*/
+//*---------------------Outside module inclusion----------------------------------------
+#include <String/unicode.h> //for unicode functions
+//for error logging macros
+    #include <stdio.h>//for FILE* used inside printf.h
+    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
+    #include <Utils/error.h>
+//for memory allocation macros
+    #include <stdlib.h> //for malloc, calloc,realloc and exit()
+    #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
+    #include <Utils/memory.h> //for refu memory allocation
+//for local scope macros
+    #include <Definitions/threadspecific.h> //for the thread specific attribute
+    #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
+    #include <string.h> //for memset()
+    #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
+    #include <Utils/localscope.h>
+//*----------------------------End of Includes------------------------------------------
 
 
 // Appends the parameter String to this one
@@ -378,31 +394,24 @@ char i_rfString_Replace(RF_String* thisstr,const void* sstrP,const void* rstrP,c
     //act depending on the size difference of rstr and sstr
     if(rstr->byteLength > sstr->byteLength) //replace string is bigger than the removed one
     {
-        int32_t orSize,nSize;
+        int32_t nSize;
 
         diff = rstr->byteLength - sstr->byteLength;
-        //will keep the original size in bytes
-        orSize = thisstr->byteLength +1;
         //reallocate the string to fit the new bigger size
-        nSize= orSize + number*diff;
+        nSize= thisstr->byteLength +1 + number*diff;
         RF_REALLOC(thisstr->bytes,char,nSize)
         //now replace all the substrings one by one
         for(i = 0; i < number; i ++)
         {
-            //move all of the contents of the string to fit the replacement
-            for(j =orSize+diff-1; j > bytePositions[i]+sstr->byteLength; j -- )
-                thisstr->bytes[j] = thisstr->bytes[j-diff];
+            memmove(thisstr->bytes+bytePositions[i]+sstr->byteLength+diff,thisstr->bytes+bytePositions[i]+sstr->byteLength,thisstr->byteLength+1-(bytePositions[i]+sstr->byteLength));
             //copy in the replacement
-            strncpy(thisstr->bytes+bytePositions[i],rstr->bytes,rstr->byteLength);
+            memcpy(thisstr->bytes+bytePositions[i],rstr->bytes,rstr->byteLength);
             //also increase the original size (since now we moved the whole string by one replacement)
-            orSize += diff;
+            thisstr->byteLength += diff;
             //also increase all the subsequent found byte positions since there is a change of string size
             for(j = i+1; j < number; j ++)
                 bytePositions[j] = bytePositions[j]+diff;
-
         }
-        //finally let's keep the new byte length
-        thisstr->byteLength = nSize-1;
     }
     else if( rstr->byteLength < sstr->byteLength) //replace string is smaller than the removed one
     {
@@ -413,16 +422,15 @@ char i_rfString_Replace(RF_String* thisstr,const void* sstrP,const void* rstrP,c
         for(i =0; i < number; i ++)
         {
             //copy in the replacement
-            strncpy(thisstr->bytes+bytePositions[i],rstr->bytes,rstr->byteLength);
+            memcpy(thisstr->bytes+bytePositions[i],rstr->bytes,rstr->byteLength);
             //move all of the contents of the string to fit the replacement
-            for(j =bytePositions[i]+rstr->byteLength; j < thisstr->byteLength; j ++ )
-                thisstr->bytes[j] = thisstr->bytes[j+diff];
+            memmove(thisstr->bytes+bytePositions[i]+rstr->byteLength,thisstr->bytes+bytePositions[i]+sstr->byteLength,thisstr->byteLength+1-(bytePositions[i]+sstr->byteLength));
+            //reduce bytelength
+            thisstr->byteLength -= diff;
             //also decrease all the subsequent found byte positions since there is a change of string size
             for(j = i+1; j < number; j ++)
                 bytePositions[j] = bytePositions[j]-diff;
         }
-        //finally let's keep the new byte length
-        thisstr->byteLength -= diff*number;
         //just note that reallocating downwards is not necessary
     }
     else //replace and remove strings are equal

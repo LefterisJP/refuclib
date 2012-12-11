@@ -17,14 +17,28 @@
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef RF_XML_H
-#define RF_XML_H
+#ifndef RF_XML_MODULE_HEADERS
+#define RF_XML_MODULE_HEADERS
 
 #include <rf_options.h>
 #ifdef RF_MODULE_DF_XML //XML module check
-    #include <Data_Formats/rfc_xml.h>
-#else //end of XML module include
-    #error Attempted to include Refu XML module without the proper module flag on. If you need to use it build the library with that option.
+
+#include <Definitions/types.h> //for fixed size data types
+#include <Definitions/imex.h> //for import export macro
+#include <Definitions/defarg.h> //for enabling default arguments
+#include <String/string_decl.h> //for RF_String used in RF_XMLTag
+#include <String/stringx_decl.h> //for RF_StringX used in RF_XMLTag
+#include <Data_Structures/list_decl.h> //for RF_ListP used in RF_XMLTag
+#include <Data_Formats/xmltag_decl.h>//for RF_XMLTag
+#include <Data_Formats/xmltag.h> //for RF_XMLTag functions
+
+#include <IO/common.h> //for foff_rft used in RF_XML
+#include <stdio.h> //for FILE* used in RF_TextFile
+#include <IO/textfile_decl.h> //for RF_TextFile used in RF_XML
+#include <Data_Formats/xml_decl.h>//for RF_XML
+#include <Data_Formats/xml.h>//for RF_XML functions
+#else
+    #error Attempted to include RF_XML while not having compiled the library with the appropriate module activated
 #endif
 
 #endif //include guards end

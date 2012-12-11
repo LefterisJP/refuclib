@@ -25,11 +25,15 @@
 ** It's a private header since there is no need to expose this functionality to the user as
 ** things currently stand plus, if exposed to the user, the inlining would have to go away
 ** since Dynamic libraries can't have inline functions if I am not mistaken.
+**
+---------------------For internal library include make sure to have----------------------------
+#include <Definitions/inline.h> //for the inline declaration
+#include <Definitions/types.h> //for fixed size data types
+#include <Definitions/retcodes.h> //for return codes and true/false definition
+---------------------For internal library include make sure to have----------------------------
 */
 #ifndef RF_NUMERIC_INT_PH
 #define RF_NUMERIC_INT_PH
-
-#include <rf_setup.h> //for int64_t and inline declaration
 
 //xor swapping
 #define XOR_SWAP(X,Y)\

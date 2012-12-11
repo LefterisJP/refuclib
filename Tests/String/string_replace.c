@@ -1,5 +1,6 @@
 ﻿#include <RFstring.h>
-#include <stdio.h>
+#include <RFprintf.h>
+#include <refu.h>
 
 #include "../refu_tests.h"
 int main()
@@ -17,7 +18,7 @@ int main()
     EXPECT(true,rfString_Replace(&s1,RFS_("$FLAGS"),RFS_("-Wall -O2"),0,0))
     EXPECT(true,rfString_Replace(&s1,RFS_("$FILE"),RFS_("tocompile"),0,0))
     EXPECT(true,rfString_Replace(&s1,RFS_("$OBJDIRNAME"),RFS_("obj"),0,0))
-    printf("%s\n",rfString_Cstr(&s1));
+    rfPrintf("%S\n",&s1);
 
     //expect the same string with some kanji replaced by their English equivalent
     EXPECT(true,rfString_Init(&s2,"中国メディアはＪ３１について、９月に就役した初の空母「遼寧」号などに搭載する新型艦載機や輸出用戦闘機になるとの見方を伝えている。"))

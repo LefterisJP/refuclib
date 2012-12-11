@@ -1,5 +1,6 @@
 ﻿#include <RFstring.h>
-#include <stdio.h>
+#include <RFprintf.h>
+#include <refu.h>
 
 #include "../refu_tests.h"
 int main()
@@ -16,12 +17,12 @@ int main()
     rfString_Append(&s1,&s2);
 
     //expect the addition of the above sentence in stdout
-    printf("%s\n",rfString_Cstr(&s1));
+    rfPrintf("%S\n",&s1);
 
     //expect the additions of the sentences below in stdout
     EXPECT(true,rfString_Init(&s3,"A very interesting"));
     rfString_Append(&s3,RFS_(" %s is %s and its value is %.4f","number","the golden mean",1.6180339));
-    printf("%s\n",rfString_Cstr(&s3));
+    rfPrintf("%S\n",&s3);
 
     //expect true if the additions of these are correct
     EXPECT(true,rfString_Init(&s4,"東京"));

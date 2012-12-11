@@ -19,7 +19,6 @@
 #ifndef RF_STRING_DECL_H
 #define RF_STRING_DECL_H
 
-#include <rf_setup.h> //for uint32_t
 
 /**
 ** @internal

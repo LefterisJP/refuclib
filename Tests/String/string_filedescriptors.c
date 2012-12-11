@@ -1,6 +1,8 @@
 ﻿#include <RFstring.h>
-#include <rf_system.h>
-#include <stdio.h>
+#include <RFprintf.h>
+#include <RFsystem.h>
+#include <refu.h>
+
 
 
 #include "../refu_tests.h"
@@ -24,7 +26,7 @@ int main()
 	
     //expect to see the first line of the file (as mentioned in the first comment let's just get rid of the bom here)
     EXPECT(true,rfString_PruneStart(&s1,1))
-    printf("%s",rfString_Cstr(&s1));//ending newline is included since we don't use RF_TextFile
+    rfPrintf("%S",&s1);//ending newline is included since we don't use RF_TextFile
     
     //assign the next line to the same string
     EXPECTGE(0,rfString_Assign_fUTF8(&s1,futf8,&eof,RF_EOL_LF))
@@ -48,7 +50,7 @@ int main()
 	
 	EXPECTGE(0,rfStringX_Init_fUTF8(&sx1,futf8,&eof,RF_EOL_LF))
 	EXPECT(true,rfString_PruneStart(&sx1,1))
-	printf("%s",rfString_Cstr(&sx1));//ending newline is included since we don't use RF_TextFile
+	rfPrintf("%S",&sx1);//ending newline is included since we don't use RF_TextFile
 	EXPECTGE(0,rfStringX_Assign_fUTF8(&sx1,futf8,&eof,RF_EOL_LF))
     //append the next line to the same string
     EXPECTGE(0,rfStringX_Append_fUTF8(&sx1,futf8,&eof,RF_EOL_LF))
@@ -74,7 +76,7 @@ int main()
 	EXPECTGE(0,rfString_Init_fUTF16(&s3,futf16,RF_LITTLE_ENDIAN,&eof,RF_EOL_LF))
     //expect to see the first line of the file (as mentioned in the first comment let's just get rid of the bom here)
     EXPECT(true,rfString_PruneStart(&s3,1));
-    printf("%s",rfString_Cstr(&s3));//ending newline is included since we don't use RF_TextFile
+    rfPrintf("%S",&s3);//ending newline is included since we don't use RF_TextFile
     //assign the next line to the same string
     EXPECTGE(0,rfString_Assign_fUTF16(&s3,futf16,RF_LITTLE_ENDIAN,&eof,RF_EOL_LF))
     //append the next line to the same string and check for EOF
@@ -99,7 +101,7 @@ int main()
 	EXPECTGE(0,rfStringX_Init_fUTF16(&sx3,futf16,RF_LITTLE_ENDIAN,&eof,RF_EOL_LF))
     //expect to see the first line of the file (as mentioned in the first comment let's just get rid of the bom here)
     EXPECT(true,rfString_PruneStart(&sx3,1));
-    printf("%s",rfString_Cstr(&sx3));//ending newline is included since we don't use RF_TextFile
+    rfPrintf("%S",&sx3);//ending newline is included since we don't use RF_TextFile
     //assign the next line to the same string
     EXPECTGE(0,rfStringX_Assign_fUTF16(&sx3,futf16,RF_LITTLE_ENDIAN,&eof,RF_EOL_LF))
     //append the next line to the same string and check for EOF
@@ -127,7 +129,7 @@ int main()
 	EXPECTGE(0,rfString_Init_fUTF16(&s5,futf16,RF_BIG_ENDIAN,&eof,RF_EOL_LF))
     //expect to see the first line of the file (as mentioned in the first comment let's just get rid of the bom here)
     EXPECT(true,rfString_PruneStart(&s5,1))
-    printf("%s",rfString_Cstr(&s5));//ending newline is included since we don't use RF_TextFile
+    rfPrintf("%S",&s5);//ending newline is included since we don't use RF_TextFile
     //assign the next line to the same string
     EXPECTGE(0,rfString_Assign_fUTF16(&s5,futf16,RF_BIG_ENDIAN,&eof,RF_EOL_LF))
     //append the next line to the same string
@@ -152,7 +154,7 @@ int main()
 	EXPECTGE(0,rfStringX_Init_fUTF16(&sx5,futf16,RF_BIG_ENDIAN,&eof,RF_EOL_LF))
     //expect to see the first line of the file (as mentioned in the first comment let's just get rid of the bom here)
     EXPECT(true,rfString_PruneStart(&sx5,1))
-    printf("%s",rfString_Cstr(&sx5));//ending newline is included since we don't use RF_TextFile
+    rfPrintf("%S",&sx5);//ending newline is included since we don't use RF_TextFile
     //assign the next line to the same string
     EXPECTGE(0,rfStringX_Assign_fUTF16(&sx5,futf16,RF_BIG_ENDIAN,&eof,RF_EOL_LF))
     //append the next line to the same string
@@ -181,7 +183,7 @@ int main()
 	EXPECTGE(0,rfString_Init_fUTF32(&s7,futf32,RF_LITTLE_ENDIAN,&eof,RF_EOL_LF))
     //expect to see the first line of the file (as mentioned in the first comment let's just get rid of the bom here)
     EXPECT(true,rfString_PruneStart(&s7,1))
-    printf("%s",rfString_Cstr(&s7));//ending newline is included since we don't use RF_TextFile
+    rfPrintf("%S",&s7);//ending newline is included since we don't use RF_TextFile
     //assign the next line to the same string
     EXPECTGE(0,rfString_Assign_fUTF32(&s7,futf32,RF_LITTLE_ENDIAN,&eof,RF_EOL_LF))
     //append the next line to the same string
@@ -206,7 +208,7 @@ int main()
 	EXPECTGE(0,rfStringX_Init_fUTF32(&sx7,futf32,RF_LITTLE_ENDIAN,&eof,RF_EOL_LF))
     //expect to see the first line of the file (as mentioned in the first comment let's just get rid of the bom here)
     EXPECT(true,rfString_PruneStart(&sx7,1))
-    printf("%s",rfString_Cstr(&sx7));//ending newline is included since we don't use RF_TextFile
+    rfPrintf("%S",&sx7);//ending newline is included since we don't use RF_TextFile
     //assign the next line to the same string
     EXPECTGE(0,rfStringX_Assign_fUTF32(&sx7,futf32,RF_LITTLE_ENDIAN,&eof,RF_EOL_LF))
     //append the next line to the same string
@@ -235,7 +237,7 @@ int main()
 	EXPECTGE(0,rfString_Init_fUTF32(&s9,futf32,RF_BIG_ENDIAN,&eof,RF_EOL_LF))
     //expect to see the first line of the file (as mentioned in the first comment let's just get rid of the bom here)
     EXPECT(true,rfString_PruneStart(&s9,1))
-    printf("%s",rfString_Cstr(&s9));//ending newline is included since we don't use RF_TextFile
+    rfPrintf("%S",&s9);//ending newline is included since we don't use RF_TextFile
     //assign the next line to the same string
     EXPECTGE(0,rfString_Assign_fUTF32(&s9,futf32,RF_BIG_ENDIAN,&eof,RF_EOL_LF))
     //append the next line to the same string
@@ -261,7 +263,7 @@ int main()
 	EXPECTGE(0,rfStringX_Init_fUTF32(&sx9,futf32,RF_BIG_ENDIAN,&eof,RF_EOL_LF))
     //expect to see the first line of the file (as mentioned in the first comment let's just get rid of the bom here)
     EXPECT(true,rfString_PruneStart(&sx9,1))
-    printf("%s",rfString_Cstr(&sx9));//ending newline is included since we don't use RF_TextFile
+    rfPrintf("%S",&sx9);//ending newline is included since we don't use RF_TextFile
     //assign the next line to the same string
     EXPECTGE(0,rfStringX_Assign_fUTF32(&sx9,futf32,RF_BIG_ENDIAN,&eof,RF_EOL_LF))
     //append the next line to the same string

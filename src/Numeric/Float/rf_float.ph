@@ -28,6 +28,10 @@
 ** It's used by the String/format.h functions.
 ** It's a private header since there is no need to expose this functionality to the user.
 ** If more functions are added this may change
+**
+---------------------For internal library include make sure to have----------------------------
+
+---------------------For internal library include make sure to have----------------------------
 */
 #ifndef RF_FLOAT_PH
 #define RF_FLOAT_PH

@@ -15,11 +15,21 @@
 **  SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**
+** --String/manipulation.h
+** This header declares the functions that manipulate RF_String
+**
+---------------------For internal library include make sure to have----------------------------
+#include <Definitions/types.h> //for fixed size types needed in various places
+#include <String/string_decl.h>//for RF_String
+#include <Definitions/imex.h> //for the import export macro
+#include <Definitions/defarg.h> //for enabling default arguments
+#include <String/manipulation.h>
+---------------------For internal library include make sure to have----------------------------
 */
 #ifndef RF_STRING_MANIPULATION_H
 #define RF_STRING_MANIPULATION_H
 
-#include <String/string_decl.h>
 
 #ifdef __cplusplus
 extern "C"

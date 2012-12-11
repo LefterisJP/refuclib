@@ -1,4 +1,4 @@
-/**
+/*
 ** Copyright (c) 2011-2012, Karapetsas Eleftherios
 ** All rights reserved.
 **
@@ -18,16 +18,46 @@
 **
 **
 ** In this source file the private xml functionality is implemented
-**/
+*/
+
+//*---------------------Corrensponding Header inclusion---------------------------------
+#include <Definitions/types.h> //for fixed size data types
+#include <Definitions/imex.h> //for import export macro
+#include <Definitions/defarg.h> //for enabling default arguments
+#include <String/string_decl.h> //for RF_String used in RF_XMLTag
+#include <String/stringx_decl.h> //for RF_StringX used in RF_XMLTag
+#include <Data_Structures/list_decl.h> //for RF_ListP used in RF_XMLTag
+#include <Data_Formats/xmltag_decl.h>//for RF_XMLTag
+#include <IO/common.h> //for foff_rft used in RF_XML
+#include <stdio.h> //for FILE* used in RF_TextFile
+#include <IO/textfile_decl.h> //for RF_TextFile used in RF_XML
+#include <Data_Formats/xml_decl.h>//for RF_XML
 #include "common.ph"
+//*---------------------Module related inclusion----------------------------------------
+#include <Data_Formats/xmltag.h> //for XMLTag functions such as rfXMLTag_GetChild()
+#include <Data_Formats/xml.h> //for rfXML_Deinit()
+//*---------------------Outside module inclusion----------------------------------------
+#include <String/flags.h> //for flags such as RF_STRINGX_ARGUMENT
+#include <String/core.h> //for rfString_Equal(), rfString_Deinit() and others
+#include <String/corex.h> //for rfStringX_Deinit() and others
+#include <String/manipulation.h> //for rfString_TrimStart()
+#include <String/manipulationx.h> //for rfStringX_Append() and others
+#include <String/traversalx.h> //for rfStringX_MoveAfterPair() and others
+#include <String/retrieval.h> //for rfString_Find()
+#include <String/common.h> //for RFS_()
 
-#include <rf_error.h>
 
-#include <RFxml.h>
-#include <RFstring.h>
-#include <IO/rfc_textfile.h>
-#include <rf_utils.h>
+#include <IO/textfile.h> //for textfile functions such as rfTextFile_ReadLine2()
 
+#include <Data_Structures/list.h>//for RF_ListP functions such as rfListP_Get()
+
+#include <Utils/bits.h>//for RF_BITFLAG_ON()
+//For error logging
+    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
+    #include <Utils/error.h>
+
+#include <Definitions/retcodes.h> //for the return codes
+//*----------------------------End of Includes------------------------------------------
 
 //! Runs through the xml tree searching for a tag recursively by name and/or contents
 //! @param x The XML file handler

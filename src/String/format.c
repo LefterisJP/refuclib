@@ -1,13 +1,30 @@
+//*---------------------Corrensponding Header inclusion---------------------------------
+#include <stdarg.h>
+#include <Definitions/types.h> //for fixed size types needed in various places
+#include <String/string_decl.h>//for RF_String
+#include <String/stringx_decl.h>//for RF_StringX
+#include <Definitions/imex.h> //for the import export macro
 #include <String/format.h>
-
+//*---------------------Module related inclusion----------------------------------------
+#include <String/flags.h> //for string macro flags
 #include <String/common.h> // for RFS()
 #include <String/manipulationx.h> //for rfStringX_Append family of functions
 #include "common.ph"//include the string private functions and macros
+//*---------------------Outside module inclusion----------------------------------------
+//for the error logging macros
+    #include <stdio.h>//for FILE* used inside printf.h
+    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
+    #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
+    #include <Utils/error.h>
 
-#include <rf_error.h>
-
-#include <rf_localmem.h> //for local scope macros
-
+#include <Definitions/retcodes.h> //for the return codes
+//for the local scope macros
+    #include <Definitions/threadspecific.h> //for the thread specific attribute
+    #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
+    #include <string.h> //for memset()
+    #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
+    #include <Utils/localscope.h>
+//*----------------------------End of Includes------------------------------------------
 
 //the specifiers that can appear in a format string
 enum  legalCharacters
@@ -396,8 +413,8 @@ static int Parse_FormatSpecifier(const char* s,Argument_Format* data)
         break;
         default:
             state = END_FORMAT;
-            i= -1;
             LOG_ERROR("During parsing a format string illegal control character '%c' was encountered",RE_FORMAT_ILLEGALCHAR,s[i])
+            i= -1;
         break;
     }//end of the huge switch
     i++;

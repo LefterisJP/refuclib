@@ -16,12 +16,43 @@
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#ifndef RF_STRING_MODULE_HEADERS
+#define RF_STRING_MODULE_HEADERS
 
-#ifndef REFU_STRING_H
-#define REFU_STRING_H
+#include <rf_options.h>
+#ifdef RF_MODULE_STRINGS//check if the strings are included as a module
 
-//include the C RF_String and RF_StringX
-#include <String/rf_string.h>
-#include <String/rf_stringx.h>
-//if this is c++ include the c++ wrapper too
+#include <Definitions/types.h> //fixed size data types
+#include <Definitions/imex.h> //including the import export macro
+#include <Definitions/defarg.h>//enabling defargs
+#include <String/string_decl.h>
+#include <String/common.h>
+#include <String/unicode.h>
+#include <String/flags.h> //for some needed flags
+
+#include <Utils/constcmp.h> //for RF_HEXEQ_C() used in rfUTF8_IsContinuationByte() which itself is used in the iteration macros
+#include <String/core.h>
+
+#include <String/retrieval.h>
+#include <String/conversion.h>
+#include <String/manipulation.h>
+
+#include <stdio.h> //for FILE* used in String/files.h and String/filesx.h
+#include <IO/common.h> //for RF_EOL macros used in String/files.h and String/filesx.h
+#include <String/files.h>
+
+//*---------------------------------------RF_StringX headers---------------------------------------
+#include <String/stringx_decl.h>
+#include <String/corex.h>
+#include <String/manipulationx.h>
+#include <String/traversalx.h>
+#include <String/filesx.h>
+
+#include <stdarg.h> //needed for the va_list argument in rfStringX_Formatv()
+#include <String/format.h>
+
+#else //end of the strings module include
+    #error Attempted to include Refu String manipulation with the String module flag off. Rebuild the library with that option added if you need to include them
+#endif
+
 #endif //end OF ifndef guards

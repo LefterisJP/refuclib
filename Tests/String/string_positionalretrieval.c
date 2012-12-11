@@ -1,5 +1,6 @@
 ﻿#include <RFstring.h>
-#include <stdio.h>
+#include <RFprintf.h>
+#include <refu.h>
 
 #include "../refu_tests.h"
 int main()
@@ -32,13 +33,13 @@ int main()
     EXPECT(true,rfString_Init(&s2,"I Am A StRinG wItH PecULIAR LeTteRs caSE"))
     //expect (true), and "PecULIAR" which is the substring
     EXPECT(true,rfString_Between(&s2,RFS_("I am a string with "),RFS_(" Letters"),&ret,RF_CASE_IGNORE))
-    printf("%s\n",rfString_Cstr(&ret));
+    rfPrintf("%S\n",&ret);
     rfString_Deinit(&ret);
 
     //expect true from both and <meta name="application-name
     EXPECT(true,rfString_Init(&s3,"<meta name=\"application-name\" content=\"BBC News\" />"))
     EXPECT(true,rfString_Beforev(&s3,&ret,0,2,RFS_("/>"),RFS_("\" ")))
-    printf("%s\n",rfString_Cstr(&ret));
+    rfPrintf("%S\n",&ret);
     //expect false
     EXPECT(false,rfString_Beforev(&s3,&ret,0,4,RFS_("56"),RFS_("@"),RFS_("ένταξη"),RFS_("Not in there")))
     rfString_Deinit(&ret);

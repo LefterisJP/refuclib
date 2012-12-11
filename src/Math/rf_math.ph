@@ -16,19 +16,21 @@
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **
-**
-**
 ** -- Math/rf_math.ph
 ** This file contains some math functions that I wanted
 ** to implement for the library. Maybe some day I would like to
 ** work towards my own implementation of the stdlib's math functions
 ** but for now this contains just things needed internally in the library
 ** so it's a private header.
+**
+---------------------For internal library include make sure to have----------------------------
+#include <Definitions/inline.h>//for the inline declaration
+#include <Definitions/types.h> //for the fixed size data types
+---------------------For internal library include make sure to have----------------------------
 */
 #ifndef RF_MATH_PH
 #define RF_MATH_PH
 
-#include <rf_setup.h>
 
 
 //! @brief Calculates the logarithm base 2 of an @c uint32_t

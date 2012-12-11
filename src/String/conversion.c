@@ -1,17 +1,35 @@
+//*---------------------Corrensponding Header inclusion---------------------------------
+#include <Definitions/types.h> //for fixed size types needed in various places
+#include <String/string_decl.h>//for RF_String
+#include <Definitions/imex.h> //for the import export macro
+#include <Definitions/defarg.h> //for enabling default arguments
 #include <String/conversion.h>
-
-#include <IO/rf_unicode.h>
-#include <rf_localmem.h> //for the local scope macros
-
+//*---------------------Module related inclusion----------------------------------------
 #include <String/core.h>//for rfString_Equal
 #include <String/retrieval.h> //for rfString_Count
 #include <String/common.h> //for RFS_()
 #include "common.ph" //for required string private macros and functions
-
-#include <rf_memory.h>
-
+//*---------------------Outside module inclusion----------------------------------------
+#include <String/unicode.h>
+#include <Definitions/retcodes.h> //for error codes
+#include <Utils/constcmp.h> //for RF_HEXEQ_C() macro and others
+//for local scope macros
+    #include <Definitions/threadspecific.h> //for the thread specific attribute
+    #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
+    #include <string.h> //for memset()
+    #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
+    #include <Utils/localscope.h>
+//for memory allocation macros
+    #include <stdlib.h> //for malloc, calloc,realloc and exit()
+    #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
+    #include <stdio.h>//for FILE* used inside printf.h
+    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
+    #include <Utils/error.h> //for LOG_ERROR() macros
+    #include <Utils/memory.h> //for refu memory allocation
+//*---------------------libc Headers inclusion------------------------------------------
 #include <errno.h> //for errno
 #include <math.h> //for HUGE_VAL
+//*----------------------------End of Includes------------------------------------------
 
 //Returns the strings contents as a UTF-16 buffer
 uint16_t* rfString_ToUTF16(const void* sP,uint32_t* length)

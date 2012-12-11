@@ -22,11 +22,15 @@
 ** This is the private header file of the C RF_String
 ** containing functions and macros that don't need to be exposed
 ** to the user
+**
+---------------------For internal library include make sure to have----------------------------
+#include <Definitions/types.h> //for fixed size types needed in various places
+#include "common.ph"
+---------------------For internal library include make sure to have----------------------------
 */
 #ifndef RF_STRING_COMMON_PH
 #define RF_STRING_COMMON_PH
 
-#include <rf_setup.h> //for int32_t declaration
 
 #ifdef __cplusplus
 extern "C"

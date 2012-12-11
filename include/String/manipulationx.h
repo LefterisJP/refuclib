@@ -15,11 +15,22 @@
 **  SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 **  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 **  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**
+** --String/manipulationx.h
+** This header declares the functions that manipulate RF_StringX
+**
+---------------------For internal library include make sure to have----------------------------
+#include <Definitions/types.h> //for fixed size types needed in various places
+#include <String/string_decl.h>//for RF_String
+#include <String/stringx_decl.h> //for RF_StringX
+#include <Definitions/imex.h> //for the import export macro
+#include <Definitions/defarg.h> //for enabling default arguments
+#include <String/manipulationx.h>
+---------------------For internal library include make sure to have----------------------------
 */
 #ifndef RF_STRING_MANIPULATIONX_H
 #define RF_STRING_MANIPULATIONX_H
 
-#include <String/stringx_decl.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -300,7 +311,7 @@ i_DECLIMEX_ char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,const void* left
 #define i_SELECT_RF_STRINGX_REPLACEBETWEEN6(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_REPSTR_,i_OPTIONS_,i_OCCURENCE_)  \
     i_rfStringX_ReplaceBetween(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_REPSTR_,i_OPTIONS_,i_OCCURENCE_)
 #define i_SELECT_RF_STRINGX_REPLACEBETWEEN5(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_REPSTR_,i_OPTIONS_)  \
-    i_rfStringX_ReplaceBetween(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_REPSTR_,i_OPTIONS_,0)
+    i_rfStringX_Between(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_REPSTR_,i_OPTIONS_,0)
 #define i_SELECT_RF_STRINGX_REPLACEBETWEEN4(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_REPSTR_)  \
     i_rfStringX_ReplaceBetween(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_REPSTR_,0,0)
 #define i_SELECT_RF_STRINGX_REPLACEBETWEEN3(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfStringX_ReplaceBetween() accepts from 4 to 6 arguments\"")

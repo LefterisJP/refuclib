@@ -1,5 +1,6 @@
 ﻿#include <RFstring.h>
-#include <rf_stdio.h>
+#include <RFprintf.h>
+#include <refu.h>
 
 #include "../refu_tests.h"
 int main()

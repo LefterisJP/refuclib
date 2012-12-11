@@ -1,5 +1,6 @@
 ﻿#include <RFstring.h>
-#include <stdio.h>
+#include <RFprintf.h>
+#include <refu.h>
 
 #include "../refu_tests.h"
 int main()
@@ -12,17 +13,17 @@ int main()
 	//testing RF_String copying functions
 	EXPECT(true,rfString_Init(&s1,"Millions of Americans are voting on whether to re-elect President Barack Obama or choose Mitt Romney with polls predicting a tight race."))
 	EXPECTNOT(0,(s2=rfString_Copy_OUT(&s1)))
-	printf("%s\n",rfString_Cstr(s2))
+	rfPrintf("%S\n",s2);
 	EXPECT(true,rfString_PruneEnd(s2,14))
 	rfString_Copy_IN(&s3,s2);
-	printf("%s\n",rfString_Cstr(&s3))
+	rfPrintf("%S\n",&s3);
 	rfString_Copy_chars(&s4,&s3,21);
-	printf("%s\n",rfString_Cstr(&s4))
+	rfPrintf("%S\n",&s4);
 	EXPECT(true,rfString_Init(&s5,"Ολι Ρεν: Αισιόδοξος για την εκταμίευση της δόσης στο Eurogroup Νοεμβρίου"))
  
 	//testing RF_StringX copying functions from String
 	rfStringX_FromString_IN(&sx1,&s1);
-	printf("%s\n",rfString_Cstr(&sx1))
+	rfPrintf("%S\n",&sx1);
 	EXPECTNOT(0,(sx2=rfStringX_FromString_OUT(&s5)))
 	EXPECT(true,rfString_Equal(sx2,RFS_("Ολι Ρεν: Αισιόδοξος για την εκταμίευση της δόσης στο Eurogroup Νοεμβρίου")))
 	

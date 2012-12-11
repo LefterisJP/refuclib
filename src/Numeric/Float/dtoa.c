@@ -19,6 +19,7 @@
 #include "rf_float.ph"
 #define IEEE_8087  //for now the only machine type we care about
 
+//All the places where //-EDIT- comments exist have been edited for the purposes of Refu library
 
 /* Please send bug reports to David M. Gay (dmg at acm dot org,
  * with " at " changed at "@" and " dot " changed to ".").	*/
@@ -201,7 +202,16 @@ typedef unsigned Long ULong;
 #define Bug(x) {fprintf(stderr, "%s\n", x); exit(1);}
 #endif
 
-#include "stdlib.h"
+//-EDIT- replaced stdlib.h with rf_memory.h since it was only needed for malloc() and free()
+#include <stdlib.h> //for malloc, calloc,realloc and exit()
+#include <Definitions/retcodes.h> //for error codes, logged in allocation failure
+#include <stdio.h>//for FILE* used inside printf.h
+#include <Definitions/imex.h> //for import export macro used inside <Utils/error.h>
+#include <Definitions/types.h> //for fixed size data types used inside <Utils/error.h>
+#include <IO/printf.h> //for rfFpintf() used in the error logging macros
+#include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
+#include <Utils/error.h> //for LOG_ERROR() macros
+#include <Utils/memory.h> //for refu memory allocation
 #include "string.h"
 
 #ifdef USE_LOCALE
@@ -565,7 +575,8 @@ Balloc
 	else {
 		x = 1 << k;
 #ifdef Omit_Private_Memory
-		rv = (Bigint *)MALLOC(sizeof(Bigint) + (x-1)*sizeof(ULong));
+		//rv = (Bigint *)MALLOC(sizeof(Bigint) + (x-1)*sizeof(ULong)); //-EDIT- Using refu malloc macro
+        RF_MALLOC(rv,sizeof(Bigint) + (x-1)*sizeof(ULong))
 #else
 		len = (sizeof(Bigint) + (x-1)*sizeof(ULong) + sizeof(double) - 1)
 			/sizeof(double);
@@ -574,7 +585,8 @@ Balloc
 			pmem_next += len;
 			}
 		else
-			rv = (Bigint*)MALLOC(len*sizeof(double));
+			//rv = (Bigint*)MALLOC(len*sizeof(double)); //-EDIT- Using refu malloc macro
+			RF_MALLOC(rv,len*sizeof(double))
 #endif
 		rv->k = k;
 		rv->maxwds = x;
@@ -1784,8 +1796,12 @@ gethex( CONST char **sp, U *rvp, int rounding, int sign)
 	static unsigned char *decimalpoint_cache;
 	if (!(s0 = decimalpoint_cache)) {
 		s0 = (unsigned char*)localeconv()->decimal_point;
-		if ((decimalpoint_cache = (unsigned char*)
-				MALLOC(strlen((CONST char*)s0) + 1))) {
+
+		//-EDIT- Using refu malloc macro
+		//if ((decimalpoint_cache = (unsigned char*)
+		//		MALLOC(strlen((CONST char*)s0) + 1))) {
+		RF_MALLOC(decimalpoint_cache,strlen((CONST char*)s0) + 1)
+		if(decimalpoint_cache){
 			strcpy((char*)decimalpoint_cache, (CONST char*)s0);
 			s0 = decimalpoint_cache;
 			}
@@ -3690,7 +3706,7 @@ doubleToStr //-EDIT- renaming the functions to compile correctly even for compil
 	*/
 
 	int bbits, b2, b5, be, dig, i, ieps, ilim, ilim0, ilim1,
-		j, j1, k, k0, k_check, leftright, m2, m5, s2, s5,
+		j, j1=0, k, k0, k_check, leftright, m2, m5, s2, s5,
 		spec_case, try_quick;
 	Long L;
 #ifndef Sudden_Underflow

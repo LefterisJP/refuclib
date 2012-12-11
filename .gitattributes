@@ -1,4 +1,3 @@
-
 *.cbp merge=keepours
 *.layout merge=keepours
 #force this file to appear as binary 

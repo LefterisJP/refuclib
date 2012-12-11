@@ -20,16 +20,30 @@
 ** In this source file the private text file functionality
 ** is implemented
 */
+//*---------------------Corrensponding Header inclusion---------------------------------
+#include <Definitions/types.h> //for fixed size types needed in various places
+#include <stdio.h> //for FILE*
+#include <String/string_decl.h> // for RF_String (used in RF_TextFile
+#include <IO/textfile_decl.h> //for RF_TextFile
 #include "textfile.ph"
+//*---------------------Module related inclusion----------------------------------------
+#include <IO/common.h> //for common I/O flags and definitions
+#include <Definitions/imex.h>
+#include <IO/file.h> //for all the IO functions
+#include "io.ph"//for private I/O macros
+//*---------------------Outside module inclusion----------------------------------------
+#include <String/unicode.h> //for the unicode macros
 
-#include <rf_error.h>
-
-#include <IO/rfc_textfile.h>
-#include <String/conversion.h> //for rfString_Cstr()
-#include <IO/rf_unicode.h> //for the unicode macros
-
+#include <Definitions/retcodes.h>//for the return codes
+//for error logging
+    #include <Definitions/types.h>
+    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
+    #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
+    #include <Utils/error.h>
+//*---------------------libc Headers inclusion------------------------------------------
 #include <errno.h>
 #include <string.h> //for strstr()
+//*----------------------------End of Includes------------------------------------------
 
 // Adds a Byte order mark to the file at the current position. Only to be used at the start of the file
 int32_t i_rfTextFile_AddBom(RF_TextFile* t)

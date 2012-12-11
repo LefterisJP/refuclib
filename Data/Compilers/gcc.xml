@@ -4,8 +4,9 @@
 <compiler>
 	<name>gcc</name>
 	<cmd>-c -I$INCLUDES $FLAGS $FILE -o ./$OBJDIRNAME/$FILE.o</cmd>
-	<flags>-static-libgcc  
-	<linux>-D_GNU_SOURCE</linux>
+	<flags>-static-libgcc 
+	<win32> -DREFU_WIN32_VERSION</win32>
+	<linux>-D_GNU_SOURCE -DREFU_LINUX_VERSION</linux>
 	</flags>
 	<test_cmd>$FILE -I$REFUINCLUDE -L$LIBDIR $LIBNAME -o $OUTPUT $FLAGS</test_cmd>
 	<test_flags>-Wall

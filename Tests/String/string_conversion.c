@@ -1,5 +1,6 @@
 ﻿#include <RFstring.h>
-#include <stdio.h>
+#include <RFprintf.h>
+#include <refu.h>
 #include <stdlib.h>
 
 
@@ -45,8 +46,8 @@ int main()
 	rfString_ToLower(&s1);
 	EXPECT(true,rfString_Init(&s2,"abcdefghijklmnopqrstuvwxyz"));
     rfString_ToUpper(&s2);
-    printf("%s\n",rfString_Cstr(&s1));
-    printf("%s\n",rfString_Cstr(&s2));
+    rfPrintf("%S\n",&s1);
+    rfPrintf("%S\n",&s2);
 
 
     //first create the string to test. Japanese(Adachiku) + MusicalSymbol(G clef)
@@ -61,20 +62,20 @@ int main()
     rfString_Init(&s5,"15042");
     EXPECT(false,rfString_ToInt(&s3,&num));
     EXPECT(true,rfString_ToInt(&s5,&num));
-    printf("%d\n",num);
+    rfPrintf("%d\n",num);
 
     //expect RE_STRING_TOFLOAT and RF_SUCCESS and 3.141592
     EXPECT(true,rfString_Init(&s6,"3.141592"));
     EXPECT(RE_STRING_TOFLOAT,rfString_ToDouble(&s3,&dbl));
     EXPECT(RF_SUCCESS,rfString_ToDouble(&s6,&dbl));
-    printf("%f\n",dbl);
+    rfPrintf("%f\n",dbl);
 
     //expect the sentence separated in words
     EXPECT(true,rfString_Init(&s7,"Drug companies are facing mounting pressure to investigate reports that new medicines are being tested on some of the poorest people in India without their knowledge"));
     EXPECT(true,rfString_Tokenize(&s7,RFS_(" "),&wordsN,&words));
     for(i=0;i<wordsN;i++)
     {
-        printf("%s\n",rfString_Cstr(&words[i]));
+        rfPrintf("%S\n",&words[i]);
     }
     //free stuff
     for(i = 0; i < wordsN; i++)

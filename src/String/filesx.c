@@ -1,15 +1,32 @@
+//*---------------------Corrensponding Header inclusion---------------------------------
+#include <stdio.h> //for FILE*
+#include <IO/common.h> //for RF_EOL macros
+#include <Definitions/imex.h> //for the import export macro
+#include <Definitions/types.h> //for fixed size types needed in various places
+#include <String/unicode.h> //for the unicode macros RF_UTF8 and friends
+#include <String/string_decl.h>//for RF_String
+#include <String/stringx_decl.h>//for RF_StringX
 #include <String/filesx.h>
-
+//*---------------------Module related inclusion----------------------------------------
 #include <String/common.h> // for RFS_()
 #include <String/manipulationx.h> //for rfStringX_Append and others
 #include <String/traversalx.h> //for rfStringX_Reset and others
+#include <IO/file.h> //for rfReadLine family  of functions
+//*---------------------Outside module inclusion----------------------------------------
+//for error logging macros
+    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
+    #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
+    #include <Utils/error.h>
+//for memory allocation macros
+#include <stdlib.h> //for malloc, calloc,realloc and exit()
+#include <Definitions/retcodes.h> //for error codes, logged in allocation failure
+#include <Utils/memory.h> //for refu memory allocation
+//for the endianess macros
+#include <Utils/endianess.h> //for the endianess macros
+//*-----------------------------Libc inclusion------------------------------------------
+#include <string.h> //for memcpy()
+//*----------------------------End of Includes------------------------------------------
 
-#include <rf_error.h>
-#include <rf_memory.h>
-
-#include <rf_localmem.h> //for the local memory scope macros
-
-/*------------------------------------------------------------------------- File I/O RF_StringX Functions -------------------------------------------------------------------------------*/
 
 //Allocates and returns an extended string from file parsing. The file's encoding must be UTF-8.If for some reason (like EOF reached) no string can be read then null is returned
 RF_StringX* rfStringX_Create_fUTF8(FILE* f, char* eof,char eol)
