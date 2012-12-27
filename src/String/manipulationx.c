@@ -150,6 +150,9 @@ void rfStringX_Append_int(RF_StringX* thisstr,int64_t num,int width,int precisio
         len=1;
         hasSign=1;
     }
+
+
+
     //turn the string into a number
     len+=intToStr(num,buff+hasSign);
 

@@ -20,6 +20,7 @@ int main()
 	rfPrintf("Left-justify %-8uMore stuff follow\n",2012);
 	rfPrintf("Left-justify %0-8uThis time the padding is zeroes\n",2012);
 	rfPrintf("Right justify with zeros for padding %08d\n",-1986);
+	rfPrintf("Testing %d %d\n",-1,4);
 //! [DECIMAL]
 
 //! [HEXADECIMAL]

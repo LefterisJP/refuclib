@@ -21,8 +21,7 @@ int checkEqual(char* b1,char* b2)
 
 int main()
 {
-	RF_String s1,s2,s3,s4;
-	uint32_t length;
+	RF_String s1,s2;
 
 	rfInit();
 

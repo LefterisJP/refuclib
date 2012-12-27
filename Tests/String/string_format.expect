@@ -2,6 +2,7 @@ Decimal    +1337
 Left-justify 2012    More stuff follow
 Left-justify 20120000This time the padding is zeroes
 Right justify with zeros for padding 000-1986
+Testing -1 4
 1337 in hex is 539
 15 in hex is 0xf
 Hex with upper flag and padding:     0xDEADBEEF

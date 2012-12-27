@@ -61,7 +61,8 @@ i_INLINE_DECL int intToStr(int64_t i,char* buff)
         buff[0] = '-';
         j=1;
         k=1;
-        hasSign = true;
+        if(num>10)//for 1<=num<=9 has sign should be 0 so that no swapping happens
+            hasSign = true;
     }
     //turn the string into a number
     while(num != 0)
