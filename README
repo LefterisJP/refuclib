@@ -1,17 +1,11 @@
-To learn more information about the library, documentation, building guide and much more visit:
-http://refu.realintelligence.net
+Refu Library
 
-To compile the library edit the appropriate configuration file:
-1)**Windows**:refu_config_win32 
-and run the rfb_win32.exe
- 
-2)**Linux**: refu_config_linux and run rfb_linux 
-executable
-In linux you may get a "permission denied error" while attempting
-to execute the refu builder. If so then run
-chmod 755 /rfb_linux to give it executable permissions.
+Refu is a collection of C/C++ programming libraries aspiring to stand alone and without dependencies in as many systems as possible. To learn more information about the library, documentation, building guide and more visit:
+http://clib.refu.co
+
+To compile the library make sure you have Python2 installed in your system. Then to simply build Refu follow the guide at the start page http://clib.refu.co/#RF_Start_BuildingSCons or for a more in-depth guide on the various build-options offered by the library you should read the building page of Refu http://clib.refu.co/RF_BuildingPGE.html
 
 Contributions to the project are greatly encouraged. In order to learn how to contribute visit the relevant page:
-http://refu.realintelligence.net/RF_ContributePGE.html
+http://clib.refu.co/RF_ContributePGE.html
 
-Contact me at: lefteris@realintelligence.net
+Contact me at: lefteris -aaTtt- refu -dooot- co

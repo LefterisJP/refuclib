@@ -1,5 +1,6 @@
 import os
 import platform
+import sys
 
 SConscript('scripts/sconsdata/compilers.py')
 SConscript('scripts/sconsdata/modules.py')
@@ -16,7 +17,7 @@ targetSystem = platform.system()
 allowedCompilers = ['gcc', 'tcc', 'msvc']
 
 
-#the command line arguments 
+#the command line arguments
 AddOption('--config-file', dest='configFileName',action='store', type='string',help='The name of the refu configuration file')
 AddOption('--test-build', dest='testBuild',action='store_true', help='Will compile a test build')
 AddOption('--compiler', dest='compiler', action='store',type='string',help='The compiler name. Allowed values are: gcc, tcc, msvc')
@@ -25,9 +26,15 @@ AddOption('--testsrc', dest='testsrc', action='store',type='string',help='When s
 
 #get the compiler
 compiler = GetOption('compiler');
-if(compiler not in allowedCompilers):
-    print "The given compiler name is not supported. Please choose one of the supported compilers. Defaulting to gcc."
+
+if(compiler != None and compiler  not in allowedCompilers):
+    print "**ERROR** The given compiler name is not supported. Please provide one of the supported compiler values"
+    print " ,".join(allowedCompilers)
+    sys.exit(-1)
+if(compiler == None):
+    print "No compiler was given. Defaulting to GCC"
     compiler = 'gcc'
+
 
 #get the configuration file name from the arguments (if given)
 configFileName = GetOption('configFileName')

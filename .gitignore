@@ -45,3 +45,4 @@ Tests/TestsLog
 *.o
 .sconsign.dblite
 TAGS
+scripts/systemcheck/systemcheck

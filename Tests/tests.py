@@ -180,13 +180,13 @@ def runTests(compiler,dynamic,outName,logFile,verbose,debug,tests):
                         os.remove(os.path.join(root,outName))
                     except:
                         pass
-                    #after finishing a test delete the executable
-                    try:
-                        os.remove(os.path.join(root,testExec))
-                    except:
-                        pass
-                    #adding some delay between tests until I figure out a better way to do this
-                    time.sleep(delay)
+                #after finishing a test delete the executable
+                try:
+                    os.remove(os.path.join(root,testExec))
+                except:
+                    pass
+                #adding some delay between tests until I figure out a better way to do this
+                time.sleep(delay)
     #after all tests have concluded clean up
     sys.stdout.write("\n");
     logFile.write("\n");
