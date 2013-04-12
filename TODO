@@ -1,0 +1,131 @@
++ [Refu builder]
+	- Fix a bug. These arguments crush the builder in Windows: rfb_win32.exe -v -oonly -f refu_config_win32
+	- Make the possible flags be read from outside data also so that there is no need to recompilie the builder
+	  to add more options or to alter existing one
+
++ [TODO - documentation]
+	- Generally try to work on the documentation as much as possible ... make it nicer..
+
++ [TODO-xml]
+	--Make the xml parsing able to parse huge one-line xml files and ease restrictions such as the existence of XML header.
+	  Test by parsing the 1 line huge files that bing search api returns. Make this work only on memory(?) parsing ... or 
+	   just find a better way to mix memory and disk parsing of xml files since right now it's totally mucked up
+
++ [TODO-Documentation]:
+
+	-- Small documentation TODO. With the change of having a different class of images for each image the doxygen <div class="image"></div> wrapper over each image is uneneccary. Maybe alter the 
+	   documentation script to search for and remove it?
+
++ [TODO - Datastructures]
+	-- Work on the existing data structures and clear out their meaning and what theyare supposed to be used for
+	-- Make more data structures
+	-- Add a way to save data structures to a file and load them back in a way that is cross-platform and recognizable by
+	   the library
+   
++ [Builder TODOs]:
+	-- Give the Refu builder the ability to recognize different compiler directories for different compilers. So that the 
+	   configuration file can contain more than one compiler directory which would be matched to the equivalent compiler.   
+
+
++ [TODO - IO/Popen]
+	-- Maybe provide more options. Such as capturing stderr too. Unless it already happens. Which is strange since calling gcc
+	   from refu_buidler with rfPOpen it does output when a gcc error happens but from python I need to specifically read stderr.
+	   Need to figure out what I am reading with rfPOpen and make sure that rfPopen provides as many options as possible
+
++ [String ToDOs]:
+  -- Create a library specific printf that will act just like the normal printf except for having an extra %FORMAT sign for Refu strings
+
++[TODO]:
+ 
+   --Implement check for null pointers if one is needed. Now where should one be needed in an API? I guess to any function exposed to the user that may be provided a 0 (null pointer)
+
+   -- For the XML Make a function that can return a child of a certain XMLTag by name
+   -- Error Logging: Rethink it. Make it also C89 compatible. Also make the whole error logging disablable by a macro switch. Absolutely essential messages should be sent to 
+      stdout with printf. Or if not ... think of a better system and rehaul all of the error logging.
+   -- ANSI C: Make an ANSIC macro switch which will enable compiling the library in ANSI_C (C89 standard). Make sure that the library is compilable under this standard since this will
+      be the backbone that the language I want to make in the future will be using
+ 
++[TODO-THINK]:
+	-- Accessor function. Make them. For example XMLTag should have accessor functions which both provide a copy of the name string but
+	   also ones which point to it. Depending on the situation the user could use what he wants
+	
+	-- free() hidden inside all the Deinit and Destroy functions is called, or can be called at any time. But free() is an expensive operation. I have heard that sometimes free() calls
+	   do not immediately free the data, but instead try to free() them after a few free() calls are bundled together. Think of some way to utilize this, or confirm if this is happening 
+       and act accordingly 
+	   
+	
+**** Files/Dirs removed for the release version ****
+  include/Utils
+  include/rf_math.h
+  include/String/cppstring.h
+  include/String/cppstringx.h
+  include/Networking
+  src/Math/rf_math.c
+  src/Networking
+  src/String/cppstring.cpp
+  src/String/cppstringx.cpp
+  src/Utils/rf_float.c
+  src/main.c
+  src/main.cpp
+
+
+
++[TODO] Make the following python scripts:
+
+ *LMS Wrapper functions and macros script
+ *Change all the preprocessor scripts so that they also print the license
+ *Create a script to copy all of the required refu sources into the Refu Release directory
+  and omit all  those that don't make it to release
+
+
+
++ [TODO] In XML maybe I should figure out a way for the searches to start from
+   the current/last position instead of the start of the file/root of the tree.
+
++ This is a list of the variable argument functions (not macros) that deserve special 
+  attention due to the fact of a limit on their calling due to the wrapping functions
+	-rfString_Beforev
+	-rfString_Afterv
+	-rfStringX_MoveAfterv
+	-rfXML_GetTag()
+	-rfXMLTag_Create(..)
+	-rfXMLTag_CreateLocal(..)
+	-rfXMLTag_Init()
+
++ **LOCAL MEMORY STACK / TEMP MACROS **
+  So far only two structures can be initialized in the local memory stack
+     -RF_String
+     -RF_XMLTag
+
+  I believe I might need to create more even if not used directly,
+  because inside the RF_XMLTag Local Creation function I was forced to reimplement
+  most creation functions using local stack push
+
++ **MAKE SURE** That from inside the Refu library no calls are made to functions that accept
+  default arguments with any arguments left to default. This is the only way that the library
+  will be able to compile with non C99 compliant compilers
+
++ rfIO_FGetsUTF8/16/32 <-- implement a proper byte stream check for the correct encodign in all 3 of them
+
++ rfString_Find/s and rfString_FindBytePos/s and generally functions like that , which return either an index
+  position or a negative, failure number need to have a check for the actual index being bigger than 
+  what is represented by the return value (int32_t). Could also increase the return type to int64_t
+  in the future.
+
++ Create Thread-safe versions of the RF_TextFile OR , make the already existing Textfile
+  threadsafe. Think of which of the two!
+
++ Intel C++ compiler needs thorough testing with both the refu builder and building 
+  the refu library. Need to obtain a correct installation to be able to do so.
+
+--Python C++ Wrapping program--
+
++ Try to figure out a way to also alter the comments nicely in the C++ documentation
+
++ Added default valued functions in the string headers. Was a pain to document them with doxygen but now I should also
+  implement different kind of wrapping for them.
+
+**Reminders**
+
+- In linux the command to build the refu builder with static linkage since codeblocks does not work is:
+gcc -static main.c compiler.c config.c writer.c -I./include -L./lib -lrefu_linux -lrt -o ./refu_builder

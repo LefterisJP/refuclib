@@ -407,20 +407,20 @@ char rfString_Beforev(const void* thisstrP,void* resultP,const char options,cons
     va_start(argList,parN);
     RF_ENTER_LOCAL_SCOPE()
 
-    minPos = LONG_MAX;
+    minPos = INT_MAX;
     for(i = 0; i < parN; i++)
     {
         s = (const RF_String*) va_arg(argList,RF_String*);
         if( (thisPos= rfString_FindBytePos(thisstr,s,options))!= RF_FAILURE)
         {
-            if(thisPos < minPos)
-                minPos = thisPos;
+            if(thisPos < minPos)      
+               minPos = thisPos;
         }
     }
     va_end(argList);
 
     //if it is not found
-    if(minPos == LONG_MAX)
+    if(minPos == INT_MAX)
     {
         RF_EXIT_LOCAL_SCOPE()
         return false;
@@ -539,7 +539,7 @@ char rfString_Afterv(const void* thisstrP,void* resultP,const char options,const
     //get the parameter characters
     va_start(argList,parN);
 
-    minPos = LONG_MAX;
+    minPos = INT_MAX;
     for(i = 0; i < parN; i++)
     {
         s = (const RF_String*) va_arg(argList,RF_String*);
@@ -554,7 +554,7 @@ char rfString_Afterv(const void* thisstrP,void* resultP,const char options,const
     }
     va_end(argList);
     //if it is not found
-    if(minPos == LONG_MAX)
+    if(minPos == INT_MAX)
     {
         RF_EXIT_LOCAL_SCOPE()
         return false;

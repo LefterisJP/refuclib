@@ -33,6 +33,9 @@
 #include <IO/common.h> //for common I/O flags and definitions
 #include <IO/textfile.h>
 
+//for File manipulation
+#include <System/rf_system.h>
+
 #else
     #error Attempted to include RF_TextFile while not having compiled the library with the appropriate module activated
 #endif

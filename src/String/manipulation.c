@@ -365,7 +365,7 @@ char i_rfString_Replace(RF_String* thisstr,const void* sstrP,const void* rstrP,c
     RF_MALLOC(bytePositions,bSize*sizeof(int32_t));
     //if the given num is 0 just make sure we replace all
     if(number == 0)
-        number = ULONG_MAX;//max number of occurences
+        number = UINT_MAX;//max number of occurences
 
     //find how many occurences exist
     rfStringX_FromString_IN(&temp,thisstr);

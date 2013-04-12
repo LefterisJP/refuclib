@@ -2,35 +2,30 @@ import subprocess
 from subprocess import CalledProcessError
 import sys
 import os
+import platform
 import shlex
 
-from compiler import Compiler
-from configreader import Config
+def compileTest(filename,dynamic,compiler,verbose,logFile):
+    """Compiles a single test file from the tests depending on the compiler and library linking type
 
-
-def compileTest(filename,dynamic,config,compiler,testExec,verbose,logFile):
-    compilerFullPath = os.path.join(config.compilerDir,compiler.compilerExec)
-    cmd = compiler.cmd;
-    cmd = cmd.replace("$REFUINCLUDE",os.path.join(config.refuDir,"include"));
-    cmd = cmd.replace("$FLAGS",compiler.flags);
-    cmd = cmd.replace("$LIBDIR",os.path.join(config.refuDir,"Tests"));
+        --filename: The name of the file to compile without the .c extension (to also match it with .expect)
+        --dynamic: A boolean value denoting if the linking should be done with a dynamic/shared library or not (static)
+        --compiler: The name of the compiler with which to do the compiling
+        --verbose: A boolean value denoting if the output to stdout should be verbose or not
+        --logFile: The name of the logfile to print the output
+    """
     if(dynamic):
-        cmd = cmd.replace("$LIBNAME",os.path.join(config.refuDir,"Tests",config.outputName+compiler.dynamicExtension))
-    else:#static
-        cmd = cmd.replace("$LIBNAME",os.path.join(config.refuDir,"Tests",config.outputName+compiler.staticExtension))
-    if(config.system == "win32"):
-        cmd = cmd.replace("$OUTPUT","test.exe")
+        target="test_shared";
     else:
-	    cmd = cmd.replace("$OUTPUT","test")
-    cmd = cmd.replace("$FILE",filename)
-    cmd = compilerFullPath+" "+cmd;
-    #for unix-like systems we can use the shlex.split() function to get a list of arguments
-    if(config.system == "linux"):
-        cmdList = shlex.split(cmd)
-    else:#for windows just provide the whole string
-        cmdList = cmd;
+        target="test_static";
+
+    if(platform.system() == 'Windows'):
+        sconsCall = ["scons.py", target,'-Q','--compiler='+compiler,'--testsrc='+filename]
+    else:
+        sconsCall = "python scons.py "+target+" -Q --compiler="+compiler+" --testsrc="+filename
+
     try:
-        p = subprocess.Popen(cmdList,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        p = subprocess.Popen(sconsCall,cwd="..",shell=True,stdout=subprocess.PIPE)
         for line in p.stdout:
             if(verbose):
                 print("\t\t"+line.decode("utf8"));
@@ -48,7 +43,7 @@ def compileTest(filename,dynamic,config,compiler,testExec,verbose,logFile):
                 logFile.write("\t\t"+line);
             print("\t-->Testing \"{0}\" ... FAILED to compile".format(filename))
             logFile.write("\t-->Testing \"{0}\" ... FAILED to compile\n".format(filename))
-            return False;
+            return False
     except CalledProcessError as err:
         print("\t\tThere was an error while invoking the compiler for test \"{0}\"".format(filename))
         print("\t\tThe compiler returned [{0}] and the output was:".format(err.returncode))

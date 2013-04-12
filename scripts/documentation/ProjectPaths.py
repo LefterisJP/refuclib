@@ -1,0 +1,5 @@
+htmldocspath = "C:\\Projects_SourceCode\\ReFu\\docs\\html"
+docsexamplepath = "C:\\Projects_SourceCode\\ReFu\\Examples\\Doxygen_Html"
+doxygenpath = "C:\\Program Files\\doxygen\\bin\\doxygen.exe"
+doxyconfigfile = "C:\\Projects_SourceCode\\ReFu\\docs\\refu_doxyfile"
+rootpath = "C:\\Projects_SourceCode\\Refu"

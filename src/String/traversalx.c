@@ -158,7 +158,7 @@ char rfStringX_MoveAfterv(RF_StringX* thisstr,void* resultP,const char options,c
     paramLen = 0;
     //get the parameter characters
     va_start(argList,parN);
-    minPos = LONG_MAX;
+    minPos = INT_MAX;
     for(i = 0; i < parN; i++)
     {
         //get the param
@@ -177,7 +177,7 @@ char rfStringX_MoveAfterv(RF_StringX* thisstr,void* resultP,const char options,c
     va_end(argList);
 
     //if it is not found
-    if(minPos == LONG_MAX)
+    if(minPos == INT_MAX)
     {
         RF_EXIT_LOCAL_SCOPE()
         return false;

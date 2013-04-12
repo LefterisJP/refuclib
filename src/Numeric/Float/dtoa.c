@@ -16,8 +16,19 @@
  * OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  *
  ***************************************************************/
+
 #include "rf_float.ph"
-#define IEEE_8087  //for now the only machine type we care about
+
+
+#define RF_DTOA_ONLY //define this so that we also get some system defs that should only be visible from this file
+#include <rf_options.h>
+#undef RF_DTOA_ONLY
+
+#ifdef RF_LITTLE_ENDIAN_COMPILE
+  #define IEEE_8087
+#else
+  #define IEEE_MC68k
+#endif
 
 //All the places where //-EDIT- comments exist have been edited for the purposes of Refu library
 
@@ -199,7 +210,8 @@ typedef unsigned Long ULong;
 
 #ifdef DEBUG
 #include "stdio.h"
-#define Bug(x) {fprintf(stderr, "%s\n", x); exit(1);}
+//-EDIT- replaced his bug macro with refu error logging
+#define Bug(x) {LOG_ERROR(x,1)}
 #endif
 
 //-EDIT- replaced stdlib.h with rf_memory.h since it was only needed for malloc() and free()
@@ -4300,7 +4312,7 @@ doubleToStr //-EDIT- renaming the functions to compile correctly even for compil
 			}
 		}
 	else
-		for(i = 1;; i++) {
+	for(i = 1;; i++) {
 			*s++ = dig = quorem(b,S) + '0';
 			if (!b->x[0] && b->wds <= 1) {
 #ifdef SET_INEXACT

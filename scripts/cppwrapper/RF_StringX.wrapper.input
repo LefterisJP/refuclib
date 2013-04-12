@@ -1,0 +1,24 @@
+#name and full of the file where to find the structure
+INPUT_FILE=C:\Projects_SourceCode\ReFu\include\String\rf_stringxc.h
+#name of the structure
+INPUT_STRUCT=RF_StringX
+#name of the output header file where the cpp wrapper will go
+OUTPUT_HEADER_FILE=C:\Projects_SourceCode\ReFu\include\String\cppstringx.h
+#name of the output source file where the cpp wrapper will go
+OUTPUT_SOURCE_FILE=C:\Projects_SourceCode\ReFu\include\String\cppstringx.cpp
+#name of a namespace to put the generated class in (Optional)
+NAMESPACE=RF
+#name of the import/export macro use to declare a function as exportable to a DLL/SO
+IMEX=i_DECLIMEX_
+#header files that you would like to be included from the header of the wrapped class
+#write them as you would normally write it in the header file without the #include
+INCLUDED_HEADERS=<string.h>,"cppstring.h"
+#put here the name of the struct that it inherits
+INHERITS_STRUCT=RF_String
+#put here the name and full path of the header file of the parent struct if any
+INHERITS_STRUCT_FILE=C:\Projects_SourceCode\ReFu\include\String\rf_stringc.h
+#here give a list of all the ancestors of this struct starting from the oldest one
+ANCESTORS=RF_String
+#determines if this structure is inherited by anyting else or not. Helps with stuff such as knowing if you want virtual destructor e.t.c.
+#Write a comma separated list of which structures inherit from this one
+INHERITED_BY=

@@ -690,7 +690,7 @@ char i_rfStringX_Replace(RF_StringX* thisstr,const void* sstrP,const void* rstrP
     RF_MALLOC(bytePositions,bSize*sizeof(int32_t));
     //if the given num is 0 just make sure we replace all
     if(num == 0)
-        num = ULONG_MAX;//max number of occurences
+        num = UINT_MAX;//max number of occurences
 
     //find how many occurences exist but also remember the previous position of the internal pointer
     start = thisstr->bIndex;
