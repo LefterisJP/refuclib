@@ -20,9 +20,9 @@ def compileTest(filename,dynamic,compiler,verbose,logFile):
         target="test_static";
 
     if(platform.system() == 'Windows'):
-        sconsCall = ["scons.py", target,'-Q','--compiler='+compiler,'--testsrc='+filename]
+        sconsCall = ["scons.py", target,'-Q','COMPILER='+compiler,'__TEST_SOURCE='+filename]
     else:
-        sconsCall = "python scons.py "+target+" -Q --compiler="+compiler+" --testsrc="+filename
+        sconsCall = "python scons.py "+target+" -Q COMPILER="+compiler+" __TEST_SOURCE="+filename
 
     try:
         p = subprocess.Popen(sconsCall,cwd="..",shell=True,stdout=subprocess.PIPE)

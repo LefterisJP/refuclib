@@ -2,6 +2,7 @@ import os
 import platform
 import sys
 
+
 SConscript('scripts/sconsdata/compilers.py')
 SConscript('scripts/sconsdata/modules.py')
 
@@ -15,44 +16,23 @@ configFileName = 0;
 sourceDir = 'src'
 targetSystem = platform.system()
 allowedCompilers = ['gcc', 'tcc', 'msvc']
+legalBuildTargets = ['shared', 'static', 'test_shared','test_static','test']
 
-
-#the command line arguments
-AddOption('--config-file', dest='configFileName',action='store', type='string',help='The name of the refu configuration file')
-AddOption('--test-build', dest='testBuild',action='store_true', help='Will compile a test build')
-AddOption('--compiler', dest='compiler', action='store',type='string',help='The compiler name. Allowed values are: gcc, tcc, msvc')
-AddOption('--testsrc', dest='testsrc', action='store',type='string',help='When scons is ran from the automated testing framework this will be the name of the test to compile and test')
-
-
-#get the compiler
-compiler = GetOption('compiler');
-
-if(compiler != None and compiler  not in allowedCompilers):
-    print "**ERROR** The given compiler name is not supported. Please provide one of the supported compiler values"
-    print " ,".join(allowedCompilers)
-    sys.exit(-1)
-if(compiler == None):
-    print "No compiler was given. Defaulting to GCC"
-    compiler = 'gcc'
-
-
-#get the configuration file name from the arguments (if given)
-configFileName = GetOption('configFileName')
 #Create an intermediate environment to read the variables ( I don't know of any other way to read the variables sort of writing a separate variable reading python script)
-vars = SConscript('scripts/sconsdata/variables.py', exports = 'configFileName')
+vars = SConscript('scripts/sconsdata/variables.py', exports = 'allowedCompilers')
 temp = Environment(variables = vars) 
 
 #create the building environment
 #env = Environment(tools= compilers[compiler].toolsValues[targetSystem])
 env = Environment()
 if('test'in COMMAND_LINE_TARGETS):
-    setupCompiler(compiler,env,targetSystem,temp['COMPILER_DIR'],True)
+    setupCompiler(temp['COMPILER'],env,targetSystem,temp['COMPILER_DIR'],True)
 else:
-    setupCompiler(compiler,env,targetSystem,temp['COMPILER_DIR'],False)
+    setupCompiler(temp['COMPILER'],env,targetSystem,temp['COMPILER_DIR'],False)
 
 #setting needed flags, paths and defines
 env.Append(CPPDEFINES = {'REFU_COMPILING': None})
-if(GetOption('testBuild')):
+if(temp['__TEST_BUILD']):
 	env.Append(CPPDEFINES = {'REFU_TEST' : None})
 
 env.Append(CPPPATH		= os.path.join(temp['REFU_DIR'],'include'))
@@ -91,6 +71,7 @@ setupConfigVars(temp,env)
 #env = conf.Finish()
 
 #Perform the system check
+compiler = temp['COMPILER']
 systemAttributes = SConscript('scripts/systemcheck/systemcheck.py',exports = 'compiler')
 #create the options file
 SConscript('scripts/sconsdata/options.py', exports = 'modules env targetSystem systemAttributes')
@@ -101,6 +82,20 @@ env.VariantDir(temp['OBJ_DIR'], sourceDir, duplicate=0)
 #a list comprehensions prepending the obj dir to all of the sources (instead of the sourcedir) ... Scons peculiarity 
 sources = [temp['OBJ_DIR']+'/'+s for s in sources]
 
+
+
+# -- From here and on check build targets
+#Check if there is no build target given
+if len(COMMAND_LINE_TARGETS)==0:
+    print "**MESSAGE** No build target was specified so the Refu SCons Building script has nothing to build. Please specify one of the legal build targets \'shared\' and \'static\' via command line"
+
+#Check if there is an illegal build target given
+for givenTarget in COMMAND_LINE_TARGETS:
+    if givenTarget not in legalBuildTargets:
+        print "***ERROR*** Provided build target \""+givenTarget+"\" is not a legal target for Refu Library. Quitting Build Script ..."
+        Exit(-1)
+
+    
 # -- Test non-library build --
 # compiles only the test file under src/main.c
 if('test' in COMMAND_LINE_TARGETS):
@@ -134,7 +129,7 @@ if('test_shared' in COMMAND_LINE_TARGETS):
     #set the rpath for GCC
     #TODO: For other compilers in Linux do something similar
     env.Append( LINKFLAGS = "-Wl,-rpath="+os.path.join(os.getcwd(),'Tests'))
-    test_shared = env.Program(os.path.join('Tests','test'),os.path.join(GetOption('testsrc')))
+    test_shared = env.Program(os.path.join('Tests','test'),os.path.join(temp['__TEST_SOURCE']))
     env.Alias('test_shared', test_shared)
 
 if('test_static' in COMMAND_LINE_TARGETS):
@@ -143,14 +138,8 @@ if('test_static' in COMMAND_LINE_TARGETS):
     outName = env['LIBPREFIX']+outName+env['LIBSUFFIX']
     #lib = File(os.path.join('Tests',outName))+" rt pthread"
     env.Append(LIBS = File(os.path.join('Tests',outName)) )
-    test_static = env.Program(os.path.join('Tests','test'),os.path.join(GetOption('testsrc'))) #,LIBS=[lib])
+    test_static = env.Program(os.path.join('Tests','test'),os.path.join(temp['__TEST_SOURCE'])) #,LIBS=[lib])
     env.Alias('test_static', test_static)
-
-#env.Default(shared)
-
-
-
-
 
 #generate help text for the variables
 Help(vars.GenerateHelpText(env))

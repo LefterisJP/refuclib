@@ -1,11 +1,28 @@
+import os
 # -- Get the user provided options --
 
-Import('configFileName')
-if(configFileName == None):
-	vars = Variables('refu.config')
-else: 
-	vars = Variables(configFileName)
+Import('allowedCompilers')
 
+
+def checkCompilerValue(key,value,environment):
+    """A function to validate the compiler value"""
+    if(value != None and value  not in allowedCompilers):
+        print "**ERROR** The given compiler name is not supported. Please provide one of the supported compiler values"
+        print " ,".join(allowedCompilers)
+        Exit(-1)
+    if(value == None):
+        print "No compiler was given. Defaulting to GCC"
+        value = 'gcc'
+    return True
+
+#Initialize the variables object
+vars = Variables('refu.config')
+#Add Variable Options which don't have to do with the actual building of the library
+vars.Add(PathVariable('__TEST_SOURCE','This is a special option used when compiling a source file for the testing framework which denotes the name of that specific file', None,PathVariable.PathIsFile))
+vars.Add(BoolVariable('__TEST_BUILD','This is a special option which if passed to scons signifies that no library will be built but a program defined by main.c will be compiled. It\'s used to test the library manually. Default is false.',False))
+
+#Add All the variable options which have to do with the building of the library
+vars.Add('COMPILER', 'The compiler name. Allowed values are: gcc, tcc, msvc', 'gcc',checkCompilerValue)
 
 vars.Add(PathVariable('COMPILER_DIR', 'The directory of the compiler. Will try to search here if scons can\'t find the requested compiler automatically. Should be an absolute path', '.',PathVariable.PathIsDir))
 

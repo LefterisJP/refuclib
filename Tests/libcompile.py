@@ -53,9 +53,9 @@ def compileLib(verbose,dynamic,compiler):
         arg="static"
 
     if(platform.system()=='Windows'):
-        sconsCall = ['scons.py',arg,'--compiler='+compiler]
+        sconsCall = ['scons.py',arg,'COMPILER='+compiler]
     else:
-        sconsCall = "python scons.py "+arg+" --compiler="+compiler
+        sconsCall = "python scons.py "+arg+" COMPILER="+compiler
     #call scons to build the library
     try:
         #p = subprocess.Popen([sconsCall, arg,'--compiler='+compiler],cwd="..",shell=True,stdout=subprocess.PIPE)
