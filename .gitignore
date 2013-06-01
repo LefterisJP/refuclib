@@ -18,6 +18,7 @@ Thumbs.db
 *.cache
 *.ilk
 *.log
+*.tmp
 [Bb]in
 [Dd]ebug*/
 *.lib
@@ -32,8 +33,6 @@ errorLog
 infoLog
 refuErrorLog
 refuInfoLog
-refuErrorLog
-refuInfoLog
 refu.depend
 docs/html
 docs/doxygenLog.txt
@@ -46,3 +45,4 @@ Tests/TestsLog
 .sconsign.dblite
 TAGS
 scripts/systemcheck/systemcheck
+librefu.a
