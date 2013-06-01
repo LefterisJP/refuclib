@@ -1,18 +1,7 @@
-
-""" This function checks if a module is included in the variables provided by the user
-
-	env -- The SCONS environment variable
-	module -- The Refu module name to check if it has been requested by the user
-	
-	Returns true for yes and false for no
-"""
-def moduleIncluded(env,module):
-	if( module in env['REFU_MODULES']):
-		return true;
-	return False;
-
-
 class Module:
+    """Represents a module of the code with its names, its list of sources
+       its #ifdef macro and a list of other modules it depends on
+    """
 	name = ""
 	sources = []
 	win32_sources = []
@@ -26,7 +15,45 @@ class Module:
 		self.win32_sources = win32_sources
 		self.linux_sources = linux_sources
 		self.dependencies = dependencies
-		
+
+        def add(self, sources, env, targetSystem, deps):
+            """Addition of a module's sources including
+               additional check for dependencies and 
+               recursive addition of said dependencies
+
+               -sources: The list of sources for compilation
+               -env: The Scons environment variable
+               -targetSystem: The OS name
+               -deps: A list of current modules to build -- helps in
+                avoiding duplication
+            """
+            sources.extend(self.sources)
+            env.Append(CPPDEFINES= {self.macro:None})
+            needed = set(self.dependencies)-set(deps)
+            for m in modules:
+                    if m.name in needed:
+                            deps.append(m.name)
+                            m.add(sources,env,targetSystem,deps)
+            if(targetSystem == 'Windows'):
+                    sources.extend(self.win32_sources)
+            else:
+                    sources.extend(self.linux_sources)
+
+
+        def simple_add(self, sources, env, targetSystem):
+            """Simple addition of a module's sources without checking
+               dependencies.
+
+               -sources: The list of sources for compilation
+               -env: The Scons environment variable
+               -targetSystem: The OS name
+            """
+            sources.extend(self.sources)
+            env.Append(CPPDEFINES= {self.macro:None})
+            if(targetSystem == 'Windows'):
+                    sources.extend(self.win32_sources)
+            else:
+                    sources.extend(self.linux_sources)
 
 #empty list of modules and sources
 sources			= []

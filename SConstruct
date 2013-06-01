@@ -42,25 +42,22 @@ env.Append(LINKFLAGS	= temp['LINKER_SHARED_FLAGS'])
 
 #now depending on each of the given modules set the compiled sources, defines and compile-time flags
 if('ALL' not in temp['REFU_MODULES']):
+    #add the core modules 
+    if 'CORE' not in temp['REFU_MODULES']:
+            temp['REFU_MODULES'].append('CORE')
+    if 'SYSTEM' not in temp['REFU_MODULES']:
+            temp['REFU_MODULES'].append('SYSTEM')
+    #make a copy of the dependencies
+    deps = temp['REFU_MODULES'][:]
     for mod in modules:
-        if(mod.name in temp['REFU_MODULE']):
-            sources.extend(mod.sources)
-            env.Append(CPPDEFINES= {mod.macro:None})
-            if(targetSystem == 'Windows'):
-                sources.extend(mod.win32_sources)
-            else:
-                sources.extend(mod.linux_sources)
-            #TODO More operating systems here
+        if(mod.name in temp['REFU_MODULES']):
+            mod.add(sources, env, targetSystem, deps)
 else:#all modules requested
     for mod in modules:
-        sources.extend(mod.sources)
-        env.Append(CPPDEFINES= {mod.macro:None})
-        if(targetSystem == 'Windows'):
-            sources.extend(mod.win32_sources)
-        else:
-            sources.extend(mod.linux_sources)
-        #TODO More operating systems here
+        mod.simple_add(sources, env, targetSystem)
 
+
+               
 #setup the variables of the configuration file
 setupConfigVars(temp,env)
 
