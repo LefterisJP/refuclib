@@ -51,11 +51,11 @@ def compileLib(verbose,dynamic,compiler):
     else:
         print("--Compiling a static version of the Refu library--")
         arg="static"
-
+    
     if(platform.system()=='Windows'):
         sconsCall = ['scons.py',arg,'COMPILER='+compiler]
     else:
-        sconsCall = "python scons.py "+arg+" COMPILER="+compiler
+        sconsCall = sys.executable+" scons.py "+arg+" COMPILER="+compiler
     #call scons to build the library
     try:
         #p = subprocess.Popen([sconsCall, arg,'--compiler='+compiler],cwd="..",shell=True,stdout=subprocess.PIPE)
