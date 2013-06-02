@@ -45,46 +45,58 @@ extern "C"
 {///opening bracket for calling from C++
 #endif
 
-//! @memberof RF_LocalMemoryStack
-//! @brief Initializes the local memory stack
-//!
-//! This function simply initializes a local memory stack and should not be used by
-//! ther user directly. It is used in 2 occasions inside the library. Once inside the library's
-//! initialization function @ref rfInit() and at every new @ref RF_Thread initialization since
-//! this stack is thread specific.
-//! @param lms The Local Memory stack to initialize
-//! @param size The size that the local memory stack will have
+/**
+ ** @memberof RF_LocalMemoryStack
+ ** @brief Initializes the local memory stack
+ **
+ ** This function simply initializes a local memory stack and should not be used by
+ ** ther user directly. It is used in 2 occasions inside the library. Once inside the library's
+ ** initialization function @ref rfInit() and at every new @ref RF_Thread initialization since
+ ** this stack is thread specific.
+ ** @param lms The Local Memory stack to initialize
+ ** @param size The size that the local memory stack will have
+ **
+ **/
 void rfLMS_Init(RF_LocalMemoryStack* lms,uint64_t size);
 
-//! @memberof RF_LocalMemoryStack
-//! @brief Pushes the local memory stack
-//!
-//! This function simply pushes the local memory stack for @c size bytes so that the stack pointer
-//! gets moved up by that amount of bytes. It also returns a pointer to the position of the stack
-//! pointer before the push which will be the allocated pointer memory position. In that respect
-//! the function works similarly to malloc()
-//! @param size The size of the block to allocate
-//! @return Returns a pointer to the allocated block or 0 for no more local memory available
+/**
+ ** @memberof RF_LocalMemoryStack
+ ** @brief Pushes the local memory stack
+ **
+ ** This function simply pushes the local memory stack for @c size bytes so that the stack pointer
+ ** gets moved up by that amount of bytes. It also returns a pointer to the position of the stack
+ ** pointer before the push which will be the allocated pointer memory position. In that respect
+ ** the function works similarly to malloc()
+ ** @param size The size of the block to allocate
+ ** @return Returns a pointer to the allocated block or 0 for no more local memory available
+ **
+ **/
 i_DECLIMEX_ void* rfLMS_Push(uint64_t size);
 
-//! @memberof RF_LocalMemoryStack
-//! @brief Pops the local stack memory back to a certain value
-//!
-//! This function puts the local stack pointer back to a specific value
-//! and in doing so essentially frees all the objects that were allocated to
-//! parts of the stack before that movement.
-//! @param t The stack value to which to pop the stack back to
+/**
+ ** @memberof RF_LocalMemoryStack
+ ** @brief Pops the local stack memory back to a certain value
+ **
+ ** This function puts the local stack pointer back to a specific value
+ ** and in doing so essentially frees all the objects that were allocated to
+ ** parts of the stack before that movement.
+ ** @param t The stack value to which to pop the stack back to
+ **
+ **/
 i_DECLIMEX_ void rfLMS_Pop(uint64_t t);
 
-//! @memberof RF_LocalMemoryStack
-//! @brief Keeps the stack pointer before the specific macro evaluation
-//!
-//! This function remembers the stack pointer right before a given
-//! local macro evaluation. Because of the sequence points there is not a given
-//! method to see which macro gets evaluated first so at the beginning of the function
-//! wrapper we will use all the saved pointer positions to find the one that is
-//! closer at the beginning and this will be determined as the local memory stack
-//! pointer before the function call
+/**
+ ** @memberof RF_LocalMemoryStack
+ ** @brief Keeps the stack pointer before the specific macro evaluation
+ **
+ ** This function remembers the stack pointer right before a given
+ ** local macro evaluation. Because of the sequence points there is not a given
+ ** method to see which macro gets evaluated first so at the beginning of the function
+ ** wrapper we will use all the saved pointer positions to find the one that is
+ ** closer at the beginning and this will be determined as the local memory stack
+ ** pointer before the function call
+ **
+ **/
 i_DECLIMEX_ void rfLMS_ArgsEval();
 
 

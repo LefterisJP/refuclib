@@ -37,19 +37,34 @@
 
 /// ================ Functions for usage only inside RF_TextFile functions ================= ///
 
-//! Adds a Byte order mark to the text file at the current position. Only to be used at the start of the file
+/**
+ ** Adds a Byte order mark to the text file at the current position. Only to be used at the start of the file
+ **
+ **/
 int32_t i_rfTextFile_AddBom(RF_TextFile* t);
-//! Adds a Byte order mark to the file at the current position. Only to be used at the start of the file
+/**
+ ** Adds a Byte order mark to the file at the current position. Only to be used at the start of the file
+ **
+ **/
 int32_t i_rfFile_AddBom(FILE*f,char encoding);
 
-//! Handles the EOL encoding for this textfile by either setting the desired encoding pattern or auto detecting it
+/**
+ ** Handles the EOL encoding for this textfile by either setting the desired encoding pattern or auto detecting it
+ **
+ **/
 char TextFile_HandleEol(RF_TextFile* t,char eol);
-//! Takes a textfile's inner FILE* to the beginning of the file depending on the encoding and BOM existence. Can fail and returns an appropriate error
+/**
+ ** Takes a textfile's inner FILE* to the beginning of the file depending on the encoding and BOM existence. Can fail and returns an appropriate error
+ **
+ **/
 int32_t TextFile_GoToStart(RF_TextFile* t);
 
 /// ================ Macros for usage only inside RF_TextFile functions ================= ///
 
-//! A macro to resume the text file pointer back to a saved position starting from the file's start and if there is an error return it
+/**
+ ** A macro to resume the text file pointer back to a saved position starting from the file's start and if there is an error return it
+ **
+ **/
 #define TEXTFILE_RESETPTR_FROMSTART(i_TEXTFILE_,i_PRLINE_,i_PREOF_,i_PROFF_)\
 if(rfFseek((i_TEXTFILE_)->f,i_PROFF_,SEEK_SET)!=0)\
 {\
@@ -58,7 +73,10 @@ if(rfFseek((i_TEXTFILE_)->f,i_PROFF_,SEEK_SET)!=0)\
 (i_TEXTFILE_)->line = i_PRLINE_;\
 (i_TEXTFILE_)->eof = i_PREOF_;
 
-//! A macro to resume the text file pointer back to a saved position starting from the file's start and if there is an error keep it and go to cleanup code
+/**
+ ** A macro to resume the text file pointer back to a saved position starting from the file's start and if there is an error keep it and go to cleanup code
+ **
+ **/
 #define TEXTFILE_RESETPTR_FROMSTART_GOTO(i_TEXTFILE_,i_PRLINE_,i_PREOF_,i_PROFF_,i_ERROR_,i_LABEL_)\
 if(rfFseek((i_TEXTFILE_)->f,i_PROFF_,SEEK_SET)!=0)\
 {\
@@ -67,7 +85,10 @@ if(rfFseek((i_TEXTFILE_)->f,i_PROFF_,SEEK_SET)!=0)\
 (i_TEXTFILE_)->line = i_PRLINE_;\
 (i_TEXTFILE_)->eof = i_PREOF_;
 
-//! A macro to resume the text file pointer back to a saved position without starting from the file's start but from the current file position
+/**
+ ** A macro to resume the text file pointer back to a saved position without starting from the file's start but from the current file position
+ **
+ **/
 #define TEXTFILE_RESETPTR(i_TEXTFILE_,i_PRLINE_,i_PREOF_,i_PROFF_){\
 foff_rft i_tomove_ = i_PROFF_ - rfFtell((i_TEXTFILE_)->f);\
 if(rfFseek((i_TEXTFILE_)->f,i_tomove_,SEEK_CUR)!=0)\
@@ -78,7 +99,10 @@ if(rfFseek((i_TEXTFILE_)->f,i_tomove_,SEEK_CUR)!=0)\
 (i_TEXTFILE_)->eof = i_PREOF_;\
 }
 
-//! A macro to check if a textfile needs to change its mode in order to perform a read operation. If an error occurs it returns it
+/**
+ ** A macro to check if a textfile needs to change its mode in order to perform a read operation. If an error occurs it returns it
+ **
+ **/
 #define RF_TEXTFILE_CANREAD(i_TEXTFILE_) {\
 /*Get current file position*/\
 foff_rft i_cPos_;\
@@ -116,7 +140,10 @@ else if((i_TEXTFILE_)->mode == RF_FILE_READWRITE)\
     }\
 }}
 
-//! A macro to check if a textfile needs to change its mode in order to perform a read operation. If error occurs it keeps it and goes to the cleanup code
+/**
+ ** A macro to check if a textfile needs to change its mode in order to perform a read operation. If error occurs it keeps it and goes to the cleanup code
+ **
+ **/
 #define RF_TEXTFILE_CANREAD_GOTO(i_TEXTFILE_,i_ERROR_,i_LABEL_) {\
 /*Get current file position*/\
 foff_rft i_cPos_;\
@@ -155,7 +182,10 @@ else if((i_TEXTFILE_)->mode == RF_FILE_READWRITE)\
     }\
 }}
 
-//! A macro to check if a textfile needs to changes its mode in order to perform a write operation. If there is an error it returns it
+/**
+ ** A macro to check if a textfile needs to changes its mode in order to perform a write operation. If there is an error it returns it
+ **
+ **/
 #define RF_TEXTFILE_CANWRITE(i_TEXTFILE_){ \
 /*Get current file position*/\
 foff_rft i_cPos_;\
@@ -192,7 +222,10 @@ else if((i_TEXTFILE_)->mode == RF_FILE_READWRITE)\
         }\
     }\
 }}
-//! A macro to check if a textfile needs to changes its mode in order to perform a write operation. If there is an error it keeps it and goes to cleanup code
+/**
+ ** A macro to check if a textfile needs to changes its mode in order to perform a write operation. If there is an error it keeps it and goes to cleanup code
+ **
+ **/
 #define RF_TEXTFILE_CANWRITE_GOTO(i_TEXTFILE_,i_ERROR_,i_LABEL_){ \
 /*Get current file position*/\
 foff_rft i_cPos_;\
@@ -232,7 +265,10 @@ else if((i_TEXTFILE_)->mode == RF_FILE_READWRITE)\
 }}
 
 
-//! A macro that checks errno after an fseek() call FOR A TEXTFILE and returns appropriate error
+/**
+ ** A macro that checks errno after an fseek() call FOR A TEXTFILE and returns appropriate error
+ **
+ **/
 #define i_TEXTFILE_FSEEK_CHECK(i_TEXTFILE_,i_TEXT_) \
 /*Depending on the errno*/\
 switch(errno)\
@@ -269,7 +305,10 @@ switch(errno)\
     break;\
 }//end of error handling
 
-//! A macro that checks errno after an fseek() call FOR A TEXTFILE sets the error and goes to cleanup and error return
+/**
+ ** A macro that checks errno after an fseek() call FOR A TEXTFILE sets the error and goes to cleanup and error return
+ **
+ **/
 #define i_TEXTFILE_FSEEK_CHECK_GOTO(i_TEXTFILE_,i_TEXT_,i_ERROR_,i_LABEL_) \
 /*Depending on the errno*/\
 switch(errno)\
@@ -316,7 +355,10 @@ switch(errno)\
 }\
 goto i_LABEL_;
 
-//! A macro that checks errno after an fopen() call for textfiles, and returns appropriate error
+/**
+ ** A macro that checks errno after an fopen() call for textfiles, and returns appropriate error
+ **
+ **/
 #define i_TEXTFILE_FOPEN_CHECK(i_TEXTFILE_,i_TEXT_) \
 /*depending on errno*/\
 switch(errno)\
@@ -355,7 +397,10 @@ switch(errno)\
     break;\
 }
 
-//! A macro that checks errno after an fopen() call for textfiles, keeps the error and goes to cleanup code
+/**
+ ** A macro that checks errno after an fopen() call for textfiles, keeps the error and goes to cleanup code
+ **
+ **/
 #define i_TEXTFILE_FOPEN_CHECK_GOTO(i_TEXTFILE_,i_TEXT_,i_ERROR_,i_LABEL_) {\
 /*depending on errno*/\
 switch(errno)\
@@ -403,7 +448,10 @@ switch(errno)\
 goto i_LABEL_;}
 
 
-//! A macro to check the result of file writting functions for TextFiles and if there is an error return it
+/**
+ ** A macro to check the result of file writting functions for TextFiles and if there is an error return it
+ **
+ **/
 #define i_TEXTFILE_WRITE_CHECK(i_TEXTFILE_,i_TEXT_)\
 /*depending or errno*/\
 if(ferror((i_TEXTFILE_)->f) != 0){\
@@ -436,7 +484,10 @@ if(ferror((i_TEXTFILE_)->f) != 0){\
         break;\
     }}\
 
-//! A macro to check the result of file writting functions for TextFiles and if there is an error jump to a label
+/**
+ ** A macro to check the result of file writting functions for TextFiles and if there is an error jump to a label
+ **
+ **/
 #define i_TEXTFILE_WRITE_CHECK_GOTO(i_TEXTFILE_,i_TEXT_,i_ERROR_,i_LABEL_)\
 /*depending or errno*/\
 if(ferror((i_TEXTFILE_)->f) != 0){\

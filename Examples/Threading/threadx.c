@@ -6,7 +6,10 @@
 
 #define THREADS_NUM 5
 
-//! [THREAD_DATA]
+/**
+ ** [THREAD_DATA]
+ **
+ **/
 //Packing all the data to give as input to the Thread in a structure
 typedef struct i_Thread_Data
 {
@@ -17,9 +20,15 @@ typedef struct i_Thread_Data
     //The commom file
     RF_TextFile* f;
 } i_Thread_Data;
-//! [THREAD_DATA]
+/**
+ ** [THREAD_DATA]
+ **
+ **/
 
-//! [THREAD_FUNCTION]
+/**
+ ** [THREAD_FUNCTION]
+ **
+ **/
 //The function that demonstrates the usage of RF_ThreadX
 void* threadXTest(RF_ThreadX* thisThread)
 {
@@ -36,7 +45,10 @@ void* threadXTest(RF_ThreadX* thisThread)
     for(i = 0; i < 100; i ++)
     {
         //demonstrating ThreadX ReadSignal, we attempt to read if something was sent by any other thread in this thread's queue
-//! [READ_SIGNAL]
+/**
+ ** [READ_SIGNAL]
+ **
+ **/
         if(rfThreadX_TryReadSignal(thisThread,&stop,&size) == RF_SUCCESS)
         {
             if(stop == true)//the only thing that we sent in this example is a boolean so it's always gonna be true
@@ -46,7 +58,10 @@ void* threadXTest(RF_ThreadX* thisThread)
                 return 0;
             }
         }
-//! [READ_SIGNAL]
+/**
+ ** [READ_SIGNAL]
+ **
+ **/
         //otherwise just write a line to the file
         rfTextFile_Write(d->f,RFS_("Thread %d writing the %d line in the file\n",d->num,i));
     }//file writing for closes
@@ -60,7 +75,10 @@ void* threadXTest(RF_ThreadX* thisThread)
     printf("Thread %d finished using the resource and unlocked the mutex\n",d->num);
     return 0;
 }
-//! [THREAD_FUNCTION]
+/**
+ ** [THREAD_FUNCTION]
+ **
+ **/
 
 
 int main()
@@ -74,7 +92,10 @@ int main()
     RF_Mutex m;
     //A textfile that all threads will write in
     RF_TextFile t;
-//! [INIT_STUFF]
+/**
+ ** [INIT_STUFF]
+ **
+ **/
     //init the library
     rfInit("errorlog","infolog");
     //Initialize the text file
@@ -89,20 +110,35 @@ int main()
         d[i].f = &t;
         d[i].num = i+1;
     }
-//! [INIT_STUFF]
+/**
+ ** [INIT_STUFF]
+ **
+ **/
 
-//! [INIT_THREADS]
+/**
+ ** [INIT_THREADS]
+ **
+ **/
     //init 10 joinable ThreadsX and give them the data
     for(i=0; i< THREADS_NUM; i ++)
         rfThreadX_Init(&threads[i],0,&threadXTest,&d[i],1000,10);//10 is the max messages that can wait in the message queue,1000 is LMS size
-//! [INIT_THREADS]
+/**
+ ** [INIT_THREADS]
+ **
+ **/
 
-//! [SEND_SIGNAL]
+/**
+ ** [SEND_SIGNAL]
+ **
+ **/
     //let's send a stop boolean to a thread to demonstrate ThreadX
     char stop = true;
     rfThreadX_SendSignal(&threads[2],&stop,1);
-//! [SEND_SIGNAL]
-//! [CLEANUP]
+/**
+ ** [SEND_SIGNAL]
+ ** [CLEANUP]
+ **
+ **/
     //wait for all the threads to finish
     for(i=0; i< THREADS_NUM; i ++)
         rfThread_Join(&threads[i]);
@@ -111,6 +147,9 @@ int main()
     rfMutex_Deinit(&m);
     rfTextFile_Deinit(&t);
     return 0;
-//! [CLEANUP]
+/**
+ ** [CLEANUP]
+ **
+ **/
 }
 

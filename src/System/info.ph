@@ -36,7 +36,10 @@
 #define RF_SYSTEM_INFO_PH
 
 
-//!Globals for Systeminformation
+/**
+ **Globals for Systeminformation
+ **
+ **/
 typedef struct RF_SystemInfo
 {
     //! A byte holding the system's endianess. Is @c 0 (@c RF_LITTLE_ENDIAN) for little endian and @c 1 (@c RF_BIG_ENDIAN) for big endian
@@ -59,7 +62,10 @@ typedef struct RF_SystemInfo
 extern RF_SystemInfo rfSysInfo;
 
 
-//! A function which detects the system's endianess
+/**
+ ** A function which detects the system's endianess
+ **
+ **/
 void i_DetectEndianess();
 
 

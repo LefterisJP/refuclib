@@ -36,8 +36,14 @@
 ---------------------For internal library include make sure to have----------------------------
 */
 
-//! Initializes the stdio buffer that is needed by all Refu stdio functions
+/**
+ ** Initializes the stdio buffer that is needed by all Refu stdio functions
+ **
+ **/
 char rfInitStdio();
 
-//! Declaring the String to act as a buffer for all the format IO functions
+/**
+ ** Declaring the String to act as a buffer for all the format IO functions
+ **
+ **/
 extern i_THREAD__ RF_StringX ioBuffer;

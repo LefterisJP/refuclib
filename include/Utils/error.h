@@ -44,26 +44,44 @@
 ** @{
 **/
 
-//! This is the last error code that occured
+/**
+ ** This is the last error code that occured
+ **
+ **/
 extern int32_t  i_DECLIMEX_ RF_LastError;
-//! The standard log used by the library
+/**
+ ** The standard log used by the library
+ **
+ **/
 extern i_DECLIMEX_ FILE* rfStdLog;
-//! The standard error used by the library
+/**
+ ** The standard error used by the library
+ **
+ **/
 extern i_DECLIMEX_ FILE* rfStdErr;
 
 #ifdef RF_OPTION_VERBOSE_ERRORS
 
 #ifndef RF_NO_C99
-//! @brief Logs an error to the refu standard error stream
-//!
-//! This macro logs an error to the refu error stream
-//! @param i_msg_ A string literal containing the message to be logged for the error in the file. Can contain printf format specifiers which will be translated into values from the variables passed as further parameters to the macro
-//! @param i_errorCode_ The error code to log. Must be an int32_t value
-//! @param ... This is an optional input. If you have given any printf-style format specifiers in the string literal passes @c i_msg_ then here give the variables from which the value will be taken
+/**
+ ** @brief Logs an error to the refu standard error stream
+ **
+ ** This macro logs an error to the refu error stream
+ ** @param i_msg_ A string literal containing the message to be logged for the error in the file. Can contain printf format specifiers which will be translated into values from the variables passed as further parameters to the macro
+ ** @param i_errorCode_ The error code to log. Must be an int32_t value
+ ** @param ... This is an optional input. If you have given any printf-style format specifiers in the string literal passes @c i_msg_ then here give the variables from which the value will be taken
+ **
+ **/
 #define LOG_ERROR(i_msg_,i_errorCode_,...)  i_PICK_LOG_ERROR_FUNC_GT(i_msg_,i_errorCode_,RF_NARG(__VA_ARGS__),__VA_ARGS__)
-//! This macro logs an error to the refu error stream and returns the error code from the function it was called from.
+/**
+ ** This macro logs an error to the refu error stream and returns the error code from the function it was called from.
+ **
+ **/
 #define RETURN_LOG_ERROR(i_msg_,i_errorCode_,...)  {LOG_ERROR(i_msg_,i_errorCode_,__VA_ARGS__) return i_errorCode_; }
-//! This macro logs an error to the refu error stream and jumps to the specified goto label to exit a function
+/**
+ ** This macro logs an error to the refu error stream and jumps to the specified goto label to exit a function
+ **
+ **/
 #define RETURNGOTO_LOG_ERROR(i_msg_,i_errorCode_,i_retvar,i_label,...)  {LOG_ERROR(i_msg_,i_errorCode_,__VA_ARGS__) i_retvar=i_errorCode_;goto i_label; }
 
 //This macro picks up the correct error logging function, by taking the number of extra arguments and checking if it is greater than 0
@@ -77,17 +95,26 @@ extern i_DECLIMEX_ FILE* rfStdErr;
 #define i_LOG_ERROR0(i_msg_,i_errorCode_, ...)  {rfFPrintf(rfStdErr,"At \"%s\" >>> "i_msg_"\n",__FUNCTION__);RF_LastError = i_errorCode_;fflush(rfStdErr);}
 
 
-//! @brief Logs an error to the standard error stream in detail
-//!
-//! This macro logs an error in detail to the refu error stream
-//! In detail means that it also saves the file and line number it occured
-//! @param i_msg_ A string literal containing the message to be logged for the error in the file. Can contain printf format specifiers which will be translated into values from the variables passed as further parameters to the macro
-//! @param i_errorCode_ The error code to log. Must be an int32_t value
-//! @param ... This is an optional input. If you have given any printf-style format specifiers in the string literal passes @c i_msg_ then here give the variables from which the value will be taken
+/**
+ ** @brief Logs an error to the standard error stream in detail
+ **
+ ** This macro logs an error in detail to the refu error stream
+ ** In detail means that it also saves the file and line number it occured
+ ** @param i_msg_ A string literal containing the message to be logged for the error in the file. Can contain printf format specifiers which will be translated into values from the variables passed as further parameters to the macro
+ ** @param i_errorCode_ The error code to log. Must be an int32_t value
+ ** @param ... This is an optional input. If you have given any printf-style format specifiers in the string literal passes @c i_msg_ then here give the variables from which the value will be taken
+ **
+ **/
 #define DLOG_ERROR(i_msg_,i_errorCode_, ...)  i_PICK_DLOG_ERROR_FUNC_GT(i_msg_,i_errorCode_,RF_NARG(__VA_ARGS__),__VA_ARGS__)
-//! This macro logs an error in detail to the refu error stream and returns the error code from the function it was called from.
+/**
+ ** This macro logs an error in detail to the refu error stream and returns the error code from the function it was called from.
+ **
+ **/
 #define DRETURN_LOG_ERROR(i_msg_,i_errorCode_,...)  {DLOG_ERROR(i_msg_,i_errorCode_,__VA_ARGS__) return i_errorCode_; }
-//! This macro logs an error to the refu error stream and jumps to the specified goto label to exit a function
+/**
+ ** This macro logs an error to the refu error stream and jumps to the specified goto label to exit a function
+ **
+ **/
 #define DRETURNGOTO_LOG_ERROR(i_msg_,i_errorCode_,i_retvar,i_label,...)  {DLOG_ERROR(i_msg_,i_errorCode_,__VA_ARGS__) i_retvar=i_errorCode_;goto i_label; }
 
 //This macro picks up the correct error logging function, by taking the number of extra arguments and checking if it is greater than 0
@@ -102,10 +129,13 @@ extern i_DECLIMEX_ FILE* rfStdErr;
 
 
 #ifdef REFU_WIN32_VERSION
-//! @brief Gets Windows Last System error
-//!
-//! Gets Windows Last System error and turns it into a char* that later needs to be freed by the user using the @c LocalFree() function
-//! @param i_STRBUFF The String buffer
+/**
+ ** @brief Gets Windows Last System error
+ **
+ ** Gets Windows Last System error and turns it into a char* that later needs to be freed by the user using the @c LocalFree() function
+ ** @param i_STRBUFF The String buffer
+ **
+ **/
 #define RF_WIN32_GETSYSERROR(i_STRBUFF) \
 /*The buffer to hold the string*/\
 char* i_STRBUFF;\
@@ -123,9 +153,12 @@ MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),\
 #endif
 
 
-//! @brief Logs a message in the standard information log
-//! @param i_msg_ A string literal containing the message to be logged in the file. Can contain printf format specifiers which will be translated into values from the variables passed as further parameters to the macro
-//! @param ... This is an optional input. If you have given any printf-style format specifiers in the string literal passes @c i_msg_ then here give the variables from which the value will be taken
+/**
+ ** @brief Logs a message in the standard information log
+ ** @param i_msg_ A string literal containing the message to be logged in the file. Can contain printf format specifiers which will be translated into values from the variables passed as further parameters to the macro
+ ** @param ... This is an optional input. If you have given any printf-style format specifiers in the string literal passes @c i_msg_ then here give the variables from which the value will be taken
+ **
+ **/
 #define LOG_INFO(i_msg_,...)  i_PICK_LOG_INFO_FUNC_GT(i_msg_,RF_NARG(__VA_ARGS__),__VA_ARGS__)
 
 //This macro picks up the correct logging function, by taking the number of extra arguments and checking if it is greater than 0
@@ -138,11 +171,14 @@ MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),\
 //Logs something to the standard refu log without var_args
 #define i_LOG_INFO0(i_msg_, ...)   {rfFPrintf(rfStdLog,"At \"%s\" >>> "i_msg_"\n",__FUNCTION__);fflush(rfStdLog);}
 
-//! @brief Logs a message in the standard information log with details
-//!
-//! In detail means that it also saves the file and line number it occured
-//! @param i_msg_ A string literal containing the message to be logged in the file. Can contain printf format specifiers which will be translated into values from the variables passed as further parameters to the macro
-//! @param ... This is an optional input. If you have given any printf-style format specifiers in the string literal passes @c i_msg_ then here give the variables from which the value will be taken
+/**
+ ** @brief Logs a message in the standard information log with details
+ **
+ ** In detail means that it also saves the file and line number it occured
+ ** @param i_msg_ A string literal containing the message to be logged in the file. Can contain printf format specifiers which will be translated into values from the variables passed as further parameters to the macro
+ ** @param ... This is an optional input. If you have given any printf-style format specifiers in the string literal passes @c i_msg_ then here give the variables from which the value will be taken
+ **
+ **/
 #define DLOG_INFO(i_msg_,...)  i_PICK_DLOG_INFO_FUNC_GT(i_msg_,RF_NARG(__VA_ARGS__),__VA_ARGS__)
 
 //This macro picks up the correct logging function, by taking the number of extra arguments and checking if it is greater than 0
@@ -173,11 +209,20 @@ void DLOG_INFO(const char* msg,...);
     #define DLOG_INFO(i_msg_,...)
 #endif
 
-//! @brief Returns the error code of the last error that occured
+/**
+ ** @brief Returns the error code of the last error that occured
+ **
+ **/
 #define RF_GETLASTERROR()  RF_LastError
-//! @brief Returns the standard refu log file descriptor
+/**
+ ** @brief Returns the standard refu log file descriptor
+ **
+ **/
 #define RF_GET_LOG()      rfStdLog
-//! @brief Returns the standard refu error file descriptor
+/**
+ ** @brief Returns the standard refu error file descriptor
+ **
+ **/
 #define RF_GET_ERR()      rfStdErr
 
 

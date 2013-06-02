@@ -104,7 +104,10 @@
         break;\
     }
 
-//! Assigns the value of src RF_Date pointer to the i_dst poiner
+/**
+ ** Assigns the value of src RF_Date pointer to the i_dst poiner
+ **
+ **/
 #define RF_DATE_ASSIGN_PTR(i_dst,i_src)     \
     i_dst->seconds = i_src->seconds;\
     i_dst->minutes = i_src->minutes;\

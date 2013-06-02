@@ -4,7 +4,10 @@
 #include <RFtextfile.h>
 #include <refu.h>
 
-//! [THREAD_DATA]
+/**
+ ** [THREAD_DATA]
+ **
+ **/
 //Packing all the data to give as input to the Thread in a structure
 typedef struct i_Thread_Data
 {
@@ -17,9 +20,15 @@ typedef struct i_Thread_Data
     //The string literal to write to the file
     RF_String s;
 } i_Thread_Data;
-//! [THREAD_DATA]
+/**
+ ** [THREAD_DATA]
+ **
+ **/
 
-//! [THREAD_FUNCTION]
+/**
+ ** [THREAD_FUNCTION]
+ **
+ **/
 //The function that safely writes to the file using the mutex from this thread
 void* safeWrite(void* data)
 {
@@ -38,7 +47,10 @@ void* safeWrite(void* data)
     printf("Thread %d finished writing to the file and unlocked the mutex\n",d->num);
     return 0;
 }
-//! [THREAD_FUNCTION]
+/**
+ ** [THREAD_FUNCTION]
+ **
+ **/
 
 //the main function
 int main()
@@ -51,7 +63,10 @@ int main()
     RF_Mutex m;
     //The file
     RF_TextFile file;
-//! [INIT_STUFF]
+/**
+ ** [INIT_STUFF]
+ **
+ **/
     rfInit();//init the library
     //The main thread creates and opens a file for writing
     rfTextFile_Init(&file,RFS_("testfile"),RF_FILE_NEW,RF_UTF8);
@@ -64,15 +79,27 @@ int main()
     d1.m = d2.m = &m;
     rfString_Init(&d1.s,"I am the string of the first thread\n");
     rfString_Init(&d2.s,"I am the string of the second thread\n");
-//! [INIT_STUFF]
+/**
+ ** [INIT_STUFF]
+ **
+ **/
 
-//! [INIT_THREADS]
+/**
+ ** [INIT_THREADS]
+ **
+ **/
     //initialize (and run) the threads
     rfThread_Init(&t1,0,&safeWrite,&d1);
     rfThread_Init(&t2,0,&safeWrite,&d2);
-//! [INIT_THREADS]
+/**
+ ** [INIT_THREADS]
+ **
+ **/
 
-//! [CLEANUP]
+/**
+ ** [CLEANUP]
+ **
+ **/
     //wait for the threads to finish
     rfThread_Join(&t1);
     rfThread_Join(&t2);
@@ -80,5 +107,8 @@ int main()
     rfMutex_Deinit(&m);
     rfTextFile_Deinit(&file);
     return 0;
-//! [CLEANUP]
+/**
+ ** [CLEANUP]
+ **
+ **/
 }

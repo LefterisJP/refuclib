@@ -24,7 +24,10 @@
 #ifndef RF_COMMON_FLAGS_H
 #define RF_COMMON_FLAGS_H
 
-//! This is the type that represents the file offset
+/**
+ ** This is the type that represents the file offset
+ **
+ **/
 #ifdef _MSC_VER
 typedef __int64 foff_rft;
 #else
@@ -32,9 +35,15 @@ typedef __int64 foff_rft;
 typedef off64_t foff_rft;
 #endif
 
-//! New line feed
+/**
+ ** New line feed
+ **
+ **/
 #define RF_LF   0xA
-//! Carriage Return
+/**
+ ** Carriage Return
+ **
+ **/
 #define RF_CR   0xD
 
 #ifdef REFU_WIN32_VERSION
@@ -43,7 +52,10 @@ typedef off64_t foff_rft;
     #define i_PLUSB_WIN32   ""
 #endif
 
-//! The different end of line types for text files
+/**
+ ** The different end of line types for text files
+ **
+ **/
 #define RF_EOL_AUTO     0
 #define RF_EOL_LF       1
 #define RF_EOL_CRLF     2

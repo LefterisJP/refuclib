@@ -2,7 +2,10 @@
 #include <RFtextfile.h>
 #include <refu.h>
 
-//! [PRINT_ARRAY]
+/**
+ ** [PRINT_ARRAY]
+ **
+ **/
 void printArray(RF_ArrayV* array)
 {
     uint32_t i;
@@ -15,7 +18,10 @@ void printArray(RF_ArrayV* array)
             printf("Array[%d]=\"%s\"\n",i,rfString_ToCstr(&s));
     }
 }
-//! [PRINT_ARRAY]
+/**
+ ** [PRINT_ARRAY]
+ **
+ **/
 
 int main()
 {
@@ -26,20 +32,35 @@ int main()
     RF_String addition;
     rfInit("errorLog","infoLog");
 
-//! [INIT_STUFF]
+/**
+ ** [INIT_STUFF]
+ **
+ **/
     //initialize the text file
     rfTextFile_Init(&f,RFS_("testfile"),RF_FILE_READ,RF_UTF8);
     //initialize the array with 4 elements initial size since we know that the file has 4 lines
-//! [ARRAY_INIT]
+/**
+ ** [ARRAY_INIT]
+ **
+ **/
     rfArrayV_Init(&array,RF_String,4);
-//! [ARRAY_INIT]
+/**
+ ** [ARRAY_INIT]
+ **
+ **/
     //initialize the file reading StringX buffer
     rfStringX_Init_buff(&buffer,256,"");
     //initialize an addition string
     rfString_Init(&addition,"I am an addition string");
-//! [INIT_STUFF]
+/**
+ ** [INIT_STUFF]
+ **
+ **/
 
-//! [READ_LINES]
+/**
+ ** [READ_LINES]
+ **
+ **/
     //read each line of the file
     while(rfTextFile_ReadLine(&f,&buffer) == RF_SUCCESS)
     {
@@ -48,16 +69,28 @@ int main()
         i++;
     }
     printArray(&array);
-//! [READ_LINES]
+/**
+ ** [READ_LINES]
+ **
+ **/
 
-//! [REMOVE]
+/**
+ ** [REMOVE]
+ **
+ **/
     //showcasing removal from array
     rfArrayV_Remove(&array,0);
     rfArrayV_Remove(&array,3);
     printArray(&array);
-//! [REMOVE]
+/**
+ ** [REMOVE]
+ **
+ **/
 
-//! [REALLOC]
+/**
+ ** [REALLOC]
+ **
+ **/
     //let's say we need to add 2 more strings in indices bigger than 4
     //we can accomplish that by reallocating the array
     rfArrayV_Reallocate(&array,6);
@@ -68,13 +101,22 @@ int main()
     rfArrayV_Set_copy(&array,5,&addition,true);
     //print to see the result
     printArray(&array);
-//! [REALLOC]
+/**
+ ** [REALLOC]
+ **
+ **/
 
-//! [CLEANUP]
+/**
+ ** [CLEANUP]
+ **
+ **/
     //finally cleanup the array and all the other stuff
     rfArrayV_Deinit(&array);
     rfStringX_Deinit(&buffer);
     rfTextFile_Deinit(&f);
-//! [CLEANUP]
+/**
+ ** [CLEANUP]
+ **
+ **/
     return 0;
 }

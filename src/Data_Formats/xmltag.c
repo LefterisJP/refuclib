@@ -405,12 +405,15 @@ void rfXMLTag_GetContent(RF_XMLTag* t,RF_String* line)
 }
 
 
-//! Runs through the tree recursively printing the tags
-//! @param t The XML tag that we recursively print
-//! @param f The textfile in which we print
-//! @param strBuff An already initialized RF_StringX buffer
-//! @param level The level of the tag in the xml tree. Is used for the /t tabs
-//! @return Returns true for succesful writting of the @c t XML tag and false otherwise
+/**
+ ** Runs through the tree recursively printing the tags
+ ** @param t The XML tag that we recursively print
+ ** @param f The textfile in which we print
+ ** @param strBuff An already initialized RF_StringX buffer
+ ** @param level The level of the tag in the xml tree. Is used for the /t tabs
+ ** @return Returns true for succesful writting of the @c t XML tag and false otherwise
+ **
+ **/
 char rfXMLTag_ToStr_internal(RF_XMLTag* t,RF_StringX* strBuff,uint32_t level)
 {
     uint32_t i;

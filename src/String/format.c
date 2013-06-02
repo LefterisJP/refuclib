@@ -107,11 +107,14 @@ typedef struct Argument_Format
     char specifier;
 }Argument_Format;
 
-//! Parses a Single argument format specifier
-//!
-//! @param s A pointer to the format string at the position right after the '%'
-//! @param data A pointer to Argument_Format data type to populate
-//! @return The number of characters used after the '%' to specify the argument's format or 0 for failure
+/**
+ ** Parses a Single argument format specifier
+ **
+ ** @param s A pointer to the format string at the position right after the '%'
+ ** @param data A pointer to Argument_Format data type to populate
+ ** @return The number of characters used after the '%' to specify the argument's format or 0 for failure
+ **
+ **/
 static int Parse_FormatSpecifier(const char* s,Argument_Format* data)
 {
     int i;//the index to the format string after the '%' sign

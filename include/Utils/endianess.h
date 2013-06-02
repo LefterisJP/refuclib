@@ -35,9 +35,15 @@
 #define RF_UTILS_ENDIANESS_H
 
 
-//! Defines little endian system
+/**
+ ** Defines little endian system
+ **
+ **/
 #define RF_LITTLE_ENDIAN    0
-//! Defines big endian system
+/**
+ ** Defines big endian system
+ **
+ **/
 #define RF_BIG_ENDIAN       1
 
 
@@ -47,27 +53,45 @@ extern "C"
 #endif
 
 
-//! @brief A function that returns the endianess of the system
-//!
-//! @return The endianess of the system. Can be either @c RF_LITTLE_ENDIAN or @c RF_BIG_ENDIAN
+/**
+ ** @brief A function that returns the endianess of the system
+ **
+ ** @return The endianess of the system. Can be either @c RF_LITTLE_ENDIAN or @c RF_BIG_ENDIAN
+ **
+ **/
 i_DECLIMEX_ char rfEndianess();
 
-//! Swaps the endianness of the variable
-//! @warning the & 0xXXXX makes sure that in the signed case we DO NOT get a wrong number.
-//! (Because when you shift right >> a signed number the bits get filled by the sign and not zeros
-//! @param v The Variable whose endianness we wanna change
+/**
+ ** Swaps the endianness of the variable
+ ** @warning the & 0xXXXX makes sure that in the signed case we DO NOT get a wrong number.
+ ** (Because when you shift right >> a signed number the bits get filled by the sign and not zeros
+ ** @param v The Variable whose endianness we wanna change
+ **
+ **/
 i_DECLIMEX_ void rfSwapEndianUS(uint16_t* v);
-//! Swaps the endianness of the variable
-//! @param v The Variable whose endianness we wanna change
+/**
+ ** Swaps the endianness of the variable
+ ** @param v The Variable whose endianness we wanna change
+ **
+ **/
 i_DECLIMEX_ void rfSwapEndianS(int16_t* v);
-//! Swaps the endianness of the variable
-//! @param v The Variable whose endianness we wanna change
+/**
+ ** Swaps the endianness of the variable
+ ** @param v The Variable whose endianness we wanna change
+ **
+ **/
 i_DECLIMEX_ void rfSwapEndianUI(uint32_t*   v);
-//! Swaps the endianness of the variable
-//! @param v The Variable whose endianness we wanna change
+/**
+ ** Swaps the endianness of the variable
+ ** @param v The Variable whose endianness we wanna change
+ **
+ **/
 i_DECLIMEX_ void rfSwapEndianI(int32_t*   v);
-//! Swaps the endianness of the variable
-//! @param v The Variable whose endianness we wanna change
+/**
+ ** Swaps the endianness of the variable
+ ** @param v The Variable whose endianness we wanna change
+ **
+ **/
 i_DECLIMEX_ void rfSwapEndianUL(uint32_t*   v);
 
 

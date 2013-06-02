@@ -38,12 +38,15 @@
 
 
 
-//! @brief Calculates the logarithm base 2 of an @c uint32_t
-//!
-//! You can read more about this implementation at this page:
-//! http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogDeBruijn
-//! @param v Pass a @c uint32_t whose log2 is needed
-//! @return The log2 of @c v
+/**
+ ** @brief Calculates the logarithm base 2 of an @c uint32_t
+ **
+ ** You can read more about this implementation at this page:
+ ** http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogDeBruijn
+ ** @param v Pass a @c uint32_t whose log2 is needed
+ ** @return The log2 of @c v
+ **
+ **/
 i_INLINE_DECL int log2_int32(uint32_t* v)
 {
     static const int MultiplyDeBruijnBitPosition[32] =
@@ -61,8 +64,11 @@ i_INLINE_DECL int log2_int32(uint32_t* v)
 }
 
 
-//! Should only be used with positive integers and does not work
-//! correctly for 0
+/**
+ ** Should only be used with positive integers and does not work
+ ** correctly for 0
+ **
+ **/
 #define IS_POWEROF2(X_) ((X_&(X_-1))==0)
 
 

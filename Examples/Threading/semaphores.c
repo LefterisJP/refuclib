@@ -5,7 +5,10 @@
 #include <RFtimer.h>
 #include <refu.h>
 
-//! [THREAD_DATA]
+/**
+ ** [THREAD_DATA]
+ **
+ **/
 //Packing all the data to give as input to the Thread in a structure
 typedef struct i_Thread_Data
 {
@@ -14,9 +17,15 @@ typedef struct i_Thread_Data
     //The semaphore for the example
     RF_Semaphore* s;
 } i_Thread_Data;
-//! [THREAD_DATA]
+/**
+ ** [THREAD_DATA]
+ **
+ **/
 
-//! [THREAD_FUNCTION]
+/**
+ ** [THREAD_FUNCTION]
+ **
+ **/
 //The function that safely writes to the file using the semaphore from this thread
 void* semTest(void* data)
 {
@@ -39,7 +48,10 @@ void* semTest(void* data)
     printf("Thread %d finished using the resource and posted to the semaphore\n",d->num);
     return 0;
 }
-//! [THREAD_FUNCTION]
+/**
+ ** [THREAD_FUNCTION]
+ **
+ **/
 
 
 int main()
@@ -52,7 +64,10 @@ int main()
     //The semaphore
     RF_Semaphore s;
     rfInit("errorLog","infoLog");
-//! [INIT_STUFF]
+/**
+ ** [INIT_STUFF]
+ **
+ **/
     //The main thread creates the semaphore
     //Initialize the semaphore
     if(rfSemaphore_Init(&s,5,5) != RF_SUCCESS)
@@ -63,15 +78,27 @@ int main()
         d[i].s = &s; //just point to the semaphore
         d[i].num = i+1; //and give each thread an id
     }
-//! [INIT_STUFF]
+/**
+ ** [INIT_STUFF]
+ **
+ **/
 
-//! [INIT_THREADS]
+/**
+ ** [INIT_THREADS]
+ **
+ **/
     //init 10 joinable threads and give them the data
     for(i=0; i< 10; i ++)
         rfThread_Init(&threads[i],0,&semTest,&d[i]);
-//! [INIT_THREADS]
+/**
+ ** [INIT_THREADS]
+ **
+ **/
 
-//! [CLEANUP]
+/**
+ ** [CLEANUP]
+ **
+ **/
     //wait for all the threads to finish
     for(i=0; i< 10; i ++)
         rfThread_Join(&threads[i]);
@@ -79,5 +106,8 @@ int main()
     //cleanup
     rfSemaphore_Deinit(&s);
     return 0;
-//! [CLEANUP]
+/**
+ ** [CLEANUP]
+ **
+ **/
 }

@@ -48,22 +48,25 @@ extern "C"
 ** @{
 **/
 
-//! @brief Initializes the ReFu library
-//!
-//! This function needs to be called in the very beginning of any program using the library. It initializes everything that has to do with the library itself. Some of the things it does is:
-//! + Initialize the error and info logging files
-//! + Detect the endianess of the system and keep it so that the user can retrieve it with @ref rfEndianess()
-//! + Initialize the local stack memory for the main thread
-//! @param errstr \rfoptional{"refuErrorLog"} The filename of the error log to create and output the refu error log. You can provide any filename except for
-//! @c "stdout" and @c "stderr" because they will be interpreted as special values for which the standard output stream or the standard error stream are used respectively
-//! If no value is provided the default value is @c "refuErrorLog"
-//! @param logstr \rfoptional{"refuInfoLog"} The filename of the info log to creeat and output the refu info log.You can provide any filename except for
-//! @c "stdout" and @c "stderr" because they will be interpreted as special values for which the standard output stream or the standard error stream are used respectively
-//! If no value is provided the default value is @c "refuInfoLog"
-//! @param lmsSize \rfoptional{RF_OPTION_LOCALSTACKMEMORY_SIZE} The size of the main thread's local memory stack. This will be the size by which the
-//! main thread's local memory stack will be initialized. It allows the usage of macros for temporary object creation such as @ref RFS_() or @ref RFXML_()
-//! If no value is given the default value is to use the one provided at compile time by the Refu Builder and the
-//! preprocessor directive @c RF_OPTION_LOCALSTACKMEMORY_SIZE.
+/**
+ ** @brief Initializes the ReFu library
+ **
+ ** This function needs to be called in the very beginning of any program using the library. It initializes everything that has to do with the library itself. Some of the things it does is:
+ ** + Initialize the error and info logging files
+ ** + Detect the endianess of the system and keep it so that the user can retrieve it with @ref rfEndianess()
+ ** + Initialize the local stack memory for the main thread
+ ** @param errstr \rfoptional{"refuErrorLog"} The filename of the error log to create and output the refu error log. You can provide any filename except for
+ ** @c "stdout" and @c "stderr" because they will be interpreted as special values for which the standard output stream or the standard error stream are used respectively
+ ** If no value is provided the default value is @c "refuErrorLog"
+ ** @param logstr \rfoptional{"refuInfoLog"} The filename of the info log to creeat and output the refu info log.You can provide any filename except for
+ ** @c "stdout" and @c "stderr" because they will be interpreted as special values for which the standard output stream or the standard error stream are used respectively
+ ** If no value is provided the default value is @c "refuInfoLog"
+ ** @param lmsSize \rfoptional{RF_OPTION_LOCALSTACKMEMORY_SIZE} The size of the main thread's local memory stack. This will be the size by which the
+ ** main thread's local memory stack will be initialized. It allows the usage of macros for temporary object creation such as @ref RFS_() or @ref RFXML_()
+ ** If no value is given the default value is to use the one provided at compile time by the Refu Builder and the
+ ** preprocessor directive @c RF_OPTION_LOCALSTACKMEMORY_SIZE.
+ **
+ **/
 #ifdef RF_IAMHERE_FOR_DOXYGEN
 i_DECLIMEX_  void rfInit(char* errstr,char* logstr,uint64_t size);
 #else

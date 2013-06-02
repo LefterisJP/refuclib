@@ -85,7 +85,10 @@
     #define i_READ_CHECK_CASE_EOVERFLOW_RESET(i_TEXT_)
 #endif
 
-//! A macro that checks errno after an ftell() call and returns appropriate error
+/**
+ ** A macro that checks errno after an ftell() call and returns appropriate error
+ **
+ **/
 #define i_FTELL_CHECK(i_TEXT_) \
 /*Depending on errno value*/\
 switch(errno)\
@@ -102,7 +105,10 @@ switch(errno)\
     break;\
 }
 
-//! A macro that checks errno after an ftell() call, sets the appropriate error and uses go to to jump to the appropriate error handling case
+/**
+ ** A macro that checks errno after an ftell() call, sets the appropriate error and uses go to to jump to the appropriate error handling case
+ **
+ **/
 #define i_FTELL_CHECK_GOTO(i_TEXT_,i_ERROR_,i_LABEL_) \
 /*Depending on errno value*/\
 switch(errno)\
@@ -123,7 +129,10 @@ switch(errno)\
 }\
 goto i_LABEL_;
 
-//! A macro that checks errno after an fseek() call, and returns appropriate error to be used for general refu I/O functions as opposed to i_FSEEK_CHECK() which is for TextFiles only
+/**
+ ** A macro that checks errno after an fseek() call, and returns appropriate error to be used for general refu I/O functions as opposed to i_FSEEK_CHECK() which is for TextFiles only
+ **
+ **/
 #define i_FSEEK_CHECK(i_TEXT_)\
 switch(errno)\
 {\
@@ -159,7 +168,10 @@ switch(errno)\
     break;\
 }//end of error handling
 
-//! A macro that checks errno after an fseek() call, and jumpst to a label logging an appropriate error to be used for general refu I/O functions as opposed to i_FSEEK_CHECK() which is for TextFiles only
+/**
+ ** A macro that checks errno after an fseek() call, and jumpst to a label logging an appropriate error to be used for general refu I/O functions as opposed to i_FSEEK_CHECK() which is for TextFiles only
+ **
+ **/
 #define i_FSEEK_CHECK_GOTO(i_TEXT_,i_ERROR_,i_LABEL_){\
 switch(errno)\
 {\
@@ -206,7 +218,10 @@ switch(errno)\
 goto i_LABEL_;\
 }
 
-//! A macro to check the result of fopen and fread for files. By opening an else block under the macro you can process the actual EOF case
+/**
+ ** A macro to check the result of fopen and fread for files. By opening an else block under the macro you can process the actual EOF case
+ **
+ **/
 #define i_READ_CHECK(i_FILE_,i_TEXT_) \
 /*if the error indicator of the stream is set*/\
 if(ferror(i_FILE_)!=0){\
@@ -234,7 +249,10 @@ if(ferror(i_FILE_)!=0){\
         break;\
     }}
 
-//! A macro to check the result of fopen and fread for files and jumpt to a label with goto. By opening an else block under the macro you can process the actual EOF case
+/**
+ ** A macro to check the result of fopen and fread for files and jumpt to a label with goto. By opening an else block under the macro you can process the actual EOF case
+ **
+ **/
 #define i_READ_CHECK_GOTO(i_FILE_,i_TEXT_,i_ERROR_,i_LABEL_) \
 /*if the error indicator of the stream is set*/\
 if(ferror(i_FILE_)!=0){\
@@ -270,7 +288,10 @@ if(ferror(i_FILE_)!=0){\
     goto i_LABEL_;\
 }
 
-//! A macro to check the result of file writting functions for I/O
+/**
+ ** A macro to check the result of file writting functions for I/O
+ **
+ **/
 #define i_WRITE_CHECK(i_FILE_,i_TEXT_) \
 /*depending or errno*/\
 if(ferror(i_FILE_) != 0){\
@@ -303,7 +324,10 @@ if(ferror(i_FILE_) != 0){\
         break;\
     }}
 
-//! A macro to check the result of file writting functions for I/O and jump to a label with goto
+/**
+ ** A macro to check the result of file writting functions for I/O and jump to a label with goto
+ **
+ **/
 #define i_WRITE_CHECK_GOTO(i_FILE_,i_TEXT_,i_ERROR_,i_LABEL_) \
 /*depending or errno*/\
 if(ferror(i_FILE_) != 0){\

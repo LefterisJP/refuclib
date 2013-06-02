@@ -67,9 +67,15 @@ typedef struct RF_LocalMemoryStack
     uint32_t macroEvalsI;
 }RF_LocalMemoryStack;
 
-//! Declare a pointer to the thread-specific the local memory stack
+/**
+ ** Declare a pointer to the thread-specific the local memory stack
+ **
+ **/
 extern i_THREAD__ i_DECLIMEX_  RF_LocalMemoryStack* RF_LMS;
-//! The main thread's local memory stack
+/**
+ ** The main thread's local memory stack
+ **
+ **/
 extern i_DECLIMEX_ RF_LocalMemoryStack RF_MainLMS;
 
 #endif //include guards end

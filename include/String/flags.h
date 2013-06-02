@@ -26,11 +26,20 @@
 #ifndef RF_STRING_FLAGS_H
 #define RF_STRING_FLAGS_H
 
-//! An option for some string functions. Means that the case should not be exactly matched in the string replacing,finding e.t.c.
+/**
+ ** An option for some string functions. Means that the case should not be exactly matched in the string replacing,finding e.t.c.
+ **
+ **/
 #define RF_CASE_IGNORE  0x1
-//! An options for some string functions. Means that the exact string should be found/replaced e.t.c.
+/**
+ ** An options for some string functions. Means that the exact string should be found/replaced e.t.c.
+ **
+ **/
 #define RF_MATCH_WORD 0x2
-//! An option for some string functions denothing that some specific argument is of RF_StringX type
+/**
+ ** An option for some string functions denothing that some specific argument is of RF_StringX type
+ **
+ **/
 #define RF_STRINGX_ARGUMENT 0x4
 
 

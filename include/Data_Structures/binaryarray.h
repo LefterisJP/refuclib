@@ -42,88 +42,121 @@ extern "C"
 #endif
 
 
-//! @memberof RF_BinaryArray
-//! @brief Allocates and returns a binary array. All initial values are 0 (false)
-//!
-//! @param size The size of the array in values
-//! @return Returns the initialized binary array
+/**
+ ** @memberof RF_BinaryArray
+ ** @brief Allocates and returns a binary array. All initial values are 0 (false)
+ **
+ ** @param size The size of the array in values
+ ** @return Returns the initialized binary array
+ **
+ **/
 i_DECLIMEX_ RF_BinaryArray* rfBinaryArray_Create(uint32_t size);
-//! @memberof RF_BinaryArray
-//! @brief Initializes a binary array. All initial values are 0 (false)
-//!
-//! @param arr The array to initialize
-//! @param size The size of the array in values
-//! @return Returns true in success and false for failure
+/**
+ ** @memberof RF_BinaryArray
+ ** @brief Initializes a binary array. All initial values are 0 (false)
+ **
+ ** @param arr The array to initialize
+ ** @param size The size of the array in values
+ ** @return Returns true in success and false for failure
+ **
+ **/
 i_DECLIMEX_ char rfBinaryArray_Init(RF_BinaryArray* arr,uint32_t size);
 
-//! @memberof RF_BinaryArray
-//! @brief Copies RF_BinarryArray @c src into RF_BinaryArray @c dst
-//!
-//! @param dst The new binarry array copy to create
-//! @param src The binary array to copy from
+/**
+ ** @memberof RF_BinaryArray
+ ** @brief Copies RF_BinarryArray @c src into RF_BinaryArray @c dst
+ **
+ ** @param dst The new binarry array copy to create
+ ** @param src The binary array to copy from
+ **
+ **/
 i_DECLIMEX_ void rfBinaryArray_Copy_IN(RF_BinaryArray* dst,RF_BinaryArray* src);
-//! @memberof RF_BinaryArray
-//! @brief Creates and returns an allocated copy of the given RF_BinarryArray
-//!
-//! @param src The Binary array to copy
-//! @return An allocated RF_BinaryArray copy of the given binary array
+/**
+ ** @memberof RF_BinaryArray
+ ** @brief Creates and returns an allocated copy of the given RF_BinarryArray
+ **
+ ** @param src The Binary array to copy
+ ** @return An allocated RF_BinaryArray copy of the given binary array
+ **
+ **/
 i_DECLIMEX_ RF_BinaryArray* rfBinaryArray_Copy_OUT(RF_BinaryArray* src);
 
-//! @memberof RF_BinaryArray
-//! @brief Destroys a binary array freeing its memory
-//!
-//! Call this for arrays initialized with _Create
-//! @param a The binary array to destroy
+/**
+ ** @memberof RF_BinaryArray
+ ** @brief Destroys a binary array freeing its memory
+ **
+ ** Call this for arrays initialized with _Create
+ ** @param a The binary array to destroy
+ **
+ **/
 i_DECLIMEX_ void rfBinaryArray_Destroy(RF_BinaryArray* a);
-//! @memberof RF_BinaryArray
-//! @brief Destroys a binary array but not freeing own memory
-//!
-//! Call this for arrays initialized with _Init
-//! @param a The binary array to destroy
+/**
+ ** @memberof RF_BinaryArray
+ ** @brief Destroys a binary array but not freeing own memory
+ **
+ ** Call this for arrays initialized with _Init
+ ** @param a The binary array to destroy
+ **
+ **/
 i_DECLIMEX_ void rfBinaryArray_Deinit(RF_BinaryArray* a);
 
-//! @memberof RF_BinaryArray
-//! @brief Gets a specific value of the array
-//! @param[in] a The binary array from where to get the value
-//! @param[in] i The index of the value to get
-//! @param[out] val Pass a reference to a char to get the value here
-//! @return Returns true if the value exists and false if the requested index is out of bounds
+/**
+ ** @memberof RF_BinaryArray
+ ** @brief Gets a specific value of the array
+ ** @param[in] a The binary array from where to get the value
+ ** @param[in] i The index of the value to get
+ ** @param[out] val Pass a reference to a char to get the value here
+ ** @return Returns true if the value exists and false if the requested index is out of bounds
+ **
+ **/
 i_DECLIMEX_ char rfBinaryArray_Get(RF_BinaryArray* a,uint32_t i,char* val);
 
-//! @memberof RF_BinaryArray
-//! @brief Gets a specific value of the array, no checking.
-//!
-//! This function gets a value without checking for array index out of bounds. If the index IS out of bounds the value can not be trusted and
-//! a segmentation fault can also happen. For a safer function look at #rfBinaryArray_Get that performs the check.
-//! @warning  NEVER use this function if you are not sure wether the index is out of bounds or not
-//! @param a The binary array from where to get the value
-//! @param i The index of the value to get
-//! @return Returns true if the value is set and false if it is not set
+/**
+ ** @memberof RF_BinaryArray
+ ** @brief Gets a specific value of the array, no checking.
+ **
+ ** This function gets a value without checking for array index out of bounds. If the index IS out of bounds the value can not be trusted and
+ ** a segmentation fault can also happen. For a safer function look at #rfBinaryArray_Get that performs the check.
+ ** @warning  NEVER use this function if you are not sure wether the index is out of bounds or not
+ ** @param a The binary array from where to get the value
+ ** @param i The index of the value to get
+ ** @return Returns true if the value is set and false if it is not set
+ **
+ **/
 i_DECLIMEX_ char rfBinaryArray_Get_NC(RF_BinaryArray* a,uint32_t i);
 
-//! @memberof RF_BinaryArray
-//! @brief Sets a specific value of the binary array.
-//! @param a The binary array from where to get the value
-//! @param i The index of the value to set
-//! @param val The value to give. Either 1 or 0.
-//! @return Returns true if the value was succesfully set or false if the given index was out of bounds
+/**
+ ** @memberof RF_BinaryArray
+ ** @brief Sets a specific value of the binary array.
+ ** @param a The binary array from where to get the value
+ ** @param i The index of the value to set
+ ** @param val The value to give. Either 1 or 0.
+ ** @return Returns true if the value was succesfully set or false if the given index was out of bounds
+ **
+ **/
 i_DECLIMEX_ char rfBinaryArray_Set(RF_BinaryArray* a,uint32_t i,char val);
 
-//! @memberof RF_BinaryArray
-//! @brief Sets a specific value of the binary array, no checking.
-//!
-//! This function sets a value without making an index out of bounds check. Use only if you are certain that the given index is not out of bounds!!!!
-//! @warning  NEVER use this function if you are not sure wether the index is out of bounds or not
-//! @param a The binary array from where to get the value
-//! @param i The index of the value to set
-//! @param val The value to give. Either 1 or 0.
+/**
+ ** @memberof RF_BinaryArray
+ ** @brief Sets a specific value of the binary array, no checking.
+ **
+ ** This function sets a value without making an index out of bounds check. Use only if you are certain that the given index is not out of bounds!!!!
+ ** @warning  NEVER use this function if you are not sure wether the index is out of bounds or not
+ ** @param a The binary array from where to get the value
+ ** @param i The index of the value to set
+ ** @param val The value to give. Either 1 or 0.
+ **
+ **/
 i_DECLIMEX_ void rfBinaryArray_Set_NC(RF_BinaryArray* a,uint32_t i,char val);
 
-//! @memberof RF_BinaryArray
-//! @brief Increases or decreases the size of a binary array.
-//! @param a The binary array to reallocate
-//! @param newSize The new size in values that the array should have.
-//! @return True for succesfull reallocation and false otherwise.
+/**
+ ** @memberof RF_BinaryArray
+ ** @brief Increases or decreases the size of a binary array.
+ ** @param a The binary array to reallocate
+ ** @param newSize The new size in values that the array should have.
+ ** @return True for succesfull reallocation and false otherwise.
+ **
+ **/
 i_DECLIMEX_ char rfBinaryArray_Reallocate(RF_BinaryArray* a,uint32_t newSize);
 
 #ifdef __cplusplus

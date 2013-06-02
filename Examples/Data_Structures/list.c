@@ -2,7 +2,10 @@
 #include <refu.h>
 #include <stdio.h>
 
-//! [PRINT_LISTS]
+/**
+ ** [PRINT_LISTS]
+ **
+ **/
 //prints a ListP
 void printListP(RF_ListP* list)
 {
@@ -25,7 +28,10 @@ void printListV(RF_ListV* list)
     }
 }
 
-//! [PRINT_LISTS]
+/**
+ ** [PRINT_LISTS]
+ **
+ **/
 int main()
 {
     rfInit("errorLog","infoLog");
@@ -40,31 +46,52 @@ int main()
     rfString_Init(&s5,"I am an addition");
     rfString_Init(&s6,"I am another addition");
     rfString_Init(&set,"I was inserted by Set");
-//! [POPULATE_LISTP]
+/**
+ ** [POPULATE_LISTP]
+ **
+ **/
     //Initialize a list of 4 pointers to string and add 4 of them
     rfListP_Init(&listP,RF_String,4);
     rfListP_Add(&listP,rfString_Create("First string on the heap"));
     rfListP_Add(&listP,rfString_Create("Second string on the heap"));
     rfListP_Add(&listP,rfString_Create("Third string on the heap"));
     rfListP_Add(&listP,rfString_Create("Fourth string on the heap"));
-//! [POPULATE_LISTP]
+/**
+ ** [POPULATE_LISTP]
+ **
+ **/
 
-//! [POPULATE_LISTV]
+/**
+ ** [POPULATE_LISTV]
+ **
+ **/
     //Initialize a list of 4 strings and add the ones we had before
     rfListV_Init(&listV,RF_String,4);
     rfListV_Add(&listV,&s1);
     rfListV_Add(&listV,&s2);
     rfListV_Add(&listV,&s3);
     rfListV_Add(&listV,&s4);
-//! [POPULATE_LISTV]
+/**
+ ** [POPULATE_LISTV]
+ **
+ **/
 
-//! [DO_PRINT1]
+/**
+ ** [DO_PRINT1]
+ **
+ **/
     //print the 2 lists
     printListP(&listP);
     printListV(&listV);
-//! [DO_PRINT1]
+/**
+ ** [DO_PRINT1]
+ **
+ **/
 
-//! [ADD_REMOVE]
+/**
+ ** [ADD_REMOVE]
+ **
+ **/
     //make a copy of the values list
     RF_ListV listV2;
     rfListV_Copy_IN(&listV2,&listV);
@@ -83,13 +110,22 @@ int main()
     //print the 2 values list now
     printListV(&listV);
     printListV(&listV2);
-//! [ADD_REMOVE]
+/**
+ ** [ADD_REMOVE]
+ **
+ **/
 
-//! [CLEANUP]
+/**
+ ** [CLEANUP]
+ **
+ **/
 	//cleanup of the lists
 	rfListV_Deinit(&listV);
 	rfListV_Deinit(&listV2);
 	rfListP_Deinit(&listP);
-//! [CLEANUP]
+/**
+ ** [CLEANUP]
+ **
+ **/
     return 0;
 }

@@ -4,7 +4,10 @@
 
 int main()
 {
-//! [ALL]
+/**
+ ** [ALL]
+ **
+ **/
 	rfInit("refuErrorLog.txt","refuInfoLog.txt");
 	//initialize the date as the current local time
     RF_Date date,oDate,result;
@@ -18,17 +21,26 @@ int main()
     rfDate_SubMinutes(&oDate,25);
     rfDate_SubSeconds(&oDate,29);
     printf("The final date is (%u) %u/%u/%u\t%u:%u \n",oDate.wDay,oDate.mDay,oDate.month,oDate.year,oDate.hours,oDate.minutes);
-//! [FUNCTION CALL]
+/**
+ ** [FUNCTION CALL]
+ **
+ **/
 	//compare the two dates
     char relation = rfDate_Diff(&date,&oDate,&result);
 	//print the result depending on the returned relation (past,future) of the dates
     switch(relation)
     {
         case RF_FUTURE:
-//! [ACCESSED MEMBERS]
+/**
+ ** [ACCESSED MEMBERS]
+ **
+ **/
             printf("The second date is %u YEARS, %u MONTHS, %u DAYS, %u HOURS, %u MINUTES and %u SECONDS in the PAST\n",
 			result.year,result.month,result.mDay,result.hours,result.minutes,result.seconds);
-//! [ACCESSED MEMBERS]
+/**
+ ** [ACCESSED MEMBERS]
+ **
+ **/
         break;
         case RF_PAST:
             printf("The second date is %u YEARS, %u MONTHS, %u DAYS, %u HOURS, %u MINUTES and %u SECONDS in the FUTURE\n",
@@ -41,7 +53,10 @@ int main()
 			printf("There was an error");
 		break;
     }
-//! [FUNCTION CALL]
-//! [ALL]
+/**
+ ** [FUNCTION CALL]
+ ** [ALL]
+ **
+ **/
 	return 0;
 }

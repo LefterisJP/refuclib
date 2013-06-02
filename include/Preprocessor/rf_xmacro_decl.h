@@ -42,11 +42,17 @@
 #define i_RP_PICK_FUNC_DECL(funcmacro__,eqresult__,cmpresult__)  i_RP_PASTE3(funcmacro__,eqresult__,cmpresult__)
 
 
-//! These macros are used when you want to declare a function in a header file with default arguments and want to avoid lots of typing
+/**
+ ** These macros are used when you want to declare a function in a header file with default arguments and want to avoid lots of typing
+ **
+ **/
 
 
 
-//! This macro is used to declare a function with 36 arguments in a header file
+/**
+ ** This macro is used to declare a function with 36 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC36(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34,arg__35,arg__36)\
 i_RP_DECLARE_FUNC36(funcNarf__,retType__,36,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34,arg__35,arg__36)
 
@@ -63,7 +69,10 @@ i_RP_DECLARE_FUNC35(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 35 arguments in a header file
+/**
+ ** This macro is used to declare a function with 35 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC35(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34,arg__35)\
 i_RP_DECLARE_FUNC35(funcNarf__,retType__,35,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34,arg__35)
 
@@ -80,7 +89,10 @@ i_RP_DECLARE_FUNC34(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 34 arguments in a header file
+/**
+ ** This macro is used to declare a function with 34 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC34(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34)\
 i_RP_DECLARE_FUNC34(funcNarf__,retType__,34,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33,arg__34)
 
@@ -97,7 +109,10 @@ i_RP_DECLARE_FUNC33(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 33 arguments in a header file
+/**
+ ** This macro is used to declare a function with 33 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC33(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33)\
 i_RP_DECLARE_FUNC33(funcNarf__,retType__,33,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32,arg__33)
 
@@ -114,7 +129,10 @@ i_RP_DECLARE_FUNC32(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 32 arguments in a header file
+/**
+ ** This macro is used to declare a function with 32 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC32(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32)\
 i_RP_DECLARE_FUNC32(funcNarf__,retType__,32,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31,arg__32)
 
@@ -131,7 +149,10 @@ i_RP_DECLARE_FUNC31(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 31 arguments in a header file
+/**
+ ** This macro is used to declare a function with 31 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC31(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31)\
 i_RP_DECLARE_FUNC31(funcNarf__,retType__,31,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30,arg__31)
 
@@ -148,7 +169,10 @@ i_RP_DECLARE_FUNC30(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 30 arguments in a header file
+/**
+ ** This macro is used to declare a function with 30 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC30(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30)\
 i_RP_DECLARE_FUNC30(funcNarf__,retType__,30,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29,arg__30)
 
@@ -165,7 +189,10 @@ i_RP_DECLARE_FUNC29(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 29 arguments in a header file
+/**
+ ** This macro is used to declare a function with 29 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC29(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29)\
 i_RP_DECLARE_FUNC29(funcNarf__,retType__,29,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28,arg__29)
 
@@ -182,7 +209,10 @@ i_RP_DECLARE_FUNC28(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 28 arguments in a header file
+/**
+ ** This macro is used to declare a function with 28 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC28(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28)\
 i_RP_DECLARE_FUNC28(funcNarf__,retType__,28,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27,arg__28)
 
@@ -199,7 +229,10 @@ i_RP_DECLARE_FUNC27(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 27 arguments in a header file
+/**
+ ** This macro is used to declare a function with 27 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC27(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27)\
 i_RP_DECLARE_FUNC27(funcNarf__,retType__,27,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26,arg__27)
 
@@ -216,7 +249,10 @@ i_RP_DECLARE_FUNC26(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 26 arguments in a header file
+/**
+ ** This macro is used to declare a function with 26 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC26(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26)\
 i_RP_DECLARE_FUNC26(funcNarf__,retType__,26,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25,arg__26)
 
@@ -233,7 +269,10 @@ i_RP_DECLARE_FUNC25(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 25 arguments in a header file
+/**
+ ** This macro is used to declare a function with 25 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC25(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25)\
 i_RP_DECLARE_FUNC25(funcNarf__,retType__,25,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24,arg__25)
 
@@ -250,7 +289,10 @@ i_RP_DECLARE_FUNC24(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 24 arguments in a header file
+/**
+ ** This macro is used to declare a function with 24 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC24(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24)\
 i_RP_DECLARE_FUNC24(funcNarf__,retType__,24,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23,arg__24)
 
@@ -267,7 +309,10 @@ i_RP_DECLARE_FUNC23(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 23 arguments in a header file
+/**
+ ** This macro is used to declare a function with 23 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC23(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23)\
 i_RP_DECLARE_FUNC23(funcNarf__,retType__,23,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22,arg__23)
 
@@ -284,7 +329,10 @@ i_RP_DECLARE_FUNC22(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 22 arguments in a header file
+/**
+ ** This macro is used to declare a function with 22 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC22(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22)\
 i_RP_DECLARE_FUNC22(funcNarf__,retType__,22,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21,arg__22)
 
@@ -301,7 +349,10 @@ i_RP_DECLARE_FUNC21(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 21 arguments in a header file
+/**
+ ** This macro is used to declare a function with 21 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC21(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21)\
 i_RP_DECLARE_FUNC21(funcNarf__,retType__,21,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20,arg__21)
 
@@ -318,7 +369,10 @@ i_RP_DECLARE_FUNC20(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 20 arguments in a header file
+/**
+ ** This macro is used to declare a function with 20 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC20(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20)\
 i_RP_DECLARE_FUNC20(funcNarf__,retType__,20,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19,arg__20)
 
@@ -335,7 +389,10 @@ i_RP_DECLARE_FUNC19(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 19 arguments in a header file
+/**
+ ** This macro is used to declare a function with 19 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC19(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19)\
 i_RP_DECLARE_FUNC19(funcNarf__,retType__,19,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18,arg__19)
 
@@ -352,7 +409,10 @@ i_RP_DECLARE_FUNC18(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 18 arguments in a header file
+/**
+ ** This macro is used to declare a function with 18 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC18(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18)\
 i_RP_DECLARE_FUNC18(funcNarf__,retType__,18,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17,arg__18)
 
@@ -369,7 +429,10 @@ i_RP_DECLARE_FUNC17(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 17 arguments in a header file
+/**
+ ** This macro is used to declare a function with 17 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC17(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17)\
 i_RP_DECLARE_FUNC17(funcNarf__,retType__,17,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16,arg__17)
 
@@ -386,7 +449,10 @@ i_RP_DECLARE_FUNC16(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 16 arguments in a header file
+/**
+ ** This macro is used to declare a function with 16 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC16(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16)\
 i_RP_DECLARE_FUNC16(funcNarf__,retType__,16,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15,arg__16)
 
@@ -403,7 +469,10 @@ i_RP_DECLARE_FUNC15(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 15 arguments in a header file
+/**
+ ** This macro is used to declare a function with 15 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC15(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15)\
 i_RP_DECLARE_FUNC15(funcNarf__,retType__,15,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14,arg__15)
 
@@ -420,7 +489,10 @@ i_RP_DECLARE_FUNC14(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 14 arguments in a header file
+/**
+ ** This macro is used to declare a function with 14 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC14(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14)\
 i_RP_DECLARE_FUNC14(funcNarf__,retType__,14,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13,arg__14)
 
@@ -437,7 +509,10 @@ i_RP_DECLARE_FUNC13(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 13 arguments in a header file
+/**
+ ** This macro is used to declare a function with 13 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC13(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13)\
 i_RP_DECLARE_FUNC13(funcNarf__,retType__,13,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12,arg__13)
 
@@ -454,7 +529,10 @@ i_RP_DECLARE_FUNC12(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 12 arguments in a header file
+/**
+ ** This macro is used to declare a function with 12 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC12(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12)\
 i_RP_DECLARE_FUNC12(funcNarf__,retType__,12,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11,arg__12)
 
@@ -471,7 +549,10 @@ i_RP_DECLARE_FUNC11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 11 arguments in a header file
+/**
+ ** This macro is used to declare a function with 11 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC11(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11)\
 i_RP_DECLARE_FUNC11(funcNarf__,retType__,11,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10,arg__11)
 
@@ -488,7 +569,10 @@ i_RP_DECLARE_FUNC10(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg
 
 
 
-//! This macro is used to declare a function with 10 arguments in a header file
+/**
+ ** This macro is used to declare a function with 10 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC10(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10)\
 i_RP_DECLARE_FUNC10(funcNarf__,retType__,10,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9,arg__10)
 
@@ -505,7 +589,10 @@ i_RP_DECLARE_FUNC9(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg_
 
 
 
-//! This macro is used to declare a function with 9 arguments in a header file
+/**
+ ** This macro is used to declare a function with 9 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC9(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9)\
 i_RP_DECLARE_FUNC9(funcNarf__,retType__,9,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8,arg__9)
 
@@ -522,7 +609,10 @@ i_RP_DECLARE_FUNC8(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg_
 
 
 
-//! This macro is used to declare a function with 8 arguments in a header file
+/**
+ ** This macro is used to declare a function with 8 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC8(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8)\
 i_RP_DECLARE_FUNC8(funcNarf__,retType__,8,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7,arg__8)
 
@@ -539,7 +629,10 @@ i_RP_DECLARE_FUNC7(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg_
 
 
 
-//! This macro is used to declare a function with 7 arguments in a header file
+/**
+ ** This macro is used to declare a function with 7 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC7(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7)\
 i_RP_DECLARE_FUNC7(funcNarf__,retType__,7,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6,arg__7)
 
@@ -556,7 +649,10 @@ i_RP_DECLARE_FUNC6(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg_
 
 
 
-//! This macro is used to declare a function with 6 arguments in a header file
+/**
+ ** This macro is used to declare a function with 6 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC6(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6)\
 i_RP_DECLARE_FUNC6(funcNarf__,retType__,6,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5,arg__6)
 
@@ -573,7 +669,10 @@ i_RP_DECLARE_FUNC5(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg_
 
 
 
-//! This macro is used to declare a function with 5 arguments in a header file
+/**
+ ** This macro is used to declare a function with 5 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC5(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5)\
 i_RP_DECLARE_FUNC5(funcNarf__,retType__,5,defArgsN__,arg__1,arg__2,arg__3,arg__4,arg__5)
 
@@ -590,7 +689,10 @@ i_RP_DECLARE_FUNC4(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg_
 
 
 
-//! This macro is used to declare a function with 4 arguments in a header file
+/**
+ ** This macro is used to declare a function with 4 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC4(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3,arg__4)\
 i_RP_DECLARE_FUNC4(funcNarf__,retType__,4,defArgsN__,arg__1,arg__2,arg__3,arg__4)
 
@@ -607,7 +709,10 @@ i_RP_DECLARE_FUNC3(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2,arg_
 
 
 
-//! This macro is used to declare a function with 3 arguments in a header file
+/**
+ ** This macro is used to declare a function with 3 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC3(retType__,funcNarf__,defArgsN__,arg__1,arg__2,arg__3)\
 i_RP_DECLARE_FUNC3(funcNarf__,retType__,3,defArgsN__,arg__1,arg__2,arg__3)
 
@@ -624,7 +729,10 @@ i_RP_DECLARE_FUNC2(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1,arg__2)
 
 
 
-//! This macro is used to declare a function with 2 arguments in a header file
+/**
+ ** This macro is used to declare a function with 2 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC2(retType__,funcNarf__,defArgsN__,arg__1,arg__2)\
 i_RP_DECLARE_FUNC2(funcNarf__,retType__,2,defArgsN__,arg__1,arg__2)
 
@@ -641,7 +749,10 @@ i_RP_DECLARE_FUNC1(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1)
 
 
 
-//! This macro is used to declare a function with 1 arguments in a header file
+/**
+ ** This macro is used to declare a function with 1 arguments in a header file
+ **
+ **/
 #define RF_DECLARE_DFUNC1(retType__,funcNarf__,defArgsN__,arg__1)\
 i_RP_DECLARE_FUNC1(funcNarf__,retType__,1,defArgsN__,arg__1)
 
@@ -657,7 +768,10 @@ i_RP_DECLARE_FUNC0(funcNarf__,retType__,maxArgsN__,defArgsN__)
 #define i_RP_DECLARE_FUNC1_IMP11(funcNarf__,retType__,maxArgsN__,defArgsN__,arg__1)
 
 
-//! This macro is used to declare a function with 0 arguments in a header file
+/**
+ ** This macro is used to declare a function with 0 arguments in a header file
+ **
+ **/
 #define i_RP_DECLARE_FUNC0(funcNarf__,retType__,maxArgsN__,defArgsN__)\
 i_RP_PICK_FUNC_DECL(i_RP_DECLARE_FUNC0_IMP,i_RP_DECL_MACRO_CHECK1(maxArgsN__,defArgsN__,0),i_RP_DECL_MACRO_CHECK2(maxArgsN__,defArgsN__,0))(funcNarf__,retType__,maxArgsN__,defArgsN__)
 #define i_RP_DECLARE_FUNC0_IMP00(funcNarf__,retType__,maxArgsN__,defArgsN__)  retType__  funcNarf__##0();

@@ -8,7 +8,10 @@ typedef struct foo
 	char* name;
 }foo;
 
-//! [TEMP_INIT_FUNC]
+/**
+ ** [TEMP_INIT_FUNC]
+ **
+ **/
 //This will be the function that can initialize temporary foo objects. Exactly like RFS_() is in normal library code
 foo* FOO_(int id,char* name)
 {
@@ -29,9 +32,15 @@ foo* FOO_(int id,char* name)
 	//finally return the temporary foo
 	return ret;
 }
-//! [TEMP_INIT_FUNC]
+/**
+ ** [TEMP_INIT_FUNC]
+ **
+ **/
 
-//! [TEMP_FOO]
+/**
+ ** [TEMP_FOO]
+ **
+ **/
 void dosth_with_foo(foo* f)
 {//must be in the beginning of any function that may accept any sort of temporary objects residing in the local stack
 	RF_ENTER_LOCAL_SCOPE()
@@ -39,7 +48,10 @@ void dosth_with_foo(foo* f)
 	//must be in the end of any function that may accept any sort of temporary objects residing in the local stack
 	RF_EXIT_LOCAL_SCOPE()
 }
-//! [TEMP_FOO]
+/**
+ ** [TEMP_FOO]
+ **
+ **/
 
 int main()
 {

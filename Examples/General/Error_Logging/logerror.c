@@ -1,11 +1,17 @@
 #include <String/rf_unicode.h>
 #include <string.h>
 
-//! [ERRORDEF]
+/**
+ ** [ERRORDEF]
+ **
+ **/
 #define NO_MEANING      RF_HIGHEST_ERROR-1
 #define ILLEGAL_INPUT   RF_HIGHEST_ERROR-2
-//! [ERRORDEF]
-//! [ENCODE]
+/**
+ ** [ERRORDEF]
+ ** [ENCODE]
+ **
+ **/
 //a function to encode a utf8 buffer into a given encoding
 char* encode(const char* utf8,uint32_t length,char encoding)
 {
@@ -34,25 +40,40 @@ char* encode(const char* utf8,uint32_t length,char encoding)
 	}
 	return 0;
 }
-//! [ENCODE]
+/**
+ ** [ENCODE]
+ **
+ **/
 
 int main()
 {
     char* buffer;
 	rfInit();//initialize refu library
 	const char utf8[] = "A buffer";
-//! [CALL]
+/**
+ ** [CALL]
+ **
+ **/
 	//call the function with a no meaning value
     buffer = encode(utf8,strlen(utf8),RF_UTF8);
     //call the function with an illegal value
     buffer = encode(utf8,strlen(utf8),46);
-//! [CALL]
+/**
+ ** [CALL]
+ **
+ **/
 
-//! [LAST_ERROR]
+/**
+ ** [LAST_ERROR]
+ **
+ **/
     //just showcasing the RF_GETLASTERROR() macro
     if(RF_GETLASTERROR()!=0)
         printf("The last error value is: [%d]",RF_GETLASTERROR());
-//! [LAST_ERROR]
+/**
+ ** [LAST_ERROR]
+ **
+ **/
 	return 0;
 }
 

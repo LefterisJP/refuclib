@@ -1,6 +1,9 @@
 #include "example.h"
 
-//! [Function Definition]
+/**
+ ** [Function Definition]
+ **
+ **/
 // This is how we will define a function with default arguments in a source file
 // Remember that we declared it as a function with 2 default values so the
 // ints and the float need to get their default values in order
@@ -12,10 +15,16 @@ RF_DEFINE_DFUNC3(float,test_func,int,firstNum,int,secondNum,float,thirdNum,100,0
 	ret = ret*thirdNum;
 	return ret;
 }
-//! [Function Definition]
+/**
+ ** [Function Definition]
+ **
+ **/
 
 
-//! [Function Calling]
+/**
+ ** [Function Calling]
+ **
+ **/
 //Define a macro that will correctly choose the appropriate default arguments function.
 #define test_func(...) RF_SELECT_FUNC(test_func,__VA_ARGS__)
 //let's test the default arguments function calling
@@ -26,4 +35,5 @@ int main()
 	float c = test_func(100,2,2.5);//102*2.5 = 255
 	return 0;
 }
-//! [Function Calling]
+/**
+ ** [Function Calling]

@@ -83,15 +83,21 @@ i_RP_ISEMPTY(                                                               \
     #define i_RP_NARG_EMPTY_1(V__) 0
     #define i_RP_NARG_EMPTY_0(V__) V__
 
-//! @defgroup RF_PreprocessorGRP Preprocessor
-//! @addtogroup RF_PreprocessorGRP
+/**
+ ** @defgroup RF_PreprocessorGRP Preprocessor
+ ** @addtogroup RF_PreprocessorGRP
 //! @{
+ **
+ **/
 
-//! @brief Counts the number of arguments
-//!
-//! This is the macro that actually counts the number of arguments that are passed to it and returns it. Works for empty argument list too
-//! Max number of arguments that this macro will currently work for is 36. If given an empty argument list it returns 0.
-//! @param ... The arguments list whose number of arguments we need counted.
+/**
+ ** @brief Counts the number of arguments
+ **
+ ** This is the macro that actually counts the number of arguments that are passed to it and returns it. Works for empty argument list too
+ ** Max number of arguments that this macro will currently work for is 36. If given an empty argument list it returns 0.
+ ** @param ... The arguments list whose number of arguments we need counted.
+ **
+ **/
 #define RF_NARG(...) i_RP_NARG_1(i_RP_EMPTY_NARG(__VA_ARGS__), i_RP_NARG_NOEMPTY(__VA_ARGS__))
 //!@}
 
@@ -100,15 +106,18 @@ i_RP_ISEMPTY(                                                               \
     // Helper macro. Basically decides what RP_NARG returns, which is either __V__ the value of RF_NARG_NOEMPTY or 0 in the case of NARG_EMPTY() evaluating to 0
     #define i_RP_NARG_2(B__, V__) B__(V__)
 
-//! @ingroup RF_Preprocessor_DefaultArgsGRP
-//! @brief Selects an appropriate function depending on the number of arguments
-//!
-//! This macro selects the function name according to the arguments given and passes both the name and the arguments to the selected function.
-//! Basically what this macro does is paste the token of the name with the token of the function number and hence issue a call to the corresponding
-//! function.
-//! @param i_FUNCNAME_ The name of the function
-//! @param ... Pass the arguments to the function here. The arguments passed NEED to be no more than the arguments defined for the same function with #RF_DECLARE_DFUNCXX
-//!            and also no less than the number of MaxArguments-DefaultArguments. Calling this macro with wrong number of arguments will result in compile error.
+/**
+ ** @ingroup RF_Preprocessor_DefaultArgsGRP
+ ** @brief Selects an appropriate function depending on the number of arguments
+ **
+ ** This macro selects the function name according to the arguments given and passes both the name and the arguments to the selected function.
+ ** Basically what this macro does is paste the token of the name with the token of the function number and hence issue a call to the corresponding
+ ** function.
+ ** @param i_FUNCNAME_ The name of the function
+ ** @param ... Pass the arguments to the function here. The arguments passed NEED to be no more than the arguments defined for the same function with #RF_DECLARE_DFUNCXX
+ **            and also no less than the number of MaxArguments-DefaultArguments. Calling this macro with wrong number of arguments will result in compile error.
+ **
+ **/
 #define RF_SELECT_FUNC(i_FUNCNAME_,...) RP_SELECT_FUNC(i_FUNCNAME_,RF_NARG(__VA_ARGS__), __VA_ARGS__)
 #define RF_SELECT_FUNC2(i_FUNCNAME_,...) RP_SELECT_FUNC2(i_FUNCNAME_,RF_NARG(__VA_ARGS__), __VA_ARGS__)
 

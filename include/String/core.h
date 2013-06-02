@@ -47,20 +47,23 @@ extern "C"
 //! @name Creating an RF_String
 //! @{
 
-//! @memberof RF_String
-//! @opassign
-//! @brief Allocates and returns a string with the given characters
-//!
-//! Given characters have to be in UTF-8. A check for valid sequence of bytes is performed. @notinherited{StringX}
-//! @lmsFunction
-//! @param s The sequence of bytes for the characters in UTF-8 (the default). Can also follow a printf-like format which will be formatted with
-//! the variables that follow it. A check to see if it is a valid UTF-8 sequence is performed
-//! @param ... \rfoptional{nothing}  Depending on the string literal, the function may expect a sequence of additional arguments,
-//! each containing one value to be inserted instead of each %-tag specified in the @c slit parameter, if any. There should be
-//! the same number of these arguments as the number of %-tags that expect a value.
-//! @return Returns the initialized RF_string or null in case of failure to initialize, due to invalid utf-8 sequence
-//! @see rfString_Init()
-//! @see rfStringX_Create()
+/**
+ ** @memberof RF_String
+ ** @opassign
+ ** @brief Allocates and returns a string with the given characters
+ **
+ ** Given characters have to be in UTF-8. A check for valid sequence of bytes is performed. @notinherited{StringX}
+ ** @lmsFunction
+ ** @param s The sequence of bytes for the characters in UTF-8 (the default). Can also follow a printf-like format which will be formatted with
+ ** the variables that follow it. A check to see if it is a valid UTF-8 sequence is performed
+ ** @param ... \rfoptional{nothing}  Depending on the string literal, the function may expect a sequence of additional arguments,
+ ** each containing one value to be inserted instead of each %-tag specified in the @c slit parameter, if any. There should be
+ ** the same number of these arguments as the number of %-tags that expect a value.
+ ** @return Returns the initialized RF_string or null in case of failure to initialize, due to invalid utf-8 sequence
+ ** @see rfString_Init()
+ ** @see rfStringX_Create()
+ **
+ **/
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ RF_String* rfString_Create(const char* s,...);
 #else
@@ -74,21 +77,24 @@ i_DECLIMEX_ RF_String* i_NVrfString_Create(const char* s);
 
 
 
-//! @memberof RF_String
-//! @brief Initializes a string with the given characters.
-//!
-//! @notinherited{StringX}
-//! Given characters have to be in UTF-8. A check for valide sequence of bytes is performed.
-//! @lmsFunction
-//! @param str The string to initialize
-//! @param s The sequence of bytes for the characters in UTF-8 (the default).Can also follow a printf-like format which will be formatted with
-//! the variables that follow it. A check to see if it is a valid UTF-8 sequence is performed
-//! @param ... \rfoptional{nothing}  Depending on the string literal, the function may expect a sequence of additional arguments,
-//! each containing one value to be inserted instead of each %-tag specified in the @c slit parameter, if any. There should be
-//! the same number of these arguments as the number of %-tags that expect a value.
-//! @return Returns true in case of correct initialization and false , due to invalid utf-8 sequence
-//! @see rfString_Create()
-//! @see rfStringX_Init()
+/**
+ ** @memberof RF_String
+ ** @brief Initializes a string with the given characters.
+ **
+ ** @notinherited{StringX}
+ ** Given characters have to be in UTF-8. A check for valide sequence of bytes is performed.
+ ** @lmsFunction
+ ** @param str The string to initialize
+ ** @param s The sequence of bytes for the characters in UTF-8 (the default).Can also follow a printf-like format which will be formatted with
+ ** the variables that follow it. A check to see if it is a valid UTF-8 sequence is performed
+ ** @param ... \rfoptional{nothing}  Depending on the string literal, the function may expect a sequence of additional arguments,
+ ** each containing one value to be inserted instead of each %-tag specified in the @c slit parameter, if any. There should be
+ ** the same number of these arguments as the number of %-tags that expect a value.
+ ** @return Returns true in case of correct initialization and false , due to invalid utf-8 sequence
+ ** @see rfString_Create()
+ ** @see rfStringX_Init()
+ **
+ **/
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ char rfString_Init(RF_String* str,const char* s,...);
 #else
@@ -99,141 +105,177 @@ i_DECLIMEX_ char i_NVrfString_Init(RF_String* str,const char* s);
 #define i_SELECT_RF_STRING_INIT0(...) i_rfString_Init(__VA_ARGS__)
 #endif
 
-//! @memberof RF_String
-//! @cppnotctor
-//! @brief Allocates a String by turning a unicode code point in a String (encoded in UTF-8).
-//!
-//! @notinherited{StringX}
-//! @param code The unicode code point to encode
-//! @return A String with the code point encoded in it or a null pointer in case of an illegal code point value
-//! @see rfString_Init_cp()
-//! @see rfStringX_Create_cp()
+/**
+ ** @memberof RF_String
+ ** @cppnotctor
+ ** @brief Allocates a String by turning a unicode code point in a String (encoded in UTF-8).
+ **
+ ** @notinherited{StringX}
+ ** @param code The unicode code point to encode
+ ** @return A String with the code point encoded in it or a null pointer in case of an illegal code point value
+ ** @see rfString_Init_cp()
+ ** @see rfStringX_Create_cp()
+ **
+ **/
 i_DECLIMEX_ RF_String* rfString_Create_cp(uint32_t code);
-//! @memberof RF_String
-//! @brief Initializes a string by turning a unicode code point in a String (encoded in UTF-8).
-//!
-//! @notinherited{StringX}
-//! @param str The string to initialize
-//! @param code The unicode code point to encode
-//! @return Returns true in case of correct initialization and false , due to illegal code point value
-//! @see rfString_Create_cp()
-//! @see rfStringX_Init_cp()
+/**
+ ** @memberof RF_String
+ ** @brief Initializes a string by turning a unicode code point in a String (encoded in UTF-8).
+ **
+ ** @notinherited{StringX}
+ ** @param str The string to initialize
+ ** @param code The unicode code point to encode
+ ** @return Returns true in case of correct initialization and false , due to illegal code point value
+ ** @see rfString_Create_cp()
+ ** @see rfStringX_Init_cp()
+ **
+ **/
 i_DECLIMEX_ char rfString_Init_cp(RF_String* str,uint32_t code);
 
 
 
-//! @memberof RF_String
-//! @cppnotctor
-//! @brief Allocates and returns a string with the given characters with no checking.
-//!
-//! @notinherited{StringX}
-//! @warning NO VALID-UTF8 check is performed.
-//! @param s The sequence of bytes for the characters in UTF-8 (the default).Can also follow a printf-like format which will be formatted with
-//! the variables that follow it. No check for valid bytestream is performed
-//! @return Returns the initialized RF_string or null in case of failure to initialize
-//! @see rfString_Init_unsafe()
+/**
+ ** @memberof RF_String
+ ** @cppnotctor
+ ** @brief Allocates and returns a string with the given characters with no checking.
+ **
+ ** @notinherited{StringX}
+ ** @warning NO VALID-UTF8 check is performed.
+ ** @param s The sequence of bytes for the characters in UTF-8 (the default).Can also follow a printf-like format which will be formatted with
+ ** the variables that follow it. No check for valid bytestream is performed
+ ** @return Returns the initialized RF_string or null in case of failure to initialize
+ ** @see rfString_Init_unsafe()
+ **
+ **/
 RF_String* rfString_Create_unsafe(const char* s);
 
 
 
-//! @memberof RF_String
-//! @brief Initializes a string with the given characters with no checking
-//!
-//! @notinherited{StringX}
-//! @warning NO VALID-UTF8 check is performed.
-//! @param str The string to initialize
-//! @param s The sequence of bytes for the characters in UTF-8 (the default).Can also follow a printf-like format which will be formatted with
-//! the variables that follow it. No check for valid bytestream is performed
-//! @see rfString_Create_unsafe()
+/**
+ ** @memberof RF_String
+ ** @brief Initializes a string with the given characters with no checking
+ **
+ ** @notinherited{StringX}
+ ** @warning NO VALID-UTF8 check is performed.
+ ** @param str The string to initialize
+ ** @param s The sequence of bytes for the characters in UTF-8 (the default).Can also follow a printf-like format which will be formatted with
+ ** the variables that follow it. No check for valid bytestream is performed
+ ** @see rfString_Create_unsafe()
+ **
+ **/
 i_DECLIMEX_ void rfString_Init_unsafe(RF_String* str,const char* s);
 
 
-//! @memberof RF_String
-//! @opassign
-//! @brief Allocates and returns a string with the given integer.
-//!
-//! @notinherited{StringX}
-//! @param i The integer to turn into a string
-//! @return Returns the initialized RF_string
-//! @see rfString_Init_i()
+/**
+ ** @memberof RF_String
+ ** @opassign
+ ** @brief Allocates and returns a string with the given integer.
+ **
+ ** @notinherited{StringX}
+ ** @param i The integer to turn into a string
+ ** @return Returns the initialized RF_string
+ ** @see rfString_Init_i()
+ **
+ **/
 i_DECLIMEX_ RF_String* rfString_Create_i(int32_t i);
-//! @memberof RF_String
-//! @brief Initializes a string with the given integer.
-//!
-//! @notinherited{StringX}
-//! @param str The string to initialize
-//! @param i The integer to turn into a string
-//! @return Returns true in case of correct initialization and false otherwise
-//! @see rfString_Create_i()
+/**
+ ** @memberof RF_String
+ ** @brief Initializes a string with the given integer.
+ **
+ ** @notinherited{StringX}
+ ** @param str The string to initialize
+ ** @param i The integer to turn into a string
+ ** @return Returns true in case of correct initialization and false otherwise
+ ** @see rfString_Create_i()
+ **
+ **/
 i_DECLIMEX_ char rfString_Init_i(RF_String* str,int32_t i);
-//! @memberof RF_String
-//! @opassign
-//! @brief Allocates and returns a string with the given float.
-//!
-//! @notinherited{StringX}
-//! @param f The float to turn into a string
-//! @return Returns the initialized RF_string
-//! @see rfString_Init_f()
+/**
+ ** @memberof RF_String
+ ** @opassign
+ ** @brief Allocates and returns a string with the given float.
+ **
+ ** @notinherited{StringX}
+ ** @param f The float to turn into a string
+ ** @return Returns the initialized RF_string
+ ** @see rfString_Init_f()
+ **
+ **/
 i_DECLIMEX_ RF_String* rfString_Create_f(float f);
-//! @memberof RF_String
-//! @brief Initializes a string with the given float.
-//!
-//! @notinherited{StringX}
-//! @param str The string to initialize
-//! @param f The float to turn into a string
-//! @return Returns true in case of correct initialization and false otherwise
-//! @see rfString_Create_f()
+/**
+ ** @memberof RF_String
+ ** @brief Initializes a string with the given float.
+ **
+ ** @notinherited{StringX}
+ ** @param str The string to initialize
+ ** @param f The float to turn into a string
+ ** @return Returns true in case of correct initialization and false otherwise
+ ** @see rfString_Create_f()
+ **
+ **/
 i_DECLIMEX_ char rfString_Init_f(RF_String* str,float f);
 
-//! @memberof RF_String
-//! @brief Allocates and returns a string with the given UTF-16 byte sequence.
-//!
-//! @notinherited{StringX}
-//! Given characters have to be in UTF-16 and in the endianess of the system. They also have to be null terminated.
-//! @param s A buffer of 2-byte words representing the utf-16 byte sequence. Needs to be null terminated.
-//! @return Returns the initialized RF_string or null in case of failure to initialize, due to invalid utf-16 sequence or illegal endianess value
-//! @see rfString_Init_UTF16()
-//! @see rfString_Create_fUTF16()
-//! @see rfString_Init_UTF16()
+/**
+ ** @memberof RF_String
+ ** @brief Allocates and returns a string with the given UTF-16 byte sequence.
+ **
+ ** @notinherited{StringX}
+ ** Given characters have to be in UTF-16 and in the endianess of the system. They also have to be null terminated.
+ ** @param s A buffer of 2-byte words representing the utf-16 byte sequence. Needs to be null terminated.
+ ** @return Returns the initialized RF_string or null in case of failure to initialize, due to invalid utf-16 sequence or illegal endianess value
+ ** @see rfString_Init_UTF16()
+ ** @see rfString_Create_fUTF16()
+ ** @see rfString_Init_UTF16()
+ **
+ **/
 i_DECLIMEX_ RF_String* rfString_Create_UTF16(const uint16_t* s);
-//! @memberof RF_String
-//! @brief Initializes a string with the given UTF-16 byte sequence.
-//!
-//! @notinherited{StringX}
-//! Given characters have to be in UTF-16 and in the endianess of the system. They also have to be null terminated.
-//! @param str The string to initialize
-//! @param s A buffer of 2-byte words representing the utf-16 byte sequence. Needs to be null terminated.
-//! @return Returns true for succesfull initialization and false otherwise due to invalid utf-16 sequence or illegal endianess value
-//! @see rfString_Create_UTF16()
-//! @see rfString_Create_fUTF16()
-//! @see rfString_Init_UTF16()
+/**
+ ** @memberof RF_String
+ ** @brief Initializes a string with the given UTF-16 byte sequence.
+ **
+ ** @notinherited{StringX}
+ ** Given characters have to be in UTF-16 and in the endianess of the system. They also have to be null terminated.
+ ** @param str The string to initialize
+ ** @param s A buffer of 2-byte words representing the utf-16 byte sequence. Needs to be null terminated.
+ ** @return Returns true for succesfull initialization and false otherwise due to invalid utf-16 sequence or illegal endianess value
+ ** @see rfString_Create_UTF16()
+ ** @see rfString_Create_fUTF16()
+ ** @see rfString_Init_UTF16()
+ **
+ **/
 i_DECLIMEX_ char rfString_Init_UTF16(RF_String* str,const uint16_t* s);
 
-//! @memberof RF_String
-//! @cppnotctor
-//! @brief Allocates and returns a string with the given UTF-32 byte sequence.
-//!
-//! @notinherited{StringX}
-//! Given characters have to be in UTF-32 and in the endianess of the system.
-//! No endianess swapping occurs in the function
-//! @param s A buffer of 4-byte words representing the utf-32 byte sequence. Needs to be null terminated.
-//! @return Returns the initialized RF_string or null in case of failure to initialize
-//! @see rfString_Init_UTF32()
-//! @see rfString_Create_fUTF32()
-//! @see rfString_Init_UTF32()
+/**
+ ** @memberof RF_String
+ ** @cppnotctor
+ ** @brief Allocates and returns a string with the given UTF-32 byte sequence.
+ **
+ ** @notinherited{StringX}
+ ** Given characters have to be in UTF-32 and in the endianess of the system.
+ ** No endianess swapping occurs in the function
+ ** @param s A buffer of 4-byte words representing the utf-32 byte sequence. Needs to be null terminated.
+ ** @return Returns the initialized RF_string or null in case of failure to initialize
+ ** @see rfString_Init_UTF32()
+ ** @see rfString_Create_fUTF32()
+ ** @see rfString_Init_UTF32()
+ **
+ **/
 i_DECLIMEX_ RF_String* rfString_Create_UTF32(const uint32_t* s);
-//! @memberof RF_String
-//! @brief Initializes a string with the given UTF-32 byte sequence.
-//!
-//! @notinherited{StringX}
-//! Given characters have to be in UTF-32 and in the endianess of the system.
-//! No endianess swapping occurs in the function
-//! @param str The string to initialize
-//! @param s A buffer of 4-byte words representing the utf-32 byte sequence. Needs to be null terminated.
-//! @return Returns true for successful initialization and false otherwise
-//! @see rfString_Create_UTF32()
-//! @see rfString_Create_fUTF32()
-//! @see rfString_Init_UTF32()
+/**
+ ** @memberof RF_String
+ ** @brief Initializes a string with the given UTF-32 byte sequence.
+ **
+ ** @notinherited{StringX}
+ ** Given characters have to be in UTF-32 and in the endianess of the system.
+ ** No endianess swapping occurs in the function
+ ** @param str The string to initialize
+ ** @param s A buffer of 4-byte words representing the utf-32 byte sequence. Needs to be null terminated.
+ ** @return Returns true for successful initialization and false otherwise
+ ** @see rfString_Create_UTF32()
+ ** @see rfString_Create_fUTF32()
+ ** @see rfString_Init_UTF32()
+ **
+ **/
 i_DECLIMEX_ char rfString_Init_UTF32(RF_String* str,const uint32_t* s);
 
 //! @}
@@ -242,28 +284,34 @@ i_DECLIMEX_ char rfString_Init_UTF32(RF_String* str,const uint32_t* s);
 //! @name Assigning to a String
 //! @{
 
-//! @memberof RF_String
-//! @brief Assigns the value of the source string to the destination.
-//!
-//! @notinherited{StringX}
-//! @lmsFunction
-//! Both strings should already be initialized and hold a value. It is an error to give null parameters.
-//! @param dest The destination string, which should get assigned
-//! @param source The source string, whose values to copy. @inhtype{String,StringX} @tmpSTR
-//! @see rfString_Assign_char()
-//! @see rfStringX_Assign()
+/**
+ ** @memberof RF_String
+ ** @brief Assigns the value of the source string to the destination.
+ **
+ ** @notinherited{StringX}
+ ** @lmsFunction
+ ** Both strings should already be initialized and hold a value. It is an error to give null parameters.
+ ** @param dest The destination string, which should get assigned
+ ** @param source The source string, whose values to copy. @inhtype{String,StringX} @tmpSTR
+ ** @see rfString_Assign_char()
+ ** @see rfStringX_Assign()
+ **
+ **/
 i_DECLIMEX_ void rfString_Assign(RF_String* dest,const void* source);
 
 
-//! @memberof RF_String
-//! @brief Assigns the value of a unicode character to the string
-//!
-//! @notinherited{StringX}
-//! @param thisstr The string to assign to
-//! @param character The unicode character codepoint to assign to the String
-//! @return Returns @c true for succesfull assignment and @c false if the given @c character was not a valid unicode codepoint
-//! @see rfString_Assign()
-//! @see rfStringX_Assign_char()
+/**
+ ** @memberof RF_String
+ ** @brief Assigns the value of a unicode character to the string
+ **
+ ** @notinherited{StringX}
+ ** @param thisstr The string to assign to
+ ** @param character The unicode character codepoint to assign to the String
+ ** @return Returns @c true for succesfull assignment and @c false if the given @c character was not a valid unicode codepoint
+ ** @see rfString_Assign()
+ ** @see rfStringX_Assign_char()
+ **
+ **/
 i_DECLIMEX_ char rfString_Assign_char(RF_String* thisstr,uint32_t character);
 
 //! @}
@@ -273,39 +321,48 @@ i_DECLIMEX_ char rfString_Assign_char(RF_String* thisstr,uint32_t character);
 //! @name String Copying Functions
 //! @{
 
-//! @memberof RF_String
-//! @cppignore
-//! @brief Creates and returns an allocated copy of the given string
-//!
-//! @isinherited{StringX}
-//! @note The Returned Substring needs to be freed by the user. BEWARE when assigning to a string using this function since if any previous string exists there IS NOT getting freed. You have to free it explicitly
-//! @param src The string to copy from. @inhtype{String,StringX}
-//! @return Returns a string copied from the previous one or null if the original string was null
-//! @see rfString_Copy_IN()
-//! @see rfString_Copy_chars()
+/**
+ ** @memberof RF_String
+ ** @cppignore
+ ** @brief Creates and returns an allocated copy of the given string
+ **
+ ** @isinherited{StringX}
+ ** @note The Returned Substring needs to be freed by the user. BEWARE when assigning to a string using this function since if any previous string exists there IS NOT getting freed. You have to free it explicitly
+ ** @param src The string to copy from. @inhtype{String,StringX}
+ ** @return Returns a string copied from the previous one or null if the original string was null
+ ** @see rfString_Copy_IN()
+ ** @see rfString_Copy_chars()
+ **
+ **/
 i_DECLIMEX_ RF_String* rfString_Copy_OUT(const void* src);
-//! @memberof RF_String
-//! @cppignore
-//! @brief Copies all the contents of a string to another
-//!
-//! @isinherited{StringX}
-//! @param dst The string to copy in.
-//! @param src The string to copy from. @inhtype{String,StringX}
-//! If the value is bigger than the maximum number of characters then still all characters are copied.
-//! @see rfString_Copy_OUT()
-//! @see rfString_Copy_chars()
+/**
+ ** @memberof RF_String
+ ** @cppignore
+ ** @brief Copies all the contents of a string to another
+ **
+ ** @isinherited{StringX}
+ ** @param dst The string to copy in.
+ ** @param src The string to copy from. @inhtype{String,StringX}
+ ** If the value is bigger than the maximum number of characters then still all characters are copied.
+ ** @see rfString_Copy_OUT()
+ ** @see rfString_Copy_chars()
+ **
+ **/
 i_DECLIMEX_ void rfString_Copy_IN(RF_String* dst,const void* src);
-//! @memberof RF_String
-//! @brief Copies a certain number of characters from a string
-//!
-//! @isinherited{StringX}
-//! Copies @c n characters from @c src String into the destination @c dst string.
-//! @param dst The string to copy in
-//! @param src The string to copy from. @inhtype{String,StringX}
-//! @param n The number of characters to copy from the @c src string
-//! If the value is bigger than the maximum number of characters then still all characters are copied.
-//! @see rfString_Copy_IN()
-//! @see rfString_Copy_OUT()
+/**
+ ** @memberof RF_String
+ ** @brief Copies a certain number of characters from a string
+ **
+ ** @isinherited{StringX}
+ ** Copies @c n characters from @c src String into the destination @c dst string.
+ ** @param dst The string to copy in
+ ** @param src The string to copy from. @inhtype{String,StringX}
+ ** @param n The number of characters to copy from the @c src string
+ ** If the value is bigger than the maximum number of characters then still all characters are copied.
+ ** @see rfString_Copy_IN()
+ ** @see rfString_Copy_OUT()
+ **
+ **/
 i_DECLIMEX_ void rfString_Copy_chars(RF_String* dst,const void* src,uint32_t n);
 
 //! @}
@@ -315,25 +372,31 @@ i_DECLIMEX_ void rfString_Copy_chars(RF_String* dst,const void* src,uint32_t n);
 //! @name Getting rid of an RF_String
 //! @{
 
-//! @memberof RF_String
-//! @cppignore
-//! @brief Deletes a string object and also frees its pointer.
-//!
-//! @notinherited{StringX}
-//! It is an error to give a NULL(0x0) string for deleting. Will most probably lead to a segmentation fault
-//! Use it for strings made with _Create
-//! @param s The string for deletion
-//! @see rfString_Deinit()
+/**
+ ** @memberof RF_String
+ ** @cppignore
+ ** @brief Deletes a string object and also frees its pointer.
+ **
+ ** @notinherited{StringX}
+ ** It is an error to give a NULL(0x0) string for deleting. Will most probably lead to a segmentation fault
+ ** Use it for strings made with _Create
+ ** @param s The string for deletion
+ ** @see rfString_Deinit()
+ **
+ **/
 i_DECLIMEX_ void rfString_Destroy(RF_String* s);
-//! @memberof RF_String
-//! @cppignore
-//! @brief Deletes a string object only, not its memory.
-//!
-//! @notinherited{StringX}
-//! It is an error to give a NULL(0x0) string for deleting. Will most probably lead to a segmentation fault
-//! Use it for strings made with _Init
-//! @param s The string for deletion
-//! @see rfString_Destroy()
+/**
+ ** @memberof RF_String
+ ** @cppignore
+ ** @brief Deletes a string object only, not its memory.
+ **
+ ** @notinherited{StringX}
+ ** It is an error to give a NULL(0x0) string for deleting. Will most probably lead to a segmentation fault
+ ** Use it for strings made with _Init
+ ** @param s The string for deletion
+ ** @see rfString_Destroy()
+ **
+ **/
 i_DECLIMEX_ void rfString_Deinit(RF_String* s);
 
 
@@ -342,15 +405,18 @@ i_DECLIMEX_ void rfString_Deinit(RF_String* s);
 //! @name Equality check
 //! @{
 
-//! @memberof RF_String
-//! @opcmpeq
-//! @brief Compares two Strings and returns true if they are equal and false otherwise
-//!
-//! @isinherited{StringX}
-//! @lmsFunction
-//! @param s1 The first string to compare @inhtype{String,StringX} @tmpSTR
-//! @param s2 The second string to compare @inhtype{String,StringX} @tmpSTR
-//! @return True in case the strings are equal and false otherwise
+/**
+ ** @memberof RF_String
+ ** @opcmpeq
+ ** @brief Compares two Strings and returns true if they are equal and false otherwise
+ **
+ ** @isinherited{StringX}
+ ** @lmsFunction
+ ** @param s1 The first string to compare @inhtype{String,StringX} @tmpSTR
+ ** @param s2 The second string to compare @inhtype{String,StringX} @tmpSTR
+ ** @return True in case the strings are equal and false otherwise
+ **
+ **/
 i_DECLIMEX_ char rfString_Equal(const void* s1,const void* s2);
 
 //! @}
@@ -362,38 +428,44 @@ i_DECLIMEX_ char rfString_Equal(const void* s1,const void* s2);
 
 
 // **The following 2 functions are exposed here only because they are used in the iteration macros** //
-//! @internal
-//! @memberof RF_String
-//! @cppignore
-//! @brief Retrieves the unicode code point of the parameter bytepos of the string.
-//!
-//! @isinherited{StringX}
-//! This is an internal function, there is no need to use it. The reason it is exposed here is that it is utilized in the iteration macros.
-//! @warning DO NOT use this function unless you know what you are doing
-//! @param thisstr The string whose byte position code point we need. @inhtype{String,StringX}
-//! @param bytepos The byte position of the string from where to get the code point.
-//! @warning If this is out of bounds then nothing can detect it and at best it will cause a SEG FAULT.
-//!                 Moreover no check to see if this is not a continutation byte is made. All the checks must have been made before calling the function.
-//! @return Returns the code point of the byte position as an uint32_t
-//! @endinternal
+/**
+ ** @internal
+ ** @memberof RF_String
+ ** @cppignore
+ ** @brief Retrieves the unicode code point of the parameter bytepos of the string.
+ **
+ ** @isinherited{StringX}
+ ** This is an internal function, there is no need to use it. The reason it is exposed here is that it is utilized in the iteration macros.
+ ** @warning DO NOT use this function unless you know what you are doing
+ ** @param thisstr The string whose byte position code point we need. @inhtype{String,StringX}
+ ** @param bytepos The byte position of the string from where to get the code point.
+ ** @warning If this is out of bounds then nothing can detect it and at best it will cause a SEG FAULT.
+ **                 Moreover no check to see if this is not a continutation byte is made. All the checks must have been made before calling the function.
+ ** @return Returns the code point of the byte position as an uint32_t
+ ** @endinternal
+ **
+ **/
 i_DECLIMEX_ uint32_t rfString_BytePosToCodePoint(const void* thisstr,uint32_t bytepos);
-//! @internal
-//! @memberof RF_String
-//! @cppignore
-//! @brief Retrieves character position of a byte position
-//!
-//! @isinherited{StringX}
-//! This is an internal function, there is no need to use it. It attempts to retrieve character position from a byte position. If the byte
-//! position is a continutation byte and does not constitute the start of a character then depending on the option the function will find
-//! either the next character or the previous character position from this byte position
-//!
-//! @warning DO NOT use this function unless you know what you are doing
-//! @param thisstr The string whose byte position code point we need. @inhtype{String,StringX}
-//! @param bytepos The byte position of the string from where to get the character position
-//! @param before A boolean flag denoting the behaviour in case this byte position is a continutation byte. If @c before is true then
-//! the function will retrieve the first character position before the byte. If it is false, it will retrieve the first character position
-//! after the continuation byte.
-//! @endinternal
+/**
+ ** @internal
+ ** @memberof RF_String
+ ** @cppignore
+ ** @brief Retrieves character position of a byte position
+ **
+ ** @isinherited{StringX}
+ ** This is an internal function, there is no need to use it. It attempts to retrieve character position from a byte position. If the byte
+ ** position is a continutation byte and does not constitute the start of a character then depending on the option the function will find
+ ** either the next character or the previous character position from this byte position
+ **
+ ** @warning DO NOT use this function unless you know what you are doing
+ ** @param thisstr The string whose byte position code point we need. @inhtype{String,StringX}
+ ** @param bytepos The byte position of the string from where to get the character position
+ ** @param before A boolean flag denoting the behaviour in case this byte position is a continutation byte. If @c before is true then
+ ** the function will retrieve the first character position before the byte. If it is false, it will retrieve the first character position
+ ** after the continuation byte.
+ ** @endinternal
+ **
+ **/
 i_DECLIMEX_ uint32_t rfString_BytePosToCharPos(const void* thisstr,uint32_t bytepos,char before);
 
 
@@ -446,14 +518,17 @@ i_DECLIMEX_ uint32_t rfString_BytePosToCharPos(const void* thisstr,uint32_t byte
                 {/*Give the character value to the user*/\
                     characterUnicodeValue_ = rfString_BytePosToCodePoint( (string_),byteIndex_);
 
-//! @memberof RF_String
-//! @cppignore
-//! @brief Ends an RF_String/RF_StringX forward iteration scope.
-//!
-//! @isinherited{StringX}
-//! Look at #rfString_Iterate_Start for an example usage
-//! @param[in,out] startCharacterPos_ Here give the uint32_t given to #rfString_Iterate_Start
-//! @see rfString_Iterate_Start()
+/**
+ ** @memberof RF_String
+ ** @cppignore
+ ** @brief Ends an RF_String/RF_StringX forward iteration scope.
+ **
+ ** @isinherited{StringX}
+ ** Look at #rfString_Iterate_Start for an example usage
+ ** @param[in,out] startCharacterPos_ Here give the uint32_t given to #rfString_Iterate_Start
+ ** @see rfString_Iterate_Start()
+ **
+ **/
 #define rfString_Iterate_End(startCharacterPos_)  startCharacterPos_++;}byteIndex_++;}}
 
 //Two macros to accomplish iteration of an RF_String from any given character going backwards. This macro should be used with its end pair.
@@ -506,14 +581,17 @@ i_DECLIMEX_ uint32_t rfString_BytePosToCharPos(const void* thisstr,uint32_t byte
                 {/*Give the character value to the user*/\
                     characterUnicodeValue_ = rfString_BytePosToCodePoint( (string_),b_index_);
 
-//! @memberof RF_String
-//! @cppignore
-//! @brief Ends an RF_String/RF_StringX backward iteration scope.
-//!
-//! @isinherited{StringX}
-//! Look at #rfString_IterateB_Start for an example usage
-//! @param[in,out] characterPos_ Here give the uint32_t given to #rfString_IterateB_Start
-//! @see rfString_IteraB_Start()
+/**
+ ** @memberof RF_String
+ ** @cppignore
+ ** @brief Ends an RF_String/RF_StringX backward iteration scope.
+ **
+ ** @isinherited{StringX}
+ ** Look at #rfString_IterateB_Start for an example usage
+ ** @param[in,out] characterPos_ Here give the uint32_t given to #rfString_IterateB_Start
+ ** @see rfString_IteraB_Start()
+ **
+ **/
 #define rfString_IterateB_End(characterPos_)  c_index_-- ;characterPos_--;}b_index_--;}}
 
 //! @}

@@ -43,7 +43,10 @@
 #ifndef RF_LOCALSCOPE_H
 #define RF_LOCALSCOPE_H
 
-//! A small macro to find the smallest of the macro evaluation indices. Just to avoid copying pasting
+/**
+ ** A small macro to find the smallest of the macro evaluation indices. Just to avoid copying pasting
+ **
+ **/
 #define RF_ENTER_LOCAL_SCOPE()  \
     uint32_t i_stackPtrBefore_;\
     uint32_t i_index_;\
@@ -64,7 +67,10 @@
     else\
         i_stackPtrBefore_= RF_LMS->stackPtr;
 
-//! Another small macro to free the temporary objects after a function or scope has been passed
+/**
+ ** Another small macro to free the temporary objects after a function or scope has been passed
+ **
+ **/
 #define RF_EXIT_LOCAL_SCOPE()   \
     RF_LMS->stackPtr = i_stackPtrBefore_;
 

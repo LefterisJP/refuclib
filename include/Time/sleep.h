@@ -44,17 +44,23 @@ extern "C"
 ** @{
 **/
 
-//! @brief Suspends the calling thread for a number of seconds
-//!
-//! For a function that suspends the thread's operation for milliseconds look at @ref rfSleep_ms()
-//! Under linux <b>DO NOT</b> mix with @ref rfSleep_ms() or any of the timer functions.
-//! @param seconds The number of seconds to suspend the operation of the calling thread for
+/**
+ ** @brief Suspends the calling thread for a number of seconds
+ **
+ ** For a function that suspends the thread's operation for milliseconds look at @ref rfSleep_ms()
+ ** Under linux <b>DO NOT</b> mix with @ref rfSleep_ms() or any of the timer functions.
+ ** @param seconds The number of seconds to suspend the operation of the calling thread for
+ **
+ **/
 i_DECLIMEX_ void rfSleep(uint32_t seconds);
-//! @brief Suspends the calling thread for a number of milliseconds
-//!
-//! For a function that suspends the thread's operation for seconds look at @ref rfSleep()
-//! Under linux <b>DO NOT</b> mix with @ref rfSleep() or any of the timer functions.
-//! @param milliseconds The number of milliseconds to suspend the operation of the calling thread for
+/**
+ ** @brief Suspends the calling thread for a number of milliseconds
+ **
+ ** For a function that suspends the thread's operation for seconds look at @ref rfSleep()
+ ** Under linux <b>DO NOT</b> mix with @ref rfSleep() or any of the timer functions.
+ ** @param milliseconds The number of milliseconds to suspend the operation of the calling thread for
+ **
+ **/
 i_DECLIMEX_ void rfSleep_ms(uint32_t milliseconds);
 
 //! @} //timegroup ends

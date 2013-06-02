@@ -73,7 +73,10 @@
 #include <string.h>
 //*----------------------------End of Includes------------------------------------------
 
-//! Defines the maximum buffer size for string read from a file
+/**
+ ** Defines the maximum buffer size for string read from a file
+ **
+ **/
 #define MAX_LINE_BUFFER_SIZE    128000
 
 // Allocates and returns a new XML file handler

@@ -48,22 +48,28 @@ extern "C"
 ** @{
 **/
 
-//! @brief Prints a formatted string to the stdout
-//!
-//! For more information take a look at @ref rfStringX_Formatv()
-//! @lmsFunction
-//! @param format The formatted string to print
-//! @param ... Extra arguments to output to the string
-//! @return The number of @c bytes written to the stdout
+/**
+ ** @brief Prints a formatted string to the stdout
+ **
+ ** For more information take a look at @ref rfStringX_Formatv()
+ ** @lmsFunction
+ ** @param format The formatted string to print
+ ** @param ... Extra arguments to output to the string
+ ** @return The number of @c bytes written to the stdout
+ **
+ **/
 i_DECLIMEX_ int rfPrintf(const char * format, ...);
-//! @brief Prints a formatted string to the a file descriptor
-//!
-//! For more information take a look at @ref rfStringX_Formatv()
-//! @lmsFunction
-//! @param f The file descriptor into which to output the formatted string
-//! @param format The formatted string to print
-//! @param ... Extra arguments to output to the string
-//! @return The number of @c bytes written to @c f
+/**
+ ** @brief Prints a formatted string to the a file descriptor
+ **
+ ** For more information take a look at @ref rfStringX_Formatv()
+ ** @lmsFunction
+ ** @param f The file descriptor into which to output the formatted string
+ ** @param format The formatted string to print
+ ** @param ... Extra arguments to output to the string
+ ** @return The number of @c bytes written to @c f
+ **
+ **/
 i_DECLIMEX_ int rfFPrintf(FILE* f,const char * format, ...);
 
 //!@}

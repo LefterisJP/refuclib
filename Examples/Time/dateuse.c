@@ -5,7 +5,10 @@
 int main()
 {
     rfInit("refuErrorLog.txt","refuInfoLog.txt");
-//! [ALL]
+/**
+ ** [ALL]
+ **
+ **/
 	//Initialize a date with the current local time
 	RF_Date date;
     rfDate_Init_Now(&date,true);
@@ -18,6 +21,9 @@ int main()
 		printf("The system did not allow the date change");
 	
 	printf("The date is now changed!");
-//! [ALL]
+/**
+ ** [ALL]
+ **
+ **/
 	return 0;
 }

@@ -64,12 +64,15 @@
 #include <Definitions/retcodes.h> //for the return codes
 //*----------------------------End of Includes------------------------------------------
 
-//! Runs through the xml tree searching for a tag recursively by name and/or contents
-//! @param x The XML file handler
-//! @param t The currently searching tag
-//! @param tName The name of the tag we are searching for
-//! @param contents The contents of the tag we are searching for
-//! @return Returns the tag if it was found or NULL if not
+/**
+ ** Runs through the xml tree searching for a tag recursively by name and/or contents
+ ** @param x The XML file handler
+ ** @param t The currently searching tag
+ ** @param tName The name of the tag we are searching for
+ ** @param contents The contents of the tag we are searching for
+ ** @return Returns the tag if it was found or NULL if not
+ **
+ **/
 RF_XMLTag* rfXML_SearchSmall(RF_XML* x,RF_XMLTag* t,void* tName,void* contents)
 {
     uint32_t i;
@@ -106,12 +109,15 @@ RF_XMLTag* rfXML_SearchSmall(RF_XML* x,RF_XMLTag* t,void* tName,void* contents)
 }
 
 
-//! Runs through the xml tree searching for a tag recursively by name ,attributes and contents
-//! @param t The currently searching tag
-//! @param tName The name of the tag we are searching for
-//! @param contents The contents we want the tag to have
-//! @param attrN The number of attributes
-//! @return Returns the tag if it was found or NULL if not
+/**
+ ** Runs through the xml tree searching for a tag recursively by name ,attributes and contents
+ ** @param t The currently searching tag
+ ** @param tName The name of the tag we are searching for
+ ** @param contents The contents we want the tag to have
+ ** @param attrN The number of attributes
+ ** @return Returns the tag if it was found or NULL if not
+ **
+ **/
 RF_XMLTag* rfXML_SearchFull(RF_XML* x,RF_XMLTag* t,void* tNameP,void* contentsP,uint32_t attrN,RF_String** sAttribs,RF_String** sAttribValues)
 {
     uint32_t i;
@@ -163,14 +169,17 @@ RF_XMLTag* rfXML_SearchFull(RF_XML* x,RF_XMLTag* t,void* tNameP,void* contentsP,
     return 0;
 }
 
-//! Runs through the tree searching for a tag tName with a child childName somewhere in its children
-//! @param x The XML handler
-//! @param t The currently searching tag
-//! @param tName The name of the tag we are searching for
-//! @param childName The name of the child tag we want the tag we search for to have
-//! @param direct Boolean flag denoting whether childName neeeds to be direct child (=true) or anywhere in its childre(=false)
-//! @param rParent Boolean flag denoting whether we want to return the parent or the child.
-//! @return Returns the tag if it was found or NULL if not
+/**
+ ** Runs through the tree searching for a tag tName with a child childName somewhere in its children
+ ** @param x The XML handler
+ ** @param t The currently searching tag
+ ** @param tName The name of the tag we are searching for
+ ** @param childName The name of the child tag we want the tag we search for to have
+ ** @param direct Boolean flag denoting whether childName neeeds to be direct child (=true) or anywhere in its childre(=false)
+ ** @param rParent Boolean flag denoting whether we want to return the parent or the child.
+ ** @return Returns the tag if it was found or NULL if not
+ **
+ **/
 RF_XMLTag* i_rfXML_SearchChild(RF_XML* x,RF_XMLTag* t,void* tNameP,void* childNameP,char direct,char rParent)
 {
     uint32_t i;
@@ -233,12 +242,15 @@ RF_XMLTag* i_rfXML_SearchChild(RF_XML* x,RF_XMLTag* t,void* tNameP,void* childNa
     return 0;
 }
 
-//! Runs through the tree recursively printing the tags
-//! @param t The XML tag that we recursively print
-//! @param f The textfile in which we print
-//! @param strBuff An already initialize RF_StringX buffer
-//! @param level The level of the tag in the xml tree. Is used for the /t tabs
-//! @return Returns true for succesful writting of the @c t XML tag and false otherwise
+/**
+ ** Runs through the tree recursively printing the tags
+ ** @param t The XML tag that we recursively print
+ ** @param f The textfile in which we print
+ ** @param strBuff An already initialize RF_StringX buffer
+ ** @param level The level of the tag in the xml tree. Is used for the /t tabs
+ ** @return Returns true for succesful writting of the @c t XML tag and false otherwise
+ **
+ **/
 char i_rfXMLTag_PrintToFile(RF_XMLTag* t,RF_TextFile* f,RF_StringX* strBuff,uint32_t level)
 {
     uint32_t i;

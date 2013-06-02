@@ -53,10 +53,13 @@
 #define RF_LOCAL_MEMORY_PH
 
 
-//! Is the internal version of the @ref rfLMS_Push() function. Is used internally in the library
-//! to allow faster local memory stack objects initialization internally
-//! @param i_ptr_ The pointer to point to the newly allocated place in the stack. Can be 0 if there was not enough size
-//! @param i_size_ The size to allocate
+/**
+ ** Is the internal version of the @ref rfLMS_Push() function. Is used internally in the library
+ ** to allow faster local memory stack objects initialization internally
+ ** @param i_ptr_ The pointer to point to the newly allocated place in the stack. Can be 0 if there was not enough size
+ ** @param i_size_ The size to allocate
+ **
+ **/
 
 #define i_rfLMS_Push(i_ptr_,i_size_)    do{\
     /* If the size of the stack plus the requested allocation goes beyond the stack size*/\
@@ -71,8 +74,11 @@
     }while(0)
 
 
-//! Is the internal library version of the @ref rfLMS_Pop() function. Frees memory from the local stack.
-//! @param i_size_ The size to pop (free)
+/**
+ ** Is the internal library version of the @ref rfLMS_Pop() function. Frees memory from the local stack.
+ ** @param i_size_ The size to pop (free)
+ **
+ **/
 #define i_rfLMS_Pop(i_size_) \
 {\
     if(i_size_ > RF_LMS->stackPtr)\
@@ -84,9 +90,12 @@
 }
 
 
-//! Is the internal library version of @ref rfLMS_ArgsEval() function. It keeps the
-//! stack pointer before a specific function's argument evaluation. So that we can know
-//! what stack pointer value to return to after a function with local objects finishes
+/**
+ ** Is the internal library version of @ref rfLMS_ArgsEval() function. It keeps the
+ ** stack pointer before a specific function's argument evaluation. So that we can know
+ ** what stack pointer value to return to after a function with local objects finishes
+ **
+ **/
 #define i_rfLMS_ArgsEval() \
 {   /*Check if the function had more local object macros evaluation than the max number of arguments*/\
     if(RF_LMS->macroEvalsI+1 >= RF_MAX_FUNC_ARGS)\

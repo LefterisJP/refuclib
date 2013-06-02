@@ -48,48 +48,72 @@ extern "C"
 
 
 
-//! Denotes that the timer gives the results in seconds
+/**
+ ** Denotes that the timer gives the results in seconds
+ **
+ **/
 #define RF_TIMER_SECONDS        1
-//! Denotes that the timer gives the results in milliseconds
+/**
+ ** Denotes that the timer gives the results in milliseconds
+ **
+ **/
 #define RF_TIMER_MILLISECONDS   2
-//! Denotes that the timer gives the results in microseconds
+/**
+ ** Denotes that the timer gives the results in microseconds
+ **
+ **/
 #define RF_TIMER_MICROSECONDS   3
-//! Denotes that the timer gives the results in nanoseconds
+/**
+ ** Denotes that the timer gives the results in nanoseconds
+ **
+ **/
 #define RF_TIMER_NANOSECONDS    4
 
-//! @memberof RF_Timer
-//! @brief Initializes a timer
-//!
-//! @param t The timer object to initialize
-//! @param resolution The desired resolution of the timer. Legal values are:@c RF_TIMER_SECONDS, @c RF_TIMER_MILLISECONDS, @c RF_TIMER_MICROSEONDS and @c RF_TIMER_NANOSECONDS
-//! @return Returns true for correct initialization or false while logging an error otherwise
+/**
+ ** @memberof RF_Timer
+ ** @brief Initializes a timer
+ **
+ ** @param t The timer object to initialize
+ ** @param resolution The desired resolution of the timer. Legal values are:@c RF_TIMER_SECONDS, @c RF_TIMER_MILLISECONDS, @c RF_TIMER_MICROSEONDS and @c RF_TIMER_NANOSECONDS
+ ** @return Returns true for correct initialization or false while logging an error otherwise
+ **
+ **/
 i_DECLIMEX_ char rfTimer_Init(RF_Timer* t,char resolution);
-//! @memberof RF_Timer
-//! @brief Allocates and returns a timer object
-//!
-//! @param resolution The desired resolution of the timer. Legal values are: @c RF_TIMER_SECONDS, @c RF_TIMER_MILLISECONDS, @c RF_TIMER_MICROSEONDS and @c RF_TIMER_NANOSECONDS
-//! @return Returns the timer object
+/**
+ ** @memberof RF_Timer
+ ** @brief Allocates and returns a timer object
+ **
+ ** @param resolution The desired resolution of the timer. Legal values are: @c RF_TIMER_SECONDS, @c RF_TIMER_MILLISECONDS, @c RF_TIMER_MICROSEONDS and @c RF_TIMER_NANOSECONDS
+ ** @return Returns the timer object
+ **
+ **/
 i_DECLIMEX_ RF_Timer* rfTimer_Create(char resolution);
 
-//! @memberof RF_Timer
-//! @brief Destroys a timer
-//!
-//! Use it only for timers that were made with @ref rfTimer_Create. Timers made with init need no freeing
-//! @param t The timer to destroy
+/**
+ ** @memberof RF_Timer
+ ** @brief Destroys a timer
+ **
+ ** Use it only for timers that were made with @ref rfTimer_Create. Timers made with init need no freeing
+ ** @param t The timer to destroy
+ **
+ **/
 i_DECLIMEX_ void rfTimer_Destroy(RF_Timer* t);
 
-//! @memberof RF_Timer
-//! @brief Queries a timer
-//!
-//! Using this function the timer can be queried. There is a choice between querying with the previously given resolution or with a new resolution. If no change in resolution is
-//! requested then provide 0 for the resolution. Otherwise provide one of   @c RF_TIMER_SECONDS, @c RF_TIMER_MILLISECONDS, @c RF_TIMER_MICROSEONDS or @c RF_TIMER_NANOSECONDS.
-//! If an illegal resolution value is given here then an error is logged and the query's result is given in the previously saved resolution. For an example query usage look at the following
-//! snippet from the overall timer example.
-//! @snippet Time/timer1.c  QUERY
-//! @param t The timer object to query
-//! @param resolution With this parameter you have the choice to either query the timer with the saved resolutiont in which case you should give @c RF_NONE, or change the resolution
-//! and get the result of the query in the new resolution by giving  @c RF_TIMER_SECONDS, @c RF_TIMER_MILLISECONDS, @c RF_TIMER_MICROSEONDS or @c RF_TIMER_NANOSECONDS
-//! @return The time difference between this query and the previous one. Or this query and the initialization in the case of this being the first
+/**
+ ** @memberof RF_Timer
+ ** @brief Queries a timer
+ **
+ ** Using this function the timer can be queried. There is a choice between querying with the previously given resolution or with a new resolution. If no change in resolution is
+ ** requested then provide 0 for the resolution. Otherwise provide one of   @c RF_TIMER_SECONDS, @c RF_TIMER_MILLISECONDS, @c RF_TIMER_MICROSEONDS or @c RF_TIMER_NANOSECONDS.
+ ** If an illegal resolution value is given here then an error is logged and the query's result is given in the previously saved resolution. For an example query usage look at the following
+ ** snippet from the overall timer example.
+ ** @snippet Time/timer1.c  QUERY
+ ** @param t The timer object to query
+ ** @param resolution With this parameter you have the choice to either query the timer with the saved resolutiont in which case you should give @c RF_NONE, or change the resolution
+ ** and get the result of the query in the new resolution by giving  @c RF_TIMER_SECONDS, @c RF_TIMER_MILLISECONDS, @c RF_TIMER_MICROSEONDS or @c RF_TIMER_NANOSECONDS
+ ** @return The time difference between this query and the previous one. Or this query and the initialization in the case of this being the first
+ **
+ **/
 i_DECLIMEX_ double rfTimer_Query(RF_Timer* t,char resolution);
 
 #ifdef __cplusplus

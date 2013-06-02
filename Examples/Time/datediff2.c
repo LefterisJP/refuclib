@@ -13,7 +13,10 @@ int main()
  //! [ADD BIG]
 	rfDate_AddHours(&oDate,36526);
     rfDate_AddMinutes(&oDate,69000);
-//! [ADD BIG]
+/**
+ ** [ADD BIG]
+ **
+ **/
     printf("The final date is (%u) %u/%u/%u\t%u:%u \n",oDate.wDay,oDate.mDay,oDate.month,oDate.year,oDate.hours,oDate.minutes);
 
     char relation = rfDate_Diff(&date,&oDate,&result);
@@ -29,12 +32,18 @@ int main()
             printf("The two dates are identical\n");
         break;
     }
-//! [CONFIRM]
+/**
+ ** [CONFIRM]
+ **
+ **/
    rfDate_SubYears(&oDate,4);
    rfDate_SubMonths(&oDate,3);
    rfDate_SubDays(&oDate,16);
    rfDate_SubHours(&oDate,20);
-//! [CONFIRM]
+/**
+ ** [CONFIRM]
+ **
+ **/
     relation = rfDate_Diff(&date,&oDate,&result);
     switch(relation)
     {

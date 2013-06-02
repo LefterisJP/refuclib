@@ -28,7 +28,10 @@
 ** used by data structures of the refu library. Only one for now
 **/
 
-//! The size of a pointer from an array or a list of pointers
+/**
+ ** The size of a pointer from an array or a list of pointers
+ **
+ **/
 #define RF_PTRMEMORYLOC_SIZE  sizeof(void*)
 
 
