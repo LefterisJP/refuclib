@@ -13,27 +13,32 @@ from args import parseArguments
 
 
 #read the command line arguments
-options = parseArguments()
+args = parseArguments()
 
 #open the logfile
-logFile = open(options.logfile,"w")
+logFile = open(args.logfile, "w")
 #for each different compiler
-for compiler in options.compilers:
+for compiler in args.compilers:
     print("===Running Tests for the {0} Compiler===\n".format(compiler))
 
     #compile a dynamic version of the library
-    outName = compileLib(options.verbose,True,compiler)
-    if(outName == False):
-        print("Compiling dynamic version of Refu with the {0} compiler failed. Skipping tests for this version...".format(compiler));
+    outName = compileLib(args.verbose, True, compiler)
+    if(outName is False):
+        print("Compiling dynamic version of Refu with the {0} compiler "
+              "failed. Skipping tests for this version...".format(compiler))
     else:
-        runTests(compiler,True,outName,logFile,options.verbose,options.debug,options.tests);
+        runTests(compiler, True, outName, logFile, args.verbose,
+                 args.debug, args.tests, args.fail_fast)
     #compile a static version of the library
-    outName = compileLib(options.verbose,False,compiler)
-    if(outName == False):
-        print("Compiling static version of Refu with the {0} compiler failed. Skipping tests for this version...".format(compiler));
+    outName = compileLib(args.verbose, False, compiler)
+    if(outName is False):
+        print("Compiling static version of Refu with the {0} compiler "
+              "failed. Skipping tests for this version...".format(compiler))
     else:
-        runTests(compiler,False,outName,logFile,options.verbose,options.debug,options.tests);
+        runTests(compiler, False, outName, logFile, args.verbose,
+                 args.debug, args.tests, args.fail_fast)
 
-print("\nAll tests have concluded. For more information you can check logfile: \"{0}\"".format(options.logfile));
+print("\nAll tests have concluded. For more information you can check "
+      "logfile: \"{0}\"".format(args.logfile))
 logFile.close()
 
