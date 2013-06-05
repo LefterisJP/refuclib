@@ -216,6 +216,7 @@ enum {
         RE_POPEN_INVALID_MODE, //Occurs if an invalid mode argument was passed to rfPopen
         RE_FILE_BUSY,// Occurs if the operation to be done to the file failed because the file was accessed by another process or by the system
         RE_FILE_RO,// Occurs if the operation to be done to the file failed because it is a read only file
+        RE_FILE_MOUNT,// Occurs if the operation happens between two different mounting points
         RE_FILE_MODE_CHANGE, //Occures if an attempt to change the file handler's opening mode, from writting to reading or vice versa failed
         RE_FILE_MOVEPOS, //Occurs if an illegal movement of the internal file pointer is attempted
 

@@ -142,27 +142,29 @@ int32_t TextFile_GoToStart(RF_TextFile* t)
     {
         case RF_UTF8:
          if(t->hasBom == true)
-            byteOffset=3;
+            byteOffset = 3;
         break;
         case RF_UTF16_BE:
         case RF_UTF16_LE:
             if(t->hasBom == true)
-                byteOffset=2;
+                byteOffset = 2;
         break;
         case RF_UTF32_BE:
         case RF_UTF32_LE:
             if(t->hasBom == true)
-                byteOffset=4;
+                byteOffset = 4;
         break;
     }
     //First rewind back to the start so that read/write operations can be reset
-    if(rfFseek(t->f,0,SEEK_SET) != 0)
+    if(rfFseek(t->f, 0, SEEK_SET) != 0)
     {
-        i_TEXTFILE_FSEEK_CHECK(t,"During attempting to rewind to the beginning of a TextFile's inner file pointer")
+        i_TEXTFILE_FSEEK_CHECK(t,"attempting to rewind to the beginning "
+                               "of a TextFile's inner file pointer")
     }
     if(rfFseek(t->f,byteOffset,SEEK_SET) != 0)
     {
-        i_TEXTFILE_FSEEK_CHECK(t,"During attempting to go over the BOM of a TextFile")
+        i_TEXTFILE_FSEEK_CHECK(t,"attempting to go over the BOM of a "
+                               "TextFile")
     }
     t->previousOp = 0;
     t->line = 1;

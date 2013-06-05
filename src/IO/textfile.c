@@ -1055,7 +1055,11 @@ int32_t rfTextFile_GoToOffset(RF_TextFile* t,foff_rft offset,int origin)
             return RE_INPUT;
         //go to the start of the file
         if((error=TextFile_GoToStart(t))!= RF_SUCCESS)
-            RETURN_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%S\" to the beginning",error,&t->name)
+        {
+            RETURN_LOG_ERROR("Failed to move the internal filepointer of"
+                             " TextFile \"%S\" to the beginning", 
+                             error, &t->name)
+        }
         do
         {
             //keep going forward
@@ -1164,12 +1168,14 @@ cleanup1:
 
 //Inserts a line into a specific part of the Text File
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-int32_t rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,char after)
+int32_t rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,
+                          char after)
 #else
-int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,char after)
+int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,
+                            char after)
 #endif
 {
-    char tempFName[L_tmpnam+1], *tmpNamePtr;
+    RF_String tempFileName;
     char lineFound,allocatedS;
     foff_rft tOff=0;
     FILE* newFile;
@@ -1186,7 +1192,6 @@ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,char aft
         goto cleanup0;//failure
     if(after==false)
         lineN-=1;
-
 
     //determine how many lines the given string has
     linesCount = rfString_Count(string,RFS_("\n"),0)+1;
@@ -1205,13 +1210,15 @@ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,char aft
 
     //go to the beginning of this file
     if((error=TextFile_GoToStart(t))!= RF_SUCCESS)
-        RETURNGOTO_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%S\" to the beginning",error,error,cleanup1,&t->name)
+        RETURNGOTO_LOG_ERROR("Failed to move the internal filepointer"
+                             " of TextFile \"%S\" to the beginning",error
+                             ,error,cleanup1,&t->name)
     //check if this file can read
     RF_TEXTFILE_CANREAD_GOTO(t,error,cleanup1)
     t->previousOp = RF_FILE_READ;
     //now open another temporary file
-    tmpNamePtr = tmpnam(tempFName);///cleanup2 - is for temporary file Deletion
-    newFile = fopen(tmpNamePtr,"w"i_PLUSB_WIN32);
+    rfString_Init(&tempFileName, "%S_temp",&t->name);///cleanup2 - is for temporary file Deletion
+    newFile = fopen(tempFileName.bytes,"w"i_PLUSB_WIN32);
     if(t->hasBom)
     {
         if((error=i_rfFile_AddBom(newFile,t->encoding))!= RF_SUCCESS)
@@ -1224,63 +1231,88 @@ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,char aft
     if(lineN==0)
     {
         lineFound = true;
-        if((tOff = rfFtell(newFile))== (foff_rft)-1)//get the file offset that we are going to come back to in success
+        //get the file offset that we are going to come back to in success
+        if((tOff = rfFtell(newFile))== (foff_rft)-1)
         {
-            i_FTELL_CHECK_GOTO("Reading the file position",error,cleanup2);
+            i_FTELL_CHECK_GOTO("Reading the file position",
+                               error,cleanup2);
         }
 
         //now depending on the EOL pattern write the line
         if(t->eol == RF_EOL_CRLF)
-            error=rfString_Fwrite(RFS_("%S\xD\n",string),newFile,t->encoding);
+            error=rfString_Fwrite(RFS_("%S\xD\n",string),
+                                  newFile,t->encoding);
         else if(t->eol == RF_EOL_CR)
-            error=rfString_Fwrite(RFS_("%S\xD",string),newFile,t->encoding);
+            error=rfString_Fwrite(RFS_("%S\xD",string),newFile,
+                                  t->encoding);
         else
-            error=rfString_Fwrite(RFS_("%S\n",string),newFile,t->encoding);
+            error=rfString_Fwrite(RFS_("%S\n",string),newFile,
+                                  t->encoding);
         //and check for errors
         if(error != RF_SUCCESS)
         {
-            LOG_ERROR("There was a file write error while inserting string \"%S\" at the beginning of Text File \"%S\"",error,string,&t->name);
+            LOG_ERROR("There was a file write error while inserting "
+                      "string \"%S\" at the beginning of Text File "
+                      "\"%S\"",error,string,&t->name);
             goto cleanup2;
         }
     }
 
     //initialize a string reading buffer
-    rfStringX_Init_buff(&buffer,RF_OPTION_FGETS_READBYTESN+1,"");///cleanup3 - for the string buffer deinitialization
+    rfStringX_Init_buff(&buffer,RF_OPTION_FGETS_READBYTESN+1,"");
+    //cleanup3 - for the string buffer deinitialization
+    
     //read every line of this file from the beginning
     while((error =rfTextFile_ReadLine2(t,&buffer))==RF_SUCCESS)
     {
         //now depending on the EOL pattern write the line to the other file
         if(t->eol == RF_EOL_CRLF)
-            error=rfString_Fwrite(RFS_("%S\xD\n",&buffer),newFile,t->encoding);
+            error=rfString_Fwrite(RFS_("%S\xD\n",&buffer),
+                                  newFile,t->encoding);
         else if(t->eol == RF_EOL_CR)
-            error=rfString_Fwrite(RFS_("%S\xD",&buffer),newFile,t->encoding);
+            error=rfString_Fwrite(RFS_("%S\xD",&buffer),
+                                  newFile,t->encoding);
         else
-            error=rfString_Fwrite(RFS_("%S\n",&buffer),newFile,t->encoding);
+            error=rfString_Fwrite(RFS_("%S\n",&buffer),newFile,
+                                  t->encoding);
         //and check for errors
         if(error!=RF_SUCCESS)
         {
-            LOG_ERROR("There was a file write error while inserting string \"%S\" at line [%llu] inside Text File \"%S\"",error,string,lineN,&t->name);
+            LOG_ERROR("There was a file write error while inserting "
+                      "string \"%S\" at line [%llu] inside Text File"
+                      " \"%S\"",error,string,lineN,&t->name);
             goto cleanup3;
         }
         //also if this is the place to put the line, do it
-        if(t->line-1 == lineN)//-1 is since right after the ReadLine2 function the current line changes
+        if(t->line-1 == lineN)
+        //-1 is since right after the ReadLine2 function
+        // the current line changes
         {
             lineFound = true;
-            if((tOff = rfFtell(newFile))== (foff_rft)-1)//get the file offset that we are going to come back to in success
+            if((tOff = rfFtell(newFile))== (foff_rft)-1)
             {
-                i_FTELL_CHECK_GOTO("Reading the file position",error,cleanup3);
+                //get the file offset that we are going to
+                //come back to in success
+                i_FTELL_CHECK_GOTO("Reading the file position",
+                                   error,cleanup3);
             }
-            //write the given line to the other file depending on the EOL pattern
+            //write the given line to the other file depending
+            //on the EOL pattern
             if(t->eol == RF_EOL_CRLF)
-                error=rfString_Fwrite(RFS_("%S\xD\n",string),newFile,t->encoding);
+                error=rfString_Fwrite(RFS_("%S\xD\n",string),
+                                      newFile,t->encoding);
             else if(t->eol == RF_EOL_CR)
-                error=rfString_Fwrite(RFS_("%S\xD",string),newFile,t->encoding);
+                error=rfString_Fwrite(RFS_("%S\xD",string),
+                                      newFile,t->encoding);
             else
-                error=rfString_Fwrite(RFS_("%S\n",string),newFile,t->encoding);
+                error=rfString_Fwrite(RFS_("%S\n",string),
+                                      newFile,t->encoding);
             //and check for errors
             if(error != RF_SUCCESS)
             {
-                LOG_ERROR("There was a file write error while inserting string \"%S\" at line [%llu] inside Text File \"%S\"",error,string,lineN,&t->name);
+                LOG_ERROR("There was a file write error while inserting "
+                          "string \"%S\" at line [%llu] inside Text "
+                          "File \"%S\"",error,string,lineN,&t->name);
                 goto cleanup3;
             }
         }
@@ -1292,12 +1324,16 @@ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,char aft
     {
         if(error == RE_FILE_EOF)
         {
-            LOG_ERROR("While attempting to find line [%llu] of TextFile \"%S\" premature End Of File was encountered",RE_FILE_EOF,lineN,&t->name);
+            LOG_ERROR("While attempting to find line [%llu] of TextFile "
+                      "\"%S\" premature End Of File was encountered",
+                      RE_FILE_EOF,lineN,&t->name);
             goto cleanup2;
         }//or else if there was an error
         else
         {
-            LOG_ERROR("While attempting to find line [%llu] of TextFile \"%S\" a file reading error was encountered",error,lineN,&t->name);
+            LOG_ERROR("While attempting to find line [%llu] of TextFile "
+                      "\"%S\" a file reading error was encountered",
+                      error,lineN,&t->name);
             goto cleanup2;
         }
     }
@@ -1306,27 +1342,32 @@ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,char aft
     if(rfDeleteFile(&t->name) != RF_SUCCESS)
     {
         error = RE_FILE_DELETE;
-        LOG_ERROR("After the insertion operation the temporary file used, could not be deleted",error);
+        LOG_ERROR("After the insertion operation the temporary file used"
+                  " could not be deleted",error);
         goto cleanup1;
     }
     //rename the temp file to be the new file
     fclose(newFile);
-    if(rfRenameFile(RFS_(tempFName),&t->name) != RF_SUCCESS)
+    if(rfRenameFile(&tempFileName, &t->name) != RF_SUCCESS)
     {
         error = RE_FILE_RENAME;
-        LOG_ERROR("After the insertion operation the temporary file used, could not be renamed to the original file",error);
+        LOG_ERROR("After the insertion operation the temporary file used"
+                  ", could not be renamed to the original file",error);
         goto cleanup1;
     }
+    //after renaming we no longer need the string
+    rfString_Deinit(&tempFileName);
     t->f = fopen(t->name.bytes,"r"i_PLUSB_WIN32"+");
-    //if the line was inserted before this line then this line should be + the number of lines the string has
+    //if the line was inserted before this line then this line should be
+    // + the number of lines the string has
     if(lineN<t->line)
     {
         t->line+=linesCount;
     }
     if(allocatedS == true)
         rfString_Destroy(string);
-    TEXTFILE_RESETPTR(t,lineN,false,tOff)//go to the beginning of the inserted lines
-
+    //go to the beginning of the inserted lines
+    TEXTFILE_RESETPTR(t,lineN,false,tOff)
     ///success
     RF_EXIT_LOCAL_SCOPE()
     return RF_SUCCESS;
@@ -1336,7 +1377,8 @@ cleanup3:
     rfStringX_Deinit(&buffer);
 cleanup2:
     fclose(newFile);
-    rfDeleteFile(RFS_(tmpNamePtr));
+    rfDeleteFile(&tempFileName);
+    rfString_Deinit(&tempFileName);
 cleanup1:
     if(allocatedS == true)
         rfString_Destroy(string);
@@ -1349,7 +1391,7 @@ cleanup0:
 //Removes a specific line from the text file
 int32_t rfTextFile_Remove(RF_TextFile* t,uint64_t lineN)
 {
-    char tempFName[L_tmpnam+1], *tmpNamePtr;
+    RF_String tempFileName;
     char prEof,lineFound;
     int32_t error;
     foff_rft prOff;
@@ -1374,8 +1416,8 @@ int32_t rfTextFile_Remove(RF_TextFile* t,uint64_t lineN)
     RF_TEXTFILE_CANREAD_GOTO(t,error,cleanup1)
     t->previousOp = RF_FILE_READ;
     //now open another temporary file
-    tmpNamePtr = tmpnam(tempFName);
-    newFile = fopen(tmpNamePtr,"w"i_PLUSB_WIN32); ///need to cleanup the temporary file -- cleanup2
+    rfString_Init(&tempFileName, "%S_temp", &t->name);
+    newFile = fopen(tempFileName.bytes,"w"i_PLUSB_WIN32); ///need to cleanup the temporary file -- cleanup2
     if(t->hasBom)
     {
         if((error=i_rfFile_AddBom(newFile,t->encoding))!= RF_SUCCESS)
@@ -1436,12 +1478,14 @@ int32_t rfTextFile_Remove(RF_TextFile* t,uint64_t lineN)
     }
     //rename the temp file to be the new file
     fclose(newFile); /// no need to clean this up anymore, back to cleanup1
-    if(rfRenameFile(RFS_(tempFName),&t->name) != RF_SUCCESS)
+    if(rfRenameFile(&tempFileName,&t->name) != RF_SUCCESS)
     {
         error = RE_FILE_RENAME;
         LOG_ERROR("After the removal operation the temporary file used, could not be renamed to the original file",error);
         goto cleanup1;
     }
+    //after renaming we no longer need the string
+    rfString_Deinit(&tempFileName);
     t->f = fopen(t->name.bytes,"r"i_PLUSB_WIN32"+");
     //if the line was removed before this line then we should reduce the current line count
     t->line = prLine;
@@ -1460,7 +1504,8 @@ cleanup3:
     rfStringX_Deinit(&buffer);
 cleanup2:
     fclose(newFile);
-    rfDeleteFile(RFS_(tmpNamePtr));
+    rfDeleteFile(&tempFileName);
+    rfString_Deinit(&tempFileName);
 cleanup1:
     TEXTFILE_RESETPTR_FROMSTART(t,prLine,prEof,prOff)
     return error;
@@ -1468,7 +1513,7 @@ cleanup1:
 //Replaces a line of the textfile with the given string
 int32_t rfTextFile_Replace(RF_TextFile* t,uint64_t lineN,void* stringP)
 {
-    char tempFName[L_tmpnam+1], *tmpNamePtr;
+    RF_String tempFileName;
     char lineFound,allocatedS;
     int32_t error = RF_FAILURE;
     FILE* newFile;
@@ -1507,8 +1552,8 @@ int32_t rfTextFile_Replace(RF_TextFile* t,uint64_t lineN,void* stringP)
     RF_TEXTFILE_CANREAD_GOTO(t,error,cleanup1)
     t->previousOp = RF_FILE_READ;
     //now open another temporary file
-    tmpNamePtr = tmpnam(tempFName);///cleanup2 - For the removal and deallocation of the temporary file
-    newFile = fopen(tmpNamePtr,"w"i_PLUSB_WIN32);
+    rfString_Init(&tempFileName, "%S_temp", &t->name);///cleanup2 - For the removal and deallocation of the temporary file
+    newFile = fopen(tempFileName.bytes,"w"i_PLUSB_WIN32);
     if(t->hasBom)
     {
         if((error=i_rfFile_AddBom(newFile,t->encoding))!= RF_SUCCESS)
@@ -1568,12 +1613,16 @@ int32_t rfTextFile_Replace(RF_TextFile* t,uint64_t lineN,void* stringP)
     {
         if(error == RE_FILE_EOF)
         {
-            LOG_ERROR("While attempting to find line [%llu] of TextFile \"%S\" for replacement, premature End Of File was encountered",RE_FILE_EOF,lineN,&t->name)
+            LOG_ERROR("While attempting to find line [%llu] of TextFile "
+                      "\"%S\" for replacement, premature End Of File was "
+                      "encountered", RE_FILE_EOF, lineN, &t->name)
             goto cleanup2;
         }//or else if there was an error
         else
         {
-            LOG_ERROR("While attempting to find line [%llu] of TextFile \"%S\" for replacement, a file reading error was encountered",error,lineN,&t->name)
+            LOG_ERROR("While attempting to find line [%llu] of TextFile "
+                      "\"%S\" for replacement, a file reading error was "
+                      "encountered", error, lineN, &t->name)
             goto cleanup2;
         }
     }
@@ -1582,17 +1631,21 @@ int32_t rfTextFile_Replace(RF_TextFile* t,uint64_t lineN,void* stringP)
     if(rfDeleteFile(&t->name) != RF_SUCCESS) ///back to cleanup2
     {
         error = RE_FILE_DELETE;
-        LOG_ERROR("After the replacement operation the temporary file used, could not be deleted",error);
+        LOG_ERROR("After the replacement operation the temporary file "
+                  "used, could not be deleted", error);
         goto cleanup1;//since the file closed already
     }
     //rename the temp file to be the new file
     fclose(newFile);
-    if(rfRenameFile(RFS_(tempFName),&t->name) != RF_SUCCESS)
+    if(rfRenameFile(&tempFileName,&t->name) != RF_SUCCESS)
     {
         error = RE_FILE_RENAME;
-        LOG_ERROR("After the replacement operation the temporary file used, could not be renamed to the original file",error);
+        LOG_ERROR("After the replacement operation the temporary file "
+                  "used, could not be renamed to the original file",error);
         goto cleanup1;
     }
+    //after renaming the file we no longer need the string
+    rfString_Deinit(&tempFileName);
     t->f = fopen(t->name.bytes,"r"i_PLUSB_WIN32"+");
     if(allocatedS == true)
         rfString_Destroy(string);
@@ -1607,7 +1660,8 @@ cleanup3:
     rfStringX_Deinit(&buffer);
 cleanup2:
     fclose(newFile);
-    rfDeleteFile(RFS_(tmpNamePtr));
+    rfDeleteFile(&tempFileName);
+    rfString_Deinit(&tempFileName);
 cleanup1:
     if(allocatedS == true)
         rfString_Destroy(string);

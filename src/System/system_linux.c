@@ -302,42 +302,63 @@ used by some other proccess or by the system",RE_FILE_BUSY,name)
 }
 
 // Renames a file
-int32_t rfRenameFile(void* nameP,void* newNameP)
+int32_t rfRenameFile(void* nameP, void* newNameP)
 {
     RF_String* name = (RF_String*)nameP;
     RF_String* newName = (RF_String*)newNameP;
     int32_t ret = RF_SUCCESS;
     RF_ENTER_LOCAL_SCOPE()
 
-    if(rename(name->bytes,newName->bytes)!= 0)
+    if(rename(name->bytes, newName->bytes)!= 0)
     {
         switch(errno)
         {
             case EACCES:
             case EPERM:
-                LOG_ERROR("When attempting to rename file \"%S\" to \"%S\", permission is denied on a component of the \
-path prefix, or write permission is denied on the parent directory of the file to be removed",RE_PERMISSION,name,newName)
+                LOG_ERROR("When attempting to rename file \"%S\" to \"%S"
+                          "\", permission is denied on a component of the"
+                          " path prefix, or write permission is denied "
+                          "on the parent directory of the file to be "
+                          "removed", RE_PERMISSION, name, newName)
             break;
             case EBUSY:
-                LOG_ERROR("When attempting to rename file \"%S\" to \"%S\", permission is denied because it is currently\
-used by some other proccess or by the system",RE_FILE_BUSY,name,newName)
+                LOG_ERROR("When attempting to rename file \"%S\" to \"%S\""
+                          ", permission is denied because it is currently "
+                          "used by some other proccess or by the system",
+                          RE_FILE_BUSY,name,newName)
             break;
             case EINVAL:
             case ENOENT:
             case ENOTDIR:
-                LOG_ERROR("When attempting to rename file \"%S\" to \"%S\", permission is denied because the path argument is invalid or it is not a file",RE_FILE_NOTFILE,name,newName)
+                LOG_ERROR("When attempting to rename file \"%S\" to \"%S\""
+                          ", permission is denied because the path "
+                          "argument is invalid or it is not a file",
+                          RE_FILE_NOTFILE,name,newName)
             break;
             case EIO:
-                LOG_ERROR("When attempting to rename file \"%S\" to \"%S\", a physical I/O error has occured",RE_FILE_IO,name,newName);
+                LOG_ERROR("When attempting to rename file \"%S\" to \"%S\""
+                          ", a physical I/O error has occured",
+                          RE_FILE_IO,name,newName);
             break;
             case ENAMETOOLONG:
-                LOG_ERROR("When attempting to rename file \"%S\" to \"%S\", the given name is too long",RE_FILE_NAMELENGTH,name,newName)
+                LOG_ERROR("When attempting to rename file \"%S\" to \"%S\""
+                          ", the given name is too long",
+                          RE_FILE_NAMELENGTH,name,newName)
             break;
             case EROFS:
-                LOG_ERROR("When attempting to rename file \"%S\" to \"%S\", the file resides in a read only file system",RE_FILE_RO,name,newName)
+                LOG_ERROR("When attempting to rename file \"%S\" to \"%S\""
+                          ", the file resides in a read only file system",
+                          RE_FILE_RO,name,newName)
+            break;
+            case EXDEV:
+              LOG_ERROR("When attempting to rename file \"%S\" to \"%S\""
+                        ", the 2 files are mounted at different mounting"
+                        " points and this is not supported by this function",
+                        RE_FILE_MOUNT, name, newName)
             break;
             default:
-                LOG_ERROR("Failed to rename file \"%S\" to \"%S\"",RE_FILE_DELETE,name,newName)
+                LOG_ERROR("Failed to rename file \"%S\" to \"%S\"",
+                          RE_FILE_DELETE,name,newName)
             break;
         }
         ret = RF_LastError;
