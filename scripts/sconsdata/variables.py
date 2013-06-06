@@ -49,6 +49,11 @@ vars.Add(ListVariable('REFU_MODULES', 'The modules that you want to build of ref
 'SYSTEM']
 ))
 
+vars.Add('DEBUG', "This option determines if this will be a Debug Build (0"
+         "or 1), and if more than 1 it can indicate a different debug level",
+         0)
+         
+
 vars.Add(BoolVariable('DEFAULT_ARGUMENTS', 'If \'yes\' then the library is built with some functions having default arguments, utilizing the C preprocessor. If \'no\' they are build normally. Accepted values for this option are \'yes\' and \'no\'. Default is \'yes\'.', 1))
 
 vars.Add(BoolVariable('SAFE_MEMORY_ALLOC', 'If \'yes\' then the malloc and calloc calls of the library check for failure and in case of failure log an error and exit the process.If \'no\' then malloc and calloc are called normally.Accepted values for this option are \'yes\' and \'no\'. Default is \'no\'.', 0))
