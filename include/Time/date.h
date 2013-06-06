@@ -350,7 +350,7 @@ i_DECLIMEX_ char rfDate_SetToLocal(RF_Date* d);
 i_DECLIMEX_ char rfDate_Diff(RF_Date* tDate,RF_Date* oDate,RF_Date* res);
 /*
 needs thinking
-/**
+**
  ** @memberof RF_Date
  ** @brief Turns a time interval into seconds
  **

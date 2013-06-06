@@ -115,7 +115,7 @@ typedef struct Argument_Format
  ** @return The number of characters used after the '%' to specify the argument's format or 0 for failure
  **
  **/
-static int Parse_FormatSpecifier(const char* s,Argument_Format* data)
+static int Parse_FormatSpecifier(const char* s, Argument_Format* data)
 {
     int i;//the index to the format string after the '%' sign
     char state = EXPECT_FLAG;
@@ -614,7 +614,8 @@ cleanup1:
 
 
 
-//Formats an @ref RF_StringX according to the given format string and variable arguments
+//Formats an @ref RF_StringX according to the given format string and 
+//variable arguments
 int32_t rfStringX_Format(RF_StringX *s,const char* format,...)
 {
     va_list args;//note that no local scope macros are needed here since the arguments get evaluated in rfStringX_Formatv()

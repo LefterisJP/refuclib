@@ -36,7 +36,7 @@
 #include <Definitions/threadspecific.h> //for the thread specific attribute
 #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
 #include <string.h> //for memset()
-#include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
+#include <stdint.h> //for UINT32_MAX used in RF_ENTER_LOCAL_SCOPE() macro
 #include <Utils/localscope.h>
 ---------------------For internal library include make sure to have----------------------------
 */
@@ -44,7 +44,8 @@
 #define RF_LOCALSCOPE_H
 
 /**
- ** A small macro to find the smallest of the macro evaluation indices. Just to avoid copying pasting
+ ** A small macro to find the smallest of the macro evaluation indices. 
+ ** Just to avoid copying pasting
  **
  **/
 #define RF_ENTER_LOCAL_SCOPE()  \
@@ -54,8 +55,8 @@
     if(RF_LMS->macroEvalsI > 0)\
     {\
         /*find the smallest pointer of the macro evaluations. This is where the stack pointer was before the function call*/\
-        i_stackPtrBefore_ = ULONG_MAX;\
-        for(i_index_=0;i_index_< RF_LMS->macroEvalsI; i_index_ ++)\
+        i_stackPtrBefore_ = UINT32_MAX;\
+        for(i_index_=0; i_index_< RF_LMS->macroEvalsI; i_index_ ++)\
         {\
             if(RF_LMS->macroEvals[i_index_] < i_stackPtrBefore_)\
                 i_stackPtrBefore_ = RF_LMS->macroEvals[i_index_];\
@@ -68,7 +69,8 @@
         i_stackPtrBefore_= RF_LMS->stackPtr;
 
 /**
- ** Another small macro to free the temporary objects after a function or scope has been passed
+ ** Another small macro to free the temporary objects after a function or
+ ** scope has been passed
  **
  **/
 #define RF_EXIT_LOCAL_SCOPE()   \
