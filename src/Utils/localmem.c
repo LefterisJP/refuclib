@@ -27,6 +27,8 @@
 #include <Definitions/threadspecific.h> //for the thread specific attribute
 #include <Utils/localmem_decl.h> //for RF_LocalMemoryStack
 #include <Utils/localmem.h>
+//*---------------------Module related inclusion----------------------------------------
+#include "localmem.ph" //for the private definitions of rfLMS functions
 //*---------------------Outside module inclusion----------------------------------------
 //for error logging
     #include <stdio.h>//for FILE* used inside printf.h

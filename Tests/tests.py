@@ -115,8 +115,8 @@ def test(root, fileName, logFile, testExec, verbose):
                "the logfile for details")
         line = line.partition("[")[2]
         line = line.partition("]")[0]
-        report(logFile, "\t\tTest ran until line [{}]"
-               "\n".format(str(line)))
+        report(logFile, "\t\tLast line we are sure succesfully executed "
+               "is [{}]\n".format(str(line)))
         raise TestError(fileName, line)
 
 def debugTest(root, fileName, logFile, testExec):

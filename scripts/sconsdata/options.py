@@ -34,7 +34,7 @@ def writeDefVal(file,defname,defines):
     file.write("#endif\n\n")
 
 
-#open the fle and write its introduction
+#open the file and write its introduction
 f = open("../../include/rf_options.h","w");
 f.write("/**\n\
 ** This file contains the options that the refu library got built with by the Scons Build system\n\
@@ -60,7 +60,10 @@ else:
     exit(1)
 #iterate through all the modules we need and report their existence in rf_options.h  (skipping the core module)
 for mod in modules[1:]:
-    writeDef(f,mod.macro)
+    writeDef(f, mod.macro)
+    if mod.extra_generated == True:
+        #if extra sources were generated for a module we need to know
+        writeDef(f, mod.macro + "_EXTRA")
     
 #also write all the defines which should go in the options file
 for o in optionsList:

@@ -48,46 +48,83 @@ extern "C"
  ** @memberof RF_ArrayV
  ** @brief Allocates and returns an array of objects
  **
- ** @param objectType Give the type of the object you want stored in the array. For example if you want strings give @c RF_String
+ ** @param objectType Give the type of the object you want stored in the 
+ ** array. For example if you want strings give @c RF_String
  ** @param size The number of object that the array will initially store
- ** @param ptr2Destroy \rfoptional{The object's Deinit() functions} A pointer to the destruction function for the objects stored inside the group. Used for object deletion.
- ** Can be @c 0 which means no destructor is given, so no freeing will happen when members of the list are removed
- ** @warning Be careful this must be a destruction function that DOES NOT free the pointer itself since there are
- ** only values saved in here. So it must only be destroying the value of the object. Else undefined behaviour is caused.
- ** If omitted then the appropriate  @c objectType_Deinit()
- ** function will be called. If you are making a list of non Refu object and omit this argument
- ** it will lead to a compilation error.
- ** @param ptr2Copy \rfoptional{The object's Copy_IN function} A pointer to the copying function for the objects stored inside the list. It is used for copying the
- ** List and also for making copies of the objects themselves. Can be @c 0 which means that at List copying the copied
- ** list contains a blind data buffer copy of the to copy list. Can be dangerous for any type of stored object
- ** that stores data on the heap. It is recommended to always provide a copy function.
- ** This function must be in the form of all the functions of the library that Copy
- ** an object from a destination to a src type. For reference look at @ref rfString_Copy_IN() or rfListV_Copy_IN()
- ** For storing objects of the Refu library this argument can be omitted and will be given a pointer
- ** to the object's @c objectType_Copy_IN() functio. If you are making a list of non Refu object and omit this argument
- ** it will lead to a compilation error.
- ** @return The newly initialized array or null pointer if there was an error
+ ** @param ptr2Destroy \rfoptional{The object's Deinit() functions} A 
+ ** pointer to the destruction function for the objects stored inside the
+ ** group. Used for object deletion. Can be @c 0 which means no destructor
+ ** is given, so no freeing will happen when members of the list are 
+ ** removed
+ ** @warning Be careful this must be a destruction function that DOES NOT
+ ** free the pointer itself since there are only values saved in here. So
+ ** it must only be destroying the value of the object. Else undefined 
+ ** behaviour is caused.If omitted then the appropriate @c objectType_Deinit()
+ ** function will be called. If you are making a list of non Refu object
+ ** and omit this argument it will lead to a compilation error.
+ ** @param ptr2Copy \rfoptional{The object's Copy_IN function} A pointer
+ ** to the copying function for the objects stored inside the list. It is
+ ** used for copying the List and also for making copies of the objects
+ ** themselves. Can be @c 0 which means that at List copying the copied
+ ** list contains a blind data buffer copy of the to copy list. Can be
+ ** dangerous for any type of stored object that stores data on the heap.
+ ** It is recommended to always provide a copy function.
+ ** This function must be in the form of all the functions of the library
+ ** that Copy an object from a destination to a src type. For reference
+ ** look at @ref rfString_Copy_IN() or rfListV_Copy_IN()
+ ** For storing objects of the Refu library this argument can be omitted
+ ** and will be given a pointer to the object's @c objectType_Copy_IN()
+ ** function. If you are making a list of non Refu object and omit this
+ ** argument it will lead to a compilation error.
+ ** @return The newly initialized array or null pointer if there was an
+ ** error
  **
  **/
 #ifdef  RF_IAMHERE_FOR_DOXYGEN
-RF_ArrayV* rfArrayV_Create(Type objectType,uint32_t size,void (*ptr2Destroy)(void*),void (*ptr2Copy)(void*,void*));
+RF_ArrayV* rfArrayV_Create(Type objectType,
+                           uint32_t size,
+                           void (*ptr2Destroy)(void*),
+                           void (*ptr2Copy)(void*,void*));
 #else
-i_DECLIMEX_ RF_ArrayV*  i_rfArrayV_Create(uint32_t elSize,uint32_t size,void (*ptr2Destroy)(void*),void (*ptr2Copy)(void*,void*));
+i_DECLIMEX_ RF_ArrayV*  i_rfArrayV_Create(uint32_t elSize,
+                                          uint32_t size,
+                                          void (*ptr2Destroy)(void*),
+                                          void (*ptr2Copy)(void*,void*));
     #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfArrayV_Create(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_ARRAYV_CREATE,4,__VA_ARGS__)
-        #define i_NPSELECT_RF_ARRAYV_CREATE1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfArrayV_Create() accepts from 2 to 4 arguments\"")
-        #define i_NPSELECT_RF_ARRAYV_CREATE0(...) RF_SELECT_FUNC(i_SELECT_RF_ARRAYV_CREATE,__VA_ARGS__)
-        #define i_SELECT_RF_ARRAYV_CREATE4(i_TYPE_ ,i_NUMELEMENTS_,i_PTR2DESTROY_,i_PTR2COPY) \
-            i_rfArrayV_Create(sizeof(i_TYPE_), i_NUMELEMENTS_,(void(*)(void*))i_PTR2DESTROY_,(void(*)(void*,void*))i_PTR2COPY)
-        #define i_SELECT_RF_ARRAYV_CREATE3(i_TYPE_ ,i_NUMELEMENTS_,i_PTR2DESTROY_) \
-            i_rfArrayV_Create(sizeof(i_TYPE_), i_NUMELEMENTS_,(void(*)(void*))i_PTR2DESTROY_,(void(*)(void*,void*))i_RF_GET_COPYIN(i_TYPE_))
-        #define i_SELECT_RF_ARRAYV_CREATE2(i_TYPE_ ,i_NUMELEMENTS_) \
-            i_rfArrayV_Create(sizeof(i_TYPE_), i_NUMELEMENTS_,(void(*)(void*))i_RF_GET_DEINIT(i_TYPE_),(void(*)(void*,void*))i_RF_GET_COPYIN(i_TYPE_))
-        #define i_SELECT_RF_ARRAYV_CREATE1(...)  RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfArrayV_Create() accepts from 2 to 4 arguments\"")
-        #define i_SELECT_RF_ARRAYV_CREATE0(...)  RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfArrayV_Create() accepts from 2 to 4 arguments\"")
+        #define rfArrayV_Create(...) \
+        RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_ARRAYV_CREATE, 4, __VA_ARGS__)
+        #define i_NPSELECT_RF_ARRAYV_CREATE1(...) \
+        RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function \
+rfArrayV_Create() accepts from 2 to 4 arguments\"")
+        #define i_NPSELECT_RF_ARRAYV_CREATE0(...) \
+        RF_SELECT_FUNC(i_SELECT_RF_ARRAYV_CREATE, __VA_ARGS__)
+        #define i_SELECT_RF_ARRAYV_CREATE4(i_TYPE_ , i_NUMELEMENTS_, i_PTR2DESTROY_, i_PTR2COPY) \
+        i_rfArrayV_Create(sizeof(i_TYPE_),\
+                          i_NUMELEMENTS_,\
+                          (void(*)(void*))i_PTR2DESTROY_,\
+                          (void(*)(void*,void*))i_PTR2COPY)
+        #define i_SELECT_RF_ARRAYV_CREATE3(i_TYPE_ , i_NUMELEMENTS_, i_PTR2DESTROY_) \
+        i_rfArrayV_Create(sizeof(i_TYPE_),\
+                          i_NUMELEMENTS_,\
+                          (void(*)(void*))i_PTR2DESTROY_,\
+                          (void(*)(void*,void*))i_RF_GET_COPYIN(i_TYPE_))
+        #define i_SELECT_RF_ARRAYV_CREATE2(i_TYPE_ , i_NUMELEMENTS_) \
+        i_rfArrayV_Create(sizeof(i_TYPE_),\
+                          i_NUMELEMENTS_,\
+                          (void(*)(void*))i_RF_GET_DEINIT(i_TYPE_),\
+                          (void(*)(void*,void*))i_RF_GET_COPYIN(i_TYPE_))
+        #define i_SELECT_RF_ARRAYV_CREATE1(...)  \
+        RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function \
+rfArrayV_Create() accepts from 2 to 4 arguments\"")
+        #define i_SELECT_RF_ARRAYV_CREATE0(...)  \
+        RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function \
+rfArrayV_Create() accepts from 2 to 4 arguments\"")
     #else
-        #define rfArrayV_Create(i_TYPE_,i_NUMELEMENTS_,i_PTR2DESTROY_,i_PTR2COPY_)  \
-            i_rfArrayV_Create(sizeof(i_TYPE_), i_NUMELEMENTS_,(void(*)(void*))i_PTR2DESTROY_,(void(*)(void*,void*))i_PTR2COPY_)
+        #define rfArrayV_Create(i_TYPE_, i_NUMELEMENTS_, i_PTR2DESTROY_, i_PTR2COPY_)  \
+        i_rfArrayV_Create(sizeof(i_TYPE_),\
+                          i_NUMELEMENTS_,\
+                          (void(*)(void*))i_PTR2DESTROY_,\
+                          (void(*)(void*,void*))i_PTR2COPY_)
     #endif
 #endif
 
@@ -97,45 +134,90 @@ i_DECLIMEX_ RF_ArrayV*  i_rfArrayV_Create(uint32_t elSize,uint32_t size,void (*p
  ** @brief Initializes an array of objects
  **
  ** @param arr The array to initialize
- ** @param ptr2Destroy \rfoptional{The object's Deinit() functions} A pointer to the destruction function for the objects stored inside the group. Used for object deletion.
- ** Can be @c 0 which means no destructor is given, so no freeing will happen when members of the list are removed
- ** @warning Be careful this must be a destruction function that DOES NOT free the pointer itself since there are
- ** only values saved in here. So it must only be destroying the value of the object. Else undefined behaviour is caused.
+ ** @param size The number of values to allocate for the Array
+ ** @param ptr2Destroy \rfoptional{The object's Deinit() functions} A
+ ** pointer to the destruction function for the objects stored inside the
+ ** group. Used for object deletion.
+ ** Can be @c 0 which means no destructor is given, so no freeing will
+ ** happen when members of the list are removed
+ ** @warning Be careful this must be a destruction function that DOES NOT
+ ** free the pointer itself since there are only values saved in here.
+ ** So it must only be destroying the value of the object. 
+ ** Else undefined behaviour is caused.
  ** If omitted then the appropriate  @c objectType_Deinit()
- ** function will be called. If you are making a list of non Refu object and omit this argument
- ** it will lead to a compilation error.
- ** @param ptr2Copy \rfoptional{The object's Copy_IN function} A pointer to the copying function for the objects stored inside the list. It is used for copying the
- ** List and also for making copies of the objects themselves. Can be @c 0 which means that at List copying the copied
- ** list contains a blind data buffer copy of the to copy list. Can be dangerous for any type of stored object
- ** that stores data on the heap. It is recommended to always provide a copy function.
- ** This function must be in the form of all the functions of the library that Copy
- ** an object from a destination to a src type. For reference look at @ref rfString_Copy_IN() or rfListV_Copy_IN()
- ** For storing objects of the Refu library this argument can be omitted and will be given a pointer
- ** to the object's @c objectType_Copy_IN() functio. If you are making a list of non Refu object and omit this argument
- ** it will lead to a compilation error.
+ ** function will be called. If you are making a list of non Refu object 
+ ** and omit this argument it will lead to a compilation error.
+ ** @param ptr2Copy \rfoptional{The object's Copy_IN function} A pointer
+ ** to the copying function for the objects stored inside the list. It is
+ ** used for copying the List and also for making copies of the objects
+ ** themselves. Can be @c 0 which means that at List copying the copied
+ ** list contains a blind data buffer copy of the to copy list. Can be
+ ** dangerous for any type of stored object that stores data on the heap.
+ ** It is recommended to always provide a copy function. This function
+ ** must be in the form of all the functions of the library that Copy
+ ** an object from a destination to a src type. For reference look at
+ ** @ref rfString_Copy_IN() or rfListV_Copy_IN()
+ ** For storing objects of the Refu library this argument can be omitted
+ ** and will be given a pointer to the object's @c objectType_Copy_IN()
+ ** function. If you are making a list of non Refu object and omit this
+ ** argument it will lead to a compilation error.
  ** @return Returns true in succesfull initialization and false otherwise
  **
  **/
 #ifdef RF_IAMHERE_FOR_DOXYGEN
-char  rfArrayV_Init(RF_ArrayV* arr,Type objectType,uint32_t size,void (*ptr2Destroy)(void*),void (*ptr2Copy)(void*,void*));
+char  rfArrayV_Init(RF_ArrayV* arr,
+                    Type objectType,
+                    uint32_t size,
+                    void (*ptr2Destroy)(void*),
+                    void (*ptr2Copy)(void*,void*));
 #else
-i_DECLIMEX_ char  i_rfArrayV_Init(RF_ArrayV* arr,uint32_t elSize,uint32_t size,void (*ptr2Destroy)(void*),void (*ptr2Copy)(void*,void*));
+i_DECLIMEX_ char  i_rfArrayV_Init(RF_ArrayV* arr,
+                                  uint32_t elSize,
+                                  uint32_t size,
+                                  void (*ptr2Destroy)(void*),
+                                  void (*ptr2Copy)(void*,void*));
      #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfArrayV_Init(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_ARRAYV_INIT,5,__VA_ARGS__)
-        #define i_NPSELECT_RF_ARRAYV_INIT1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfArrayV_Init() accepts from 3 to 5 arguments\"")
-        #define i_NPSELECT_RF_ARRAYV_INIT0(...) RF_SELECT_FUNC(i_SELECT_RF_ARRAYV_INIT,__VA_ARGS__)
-        #define i_SELECT_RF_ARRAYV_INIT5(i_LIST_,i_TYPE_ ,i_NUMELEMENTS_,i_PTR2DESTROY_,i_PTR2COPY) \
-            i_rfArrayV_Init(i_LIST_,sizeof(i_TYPE_) , i_NUMELEMENTS_ ,(void(*)(void*))i_PTR2DESTROY_,(void(*)(void*,void*))i_PTR2COPY)
-        #define i_SELECT_RF_ARRAYV_INIT4(i_LIST_,i_TYPE_ ,i_NUMELEMENTS_,i_PTR2DESTROY_) \
-            i_rfArrayV_Init(i_LIST_,sizeof(i_TYPE_) , i_NUMELEMENTS_ ,(void(*)(void*))i_PTR2DESTROY_,(void(*)(void*,void*))i_RF_GET_COPYIN(i_TYPE_))
-        #define i_SELECT_RF_ARRAYV_INIT3(i_LIST_,i_TYPE_ ,i_NUMELEMENTS_) \
-            i_rfArrayV_Init(i_LIST_,sizeof(i_TYPE_) , i_NUMELEMENTS_ ,(void(*)(void*))i_RF_GET_DEINIT(i_TYPE_),(void(*)(void*,void*))i_RF_GET_COPYIN(i_TYPE_))
-        #define i_SELECT_RF_ARRAYV_INIT2(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfArrayV_Init() accepts from 3 to 5 arguments\"")
-        #define i_SELECT_RF_ARRAYV_INIT1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfArrayV_Init() accepts from 3 to 5 arguments\"")
-        #define i_SELECT_RF_ARRAYV_INIT0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfArrayV_Init() accepts from 3 to 5 arguments\"")
+        #define rfArrayV_Init(...) \
+        RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_ARRAYV_INIT, 5, __VA_ARGS__)
+        #define i_NPSELECT_RF_ARRAYV_INIT1(...) \
+        RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function \
+rfArrayV_Init() accepts from 3 to 5 arguments\"")
+        #define i_NPSELECT_RF_ARRAYV_INIT0(...) \
+        RF_SELECT_FUNC(i_SELECT_RF_ARRAYV_INIT,__VA_ARGS__)
+        #define i_SELECT_RF_ARRAYV_INIT5(i_LIST_, i_TYPE_ , i_NUMELEMENTS_, i_PTR2DESTROY_, i_PTR2COPY) \
+        i_rfArrayV_Init(i_LIST_,\
+                        sizeof(i_TYPE_) ,\
+                        i_NUMELEMENTS_ ,\
+                        (void(*)(void*))i_PTR2DESTROY_,\
+                        (void(*)(void*,void*))i_PTR2COPY)
+        #define i_SELECT_RF_ARRAYV_INIT4(i_LIST_, i_TYPE_ , i_NUMELEMENTS_, i_PTR2DESTROY_) \
+        i_rfArrayV_Init(i_LIST_,\
+                        sizeof(i_TYPE_) ,\
+                        i_NUMELEMENTS_ ,\
+                        (void(*)(void*))i_PTR2DESTROY_,\
+                        (void(*)(void*,void*))i_RF_GET_COPYIN(i_TYPE_))
+        #define i_SELECT_RF_ARRAYV_INIT3(i_LIST_, i_TYPE_ , i_NUMELEMENTS_) \
+        i_rfArrayV_Init(i_LIST_,\
+                       sizeof(i_TYPE_),\
+                       i_NUMELEMENTS_ ,\
+                       (void(*)(void*))i_RF_GET_DEINIT(i_TYPE_),\
+                       (void(*)(void*,void*))i_RF_GET_COPYIN(i_TYPE_))
+        #define i_SELECT_RF_ARRAYV_INIT2(...) \
+        RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function \
+rfArrayV_Init() accepts from 3 to 5 arguments\"")
+        #define i_SELECT_RF_ARRAYV_INIT1(...) \
+        RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function \
+rfArrayV_Init() accepts from 3 to 5 arguments\"")
+        #define i_SELECT_RF_ARRAYV_INIT0(...) \
+        RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function \
+rfArrayV_Init() accepts from 3 to 5 arguments\"")
     #else
-        #define rfArrayV_Init(i_ARRAY_,i_TYPE_,i_NUMELEMENTS_,i_PTR2DESTROY_,i_PTR2COPY_) \
-            i_rfArrayV_Init(i_ARRAY_,sizeof(object_p),sizeof(i_TYPE_), i_NUMELEMENTS_,(void(*)(void*))i_PTR2DESTROY_,(void(*)(void*,void*))i_PTR2COPY_)
+        #define rfArrayV_Init(i_ARRAY_, i_TYPE_, i_NUMELEMENTS_, i_PTR2DESTROY_,i_PTR2COPY_) \
+        i_rfArrayV_Init(i_ARRAY_,\
+                        sizeof(object_p),\
+                        sizeof(i_TYPE_),\
+                        i_NUMELEMENTS_,(void(*)(void*))i_PTR2DESTROY_,\
+                        (void(*)(void*,void*))i_PTR2COPY_)
     #endif
 #endif
 
@@ -160,7 +242,8 @@ i_DECLIMEX_ RF_ArrayV* rfArrayV_Copy_OUT(RF_ArrayV* src);
 
 /**
  ** @memberof RF_ArrayV
- ** @brief Destroys an array of objects, calling the destructing function if it exists
+ ** @brief Destroys an array of objects, calling the destructing function
+ **  if it exists
  **
  ** If for some reason you do not want to call the destruction
  ** function of the given objects at array destruction use
@@ -171,7 +254,8 @@ i_DECLIMEX_ RF_ArrayV* rfArrayV_Copy_OUT(RF_ArrayV* src);
 i_DECLIMEX_ void rfArrayV_Destroy(RF_ArrayV* a);
 /**
  ** @memberof RF_ArrayV
- ** @brief Destroys an array of objects, without calling the destructing function if it exists
+ ** @brief Destroys an array of objects, without calling the destructing
+ ** function if it exists
  **
  ** For a function that deletes the array and calls the appropriate
  ** destruction function for each individual object refer to
@@ -193,7 +277,8 @@ i_DECLIMEX_ void rfArrayV_Destroy_nofree(RF_ArrayV* a);
 i_DECLIMEX_ void rfArrayV_Deinit(RF_ArrayV* a);
 /**
  ** @memberof RF_ArrayV
- ** @brief Deinitializes an array of objects, without calling the destructing function if it exists
+ ** @brief Deinitializes an array of objects, without calling the
+ **  destructing function if it exists
  **
  ** For a function that deletes the array and calls the appropriate
  ** deinitalization function for each individual object refer to
@@ -313,23 +398,46 @@ i_DECLIMEX_ char rfArrayV_Reallocate(RF_ArrayV* a,uint32_t newSize);
  **
  **/
 #ifdef  RF_IAMHERE_FOR_DOXYGEN
-i_DECLIMEX_ RF_ArrayP* rfArrayP_Create(Type objectType,uint32_t size,void (*ptr2Destroy)(void*),void* (*ptr2Copy)(void*));
+i_DECLIMEX_ RF_ArrayP* rfArrayP_Create(Type objectType, uint32_t size,
+                                       void (*ptr2Destroy)(void*),
+                                       void* (*ptr2Copy)(void*));
 #else
-i_DECLIMEX_ RF_ArrayP* i_rfArrayP_Create(uint32_t size,void (*ptr2Destroy)(void*),void* (*ptr2Copy)(void*));
+i_DECLIMEX_ RF_ArrayP* i_rfArrayP_Create(uint32_t size,
+                                         void (*ptr2Destroy)(void*),
+                                         void* (*ptr2Copy)(void*));
     #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfArrayP_Create(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_ARRAYP_CREATE,4,__VA_ARGS__)
-        #define i_NPSELECT_RF_ARRAYP_CREATE1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfArrayP_Create() accepts from 2 to 4 arguments\"")
-        #define i_NPSELECT_RF_ARRAYP_CREATE0(...) RF_SELECT_FUNC(i_SELECT_RF_ARRAYP_CREATE,__VA_ARGS__)
-        #define i_SELECT_RF_ARRAYP_CREATE4(i_TYPE_,i_SIZE_,i_PTR2DESTROY_,i_PTR2COPY_) \
-            i_rfArrayP_Create(i_SIZE_,(void(*)(void*))i_PTR2DESTROY_,(void*(*)(void*))i_PTR2COPY_)
-        #define i_SELECT_RF_ARRAYP_CREATE3(i_TYPE_,i_SIZE_,i_PTR2DESTROY_) \
-            i_rfListP_Create(i_SIZE_,(void(*)(void*))i_PTR2DESTROY_,(void*(*)(void*))i_RF_GET_COPYOUT(i_TYPE_))
-        #define i_SELECT_RF_ARRAYP_CREATE2(i_TYPE_,i_SIZE_) \
-            i_rfListP_Create(i_SIZE_,(void(*)(void*))i_RF_GET_DESTROY(i_TYPE_),(void*(*)(void*))i_RF_GET_COPYOUT(i_TYPE_))
-        #define i_SELECT_RF_ARRAYP_CREATE1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfArrayP_Create() accepts from 2 to 4 arguments\"")
-        #define i_SELECT_RF_ARRAYP_CREATE0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfArrayP_Create() accepts from 2 to 4 arguments\"")
+        #define rfArrayP_Create(...) \
+        RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_ARRAYP_CREATE,\
+                                 4,\
+                                 __VA_ARGS__)
+        #define i_NPSELECT_RF_ARRAYP_CREATE1(...) \
+        RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function \
+rfArrayP_Create() accepts from 2 to 4 arguments\"")
+        #define i_NPSELECT_RF_ARRAYP_CREATE0(...) \
+        RF_SELECT_FUNC(i_SELECT_RF_ARRAYP_CREATE, __VA_ARGS__)
+        #define i_SELECT_RF_ARRAYP_CREATE4(i_TYPE_, i_SIZE_, i_PTR2DESTROY_, i_PTR2COPY_) \
+        i_rfArrayP_Create(i_SIZE_,\
+                         (void(*)(void*))i_PTR2DESTROY_,\
+                          (void*(*)(void*))i_PTR2COPY_)
+        #define i_SELECT_RF_ARRAYP_CREATE3(i_TYPE_, i_SIZE_, i_PTR2DESTROY_) \
+        i_rfListP_Create(i_SIZE_,\
+                         (void(*)(void*))i_PTR2DESTROY_,\
+                         (void*(*)(void*))i_RF_GET_COPYOUT(i_TYPE_))
+        #define i_SELECT_RF_ARRAYP_CREATE2(i_TYPE_, i_SIZE_) \
+        i_rfListP_Create(i_SIZE_,\
+                         (void(*)(void*))i_RF_GET_DESTROY(i_TYPE_),\
+                         (void*(*)(void*))i_RF_GET_COPYOUT(i_TYPE_))
+        #define i_SELECT_RF_ARRAYP_CREATE1(...) \
+        RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function \
+rfArrayP_Create() accepts from 2 to 4 arguments\"")
+        #define i_SELECT_RF_ARRAYP_CREATE0(...) \
+        RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function \
+rfArrayP_Create() accepts from 2 to 4 arguments\"")
     #else
-        #define rfArrayP_Create(i_TYPE_,i_SIZE_,i_PTR2DESTROY_,i_PTR2COPY_) i_rfArrayP_Create(i_SIZE_,(void(*)(void*))i_PTR2DESTROY_,(void*(*)(void*))i_PTR2COPY_)
+        #define rfArrayP_Create(i_TYPE_, i_SIZE_, i_PTR2DESTROY_, i_PTR2COPY_) \
+        i_rfArrayP_Create(i_SIZE_,\
+                          (void(*)(void*))i_PTR2DESTROY_,\
+                          (void*(*)(void*))i_PTR2COPY_)
     #endif
 #endif
 
@@ -338,44 +446,81 @@ i_DECLIMEX_ RF_ArrayP* i_rfArrayP_Create(uint32_t size,void (*ptr2Destroy)(void*
  ** @brief Initialises an array of pointers to objects
  **
  ** @param arr The array to initialize
- ** @param objectType Give the type of the object you want stored in the array. For example if you want strings give @c RF_String
+ ** @param objectType Give the type of the object you want stored in the
+ ** array. For example if you want strings give @c RF_String
  ** @param size The number of pointers to allocate for the Array
- ** @param ptr2Destroy \rfoptional{The object's destruction function} A pointer to the destruction function for the elements stored inside the list.
- ** Used for object deletion. Can also be @c 0 which means no destruction of objects will happen. They will simply be removed
- ** from the list of pointers. This argument can only be omitted for objects of the refu library. If omitted then the appropriate
- ** @c objectType_Destroy() function will be called. If you are making a list of non Refu object and omit this argument
- ** it will lead to a compilation error.
- ** @param ptr2Copy \rfoptional{The object's Copy_OUT function} A pointer to the copying function for the objects stored inside the list. It is used for copying the
- ** List and also making copies of the objects themselves.  Can also be @c 0 which means that at List copying the copied
- ** list contains a blind data buffer copy of the to copy list. Can be dangerous for any type of stored object
- ** that stores data on the heap. It is recommended to always provide a copy function.
- ** This function must be in the form of all the functions of the library that return an allocated copy of an object
- ** from a destination of the same object type. For reference look at @ref rfString_Copy_OUT() or rfListV_Copy_OUT()
- ** For storing objects of the Refu library this argument can be omitted and will be given a pointer
- ** to the object's @c objectType_Copy_OUT() function. If you are making a list of non Refu object and omit this argument
+ ** @param ptr2Destroy \rfoptional{The object's destruction function} A 
+ ** pointer to the destruction function for the elements stored inside
+ ** the list.
+ ** Used for object deletion. Can also be @c 0 which means no destruction
+ **  of objects will happen. They will simply be removed
+ ** from the list of pointers. This argument can only be omitted for
+ ** objects of the refu library. If omitted then the appropriate
+ ** @c objectType_Destroy() function will be called. If you are making a
+ ** list of non Refu object and omit this argument it will lead to a
+ ** compilation error.
+ ** @param ptr2Copy \rfoptional{The object's Copy_OUT function} A pointer
+ ** to the copying function for the objects stored inside the list. It is
+ ** used for copying the List and also making copies of the objects
+ ** themselves.  Can also be @c 0 which means that at List copying the
+ ** copied list contains a blind data buffer copy of the to copy list.
+ ** Can be dangerous for any type of stored object that stores data on the
+ ** heap. It is recommended to always provide a copy function.
+ ** This function must be in the form of all the functions of the library
+ ** that return an allocated copy of an object
+ ** from a destination of the same object type. For reference look at
+ ** @ref rfString_Copy_OUT() or rfListV_Copy_OUT()
+ ** For storing objects of the Refu library this argument can be omitted
+ ** and will be given a pointer
+ ** to the object's @c objectType_Copy_OUT() function. If you are making
+ ** a list of non Refu object and omit this argument
  ** it will lead to a compilation error.
  ** @return True for success or false if the object size was 0
  **
  **/
 #ifdef  RF_IAMHERE_FOR_DOXYGEN
-i_DECLIMEX_ char rfArrayP_Init(RF_ArrayP* arr,Type objectType,uint32_t size,void (*ptr2Destroy)(void*),void* (*ptr2Copy)(void*));
+i_DECLIMEX_ char rfArrayP_Init(RF_ArrayP* arr, Type objectType,
+                               uint32_t size, void (*ptr2Destroy)(void*),
+                               void* (*ptr2Copy)(void*));
 #else
-i_DECLIMEX_ char i_rfArrayP_Init(RF_ArrayP* arr,uint32_t size,void (*ptr2Destroy)(void*),void* (*ptr2Copy)(void*));
+i_DECLIMEX_ char i_rfArrayP_Init(RF_ArrayP* arr, uint32_t size,
+                                 void (*ptr2Destroy)(void*),
+                                 void* (*ptr2Copy)(void*));
     #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfArrayP_Init(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_ARRAYP_INIT,5,__VA_ARGS__)
-        #define i_NPSELECT_RF_ARRAYP_INIT1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfArrayP_Init() accepts from 3 to 5 arguments\"")
-        #define i_NPSELECT_RF_ARRAYP_INIT0(...) RF_SELECT_FUNC(i_SELECT_RF_ARRAYP_INIT,__VA_ARGS__)
-        #define i_SELECT_RF_ARRAYP_INIT5(i_ARR_,i_TYPE_,i_SIZE_,i_PTR2DESTROY_,i_PTR2COPY_) \
-            i_rfArrayP_Init(i_ARR_,i_SIZE_,(void(*)(void*))i_PTR2DESTROY_,(void*(*)(void*))i_PTR2COPY_)
-        #define i_SELECT_RF_ARRAYP_INIT4(i_ARR_,i_TYPE_,i_SIZE_,i_PTR2DESTROY_) \
-            i_rfArrayP_Init(i_ARR_,i_SIZE_,(void(*)(void*))i_PTR2DESTROY_,(void*(*)(void*))i_RF_GET_COPYOUT(i_TYPE_))
-        #define i_SELECT_RF_ARRAYP_INIT3(i_ARR_,i_TYPE_,i_SIZE_) \
-            i_rfArrayP_Init(i_ARR_,i_SIZE_,(void(*)(void*))i_RF_GET_DESTROY(i_TYPE_),(void*(*)(void*))i_RF_GET_COPYOUT(i_TYPE_))
-        #define i_SELECT_RF_ARRAYP_INIT2(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfArrayP_Init() accepts from 3 to 5 arguments\"")
-        #define i_SELECT_RF_ARRAYP_INIT1(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfArrayP_Init() accepts from 3 to 5 arguments\"")
-        #define i_SELECT_RF_ARRAYP_INIT0(...) RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfArrayP_Init() accepts from 3 to 5 arguments\"")
+        #define rfArrayP_Init(...) \
+        RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_ARRAYP_INIT, 5, __VA_ARGS__)
+        #define i_NPSELECT_RF_ARRAYP_INIT1(...) \
+        RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function \
+rfArrayP_Init() accepts from 3 to 5 arguments\"")
+        #define i_NPSELECT_RF_ARRAYP_INIT0(...) \
+        RF_SELECT_FUNC(i_SELECT_RF_ARRAYP_INIT,__VA_ARGS__)
+        #define i_SELECT_RF_ARRAYP_INIT5(i_ARR_, i_TYPE_, i_SIZE_, i_PTR2DESTROY_, i_PTR2COPY_) \
+        i_rfArrayP_Init(i_ARR_,\
+                        i_SIZE_,\
+                        (void(*)(void*))i_PTR2DESTROY_,\
+                        (void*(*)(void*))i_PTR2COPY_)
+        #define i_SELECT_RF_ARRAYP_INIT4(i_ARR_, i_TYPE_, i_SIZE_, i_PTR2DESTROY_) \
+        i_rfArrayP_Init(i_ARR_,\
+                        i_SIZE_,\
+                        (void(*)(void*))i_PTR2DESTROY_,\
+                        (void*(*)(void*))i_RF_GET_COPYOUT(i_TYPE_))
+        #define i_SELECT_RF_ARRAYP_INIT3(i_ARR_, i_TYPE_, i_SIZE_) \
+        i_rfArrayP_Init(i_ARR_,\
+                        i_SIZE_,\
+                        (void(*)(void*))i_RF_GET_DESTROY(i_TYPE_),\
+                        (void*(*)(void*))i_RF_GET_COPYOUT(i_TYPE_))
+        #define i_SELECT_RF_ARRAYP_INIT2(...) \
+        RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfArrayP_Init() accepts from 3 to 5 arguments\"")
+        #define i_SELECT_RF_ARRAYP_INIT1(...) \
+        RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfArrayP_Init() accepts from 3 to 5 arguments\"")
+        #define i_SELECT_RF_ARRAYP_INIT0(...) \
+        RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function rfArrayP_Init() accepts from 3 to 5 arguments\"")
     #else
-        #define rfArrayP_Init(i_ARR_,i_TYPE_,i_SIZE_,i_PTR2DESTROY_,i_PTR2COPY_) i_rfArrayP_Init(i_ARR_,i_SIZE_,(void(*)(void*))i_PTR2DESTROY_,(void*(*)(void*))i_PTR2COPY_)
+        #define rfArrayP_Init(i_ARR_, i_TYPE_, i_SIZE_, i_PTR2DESTROY_, i_PTR2COPY_) \
+        i_rfArrayP_Init(i_ARR_,\
+                        i_SIZE_,\
+                        (void(*)(void*))i_PTR2DESTROY_,\
+                        (void*(*)(void*))i_PTR2COPY_)
     #endif
 #endif
 

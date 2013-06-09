@@ -36,9 +36,10 @@
 ** Functions to set, remove and retrieve
 ** objects from the array exist.
 **
-** Normal usage is to set an initial size of the array and then set which objects you want.
-** If there is a need to increase/decrease the size of the array there is a reallocation method but
-** has to be called explicitly. For a data structure that does all these dynamically look
+** Normal usage is to set an initial size of the array and then set which 
+** objects you want. If there is a need to increase/decrease the size of the
+** array there is a reallocation method but has to be called explicitly. For
+** a data structure that does all these dynamically look
 ** at RF_ListP and RF_ListV
 **
 ** To store an array of pointers use the #RF_ArrayP structure
@@ -71,12 +72,14 @@ typedef struct RF_ArrayV
 ** Functions to set, remove and retrieve
 ** pointers from the array exist.
 **
-** Normal usage is to set an initial size of the array and then set which pointers you want.
-** If there is a need to increase/decrease the size of the array there is a reallocation method but
-** has to be called explicitly. For a data structure that does all these dynamically look
-** at RF_ListP and RF_ListV
+** Normal usage is to set an initial size of the array and then set which
+** pointers you want. If there is a need to increase/decrease the size of
+** the array there is a reallocation method but has to be called explicitly.
+** For a data structure that does all these dynamically look at RF_ListP
+** and RF_ListV
 **
-** @note To store an array of objects and not pointers use the #RF_ArrayV structure
+** @note To store an array of objects and not pointers use the #RF_ArrayV
+** structure
 **/
 typedef struct RF_ArrayP
 {

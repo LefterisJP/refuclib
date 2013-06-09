@@ -1,22 +1,32 @@
 import os
 import platform
 import sys
-
+import fnmatch
 
 SConscript('scripts/sconsdata/compilers.py')
 SConscript('scripts/sconsdata/modules.py')
 
 
-from scripts.sconsdata.modules import modules,sources
+from scripts.sconsdata.modules import setup_modules
 from scripts.sconsdata.compilers import compilers, setupCompiler
 from scripts.sconsdata.configvariables import setupConfigVars
+from scripts.sconsdata.cleanup import clean_generated_files
 
 
 configFileName = 0;
+
 sourceDir = 'src'
+
 targetSystem = platform.system()
+
 allowedCompilers = ['gcc', 'tcc', 'msvc']
-legalBuildTargets = ['shared', 'static', 'test_shared','test_static','test']
+
+legalBuildTargets = [
+    'shared',
+    'static',
+    'test_shared',
+    'test_static',
+    'test']
 
 # Create an intermediate environment to read the variables ( I don't know 
 # of any other way to read the variables sort of writing a separate 
@@ -39,22 +49,8 @@ env.Append(CCFLAGS 		= temp['COMPILER_FLAGS'])
 env.Append(LINKFLAGS	= temp['LINKER_SHARED_FLAGS'])
 
 
-# now depending on each of the given modules set the compiled sources,
-# defines and compile-time flags
-if 'ALL' not in temp['REFU_MODULES']:
-    # add the core modules 
-    if 'CORE' not in temp['REFU_MODULES']:
-            temp['REFU_MODULES'].append('CORE')
-    if 'SYSTEM' not in temp['REFU_MODULES']:
-            temp['REFU_MODULES'].append('SYSTEM')
-    #make a copy of the dependencies
-    deps = temp['REFU_MODULES'][:]
-    for mod in modules:
-        if mod.name in temp['REFU_MODULES']:
-            mod.add(sources, env, targetSystem, deps)
-else:  # all modules requested
-    for mod in modules:
-        mod.simple_add(sources, env, targetSystem)
+#setup the modules
+(modules, sources) = setup_modules(temp, env, targetSystem)
 
 #setup the variables of the configuration file
 setupConfigVars(temp,env)
@@ -78,9 +74,10 @@ sources = [temp['OBJ_DIR']+'/'+s for s in sources]
 # -- From here and on check build targets
 #Check if there is no build target given
 if len(COMMAND_LINE_TARGETS) == 0:
-    print "**MESSAGE** No build target was specified so the Refu SCons "
-    "Building script has nothing to build. Please specify one of the legal"
-    " build targets \'shared\' and \'static\' via command line"
+    print ("**MESSAGE** No build target was specified so the Refu SCons "
+           "Building script has nothing to build. Please specify one of"
+           "the legal build targets \'shared\' and \'static\' "
+           "via command line")
 
 #Check if there is an illegal build target given
 for givenTarget in COMMAND_LINE_TARGETS:
@@ -89,6 +86,12 @@ for givenTarget in COMMAND_LINE_TARGETS:
         "target for Refu Library. Quitting Build Script"
         " ...".format(givenTarget)
         Exit(-1)
+
+
+
+#If clean is specified make sure that we delete all of the generated files
+if env.GetOption('clean'):
+    clean_generated_files(temp['REFU_DIR'])
 
 # -- Test non-library build --
 # compiles only the test file under src/main.c

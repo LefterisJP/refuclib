@@ -28,11 +28,13 @@
 #include "rf_xmacro_argcount.h"
 
 //===The macros here help determine the fun start of each object of the refu library===//
-//Later, when a preprocessor for Refu exists, these will automatically be created by following the naming convention
+//If ever, a preprocessor for Refu exists, these will automatically be created by following the naming convention
 //so that they can be determined for any type of object
-#define i_RF_GETTYPE_FUNCSTART(i_REFU_TYPE)  i_RP_PASTE3(i_TYPE_,i_REFU_TYPE,_FUNCSTART_)
+#define i_RF_GETTYPE_FUNCSTART(i_REFU_TYPE) \
+    i_RP_PASTE3(i_TYPE_,i_REFU_TYPE,_FUNCSTART_)
 #define i_TYPE_RF_StringX_FUNCSTART_   rfStringX
 #define i_TYPE_RF_String_FUNCSTART_   rfString
+#define i_TYPE_RF_LinkedList_FUNCSTART_ rfLinkedList
 #define i_TYPE_RF_ListV_FUNCSTART_   rfListV
 #define i_TYPE_RF_ListP_FUNCSTART_   rfListP
 #define i_TYPE_RF_ArrayP_FUNCSTART_   rfArrayP
@@ -58,6 +60,7 @@
 #define i_NCRF_GET_COPYIN(i_FUNC_START_)   i_RP_PASTE2(i_FUNC_START_,_Copy_IN)
 #define i_RF_GET_COPYOUT(i_REFU_TYPE)   i_NCRF_GET_COPYOUT(i_RF_GETTYPE_FUNCSTART(i_REFU_TYPE))
 #define i_NCRF_GET_COPYOUT(i_FUNC_START_)   i_RP_PASTE2(i_FUNC_START_,_Copy_OUT)
-
+#define i_RF_GET_EQUAL(i_REFU_TYPE) i_NCRF_GET_EQUAL(i_RF_GETTYPE_FUNCSTART(i_REFU_TYPE))
+#define i_NCRF_GET_EQUAL(i_FUNC_START_) i_RP_PASTE2(i_FUNC_START_, _Equal)
 
 #endif//include guards end

@@ -116,7 +116,7 @@ enum {
         RE_ARRAY_UNINITIALIZED_POINTER,//Uninitialized array pointer requested
         RE_FUNCGROUP_INIT_FAILURE,//Failure at the initialization of a function group
         RE_FUNCGROUP_ADD_FAILURE,//Failure at adding an element in a function group
-
+        RE_LINKEDLIST_INIT_FAILURE, //Failure to initialize a linked list
         /* Math Errors */
         RE_MATH_RANDOM_BETWEEN_RANGE,//Error for when using a call to random numbers in a range with the max being smaller than the min
 

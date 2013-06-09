@@ -42,11 +42,18 @@ vars.Add(ListVariable('REFU_MODULES', 'The modules that you want to build of ref
 ['ALL',
 'STRING',
 'IO', 'TEXTFILE',
-'DATA_STRUCTURES', 'LIST', 'ARRAY', 'BINARY_ARRAY',
+'DATA_STRUCTURES', 'LIST', 'ARRAY', 'BINARY_ARRAY', 'LINKED_LIST',
 'TIME', 'DATE',
 'XML',
 'THREADS', 'THREADS_SIMPLE', 'THREADS_X',
 'SYSTEM']
+))
+
+vars.Add(ListVariable('LINKED_LIST', 'These are options specific to'
+                      'the linked list module. They specify what types of'
+                      'linked lists to create', 
+                      [],
+                      ['I', 'UI', 'I32']
 ))
 
 vars.Add('DEBUG', "This option determines if this will be a Debug Build (0"

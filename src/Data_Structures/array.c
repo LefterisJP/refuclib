@@ -46,17 +46,21 @@
 //*----------------------------End of Includes------------------------------------------
 
 // Allocates and returns an array of objects
-RF_ArrayV*  i_rfArrayV_Create(uint32_t elSize,uint32_t size,void (*ptr2Destroy)(void*),void (*ptr2Copy)(void*,void*))
+RF_ArrayV*  i_rfArrayV_Create(uint32_t elSize,
+                              uint32_t size,
+                              void (*ptr2Destroy)(void*),
+                              void (*ptr2Copy)(void*, void*))
 {
     RF_ArrayV* ret;
     //if the given size is 0
     if(elSize == 0)
     {
-        LOG_ERROR("Tried to create an array of objects with zero sized elements",RE_ARRAY_INIT_FAILURE);
+        LOG_ERROR("Tried to create an array of objects with zero sized "
+                  "elements",RE_ARRAY_INIT_FAILURE);
         return 0;
     }
     //allocate the new array
-    RF_MALLOC(ret,sizeof(RF_ArrayV))
+    RF_MALLOC(ret, sizeof(RF_ArrayV))
     //allocate the data buffer
     ret->elementSize = elSize;
     ret->size = size;

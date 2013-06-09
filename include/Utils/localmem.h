@@ -103,6 +103,21 @@ i_DECLIMEX_ void rfLMS_Pop(uint64_t t);
 i_DECLIMEX_ void rfLMS_ArgsEval();
 
 
+//functions to declare create old value data types on the local stack
+//and pass them as parameters to functions which can accept them
+i_DECLIMEX_ int* RFI_(int d);
+i_DECLIMEX_ unsigned int* RFUI_(unsigned int d);
+i_DECLIMEX_ int8_t* RFI8_(int8_t d);
+i_DECLIMEX_ uint8_t* RFUI8_(uint8_t d);
+i_DECLIMEX_ int16_t* RFI16_(int16_t d);
+i_DECLIMEX_ uint16_t* RFUI16_(uint16_t d);
+i_DECLIMEX_ int32_t* RFI32_(int32_t d);
+i_DECLIMEX_ uint32_t* RFUI32_(uint32_t d);
+i_DECLIMEX_ int64_t* RFI64_(int64_t d);
+i_DECLIMEX_ uint64_t* RFUI64_(uint64_t d);
+i_DECLIMEX_ float* RFFLOAT_(float d);
+i_DECLIMEX_ double* RFDOUBLE_(double d);
+
 #ifdef __cplusplus
 } //closing bracket for C++ calling
 #endif
