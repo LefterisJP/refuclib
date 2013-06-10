@@ -49,6 +49,7 @@
 #include <string.h> //for memcpy and memcp
 //*----------------------------End of Includes------------------------------------------
 
+/* @mutate rmi FUNCNAME */
 RF_LinkedList*  i_rfLinkedList_Create(
     /* @omit start */
     uint32_t elSize,
@@ -81,6 +82,8 @@ RF_LinkedList*  i_rfLinkedList_Create(
     /* @omit end */
     return ret;
 }
+
+/* @mutate rmi FUNCNAME */
 char  i_rfLinkedList_Init(
     RF_LinkedList* l
     /* @omit start */

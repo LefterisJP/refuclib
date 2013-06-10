@@ -59,7 +59,7 @@ def code_gen(name, parent_dir, root, type_d, name_subs):
 def check_line_for_name_sub(line, subs, type_d):
     for s in subs:
         if s in line:
-            return line.replace(s, s + type_d)
+            line = line.replace(s, s + type_d)
     return line
 
 def get_func2_args(line, func_name):
@@ -82,7 +82,13 @@ def handle_ASSIGN(line, mutate_from, type_d, file_name):
         (arg1, arg2) = get_func2_args(line, mutate_from)
         return "{} = {};\n".format(arg1, arg2)
     else:
-        raise MutateSourcerror(mutate_from, file_name)
+        raise MutateSourcError(mutate_from, file_name)
+
+def handle_FUNCNAME(line, mutate_from, type_d, file_name):
+    if mutate_from == "rmi":
+        return line.replace("i_rf", "rf")
+    else:
+        raise MutateSourcError(mutate_from, file_name)
 
 def handle_TYPE(line, mutate_from, type_d, file_name):
     return line.replace(mutate_from, type_dict[type_d])
@@ -95,7 +101,8 @@ def handle_mutate(mutate_to ,mutate_from, type_d, line, name):
 handle_dict = {
     "TYPE": handle_TYPE,
     "ASSIGN": handle_ASSIGN,
-    "COMPARE": handle_COMPARE
+    "COMPARE": handle_COMPARE,
+    "FUNCNAME": handle_FUNCNAME,
 };
 
 def gen_single_source(name, newName, type_d, name_subs):

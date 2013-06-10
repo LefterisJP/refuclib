@@ -7,15 +7,16 @@
 
 int ints[10] = {20, 30, 14, 1, 5, 4, 23, 221, 2314, 2105};
 int ints_adel[7] = {20, 14, 5, 4, 23, 221, 2314};
+
 //a function to iterate through a linked list checking its int data
-void iterate_ll_ints(RF_LinkedList* l, int* arr)
+void iterate_ll_ints(RF_LinkedListI* l, int* arr)
 {
-    int* d;
+    int d;
     int i = 0;
-    RF_LINKEDLIST_ITERATE_START(l, d)
-    EXPECT(arr[i], *d)
+    RF_LINKEDLISTI_ITERATE_START(l, d)
+    EXPECT(arr[i], d)
     i++;
-    RF_LINKEDLIST_ITERATE_END()
+    RF_LINKEDLISTI_ITERATE_END()
 }
 
 
@@ -60,36 +61,36 @@ void iterate_ll_stringsdel(RF_LinkedList* l)
 
 int main()
 {
-    RF_LinkedList l1, *l2, l3;
+    RF_LinkedListI l1;
+    RF_LinkedList *l2, l3;
     RF_String s;
     int i;
     rfInit();
 
     //simple test of adding 10 ints to a linked list and then iterating
     //through them
-    /* EXPECT(rfLinkedList_Init(&l1, int, 0, 0, 0), true) */
-    /* for(i = 0; i < 10; i++) */
-    /*     EXPECT(rfLinkedList_Add(&l1, &ints[i]), true) */
-    /* iterate_ll_ints(&l1, ints); */
+    EXPECT(rfLinkedListI_Init(&l1), true)
+    for(i = 0; i < 10; i++)
+        EXPECT(rfLinkedListI_Add(&l1, ints[i]), true)
+    iterate_ll_ints(&l1, ints);
     
-    /* EXPECT(rfLinkedList_Has(&l1, RFI_(1)), true) */
-    /* //now let's delete 3 ints */
-    /* EXPECT(rfLinkedList_Delete(&l1, RFI_(1)), true) */
-    /* EXPECT(rfLinkedList_Delete(&l1, RFI_(2105)), true) */
-    /* EXPECT(rfLinkedList_Delete(&l1, RFI_(30)), true)     */
+    EXPECT(rfLinkedListI_Has(&l1, 1), true)
+    //now let's delete 3 ints
+    EXPECT(rfLinkedListI_Delete(&l1, 1), true)
+    EXPECT(rfLinkedListI_Delete(&l1, 2105), true)
+    EXPECT(rfLinkedListI_Delete(&l1, 30), true)
 
-    /* //1 should not be there now */
-    /* EXPECT(rfLinkedList_Has(&l1, RFI_(1)), false) */
+    //1 should not be there now
+    EXPECT(rfLinkedListI_Has(&l1, 1), false)
 
-    /* //try to delete an int that is not in the linked list */
-    /* EXPECT(rfLinkedList_Delete(&l1, RFI_(543)), false) */
+    //try to delete an int that is not in the linked list
+    EXPECT(rfLinkedListI_Delete(&l1, 543), false)
 
-    /* //check to see if we have what we expect after deletion */
-    /* iterate_ll_ints(&l1, ints_adel); */
+    //check to see if we have what we expect after deletion
+    iterate_ll_ints(&l1, ints_adel);
 
     //let's make a linked list of strings, destruction and construction
     //function should be automatically figured out
-
 
     l2 = rfLinkedList_Create(RF_String,
                              rfString_Deinit,

@@ -37,7 +37,8 @@ def findOutput(dynamic):
 def compileLib(verbose,dynamic,compiler):
     """Compile the refu library by invoking the appropriate refu builder
         --verbose: A boolean flag denoting if the output should be verbose
-        --dynamic: A boolean flag denoting whether a dynamic or a static library should be built
+        --dynamic: A boolean flag denoting whether a dynamic or a static
+                   library should be built
         --compiler: The compiler name. Can be one of ['gcc', 'tcc', 'msvc']
         
         Returns the output name produced by compiling the library
@@ -45,21 +46,29 @@ def compileLib(verbose,dynamic,compiler):
     #first of all clean the related directories
     cleanDir(".")
 
-    if(dynamic):
+    if dynamic:
         print("--Compiling a dynamic version of the Refu library--")
-        arg="shared"
+        arg = "shared"
     else:
         print("--Compiling a static version of the Refu library--")
-        arg="static"
+        arg = "static"
     
-    if(platform.system()=='Windows'):
-        sconsCall = ['scons.py',arg,'COMPILER='+compiler]
+    # for now we give here all the options to generate extra sources that
+    # all the tests need. In the future if the library compiles again for
+    # each module tested this will need to change
+    extra_source_opts = "LINKED_LIST=I"
+
+    if platform.system() == 'Windows':
+        sconsCall = ['scons.py', arg, 'COMPILER='+compiler,
+                     extra_source_opts]
     else:
-        sconsCall = sys.executable+" scons.py "+arg+" COMPILER="+compiler
+        sconsCall = "{} scons.py {} COMPILER={} {}".format(
+            sys.executable, arg, compiler, extra_source_opts)
+
     #call scons to build the library
     try:
-        #p = subprocess.Popen([sconsCall, arg,'--compiler='+compiler],cwd="..",shell=True,stdout=subprocess.PIPE)
-        p = subprocess.Popen(sconsCall,cwd="..",shell=True,stdout=subprocess.PIPE)
+        p = subprocess.Popen(sconsCall, cwd="..", shell=True,
+                             stdout=subprocess.PIPE)
         if(verbose):
             print("\n\t==Scons Output Starts==\n")
             for line in p.stdout:

@@ -85,6 +85,7 @@ RF_LinkedList* rfLinkedList_Create(Type objectType,
 );
 #else
 /* @omit end */
+/* @mutate rmi FUNCNAME */
 i_DECLIMEX_ RF_LinkedList*  i_rfLinkedList_Create(
 /* @omit start */
     uint32_t elSize,
@@ -177,6 +178,7 @@ char  rfLinkedList_Init(RF_LinkedList* l,
 );
 #else
 /* @omit end */
+/* @mutate rmi FUNCNAME */
 i_DECLIMEX_ char  i_rfLinkedList_Init(
     RF_LinkedList* l
 /* @omit start */

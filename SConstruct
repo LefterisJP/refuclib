@@ -49,8 +49,13 @@ env.Append(CCFLAGS 		= temp['COMPILER_FLAGS'])
 env.Append(LINKFLAGS	= temp['LINKER_SHARED_FLAGS'])
 
 
-#setup the modules
-(modules, sources) = setup_modules(temp, env, targetSystem)
+#TODO: Fix the "only if actually building sections" that are here to differentiate
+# when building the library and when building the tests. 
+# Find a nice and clean way to have those separate and not affecting one another
+
+#only if actually building setup the required modules
+if 'shared' in COMMAND_LINE_TARGETS or 'static' in COMMAND_LINE_TARGETS:
+    (modules, sources) = setup_modules(temp, env, targetSystem)
 
 #setup the variables of the configuration file
 setupConfigVars(temp,env)
@@ -59,15 +64,19 @@ setupConfigVars(temp,env)
 compiler = temp['COMPILER']
 systemAttributes = SConscript('scripts/systemcheck/systemcheck.py',
                               exports = 'compiler')
-#create the options file
-SConscript('scripts/sconsdata/options.py',
-           exports = 'modules env targetSystem systemAttributes')
+#only if actually building create the options file
+if 'shared' in COMMAND_LINE_TARGETS or 'static' in COMMAND_LINE_TARGETS:
+    SConscript('scripts/sconsdata/options.py',
+               exports = 'modules env targetSystem systemAttributes')
 
 outName = temp['OUTPUT_NAME']
-env.VariantDir(temp['OBJ_DIR'], sourceDir, duplicate=0)
-#a list comprehension prepending the obj dir to all of the sources 
-# (instead of the sourcedir) ... Scons peculiarity 
-sources = [temp['OBJ_DIR']+'/'+s for s in sources]
+
+#only if actually building set the obj dir and prepend obj dir to all sources
+if 'shared' in COMMAND_LINE_TARGETS or 'static' in COMMAND_LINE_TARGETS:
+    env.VariantDir(temp['OBJ_DIR'], sourceDir, duplicate=0)
+    #a list comprehension prepending the obj dir to all of the sources 
+    # (instead of the sourcedir) ... Scons peculiarity 
+    sources = [temp['OBJ_DIR']+'/'+s for s in sources]
 
 
 
