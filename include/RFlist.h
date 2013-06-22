@@ -25,14 +25,18 @@
 #define RF_LIST_MODULE_HEADERS
 
 #include <rf_options.h>
-#ifdef RF_MODULE_DS_LIST //module check
+#ifdef RF_MODULE_LIST // module check
 
 #include <Definitions/imex.h> //for import export macro
 #include <Definitions/types.h> //for fixed size data types
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <Preprocessor/rf_tokens.h>//for the defined library tokens
-#include <Data_Structures/list_decl.h> //for RF_ListP and RF_ListV
+#include <Data_Structures/list_decl.h>
 #include <Data_Structures/list.h>
+
+#ifdef RF_MODULE_LIST_EXTRA
+#include <Data_Structures/list_extra.h>
+#endif
 
 #else
     #error Attempted to include RF_List while not having compiled the library with the appropriate module activated

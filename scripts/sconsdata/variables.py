@@ -1,4 +1,5 @@
 import os
+from code_gen import type_dict
 # -- Get the user provided options --
 
 Import('allowedCompilers')
@@ -49,11 +50,11 @@ vars.Add(ListVariable('REFU_MODULES', 'The modules that you want to build of ref
 'SYSTEM']
 ))
 
-vars.Add(ListVariable('LINKED_LIST', 'These are options specific to'
+vars.Add(ListVariable('LIST', 'These are options specific to'
                       'the linked list module. They specify what types of'
                       'linked lists to create', 
                       [],
-                      ['I', 'UI', 'I32']
+                      type_dict
 ))
 
 vars.Add('DEBUG', "This option determines if this will be a Debug Build (0"
@@ -71,7 +72,7 @@ vars.Add('FGETS_READ_BYTESN', 'This option is the number of bytes that will be r
 
 vars.Add('STRINGX_CAPACITY_MULTIPLIER', 'This is the multiplier by which a StringX\'s buffer will get allocated/reallocated by when there is a need for buffer extension. Also when the StringX gets initialized this is how much bigger than the given String the buffer will be. Must be a positive integer. Default is 2', 2)
 
-vars.Add('LIST_CAPACITY_MULTIPLIER', 'This is the multiplier by which a List\'s buffer will get allocated/reallocated by when there is a need for buffer extension. Also when the List gets initialized this is how much bigger than the given initial size the buffer will be. Must be a positive integer. Default is 2', 2)
+vars.Add('DYNAMICARRAY_CAPACITY_MULTIPLIER', 'This is the multiplier by which a Dynamic array\'s buffer will get allocated/reallocated by when there is a need for buffer extension. Also when the List gets initialized this is how much bigger than the given initial size the buffer will be. Must be a positive integer. Default is 2', 2)
 
 vars.Add('LOCAL_STACK_SIZE', 'This is the default size in bytes of the main thread\'s Local Stack of the Refu Library. All objects that are initialized as temporary objects such as with the  RFS_() macro or the RFXML_() macro are initialized in this stack. Make sure to provide a big enough value so that no overflow happens for your program. Default Value is around 1 MB. This is just the value to be used if no specific value is provided at rfInit()', 1048576)
 

@@ -21,25 +21,25 @@
 **      ==END OF REFU LICENSE==
 **
 */
-#ifndef RF_LINKED_LIST_MODULE_HEADERS
-#define RF_LINKED_LIST_MODULE_HEADERS
+#ifndef RF_DYNAMICARRAY_MODULE_HEADERS
+#define RF_DYNAMICARRAY_MODULE_HEADERS
 
 #include <rf_options.h>
-#ifdef RF_MODULE_DS_LINKED_LIST // Array data structure module check
+#ifdef RF_MODULE_DYNAMICARRAY //module check
 
 #include <Definitions/imex.h> //for import export macro
 #include <Definitions/types.h> //for fixed size data types
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <Preprocessor/rf_tokens.h>//for the defined library tokens
-#include <Data_Structures/linkedlist_decl.h>
-#include <Data_Structures/linkedlist.h>
+#include <Data_Structures/dynamicarray_decl.h>
+#include <Data_Structures/dynamicarray.h>
 
-#ifdef RF_MODULE_DS_LINKED_LIST_EXTRA
-#include <Data_Structures/linkedlist_extra.h>
+#ifdef RF_MODULE_DYNAMICARRAY_EXTRA
+#include <Data_Structures/dynamicarray_extra.h>
 #endif
 
 #else
-    #error Attempted to include RF_LinkedList while not having compiled the library with the appropriate module activated
+    #error Attempted to include RF_DynamicArray while not having compiled the library with the appropriate module activated
 #endif
 
 #endif//include guards end

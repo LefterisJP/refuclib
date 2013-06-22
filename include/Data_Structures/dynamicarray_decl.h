@@ -21,33 +21,48 @@
 **      ==END OF REFU LICENSE==
 **
 */
-#ifndef RF_LINKEDLIST_DECL_H
-#define RF_LINKEDLIST_DECL_H
+#ifndef RF_DYNAMICARRAY_DECL_H
+#define RF_DYNAMICARRAY_DECL_H
 
 
-typedef struct RF_LL_Node
+
+/**
+ ** @internal
+ ** @author Lefteris
+ ** @date 10/07/2011
+ ** @endinternal
+ ** @brief An array of objects that can grow on demand
+ **
+ ** Functions to add, remove and retrieve
+ ** object from the list exist.
+ **
+ ** Normal usage is to set an initial capacity of the list and then whenever
+ ** more objects are added the capacity gets increased if it goes over the
+ ** buffer and it also gets decreased if many objects are removed.
+ ** So this is a datastructure to use if you need something that adjusts its
+ ** size when needed.
+ **
+ **/
+typedef struct RF_DynamicArray
 {
-    struct RF_LL_Node* next;
-    /* @mutate void* TYPE */
+    //! The current buffer capacity in bytes
+    uint32_t bufferCapacity;
+    //! The size of the array in elements (how many elements are actually 
+    //! occupying the array right now). So the next element will go to
+    // index = size
+    uint32_t size;
+
+    /* @mutate void* TYPEPTR */
     void* data;
-}RF_LL_Node;
-
-typedef struct RF_LinkedList
-{
-    //! The first node of the linked list
-    struct RF_LL_Node* start;
-    //! The last node of the linked list
-    struct RF_LL_Node* end;
     /* @omit start */
     //! An element's size
-    uint32_t element_size;
-    //! The destruction function for the elements of the list
+    uint32_t elementSize;
+    //! A Function pointer for the destruction of the objects
     void (*ptr2Destroy)(void*);
-    //! The copy function for the elements of the list
-    void (*ptr2Copy)(void*, void*);
-    //! The equality function for the elements of the list
-    char (*ptr2Equal)(void*, void*);
+    //! A Function pointer for the copying of the objects
+    void (*ptr2Copy)(void*,void*);
     /* @omit end */
-}RF_LinkedList;
+}RF_DynamicArray;
+
 
 #endif//include guards end

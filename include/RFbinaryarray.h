@@ -25,7 +25,7 @@
 #define RF_BINARYARRAY_MODULE_HEADERS
 
 #include <rf_options.h>
-#ifdef RF_MODULE_DS_BARRAY//Binarry array module check
+#ifdef RF_MODULE_BINARYARRAY//Binarry array module check
 
 #include <Definitions/imex.h> //for import export macro
 #include <Definitions/types.h>//for fixed size data types

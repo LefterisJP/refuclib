@@ -173,11 +173,11 @@ Module("LIST",
 ['Data_Structures/list.c'],
 macro = "RF_MODULE_LIST",
 has_template = "LIST",
-gen_name_sub = ["RF_LNode",
+gen_name_sub = ["RF_L_Node",
                 "RF_List",
                 "rfList",
                 "RF_LIST",
-                "list"
+                "list" #this last one is for the header includes
                ]
 ))
 

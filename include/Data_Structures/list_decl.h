@@ -25,75 +25,29 @@
 #define RF_LIST_DECL_H
 
 
-
-/**
-** @internal
-** @author Lefteris
-** @date 10/07/2011
-** @endinternal
-** @brief A List of  objects (not pointers) of any DATA type that can be created dynamically
-**
-** Functions to add, remove and retrieve
-** object from the list exist.
-**
-** Normal usage is to set an initial capacity of the list and then whenever more objects
-** are added the capacity gets increased if it goes over the buffer and it also gets decreased if
-** many objects are removed. So this is a datastructure to use if you need something that grows bigger
-** and/or shrinks when needed. For a well managed but immutable(should not change its size dynamically unless specified) data structure
-** take a look at @ref RF_ArrayV and @ref RF_ArrayP
-**
-** @note To store a list of pointers use the @ref RF_ListP structure
-**/
-typedef struct RF_ListV
+typedef struct RF_L_Node
 {
-    //! The data of the group for when we save values
+    struct RF_L_Node* next;
+    /* @mutate void* TYPE */
     void* data;
-    //! An element's size
-    uint32_t elementSize;
-    //! The current buffer capacity in bytes
-    uint32_t bufferCapacity;
-    //! The size of the list in elements (how many elements are actually occupying the list right now). So the next element will go to index = size
-    uint32_t size;
-    //! A Function pointer for the destruction of the objects
-    void (*ptr2Destroy)(void*);
-    //! A Function pointer for the copying of the objects
-    void (*ptr2Copy)(void*,void*);
-}RF_ListV;
+}RF_L_Node;
 
-
-/**
-** @internal
-** @author Lefteris
-** @date 10/07/2011
-** @endinternal
-** @brief A List of pointers to any object DATA type that can be created
-** dynamically
-**
-** Functions to add, remove and retrieve
-** object from the group exist. Only the pointers to the objects
-** are stored in this type of group.
-**
-** Normal usage is to set an initial capacity of the list and then whenever more objects
-** are added the capacity gets increased if it goes over the buffer and it also gets decreased if
-** many objects are removed. So this is a datastructure to use if you need something that grows bigger
-** and/or shrinks when needed. For a well managed but immutable(should not change its size dynamically unless specified) data structure
-** take a look at @ref RF_ArrayV and @ref RF_ArrayP
-**
-** @note To store a list of object and not pointers use the @ref RF_ListV structure
-**/
-typedef struct RF_ListP
+typedef struct RF_List
 {
-    //! The data of the group for when we save pointers
-    void** data;
-    //! The current buffer capacity in bytes
-    uint32_t bufferCapacity;
-    //! The size of the list in pointers (how many pointers are actually occupying the list right now). So the next pointer will go to index = size
-    uint32_t size;
-    //! A Function pointer for the destruction of the objects
+    //! The first node of the linked list
+    struct RF_L_Node* start;
+    //! The last node of the linked list
+    struct RF_L_Node* end;
+    /* @omit start */
+    //! An element's size
+    uint32_t element_size;
+    //! The destruction function for the elements of the list
     void (*ptr2Destroy)(void*);
-    //! A Function pointer for the copying of the objects
-    void* (*ptr2Copy)(void*);
-}RF_ListP;
-
+    //! The copy function for the elements of the list
+    void (*ptr2Copy)(void*, void*);
+    //! The equality function for the elements of the list
+    char (*ptr2Equal)(void*, void*);
+    /* @omit end */
+}RF_List;
 
 #endif//include guards end
