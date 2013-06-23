@@ -8,7 +8,8 @@ Import('allowedCompilers')
 def checkCompilerValue(key,value,environment):
     """A function to validate the compiler value"""
     if(value != None and value  not in allowedCompilers):
-        print "**ERROR** The given compiler name is not supported. Please provide one of the supported compiler values"
+        print("**ERROR** The given compiler name is not supported. Please "
+        "provide one of the supported compiler values")
         print " ,".join(allowedCompilers)
         Exit(-1)
     if(value == None):
@@ -16,11 +17,20 @@ def checkCompilerValue(key,value,environment):
         value = 'gcc'
     return True
 
-#Initialize the variables object
+# Initialize the variables object
 vars = Variables('refu.config')
-#Add Variable Options which don't have to do with the actual building of the library
-vars.Add(PathVariable('__TEST_SOURCE','This is a special option used when compiling a source file for the testing framework which denotes the name of that specific file', None,PathVariable.PathIsFile))
-vars.Add(BoolVariable('__TEST_BUILD','This is a special option which if passed to scons signifies that no library will be built but a program defined by main.c will be compiled. It\'s used to test the library manually. Default is false.',False))
+# Add Variable Options which don't have to do with the actual building of
+# the library
+vars.Add(
+    PathVariable('__TEST_SOURCE','This is a special option used when '
+                 'compiling a source file for the testing framework which '
+                 'denotes the name of that specific file', None,
+                 PathVariable.PathIsFile))
+vars.Add(
+    BoolVariable('__TEST_BUILD','This is a special option which if passed '
+                 'to scons signifies that no library will be built but a '
+                 'program defined by main.c will be compiled. It\'s used to'
+                 ' test the library manually. Default is false.', False))
 
 #Add All the variable options which have to do with the building of the library
 vars.Add('COMPILER', 'The compiler name. Allowed values are: gcc, tcc, msvc', 'gcc',checkCompilerValue)
@@ -43,19 +53,23 @@ vars.Add(ListVariable('REFU_MODULES', 'The modules that you want to build of ref
 ['ALL',
 'STRING',
 'IO', 'TEXTFILE',
-'DATA_STRUCTURES', 'LIST', 'ARRAY', 'BINARY_ARRAY', 'LINKED_LIST',
+'DATA_STRUCTURES', 'LIST', 'DYNAMIC_ARRAY', 'BINARY_ARRAY',
 'TIME', 'DATE',
 'XML',
 'THREADS', 'THREADS_SIMPLE', 'THREADS_X',
 'SYSTEM']
 ))
 
-vars.Add(ListVariable('LIST', 'These are options specific to'
-                      'the linked list module. They specify what types of'
-                      'linked lists to create', 
-                      [],
-                      type_dict
-))
+vars.Add(
+    ListVariable('LIST', 'These are options specific to the linked list '
+                 'module. They specify what types of linked lists to '
+                 'create', [], type_dict))
+
+vars.Add(
+    ListVariable('DYNAMIC_ARRAY',
+                 'These are options specific to the dynamic array '
+                 'module. They specify what types of dynamic arrays to '
+                 'create', [], type_dict))
 
 vars.Add('DEBUG', "This option determines if this will be a Debug Build (0"
          "or 1), and if more than 1 it can indicate a different debug level",

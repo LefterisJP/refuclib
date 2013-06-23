@@ -200,7 +200,7 @@ i_DECLIMEX_ void rfList_Deinit(RF_List* a);
  ** @param e A pointer to the element to add
  **
  **/
-/* @mutate void* TYPEPTR */
+/* @mutate void* TYPEPTR_OBJ_ONLY */
 i_DECLIMEX_ char rfList_Add(RF_List* a, void* e);
 
 /**
@@ -215,7 +215,7 @@ i_DECLIMEX_ char rfList_Add(RF_List* a, void* e);
  ** list and @c false otherwise
  **
  **/
-/* @mutate void* TYPEPTR */
+/* @mutate void* TYPEPTR_OBJ_ONLY */
 i_DECLIMEX_ char rfList_Delete(RF_List* a, void* e);
 
 
@@ -231,7 +231,7 @@ i_DECLIMEX_ char rfList_Delete(RF_List* a, void* e);
  ** @return Returns @c true if the element is found and false otherwise
  **
  **/
-/* @mutate void* TYPEPTR */
+/* @mutate void* TYPEPTR_OBJ_ONLY */
 i_DECLIMEX_ char rfList_Has(RF_List* a, void* ret);
 
 /**

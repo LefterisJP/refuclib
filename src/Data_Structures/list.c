@@ -231,7 +231,7 @@ void rfList_Deinit(RF_List* a)
     free(a->start);
 }
 
-/* @mutate void* TYPEPTR */
+/* @mutate void* TYPEPTR_OBJ_ONLY */
 char rfList_Add(RF_List* a, void* e)
 {
     RF_L_Node* n;
@@ -252,7 +252,7 @@ char rfList_Add(RF_List* a, void* e)
     return true;
 }
 
-/* @mutate void* TYPEPTR */
+/* @mutate void* TYPEPTR_OBJ_ONLY */
 char rfList_Delete(RF_List* a, void* e)
 {
     RF_L_Node* n = a->start->next;
@@ -292,7 +292,7 @@ char rfList_Delete(RF_List* a, void* e)
     return false;
 }
 
-/* @mutate void* TYPEPTR */
+/* @mutate void* TYPEPTR_OBJ_ONLY */
 char rfList_Has(RF_List* a, void* e)
 {
     RF_L_Node* n = a->start->next;

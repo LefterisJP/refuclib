@@ -129,8 +129,15 @@ def get_func1_args(line, func_name):
     """
        Returns the argument of an 1 argument function
     """
-    line = line.partition(func_name+"(")[2]
-    arg = line.partition(")")[0]
+    part = line.partition(func_name+"(")
+    #count how many open parentheses we had before
+    openP = part[0].count("(")
+    line = part[2]
+    #take only the relevant parenetheses part
+    arg = line
+    for i in range(openP):
+        arg = arg.rpartition(")")[0]
+    arg = arg.rpartition(")")[0]
     arg = arg.strip()
     return arg
 
@@ -138,10 +145,17 @@ def get_func2_args(line, func_name):
     """
        Returns a tuple with the arguments of a 2 arguments function
     """
-    line = line.partition(func_name+"(")[2]
+    part = line.partition(func_name+"(")
+    #count how many open parentheses we had before
+    openP = part[0].count("(")
+    line = part[2]
     part = line.partition(",")
     arg1 = part[0].strip()
-    arg2 = part[2].partition(")")[0]
+    #take only the relevant parenetheses part
+    arg2 = part[2]
+    for i in range(openP):
+        arg2 = arg2.rpartition(")")[0]
+    arg2 = arg2.rpartition(")")[0]
     arg2 = arg2.strip()
     return (arg1, arg2)
 
@@ -231,7 +245,19 @@ def handle_ASSIGN(line, mutate, type_d, file_name):
             else:
                 raise MutateSourceError(mutate[0], file_name, line)
         else:
-            return "{} = {};\n".format(arg1, arg2)
+            if "PODPTR" in mutate:
+                if mutate[0] == "ptr2Copypp":
+                    return "*({}) = *({});\n".format(arg1, arg2);
+                elif mutate[0] == "ptr2Copypr":
+                    return "*({}) = {};\n".format(arg1, arg2);
+                elif mutate[0] == "ptr2Copyrp":
+                    return "{} = *({});\n".format(arg1, arg2);
+                else:
+                    raise MutateError("Unknown ptr2Copy handler for POD "
+                                      "data has been given", file_name,
+                                      line)
+            else:
+                return "{} = {};\n".format(arg1, arg2)
     else:
         raise MutateSourceError(mutate[0], file_name, line)
 
@@ -290,7 +316,7 @@ def handle_SIZE(line, mutate, type_d, file_name):
     return line.replace(mutate[0], "sizeof({})".format(
         type_dict[type_d]))
 
-def handle_TYPEPTR(line, mutate, type_d, file_name):
+def handle_TYPEPTR_OBJ_ONLY(line, mutate, type_d, file_name):
     """
        mutate[0] (mutate_from) is changed into the type if the type is
        plain old data. If not then it's changed into type pointer
@@ -299,6 +325,12 @@ def handle_TYPEPTR(line, mutate, type_d, file_name):
         return line.replace(mutate[0], type_dict[type_d]+"*")
     else:
         return line.replace(mutate[0], type_dict[type_d])
+
+def handle_TYPEPTR(line, mutate, type_d, file_name):
+    """
+       mutate[0] (mutate_from) is changed into type pointer
+    """
+    return line.replace(mutate[0], type_dict[type_d]+"*")
 
 def handle_REMOVE(line, mutate, type_d, file_name):
     """
@@ -339,6 +371,7 @@ def handle_omit_cond(line, type_d, filename):
 handle_dict = {
     "TYPE": handle_TYPE,
     "TYPEPTR": handle_TYPEPTR,
+    "TYPEPTR_OBJ_ONLY": handle_TYPEPTR_OBJ_ONLY,
     "SIZE": handle_SIZE,
     "REFERENCE": handle_REFERENCE,
     "ASSIGN": handle_ASSIGN,
