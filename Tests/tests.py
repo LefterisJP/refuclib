@@ -128,7 +128,7 @@ def debugTest(root, fileName, logFile, testExec):
         --testExec: The name of the test executable
     """
     #Remove Tests/ part of the directory from the filename
-    tempName = os.path.split(filename)
+    tempName = os.path.split(fileName)
     fileName = os.path.join(os.path.split(tempName[0])[1] , tempName[1])
 
     report(logFile, 

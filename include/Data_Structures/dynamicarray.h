@@ -48,9 +48,9 @@ extern "C"
  ** @return The allocated array
  **/
 i_DECLIMEX_ RF_DynamicArray*  rfDynamicArray_Create(
-    uint32_t numElements,
+    uint32_t numElements
     /* @omit start */
-    uint32_t elementSize,
+    , uint32_t elementSize,
     void (*ptr2Destroy)(void*),
     void (*ptr2Copy)(void*,void*)
     /* @omit end */
@@ -67,9 +67,9 @@ i_DECLIMEX_ RF_DynamicArray*  rfDynamicArray_Create(
  **/
 i_DECLIMEX_ char  rfDynamicArray_Init(
     RF_DynamicArray* array,
-    uint32_t numElements,
+    uint32_t numElements
     /* @omit start */
-    uint32_t elSize,
+    , uint32_t elSize,
     void (*ptr2Destroy)(void*),
     void (*ptr2Copy)(void*,void*)
     /* @omit end */
@@ -150,102 +150,79 @@ i_DECLIMEX_ void rfDynamicArray_Deinit_nofree(RF_DynamicArray* l);
  **
  ** The @c object is added in the array right after the last element and
  **  if it does not fit in the buffer, a reallocation happens.
- ** The @c object is just copied as it is inside the already allocated 
- ** space of @c sizeof(objectType) of the data structure
- ** So basically the object itself is added into the Array. No copy is made.
- ** For a version of this function that first creates a copy use @ref rfDynamicArray_AddCopy()
+ ** If the @c object is Plain old Data then it's simply appended to the 
+ ** array while if it's any other type created by the template its copy
+ ** function is called.
  ** @param l The array in which to add the object
- ** @param object The object to add. Should be a pointer to the object
- ** so if you need to add an object on the stack do not forget to use the
- ** @c & operator.
+ ** @param object The object to add. For plain old data types simply add
+ ** it here. For objects make sure to pass a pointer to the object
  **
+ ** @return Returns @c RF_SUCCESS in all cases except for when there is 
+ ** insufficient memory in which case the function will return @c 
+ ** RE_REALLOC_FAILURE
  **/
-i_DECLIMEX_ void rfDynamicArray_Add(RF_DynamicArray* l,void* object);
+/* @mutate void* TYPEPTR_OBJ_ONLY */
+i_DECLIMEX_ int32_t rfDynamicArray_Add(RF_DynamicArray* l,void* object);
 
-/**
- ** @memberof RF_DynamicArray
- ** @brief Adds a a copy of an object to the array
- **
- ** A copy of @c object is made using the equivalent copy function
- ** given at array initialization. If no copy function was given the
- ** function returns false. For a simple addition without copying
- ** refer to @ref rfDynamicArray_Add()
- ** @param l The array in which to add the object
- ** @param object The object to add. Should be a pointer to the object
- ** so if you need to add an object on the stack do not forget to use 
- ** the @c & operator.
- **
- **/
-i_DECLIMEX_ char rfDynamicArray_AddCopy(RF_DynamicArray* l,void* object);
 
 /**
  ** @memberof RF_DynamicArray
  ** @brief Retrieves an object from the array
  **
- ** The object will be placed in the passed parameter @c ret. It must be
- ** allocated properly.
- ** Passing incorrect data to the position @c ret position will cause 
- ** undefined behaviour, probably segmentation fault.
+ ** The object will be placed in the passed parameter @c ret. It must
+ ** be a reference of the appropriate type.
  ** @param l The array from which to retrieve
  ** @param i The index of the element to retrieve
  ** @param ret A pointer to the object you need to populate with the
  ** retrieved data
- ** @return RF_SUCCESS if the object was retrieved succesfully and 
- ** @cRF_FAILURE if the index is out of bounds
+ ** @return @c RF_SUCCESS if the object was retrieved succesfully and 
+ ** @c RE_INDEX_OUT_OF_BOUNDS if the index is out of bounds
  **
  **/
-i_DECLIMEX_ int32_t rfDynamicArray_Get(
+i_DECLIMEX_ int32_t rfDynamicArray_Get_IN(
     RF_DynamicArray* l,
     uint32_t i,
+/* @mutate void* TYPEPTR */
     void* ret
 );
 
 /**
  ** @memberof RF_DynamicArray
- ** @brief Sets the given objects to a specific index in the array
+ ** @brief Returns an object from the array
  **
- ** The @c object is just copied as it is inside the already allocated 
- ** space of @c sizeof(objectType) of the data structure
- ** So basically the object itself is added into the Array. No copy is made.
- ** If you need a function that first makes a copy of @c object refer to
- ** @ref rfDynamicArray_Set_copy().
+ ** @param l The array from which to retrieve
+ ** @param i The index of the element to retrieve
+ ** @param code Contains @c RF_SUCCESS if all went well with the object
+ ** retrieval and @c RE_INDEX_OUT_OF_BOUNDS if there was an index out of bounds
+ ** @return If @c code contains @c RF_SUCCESS then it returns the 
+ ** value of the array at @c i. If there is a failure this will return @c 0
+ **/
+/* @mutate void* TYPEPTR_OBJ_ONLY */
+i_DECLIMEX_ void* rfDynamicArray_Get_OUT(
+    RF_DynamicArray* l,
+    uint32_t i,
+    int32_t* code
+);
+
+/**
+ ** @memberof RF_DynamicArray
+ ** @brief Sets a copy of the given object to the specified array index
  **
+ ** @c object is copied into the @c i index of the array. If the object is
+ ** plain old data type then it is simply placed there while if it is an 
+ ** object type its copy function is called.
  ** @param l The array for which to set the object
  ** @param i The index of the object to set
  ** @param e A pointer to the object to add.
  ** previous object at @c i or @c false if you don't
- ** @return True if the element got set succesfully and false if index i is over capacity
+ ** @return True if the element got set succesfully and false if index @c i
+ ** is over the capacity of the array
  **
  **/
 i_DECLIMEX_ char rfDynamicArray_Set(
     RF_DynamicArray* l,
     uint32_t i,
-    void* e
-);
-
-/**
- ** @memberof RF_DynamicArray
- ** @brief Sets a copy of the given objects to a specific index in the array
- **
- ** A copy of @c object is made using the equivalent copy function
- ** given at array initialization. If no copy function was given the
- ** function returns false. For setting an object without copying
- ** refer to @ref rfDynamicArray_Add() .
- ** This function can't set the location of an unitialized object. This is
- ** not how this data structure works.
- ** For a data structure with such functionality that achieves this take a
- ** look at @ref RF_ArrayV.
- ** @param l The array for which to set the object
- ** @param i The index of the object to set
- ** @param e A pointer to the object to add.
- ** previous object at @c i or @c false if you don't
- ** @return True if the element got set succesfully and false if index i is over capacity or no
- ** copy function has been given to the array.
- **
- **/
-i_DECLIMEX_ char rfDynamicArray_Set_copy(
-    RF_DynamicArray* l,
-    uint32_t i,
+/* @mutate void* TYPEPTR_OBJ_ONLY */
     void* e
 );
 
@@ -261,27 +238,12 @@ i_DECLIMEX_ char rfDynamicArray_Set_copy(
  ** @ref rfDynamicArray_Remove_nofree()
  ** @param l The array from which to remove
  ** @param i The index of the element to remove
- **
+ ** @return Returns RF_SUCCESS if the object at @c i was succesfully removed
+ ** and @c RE_INDEX_OUT_OF_BOUNDS if there is no element at @c i. Additionally
+ ** if during reallocation downwards there is an error this function can 
+ ** return @c RE_REALLOC_FAILURE
  **/
-i_DECLIMEX_ void rfDynamicArray_Remove(RF_DynamicArray* l, uint32_t i);
-
-/**
- ** @memberof RF_DynamicArray
- ** @brief Removes an object from the array without calling its destroy
- ** function
- **
- ** All objects get moved to make up for the freed up space and if there 
- ** is too much space left the array gets reallocated downwards.
- ** Note that the destructor of the object at index @c i is not called. 
- ** If you need to call the destructor refer
- ** to the function @ref rfDynamicArray_Remove()
- ** @param l The array from which to remove
- ** @param i The index of the element to remove
- **
- **/
-i_DECLIMEX_ void rfDynamicArray_Remove_nofree(RF_DynamicArray* l,
-                                              uint32_t i);
-
+i_DECLIMEX_ int32_t rfDynamicArray_Remove(RF_DynamicArray* l, uint32_t i);
 
 #ifdef __cplusplus
 }///closing bracket for calling from C++

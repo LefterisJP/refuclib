@@ -39,10 +39,18 @@
     #include <stdlib.h> //for malloc, calloc,realloc and exit()
     #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
     #include <Utils/memory.h> //for refu memory allocation
-//*---------------------libc Headers inclusion------------------------------------------
-#include <string.h> //for memcpy e.t.c.
-//*----------------------------End of Includes------------------------------------------
 
+// used by the lms stuff and by other functions in this module
+    #include <string.h> //for memcpy e.t.c.
+
+//for local memory scope macros (where needed)
+    /* @omitcond NONLMS */
+    #include <Definitions/threadspecific.h> //for the thread specific attribute
+    #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
+    #include <stdint.h> //for UINT32_MAX used in RF_ENTER_LOCAL_SCOPE() macro
+    #include <Utils/localscope.h>
+    /* @omit end */
+//*----------------------------End of Includes------------------------------------------
 
 //Allocates and returns an array of objects
 RF_DynamicArray* rfDynamicArray_Create(
@@ -126,7 +134,7 @@ void rfDynamicArray_Copy_IN(RF_DynamicArray* dst,RF_DynamicArray* src)
     //copy each element using the copy function
     for(i=0;i<dst->size;i++)
     {
-        /* @mutate ptr2Copypp ASSIGN_NOSIZE */
+        /* @mutate ptr2Copypp ASSIGN NOSIZE PODPTR POD_DLR */
         dst->ptr2Copy(dst->data+(i*dst->elementSize),src->data+(i*src->elementSize));
     }
     
@@ -150,7 +158,7 @@ RF_DynamicArray* rfDynamicArray_Copy_OUT(RF_DynamicArray* src)
     //copy each element using the copy function
     for(i=0;i<dst->size;i++)
     {
-        /* @mutate ptr2Copypp ASSIGN NOSIZE */
+        /* @mutate ptr2Copypp ASSIGN NOSIZE PODPTR POD_DLR */
         dst->ptr2Copy(dst->data+(i*dst->elementSize),src->data+(i*src->elementSize));
     }
 
@@ -161,10 +169,11 @@ RF_DynamicArray* rfDynamicArray_Copy_OUT(RF_DynamicArray* src)
 // destructing function if it exists
 void rfDynamicArray_Destroy(RF_DynamicArray* l)
 {
-    uint32_t i;
     
-    //delete the individual objects
+
     /* @omitcond POD */
+    uint32_t i;
+    //delete the individual objects
     for(i = 0; i < l->size; i ++)
     {
         /* @mutate ptr2Destroyp DESTROY NOSIZE */
@@ -189,8 +198,9 @@ void rfDynamicArray_Destroy_nofree(RF_DynamicArray* l)
 // their memory and calling the destructing function if it exists
 void rfDynamicArray_Deinit(RF_DynamicArray* l)
 {
-    uint32_t i;
+
     /* @omitcond POD */
+    uint32_t i;
     for(i = 0; i < l->size; i ++)
     {
         /* @mutate ptr2Destroyp DESTROY NOSIZE */
@@ -210,12 +220,13 @@ void rfDynamicArray_Deinit_nofree(RF_DynamicArray* l)
 
 
 
-// Adds a new object to the list by taking it from a pointer address.
-// The object is added right after the last element and if it does not fit
-// in the buffer a reallocation happens
-/* @mutate void* TYPEPTR */
-void rfDynamicArray_Add(RF_DynamicArray* l, void* object)
+// Adds a new object at the end of the array
+/* @mutate void* TYPEPTR_OBJ_ONLY */
+int32_t rfDynamicArray_Add(RF_DynamicArray* l, void* object)
 {
+    /* @omitcond NONLMS */
+    RF_ENTER_LOCAL_SCOPE()
+    /* @omit end */
     //check if there is enough space in the list
     /* @mutate l->elementSize SIZE */
     if(l->size*l->elementSize >= l->bufferCapacity)
@@ -231,105 +242,109 @@ void rfDynamicArray_Add(RF_DynamicArray* l, void* object)
             LOG_ERROR("Realloc failed in adding an object to an array of "
                       "Objects during an attempt to increase buffer"
                       " capacity. Aborting program", RE_REALLOC_FAILURE);
-            exit(RE_REALLOC_FAILURE);
+            /* @omitcond NONLMS */
+            RF_EXIT_LOCAL_SCOPE()
+            /* @omit end */
+            return RE_REALLOC_FAILURE;
         }
     }//end of capacity increase case
     //copy the new element in to the data and increase the index
-    /* @mutate l->elementSize SIZE */
-    memcpy(l->data+(l->size*l->elementSize),object,l->elementSize);
-    l->size++;
-}
-
-// Adds a a copy of an object to the array
-/* @mutate void* TYPEPTR */
-char rfDynamicArray_AddCopy(RF_DynamicArray* l, void* object)
-{
-    //check if there is enough space in the list
-    /* @mutate l->elementSize SIZE */
-    if(l->size*l->elementSize >= l->bufferCapacity)
-    {
-        //if not reallocate to double capacity
-        l->bufferCapacity*= RF_OPTION_DYNAMICARRAY_CAPACITY_M;
-        /* @mutate void* TYPEPTR */
-        void* testPtr = realloc(l->data,l->bufferCapacity);
-        if(testPtr)
-            l->data = testPtr;
-        else
-        {
-            LOG_ERROR("Realloc failed in adding an object to an array of "
-                      "Objects during an attempt to increase buffer"
-                      " capacity. Aborting program", RE_REALLOC_FAILURE);
-            exit(RE_REALLOC_FAILURE);
-        }
-    }//end of capacity increase case
-    //copy the new element in to the data and increase the index
-    /* @mutate ptr2Copypp NOSIZE */
+    /* @mutate ptr2Copypp ASSIGN NOSIZE PODPTR POD_DL */
     l->ptr2Copy(l->data+(l->size*l->elementSize),object);
     l->size++;
-    return true;
+    /* @omitcond NONLMS */
+    RF_EXIT_LOCAL_SCOPE()
+    /* @omit end */
+    return RF_SUCCESS;
 }
 
 // Retrieves an object from the group and saves it in the given pointer.
 // Pointer must be allocated
 /* @mutate void* TYPEPTR */
-int32_t rfDynamicArray_Get(RF_DynamicArray* l, uint32_t i, void* ret)
+int32_t rfDynamicArray_Get_IN(RF_DynamicArray* l, uint32_t i, void* ret)
 {
+    /* @omitcond NONLMS */
+    RF_ENTER_LOCAL_SCOPE()
+    /* @omit end */
     //if the index goes over the buffer capacity
     if( i >= l->size)
     {
         LOG_ERROR("Attempted to retrieve an element from an array with an"
                   " index that is out of bounds", RE_INDEX_OUT_OF_BOUNDS);
-        return RF_FAILURE;
+        /* @omitcond NONLMS */
+        RF_EXIT_LOCAL_SCOPE()
+        /* @omit end */
+        return RE_INDEX_OUT_OF_BOUNDS;
     }
-    /* @mutate l->elementSize SIZE */
-    memcpy(ret, l->data+(i*l->elementSize), l->elementSize);
+    /* @mutate *l->elementSize REMOVE */
+    memcpy(ret, l->data+(i*l->elementSize),
+           /* @mutate l->elementSize SIZE */
+           l->elementSize);
+    /* @omitcond NONLMS */
+    RF_EXIT_LOCAL_SCOPE()
+    /* @omit end */
     return RF_SUCCESS;
 }
 
-// Sets an object of the list to the given pointer value. If there was 
-// already an object in the previous location it is removed and its
-// destructor is called.
-char rfDynamicArray_Set(RF_DynamicArray* l,
-                        uint32_t i,
-                        /* @mutate void* TYPEPTR */
-                        void* e)
-{
-    //if the index points to a non-yet set element
-    if(i >= l->size)
-    {
-        LOG_ERROR("Attempted to set an element in an array with an index "
-                  "out of bounds. If you want to add objects to the list"
-                  "use the Add function.", RE_INDEX_OUT_OF_BOUNDS)
-        return false;
-    }
-    /* @mutate ptr2Destroyp NOSIZE */
-    l->ptr2Destroy(l->data + (i*l->elementSize));
-    //set the new object
-    /* @mutate l->elementSize SIZE */
-    memcpy(l->data+(i*l->elementSize), e, l->elementSize);
-    return true;
-}
 
-// Sets a copy of the given objects to a specific index in the array
-char rfDynamicArray_Set_copy(
+
+// Returns an object from the array
+/* @mutate void* TYPEPTR_OBJ_ONLY */
+void* rfDynamicArray_Get_OUT(
     RF_DynamicArray* l,
     uint32_t i,
-    /* @mutate void* TYPEPTR */
+    int32_t* code)
+{
+    /* @mutate void* TYPEPTR_OBJ_ONLY */
+    void* ret;
+    /* @omitcond POD */
+    /* @mutate l->elementSize SIZE */
+    RF_MALLOC(ret, l->elementSize)
+    /* @omit end */
+    //if the index goes over the buffer capacity
+    if( i >= l->size)
+    {
+        LOG_ERROR("Attempted to retrieve an element from an array with an"
+                  " index that is out of bounds", RE_INDEX_OUT_OF_BOUNDS);
+        *code = RE_INDEX_OUT_OF_BOUNDS;
+        return 0;
+    }
+
+    /* @mutate ptr2Copypp ASSIGN NOSIZE PODPTR POD_DR */
+    l->ptr2Copy(ret, l->data+(i*l->elementSize));
+    *code = RF_SUCCESS;
+    return ret;
+}
+
+// Sets a copy of the given object to the specified array index
+char rfDynamicArray_Set(
+    RF_DynamicArray* l,
+    uint32_t i,
+/* @mutate void* TYPEPTR_OBJ_ONLY */
     void* e)
 {
+    /* @omitcond NONLMS */
+    RF_ENTER_LOCAL_SCOPE()
+    /* @omit end */
     //if the index points to a non-yet set element
     if(i >= l->size)
     {
         LOG_ERROR("Attempted to set an element in an array with an index "
                   "out of bounds. If you want to add objects to the list"
                   "use the Add function.", RE_INDEX_OUT_OF_BOUNDS)
+        /* @omitcond NONLMS */
+        RF_EXIT_LOCAL_SCOPE()
+        /* @omit end */
         return false;
     }
-    /* @mutate ptr2Destroyp NOSIZE */
+    /* @mutate ptr2Destroyp DESTROY NOSIZE */
     l->ptr2Destroy(l->data + (i*l->elementSize));
     //set the new object as the copy of e
-    /* @mutate ptr2Copypp ASSIGN NOSIZE*/
+    /* @mutate ptr2Copypp ASSIGN NOSIZE PODPTR POD_DL */
     l->ptr2Copy(l->data+(i*l->elementSize), e);
+    /* @omitcond NONLMS */
+    RF_EXIT_LOCAL_SCOPE()
+    /* @omit end */
     return true;
 }
 
@@ -337,28 +352,33 @@ char rfDynamicArray_Set_copy(
 // Removes an object from the list. All objects get moved to make up for
 // the freed up space and if there is too much space left the list gets 
 // reallocated downwards. The destructor of the element is called if given
-void rfDynamicArray_Remove(RF_DynamicArray* l, uint32_t i)
+int32_t rfDynamicArray_Remove(RF_DynamicArray* l, uint32_t i)
 {
     //if the index points to a non-yet set element
     if(i >= l->size)
     {
         LOG_ERROR("Attempted to remove an element from an array with an"
-                  " index out of bounds",RE_INDEX_OUT_OF_BOUNDS)
-        return;
+                  " index out of bounds", RE_INDEX_OUT_OF_BOUNDS)
+        return RE_INDEX_OUT_OF_BOUNDS;
     }
 
     /* @mutate ptr2Destroyp DESTROY NOSIZE */
     l->ptr2Destroy(l->data+(i*l->elementSize));
-
     //Move the whole buffer back to cover up for the removed element
-    /* @mutate l->elementSize SIZE */
-    memmove(l->data+(i*l->elementSize), l->data+(i*l->elementSize)+l->elementSize,l->elementSize*(l->size-i-1));
+    /* @mutate *l->elementSize REMOVE */
+    memmove(l->data+(i*l->elementSize),
+            /* @mutate *l->elementSize REMOVE */
+            l->data+(i*l->elementSize) + 
+            /* @mutate l->elementSize REPLACE 1 */
+            l->elementSize,
+            /* @mutate l->elementSize SIZE */            
+            l->elementSize*(l->size-i-1));
     //and reduce size
     l->size--;
 
     //also check if we can reallocate downwards. Condition is if the 
     //current size is less than the fraction of the capacity
-    /* @mutate l->elementsize SIZE */
+    /* @mutate l->elementSize SIZE */
     if( l->size*l->elementSize < 
         l->bufferCapacity/RF_OPTION_DYNAMICARRAY_CAPACITY_M)
     {
@@ -373,49 +393,9 @@ void rfDynamicArray_Remove(RF_DynamicArray* l, uint32_t i)
             LOG_ERROR("Realloc failed in removing an object from an array"
                       " during an attempt to shrink the buffer. Aborting "
                       "program",RE_REALLOC_FAILURE);
-            exit(RE_REALLOC_FAILURE);
+            return RE_REALLOC_FAILURE;
         }
     }
+    return RF_SUCCESS;
 }
-
-// Removes an object from the list without calling its destroy function
-void rfDynamicArray_Remove_nofree(RF_DynamicArray* l, uint32_t i)
-{
-    //if the index points to a non-yet set element
-    if(i >= l->size)
-    {
-        LOG_ERROR("Attempted to remove an element from an array with an"
-                  " index out of bounds",RE_INDEX_OUT_OF_BOUNDS)
-        return;
-    }
-
-    //Move the whole buffer back to cover up for the removed element
-    /* @mutate l->elementSize SIZE */
-    memmove(l->data+(i*l->elementSize), l->data+(i*l->elementSize)+l->elementSize,l->elementSize*(l->size-i-1));
-    //and reduce size
-    l->size--;
-
-    //also check if we can reallocate downwards. Condition is if the 
-    //current size is less than the fraction of the capacity
-    /* @mutate l->elementsize SIZE */
-    if( l->size*l->elementSize < 
-        l->bufferCapacity/RF_OPTION_DYNAMICARRAY_CAPACITY_M)
-    {
-        l->bufferCapacity /= RF_OPTION_DYNAMICARRAY_CAPACITY_M;
-        //reallocate
-        /* @mutate void* TYPEPTR */
-        void* testPtr = realloc(l->data,l->bufferCapacity);
-        if(testPtr)
-            l->data = testPtr;
-        else
-        {
-            LOG_ERROR("Realloc failed in removing an object from an array"
-                      " during an attempt to shrink the buffer. Aborting "
-                      "program",RE_REALLOC_FAILURE);
-            exit(RE_REALLOC_FAILURE);
-        }
-    }
-}
-
-
 

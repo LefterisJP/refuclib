@@ -25,6 +25,8 @@ obj_dict = {
                ["RFstring.h"]]
 }
 
+lms_list = ["String"]
+
 class MutateTargetError(Exception):
     def __init__(self, target_type, file_name, line):
         self.target_type = target_type
@@ -246,12 +248,14 @@ def handle_ASSIGN(line, mutate, type_d, file_name):
                 raise MutateSourceError(mutate[0], file_name, line)
         else:
             if "PODPTR" in mutate:
-                if mutate[0] == "ptr2Copypp":
+                if "POD_DLR" in mutate: # dereference POD left and right 
                     return "*({}) = *({});\n".format(arg1, arg2);
-                elif mutate[0] == "ptr2Copypr":
+                elif "POD_DL" in mutate: # derefence POD left
                     return "*({}) = {};\n".format(arg1, arg2);
-                elif mutate[0] == "ptr2Copyrp":
+                elif "POD_DR" in mutate: # dereference POD right
                     return "{} = *({});\n".format(arg1, arg2);
+                elif "POD_NDR" in mutate: # do not dereference POD at all
+                    return "{} = {};\n".format(arg1, arg2);
                 else:
                     raise MutateError("Unknown ptr2Copy handler for POD "
                                       "data has been given", file_name,
@@ -338,6 +342,17 @@ def handle_REMOVE(line, mutate, type_d, file_name):
     """
     return line.replace(mutate[0], "")
 
+def handle_REPLACE(line, mutate, type_d, file_name):
+    """
+        Handle the simple case of requesting replacing something
+        with something else
+    """
+    if len(mutate) != 3:
+        raise MutateError("Incorrect arguments given for replacement",
+                          file_name, line)
+
+    return line.replace(mutate[0], mutate[2])
+
 def handle_mutate(mutate, type_d, line, name):
     if len(mutate) < 2:
         raise MutateError("mutate list with less than 2 arguments passed "
@@ -359,13 +374,15 @@ def handle_omit_cond(line, type_d, filename):
     if cond == "OBJECT":
         if type_d in obj_dict:
             return True;
-        return False;
     elif cond == "POD":
         if type_d not in obj_dict:
             return True;
-        return False;
+    elif cond == "NONLMS":
+        if type_d not in lms_list:
+            return True;
     else:
         raise OmitConditionError(cond, filename, line)
+    return False;
         
 
 handle_dict = {
@@ -378,7 +395,8 @@ handle_dict = {
     "COMPARE": handle_COMPARE,
     "DESTROY": handle_DESTROY,
     "INITIALIZE": handle_INITIALIZE,
-    "REMOVE": handle_REMOVE
+    "REMOVE": handle_REMOVE,
+    "REPLACE": handle_REPLACE
 };
 
 def gen_single_source(name, newName, type_d, name_subs):
