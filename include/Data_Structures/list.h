@@ -235,22 +235,22 @@ i_DECLIMEX_ char rfList_Delete(RF_List* a, void* e);
 i_DECLIMEX_ char rfList_Has(RF_List* a, void* ret);
 
 /**
- ** These 2 macros here are used to iterate a linked list from the 
- ** starting node to its end node.
+ ** This macro is used to iterate a list from each start node until
+ ** its end node.
  ** @param i_LIST_ A pointer to the linked list to iterate
  ** @param i_DATA_PTR_ A pointer of the type of data you have stored in
  ** the linked list. In every iteration this pointer will point to the 
- ** current data.
+ ** current data. If the type is plain old data this is not a pointer.
  **/
-#define RF_LIST_ITERATE_START(i_LIST_, i_DATA_PTR_)   \
-    RF_L_Node* i_anode_ptr_ = i_LIST_->start->next;\
-    while(i_anode_ptr_ != 0)\
-    {\
-    /* @mutate (i_anode_ptr_ REFERENCE */ \
-    i_DATA_PTR_ = (i_anode_ptr_->data);
-
-#define RF_LIST_ITERATE_END() \
-    i_anode_ptr_ = i_anode_ptr_->next;}
+#define rfList_Iterate(i_LIST_, i_DATA_PTR_) \
+    RF_L_Node* i_anode_ptr_ = (i_LIST_)->start->next;\
+    /* @mutate (i_anode_ptr_ REFERENCE */          \
+    for(i_DATA_PTR_ = (i_anode_ptr_->data);        \
+        i_anode_ptr_->next != 0;                   \
+        i_anode_ptr_ = i_anode_ptr_->next,         \
+        /* @mutate (i_anode_ptr_ REFERENCE */      \
+        i_DATA_PTR_ = (i_anode_ptr_->data))
+    
 
 #ifdef __cplusplus
 }///closing bracket for calling from C++

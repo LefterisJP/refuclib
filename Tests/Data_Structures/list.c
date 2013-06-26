@@ -13,10 +13,11 @@ void iterate_ll_ints(RF_List_I* l, int* arr)
 {
     int d;
     int i = 0;
-    RF_LIST_I_ITERATE_START(l, d)
-    EXPECT(arr[i], d)
-    i++;
-    RF_LIST_I_ITERATE_END()
+    rfList_I_Iterate(l, d)
+    {
+        EXPECT(arr[i], d)
+        i++;
+    }
 }
 
 
@@ -25,38 +26,40 @@ void iterate_ll_strings(RF_List_String* l)
 {
     RF_String* s;
     int i = 0;
-    RF_LIST_String_ITERATE_START(l, s)
-    if(i == 0)
+    rfList_String_Iterate(l, s)
     {
-        EXPECT(rfString_Equal(s, RFS_("String 1")), true)
+        if(i == 0)
+        {
+            EXPECT(rfString_Equal(s, RFS_("String 1")), true)
+        }
+        else if(i == 1)
+        {
+            EXPECT(rfString_Equal(s, RFS_("String 2")), true)
+        }
+        else
+        {
+            EXPECT(rfString_Equal(s, RFS_("String 3")), true)
+        }         
+        i++;
     }
-    else if(i == 1)
-    {
-        EXPECT(rfString_Equal(s, RFS_("String 2")), true)
-    }
-    else
-    {
-        EXPECT(rfString_Equal(s, RFS_("String 3")), true)
-    }         
-    i++;
-    RF_LIST_String_ITERATE_END()    
 } 
 
 void iterate_ll_stringsdel(RF_List_String* l)
 {
     RF_String* s;
     int i = 0;
-    RF_LIST_String_ITERATE_START(l, s)
-    if(i == 0)
+    rfList_String_Iterate(l, s)
     {
-        EXPECT(rfString_Equal(s, RFS_("String 2")), true)
+        if(i == 0)
+        {
+            EXPECT(rfString_Equal(s, RFS_("String 2")), true)
+        }
+        else
+        {
+            EXPECT(rfString_Equal(s, RFS_("String 3")), true)
+        }
+        i++;
     }
-    else
-    {
-        EXPECT(rfString_Equal(s, RFS_("String 3")), true)
-    }
-    i++;
-    RF_LIST_String_ITERATE_END()    
 } 
 
 int main()
