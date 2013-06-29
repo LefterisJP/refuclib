@@ -39,7 +39,7 @@
 #ifndef RF_UTILS_CONSTCMP_H
 #define RF_UTILS_CONSTCMP_H
 
-/* --------------------------------------------- Safe Float and Double comparisons (need to include <float.h> too------------------------------------------------------- */
+/* - Safe Float and Double comparisons (need to include <float.h> too - */
 
 /**
  **  Returns true if float a > float b

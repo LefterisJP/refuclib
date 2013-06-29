@@ -195,19 +195,19 @@ modules.append(
        )
 )
 
-# modules.append(
-#     Module("HASHMAP",
-#            ['Data_Structures/dynamicarray.c'],
-#            macro = "RF_MODULE_HASHMAP",
-#            has_template = "HASHMAP",
-#            gen_name_sub = ["RF_HashMap",
-#                            "rfHashMap",
-#                            "RF_HASHMAP",
-#                            "hashmap",
-#                            "RF_HashSlot"
-#                        ]
-#        )
-# )
+modules.append(
+    Module("HASHMAP",
+           ['Data_Structures/hashmap.c'],
+           macro = "RF_MODULE_HASHMAP",
+           has_template = "HASHMAP",
+           gen_name_sub = ["RF_Hashmap",
+                           "rfHashmap",
+                           "RF_HASHMAP",
+                           "hashmap",
+                           "RF_Hashslot"
+                       ]
+       )
+)
 
 modules.append(
     Module("BINARY_ARRAY",

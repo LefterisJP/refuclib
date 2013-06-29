@@ -23,7 +23,13 @@ type_dict = { "I": "int",
 
 obj_dict = {
     "String": ["rfString_Deinit", "rfString_Copy_IN", "rfString_Equal",
-               ["RFstring.h"]]
+               ["Definitions/imex.h", # for import export macro
+                "Definitions/defarg.h", # for default arguments
+                "Preprocessor/rf_tokens.h", #for defined library tokens
+                "Definitions/types.h",  #for fixed size data types
+                "String/string_decl.h",  #for RF_String
+                "String/core.h"]  #for Equal, Copy_IN and Deinit
+           ]
 }
 
 lms_list = ["String"]
@@ -400,6 +406,9 @@ def handle_omit_cond(line, type_d, filename):
     elif cond == "NONLMS":
         if type_d not in lms_list:
             return True;
+    elif cond == "STRING":
+        if type_d == "String":
+            return True;
     else:
         raise OmitConditionError(cond, filename, line)
     return False;
@@ -429,8 +438,11 @@ def gen_single_source(name, newName, type_d, name_subs):
     mutate = []
     outF.write(gen_template_intro_str(name, type_dict[type_d]))
     #if the type is an object and it needs to have any extra headers
-    if type_d in obj_dict and name.endswith("_decl.h"):
+    if type_d in obj_dict and name.endswith(".c"):
         #simply add them
+        outF.write("/**\n"
+                   " ** ---- Headers added by the building script specifically"
+                   " for {} ----\n*/\n\n".format(type_dict[type_d]))
         for header in obj_dict[type_d][obj.headers]:
             outF.write("#include <{}>\n".format(header))
     #start creating the source from the generic template

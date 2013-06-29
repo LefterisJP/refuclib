@@ -56,7 +56,8 @@ def compileLib(verbose,dynamic,compiler):
     # for now we give here all the options to generate extra sources that
     # all the tests need. In the future if the library compiles again for
     # each module tested this will need to change
-    extra_source_opts = "LIST=I,String DYNAMIC_ARRAY=I,String"
+    extra_source_opts = ("LIST=I,String DYNAMIC_ARRAY=I,String "
+                         "HASHMAP=I,String")
 
     if platform.system() == 'Windows':
         sconsCall = ['scons.py', arg, 'COMPILER='+compiler,
