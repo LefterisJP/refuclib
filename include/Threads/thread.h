@@ -60,7 +60,7 @@ extern "C"
  **      has finished
  ** @param ptr2onExecution Give the address of the function you want to run as the main thread's execution function here
  ** @param data Give a pointer to the data to be passed to the thread
- ** @param lmsSize \rfoptional{RF_OPTION_LOCALSTACKMEMORY_SIZE} The size of the thread's local stack memory. Provide a value here
+ ** @param lmsSize \rfoptional{RF_OPTION_LOCALSTACK_MEMORY_SIZE} The size of the thread's local stack memory. Provide a value here
  ** that shall determine the value of this thread's local memory stack size,that will be used for temporary objects initialized by macros
  ** such as @ref RFS_() and @ref RFXML_(). If inside that thread such objects are not initialized it is safe to give a small value or even 0
  ** to save memory. If no value is given then the default is to create a thread with the same value as that given in compiling with refu builder.
@@ -73,7 +73,7 @@ i_DECLIMEX_ RF_Thread* rfThread_Create(uint32_t flags,void* (*ptr2onExecution)(v
 #ifdef RF_OPTION_DEFAULT_ARGUMENTS
     i_DECLIMEX_ RF_Thread* i_rfThread_Create(uint32_t flags,void* (*ptr2onExecution)(void*),void* data,uint64_t lmsSize );
     #define rfThread_Create(...)    RF_SELECT_FUNC(i_SELECT_RF_THREAD_CREATE,__VA_ARGS__)
-    #define i_SELECT_RF_THREAD_CREATE3(...) i_rfThread_Create(__VA_ARGS__,RF_OPTION_LOCALSTACKMEMORY_SIZE)
+    #define i_SELECT_RF_THREAD_CREATE3(...) i_rfThread_Create(__VA_ARGS__,RF_OPTION_LOCALSTACK_MEMORY_SIZE)
     #define i_SELECT_RF_THREAD_CREATE4(...) i_rfThread_Create(__VA_ARGS__)
 #else
     i_DECLIMEX_ RF_Thread* rfThread_Create(uint32_t flags,void* (*ptr2onExecution)(void*),void* data,uint64_t lmsSize );
@@ -92,7 +92,7 @@ i_DECLIMEX_ RF_Thread* rfThread_Create(uint32_t flags,void* (*ptr2onExecution)(v
  **      has finished
  ** @param ptr2onExecution Give the address of the function you want to run as the main thread's execution function here
  ** @param data Give a pointer to the data to be passed to the thread
- ** @param lmsSize \rfoptional{RF_OPTION_LOCALSTACKMEMORY_SIZE} The size of the thread's local stack memory. Provide a value here
+ ** @param lmsSize \rfoptional{RF_OPTION_LOCALSTACK_MEMORY_SIZE} The size of the thread's local stack memory. Provide a value here
  ** that shall determine the value of this thread's local memory stack size,that will be used for temporary objects initialized by macros
  ** such as @ref RFS_() and @ref RFXML_(). If inside that thread such objects are not initialized it is safe to give a small value or even 0
  ** to save memory. If no value is given then the default is to create a thread with the same value as that given in compiling with refu builder.
@@ -105,7 +105,7 @@ i_DECLIMEX_ char rfThread_Init(RF_Thread* t,uint32_t flags,void* (*ptr2onExecuti
 #ifdef RF_OPTION_DEFAULT_ARGUMENTS
     i_DECLIMEX_ char i_rfThread_Init(RF_Thread* t,uint32_t flags,void* (*ptr2onExecution)(void*),void* data,uint64_t lmsSize );
     #define rfThread_Init(...)    RF_SELECT_FUNC(i_SELECT_RF_THREAD_INIT,__VA_ARGS__)
-    #define i_SELECT_RF_THREAD_INIT4(...) i_rfThread_Init(__VA_ARGS__,RF_OPTION_LOCALSTACKMEMORY_SIZE)
+    #define i_SELECT_RF_THREAD_INIT4(...) i_rfThread_Init(__VA_ARGS__,RF_OPTION_LOCALSTACK_MEMORY_SIZE)
     #define i_SELECT_RF_THREAD_INIT5(...) i_rfThread_Init(__VA_ARGS__)
 #else
     i_DECLIMEX_ char rfThread_Init(RF_Thread* t,uint32_t flags,void* (*ptr2onExecution)(void*),void* data,uint64_t lmsSize );

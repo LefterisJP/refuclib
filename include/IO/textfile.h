@@ -85,7 +85,7 @@ extern "C"
  ** be tested for the existence of a Byte Order Mark.
  **
  ** To create a new file use either @c RF_FILE_NEW or @c RF_FILE_READWRITE_NEW. A Byte Order Mark will be appened to the file
- ** depending on the given @c encoding argument unless the library has been compiled with the @c RF_OPTION_FILE_ADDBOM off.
+ ** depending on the given @c encoding argument unless the library has been compiled with the @c RF_OPTION_TEXTFILE_ADDBOM off.
  ** Note that if a specific endianess for UTF-16 or UTF-32 is not given then the file will be created in the system's endianess.
  ** @lmsFunction
  ** @param t The textfile to initialize

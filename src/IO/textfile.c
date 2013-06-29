@@ -412,7 +412,7 @@ int32_t i_rfTextFile_Init(RF_TextFile* t,const void* nameP,char mode,char encodi
             break;
         }//end of new file encoding switch
         //add a BOM if required
-#ifdef RF_OPTION_FILE_ADDBOM
+#ifdef RF_OPTION_TEXTFILE_ADDBOM
         t->hasBom = true;
         error=i_rfTextFile_AddBom(t);//can fail and so this function will also fail
 #endif
@@ -730,7 +730,7 @@ int32_t rfTextFile_GetLine_begin(RF_TextFile* t,uint64_t lineN,RF_StringX* line)
 
     ///since we got here start reading the file again, line by line until we get to the requested line
     //initialize the buffer string for readline
-    rfStringX_Init_buff(&buffer,RF_OPTION_FGETS_READBYTESN,"");
+    rfStringX_Init_buff(&buffer,RF_OPTION_FGETS_READ_BYTESN,"");
     //read all the lines until you get to the one we need
     while( (error = rfTextFile_ReadLine2(t,&buffer)) == RF_SUCCESS)
     {
@@ -810,7 +810,7 @@ int32_t rfTextFile_MoveLines(RF_TextFile* t,int64_t linesN)
     {
         char success = false;
         targetLine = prLine+linesN;
-        rfStringX_Init_buff(&buffer,RF_OPTION_FGETS_READBYTESN,"");
+        rfStringX_Init_buff(&buffer,RF_OPTION_FGETS_READ_BYTESN,"");
         //in the positive case the operation is easy, just read the lines until we get to the required one
         while( (error = rfTextFile_ReadLine2(t,&buffer)) == RF_SUCCESS)
         {
@@ -852,7 +852,7 @@ int32_t rfTextFile_MoveLines(RF_TextFile* t,int64_t linesN)
             RETURN_LOG_ERROR("Failed to move the internal filepointer of TextFile \"%S\" to the beginning",error,&t->name)
 
         //read as many lines as needed
-        rfStringX_Init_buff(&buffer,RF_OPTION_FGETS_READBYTESN,"");
+        rfStringX_Init_buff(&buffer,RF_OPTION_FGETS_READ_BYTESN,"");
         for(i=1;i<targetLine; i ++)
         {
             if((error = rfTextFile_ReadLine2(t,&buffer)) != RF_SUCCESS)
@@ -1259,7 +1259,7 @@ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stringP,
     }
 
     //initialize a string reading buffer
-    rfStringX_Init_buff(&buffer,RF_OPTION_FGETS_READBYTESN+1,"");
+    rfStringX_Init_buff(&buffer,RF_OPTION_FGETS_READ_BYTESN+1,"");
     //cleanup3 - for the string buffer deinitialization
     
     //read every line of this file from the beginning
@@ -1427,7 +1427,7 @@ int32_t rfTextFile_Remove(RF_TextFile* t,uint64_t lineN)
         }
     }
     //initialize a string reading buffer
-    rfStringX_Init_buff(&buffer,RF_OPTION_FGETS_READBYTESN+1,""); ///Need to clean the buff string -- cleanup3
+    rfStringX_Init_buff(&buffer,RF_OPTION_FGETS_READ_BYTESN+1,""); ///Need to clean the buff string -- cleanup3
     //read every line of this file from the beginning
     while((error =rfTextFile_ReadLine2(t,&buffer))==RF_SUCCESS)
     {
@@ -1563,7 +1563,7 @@ int32_t rfTextFile_Replace(RF_TextFile* t,uint64_t lineN,void* stringP)
         }
     }
     //initialize a string reading buffer
-    rfStringX_Init_buff(&buffer,RF_OPTION_FGETS_READBYTESN+1,"");///cleanup3- For the deinit of the string buffer
+    rfStringX_Init_buff(&buffer,RF_OPTION_FGETS_READ_BYTESN+1,"");///cleanup3- For the deinit of the string buffer
     //read every line of this file from the beginning;
     while((error =rfTextFile_ReadLine2(t,&buffer))==RF_SUCCESS)
     {

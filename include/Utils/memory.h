@@ -45,7 +45,9 @@
 #include <rf_options.h> //check the memory allocation options
 
 
-//Here are some macro wrappers of malloc,calloc and realloc that depending on the flag RF_OPTION_SAFE_MEMORY_ALLOCATION check their return value or not
+//Here are some macro wrappers of malloc,calloc and realloc that depending
+//on the flag @c RF_OPTION_SAFE_MEMORY_ALLOCATION check their return
+//value or not
 
 //for realloc I check no matter what since it's a bit more complicated case than the other twoo
 /**

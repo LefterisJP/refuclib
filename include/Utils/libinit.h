@@ -61,10 +61,10 @@ extern "C"
  ** @param logstr \rfoptional{"refuInfoLog"} The filename of the info log to creeat and output the refu info log.You can provide any filename except for
  ** @c "stdout" and @c "stderr" because they will be interpreted as special values for which the standard output stream or the standard error stream are used respectively
  ** If no value is provided the default value is @c "refuInfoLog"
- ** @param lmsSize \rfoptional{RF_OPTION_LOCALSTACKMEMORY_SIZE} The size of the main thread's local memory stack. This will be the size by which the
+ ** @param lmsSize \rfoptional{RF_OPTION_LOCALSTACK_MEMORY_SIZE} The size of the main thread's local memory stack. This will be the size by which the
  ** main thread's local memory stack will be initialized. It allows the usage of macros for temporary object creation such as @ref RFS_() or @ref RFXML_()
  ** If no value is given the default value is to use the one provided at compile time by the Refu Builder and the
- ** preprocessor directive @c RF_OPTION_LOCALSTACKMEMORY_SIZE.
+ ** preprocessor directive @c RF_OPTION_LOCALSTACK_MEMORY_SIZE.
  **
  **/
 #ifdef RF_IAMHERE_FOR_DOXYGEN
@@ -76,9 +76,13 @@ i_DECLIMEX_  void rfInit(char* errstr,char* logstr,uint64_t size);
     #define i_NPSELECT_RF_INIT1(...)  RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfStringInit() accepts from 0 to 3 arguments\"")
     #define i_NPSELECT_RF_INIT0(...)  RF_SELECT_FUNC(i_SELECT_RF_INIT,__VA_ARGS__)
     #define i_SELECT_RF_INIT3(...)  i_rfInit(__VA_ARGS__)
-    #define i_SELECT_RF_INIT2(...)  i_rfInit(__VA_ARGS__,RF_OPTION_LOCALSTACKMEMORY_SIZE)
-    #define i_SELECT_RF_INIT1(...)  i_rfInit(__VA_ARGS__,"refuInfoLog",RF_OPTION_LOCALSTACKMEMORY_SIZE)
-    #define i_SELECT_RF_INIT0(...)  i_rfInit("refuErrorLog","refuInfoLog",RF_OPTION_LOCALSTACKMEMORY_SIZE)
+    #define i_SELECT_RF_INIT2(...)  i_rfInit(__VA_ARGS__,\
+    RF_OPTION_LOCALSTACK_MEMORY_SIZE)
+    #define i_SELECT_RF_INIT1(...)  i_rfInit(__VA_ARGS__, "refuInfoLog",\
+    RF_OPTION_LOCALSTACK_MEMORY_SIZE)
+    #define i_SELECT_RF_INIT0(...)  i_rfInit("refuErrorLog",\
+    "refuInfoLog",                                          \
+    RF_OPTION_LOCALSTACK_MEMORY_SIZE)
 #else
     i_DECLIMEX_  void rfInit(char* errstr,char* logstr,uint64_t size);
 #endif

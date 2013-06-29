@@ -89,7 +89,7 @@ int32_t i_rfStringX_MoveAfter(RF_StringX* thisstr,const void* subP,void* resultP
         {
             RF_StringX* result = (RF_StringX*) resultP;
             result->INH_String.byteLength = move-sub->byteLength;
-            result->bSize = result->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+            result->bSize = result->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
             result->bIndex=0;
             RF_MALLOC(result->INH_String.bytes,result->bSize);
             memcpy(result->INH_String.bytes,thisstr->INH_String.bytes-move,result->INH_String.byteLength);
@@ -222,7 +222,7 @@ char rfStringX_MoveAfterv(RF_StringX* thisstr,void* resultP,const char options,c
         {
             RF_StringX* result = (RF_StringX*) resultP;
             result->INH_String.byteLength = move-paramLen;
-            result->bSize = result->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+            result->bSize = result->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
             result->bIndex=0;
             RF_MALLOC(result->INH_String.bytes,result->bSize);
             memcpy(result->INH_String.bytes,thisstr->INH_String.bytes-move,result->INH_String.byteLength);

@@ -83,7 +83,7 @@ RF_StringX* i_rfStringX_Create(const char* lit,...)
     //get bytelength
     ret->INH_String.byteLength =ioBuffer.INH_String.byteLength;
     //allocate and populate the data
-    ret->bSize = ret->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+    ret->bSize = ret->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
     RF_MALLOC(ret->INH_String.bytes,ret->bSize);
     strcpy(ret->INH_String.bytes,ioBuffer.INH_String.bytes);
     ret->bIndex = 0;
@@ -106,7 +106,7 @@ RF_StringX* i_NVrfStringX_Create(const char* lit)
     //get bytelength
     ret->INH_String.byteLength = byteLength;
     //allocate and populate the data
-    ret->bSize = byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+    ret->bSize = byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
     RF_MALLOC(ret->INH_String.bytes,ret->bSize);
     strcpy(ret->INH_String.bytes,lit);
     ret->bIndex = 0;
@@ -135,7 +135,7 @@ char i_rfStringX_Init(RF_StringX* str,const char* lit,...)
     //get bytelength
     str->INH_String.byteLength = ioBuffer.INH_String.byteLength;
     //allocate and populate the data
-    str->bSize = str->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+    str->bSize = str->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
     RF_MALLOC(str->INH_String.bytes,str->bSize);
     strcpy(str->INH_String.bytes,ioBuffer.INH_String.bytes);
     str->bIndex = 0;
@@ -156,7 +156,7 @@ char i_NVrfStringX_Init(RF_StringX* str,const char* lit)
     //get bytelength
     str->INH_String.byteLength = byteLength;
     //allocate and populate the data
-    str->bSize = byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+    str->bSize = byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
     RF_MALLOC(str->INH_String.bytes,str->bSize);
     strcpy(str->INH_String.bytes,lit);
     str->bIndex = 0;
@@ -171,7 +171,7 @@ RF_StringX* rfStringX_Create_cp(uint32_t codepoint)
     RF_StringX* ret;
     RF_MALLOC(ret,sizeof(RF_StringX));
     //since this is an extended string let's be a bit more generous with the buffer
-    ret->bSize = 5*RF_OPTION_STRINGX_CAPACITY_M;
+    ret->bSize = 5*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER;
     RF_MALLOC(ret->INH_String.bytes,ret->bSize);
     ret->bIndex = 0;
 
@@ -268,7 +268,7 @@ char rfStringX_Init_cp(RF_StringX* str,uint32_t codepoint)
 {
 
     //since this is an extended string let's be a bit more generous with the buffer
-    str->bSize = 5*RF_OPTION_STRINGX_CAPACITY_M;
+    str->bSize = 5*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER;
     RF_MALLOC(str->INH_String.bytes,str->bSize);
     str->bIndex = 0;
 
@@ -338,7 +338,7 @@ RF_StringX* rfStringX_Create_i(int32_t i)
     //initialize the string and return it
     RF_StringX* ret;
     RF_MALLOC(ret,sizeof(RF_String));
-    ret->bSize = numLen*RF_OPTION_STRINGX_CAPACITY_M;
+    ret->bSize = numLen*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER;
     RF_MALLOC(ret->INH_String.bytes,sizeof(char)*ret->bSize);
     ret->INH_String.byteLength = numLen;
     strcpy(ret->INH_String.bytes,buff);
@@ -354,7 +354,7 @@ char rfStringX_Init_i(RF_StringX* str,int32_t i)
     sprintf(buff,"%d",i);
     numLen = strlen(buff)+1;
 
-    str->bSize = numLen*RF_OPTION_STRINGX_CAPACITY_M;
+    str->bSize = numLen*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER;
     RF_MALLOC(str->INH_String.bytes,sizeof(char)*str->bSize);
     str->INH_String.byteLength = numLen;
     strcpy(str->INH_String.bytes,buff);
@@ -373,7 +373,7 @@ RF_StringX* rfStringX_Create_f(float f)
     RF_StringX* ret;
     RF_MALLOC(ret,sizeof(RF_StringX));
     ret->INH_String.byteLength = len;
-    ret->bSize = len*RF_OPTION_STRINGX_CAPACITY_M+1;
+    ret->bSize = len*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
     RF_MALLOC(ret->INH_String.bytes,ret->bSize);
     ret->bIndex = 0;
     strcpy(ret->INH_String.bytes,buff);
@@ -393,7 +393,7 @@ char rfStringX_Init_f(RF_StringX* str,float f)
 
     //initialize and return the string
     str->INH_String.byteLength = len;
-    str->bSize = len*RF_OPTION_STRINGX_CAPACITY_M+1;
+    str->bSize = len*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
     RF_MALLOC(str->INH_String.bytes,str->bSize);
     str->bIndex = 0;
     strcpy(str->INH_String.bytes,buff);
@@ -435,7 +435,7 @@ RF_StringX* i_rfStringX_Create_buff(uint32_t buffSize,const char* lit,...)
                    RE_STRING_INIT_FAILURE,lit);
 
         //set the buffer size to double the given string's length
-        ret->bSize = ioBuffer.INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+        ret->bSize = ioBuffer.INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
     }
 
     //allocate and populate the data
@@ -467,7 +467,7 @@ RF_StringX* i_NVrfStringX_Create_buff(uint32_t buffSize,const char* lit)
         LOG_ERROR("At initialization of %s as Extended String the given buffer size does not fit the original String. The buffer size is automatically corrected to fit the string",
                    RE_STRING_INIT_FAILURE,lit);
         //set the buffer size to double the given string's length
-        ret->bSize = byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+        ret->bSize = byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
     }
     //allocate and populate the data
     RF_MALLOC(ret->INH_String.bytes,ret->bSize);
@@ -504,7 +504,7 @@ char i_rfStringX_Init_buff(RF_StringX* str,uint32_t buffSize,const char* lit,...
         LOG_ERROR("At initialization of %s as Extended String the given buffer size does not fit the original String. The buffer size is automatically corrected to fit the string",
                    RE_STRING_INIT_FAILURE,lit);
         //set the buffer size to double the given string's length
-        str->bSize = ioBuffer.INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+        str->bSize = ioBuffer.INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
     }
     //allocate and populate the data
     RF_MALLOC(str->INH_String.bytes,str->bSize);
@@ -533,7 +533,7 @@ char i_NVrfStringX_Init_buff(RF_StringX* str,uint32_t buffSize,const char* lit)
                    RE_STRING_INIT_FAILURE,lit);
 
         //set the buffer size to double the given string's length
-        str->bSize = byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+        str->bSize = byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
     }
     //allocate and populate the data
     RF_MALLOC(str->INH_String.bytes,str->bSize);
@@ -638,7 +638,7 @@ RF_StringX* rfStringX_Create_unsafe(const char* lit)
     //get bytelength
     ret->INH_String.byteLength = strlen(lit);
     //allocate and populate the data
-    ret->bSize = ret->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+    ret->bSize = ret->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
     RF_MALLOC(ret->INH_String.bytes,ret->bSize);
     strcpy(ret->INH_String.bytes,lit);
     ret->bIndex = 0;
@@ -652,7 +652,7 @@ void rfStringX_Init_unsafe(RF_StringX* str,const char* lit)
     //get bytelength
     str->INH_String.byteLength = strlen(lit);
     //allocate and populate the data
-    str->bSize = str->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+    str->bSize = str->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
     RF_MALLOC(str->INH_String.bytes,str->bSize);
     strcpy(str->INH_String.bytes,lit);
     str->bIndex = 0;
@@ -685,7 +685,7 @@ char rfStringX_Assign_char(RF_StringX* str,uint32_t codepoint)
     //realloc if needed
     if(str->bSize <5)
     {
-        RF_REALLOC(str->INH_String.bytes,char,5*RF_OPTION_STRINGX_CAPACITY_M+1);
+        RF_REALLOC(str->INH_String.bytes,char,5*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1);
     }
     if((bytes=rfUTF8_Encode_single(codepoint,utf8))==0)
     {
@@ -705,7 +705,7 @@ RF_StringX* rfStringX_FromString_OUT(const RF_String* s)
     RF_StringX* ret;
     RF_MALLOC(ret,sizeof(RF_StringX));
     //copy the bytes
-    ret->bSize = s->byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+    ret->bSize = s->byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
     RF_MALLOC(ret->INH_String.bytes,ret->bSize);
     memcpy(ret->INH_String.bytes,s->bytes,s->byteLength+1);
     ret->bIndex = 0;
@@ -717,7 +717,7 @@ void rfStringX_FromString_IN(RF_StringX* dst,const RF_String* src)
 {
     //allocate the stringX
     dst->bIndex = 0;
-    dst->bSize = src->byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+    dst->bSize = src->byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
     RF_MALLOC(dst->INH_String.bytes,dst->bSize)
     dst->INH_String.byteLength = src->byteLength;
     //copy the bytes from the String

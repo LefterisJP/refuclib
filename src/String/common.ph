@@ -84,7 +84,7 @@ extern "C"
 if(REQSIZE_ >= STR_->bSize)\
 {\
     /*create the new size*/\
-    STR_->bSize = REQSIZE_*RF_OPTION_STRINGX_CAPACITY_M;\
+    STR_->bSize = REQSIZE_*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER;\
     /*Reallocate the buffer depending on whether its internal pointer has a value or not*/\
     if(STR_->bIndex==0)\
         RF_REALLOC(STR_->INH_String.bytes,char,STR_->bSize)\

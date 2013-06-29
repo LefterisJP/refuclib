@@ -1,11 +1,17 @@
 from modules import Module
-
+from time import gmtime, strftime
 
 Import('systemAttributes')
 Import('modules env targetSystem')
-#this is a list of macro defines (Except the modules and the OS define) that should actually go to rf_options.h
-optionsList = [ '_FILE_OFFSET_BITS', 'RF_OPTION_THREADX_MSGQUEUE','RF_OPTION_FGETS_READBYTESN',
-                'RF_OPTION_DEFAULT_ARGUMENTS', 'RF_OPTION_VERBOSE_ERRORS', 'RF_OPTION_LOCALSTACKMEMORY_SIZE', '_LARGEFILE64_SOURCE']
+#this is a list of macro defines (Except the modules and the OS define) that
+#should actually go to rf_options.h
+optionsList = [ '_FILE_OFFSET_BITS',
+                'RF_OPTION_THREADX_MSGQUEUE_SIZE',
+                'RF_OPTION_FGETS_READ_BYTESN',
+                'RF_OPTION_DEFAULT_ARGUMENTS',
+                'RF_OPTION_ERROR_LOGGING',
+                'RF_OPTION_LOCALSTACK_MEMORY_SIZE',
+                '_LARGEFILE64_SOURCE']
 
 """ Writes a macro definition to a file
 
@@ -34,22 +40,26 @@ def writeDefVal(file,defname,defines):
     file.write("\n");
     file.write("#endif\n\n")
 
-
 #open the file and write its introduction
 f = open("../../include/rf_options.h","w");
-f.write("/**\n\
-** This file contains the options that the refu library got built with by the Scons Build system\n\
-** It is included from inside many files in the library so that the options can\n\
-** get included and that both the library and the using\n\
-** program can know which modules are built and which are not, along with other options\n\
-**\n\
-** Note that options which are used only in the source files are given to the compiler as flags\n\
-** during compiling and are not located in here\n\
-**\n\
-** Also note that this file is totally skipped due to the first ifndef if the user builds the library with scons\n\
-**/\n\
-\n\
-#ifndef REFU_COMPILING //When we are compiling, some of the defines should be ignored as they are given by the build system\n");
+f.write("/**\n"
+        
+        " ** This file contains the options that the refu library got built\n"
+        " ** with by the Scons Build system.It was generated at:\n"
+        " ** {} \n"
+        " ** It is included from inside many files in the library so that \n"
+        " ** the options can get included and that both the library and the\n"
+        " ** using program can know which modules are built and which are not, \n"
+        " ** along with other options\n **\n"
+        " ** Note that options which are used only in the source files are \n"
+        " **given to the compiler as flags during compiling and are not located here \n"
+        " **\n"
+        " ** Also note that this file is totally skipped due to the first \n"
+        " ** ifndef if the user builds the library with scons\n"
+        "**/\n\n"
+        "#ifndef REFU_COMPILING //When we are compiling, some of the \n"
+        "//defines should be ignored as they are given by the build"
+        "//system\n".format(strftime("%Y-%m-%d %H:%M:%S", gmtime())))
 
 #depending on the OS write the proper macro
 if(targetSystem == 'Windows'):
@@ -59,7 +69,9 @@ elif(targetSystem == 'Linux'):
 else:
     print "Error! Unsupported Operating system detected during creating the configuration header"
     exit(1)
-#iterate through all the modules we need and report their existence in rf_options.h  (skipping the core module)
+
+# iterate through all the modules we need and report their existence
+# in rf_options.h  (skipping the core module)
 for mod in modules[1:]:
     writeDef(f, mod.macro)
     if mod.extra_generated == True:
@@ -87,8 +99,4 @@ if(systemAttributes['endianess']=='BIG'):
 else:
     writeDef(f,'RF_LITTLE_ENDIAN_COMPILE')
 
-    
-
-
-f.close();
-    
+f.close();    

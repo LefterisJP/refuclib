@@ -55,11 +55,11 @@ int32_t rfFReadLine_UTF8(FILE* f,char eol,char** utf8,uint32_t* byteLength,uint3
     uint32_t bIndex=0;
 
     //allocate the utf8 buffer
-    *bufferSize = RF_OPTION_FGETS_READBYTESN+4;
+    *bufferSize = RF_OPTION_FGETS_READ_BYTESN+4;
     RF_MALLOC(*utf8,*bufferSize)
     *byteLength = 0;
     //read the start
-    bytesN = rfFgets_UTF8(*utf8,RF_OPTION_FGETS_READBYTESN,f,eof,eol);
+    bytesN = rfFgets_UTF8(*utf8,RF_OPTION_FGETS_READ_BYTESN,f,eof,eol);
     (*byteLength)+=bytesN;
 
     if(bytesN < 0)//error check
@@ -71,18 +71,18 @@ int32_t rfFReadLine_UTF8(FILE* f,char eol,char** utf8,uint32_t* byteLength,uint3
     if(*((*utf8)+bytesN-1) == (char)RF_LF)
         return bytesN;
 
-    if(bytesN >= RF_OPTION_FGETS_READBYTESN && (*eof)==false)//if the size does not fit in the buffer and if we did not reach the end of file
+    if(bytesN >= RF_OPTION_FGETS_READ_BYTESN && (*eof)==false)//if the size does not fit in the buffer and if we did not reach the end of file
     {
         //keep reading until we have read all until newline or EOF
-        while(bytesN >= RF_OPTION_FGETS_READBYTESN && (*eof)==false)
+        while(bytesN >= RF_OPTION_FGETS_READ_BYTESN && (*eof)==false)
         {
-            if(*byteLength+RF_OPTION_FGETS_READBYTESN+4 >= *bufferSize)
+            if(*byteLength+RF_OPTION_FGETS_READ_BYTESN+4 >= *bufferSize)
             {
-                *bufferSize=(*byteLength+RF_OPTION_FGETS_READBYTESN+4)*2;
+                *bufferSize=(*byteLength+RF_OPTION_FGETS_READ_BYTESN+4)*2;
                 RF_REALLOC(*utf8,char,*bufferSize);
             }
             bIndex += bytesN;
-            bytesN = rfFgets_UTF8((*utf8)+bIndex,RF_OPTION_FGETS_READBYTESN,f,eof,eol);
+            bytesN = rfFgets_UTF8((*utf8)+bIndex,RF_OPTION_FGETS_READ_BYTESN,f,eof,eol);
             (*byteLength)+=bytesN;
             if(bytesN < 0)//error check
             {
@@ -107,17 +107,17 @@ int32_t rfFReadLine_UTF8(FILE* f,char eol,char** utf8,uint32_t* byteLength,uint3
 //Reads a Little Endian UTF-16 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
 int32_t rfFReadLine_UTF16LE(FILE* f,char eol,char** utf8,uint32_t* byteLength,char* eof)
 {
-    char buff[RF_OPTION_FGETS_READBYTESN+5];
+    char buff[RF_OPTION_FGETS_READ_BYTESN+5];
     int32_t bytesN,error;
-    uint32_t *codepoints,charsN,bIndex=0,buffSize=RF_OPTION_FGETS_READBYTESN+5,accum;
+    uint32_t *codepoints,charsN,bIndex=0,buffSize=RF_OPTION_FGETS_READ_BYTESN+5,accum;
     char* tempBuff = 0,buffAllocated=false;
 
-    bytesN = rfFgets_UTF16LE(buff,RF_OPTION_FGETS_READBYTESN,f,eof,eol);
+    bytesN = rfFgets_UTF16LE(buff,RF_OPTION_FGETS_READ_BYTESN,f,eof,eol);
     accum = (uint32_t)bytesN;
     tempBuff = &buff[0];//point the tempBuff to the initial buffer for now
     if(bytesN < 0)//error check
         RETURN_LOG_ERROR("Failed to read from a Little Endian UTF-16 file",bytesN)
-    else if(bytesN >= RF_OPTION_FGETS_READBYTESN && (*eof)==false)//if the size does not fit in the buffer and if we did not reach the EOF
+    else if(bytesN >= RF_OPTION_FGETS_READ_BYTESN && (*eof)==false)//if the size does not fit in the buffer and if we did not reach the EOF
     {
         //allocate the temporary buffer and move the previous buffer's content inside it
         buffSize=buffSize*2+5;
@@ -128,7 +128,7 @@ int32_t rfFReadLine_UTF16LE(FILE* f,char eol,char** utf8,uint32_t* byteLength,ch
         //keep reading until we have read all until newline or EOF
         do
         {
-            bytesN = rfFgets_UTF16LE(tempBuff+bIndex,RF_OPTION_FGETS_READBYTESN,f,eof,eol);
+            bytesN = rfFgets_UTF16LE(tempBuff+bIndex,RF_OPTION_FGETS_READ_BYTESN,f,eof,eol);
             accum += bytesN;
             if(bytesN < 0)//error check
             {
@@ -136,16 +136,16 @@ int32_t rfFReadLine_UTF16LE(FILE* f,char eol,char** utf8,uint32_t* byteLength,ch
                 RETURN_LOG_ERROR("Failed to read from a Little Endian UTF-16 file",bytesN)
             }
             //realloc to have more space in the buffer for reading if needed
-            if(accum+RF_OPTION_FGETS_READBYTESN+5 >= buffSize)
+            if(accum+RF_OPTION_FGETS_READ_BYTESN+5 >= buffSize)
             {
-                buffSize=(accum+RF_OPTION_FGETS_READBYTESN+5)*2;
+                buffSize=(accum+RF_OPTION_FGETS_READ_BYTESN+5)*2;
                 RF_REALLOC(tempBuff,char,buffSize);
             }
             bIndex += bytesN;
             //if the last character was newline break off the loop
             if( *(uint16_t*)(tempBuff+bIndex-2)== (uint16_t)RF_LF)
                 break;
-        }while(bytesN >= RF_OPTION_FGETS_READBYTESN && (*eof)==false);//end of reading loop
+        }while(bytesN >= RF_OPTION_FGETS_READ_BYTESN && (*eof)==false);//end of reading loop
     }//end of size not fitting the initial buffer case
     if(bytesN >0)//determine the amount of bytes read
         bIndex+=bytesN;
@@ -177,17 +177,17 @@ int32_t rfFReadLine_UTF16LE(FILE* f,char eol,char** utf8,uint32_t* byteLength,ch
 //Reads a Big Endian UTF-16 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
 int32_t rfFReadLine_UTF16BE(FILE* f,char eol,char** utf8,uint32_t* byteLength,char* eof)
 {
-    char buff[RF_OPTION_FGETS_READBYTESN+5];
+    char buff[RF_OPTION_FGETS_READ_BYTESN+5];
     int32_t bytesN,error;
-    uint32_t *codepoints,charsN,bIndex=0,buffSize=RF_OPTION_FGETS_READBYTESN+5,accum;
+    uint32_t *codepoints,charsN,bIndex=0,buffSize=RF_OPTION_FGETS_READ_BYTESN+5,accum;
     char* tempBuff = 0,buffAllocated=false;
 
-    bytesN = rfFgets_UTF16BE(buff,RF_OPTION_FGETS_READBYTESN,f,eof,eol);
+    bytesN = rfFgets_UTF16BE(buff,RF_OPTION_FGETS_READ_BYTESN,f,eof,eol);
     accum = (uint32_t)bytesN;
     tempBuff = &buff[0];//point the tempBuff to the initial buffer for now
     if(bytesN < 0)//error check
         RETURN_LOG_ERROR("Failed to read from a Big Endian UTF-16 file",bytesN)
-    else if(bytesN >= RF_OPTION_FGETS_READBYTESN && (*eof)==false)//if the size does not fit in the buffer and if we did not reach the EOF
+    else if(bytesN >= RF_OPTION_FGETS_READ_BYTESN && (*eof)==false)//if the size does not fit in the buffer and if we did not reach the EOF
     {
         //allocate the temporary buffer and move the previous buffer's content inside it
         buffSize=buffSize*2+5;
@@ -198,7 +198,7 @@ int32_t rfFReadLine_UTF16BE(FILE* f,char eol,char** utf8,uint32_t* byteLength,ch
         //keep reading until we have read all until newline or EOF
         do
         {
-            bytesN = rfFgets_UTF16BE(tempBuff+bIndex,RF_OPTION_FGETS_READBYTESN,f,eof,eol);
+            bytesN = rfFgets_UTF16BE(tempBuff+bIndex,RF_OPTION_FGETS_READ_BYTESN,f,eof,eol);
             accum+=bytesN;
             if(bytesN < 0)//error check
             {
@@ -206,16 +206,16 @@ int32_t rfFReadLine_UTF16BE(FILE* f,char eol,char** utf8,uint32_t* byteLength,ch
                 RETURN_LOG_ERROR("Failed to read from a Big Endian UTF-16 file",bytesN)
             }
             //realloc to have more space in the buffer for reading if needed
-            if(accum+RF_OPTION_FGETS_READBYTESN+5 >= buffSize)
+            if(accum+RF_OPTION_FGETS_READ_BYTESN+5 >= buffSize)
             {
-                buffSize=(accum+RF_OPTION_FGETS_READBYTESN+5)*2;
+                buffSize=(accum+RF_OPTION_FGETS_READ_BYTESN+5)*2;
                 RF_REALLOC(tempBuff,char,buffSize);
             }
             bIndex += bytesN;
             //if the last character was newline break off the loop
             if( (*(uint16_t*)(tempBuff+bIndex-2))== (uint16_t)RF_LF)
                 break;
-        }while(bytesN >= RF_OPTION_FGETS_READBYTESN && (*eof)==false);//end of reading loop
+        }while(bytesN >= RF_OPTION_FGETS_READ_BYTESN && (*eof)==false);//end of reading loop
     }//end of size not fitting the initial buffer case
     if(bytesN >0)//determine the amount of bytes read
         bIndex+=bytesN;
@@ -247,16 +247,16 @@ int32_t rfFReadLine_UTF16BE(FILE* f,char eol,char** utf8,uint32_t* byteLength,ch
 //Reads a Big Endian UTF-32 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
 int32_t rfFReadLine_UTF32BE(FILE* f,char eol,char** utf8,uint32_t* byteLength,char* eof)
 {
-    char buff[RF_OPTION_FGETS_READBYTESN+7];
+    char buff[RF_OPTION_FGETS_READ_BYTESN+7];
     int32_t bytesN;
-    uint32_t *codepoints,bIndex=0,buffSize=RF_OPTION_FGETS_READBYTESN+7,accum;
+    uint32_t *codepoints,bIndex=0,buffSize=RF_OPTION_FGETS_READ_BYTESN+7,accum;
     char* tempBuff = 0,buffAllocated=false;
-    bytesN = rfFgets_UTF32BE(buff,RF_OPTION_FGETS_READBYTESN,f,eof,eol);
+    bytesN = rfFgets_UTF32BE(buff,RF_OPTION_FGETS_READ_BYTESN,f,eof,eol);
     accum = (uint32_t)bytesN;
     tempBuff = &buff[0];//point the tempBuff to the initial buffer for now
     if(bytesN < 0)//error check
         RETURN_LOG_ERROR("Failed to read from a Big Endian UTF-32 file",bytesN)
-    else if(bytesN >= RF_OPTION_FGETS_READBYTESN && (*eof)==false)//if the size does not fit in the buffer and if we did not reach the EOF
+    else if(bytesN >= RF_OPTION_FGETS_READ_BYTESN && (*eof)==false)//if the size does not fit in the buffer and if we did not reach the EOF
     {
         //allocate the temporary buffer and move the previous buffer's content inside it
         buffSize=buffSize*2+7;
@@ -267,7 +267,7 @@ int32_t rfFReadLine_UTF32BE(FILE* f,char eol,char** utf8,uint32_t* byteLength,ch
         //keep reading until we have read all until newline or EOF
         do
         {
-            bytesN = rfFgets_UTF32BE(tempBuff+bIndex,RF_OPTION_FGETS_READBYTESN,f,eof,eol);
+            bytesN = rfFgets_UTF32BE(tempBuff+bIndex,RF_OPTION_FGETS_READ_BYTESN,f,eof,eol);
             accum+=bytesN;
             if(bytesN < 0)//error check
             {
@@ -275,16 +275,16 @@ int32_t rfFReadLine_UTF32BE(FILE* f,char eol,char** utf8,uint32_t* byteLength,ch
                 RETURN_LOG_ERROR("Failed to read from a Big Endian UTF-16 file",bytesN)
             }
             //realloc to have more space in the buffer for reading if needed
-            if(accum+RF_OPTION_FGETS_READBYTESN+7 >= buffSize)
+            if(accum+RF_OPTION_FGETS_READ_BYTESN+7 >= buffSize)
             {
-                buffSize=(accum+RF_OPTION_FGETS_READBYTESN+7)*2;
+                buffSize=(accum+RF_OPTION_FGETS_READ_BYTESN+7)*2;
                 RF_REALLOC(tempBuff,char,buffSize);
             }
             bIndex += bytesN;
             //if the last character was newline break off the loop
             if( (*(uint32_t*)(tempBuff+bIndex-4))== (uint32_t)RF_LF)
                 break;
-        }while(bytesN >= RF_OPTION_FGETS_READBYTESN && (*eof)==false);//end of reading loop
+        }while(bytesN >= RF_OPTION_FGETS_READ_BYTESN && (*eof)==false);//end of reading loop
     }//end of size not fitting the initial buffer case
     if(bytesN >0)//determine the amount of bytes read
         bIndex+=bytesN;
@@ -306,16 +306,16 @@ int32_t rfFReadLine_UTF32BE(FILE* f,char eol,char** utf8,uint32_t* byteLength,ch
 //Reads a Little Endian UTF-32 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
 int32_t rfFReadLine_UTF32LE(FILE* f,char eol,char** utf8,uint32_t* byteLength,char* eof)
 {
-    char buff[RF_OPTION_FGETS_READBYTESN+7];
+    char buff[RF_OPTION_FGETS_READ_BYTESN+7];
     int32_t bytesN;
-    uint32_t *codepoints,bIndex=0,buffSize=RF_OPTION_FGETS_READBYTESN+7,accum;
+    uint32_t *codepoints,bIndex=0,buffSize=RF_OPTION_FGETS_READ_BYTESN+7,accum;
     char* tempBuff = 0,buffAllocated=false;
-    bytesN = rfFgets_UTF32LE(buff,RF_OPTION_FGETS_READBYTESN,f,eof,eol);
+    bytesN = rfFgets_UTF32LE(buff,RF_OPTION_FGETS_READ_BYTESN,f,eof,eol);
     accum = (uint32_t) bytesN;
     tempBuff = &buff[0];//point the tempBuff to the initial buffer for now
     if(bytesN < 0)//error check
         RETURN_LOG_ERROR("Failed to read from a Little Endian UTF-32 file",bytesN)
-    else if(bytesN >= RF_OPTION_FGETS_READBYTESN && (*eof)==false)//if the size does not fit in the buffer and if we did not reach the EOF
+    else if(bytesN >= RF_OPTION_FGETS_READ_BYTESN && (*eof)==false)//if the size does not fit in the buffer and if we did not reach the EOF
     {
         //allocate the temporary buffer and move the previous buffer's content inside it
         buffSize=buffSize*2+7;
@@ -326,7 +326,7 @@ int32_t rfFReadLine_UTF32LE(FILE* f,char eol,char** utf8,uint32_t* byteLength,ch
         //keep reading until we have read all until newline or EOF
         do
         {
-            bytesN = rfFgets_UTF32LE(tempBuff+bIndex,RF_OPTION_FGETS_READBYTESN,f,eof,eol);
+            bytesN = rfFgets_UTF32LE(tempBuff+bIndex,RF_OPTION_FGETS_READ_BYTESN,f,eof,eol);
             accum +=bytesN;
             if(bytesN < 0)//error check
             {
@@ -334,16 +334,16 @@ int32_t rfFReadLine_UTF32LE(FILE* f,char eol,char** utf8,uint32_t* byteLength,ch
                 RETURN_LOG_ERROR("Failed to read from a Little Endian UTF-16 file",bytesN)
             }
             //realloc to have more space in the buffer for reading if needed
-            if(accum+RF_OPTION_FGETS_READBYTESN+7 >= buffSize)
+            if(accum+RF_OPTION_FGETS_READ_BYTESN+7 >= buffSize)
             {
-                buffSize=(accum+RF_OPTION_FGETS_READBYTESN+7)*2;
+                buffSize=(accum+RF_OPTION_FGETS_READ_BYTESN+7)*2;
                 RF_REALLOC(tempBuff,char,buffSize);
             }
             bIndex += bytesN;
             //if the last character was newline break off the loop
             if( (*(uint32_t*)(tempBuff+bIndex-4))== (uint32_t)RF_LF)
                 break;
-        }while(bytesN >= RF_OPTION_FGETS_READBYTESN && (*eof)==false);//end of reading loop
+        }while(bytesN >= RF_OPTION_FGETS_READ_BYTESN && (*eof)==false);//end of reading loop
     }//end of size not fitting the initial buffer case
     if(bytesN >0)//determine the amount of bytes read
         bIndex+=bytesN;

@@ -19,6 +19,7 @@ def checkCompilerValue(key,value,environment):
 
 # Initialize the variables object
 vars = Variables('refu.config')
+
 # Add Variable Options which don't have to do with the actual building of
 # the library
 vars.Add(
@@ -34,7 +35,7 @@ vars.Add(
 
 #Add All the variable options which have to do with the building of the library
 vars.Add('COMPILER', 'The compiler name. Allowed values are: gcc, tcc, msvc',
-         'gcc',checkCompilerValue)
+         'gcc',validator=checkCompilerValue)
 
 vars.Add(
     PathVariable('COMPILER_DIR', 'The directory of the compiler. Will try'
@@ -74,8 +75,11 @@ vars.Add(
                      'ALL',
                      'STRING',
                      'IO', 'TEXTFILE',
-                     'DATA_STRUCTURES', 'LIST', 'DYNAMIC_ARRAY',
+                     'DATA_STRUCTURES', 
+                     'LIST', 
+                     'DYNAMIC_ARRAY',
                      'BINARY_ARRAY',
+                     'HASMAP',
                      'TIME', 'DATE',
                      'XML',
                      'THREADS', 'THREADS_SIMPLE', 'THREADS_X',
@@ -93,6 +97,11 @@ vars.Add(
                  'module. They specify what types of dynamic arrays to '
                  'create', [], type_dict))
 
+vars.Add(
+    ListVariable('HASHMAP', 'These are options specific to the hashmap '
+                 'module. They specify what types of hashmaps to '
+                 'create', [], type_dict))
+
 vars.Add('DEBUG', "This option determines if this will be a Debug Build (0"
          "or 1), and if more than 1 it can indicate a different debug level",
          0)
@@ -103,57 +112,66 @@ vars.Add(
                  ' with some functions having default arguments, utilizing '
                  'the C preprocessor. If \'no\' they are build normally. '
                  'Accepted values for this option are \'yes\' and \'no\'.'
-                 ' Default is \'yes\'.', 1))
+                 , 'yes'))
 
 vars.Add(
-    BoolVariable('SAFE_MEMORY_ALLOC', 'If \'yes\' then the malloc and calloc'
+    BoolVariable('SAFE_MEMORY_ALLOCATION',
+                 'If \'yes\' then the malloc and calloc'
                  ' calls of the library check for failure and in case of '
                  'failure log an error and exit the process.If \'no\' then '
                  'malloc and calloc are called normally.Accepted values '
-                 'for this option are \'yes\' and \'no\'. Default is '
-                 '\'no\'.', 0))
+                 'for this option are \'yes\' and \'no\'.'
+                 ,'no' ))
 
 vars.Add(
-    BoolVariable('VERBOSE_ERROR_LOGGING', 'If \'yes\' then the library\'s '
+    BoolVariable('ERROR_LOGGING', 'If \'yes\' then the library\'s '
                  'error logging will be verbose which basically means that '
-                 'every error will be printed in the appropriate log file'
-                 ' stream. Default is \'yes\'.', 1))
+                 'all error and info logging macros will be activated '
+                 'and will be printed in the appropriate log file'
+                 ' stream.', 'yes'))
 
 vars.Add('FGETS_READ_BYTESN', 'This option is the number of bytes that will '
          'be read each time by the library\'s version of fgets. Must be a '
-         'positive integer number. Default is 512', 512)
+         'positive integer number.', 512)
 
 vars.Add('STRINGX_CAPACITY_MULTIPLIER', 'This is the multiplier by which a'
          ' StringX\'s buffer will get allocated/reallocated by when there'
          ' is a need for buffer extension. Also when the StringX gets '
          'initialized this is how much bigger than the given String the '
-         'buffer will be. Must be a positive integer. Default is 2', 2)
+         'buffer will be. Must be a positive integer.', 2)
 
 vars.Add('DYNAMICARRAY_CAPACITY_MULTIPLIER', 'This is the multiplier by which '
          'a Dynamic array\'s buffer will get allocated/reallocated by when'
          ' there is a need for buffer extension. Also when the List gets '
          'initialized this is how much bigger than the given initial size '
-         'the buffer will be. Must be a positive integer. Default is 2', 2)
+         'the buffer will be. Must be a positive integer.', 2)
 
-vars.Add('LOCAL_STACK_SIZE', 'This is the default size in bytes of the main'
+vars.Add('LOCALSTACK_MEMORY_SIZE',
+         'This is the default size in bytes of the main'
          ' thread\'s Local Stack of the Refu Library. All objects that are'
          ' initialized as temporary objects such as with the  RFS_() macro'
          ' or the RFXML_() macro are initialized in this stack. Make sure '
          'to provide a big enough value so that no overflow happens for your'
-         ' program. Default Value is around 1 MB. This is just the value to '
-         'be used if no specific value is provided at rfInit()', 1048576)
+         ' program. The default value is used if '
+         'no specific value is provided at rfInit()', 1048576)
 
 vars.Add(
     BoolVariable('TEXTFILE_ADD_BOM', 'This control whether to add a '
                  'BOM(ByteOrderMark) at the beginning of newly created '
                  'TextFiles. Provides \'yes\' to add and \'no\', not to. '
-                 'Default is \'yes\'', 1))
+                 , 'yes'))
 
 vars.Add('THREADX_MSGQUEUE_SIZE', 'This option affects The extended thread'
          ' objects RF_ThreadX, and it denotes what should the default value'
          ' of the size of the message queue of a newly created RF_ThreadX.'
          'You still have the option to change that in run-rime through the '
          'initialization functions but if a value is not provided this will '
-         'be the default value.Default value is 10', 10)
+         'be the default value.', 10)
+
+vars.Add('HASHMAP_LOAD_FACTOR', 'This option determines when the hashmap '
+         'will rehash all of its slots. When during a hashmap insertion '
+         'the ratio of occupied slots over the map\'s size is greater '
+         'than this value then rehashing of the map will take place.',
+         0.7)
 
 Return('vars')

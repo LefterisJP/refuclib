@@ -1,29 +1,37 @@
-""" Sets the configuration variables taken from the configuration file as defines to the construction environment
+# These are variables from variables.py which contain a value
+# and will be added to the build as preprocessor defines
+vars_for_compile_time = [
+    'FGETS_READ_BYTESN',
+    'STRINGX_CAPACITY_MULTIPLIER',
+    'DYNAMICARRAY_CAPACITY_MULTIPLIER',
+    'LOCALSTACK_MEMORY_SIZE',
+    'THREADX_MSGQUEUE_SIZE',
+    'HASHMAP_LOAD_FACTOR'
+]
 
-	varEnv 	-- The temporary environment holding the variables read from the configuration file
-	env		-- The construction environment for which to setup the configuration variables
-"""
+# These are variables from variables.py which are True/False
+# and will be added to the build as preprocessor defines (or not)
+truevars_for_compile_time = [
+    'DEFAULT_ARGUMENTS',
+    'SAFE_MEMORY_ALLOCATION',
+    'ERROR_LOGGING',
+    'TEXTFILE_ADD_BOM'
+]
+
 def setupConfigVars(varEnv,env):
-	if varEnv['DEFAULT_ARGUMENTS'] == True:
-		env.Append(CPPDEFINES	= {'RF_OPTION_DEFAULT_ARGUMENTS':None})
-	if varEnv['SAFE_MEMORY_ALLOC'] == True:
-		env.Append(CPPDEFINES	= {'RF_OPTION_SAFE_MEMORY_ALLOCATION':None})
-	if varEnv['VERBOSE_ERROR_LOGGING'] == True:
-		env.Append(CPPDEFINES	= {'RF_OPTION_VERBOSE_ERRORS':None})
-	if varEnv['TEXTFILE_ADD_BOM'] == True:
-		env.Append(CPPDEFINES	= {'RF_OPTION_FILE_ADDBOM': None})
-		
-	env.Append(CPPDEFINES	=
-               {'RF_OPTION_FGETS_READBYTESN':varEnv['FGETS_READ_BYTESN']})
-	env.Append(CPPDEFINES	=
-               {'RF_OPTION_STRINGX_CAPACITY_M':
-                varEnv['STRINGX_CAPACITY_MULTIPLIER']})
-	env.Append(CPPDEFINES	= 
-               {'RF_OPTION_DYNAMICARRAY_CAPACITY_M':
-                varEnv['DYNAMICARRAY_CAPACITY_MULTIPLIER']})
-	env.Append(CPPDEFINES	=
-               {'RF_OPTION_LOCALSTACKMEMORY_SIZE':
-                varEnv['LOCAL_STACK_SIZE']})
-	env.Append(CPPDEFINES	=
-               {'RF_OPTION_THREADX_MSGQUEUE':
-                varEnv['THREADX_MSGQUEUE_SIZE']})	
+    """ Sets the configuration variables taken from the configuration file
+        as defines to the construction environment
+
+        varEnv     -- The temporary environment holding the variables read from
+                   the configuration file
+        env        -- The construction environment for which to setup the
+                   configuration variables
+    """
+    # add to the environment all the compile time vars that are just defs
+    for v in truevars_for_compile_time:
+        if varEnv[v]:
+            env.Append(CPPDEFINES = {'RF_OPTION_{}'.format(v):None})
+    # add to the environment all the compile time vars with a value
+    for v in vars_for_compile_time:
+        env.Append(CPPDEFINES = {'RF_OPTION_{}'.format(v):
+                                 varEnv[v]})

@@ -398,7 +398,7 @@ char i_rfString_Between(const void* thisstrP,const void* lstrP,const void* rstrP
     {
         RF_StringX* result = (RF_StringX*) resultP;
         result->INH_String.byteLength = end;
-        result->bSize = result->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+        result->bSize = result->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
         result->bIndex = 0;
         RF_MALLOC(result->INH_String.bytes,result->bSize)
         memcpy(result->INH_String.bytes,thisstr->bytes+start+lstr->byteLength,result->INH_String.byteLength+1);
@@ -455,7 +455,7 @@ char rfString_Beforev(const void* thisstrP,void* resultP,const char options,cons
     {
         RF_StringX* result = (RF_StringX*) resultP;
         result->INH_String.byteLength = minPos;
-        result->bSize = result->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+        result->bSize = result->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
         result->bIndex = 0;
         RF_MALLOC(result->INH_String.bytes,result->bSize)
         memcpy(result->INH_String.bytes,thisstr->bytes,minPos);
@@ -497,7 +497,7 @@ char i_rfString_Before(const void* thisstrP,const void* sstrP,void* resultP,cons
     {
         RF_StringX* result = (RF_StringX*) resultP;
         result->INH_String.byteLength = ret;
-        result->bSize = result->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+        result->bSize = result->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
         result->bIndex = 0;
         RF_MALLOC(result->INH_String.bytes,result->bSize)
         memcpy(result->INH_String.bytes,thisstr->bytes,result->INH_String.byteLength);
@@ -590,7 +590,7 @@ char rfString_Afterv(const void* thisstrP,void* resultP,const char options,const
     {
         RF_StringX* result = (RF_StringX*) resultP;
         result->INH_String.byteLength = thisstr->byteLength-minPos;
-        result->bSize = result->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_M+1;
+        result->bSize = result->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
         result->bIndex = 0;
         RF_MALLOC(result->INH_String.bytes,result->bSize)
         memcpy(result->INH_String.bytes,thisstr->bytes+minPos,result->INH_String.byteLength);

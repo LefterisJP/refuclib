@@ -60,7 +60,7 @@ extern i_DECLIMEX_ FILE* rfStdLog;
  **/
 extern i_DECLIMEX_ FILE* rfStdErr;
 
-#ifdef RF_OPTION_VERBOSE_ERRORS
+#ifdef RF_OPTION_ERROR_LOGGING
 
 #ifndef RF_NO_C99
 /**
@@ -200,7 +200,7 @@ void LOG_INFO(const char* msg,...);
 void DLOG_INFO(const char* msg,...);
 #endif
 
-#else //non verbose errors
+#else //without RF_OPTION_ERROR_LOGGING
     #define LOG_ERROR(i_msg_,i_errorCode_,...)
     #define RETURN_LOG_ERROR(i_msg_,i_errorCode_,...) return i_errorCode_;
     #define DLOG_ERROR(i_msg_,i_errorCode_,...)

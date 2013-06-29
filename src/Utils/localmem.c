@@ -67,7 +67,7 @@ void rfLMS_Init(RF_LocalMemoryStack* lms,uint64_t size)
 void* rfLMS_Push(uint64_t size)
 {
     uint32_t temp;
-    if(RF_LMS->stackPtr+size > RF_OPTION_LOCALSTACKMEMORY_SIZE)
+    if(RF_LMS->stackPtr+size > RF_OPTION_LOCALSTACK_MEMORY_SIZE)
     {
         LOG_ERROR("Local Stack Memory pushing error. Attempted to allocate more memory than currently available",RE_LOCALMEMSTACK_PUSH)
         return 0;

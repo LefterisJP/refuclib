@@ -244,7 +244,7 @@ int32_t rfDynamicArray_Add(RF_DynamicArray* l, void* object)
     if(l->size*l->elementSize >= l->bufferCapacity)
     {
         //if not reallocate to double capacity
-        l->bufferCapacity*= RF_OPTION_DYNAMICARRAY_CAPACITY_M;
+        l->bufferCapacity*= RF_OPTION_DYNAMICARRAY_CAPACITY_MULTIPLIER;
         /* @mutate void* TYPEPTR */
         void* testPtr = realloc(l->data,l->bufferCapacity);
         if(testPtr)
@@ -392,9 +392,9 @@ int32_t rfDynamicArray_Remove(RF_DynamicArray* l, uint32_t i)
     //current size is less than the fraction of the capacity
     /* @mutate l->elementSize SIZE */
     if( l->size*l->elementSize < 
-        l->bufferCapacity/RF_OPTION_DYNAMICARRAY_CAPACITY_M)
+        l->bufferCapacity/RF_OPTION_DYNAMICARRAY_CAPACITY_MULTIPLIER)
     {
-        l->bufferCapacity /= RF_OPTION_DYNAMICARRAY_CAPACITY_M;
+        l->bufferCapacity /= RF_OPTION_DYNAMICARRAY_CAPACITY_MULTIPLIER;
         //reallocate
         /* @mutate void* TYPEPTR */
         void* testPtr = realloc(l->data,l->bufferCapacity);

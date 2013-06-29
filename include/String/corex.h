@@ -306,19 +306,20 @@ i_DECLIMEX_ char i_NVrfStringX_Init_buff(RF_StringX* str,uint32_t buffSize,const
  ** @memberof RF_StringX
  ** @brief Initializes an RF_StingX buffer for textfile reading
  **
- ** This is simply a wrapper macro for @ref rfStringX_Init_buff that initializes an @ref RF_StringX
- ** as a file reading buffer using the compile time option @c RF_OPTION_FGETS_READBYTESN. It is intended
+ ** This is simply a wrapper macro for @ref rfStringX_Init_buff that 
+ ** initializes an @ref RF_StringX as a file reading buffer using the
+ ** compile time option @c RF_OPTION_FGETS_READ_BYTESN. It is intended
  ** to be used with @ref RF_TextFile reading as can be seen in this code snippet:
  ** @snippet IO/textfile1.c READ_LINES
  **
- ** @warning This macro is not available if the library has not been compiled with default arguments on
- ** since then variadic macros do not exist. Replace it with the full call of
- ** @code rfStringX_Init_buff(&str,RF_OPTION_FGETS_READBYTESN+1,"") @endcode
- ** in that case
- **
+ ** @warning This macro is not available if the library has not been 
+ ** compiled with default arguments on since then variadic macros do not
+ ** exist. In that case replace it with the full call of
+ ** @code rfStringX_Init_buff(&str,RF_OPTION_FGETS_READ_BYTESN+1,"")
+ ** @endcode
  **/
 #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-#define rfStringX_Init_txtbuff(i_STRINGX_,...) rfStringX_Init_buff((i_STRINGX_),RF_OPTION_FGETS_READBYTESN+1,__VA_ARGS__)
+#define rfStringX_Init_txtbuff(i_STRINGX_,...) rfStringX_Init_buff((i_STRINGX_),RF_OPTION_FGETS_READ_BYTESN+1,__VA_ARGS__)
 #endif
 
 

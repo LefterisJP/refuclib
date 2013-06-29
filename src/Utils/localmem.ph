@@ -63,7 +63,7 @@
 
 #define i_rfLMS_Push(i_ptr_,i_size_)    do{\
     /* If the size of the stack plus the requested allocation goes beyond the stack size*/\
-    if(RF_LMS->stackPtr+(i_size_) > RF_OPTION_LOCALSTACKMEMORY_SIZE)\
+    if(RF_LMS->stackPtr+(i_size_) > RF_OPTION_LOCALSTACK_MEMORY_SIZE)\
     {\
         LOG_ERROR("Local Stack Memory pushing error. Attempted to allocate more memory than currently available",RE_LOCALMEMSTACK_PUSH)\
         i_ptr_ = 0;\
