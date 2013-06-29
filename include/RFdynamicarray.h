@@ -31,8 +31,6 @@
 #include <Definitions/types.h> //for fixed size data types
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <Preprocessor/rf_tokens.h>//for the defined library tokens
-#include <Data_Structures/dynamicarray_decl.h>
-#include <Data_Structures/dynamicarray.h>
 
 #ifdef RF_MODULE_DYNAMICARRAY_EXTRA
 #include <Data_Structures/dynamicarray_extra.h>

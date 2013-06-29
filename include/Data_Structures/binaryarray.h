@@ -32,6 +32,18 @@
 #include <Data_Structures/binaryarray.h>
 ---------------------For internal library include make sure to have----------------------------
 */
+
+/* @omit start */
+
+/*
+ * This file is a TEMPLATE. It does not actually get compiled at all
+ * anywhere inside the library. Depending on the options you provide
+ * in scons though various specializations of this file will get 
+ * generated during building the library
+ */
+
+/* @omit end */
+
 #ifndef RF_BINARY_ARRAY_H
 #define RF_BINARY_ARRAY_H
 

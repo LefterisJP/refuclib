@@ -1,5 +1,6 @@
 import shutil
 import os
+from time import gmtime, strftime
 
 def enum(*sequential, **named):
     enums = dict(zip(sequential, range(len(sequential))), **named)
@@ -26,6 +27,16 @@ obj_dict = {
 }
 
 lms_list = ["String"]
+
+
+def gen_template_intro_str(module_name, type_name):
+    return (
+        "/**\n"
+        " * This is a template generated file by the build system at\n"
+        " * {}\n"
+        " * for module \"{}\" and for data type \"{}\"\n"
+        " */\n\n\n"
+    ).format(strftime("%Y-%m-%d %H:%M:%S", gmtime()), module_name, type_name)
 
 class MutateTargetError(Exception):
     def __init__(self, target_type, file_name, line):
@@ -286,16 +297,25 @@ def handle_DESTROY(line, mutate, type_d, file_name):
         else:
             return "";
 
-def handle_INITIALIZE(line, mutate, type_d, file_name):
+def handle_INITIALIZE_TO_ZERO(line, mutate, type_d, file_name):
     """
        If type is not plain old data, mutate[0] (mutate_from) is changed
-       into a compound literal structure initialization
+       into a compound literal structure initialization to ZERO
     """
     if type_d in obj_dict:
         return line.replace(mutate[0], "(const struct {}) {{0}}".format(
             type_dict[type_d]))
     else:
         return line
+
+def handle_INIT(line, mutate, type_d, file_name):
+    """
+        If type is not plain old data, mutate[0] (mutate_from) is changed
+        into the initialization function of the data structure's object
+
+        TODO: If actually needed anywhere
+    """
+    return line
 
 def handle_REFERENCE(line, mutate, type_d, file_name):
     """
@@ -393,8 +413,9 @@ handle_dict = {
     "REFERENCE": handle_REFERENCE,
     "ASSIGN": handle_ASSIGN,
     "COMPARE": handle_COMPARE,
+    "INIT": handle_INIT,
     "DESTROY": handle_DESTROY,
-    "INITIALIZE": handle_INITIALIZE,
+    "INITIALIZE_TO_ZERO": handle_INITIALIZE_TO_ZERO,
     "REMOVE": handle_REMOVE,
     "REPLACE": handle_REPLACE
 };
@@ -406,6 +427,7 @@ def gen_single_source(name, newName, type_d, name_subs):
     omitting_next = False
     mutating = False
     mutate = []
+    outF.write(gen_template_intro_str(name, type_dict[type_d]))
     #if the type is an object and it needs to have any extra headers
     if type_d in obj_dict and name.endswith("_decl.h"):
         #simply add them

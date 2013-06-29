@@ -21,6 +21,18 @@
 **      ==END OF REFU LICENSE==
 **
 **/
+
+/* @omit start */
+
+/*
+ * This file is a TEMPLATE. It does not actually get compiled at all
+ * anywhere inside the library. Depending on the options you provide
+ * in scons though various specializations of this file will get
+ * generated during building the library
+ */
+
+/* @omit end */
+
 //*---------------------Corrensponding Header inclusion---------------------------------
 #include <Definitions/imex.h> //for import export macro
 #include <Definitions/types.h> //for fixed size data types
@@ -71,7 +83,7 @@ RF_List*  rfList_Create(
     //allocate the list
     RF_MALLOC(ret, sizeof(RF_List))
     RF_MALLOC(ret->start,sizeof(RF_L_Node))
-    /* @mutate 0 INITIALIZE */
+    /* @mutate 0 INITIALIZE_TO_ZERO */
     ret->start->data = 0;
     ret->start->next = 0;
     ret->end = ret->start;
@@ -105,7 +117,7 @@ char rfList_Init(
     /* @omit end */
     //allocate the first node
     RF_MALLOC(l->start,sizeof(RF_L_Node))
-    /* @mutate 0 INITIALIZE */
+    /* @mutate 0 INITIALIZE_TO_ZERO */
     l->start->data = 0;
     l->start->next = 0;
     l->end = l->start;
@@ -133,7 +145,7 @@ void rfList_Copy_IN(RF_List* dst,
 
     //allocate first node
     RF_MALLOC(c, sizeof(RF_L_Node))
-    /* @mutate 0 INITIALIZE */
+    /* @mutate 0 INITIALIZE_TO_ZERO */
     c->data = 0;
     c->next = 0;
     dst->start = c;
@@ -171,7 +183,7 @@ RF_List* rfList_Copy_OUT(RF_List* src)
 
     //allocate first node
     RF_MALLOC(c, sizeof(RF_L_Node))
-    /* @mutate 0 INITIALIZE */
+    /* @mutate 0 INITIALIZE_TO_ZERO */
     c->data = 0;
     c->next = 0;
     dst->start = c;

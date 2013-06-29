@@ -21,6 +21,18 @@
 **      ==END OF REFU LICENSE==
 **
 **/
+
+/* @omit start */
+
+/*
+ * This file is a TEMPLATE. It does not actually get compiled at all
+ * anywhere inside the library. Depending on the options you provide
+ * in scons though various specializations of this file will get
+ * generated during building the library
+ */
+
+/* @omit end */
+
 //*---------------------Corrensponding Header inclusion---------------------------------
 #include <Definitions/imex.h> //for import export macro
 #include <Definitions/types.h> //for fixed size data types

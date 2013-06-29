@@ -21,6 +21,18 @@
 **      ==END OF REFU LICENSE==
 **
 */
+
+/* @omit start */
+
+/*
+ * This file is a TEMPLATE. It does not actually get compiled at all
+ * anywhere inside the library. Depending on the options you provide
+ * in scons though various specializations of this file will get
+ * generated during building the library
+ */
+
+/* @omit end */
+
 #ifndef RF_LIST_DECL_H
 #define RF_LIST_DECL_H
 
@@ -39,9 +51,10 @@ typedef struct RF_List
     //! The last node of the linked list
     struct RF_L_Node* end;
     /* @omit start */
+
     //! An element's size
     uint32_t element_size;
-    //! The destruction function for the elements of the list
+    //! The destruction (deinit) function for the elements of the list
     void (*ptr2Destroy)(void*);
     //! The copy function for the elements of the list
     void (*ptr2Copy)(void*, void*);

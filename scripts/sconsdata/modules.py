@@ -59,18 +59,15 @@ class Module:
                 root = arg_env['REFU_DIR']
                 #for every type of data given for the module
                 for d_type in arg_env[self.has_template]:
-                    if d_type != "GENERIC":
-                        #generate the requested extra sources for each
-                        code_gen(name, parent_dir, root,
-                                 d_type, self.gen_name_sub)
-                        #and of course add it to the sources to compile
-                        sources.append(
-                            os.path.join(parent_dir,
-                                         name + "_" + d_type + ".c")
-                        )
-                    else:
-                        #the GENERIC type should be the template itself
-                        sources.append(self.sources)
+                    #generate the requested extra sources for each
+                    code_gen(name, parent_dir, root,
+                             d_type, self.gen_name_sub)
+                    #and of course add it to the sources to compile
+                    sources.append(
+                        os.path.join(parent_dir,
+                                     name + "_" + d_type + ".c")
+                    )
+
                 #TODO: add lines to rftokens.h
                 #create the extra include file
                 create_includes(name, parent_dir,

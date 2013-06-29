@@ -21,6 +21,18 @@
 **      ==END OF REFU LICENSE==
 **
 */
+
+/* @omit start */
+
+/*
+ * This file is a TEMPLATE. It does not actually get compiled at all
+ * anywhere inside the library. Depending on the options you provide
+ * in scons though various specializations of this file will get 
+ * generated during building the library
+ */
+
+/* @omit end */
+
 #ifndef RF_BINARYARRAY_DECL_H
 #define RF_BINARYARRAY_DECL_H
 
