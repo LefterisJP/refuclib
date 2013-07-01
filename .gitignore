@@ -47,3 +47,4 @@ TAGS
 scripts/systemcheck/systemcheck
 librefu.a
 librefu.so
+temp_build_data.json

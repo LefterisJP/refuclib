@@ -2,7 +2,6 @@ import os
 import platform
 import sys
 import fnmatch
-
 SConscript('scripts/sconsdata/compilers.py')
 SConscript('scripts/sconsdata/modules.py')
 
@@ -11,6 +10,7 @@ from scripts.sconsdata.modules import setup_modules
 from scripts.sconsdata.compilers import compilers, setupCompiler
 from scripts.sconsdata.configvariables import setupConfigVars
 from scripts.sconsdata.cleanup import clean_generated_files
+from scripts.sconsdata.code_gen import CodeGen
 
 
 configFileName = 0;
@@ -28,11 +28,19 @@ legalBuildTargets = [
     'test_static',
     'test']
 
-# Create an intermediate environment to read the variables ( I don't know 
-# of any other way to read the variables sort of writing a separate 
-# variable reading python script)
+# read the configuration file variable and the extra objects
+(config_file, extra_objects, refu_dir, args_before) = SConscript(
+    'scripts/sconsdata/args_before_config.py')
+#create the code_gen object and add all the extra objects
+code_gen = CodeGen(refu_dir)
+extra_sources = []
+for o in extra_objects:
+    extra_sources.append(code_gen.add_object(o, refu_dir))
+    
+
+# Create an intermediate environment to read the build variables
 vars = SConscript('scripts/sconsdata/variables.py', 
-                  exports = 'allowedCompilers')
+                  exports = 'allowedCompilers config_file code_gen')
 temp = Environment(variables = vars) 
 
 # create the building environment and setup the compiler
@@ -44,7 +52,7 @@ env.Append(CPPDEFINES = {'REFU_COMPILING': None})
 if(temp['__TEST_BUILD']):
 	env.Append(CPPDEFINES = {'REFU_TEST' : None})
 
-env.Append(CPPPATH		= os.path.join(temp['REFU_DIR'],'include'))
+env.Append(CPPPATH		= os.path.join(refu_dir,'include'))
 env.Append(CCFLAGS 		= temp['COMPILER_FLAGS'])
 env.Append(LINKFLAGS	= temp['LINKER_SHARED_FLAGS'])
 
@@ -55,7 +63,10 @@ env.Append(LINKFLAGS	= temp['LINKER_SHARED_FLAGS'])
 
 #only if actually building setup the required modules
 if 'shared' in COMMAND_LINE_TARGETS or 'static' in COMMAND_LINE_TARGETS:
-    (modules, sources) = setup_modules(temp, env, targetSystem)
+    (modules, sources) = setup_modules(temp, env, targetSystem,
+                                       refu_dir, code_gen)
+    #also add the extra sources (if any) given by the extra objects
+    sources.extend(extra_sources)
 
 #setup the variables of the configuration file
 setupConfigVars(temp,env)
@@ -85,22 +96,22 @@ if 'shared' in COMMAND_LINE_TARGETS or 'static' in COMMAND_LINE_TARGETS:
 if len(COMMAND_LINE_TARGETS) == 0:
     print ("**MESSAGE** No build target was specified so the Refu SCons "
            "Building script has nothing to build. Please specify one of"
-           "the legal build targets \'shared\' and \'static\' "
+           " the legal build targets \'shared\' and \'static\' "
            "via command line")
 
 #Check if there is an illegal build target given
 for givenTarget in COMMAND_LINE_TARGETS:
     if givenTarget not in legalBuildTargets:
-        print "***ERROR*** Provided build target \"{}\" is not a legal"
-        "target for Refu Library. Quitting Build Script"
-        " ...".format(givenTarget)
+        print ("***ERROR*** Provided build target \"{}\" is not a legal"
+        " target for Refu Library. Quitting Build Script"
+        " ...".format(givenTarget))
         Exit(-1)
 
 
 
 #If clean is specified make sure that we delete all of the generated files
 if env.GetOption('clean'):
-    clean_generated_files(temp['REFU_DIR'])
+    clean_generated_files(refu_dir, code_gen)
 
 # -- Test non-library build --
 # compiles only the test file under src/main.c
@@ -153,3 +164,4 @@ if 'test_static' in COMMAND_LINE_TARGETS:
     env.Alias('test_static', test_static)
 #generate help text for the variables
 Help(vars.GenerateHelpText(env))
+Help(args_before.GenerateHelpText(env))

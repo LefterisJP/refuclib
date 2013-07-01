@@ -55,9 +55,13 @@ def compileLib(verbose,dynamic,compiler):
     
     # for now we give here all the options to generate extra sources that
     # all the tests need. In the future if the library compiles again for
-    # each module tested this will need to change
-    extra_source_opts = ("LIST=I,String DYNAMIC_ARRAY=I,String "
-                         "HASHMAP=I,String")
+    # each module tested this will need to change. And as for the extra
+    # objects, omg look at all these escape characters >.<
+    extra_source_opts = (
+        " EXTRA_OBJECTS=[[\\\"test_object\\\",\\\"test_obj\\\",\\\"Tests/ExtraObjects/test.c\\\",\\\"Tests/ExtraObjects/test.h\\\",[\\\"test_destroy\\\",\\\"test_copy\\\",\\\"test_equal\\\",[]]]]"
+        " LIST=I,String,test_object DYNAMIC_ARRAY=I,String "
+        "HASHMAP=I,String "
+    )
 
     if platform.system() == 'Windows':
         sconsCall = ['scons.py', arg, 'COMPILER='+compiler,
@@ -81,7 +85,11 @@ def compileLib(verbose,dynamic,compiler):
         while(ret == None):
             ret = p.poll();
         if(ret!=0):
-            print("\tScons returned unsucessfully with return code {0}".format(ret))
+            print("\tScons returned unsucessfully with return code "
+                  "{}. Scons output follows:\n".format(ret))
+            for line in p.stdout:
+                line = line.decode("utf8")
+                sys.stdout.write("\t"+line)
             return False;
     except CalledProcessError as err:
         print("\tThere was an error while invoking scons to compile the library")

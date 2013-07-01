@@ -1,3 +1,5 @@
+//we have to include the extra object explicitly
+#include "../ExtraObjects/test.h" 
 #include <RFstring.h>
 #include <RFlist.h>
 #include <RFprintf.h>
@@ -66,6 +68,7 @@ int main()
 {
     RF_List_I l1;
     RF_List_String *l2, l3;
+    RF_List_test_object t1;
     RF_String s;
     int i;
     rfInit();
@@ -117,5 +120,11 @@ int main()
     //check that the copy has only 2 strings but the original still has all
     iterate_ll_stringsdel(&l3);
     iterate_ll_strings(l2);
+
+    //finally let's make a list of object which are outside the library
+    //TODO: work on this part of the test a bit more, don't only make
+    // sure the build system can compile extra objects
+    rfList_test_object_Init(&t1);
+    
     return 0;
 }

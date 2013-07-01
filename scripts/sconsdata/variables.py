@@ -1,8 +1,7 @@
 import os
-from code_gen import type_dict
 # -- Get the user provided options --
 
-Import('allowedCompilers')
+Import('allowedCompilers config_file code_gen')
 
 
 def checkCompilerValue(key,value,environment):
@@ -18,7 +17,7 @@ def checkCompilerValue(key,value,environment):
     return True
 
 # Initialize the variables object
-vars = Variables('refu.config')
+vars = Variables(config_file)
 
 # Add Variable Options which don't have to do with the actual building of
 # the library
@@ -42,10 +41,6 @@ vars.Add(
                  ' to search here if scons can\'t find the requested compiler'
                  ' automatically. Should be an absolute path', '.',
                  PathVariable.PathIsDir))
-
-vars.Add(
-    PathVariable('REFU_DIR', 'The root directory of the refu library.'
-                 ' Absolute value', '.',PathVariable.PathIsDir))
 
 vars.Add(
     PathVariable('OBJ_DIR', 'The name of the directory to use (will create'
@@ -89,19 +84,22 @@ vars.Add(
 vars.Add(
     ListVariable('LIST', 'These are options specific to the linked list '
                  'module. They specify what types of linked lists to '
-                 'create', [], type_dict))
+                 'create', [], code_gen.type_dict))
 
 vars.Add(
     ListVariable('DYNAMIC_ARRAY',
                  'These are options specific to the dynamic array '
                  'module. They specify what types of dynamic arrays to '
-                 'create', [], type_dict))
+                 'create', [], code_gen.type_dict))
 
 vars.Add(
     ListVariable('HASHMAP', 'These are options specific to the hashmap '
                  'module. They specify what types of hashmaps to '
-                 'create', [], type_dict))
+                 'create', [], code_gen.type_dict))
 
+
+
+                 
 vars.Add('DEBUG', "This option determines if this will be a Debug Build (0"
          "or 1), and if more than 1 it can indicate a different debug level",
          0)

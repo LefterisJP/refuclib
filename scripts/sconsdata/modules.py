@@ -1,5 +1,5 @@
 import os
-from code_gen import code_gen
+from code_gen import CodeGen
 
 class TemplateSourcesError(Exception):
     def __init__(self, module_name, sources_num):
@@ -27,19 +27,21 @@ class Module:
             self.gen_name_sub = gen_name_sub
             self.extra_generated = False
 
-    def add(self, sources, env, targetSystem, arg_env,
-            deps=[], check=True):
+    def add(self, sources, env, targetSystem, arg_env, refu_dir,
+            deps=[], check=True, codegen=None):
         """Addition of a module's sources including
            additional check for dependencies and 
            recursive addition of said dependencies
 
            -sources: The list of sources for compilation
-           -env: The Scons environment variable
+           -arg_env: The Scons environment variable for arguments
+           -refu_dir: The root directory of the library
            -targetSystem: The OS name
            -deps: A list of current modules to build -- helps in
             avoiding duplication
            -check: A flag to determine whether we should check for
             dependencies or not
+           -c: A CodeGen object
         """
         env.Append(CPPDEFINES= {self.macro:None})
         #if this is a template module
@@ -56,11 +58,10 @@ class Module:
                 #get rid of .c
                 name = name[:len(name)-2]
                 parent_dir = os.path.dirname(fullname)
-                root = arg_env['REFU_DIR']
                 #for every type of data given for the module
                 for d_type in arg_env[self.has_template]:
                     #generate the requested extra sources for each
-                    code_gen(name, parent_dir, root,
+                    codegen.code_gen(name, parent_dir, refu_dir,
                              d_type, self.gen_name_sub)
                     #and of course add it to the sources to compile
                     sources.append(
@@ -71,7 +72,7 @@ class Module:
                 #TODO: add lines to rftokens.h
                 #create the extra include file
                 create_includes(name, parent_dir,
-                                root,  arg_env[self.has_template])
+                                refu_dir,  arg_env[self.has_template])
                 #add the appropriate define to include
                 #the extra headers for the source we generated
                 env.Append(CPPDEFINES= {self.macro+"_EXTRA": None})
@@ -89,7 +90,8 @@ class Module:
                 for m in modules:
                     if m.name in needed:
                         deps.append(m.name)
-                        m.add(sources,env,targetSystem,deps)
+                        m.add(sources, env, targetSystem,
+                              deps,code_gen=c)
 
                                             
 
@@ -108,10 +110,17 @@ def create_includes(name, parent_dir, root, types_list):
                                               name + "_" + type_symbol))
     f.close()
 
-def setup_modules(arg_env, env, targetSystem):
+def setup_modules(arg_env, env, targetSystem, refu_dir, code_gen):
     """
+       This is the function that is called from the main SConstruct file.
        Depending on the given modules this function shall setup
        the required source file and dependencies
+       --arg_env: The environment containing the arguments given to the
+         build system
+       --env: The build environment
+       --targetSystem: The architecture of the target system
+       --refu_dir: Root directory of the refu library
+       --code_gen: A CodeGen object that must have already been initialized
     """
     if 'ALL' not in arg_env['REFU_MODULES']:
         # add the core and system modules 
@@ -124,11 +133,11 @@ def setup_modules(arg_env, env, targetSystem):
                 for mod in modules:
                     if mod.name in arg_env['REFU_MODULES']:
                         mod.add(sources, env, targetSystem,
-                                arg_env, deps)
+                                arg_env, refu_dir, deps, codegen=code_gen)
     else:  # all modules requested
         for mod in modules:
             mod.add(sources, env, targetSystem,
-                    arg_env, check=False)
+                    arg_env, refu_dir, check=False, codegen=code_gen)
     return (modules, sources)
 
 #empty list of modules and sources
