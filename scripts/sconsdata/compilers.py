@@ -1,3 +1,6 @@
+from utils import build_msg
+
+
 class Compiler:
     name = ""
     path = ""
@@ -9,7 +12,8 @@ class Compiler:
     cflags = {}
     lflags = {}
     debug_flags = {}
-    def __init__(self,name, path=0, bin=0, dlink=0, slink=0, coptions=0,
+
+    def __init__(self, name, path=0, bin=0, dlink=0, slink=0, coptions=0,
                  cflags=0, lflags=0, libs=0, toolsValues=0, debug_flags=0):
         self.name = name
         self.path = path
@@ -21,18 +25,20 @@ class Compiler:
         self.toolsValues = toolsValues
         self.coptions = coptions
         self.debug_flags = debug_flags
-        
+
 #Defining the compilers
 compilers = {}
 #GCC
-compilers['gcc'] = Compiler(name='gcc',
-coptions = {'all':['-static-libgcc'], 'Windows':[],'Linux':[]},
-cflags = {'all':{}, 'Windows':{},'Linux':{'_GNU_SOURCE':None}},
-lflags = {'all':[], 'Windows':[],'Linux':[]},
-libs = {'all':[], 'Windows':[],'Linux':['rt', 'pthread']},
-toolsValues = {'Windows': ['mingw'] , 'Linux':['gcc']},
-debug_flags = {'all': ["-g"], 'Windows': [], 'Linux': []}
+compilers['gcc'] = Compiler(
+    name='gcc',
+    coptions={'all': ['-static-libgcc'], 'Windows': [], 'Linux': []},
+    cflags={'all': {}, 'Windows': {}, 'Linux': {'_GNU_SOURCE': None}},
+    lflags={'all': [], 'Windows': [], 'Linux': []},
+    libs={'all': [], 'Windows': [], 'Linux': ['rt', 'pthread']},
+    toolsValues={'Windows': ['mingw'], 'Linux': ['gcc']},
+    debug_flags={'all': ["-g"], 'Windows': [], 'Linux': []}
 )
+
 
 def add_compiler_field(env, os, compiler_name, attribute, compiler_field):
     """
@@ -69,28 +75,30 @@ def setupCompiler(env, os, arg_env):
     compiler_name = arg_env['COMPILER']
     #add general options and defines for the refu project
     if(os == 'Windows'):
-        env.Append(CPPDEFINES       = {'REFU_WIN32_VERSION':None})
-        env.Append(CPPDEFINES       = {'_WIN32_WINNT':'0x501'})
+        env.Append(CPPDEFINES={'REFU_WIN32_VERSION': None})
+        env.Append(CPPDEFINES={'_WIN32_WINNT': '0x501'})
     elif(os == 'Linux'):
-        env.Append(CPPDEFINES       = {'REFU_LINUX_VERSION': None})
-        env.Append(CPPDEFINES       = {'_LARGEFILE64_SOURCE': None})
+        env.Append(CPPDEFINES={'REFU_LINUX_VERSION': None})
+        env.Append(CPPDEFINES={'_LARGEFILE64_SOURCE': None})
     else:
-        print("Unsuported Operating System value \"{}\" Detected ... Quitting"
-              "".format(os))
+        build_msg("Unsuported Operating System value \"{}\" "
+                  "Detected...Quitting".format(os), "Error")
         Exit(1)
-    env.Append(CPPDEFINES   = {'_FILE_OFFSET_BITS' : 64})
+    env.Append(CPPDEFINES={'_FILE_OFFSET_BITS': 64})
 
     #add debug symbols to the compiler if Debug is not 0
     if arg_env['DEBUG'] != 0:
         add_compiler_field(env, os, compiler_name, 'CCFLAGS', 'debug_flags')
-        
+
     # figure out the tools value
-    env.Replace(tools   = compilers[compiler_name].toolsValues[os])
-    # if a compiler dir has been given then use that. 
+    env.Replace(tools=compilers[compiler_name].toolsValues[os])
+    # if a compiler dir has been given then use that.
     # Not given is the '.' directory
     if compilerdir != '.':
-        env.Replace(ENV = {'PATH' : compilerdir})
-    
+        build_msg("Using \"{}\" as the compiler directory as instructed"
+                  "".format(compilerdir), 'Info', env)
+        env.Replace(ENV={'PATH': compilerdir})
+
     #set compiler defines, and compile and link options
     add_compiler_field(env, os, compiler_name, 'CCFLAGS', 'coptions')
     add_compiler_field(env, os, compiler_name, 'CPPDEFINES', 'cflags')

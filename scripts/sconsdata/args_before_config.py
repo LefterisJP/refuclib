@@ -1,6 +1,8 @@
 import ast
 import os
 
+from utils import build_msg
+
 def extraobjects_to_list(s):
     """
        A function to convert the extra objects string to a list
@@ -13,8 +15,8 @@ def extraobjects_to_list(s):
     except Exception as err:
         print type(err)
         print(err)
-        print("**ERROR** Provided an extra objects string but it could "
-              "not be properly evaluated as a python literal")
+        build_msg("The EXTRA_OBJECTS string provided could not be properly"
+                  " evaluated as a python literal", "Error")
         Exit(-1)
 
 args_before = Variables()
@@ -27,7 +29,7 @@ args_before.Add(PathVariable(
 
 args_before.Add(
     PathVariable('REFU_DIR', 'The root directory of the refu library.'
-                 ' Absolute value', '../..',PathVariable.PathIsDir))
+                 ' Absolute value', '../..', PathVariable.PathIsDir))
 
 args_before.Add(
     'EXTRA_OBJECTS',
@@ -56,7 +58,7 @@ args_before.Add(
     converter=extraobjects_to_list)
 
 #return the variables, and make sure the paths are absolute
-temp = Environment(variables = args_before)
+temp = Environment(variables=args_before)
 config_file = os.path.abspath(temp['CONFIG_FILE'])
 extra_objects = temp['EXTRA_OBJECTS']
 refu_dir = os.path.abspath(temp['REFU_DIR'])
