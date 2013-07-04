@@ -90,10 +90,8 @@ class Module:
                 for m in modules:
                     if m.name in needed:
                         deps.append(m.name)
-                        m.add(sources, env, targetSystem,
-                              deps,code_gen=codegen)
-
-                                            
+                        m.add(sources, env, targetSystem, arg_env,
+                              refu_dir, deps, True, codegen)
 
 def create_includes(name, parent_dir, root, types_list):
     """
