@@ -41,7 +41,7 @@ class Module:
             avoiding duplication
            -check: A flag to determine whether we should check for
             dependencies or not
-           -c: A CodeGen object
+           -codegen: A CodeGen object
         """
         env.Append(CPPDEFINES= {self.macro:None})
         #if this is a template module
@@ -91,7 +91,7 @@ class Module:
                     if m.name in needed:
                         deps.append(m.name)
                         m.add(sources, env, targetSystem,
-                              deps,code_gen=c)
+                              deps,code_gen=codegen)
 
                                             
 
