@@ -8,7 +8,7 @@ int main()
 {
 	RF_TextFile f;
 
-	rfInit();
+	EXPECT(rfInit(), true)
 	//attempt auto detection of line ending for an LF unix style UTF-8 text file
 	EXPECT(RF_SUCCESS,rfTextFile_Init(&f,RFS_("utf8_LF.forcebin"),RF_FILE_READ,RF_UTF8,RF_EOL_AUTO))
 	EXPECT(f.eol,RF_EOL_LF)

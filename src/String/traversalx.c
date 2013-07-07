@@ -72,8 +72,8 @@ int32_t i_rfStringX_MoveAfter(RF_StringX* thisstr,const void* subP,void* resultP
     //check for substring existence and return failure if not found
     if( (move = rfString_FindBytePos(thisstr,sub,options)) == RF_FAILURE)
     {
-        RF_EXIT_LOCAL_SCOPE()
-        return RF_FAILURE;
+        move = RF_FAILURE;
+        goto cleanup;
     }
     //if found, move the internal pointer
     move += sub->byteLength;
@@ -91,20 +91,28 @@ int32_t i_rfStringX_MoveAfter(RF_StringX* thisstr,const void* subP,void* resultP
             result->INH_String.byteLength = move-sub->byteLength;
             result->bSize = result->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
             result->bIndex=0;
-            RF_MALLOC(result->INH_String.bytes,result->bSize);
-            memcpy(result->INH_String.bytes,thisstr->INH_String.bytes-move,result->INH_String.byteLength);
+            RF_MALLOC_JMP(result->INH_String.bytes, result->bSize,
+                          move = RF_FAILURE, cleanup);
+            memcpy(
+                result->INH_String.bytes,
+                thisstr->INH_String.bytes-move,
+                result->INH_String.byteLength);
             result->INH_String.bytes[result->INH_String.byteLength] = '\0';
         }
         else
         {
             RF_String* result = (RF_String*) resultP;
             result->byteLength = move-sub->byteLength;
-            RF_MALLOC(result->bytes,result->byteLength+1);
-            memcpy(result->bytes,thisstr->INH_String.bytes-move,result->byteLength);
+            RF_MALLOC_JMP(result->bytes, result->byteLength+1,
+                          move = RF_FAILURE, cleanup);
+            memcpy(result->bytes,
+                   thisstr->INH_String.bytes-move,
+                   result->byteLength);
             result->bytes[result->byteLength] = '\0';
         }
     }
     //return positions moved
+  cleanup:
     RF_EXIT_LOCAL_SCOPE()
     return move;
 }
@@ -118,7 +126,8 @@ void rfStringX_MoveBack(RF_StringX* thisstr,uint32_t n)
     //as long as the bIndex is not zero keep reducing the internal pointer and the bytes pointer
     while(thisstr->bIndex >0)
     {
-        if(rfUTF8_IsContinuationByte(thisstr->INH_String.bytes[0]) == false)
+        if(rfUTF8_IsContinuationByte(
+               thisstr->INH_String.bytes[0]) == false)
         {
             if(n == length)
             {
@@ -132,7 +141,6 @@ void rfStringX_MoveBack(RF_StringX* thisstr,uint32_t n)
         //and also keep adding to the bytelength
         thisstr->INH_String.byteLength++;
     }
-
 }
 
 
@@ -145,7 +153,8 @@ void rfStringX_MoveForward(RF_StringX* thisstr,uint32_t n)
     //as long as the bIndex is not zero keep reducing the internal pointer and the bytes pointer
     while(thisstr->bIndex < thisstr->bSize)
     {
-        if(rfUTF8_IsContinuationByte(thisstr->INH_String.bytes[0]) == false)
+        if(rfUTF8_IsContinuationByte(
+               thisstr->INH_String.bytes[0]) == false)
         {
             if(n == length)
             {
@@ -170,13 +179,16 @@ void rfStringX_Reset(RF_StringX* thisstr)
 }
 
 //Moves the internal pointer after the first occurence of any of the given substrings
-char rfStringX_MoveAfterv(RF_StringX* thisstr,void* resultP,const char options,const unsigned char parN, ...)
+char rfStringX_MoveAfterv(RF_StringX* thisstr, void* resultP, 
+                          const char options,
+                          const unsigned char parN, ...)
 {
     uint32_t i,paramLen,move;
     int32_t minPos;
     int32_t thisPos;
     //will keep the argument list
     va_list argList;
+    char ret = true;
     RF_ENTER_LOCAL_SCOPE()
 
     // will keep the winning parameter length
@@ -189,7 +201,8 @@ char rfStringX_MoveAfterv(RF_StringX* thisstr,void* resultP,const char options,c
         //get the param
         RF_String* s = va_arg(argList,RF_String*);
         //if the parameter got found in the string see if it's the closest
-        if( (thisPos = rfString_FindBytePos(thisstr,s,options))!= RF_FAILURE)
+        if( (thisPos = rfString_FindBytePos(
+                 thisstr, s, options))!= RF_FAILURE)
         {
             if( thisPos< minPos)
             {
@@ -204,8 +217,8 @@ char rfStringX_MoveAfterv(RF_StringX* thisstr,void* resultP,const char options,c
     //if it is not found
     if(minPos == INT_MAX)
     {
-        RF_EXIT_LOCAL_SCOPE()
-        return false;
+        ret = false;
+        goto cleanup;
     }
 
     //move the internal pointer after the substring
@@ -224,40 +237,56 @@ char rfStringX_MoveAfterv(RF_StringX* thisstr,void* resultP,const char options,c
             result->INH_String.byteLength = move-paramLen;
             result->bSize = result->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
             result->bIndex=0;
-            RF_MALLOC(result->INH_String.bytes,result->bSize);
-            memcpy(result->INH_String.bytes,thisstr->INH_String.bytes-move,result->INH_String.byteLength);
+            RF_MALLOC_JMP(result->INH_String.bytes, result->bSize,
+                          ret = false, cleanup);
+            memcpy(
+                result->INH_String.bytes,
+                thisstr->INH_String.bytes-move,
+                result->INH_String.byteLength);
             result->INH_String.bytes[result->INH_String.byteLength] = '\0';
         }
         else
         {
             RF_String* result = (RF_String*) resultP;
             result->byteLength = move-paramLen;
-            RF_MALLOC(result->bytes,result->byteLength+1);
-            memcpy(result->bytes,thisstr->INH_String.bytes-move,result->byteLength);
+            RF_MALLOC_JMP(result->bytes, result->byteLength+1,
+                          ret = false, cleanup);
+            memcpy(
+                result->bytes,
+                thisstr->INH_String.bytes-move,
+                result->byteLength);
             result->bytes[result->byteLength] = '\0';
         }
     }
+
+  cleanup:
     //success
     RF_EXIT_LOCAL_SCOPE()
-    return true;
+    return ret;
 }
 //Moves the internal string pointer after the substring formed by the @c left and @c right substrings
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-char rfStringX_MoveAfterPair(RF_StringX* thisstr,const void* leftP,const void* rightP,void* result,char options,uint32_t occurence)
+char rfStringX_MoveAfterPair(RF_StringX* thisstr, const void* leftP,
+                             const void* rightP, void* result,
+                             char options, uint32_t occurence)
 #else
-char i_rfStringX_MoveAfterPair(RF_StringX* thisstr,const void* leftP,const void* rightP,void* result,char options,uint32_t occurence)
+char i_rfStringX_MoveAfterPair(RF_StringX* thisstr, const void* leftP,
+                               const void* rightP, void* result,
+                               char options, uint32_t occurence)
 #endif
 {
     uint32_t i,move,start = thisstr->bIndex;
     char found = false;
     const RF_String* left = (const RF_String*)leftP;
     const RF_String* right = (const RF_String*)rightP;
+    char ret = true;
     RF_ENTER_LOCAL_SCOPE()
 
     //check the occurence parameter
     if(occurence == 0)
+    {
         occurence =1;
-
+    }
 
     //get the in between string and if it is null return false
     for(i = 1; i <= occurence; i ++)
@@ -265,8 +294,8 @@ char i_rfStringX_MoveAfterPair(RF_StringX* thisstr,const void* leftP,const void*
         //attempt to get the in between string
         if(rfString_Between(thisstr,left,right,result,options) == false)
         {
-            RF_EXIT_LOCAL_SCOPE()
-            return false;
+            ret = false;
+            goto cleanup;
         }
 
         //move after this occurence of the pair
@@ -281,35 +310,48 @@ char i_rfStringX_MoveAfterPair(RF_StringX* thisstr,const void* leftP,const void*
         }
         //else depending on the passed parameter type get rid of this result
         if(options & RF_STRINGX_ARGUMENT)
+        {
             rfStringX_Deinit(result);
+        }
         else
+        {
             rfString_Deinit(result);
+        }
     }
     //if we get here and the result is not found return failure
     if(found == false)
     {
         if(options & RF_STRINGX_ARGUMENT)
+        {
             rfStringX_Deinit(result);
+        }
         else
+        {
             rfString_Deinit(result);
+        }
         //get the pointer back
         move =thisstr->bIndex - start;
         thisstr->INH_String.bytes -= move;
         thisstr->INH_String.byteLength += move;
         thisstr->bIndex = start;
-        RF_EXIT_LOCAL_SCOPE()
-        return false;
+        ret = false;
+        goto cleanup;
     }
     //if we don't want to keep the result free it
     if(result == 0)
     {
         if(options & RF_STRINGX_ARGUMENT)
+        {
             rfStringX_Deinit(result);
+        }
         else
+        {
             rfString_Deinit(result);
+        }
     }
 
+  cleanup:
     //success
     RF_EXIT_LOCAL_SCOPE()
-    return true;
+    return ret;
 }

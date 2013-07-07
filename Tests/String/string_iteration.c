@@ -7,7 +7,7 @@ int main()
 {
 	RF_String s1,s2;
 	uint32_t i=0,c;
-	rfInit();
+	EXPECT(rfInit(), true)
 	
 	//testing normal string iteration
 	EXPECT(true,rfString_Init(&s1,"Testing to see if RF_String can correctly iterate the characters of a string"))

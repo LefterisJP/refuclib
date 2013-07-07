@@ -56,9 +56,10 @@ extern "C"
  **  initialization since this stack is thread specific.
  ** @param lms The Local Memory stack to initialize
  ** @param size The size that the local memory stack will have
+ ** @return Returns @c true if initialized correctly and @c false otherwise
  **
  **/
-void rfLMS_Init(RF_LocalMemoryStack* lms, uint64_t size);
+char rfLMS_Init(RF_LocalMemoryStack* lms, uint64_t size);
 
 /**
  ** @memberof RF_LocalMemoryStack

@@ -60,9 +60,9 @@ extern "C"
  ** Initializes a hashmap data structure
  ** @param m The hashmap to initialize
  ** @param s The initial size of the map in "buckets"
- ** @return @c RF_SUCCESS for success and error otherwise
+ ** @return @c true for success and @c false otherwise
  */
-i_DECLIMEX_ int32_t rfHashmap_Init(RF_Hashmap* m, uint32_t s);
+i_DECLIMEX_ char rfHashmap_Init(RF_Hashmap* m, uint32_t s);
 
 /**
  ** Allocates and returns a hashmap data structure
@@ -89,9 +89,9 @@ i_DECLIMEX_ void rfHashmap_Destroy(RF_Hashmap* m);
  ** @param key An @ref RF_String representing the key to associate with
  ** the particular value
  ** @param value The value to insert into the hashmap
- ** @return @c RF_SUCCESS if all is fine and an error otherwise
+ ** @return @c true if all is fine and @c false otherwise
  */
-i_DECLIMEX_ int32_t rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
+i_DECLIMEX_ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
                                   /* @mutate void* TYPEPTR_OBJ_ONLY */
                                   void* value);
 

@@ -99,10 +99,11 @@ extern "C"
  ** @param[in] codepoints The buffer of code points. Must be given as a buffer of @c uint32_t.
  ** @param[in] charsN The number of codepoints inside the buffer, that is how many characters are in there
  ** @param[out] utf8Length Pass a pointer to @c uint32_t to receive inside it the bytelength of the allcoated utf8 buffer without the null termination counted
- ** @return Returns the allocated UTF-8 encoded byte buffer for success or @c 0 if there was an error
+ ** @return Returns the allocated UTF-8 encoded byte buffer for success or @c NULL if there was an error
  **
  **/
-i_DECLIMEX_ char* rfUTF8_Encode(const uint32_t* codepoints,uint32_t charsN,uint32_t* utf8Length);
+i_DECLIMEX_ char* rfUTF8_Encode(const uint32_t* codepoints, 
+                                uint32_t charsN,uint32_t* utf8Length);
 
 /**
  ** @brief Takes a unicode codepoint and turns them into a UTF-8 byte
@@ -118,7 +119,8 @@ i_DECLIMEX_ char* rfUTF8_Encode(const uint32_t* codepoints,uint32_t charsN,uint3
  ** has to store it or free it after use.
  ** @param[in] codepoint The codepoint to encode. Must be given as a @c uint32_t
  ** @param[out] utf8 Pass a buffer of at least 5 bytes here to receive the null terminated utf8 bytes
- ** @return Returns the number of byte used forthe utf8 conversion for success or @c 0 for error at encoding with additional error logging
+ ** @return Returns the number of bytes used for the utf8 conversion for
+ ** success or @c 0 for error at encoding with additional error logging
  **
  **/
 i_DECLIMEX_ char rfUTF8_Encode_single(const uint32_t codepoint,char* utf8);
@@ -132,7 +134,7 @@ i_DECLIMEX_ char rfUTF8_Encode_single(const uint32_t codepoint,char* utf8);
  ** @param[in] utf8BLength The bytes length of the UTF8 buffer
  ** @param[out] charsN Pass a reference to an @c uint32_t here to receive the number of
  ** unicode characters contained in the @c utf8 and the returned codepoints buffer
- ** @return Returns the allocated codepoints buffer. The returned buffer is null terminated
+ ** @return Returns the allocated codepoints buffer. The returned buffer is null terminated. Also returns @c NULL in case of an error
  **
  **/
 i_DECLIMEX_ uint32_t* rfUTF8_Decode(const char* utf8,uint32_t utf8BLength,uint32_t* charsN);
@@ -189,11 +191,15 @@ i_DECLIMEX_ int32_t rfUTF16_Decode_swap(const char* buff,uint32_t* length,uint32
  ** @param[out] utf16Length Give a reference to a uint32_t to receive the length in 16bit unsigned integers of the utf-16
  ** buffer that the function will return
  ** @return Returns the a utf-16 encoded buffer of the given @c codepoints for success.
- ** If an illegal codepoint is found then an error is logged and 0 is returned. The buffer needs to be freed by the user later.
+ ** If an illegal codepoint is found then an error is logged and @c NULL
+ ** is returned. The buffer needs to be freed by the user later. @c NULL is
+ ** also returned for other errors.
  ** The returned buffer is null terminated.
  **
  **/
-i_DECLIMEX_ uint16_t* rfUTF16_Encode(const uint32_t* codepoints,uint32_t charsN,uint32_t* utf16Length);
+i_DECLIMEX_ uint16_t* rfUTF16_Encode(const uint32_t* codepoints,
+                                     uint32_t charsN,
+                                     uint32_t* utf16Length);
 
 /**
  ** Parses a utf-8 byte sequence returning the byte length and verifying its validity

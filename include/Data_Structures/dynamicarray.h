@@ -64,7 +64,7 @@ i_DECLIMEX_ RF_DynamicArray*  rfDynamicArray_Create(
     /* @omit start */
     , uint32_t elementSize,
     void (*ptr2Destroy)(void*),
-    void (*ptr2Copy)(void*,void*)
+    char (*ptr2Copy)(void*,void*)
     /* @omit end */
 );
  
@@ -83,7 +83,7 @@ i_DECLIMEX_ char  rfDynamicArray_Init(
     /* @omit start */
     , uint32_t elSize,
     void (*ptr2Destroy)(void*),
-    void (*ptr2Copy)(void*,void*)
+    char (*ptr2Copy)(void*,void*)
     /* @omit end */
 );
 
@@ -93,9 +93,9 @@ i_DECLIMEX_ char  rfDynamicArray_Init(
  **
  ** @param dst The new array copy to create
  ** @param src The array to copy from
- **
+ ** @return Returns @c true in succesfull copying and false otherwise
  **/
-i_DECLIMEX_ void rfDynamicArray_Copy_IN(RF_DynamicArray* dst,
+i_DECLIMEX_ char rfDynamicArray_Copy_IN(RF_DynamicArray* dst,
                                         RF_DynamicArray* src);
 /**
  ** @memberof RF_DynamicArray
@@ -169,12 +169,10 @@ i_DECLIMEX_ void rfDynamicArray_Deinit_nofree(RF_DynamicArray* l);
  ** @param object The object to add. For plain old data types simply add
  ** it here. For objects make sure to pass a pointer to the object
  **
- ** @return Returns @c RF_SUCCESS in all cases except for when there is 
- ** insufficient memory in which case the function will return @c 
- ** RE_REALLOC_FAILURE
+ ** @return Returns @c true for success and @c false otherwise
  **/
 /* @mutate void* TYPEPTR_OBJ_ONLY */
-i_DECLIMEX_ int32_t rfDynamicArray_Add(RF_DynamicArray* l,void* object);
+i_DECLIMEX_ char rfDynamicArray_Add(RF_DynamicArray* l, void* object);
 
 
 /**
@@ -207,7 +205,8 @@ i_DECLIMEX_ int32_t rfDynamicArray_Get_IN(
  ** @param code Contains @c RF_SUCCESS if all went well with the object
  ** retrieval and @c RE_INDEX_OUT_OF_BOUNDS if there was an index out of bounds
  ** @return If @c code contains @c RF_SUCCESS then it returns the 
- ** value of the array at @c i. If there is a failure this will return @c 0
+ ** value of the array at @c i. If there is a failure this will return
+ ** @c NULL
  **/
 /* @mutate void* TYPEPTR_OBJ_ONLY */
 i_DECLIMEX_ void* rfDynamicArray_Get_OUT(

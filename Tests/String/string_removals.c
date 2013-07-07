@@ -8,7 +8,7 @@ int main()
 	RF_String s1,s2,s3,s4,s5,s6,s7;
 
 
-	rfInit();
+	EXPECT(rfInit(), true)
 
 
     //expect true and then the string without the \r

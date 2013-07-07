@@ -91,7 +91,7 @@ extern "C"
 #ifdef RF_IAMHERE_FOR_DOXYGEN
 RF_List* rfList_Create(Type objectType,
                                    void (*ptr2Destroy)(void*),
-                                   void (*ptr2Copy)(void*, void*),
+                                   char (*ptr2Copy)(void*, void*),
                                    char (*ptr2Equal)(void*, void*)
 );
 #else
@@ -100,7 +100,7 @@ RF_List* rfList_Create(Type objectType,
 i_DECLIMEX_ RF_List*  rfList_Create(
     /* @omit start */
     void (*ptr2Destroy)(void*),
-    void (*ptr2Copy)(void*, void*),
+    char (*ptr2Copy)(void*, void*),
     char (*ptr2Equal)(void*, void*)
     /* @omit end */
 );
@@ -144,7 +144,7 @@ i_DECLIMEX_ RF_List*  rfList_Create(
 char  rfList_Init(RF_List* l,
                         Type objectType,
                         void (*ptr2Destroy)(void*),
-                        void (*ptr2Copy)(void*,void*),
+                        char (*ptr2Copy)(void*,void*),
                         char (*ptr2Equal)(void*, void*)
 );
 #else
@@ -153,7 +153,7 @@ i_DECLIMEX_ char  rfList_Init(
     RF_List* l
     /* @omit start */
     ,void (*ptr2Destroy)(void*),
-    void (*ptr2Copy)(void*, void*),
+    char (*ptr2Copy)(void*, void*),
     char (*ptr2Equal)(void*, void*)
     /* @omit end */
 );
@@ -165,10 +165,11 @@ i_DECLIMEX_ char  rfList_Init(
  **
  ** @param dst The new list copy to create
  ** @param src The list to copy from
+ ** @return Returns @c true in successful copying @c false otherwise
  **
  **/
-i_DECLIMEX_ void rfList_Copy_IN(RF_List* dst,
-                                       RF_List* src);
+i_DECLIMEX_ char rfList_Copy_IN(RF_List* dst,
+                                RF_List* src);
 /**
  ** @memberof RF_List
  ** @brief Creates and returns an allocated copy of the given 
@@ -210,6 +211,8 @@ i_DECLIMEX_ void rfList_Deinit(RF_List* a);
  **
  ** @param a The list to add to
  ** @param e A pointer to the element to add
+ ** @return Returns @c true in succesfull addition of an element in the
+ ** list and @c false otherwise
  **
  **/
 /* @mutate void* TYPEPTR_OBJ_ONLY */

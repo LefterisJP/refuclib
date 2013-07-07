@@ -57,7 +57,7 @@ typedef struct RF_List
     //! The destruction (deinit) function for the elements of the list
     void (*ptr2Destroy)(void*);
     //! The copy function for the elements of the list
-    void (*ptr2Copy)(void*, void*);
+    char (*ptr2Copy)(void*, void*);
     //! The equality function for the elements of the list
     char (*ptr2Equal)(void*, void*);
     /* @omit end */

@@ -50,32 +50,30 @@ int main()
     rfInit();
 
     // test a hashmap with some unicode keys
-    EXPECT(RF_SUCCESS, rfHashmap_I_Init(&m1, 20))
-    EXPECT(RF_SUCCESS, rfHashmap_I_Insert(&m1, RFS_("ενα"), 1))
-    EXPECT(RF_SUCCESS, rfHashmap_I_Insert(&m1, RFS_("δυο"), 2))
-    EXPECT(RF_SUCCESS, rfHashmap_I_Insert(&m1, RFS_("τρια"), 3))
-    EXPECT(RF_SUCCESS, rfHashmap_I_Insert(&m1, RFS_("τεσσερα"), 4))
-    EXPECT(RF_SUCCESS, rfHashmap_I_Insert(&m1, RFS_("πεντε"), 5))
-    EXPECT(RF_SUCCESS, rfHashmap_I_Insert(&m1, RFS_("εξι"), 6))
-    EXPECT(RF_SUCCESS, rfHashmap_I_Insert(&m1, RFS_("εφτα"), 7))
-    EXPECT(RF_SUCCESS, rfHashmap_I_Insert(&m1, RFS_("οκτω"), 8))
-    EXPECT(RF_SUCCESS, rfHashmap_I_Insert(&m1, RFS_("εννια"), 9))
-    EXPECT(RF_SUCCESS, rfHashmap_I_Insert(&m1, RFS_("δεκα"), 10))
-
+    EXPECT(true, rfHashmap_I_Init(&m1, 20))
+    EXPECT(true, rfHashmap_I_Insert(&m1, RFS_("ενα"), 1))
+    EXPECT(true, rfHashmap_I_Insert(&m1, RFS_("δυο"), 2))
+    EXPECT(true, rfHashmap_I_Insert(&m1, RFS_("τρια"), 3))
+    EXPECT(true, rfHashmap_I_Insert(&m1, RFS_("τεσσερα"), 4))
+    EXPECT(true, rfHashmap_I_Insert(&m1, RFS_("πεντε"), 5))
+    EXPECT(true, rfHashmap_I_Insert(&m1, RFS_("εξι"), 6))
+    EXPECT(true, rfHashmap_I_Insert(&m1, RFS_("εφτα"), 7))
+    EXPECT(true, rfHashmap_I_Insert(&m1, RFS_("οκτω"), 8))
+    EXPECT(true, rfHashmap_I_Insert(&m1, RFS_("εννια"), 9))
+    EXPECT(true, rfHashmap_I_Insert(&m1, RFS_("δεκα"), 10))
     EXPECT(true, rfHashmap_I_Get(&m1, RFS_("οκτω"), &i))
     EXPECT(i == 8, true)
     EXPECT(true, rfHashmap_I_Get(&m1, RFS_("τρια"), &i))
     EXPECT(i == 3, true)
     
     rfHashmap_I_Deinit(&m1);
-
     // test a hashmap that will need to rehash
-    EXPECT(RF_SUCCESS, rfHashmap_I_Init(&m2, 10))
+    EXPECT(true, rfHashmap_I_Init(&m2, 10))
     for(i = 0; i < 20; i++)
     {
-        EXPECT(RF_SUCCESS, rfHashmap_I_Insert(&m2,
-                                              RFS_("%d", nums[i]),
-                                              nums[i]))
+        EXPECT(true, rfHashmap_I_Insert(&m2,
+                                        RFS_("%d", nums[i]),
+                                        nums[i]))
     }
     for(i = 0; i < 20; i++)
     {
@@ -88,18 +86,20 @@ int main()
 
     // test a hashmap of string keys and values
     m3 = rfHashmap_String_Create(10);
-    EXPECT(m3 != NULL, true)
+    EXPECTNOT(m3, NULL)
     for(i = 0; i < 13; i ++)
     {
-        EXPECT(RF_SUCCESS, rfHashmap_String_Insert(m3,
-                                                   RFS_("%s", m3_keys[i]),
-                                                   RFS_("%s", m3_values[i])))
+        EXPECT(true, rfHashmap_String_Insert(
+                   m3,
+                   RFS_("%s", m3_keys[i]),
+                   RFS_("%s", m3_values[i])))
     }
     for(i = 0; i < 13; i ++)
     {
-        EXPECT(true, rfHashmap_String_Get(m3,
-                                          RFS_("%s", m3_keys[i]),
-                                          &str))
+        EXPECT(true, rfHashmap_String_Get(
+                   m3,
+                   RFS_("%s", m3_keys[i]),
+                   &str))
         EXPECT(true, rfString_Equal(&str, RFS_("%s", m3_values[i])))
     }
     rfHashmap_String_Destroy(m3);

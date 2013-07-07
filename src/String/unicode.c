@@ -3,13 +3,13 @@
 **
 ** Copyright (c) 2011-2013, Karapetsas Eleftherios
 ** All rights reserved.
-** 
+**
 ** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 **  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 **  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in
 **     the documentation and/or other materials provided with the distribution.
 **  3. Neither the name of the Original Author of Refu nor the names of its contributors may be used to endorse or promote products derived from
-** 
+**
 ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
 ** INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 ** DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
@@ -44,12 +44,13 @@
 //*----------------------------End of Includes------------------------------------------
 
 //Takes a buffer of unicode character and turns them into a UTF-8 encoded string
-char* rfUTF8_Encode(const uint32_t* codepoints,uint32_t charsN,uint32_t* byteLength)
+char* rfUTF8_Encode(const uint32_t* codepoints, uint32_t charsN,
+                    uint32_t* byteLength)
 {
     char* utf8;
     uint32_t charN;
     //allocate the utf8 buffer
-    RF_MALLOC(utf8,(charsN+1)*4);
+    RF_MALLOC(utf8, (charsN+1)*4, NULL);
     *byteLength = charN = 0;
     /*Start iterating the codepoints until you find end of string*/
     while(codepoints[charN] != 0)
@@ -61,7 +62,8 @@ char* rfUTF8_Encode(const uint32_t* codepoints,uint32_t charsN,uint32_t* byteLen
             (*byteLength)+=1;
         }
         /*If the code point requires two bytes*/
-        else if( RF_HEXGE_UI(codepoints[charN],0x0080) && RF_HEXLE_UI(codepoints[charN],0x07ff))
+        else if( RF_HEXGE_UI(codepoints[charN],0x0080) &&
+                 RF_HEXLE_UI(codepoints[charN],0x07ff))
         {
             /*get the first 6 bits of the msb byte and encode them to the second byte*/
             utf8[(*byteLength)+1] = (codepoints[charN] & 0x3F)|(0x02<<6);
@@ -70,7 +72,8 @@ char* rfUTF8_Encode(const uint32_t* codepoints,uint32_t charsN,uint32_t* byteLen
             (*byteLength)+=2;
         }
         /*if we need 3 bytes to encode it*/
-        else if( RF_HEXGE_UI(codepoints[charN],0x0800) && RF_HEXLE_UI(codepoints[charN],0x0ffff))
+        else if( RF_HEXGE_UI(codepoints[charN],0x0800) &&
+                 RF_HEXLE_UI(codepoints[charN],0x0ffff))
         {
             /*get the first bits of the msb byte and encode them to the third byte*/
             utf8[(*byteLength)+2] = (codepoints[charN] & 0x3F)|(0x02<<6);
@@ -81,7 +84,8 @@ char* rfUTF8_Encode(const uint32_t* codepoints,uint32_t charsN,uint32_t* byteLen
             (*byteLength)+=3;
         }
         /*if we need 4 bytes to encode it*/
-        else if( RF_HEXGE_UI(codepoints[charN],0x10000) && RF_HEXLE_UI(codepoints[charN],0x10ffff))
+        else if( RF_HEXGE_UI(codepoints[charN],0x10000) &&
+                 RF_HEXLE_UI(codepoints[charN],0x10ffff))
         {
             /*get the first bits of the msb byte and encode them to the fourth byte*/
             utf8[(*byteLength)+3] = (codepoints[charN] & 0x3F)|(0x02<<6);
@@ -95,22 +99,23 @@ char* rfUTF8_Encode(const uint32_t* codepoints,uint32_t charsN,uint32_t* byteLen
         }
         else
         {
-            LOG_ERROR("Attempted to encode an invalid unicode code point into a string",RE_UTF8_INVALID_CODE_POINT);
+            LOG_ERROR("Attempted to encode an invalid unicode code point "
+                      "into a string", RE_UTF8_INVALID_CODE_POINT);
             free(utf8);
-            utf8 = 0;
-            return 0;
+            utf8 = NULL;
+            return NULL;
         }
         charN++;
     }/*end of the iteration loop*/
     ///success
-    /*at the end realloc the buffer to its true (smaller) size and add the string termination character*/\
-    /**@warning This realloc here is not very safe, since there is no check. If it fails, it destroys everything*/\
-    utf8 =  realloc(utf8,(*byteLength)+1);
+    /*at the end realloc the buffer to its true (smaller) size and add the string termination character*/
+    //TODO: Think if we should realloc down here ... it's expensive
+    RF_REALLOC(utf8, char, (*byteLength)+1, NULL);
     utf8[*byteLength] = '\0';
     return utf8;
 }
 //akes a unicode codepoint and turns them into a UTF-8 byte
-char rfUTF8_Encode_single(const uint32_t codepoint,char* utf8)
+char rfUTF8_Encode_single(const uint32_t codepoint, char* utf8)
 {
     int i = 0;
     /*If the code point requires only 1 byte*/
@@ -120,7 +125,8 @@ char rfUTF8_Encode_single(const uint32_t codepoint,char* utf8)
         i=1;
     }
     /*If the code point requires two bytes*/
-    else if( RF_HEXGE_UI(codepoint,0x0080) && RF_HEXLE_UI(codepoint,0x07ff))
+    else if( RF_HEXGE_UI(codepoint,0x0080) &&
+             RF_HEXLE_UI(codepoint,0x07ff))
     {
         /*get the first 6 bits of the msb byte and encode them to the second byte*/
         utf8[1] = (codepoint & 0x3F)|(0x02<<6);
@@ -129,7 +135,8 @@ char rfUTF8_Encode_single(const uint32_t codepoint,char* utf8)
         i=2;
     }
     /*if we need 3 bytes to encode it*/
-    else if( RF_HEXGE_UI(codepoint,0x0800) && RF_HEXLE_UI(codepoint,0x0ffff))
+    else if( RF_HEXGE_UI(codepoint,0x0800) &&
+             RF_HEXLE_UI(codepoint,0x0ffff))
     {
         /*get the first bits of the msb byte and encode them to the third byte*/
         utf8[2] = (codepoint & 0x3F)|(0x02<<6);
@@ -140,7 +147,8 @@ char rfUTF8_Encode_single(const uint32_t codepoint,char* utf8)
         i=3;
     }
     /*if we need 4 bytes to encode it*/
-    else if( RF_HEXGE_UI(codepoint,0x10000) && RF_HEXLE_UI(codepoint,0x10ffff))
+    else if( RF_HEXGE_UI(codepoint,0x10000) &&
+             RF_HEXLE_UI(codepoint,0x10ffff))
     {
         /*get the first bits of the msb byte and encode them to the fourth byte*/
         utf8[3] = (codepoint & 0x3F)|(0x02<<6);
@@ -154,7 +162,8 @@ char rfUTF8_Encode_single(const uint32_t codepoint,char* utf8)
     }
     else
     {
-        LOG_ERROR("Attempted to encode an invalid unicode code point into a string",RE_UTF8_INVALID_CODE_POINT);
+        LOG_ERROR("Attempted to encode an invalid unicode code point into"
+                  " a string", RE_UTF8_INVALID_CODE_POINT);
         utf8[0] = '\0';
         return 0;
     }
@@ -165,10 +174,11 @@ char rfUTF8_Encode_single(const uint32_t codepoint,char* utf8)
 }
 
 //Takes a utf8 buffer and decodes it into unicode codepoints
-uint32_t* rfUTF8_Decode(const char* utf8,uint32_t utf8Length,uint32_t* charsN)
+uint32_t* rfUTF8_Decode(const char* utf8, uint32_t utf8Length,
+                        uint32_t* charsN)
 {
     uint32_t* codePoints,i=0;
-    RF_MALLOC(codePoints,utf8Length*4+4);//allocate worst max amount of bytes that would be needed
+    RF_MALLOC(codePoints, utf8Length*4+4, NULL);//allocate worst max amount of bytes that would be needed
     *charsN = 0;
     while(utf8[i] != 0)
     {
@@ -223,7 +233,7 @@ uint32_t* rfUTF8_Decode(const char* utf8,uint32_t utf8Length,uint32_t* charsN)
 }
 
 // Parses a utf-8 byte sequence trying to verify if it is valid or not
-int32_t rfUTF8_VerifySequence(const char* bytes,uint32_t * i)
+int32_t rfUTF8_VerifySequence(const char* bytes, uint32_t * i)
 {
     //i is the byte index
     *i=0;
@@ -239,24 +249,34 @@ int32_t rfUTF8_VerifySequence(const char* bytes,uint32_t * i)
         {
             //also remember bytes 0xC0 and 0xC1 are invalid and could possibly be found in a starting byte of this type so check for them here
             if( RF_HEXEQ_C(bytes[*i],0xC0) || RF_HEXEQ_C(bytes[*i],0xC1))
-                RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, an invalid byte was encountered",RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE)
+            {
+                RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, "
+                                 "an invalid byte was encountered",
+                                 RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE)
+            }
 
             //if the next byte is NOT a continuation byte
             if( !rfUTF8_IsContinuationByte(bytes[*i+1]))
-                RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE)
-
+            {
+                RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, "
+                                 "and expecting a continuation byte, one "
+                                 "was not found",
+                                 RE_UTF8_INVALID_SEQUENCE_CONBYTE)
+            }
             *i= *i+2;
         }
         //if the leading bits are in the form of 0b1110xxxx then range is U+0800 to U+FFFF  (3 bytes)
         else if( RF_HEXEQ_C( ( (~(bytes[*i] ^ 0xE0))>>4),0xF))
         {
             //if the string has invalid continuation bytes quit. They are in separate if checks to avoid checking outside of array bounds
-            if(!rfUTF8_IsContinuationByte(bytes[*i+1]))
-                RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE)
-
-            if(!rfUTF8_IsContinuationByte(bytes[*i+2]))
-                RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE)
-
+            if(!rfUTF8_IsContinuationByte(bytes[*i+1]) ||
+               !rfUTF8_IsContinuationByte(bytes[*i+2]) )
+            {
+                RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, "
+                                 "and expecting a continuation byte, one "
+                                 "was not found",
+                                 RE_UTF8_INVALID_SEQUENCE_CONBYTE)
+            }
             *i= *i+3;
         }
         //if the leading bits are in the form of 0b11110xxx then range is U+010000 to U+10FFFF (4 bytes)
@@ -264,22 +284,30 @@ int32_t rfUTF8_VerifySequence(const char* bytes,uint32_t * i)
         {
             //in this type of starting byte a number of invalid bytes can be encountered. We have to check for them.
             if(RF_HEXGE_C(bytes[*i],0xF5)) //invalid byte value are from 0xF5 to 0xFF
-                RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, an invalid byte was encountered",RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE)
+            {
+                RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, "
+                                 "an invalid byte was encountered",
+                                 RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE)
+            }
 
             //if the string has invalid continuation bytes quit. They are in separate if checks to avoid checking outside of array bounds
-            if(!rfUTF8_IsContinuationByte(bytes[*i+1]))
-                RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE)
-
-            if(!rfUTF8_IsContinuationByte(bytes[*i+2]))
-                RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE)
-
-            if(!rfUTF8_IsContinuationByte(bytes[*i+3]))
-                RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, and expecting a continuation byte, one was not found",RE_UTF8_INVALID_SEQUENCE_CONBYTE)
-
+            if(!rfUTF8_IsContinuationByte(bytes[*i+1]) ||
+               !rfUTF8_IsContinuationByte(bytes[*i+2]) ||
+               !rfUTF8_IsContinuationByte(bytes[*i+3]))
+            {
+                RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, "
+                                 "and expecting a continuation byte, one "
+                                 "was not found",
+                                 RE_UTF8_INVALID_SEQUENCE_CONBYTE)
+            }
             *i=*i+4;
         }
         else//we were expecting one of the 4 different start bytes and we did not find it, there is an error
-            RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, the first byte of a character was not valid UTF-8",RE_UTF8_INVALID_SEQUENCE)
+        {
+            RETURN_LOG_ERROR("While decoding a UTF-8 byte sequence, the "
+                             "first byte of a character was not valid "
+                             "UTF-8",RE_UTF8_INVALID_SEQUENCE)
+        }
 
     }//end of iterating the bytes
 
@@ -287,7 +315,8 @@ int32_t rfUTF8_VerifySequence(const char* bytes,uint32_t * i)
     return RF_SUCCESS;
 }
 //Decodes a UTF-16  byte stream into codepoints
-int32_t rfUTF16_Decode(const char* buff,uint32_t* charactersN,uint32_t* codepoints)
+int32_t rfUTF16_Decode(const char* buff, uint32_t* charactersN,
+                       uint32_t* codepoints)
 {
     uint16_t v1,v2;
     uint32_t byteLength,U;
@@ -299,20 +328,33 @@ int32_t rfUTF16_Decode(const char* buff,uint32_t* charactersN,uint32_t* codepoin
     while(v1!=0)
     {
         /*If the value is in the surrogate area*/
-        if(RF_HEXGE_US(v1,0xD800) && RF_HEXLE_US(v1,0xDFFF))
+        if(RF_HEXGE_US(v1,0xD800) &&
+           RF_HEXLE_US(v1,0xDFFF))
         {
             //determine if it's a valid first pair(between 0xD800 and 0xDBFF)
             if(RF_HEXG_US(v1,0xDBFF))
-                RETURN_LOG_ERROR("Invalid 16-bit integer found in the given sequence. Can't decode.",RE_UTF16_INVALID_SEQUENCE)
+            {
+                RETURN_LOG_ERROR("Invalid 16-bit integer found in the "
+                                 "given sequence. Can't decode.",
+                                 RE_UTF16_INVALID_SEQUENCE)
+            }
 
             v2 = *((uint16_t*) (buff+byteLength+2));
             //determine if the surrogate pair is valid. Between 0xDC00 and 0xDFFF
             if(RF_HEXL_US(v2,0xDC00) || RF_HEXG_US(v2,0xDFFF))
             {
                 if(v2 != 0)
-                    RETURN_LOG_ERROR("Invalid surrogate pair found in the given sequence. Can't decode.",RE_UTF16_INVALID_SEQUENCE)
+                {
+                    RETURN_LOG_ERROR("Invalid surrogate pair found in the"
+                                     " given sequence. Can't decode.",
+                                     RE_UTF16_INVALID_SEQUENCE)
+                }
                 else
-                    RETURN_LOG_ERROR("A surrogate pair was expected and it was not found. Can't decode",RE_UTF16_NO_SURRPAIR)
+                {
+                    RETURN_LOG_ERROR("A surrogate pair was expected and "
+                                     "it was not found. Can't decode",
+                                     RE_UTF16_NO_SURRPAIR)
+                }
             }
             /*now decode the surrogate pairs*/
             U = v2&(uint16_t)0x3ff;
@@ -337,7 +379,8 @@ int32_t rfUTF16_Decode(const char* buff,uint32_t* charactersN,uint32_t* codepoin
     return RF_SUCCESS;
 }
 //Decodes a  UTF-16 byte stream into codepoints also swapping endianess
-int32_t rfUTF16_Decode_swap(const char* buff,uint32_t* charactersN,uint32_t* codepoints)
+int32_t rfUTF16_Decode_swap(const char* buff, uint32_t* charactersN,
+                            uint32_t* codepoints)
 {
     uint16_t v1,v2;
     uint32_t byteLength,U;
@@ -354,7 +397,11 @@ int32_t rfUTF16_Decode_swap(const char* buff,uint32_t* charactersN,uint32_t* cod
         {
             //determine if it's a valid first pair(between 0xD800 and 0xDBFF)
             if(RF_HEXG_US(v1,0xDBFF))
-                RETURN_LOG_ERROR("Invalid 16-bit integer found in the given sequence. Can't decode.",RE_UTF16_INVALID_SEQUENCE)
+            {
+                RETURN_LOG_ERROR("Invalid 16-bit integer found in the "
+                                 "given sequence. Can't decode.",
+                                 RE_UTF16_INVALID_SEQUENCE)
+            }
 
             v2 = *((uint16_t*) (buff+byteLength+2));
             rfSwapEndianUS(&v2);
@@ -362,9 +409,17 @@ int32_t rfUTF16_Decode_swap(const char* buff,uint32_t* charactersN,uint32_t* cod
             if(RF_HEXL_US(v2,0xDC00) || RF_HEXG_US(v2,0xDFFF))
             {
                 if(v2 != 0)
-                    RETURN_LOG_ERROR("Invalid surrogate pair found in the given sequence. Can't decode.",RE_UTF16_INVALID_SEQUENCE)
+                {
+                    RETURN_LOG_ERROR("Invalid surrogate pair found in the"
+                                     " given sequence. Can't decode.",
+                                     RE_UTF16_INVALID_SEQUENCE)
+                }
                 else
-                    RETURN_LOG_ERROR("A surrogate pair was expected and it was not found. Can't decode",RE_UTF16_NO_SURRPAIR)
+                {
+                    RETURN_LOG_ERROR("A surrogate pair was expected and "
+                                     "it was not found. Can't decode",
+                                     RE_UTF16_NO_SURRPAIR)
+                }
             }
             /*now decode the surrogate pairs*/
             U = v2&(uint16_t)0x3ff;
@@ -389,19 +444,22 @@ int32_t rfUTF16_Decode_swap(const char* buff,uint32_t* charactersN,uint32_t* cod
     return true;
 }
 //Encodes a buffer of unicode codepoints into UTF-16
-uint16_t* rfUTF16_Encode(const uint32_t* codepoints,uint32_t charsN,uint32_t* length)
+uint16_t* rfUTF16_Encode(const uint32_t* codepoints, uint32_t charsN,
+                         uint32_t* length)
 {
     uint32_t i,U;
     uint16_t* utf16;
-    RF_MALLOC(utf16,4*charsN+2)//worst case scenario allocation
+    RF_MALLOC(utf16, 4*charsN+2, NULL);//worst case scenario allocation
     //for all codepoints  (i -> charIndex , length -> byteIndex
     for(i = 0,*length=0; i < charsN; i ++)
     {
         if(RF_HEXG_UI(codepoints[i],0x10FFFF))
         {
-            LOG_ERROR("While encoding unicode codepoints into a UTF-16 buffer a codepoint greater than 0x10FFFF was encountered",RE_UTF16_ENCODING);
+            LOG_ERROR("While encoding unicode codepoints into a UTF-16 "
+                      "buffer a codepoint greater than 0x10FFFF was "
+                      "encountered", RE_UTF16_ENCODING);
             free(utf16);
-            return 0;
+            return NULL;
         }
         if(RF_HEXL_UI(codepoints[i],0x10000))//if it is encoded in just one word
         {
@@ -422,7 +480,7 @@ uint16_t* rfUTF16_Encode(const uint32_t* codepoints,uint32_t charsN,uint32_t* le
 }
 
 //Turns a unicode code point into utf8
-char rfUTF8_FromCodepoint(uint32_t codepoint,uint32_t* utf8Int)
+char rfUTF8_FromCodepoint(uint32_t codepoint, uint32_t* utf8Int)
 {
     char byteLength = 0;
     char* utf8 = (char*)utf8Int;
@@ -432,7 +490,8 @@ char rfUTF8_FromCodepoint(uint32_t codepoint,uint32_t* utf8Int)
         byteLength=1;
     }
     /*If the code point requires two bytes*/
-    else if( RF_HEXGE_UI(codepoint,0x0080) && RF_HEXLE_UI(codepoint,0x07ff))
+    else if( RF_HEXGE_UI(codepoint,0x0080) &&
+             RF_HEXLE_UI(codepoint,0x07ff))
     {
         /*get the first 6 bits of the msb byte and encode them to the second byte*/
         utf8[1] = (codepoint & 0x3F)|(0x02<<6);
@@ -441,7 +500,8 @@ char rfUTF8_FromCodepoint(uint32_t codepoint,uint32_t* utf8Int)
         byteLength=2;
     }
     /*if we need 3 bytes to encode it*/
-    else if( RF_HEXGE_UI(codepoint,0x0800) && RF_HEXLE_UI(codepoint,0x0ffff))
+    else if( RF_HEXGE_UI(codepoint,0x0800) &&
+             RF_HEXLE_UI(codepoint,0x0ffff))
     {
         /*get the first bits of the msb byte and encode them to the third byte*/
         utf8[2] = (codepoint & 0x3F)|(0x02<<6);
@@ -452,7 +512,8 @@ char rfUTF8_FromCodepoint(uint32_t codepoint,uint32_t* utf8Int)
         byteLength=3;
     }
     /*if we need 4 bytes to encode it*/
-    else if( RF_HEXGE_UI(codepoint,0x10000) && RF_HEXLE_UI(codepoint,0x10ffff))
+    else if( RF_HEXGE_UI(codepoint,0x10000) &&
+             RF_HEXLE_UI(codepoint,0x10ffff))
     {
         /*get the first bits of the msb byte and encode them to the fourth byte*/
         utf8[3] = (codepoint & 0x3F)|(0x02<<6);
@@ -465,6 +526,9 @@ char rfUTF8_FromCodepoint(uint32_t codepoint,uint32_t* utf8Int)
         byteLength=4;
     }
     else
-        LOG_ERROR("Attempted to encode an invalid unicode code point into a string",RE_UTF8_INVALID_CODE_POINT);
+    {
+        LOG_ERROR("Attempted to encode an invalid unicode code point into"
+                  " a string",RE_UTF8_INVALID_CODE_POINT);
+    }
     return byteLength;
 }

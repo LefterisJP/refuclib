@@ -154,7 +154,7 @@ i_DECLIMEX_ void rfStringX_Reset(RF_StringX* thisstr);
  ** @param parN The number of parameters
  ** @extraVarArgLim
  ** @param ... The strings to search for. @inhtype{String,StringX} @tmpSTR
- ** @return true if the substring got initialized and false if none of the parameters are found
+ ** @return true if the substring got initialized and false if none of the parameters are found or due to error
  ** @see rfStringX_MoveAfter()
  ** @see rfStringX_MoveAfterPair()
  ** @see rfStringX_MoveForward()
@@ -186,7 +186,8 @@ i_DECLIMEX_ char rfStringX_MoveAfterv(RF_StringX* thisstr,void* result,const cha
  ** + @c RF_STRINGX_ARGUMENT: Pass this bitflag option if the pointer you gave for initialization at @c result is of RF_StringX type
  ** @param occurence \rfoptional{0} If this is not 0 then the function will search for the number of occurence given in this parameter.
  ** If it is 0 it will search for the first occurence. If it is not found then the function shall return false
- ** @return Returns true if the substring is found and false if not
+ ** @return Returns true if the substring is found and false if not and in
+ ** the case of an error
  ** @see rfStringX_MoveAfter()
  ** @see rfStringX_MoveAfterv()
  ** @see rfStringX_MoveForward()

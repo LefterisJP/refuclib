@@ -180,9 +180,9 @@ i_DECLIMEX_ char rfXMLTag_Initv(RF_XMLTag* x,RF_XMLTag* parent,void* name,void* 
  **
  ** @param dst The XMLTag copy we are creating
  ** @param src The XMLTag that we are copying
- **
+ ** @return Returns @c true in success and @c false otherwise
  **/
-i_DECLIMEX_ void rfXMLTag_Copy_IN(RF_XMLTag* dst,RF_XMLTag* src);
+i_DECLIMEX_ char rfXMLTag_Copy_IN(RF_XMLTag* dst,RF_XMLTag* src);
 /**
  ** @memberof RF_XMLTag
  ** @brief Allocates and returns a copy of the given XML Tag
@@ -259,9 +259,10 @@ i_DECLIMEX_ void rfXMLTag_AddAttribute(RF_XMLTag* t,void* attribName,void* attri
  ** @param t The tag
  ** @param c Give an @ref RF_String to add as contents to the tag. An internal
  ** copy of the String is made, so there is no need to worry about freeing it later. @inhtype{String,StringX} @tmpSTR
+ ** @return Returns @c true for success and @c false otherwise
  **
  **/
-i_DECLIMEX_ void rfXMLTag_AddContent(RF_XMLTag* t,void* content);
+i_DECLIMEX_ char rfXMLTag_AddContent(RF_XMLTag* t, void* content);
 
 /**
  ** @memberof RF_XMLTag
@@ -318,9 +319,10 @@ i_DECLIMEX_ char rfXMLTag_GetAttributeValue(RF_XMLTag* t,uint32_t i,RF_String* v
  ** This function creates a copy of the String so the string has to be freed by the user later.
  ** @param[in] t The tag
  ** @param[out] line Pass an RF_String upon which the content line will be @b copied.
+ ** @return Returns @c true in success and @c false otherwise
  **
  **/
-i_DECLIMEX_ void rfXMLTag_GetContent(RF_XMLTag* t,RF_String* line);
+i_DECLIMEX_ char rfXMLTag_GetContent(RF_XMLTag* t,RF_String* line);
 
 /**
  ** @memberof RF_XMLTag

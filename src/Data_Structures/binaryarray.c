@@ -3,13 +3,13 @@
 **
 ** Copyright (c) 2011-2013, Karapetsas Eleftherios
 ** All rights reserved.
-** 
+**
 ** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 **  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 **  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in
 **     the documentation and/or other materials provided with the distribution.
 **  3. Neither the name of the Original Author of Refu nor the names of its contributors may be used to endorse or promote products derived from
-** 
+**
 ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
 ** INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 ** DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
@@ -44,9 +44,9 @@
 RF_BinaryArray* rfBinaryArray_Create(uint32_t size)
 {
     RF_BinaryArray* ret;
-    RF_MALLOC(ret,sizeof(RF_BinaryArray));
+    RF_MALLOC(ret, sizeof(RF_BinaryArray), NULL);
     //allocate enough bytes to encompass all of the values. Initializing everything to 0
-    RF_CALLOC(ret->data,size/8 +1,1);
+    RF_CALLOC(ret->data, size/8 +1, 1, NULL);
     ret->size = size;
     return ret;
 }
@@ -54,26 +54,27 @@ RF_BinaryArray* rfBinaryArray_Create(uint32_t size)
 char rfBinaryArray_Init(RF_BinaryArray* arr,uint32_t size)
 {
     //allocate enough bytes to encompass all of the values. Initializing everything to 0
-    RF_CALLOC(arr->data,size/8+1,1);
+    RF_CALLOC(arr->data, size/8+1, 1, false);
     arr->size = size;
     return true;
 }
 
 //Copies RF_BinarryArray @c src into RF_BinaryArray @c dst
-void rfBinaryArray_Copy_IN(RF_BinaryArray* dst,RF_BinaryArray* src)
+char rfBinaryArray_Copy_IN(RF_BinaryArray* dst, RF_BinaryArray* src)
 {
     dst->size = src->size;
-    RF_CALLOC(dst->data,dst->size/8+1,1);
-    memcpy(dst->data,src->data,dst->size/8+1);
+    RF_CALLOC(dst->data, dst->size/8+1, 1, false);
+    memcpy(dst->data, src->data, dst->size/8+1);
+    return true;
 }
 //Creates and returns an allocated copy of the given RF_BinarryArray
 RF_BinaryArray* rfBinaryArray_Copy_OUT(RF_BinaryArray* src)
 {
     RF_BinaryArray* dst;
-    RF_MALLOC(dst,sizeof(RF_BinaryArray))
+    RF_MALLOC(dst,sizeof(RF_BinaryArray), NULL);
     dst->size = src->size;
-    RF_CALLOC(dst->data,dst->size/8+1,1);
-    memcpy(dst->data,src->data,dst->size/8+1);
+    RF_CALLOC(dst->data, dst->size/8+1, 1, NULL);
+    memcpy(dst->data, src->data, dst->size/8+1);
     return dst;
 }
 
@@ -90,17 +91,20 @@ void rfBinaryArray_Deinit(RF_BinaryArray* a)
 }
 
 // Gets a specific value of the array
-char rfBinaryArray_Get(RF_BinaryArray* a,uint32_t i,char* val)
+char rfBinaryArray_Get(RF_BinaryArray* a, uint32_t i, char* val)
 {
+    char b;
     //check for out of bounds index
     if(i >= a->size)
     {
-        LOG_ERROR("Attempted to retrieve a value from a BinaryArray with an index out of bounds",RE_INDEX_OUT_OF_BOUNDS);
+        LOG_ERROR(
+            "Attempted to retrieve a value from a BinaryArray with an "
+            "index out of bounds", RE_INDEX_OUT_OF_BOUNDS);
         return false;
     }
 
     //the specific bit of the byte we wanna check for
-    char b = 0x1 << (i%8);
+    b = 0x1 << (i%8);
     //check if the bit is set or not
     *val = (b == (a->data[i/8] & b));
     //success
@@ -108,7 +112,7 @@ char rfBinaryArray_Get(RF_BinaryArray* a,uint32_t i,char* val)
 }
 
 // Gets a specific value of the array, without checking for array index out of bounds. If the index IS out of bounds the value can not be trusted. For a safer function look at #rfBinaryArray_Get
-char rfBinaryArray_Get_NC(RF_BinaryArray* a,uint32_t i)
+char rfBinaryArray_Get_NC(RF_BinaryArray* a, uint32_t i)
 {
     //the specific bit of the byte we wanna check for
     char b = 0x1 << (i%8);
@@ -117,12 +121,14 @@ char rfBinaryArray_Get_NC(RF_BinaryArray* a,uint32_t i)
 }
 
 // Sets a specific value of the binary array.
-char rfBinaryArray_Set(RF_BinaryArray* a,uint32_t i,char val)
+char rfBinaryArray_Set(RF_BinaryArray* a, uint32_t i, char val)
 {
    //check for out of bounds index
    if(i >= a->size)
    {
-       LOG_ERROR("Attempted to set a value of a BinaryArray with an index out of bounds",RE_INDEX_OUT_OF_BOUNDS);
+       LOG_ERROR(
+           "Attempted to set a value of a BinaryArray with an index out "
+           "of bounds", RE_INDEX_OUT_OF_BOUNDS);
        return false;
    }
 
@@ -139,7 +145,7 @@ char rfBinaryArray_Set(RF_BinaryArray* a,uint32_t i,char val)
 }
 
 // Sets a specific value of the binary array without making an index out of bounds check. Use only if you are certain that the given index is not out of bounds!!!!
-void rfBinaryArray_Set_NC(RF_BinaryArray* a,uint32_t i,char val)
+void rfBinaryArray_Set_NC(RF_BinaryArray* a, uint32_t i, char val)
 {
    //if the given value is true set the bit
    if(val == true)
@@ -154,26 +160,16 @@ void rfBinaryArray_Set_NC(RF_BinaryArray* a,uint32_t i,char val)
 
 
 // Increases the size of a binary array
-char rfBinaryArray_Reallocate(RF_BinaryArray* a,uint32_t newSize)
+char rfBinaryArray_Reallocate(RF_BinaryArray* a, uint32_t newSize)
 {
-    char* testptr = realloc(a->data,newSize/8+1);
-    //if reallocation fails
-    if(testptr == 0)
-    {
-        LOG_ERROR("Reallocation of a binary array has failed",RE_REALLOC_FAILURE);
-        return false;
-    }
-
-    //success so save the new pointer
-    a->data = testptr;
-
+    //attempt to realloc
+    RF_REALLOC(a->data, char, newSize/8 + 1, false);
     //check to see if the array got reallocated upwards
     if(newSize > a->size)
     {
         ///if it did we have to initialize all the new values to 0
         unsigned char j;
         unsigned char sBit = a->size%8;
-
         //get the difference in size
         uint32_t diff = newSize-a->size;
 

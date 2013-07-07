@@ -172,13 +172,15 @@ void* rfThreadX_GetData(RF_ThreadX* t);
  ** @param data A pointer to the data to send
  ** @param size The size of the data we are sending in bytes
  ** @return Returns @c RF_SUCCESS in case of success
- ** In case of error it returns:
- **  <ul><li>@c RF_THREADX_QUEUE_BUSY if the queue is being written at the moment of accesss</li>
+ ** In case of error it returns an error. Error can be anything including:
+ **  <ul><li>@c RF_THREADX_QUEUE_BUSY if the queue is being written at 
+ ** the moment of accesss</li>
  **  <li>@c RF_THREADX_QUEUE_FULL if the queue is full</li>
  **  <li>@c RF_THREADX_QUEUE_ERROR if there was a problem</li></ul>
  **
  **/
-i_DECLIMEX_ int32_t rfThreadX_TrySendSignal(RF_ThreadX* t,void* data,uint32_t size);
+i_DECLIMEX_ int32_t rfThreadX_TrySendSignal(RF_ThreadX* t, void* data,
+                                            uint32_t size);
 
 /**
  ** @memberof RF_ThreadX
@@ -188,12 +190,14 @@ i_DECLIMEX_ int32_t rfThreadX_TrySendSignal(RF_ThreadX* t,void* data,uint32_t si
  ** @param t A pointer to the thread that will receive the signal.The thread must be able to receive signals
  ** @param data A pointer to the data to send
  ** @param size The size of the data we are sending in bytes
- ** @return Returns @c RF_SUCCESS in case of success. If an error happens it returns
+ ** @return Returns @c RF_SUCCESS in case of success. If an error happens
+ ** it returns it. Error can be anything including:
  ** <ul><li>@c RF_THREADX_QUEUE_FULL if the queue is full</li>
  ** <li>@c RF_THREADX_QUEUE_ERROR if there was a problem</li></ul>
  **
  **/
-i_DECLIMEX_ int32_t rfThreadX_SendSignal(RF_ThreadX* t,void* data,uint32_t size);
+i_DECLIMEX_ int32_t rfThreadX_SendSignal(RF_ThreadX* t, void* data,
+                                         uint32_t size);
 
 /**
  ** @memberof RF_ThreadX
@@ -203,12 +207,14 @@ i_DECLIMEX_ int32_t rfThreadX_SendSignal(RF_ThreadX* t,void* data,uint32_t size)
  ** @param[in]  t A pointer to this thread
  ** @param[out] data A pointer to the data that we want to receive. Since the programmer is responsible for the data, they should already have been allocated
  ** @param[out] size Pass a reference to an uint32_t to receive here the size of the data in bytes.
- ** @return     Returns @c RF_SUCCESS in case of success. If something happens it returns:
+ ** @return     Returns @c RF_SUCCESS in case of success. If something 
+ ** happens it returns an error which can be anything including:
  ** <ul><li>@c RF_THREADX_QUEUE_EMPTY if the queue is empty</li>
  ** <li>@c RF_THREADX_QUEUE_ERROR if there was a problem</li></ul>
  **
  **/
-i_DECLIMEX_ int32_t rfThreadX_ReadSignal(RF_ThreadX* t,void *data,uint32_t* size);
+i_DECLIMEX_ int32_t rfThreadX_ReadSignal(RF_ThreadX* t, void *data,
+                                         uint32_t* size);
 
 /**
  ** @memberof RF_ThreadX
@@ -218,13 +224,15 @@ i_DECLIMEX_ int32_t rfThreadX_ReadSignal(RF_ThreadX* t,void *data,uint32_t* size
  ** @param[in]  t A pointer to this thread
  ** @param[out] data A pointer to the data that we want to receive. Since the programmer is responsible for the data, they should already have been allocated
  ** @param[out] size Pass a reference to an uint32_t to receive here the size of the data in bytes.
- ** @return     Returns @c RF_SUCCESS in case of success.If something happens it can return:
+ ** @return     Returns @c RF_SUCCESS in case of success. Otherwise it
+ ** returns an error which can be anything including:
  ** <ul><li>@c RF_THREADX_QUEUE_BUSY if the queue is being written at the moment of accesss</li>
  ** <li>@c RF_THREADX_QUEUE_EMPTY if the queue is empty</li>
  ** <li>@c RF_THREADX_QUEUE_ERROR if there was a problem</li></ul>
  **
  **/
-i_DECLIMEX_ int32_t rfThreadX_TryReadSignal(RF_ThreadX* t,void *data,uint32_t* size);
+i_DECLIMEX_ int32_t rfThreadX_TryReadSignal(RF_ThreadX* t, void *data,
+                                            uint32_t* size);
 
 #ifdef __cplusplus
 }//closing brack for C++ calling

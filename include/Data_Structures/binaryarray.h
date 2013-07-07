@@ -69,10 +69,10 @@ i_DECLIMEX_ RF_BinaryArray* rfBinaryArray_Create(uint32_t size);
  **
  ** @param arr The array to initialize
  ** @param size The size of the array in values
- ** @return Returns true in success and false for failure
+ ** @return Returns @c true in success and @c false for failure
  **
  **/
-i_DECLIMEX_ char rfBinaryArray_Init(RF_BinaryArray* arr,uint32_t size);
+i_DECLIMEX_ char rfBinaryArray_Init(RF_BinaryArray* arr, uint32_t size);
 
 /**
  ** @memberof RF_BinaryArray
@@ -80,15 +80,18 @@ i_DECLIMEX_ char rfBinaryArray_Init(RF_BinaryArray* arr,uint32_t size);
  **
  ** @param dst The new binarry array copy to create
  ** @param src The binary array to copy from
+ ** @return Returns @c true in success and @c false otherwise
  **
  **/
-i_DECLIMEX_ void rfBinaryArray_Copy_IN(RF_BinaryArray* dst,RF_BinaryArray* src);
+i_DECLIMEX_ char rfBinaryArray_Copy_IN(RF_BinaryArray* dst,
+                                       RF_BinaryArray* src);
 /**
  ** @memberof RF_BinaryArray
  ** @brief Creates and returns an allocated copy of the given RF_BinarryArray
  **
  ** @param src The Binary array to copy
- ** @return An allocated RF_BinaryArray copy of the given binary array
+ ** @return An allocated RF_BinaryArray copy of the given binary array,
+ ** or @c NULL in error
  **
  **/
 i_DECLIMEX_ RF_BinaryArray* rfBinaryArray_Copy_OUT(RF_BinaryArray* src);
@@ -121,7 +124,8 @@ i_DECLIMEX_ void rfBinaryArray_Deinit(RF_BinaryArray* a);
  ** @return Returns true if the value exists and false if the requested index is out of bounds
  **
  **/
-i_DECLIMEX_ char rfBinaryArray_Get(RF_BinaryArray* a,uint32_t i,char* val);
+i_DECLIMEX_ char rfBinaryArray_Get(RF_BinaryArray* a, uint32_t i,
+                                   char* val);
 
 /**
  ** @memberof RF_BinaryArray
@@ -135,7 +139,7 @@ i_DECLIMEX_ char rfBinaryArray_Get(RF_BinaryArray* a,uint32_t i,char* val);
  ** @return Returns true if the value is set and false if it is not set
  **
  **/
-i_DECLIMEX_ char rfBinaryArray_Get_NC(RF_BinaryArray* a,uint32_t i);
+i_DECLIMEX_ char rfBinaryArray_Get_NC(RF_BinaryArray* a, uint32_t i);
 
 /**
  ** @memberof RF_BinaryArray
@@ -146,7 +150,7 @@ i_DECLIMEX_ char rfBinaryArray_Get_NC(RF_BinaryArray* a,uint32_t i);
  ** @return Returns true if the value was succesfully set or false if the given index was out of bounds
  **
  **/
-i_DECLIMEX_ char rfBinaryArray_Set(RF_BinaryArray* a,uint32_t i,char val);
+i_DECLIMEX_ char rfBinaryArray_Set(RF_BinaryArray* a, uint32_t i, char val);
 
 /**
  ** @memberof RF_BinaryArray
@@ -159,17 +163,20 @@ i_DECLIMEX_ char rfBinaryArray_Set(RF_BinaryArray* a,uint32_t i,char val);
  ** @param val The value to give. Either 1 or 0.
  **
  **/
-i_DECLIMEX_ void rfBinaryArray_Set_NC(RF_BinaryArray* a,uint32_t i,char val);
+i_DECLIMEX_ void rfBinaryArray_Set_NC(RF_BinaryArray* a, uint32_t i,
+                                      char val);
 
 /**
  ** @memberof RF_BinaryArray
  ** @brief Increases or decreases the size of a binary array.
  ** @param a The binary array to reallocate
  ** @param newSize The new size in values that the array should have.
- ** @return True for succesfull reallocation and false otherwise.
+ ** @return Returns @c true for succesfull reallocation and @c false
+ **  otherwise.
  **
  **/
-i_DECLIMEX_ char rfBinaryArray_Reallocate(RF_BinaryArray* a,uint32_t newSize);
+i_DECLIMEX_ char rfBinaryArray_Reallocate(RF_BinaryArray* a,
+                                          uint32_t newSize);
 
 #ifdef __cplusplus
 }///closing bracket for calling from C++

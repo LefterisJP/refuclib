@@ -614,7 +614,7 @@ Balloc
 		x = 1 << k;
 #ifdef Omit_Private_Memory
 		//rv = (Bigint *)MALLOC(sizeof(Bigint) + (x-1)*sizeof(ULong)); //-EDIT- Using refu malloc macro
-        RF_MALLOC(rv,sizeof(Bigint) + (x-1)*sizeof(ULong))
+    RF_MALLOC(rv, sizeof(Bigint) + (x-1)*sizeof(ULong), 0);
 #else
 		len = (sizeof(Bigint) + (x-1)*sizeof(ULong) + sizeof(double) - 1)
 			/sizeof(double);
@@ -624,7 +624,7 @@ Balloc
 			}
 		else
 			//rv = (Bigint*)MALLOC(len*sizeof(double)); //-EDIT- Using refu malloc macro
-			RF_MALLOC(rv,len*sizeof(double))
+        RF_MALLOC(rv, len*sizeof(double), 0);
 #endif
 		rv->k = k;
 		rv->maxwds = x;
@@ -1794,7 +1794,7 @@ enum {	/* rounding values: same as FLT_ROUNDS */
 	Round_down = 3
 	};
 
- void
+int
 #ifdef KR_headers
 gethex(sp, rvp, rounding, sign)
 	CONST char **sp; U *rvp; int rounding, sign;
@@ -1838,7 +1838,7 @@ gethex( CONST char **sp, U *rvp, int rounding, int sign)
 		//-EDIT- Using refu malloc macro
 		//if ((decimalpoint_cache = (unsigned char*)
 		//		MALLOC(strlen((CONST char*)s0) + 1))) {
-		RF_MALLOC(decimalpoint_cache,strlen((CONST char*)s0) + 1)
+		RF_MALLOC(decimalpoint_cache, strlen((CONST char*)s0) + 1, 0);
 		if(decimalpoint_cache){
 			strcpy((char*)decimalpoint_cache, (CONST char*)s0);
 			s0 = decimalpoint_cache;
@@ -1955,7 +1955,7 @@ gethex( CONST char **sp, U *rvp, int rounding, int sign)
 #endif
 			word0(rvp) = 0;
 			word1(rvp) = 1;
-			return;
+			return 1;
 #endif /* IEEE_Arith */
 			}
 		switch(rounding) {
@@ -1973,7 +1973,7 @@ gethex( CONST char **sp, U *rvp, int rounding, int sign)
  ret_big:
 		word0(rvp) = Big0;
 		word1(rvp) = Big1;
-		return;
+		return 1;
 		}
 	n = s1 - s0 - 1;
 	for(k = 0; n > (1 << (kshift-2)) - 1; n >>= 1)
@@ -2038,7 +2038,7 @@ gethex( CONST char **sp, U *rvp, int rounding, int sign)
 #endif
 		word0(rvp) = Exp_mask;
 		word1(rvp) = 0;
-		return;
+		return 1;
 		}
 	denorm = 0;
 	if (e < emin) {
@@ -2067,7 +2067,7 @@ gethex( CONST char **sp, U *rvp, int rounding, int sign)
 #endif
  retz1:
 			rvp->d = 0.;
-			return;
+			return 1;
 			}
 		k = n - 1;
 		if (lostbits)
@@ -2156,6 +2156,7 @@ gethex( CONST char **sp, U *rvp, int rounding, int sign)
 	word1(rvp) = (b->x[0] >> 16) | (b->x[0] << 16);
 #endif
 	Bfree(b);
+  return 1;
 	}
 #endif /*!NO_HEX_FP}*/
 

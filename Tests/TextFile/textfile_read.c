@@ -9,7 +9,7 @@ int main()
 	RF_TextFile f;
 	RF_StringX line;
 
-	rfInit();
+	EXPECT(rfInit(), true)
 	//initialize the buffer
 	EXPECT(true,rfStringX_Init_buff(&line,4096,""))
 

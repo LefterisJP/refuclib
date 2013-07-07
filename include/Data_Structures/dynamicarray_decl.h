@@ -69,7 +69,7 @@ typedef struct RF_DynamicArray
     //! A Function pointer for the destruction of the objects
     void (*ptr2Destroy)(void*);
     //! A Function pointer for the copying of the objects
-    void (*ptr2Copy)(void*,void*);
+    char (*ptr2Copy)(void*,void*);
     /* @omit end */
 }RF_DynamicArray;
 

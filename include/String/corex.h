@@ -166,9 +166,10 @@ i_DECLIMEX_ RF_StringX* rfStringX_Create_unsafe(const char* lit);
  ** @param lit The string literal with which to initialize.
  ** Can also follow a printf-like format which will be formatted with
  ** the variables that follow it. No valid UTF-8 check performed here.
+ ** @return Returns @c true for success and @c false otherwise
  **
  **/
-i_DECLIMEX_ void rfStringX_Init_unsafe(RF_StringX* str,const char* lit);
+i_DECLIMEX_ char rfStringX_Init_unsafe(RF_StringX* str,const char* lit);
 
 
 /**
@@ -394,11 +395,13 @@ i_DECLIMEX_ char rfStringX_Init_UTF32(RF_StringX* str,const uint32_t* s);
  ** Both strings should already be initialized and hold a value. It is an error to give null parameters.
  ** @lmsFunction
  ** @param dest The destination string, which should get assigned
- ** @param source The source string, whose values to copy. @inhtype{String,StringX} @tmpSTR
+ ** @param source The source string, whose values to copy.
+ ** @inhtype{String,StringX} @tmpSTR
+ ** @return Returns @c true for success and @c false otherwise
  ** @see rfStringX_Assign_char()
  **
  **/
-i_DECLIMEX_ void rfStringX_Assign(RF_StringX* dest,const void* source);
+i_DECLIMEX_ char rfStringX_Assign(RF_StringX* dest,const void* source);
 
 
 /**
@@ -434,13 +437,14 @@ i_DECLIMEX_ RF_StringX* rfStringX_FromString_OUT(const RF_String* s);
  **
  ** @param dst The RF_StringX that will get initialize
  ** @param src The RF_String to copy from
- ** @return The RF_StringX version of the parameter string
+ ** @return Returns @c true for success and @c false otherwise
  ** @see rfStringX_FromString_OUT()
  ** @see rfStringX_Copy_IN()
  ** @see rfStringX_Copy_chars()
  **
  **/
-i_DECLIMEX_ void rfStringX_FromString_IN(RF_StringX* dst,const RF_String* src);
+i_DECLIMEX_ char rfStringX_FromString_IN(RF_StringX* dst,
+                                         const RF_String* src);
 
 
 /**
@@ -477,12 +481,13 @@ i_DECLIMEX_ RF_StringX* rfStringX_Copy_OUT(RF_StringX* s);
  ** of the source string are guaranteed to be the same.
  ** @param  dst The String to copy in.
  ** @param  src The String to copy from.
+ ** @return Returns @c true for success and @c false otherwise
  ** @see rfStringX_FromString_IN()
  ** @see rfStringX_Copy_OUT()
  ** @see rfStringX_Copy_chars()
  **
  **/
-i_DECLIMEX_ void rfStringX_Copy_IN(RF_StringX* dst,RF_StringX* src);
+i_DECLIMEX_ char rfStringX_Copy_IN(RF_StringX* dst,RF_StringX* src);
 /**
  ** @memberof RF_StringX
  ** @brief Copies a certain number of characters from an RF_StringX
@@ -497,11 +502,13 @@ i_DECLIMEX_ void rfStringX_Copy_IN(RF_StringX* dst,RF_StringX* src);
  ** @param  src The String to copy from
  ** @param n  The number of characters to copy from the @c src string.
  ** If the value is bigger than the maximum number of characters then still all characters are copied.
+ ** @return Returns @c true for success and @c false otherwise
  ** @see rfStringX_Copy_OUT()
  ** @see rfStringX_Copy_IN()
  **
  **/
-i_DECLIMEX_ void rfStringX_Copy_chars(RF_StringX* dst,RF_StringX* src,uint32_t n);
+i_DECLIMEX_ char rfStringX_Copy_chars(RF_StringX* dst, RF_StringX* src,
+                                      uint32_t n);
 
 
 //! @}

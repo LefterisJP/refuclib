@@ -57,7 +57,8 @@ extern "C"
  ** + @c RE_PERMISSION: Failed because the process lacks the appropriate privileges to initialise the semaphore.
  **
  **/
-i_DECLIMEX_ RF_Semaphore* rfSemaphore_Create(uint32_t initialCount,uint32_t maxCount);
+i_DECLIMEX_ RF_Semaphore* rfSemaphore_Create(uint32_t initialCount,
+                                             uint32_t maxCount);
 /**
  ** @memberof RF_Semaphore
  ** @brief Initializes a semaphore object
@@ -73,7 +74,9 @@ i_DECLIMEX_ RF_Semaphore* rfSemaphore_Create(uint32_t initialCount,uint32_t maxC
  ** + @c RE_UNSUPPORTED: Semaphores are not supported by the system (POSIX only)
  **
  **/
-i_DECLIMEX_ int32_t rfSemaphore_Init(RF_Semaphore* s,uint32_t initialCount,uint32_t maxCount);
+i_DECLIMEX_ int32_t rfSemaphore_Init(RF_Semaphore* s,
+                                     uint32_t initialCount,
+                                     uint32_t maxCount);
 
 /**
  ** @memberof RF_Semaphore
@@ -129,7 +132,7 @@ i_DECLIMEX_ int32_t rfSemaphore_Wait(RF_Semaphore* s);
  ** + @c RE_INTERRUPT: Failure during waiting for a semaphore because of a signal interruption (POSIX only)
  **
  **/
-i_DECLIMEX_ int32_t rfSemaphore_TimedWait(RF_Semaphore* s,uint32_t ms);
+i_DECLIMEX_ int32_t rfSemaphore_TimedWait(RF_Semaphore* s, uint32_t ms);
 
 /**
  ** @memberof RF_Semaphore

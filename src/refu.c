@@ -3,13 +3,13 @@
 **
 ** Copyright (c) 2011-2013, Karapetsas Eleftherios
 ** All rights reserved.
-** 
+**
 ** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 **  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 **  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in
 **     the documentation and/or other materials provided with the distribution.
 **  3. Neither the name of the Original Author of Refu nor the names of its contributors may be used to endorse or promote products derived from
-** 
+**
 ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
 ** INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 ** DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
@@ -59,9 +59,9 @@
 
 //Initializes the ReFu library
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-void rfInit(char* errstr,char* logstr,uint64_t lmsSize)
+char rfInit(char* errstr,char* logstr,uint64_t lmsSize)
 #else
-void i_rfInit(char* errstr,char* logstr,uint64_t lmsSize)
+char i_rfInit(char* errstr,char* logstr,uint64_t lmsSize)
 #endif
 {
     //initialize last error and open the log files or redirect to the standard stream
@@ -93,7 +93,8 @@ void i_rfInit(char* errstr,char* logstr,uint64_t lmsSize)
 
 #ifdef REFU_WIN32_VERSION
     //if this is windows detect whether we support High Resolution performance counter and if we do get the frequency
-    rfSysInfo.hasHighResTimer = QueryPerformanceFrequency((LARGE_INTEGER*)&rfSysInfo.pcFrequency);
+    rfSysInfo.hasHighResTimer = QueryPerformanceFrequency(
+        (LARGE_INTEGER*)&rfSysInfo.pcFrequency);
 #elif defined(REFU_LINUX_VERSION)
     rfSysInfo.hasHighResTimer = true;
     if(clock_getres(CLOCK_PROCESS_CPUTIME_ID, 0) == -1)
@@ -102,7 +103,9 @@ void i_rfInit(char* errstr,char* logstr,uint64_t lmsSize)
         {
             if(clock_getres(CLOCK_REALTIME,0) == -1)
             {
-                LOG_ERROR("No high resolution timer is supported. Even CLOCK_REALTIME initialization failed.",RE_TIMER_HIGHRES_UNSUPPORTED);
+                LOG_ERROR("No high resolution timer is supported. Even "
+                          "CLOCK_REALTIME initialization failed.",
+                          RE_TIMER_HIGHRES_UNSUPPORTED);
                 rfSysInfo.hasHighResTimer = false;
             }
             else
@@ -123,7 +126,15 @@ void i_rfInit(char* errstr,char* logstr,uint64_t lmsSize)
     //! @todo
 #endif
     //initialize the main thread's local stack memory
-    rfLMS_Init(&RF_MainLMS,lmsSize);
+    if(rfLMS_Init(&RF_MainLMS,lmsSize) == false)
+    {
+        LOG_ERROR("Could not initialize main thread's local memory stack",
+            RE_LOCALMEMSTACK_INIT)
+        return false;
+    }
+
+    //finish
+    return true;
 }
 
 

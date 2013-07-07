@@ -24,9 +24,9 @@
 //statement func is expected to return anything BUT value. If it does we print the location where it happened 
 #define EXPECTNOT(i_value_, i_func_)	\
     if((i_value_) == (i_func_))   \
-		rfPrintf("*ERROR*: A function or statement did not act as it was "\
-             "expected to ==> at line [%d] of test file \"%s\"\n",\
-             __LINE__,__FILE__);                                  \
+        rfPrintf("*ERROR*: A function or statement did not act as it was " \
+                 "expected to ==> at line [%d] of test file \"%s\"\n",  \
+                 __LINE__,__FILE__);                                    \
     else                                                          \
         SIGNAL_POSITION()
 

@@ -129,7 +129,13 @@ int32_t rfRemoveDir(void* dirnameP)
         if (strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
         {
             //create the full entry name
-            rfStringX_Assign(&path,RFS_("%S"RF_DIRSEP"%s",dirname,entry->d_name));
+            if(!rfStringX_Assign(
+                   &path,
+                   RFS_("%S"RF_DIRSEP"%s",dirname,entry->d_name)))
+            {
+                ret = RE_STRING_ASSIGN;
+                goto cleanup1;
+            }
             //if this directory entry is a directory itself, call the function recursively
             stat(path.INH_String.bytes, &s);
             if (s.st_mode & S_IFDIR)

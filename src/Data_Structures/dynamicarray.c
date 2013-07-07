@@ -70,31 +70,23 @@ RF_DynamicArray* rfDynamicArray_Create(
     /* @omit start */
     ,uint32_t elSize,
     void (*ptr2Destroy)(void*),
-    void (*ptr2Copy)(void*,void*)
+    char (*ptr2Copy)(void*,void*)
     /* @omit end */
 )
 {
     RF_DynamicArray* ret;
-    /* @omit start */
-    //if the given size is 0
-    if(elSize == 0)
-    {
-        LOG_ERROR("Tried to create a list of objects which have zero size",RE_LIST_INIT_FAILURE);
-        return 0;
-    }
-    /* @omit end */
     //allocate the new array
-    RF_MALLOC(ret,sizeof(RF_DynamicArray));
-    //allocate the data buffer
-    /* @mutate elSize SIZE */
-    ret->bufferCapacity = elSize*numElements;
-    RF_MALLOC(ret->data,ret->bufferCapacity);
-    ret->size = 0;
-    /* @omit start */
-    ret->elementSize = elSize;
-    ret->ptr2Destroy = ptr2Destroy;
-    ret->ptr2Copy = ptr2Copy;
-    /* @omit end */
+    RF_MALLOC(ret, sizeof(RF_DynamicArray), NULL);
+    if(! rfDynamicArray_Init(ret, numElements
+                             /* @omit start */
+                             ,ptr2Destroy,
+                             ptr2Copy
+                             /* @omit end */
+           ))
+    {
+        free(ret);
+        return NULL;
+    }
     return ret;
 }
 //Initialises an array of objects
@@ -104,7 +96,7 @@ char rfDynamicArray_Init(
     /* @omit start */
     ,uint32_t elSize,
     void (*ptr2Destroy)(void*),
-    void (*ptr2Copy)(void*,void*)
+    char (*ptr2Copy)(void*,void*)
     /* @omit end */
 )
 {
@@ -112,7 +104,9 @@ char rfDynamicArray_Init(
     //if the given size is 0
     if(elSize == 0)
     {
-        LOG_ERROR("Tried to initialize a list of objects which have zero size",RE_LIST_INIT_FAILURE);
+        LOG_ERROR(
+            "Tried to initialize a list of objects which have zero size",
+            RE_LIST_INIT_FAILURE);
         return false;
     }
     /* @omit end */
@@ -120,7 +114,7 @@ char rfDynamicArray_Init(
     //allocate the data buffer
     /* @mutate elSize SIZE */
     array->bufferCapacity = elSize * numElements;
-    RF_MALLOC(array->data, array->bufferCapacity);
+    RF_MALLOC(array->data, array->bufferCapacity, false);
     array->size = 0;
     /* @omit start */
     array->elementSize = elSize;
@@ -131,7 +125,7 @@ char rfDynamicArray_Init(
 }
 
 // Copies RF_DynamicArray @c src into RF_DynamicArray @c dst
-void rfDynamicArray_Copy_IN(RF_DynamicArray* dst,RF_DynamicArray* src)
+char rfDynamicArray_Copy_IN(RF_DynamicArray* dst, RF_DynamicArray* src)
 {
     uint32_t i;
     dst->bufferCapacity = src->bufferCapacity;
@@ -142,36 +136,25 @@ void rfDynamicArray_Copy_IN(RF_DynamicArray* dst,RF_DynamicArray* src)
     dst->ptr2Copy = src->ptr2Copy;
     /* @omit end */
     //allocate the data buffer
-    RF_MALLOC(dst->data,dst->bufferCapacity)
+    RF_MALLOC(dst->data, dst->bufferCapacity, false);
     //copy each element using the copy function
-    for(i=0;i<dst->size;i++)
+    for(i=0; i<dst->size ;i++)
     {
-        /* @mutate ptr2Copypp ASSIGN NOSIZE PODPTR POD_DLR */
+
+        /* @mutate ptr2Copypp ASSIGN NOSIZE PODPTR POD_DLR IFBLOCK return false; */
         dst->ptr2Copy(dst->data+(i*dst->elementSize),src->data+(i*src->elementSize));
     }
-    
+    return true;
 }
 // Creates and returns an allocated copy of the given RF_DynamicArray
 RF_DynamicArray* rfDynamicArray_Copy_OUT(RF_DynamicArray* src)
 {
-    uint32_t i;
     RF_DynamicArray* dst;
-    RF_MALLOC(dst,sizeof(RF_DynamicArray));
-    dst->bufferCapacity = src->bufferCapacity;
-    dst->size = src->size;
-    /* @omit start */
-    dst->ptr2Destroy = src->ptr2Destroy;
-    dst->elementSize = src->elementSize;
-    dst->ptr2Copy = src->ptr2Copy;
-    /* @omit end */
-    //allocate the data buffer
-    RF_MALLOC(dst->data,dst->bufferCapacity)
-
-    //copy each element using the copy function
-    for(i=0;i<dst->size;i++)
+    RF_MALLOC(dst, sizeof(RF_DynamicArray), NULL);
+    if(! rfDynamicArray_Copy_IN(dst, src))
     {
-        /* @mutate ptr2Copypp ASSIGN NOSIZE PODPTR POD_DLR */
-        dst->ptr2Copy(dst->data+(i*dst->elementSize),src->data+(i*src->elementSize));
+        free(dst);
+        return NULL;
     }
 
     return dst;
@@ -181,8 +164,6 @@ RF_DynamicArray* rfDynamicArray_Copy_OUT(RF_DynamicArray* src)
 // destructing function if it exists
 void rfDynamicArray_Destroy(RF_DynamicArray* l)
 {
-    
-
     /* @omitcond POD */
     uint32_t i;
     //delete the individual objects
@@ -234,8 +215,9 @@ void rfDynamicArray_Deinit_nofree(RF_DynamicArray* l)
 
 // Adds a new object at the end of the array
 /* @mutate void* TYPEPTR_OBJ_ONLY */
-int32_t rfDynamicArray_Add(RF_DynamicArray* l, void* object)
+char rfDynamicArray_Add(RF_DynamicArray* l, void* object)
 {
+    char ret = true;
     /* @omitcond NONLMS */
     RF_ENTER_LOCAL_SCOPE()
     /* @omit end */
@@ -254,20 +236,22 @@ int32_t rfDynamicArray_Add(RF_DynamicArray* l, void* object)
             LOG_ERROR("Realloc failed in adding an object to an array of "
                       "Objects during an attempt to increase buffer"
                       " capacity. Aborting program", RE_REALLOC_FAILURE);
-            /* @omitcond NONLMS */
-            RF_EXIT_LOCAL_SCOPE()
-            /* @omit end */
-            return RE_REALLOC_FAILURE;
+            ret = false;
+            goto cleanup;
         }
     }//end of capacity increase case
     //copy the new element in to the data and increase the index
-    /* @mutate ptr2Copypp ASSIGN NOSIZE PODPTR POD_DL */
-    l->ptr2Copy(l->data+(l->size*l->elementSize),object);
+
+
+    /* @mutate ptr2Copypp ASSIGN NOSIZE PODPTR POD_DL IFBLOCK ret=false; goto cleanup; */
+    l->ptr2Copy(l->data+(l->size*l->elementSize),object)
     l->size++;
+
+  cleanup:
     /* @omitcond NONLMS */
     RF_EXIT_LOCAL_SCOPE()
     /* @omit end */
-    return RF_SUCCESS;
+    return ret;
 }
 
 // Retrieves an object from the group and saves it in the given pointer.
@@ -311,7 +295,7 @@ void* rfDynamicArray_Get_OUT(
     void* ret;
     /* @omitcond POD */
     /* @mutate l->elementSize SIZE */
-    RF_MALLOC(ret, l->elementSize)
+    RF_MALLOC(ret, l->elementSize, NULL);
     /* @omit end */
     //if the index goes over the buffer capacity
     if( i >= l->size)
@@ -322,8 +306,10 @@ void* rfDynamicArray_Get_OUT(
         return 0;
     }
 
-    /* @mutate ptr2Copypp ASSIGN NOSIZE PODPTR POD_DR */
-    l->ptr2Copy(ret, l->data+(i*l->elementSize));
+
+    /* @mutate ptr2Copypp ASSIGN NOSIZE PODPTR POD_DR IFBLOCK return NULL; */
+    l->ptr2Copy(ret, l->data+(i*l->elementSize))
+
     *code = RF_SUCCESS;
     return ret;
 }
@@ -335,6 +321,7 @@ char rfDynamicArray_Set(
 /* @mutate void* TYPEPTR_OBJ_ONLY */
     void* e)
 {
+    char ret = true;
     /* @omitcond NONLMS */
     RF_ENTER_LOCAL_SCOPE()
     /* @omit end */
@@ -344,20 +331,21 @@ char rfDynamicArray_Set(
         LOG_ERROR("Attempted to set an element in an array with an index "
                   "out of bounds. If you want to add objects to the list"
                   "use the Add function.", RE_INDEX_OUT_OF_BOUNDS)
-        /* @omitcond NONLMS */
-        RF_EXIT_LOCAL_SCOPE()
-        /* @omit end */
-        return false;
+        ret = false;
+        goto cleanup;
     }
     /* @mutate ptr2Destroyp DESTROY NOSIZE */
     l->ptr2Destroy(l->data + (i*l->elementSize));
+
     //set the new object as the copy of e
-    /* @mutate ptr2Copypp ASSIGN NOSIZE PODPTR POD_DL */
+    /* @mutate ptr2Copypp ASSIGN NOSIZE PODPTR POD_DL IFBLOCK ret=false; goto cleanup; */
     l->ptr2Copy(l->data+(i*l->elementSize), e);
+
+  cleanup:
     /* @omitcond NONLMS */
     RF_EXIT_LOCAL_SCOPE()
     /* @omit end */
-    return true;
+    return ret;
 }
 
 

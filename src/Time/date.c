@@ -59,53 +59,81 @@
 
 
 // Initializes a Date object with a specific date
-char rfDate_Init(RF_Date* d,unsigned char wDay,unsigned char mDay,unsigned char month,uint16_t year,unsigned char hour,unsigned char minutes,unsigned char sec)
+char rfDate_Init(RF_Date* d,
+                     unsigned char wDay,
+                     unsigned char mDay,
+                     unsigned char month,
+                     uint16_t year,
+                     unsigned char hour,
+                     unsigned char minutes,
+                     unsigned char sec)
 {
     if(wDay > 6)
     {
-        LOG_ERROR("During initializing a Date Object an illegal value of %d was given the day of the week. Legal values are from 0 to 6",RE_DATE_ILLEGAL_PARAM,wDay);
+        LOG_ERROR(
+        "During initializing a Date Object an illegal value of %d was "
+        "given the day of the week. Legal values are from 0 to 6",
+            RE_DATE_ILLEGAL_PARAM, wDay);
         return false;
     }
     d->wDay = wDay;
 
     if(mDay < 1 || mDay > 31)
     {
-        LOG_ERROR("During initializing a Date Object an illegal value of %d was given for the day of the month. Legal values are from 1 to 31",RE_DATE_ILLEGAL_PARAM,mDay);
+        LOG_ERROR(
+        "During initializing a Date Object an illegal value of %d was "
+        "given for the day of the month. Legal values are from 1 to 31",
+            RE_DATE_ILLEGAL_PARAM,mDay);
         return false;
     }
     d->mDay = mDay;
 
     if(month < 1 || month > 12 )
     {
-        LOG_ERROR("During initializing a Date Object an illegal value of %d was given for the month. Legal values are from 1 to 12",RE_DATE_ILLEGAL_PARAM,month);
+        LOG_ERROR(
+        "During initializing a Date Object an illegal value of %d was "
+        "given for the month. Legal values are from 1 to 12",
+        RE_DATE_ILLEGAL_PARAM,month);
         return false;
     }
     d->month = month;
 
     if(year < 1601 || year > 30827)
     {
-        LOG_ERROR("During initializing a Date Object an illegal value of %d was given for the year. Legal values are from 1601 to 30827 due to limitations of the Windows version of the library",RE_DATE_ILLEGAL_PARAM,year);
+        LOG_ERROR("During initializing a Date Object an illegal value of"
+                  " %d was given for the year. Legal values are from 1601"
+                  " to 30827 due to limitations of the Windows version of"
+                  " the library", RE_DATE_ILLEGAL_PARAM, year);
         return false;
     }
     d->year = year;
 
     if(hour > 23)
     {
-        LOG_ERROR("During initializing a Date Object an illegal value of %d was given for the hour. Legal values are from 0 to 23",RE_DATE_ILLEGAL_PARAM,hour);
+        LOG_ERROR(
+            "During initializing a Date Object an illegal value of %d was"
+            " given for the hour. Legal values are from 0 to 23",
+            RE_DATE_ILLEGAL_PARAM,hour);
         return false;
     }
     d->hours = hour;
 
     if(minutes > 59)
     {
-        LOG_ERROR("During initializing a Date Object an illegal value of %d was given for the minutes. Legal values are from 0 to 59",RE_DATE_ILLEGAL_PARAM,minutes);
+        LOG_ERROR(
+            "During initializing a Date Object an illegal value of %d was"
+            " given for the minutes. Legal values are from 0 to 59",
+            RE_DATE_ILLEGAL_PARAM, minutes);
         return false;
     }
     d->minutes = minutes;
 
     if(sec > 59)
     {
-        LOG_ERROR("During initializing a Date Object an illegal value of %d was given for the seconds. Legal values are from 0 to 59",RE_DATE_ILLEGAL_PARAM,sec);
+        LOG_ERROR(
+            "During initializing a Date Object an illegal value of %d was"
+            " given for the seconds. Legal values are from 0 to 59",
+            RE_DATE_ILLEGAL_PARAM, sec);
         return false;
     }
     d->seconds = sec;
@@ -117,62 +145,21 @@ char rfDate_Init(RF_Date* d,unsigned char wDay,unsigned char mDay,unsigned char 
 }
 
 // Create a Date object with a specific date
-RF_Date* rfDate_Create(unsigned char wDay,unsigned char mDay,unsigned char month,uint16_t year,unsigned char hour,unsigned char minutes,unsigned char sec)
+RF_Date* rfDate_Create(unsigned char wDay,
+                       unsigned char mDay,
+                       unsigned char month,
+                       uint16_t year,
+                       unsigned char hour,
+                       unsigned char minutes,
+                       unsigned char sec)
 {
     RF_Date* ret;
-    RF_MALLOC(ret,sizeof(RF_Date));
-    if(wDay > 6)
+    RF_MALLOC(ret, sizeof(RF_Date), NULL);
+    if(!rfDate_Init(ret, wDay, mDay, month, year, hour, minutes, sec))
     {
-        LOG_ERROR("During creating a Date Object an illegal value of %d was given the day of the week. Legal values are from 0 to 6",RE_DATE_ILLEGAL_PARAM,wDay);
-        free(ret);return 0;
+        free(ret);
+        return NULL;
     }
-    ret->wDay = wDay;
-
-    if(mDay < 1 || mDay > 31)
-    {
-        LOG_ERROR("During creating a Date Object an illegal value of %d was given for the day of the month. Legal values are from 1 to 31",RE_DATE_ILLEGAL_PARAM,mDay);
-        free(ret);return 0;
-    }
-    ret->mDay = mDay;
-
-    if(month < 1 || month > 12 )
-    {
-        LOG_ERROR("During creating a Date Object an illegal value of %d was given for the month. Legal values are from 1 to 12",RE_DATE_ILLEGAL_PARAM,month);
-        free(ret);return 0;
-    }
-    ret->month = month;
-
-    if(year < 1601 || year > 30827)
-    {
-        LOG_ERROR("During creating a Date Object an illegal value of %d was given for the year. Legal values are from 1601 to 30827 due to limitations of the Windows version of the library",RE_DATE_ILLEGAL_PARAM,year);
-        free(ret);return 0;
-    }
-    ret->year = year;
-
-    if(hour > 23)
-    {
-        LOG_ERROR("During creating a Date Object an illegal value of %d was given for the hour. Legal values are from 0 to 23",RE_DATE_ILLEGAL_PARAM,hour);
-        free(ret);return 0;
-    }
-    ret->hours = hour;
-
-    if(minutes > 59)
-    {
-        LOG_ERROR("During creating a Date Object an illegal value of %d was given for the minutes. Legal values are from 0 to 59",RE_DATE_ILLEGAL_PARAM,minutes);
-        free(ret);return 0;
-    }
-    ret->minutes = minutes;
-
-    if(sec > 59)
-    {
-        LOG_ERROR("During creating a Date Object an illegal value of %d was given for the seconds. Legal values are from 0 to 59",RE_DATE_ILLEGAL_PARAM,sec);
-        free(ret);return 0;
-    }
-    ret->seconds = sec;
-    //also get leap year or not and number of days in the year
-    LEAP_YEAR_CHECK(ret->year,ret->isLeap);
-    GET_DAY_OF_YEAR(ret->month,ret->mDay,ret->isLeap,ret->yDay)
-    //success
     return ret;
 }
 
@@ -184,7 +171,7 @@ void rfDate_Destroy(RF_Date* c)
 
 
 // Adds a number of years to the Date
-void rfDate_AddYears(RF_Date* d,uint32_t years)
+void rfDate_AddYears(RF_Date* d, uint32_t years)
 {
     d->year += years;
     //also perform the leap year check
@@ -192,14 +179,14 @@ void rfDate_AddYears(RF_Date* d,uint32_t years)
 }
 
 // Removes a number of years from the Date
-void rfDate_SubYears(RF_Date* d,uint32_t years)
+void rfDate_SubYears(RF_Date* d, uint32_t years)
 {
     d->year -= years;
     LEAP_YEAR_CHECK(d->year,d->isLeap);
 }
 
 // Adds a number of months to the Date
-void rfDate_AddMonths(RF_Date* d,uint32_t g_months)
+void rfDate_AddMonths(RF_Date* d, uint32_t g_months)
 {
     int32_t months = g_months;
     //if the addition would take us over a year
@@ -214,7 +201,7 @@ void rfDate_AddMonths(RF_Date* d,uint32_t g_months)
     d->month += months;
 }
 // Removes a number of months frp, the Date
-void rfDate_SubMonths(RF_Date* d,uint32_t g_months)
+void rfDate_SubMonths(RF_Date* d, uint32_t g_months)
 {
     int32_t months = g_months;
     //if the subtraction would take us more than a year in the past
@@ -230,27 +217,35 @@ void rfDate_SubMonths(RF_Date* d,uint32_t g_months)
 }
 
 //Adds a number of days
-void rfDate_AddDays(RF_Date* d,uint32_t g_days)
+void rfDate_AddDays(RF_Date* d, uint32_t g_days)
 {
     int32_t days = g_days;
     int32_t thisYearDays = 365;
     if(d->isLeap == true)
+    {
         thisYearDays = 366;
+    }
 
     //if the addition would take us over a year
     while(d->yDay + days > thisYearDays)
     {
         //keep adding years and shrinking the remaining days until we get to an amount of remaining days that would not makes us cross over a year
         if(d->isLeap==false)
+        {
             days -= (365-d->yDay)+1;
+        }
         else
+        {
             days -= (366-d->yDay)+1;
+        }
 
         rfDate_AddYears(d,1);
         //now calculate the year days
         thisYearDays = 365;
         if(d->isLeap == true)
+        {
             thisYearDays = 366;
+        }
 
         //after adding a year we start at the next year's 1st day
         d->yDay = 1;
@@ -305,7 +300,10 @@ void rfDate_AddDays(RF_Date* d,uint32_t g_days)
                 remMonthDays = 31-d->mDay;
             break;
             default:
-                LOG_ERROR("Unrecognized month value encountered. Should never come here. The date obejct must be corrupt",RE_DATE_ILLEGAL_MONTH);
+                LOG_ERROR(
+                    "Unrecognized month value encountered. Should never "
+                    "come here. The date object must be corrupt",
+                    RE_DATE_ILLEGAL_MONTH);
                 remMonthDays = 0;
             break;
         }//end of month switch
@@ -336,32 +334,44 @@ void rfDate_AddDays(RF_Date* d,uint32_t g_days)
         case RF_MARCH:
             d->yDay = d->mDay+ ACCUM_DAYS_FEBRUARY;
             if(d->isLeap == true)
+            {
                 d->yDay +=1;
+            }
         break;
         case RF_APRIL:
             d->yDay = d->mDay+ ACCUM_DAYS_MARCH;
             if(d->isLeap == true)
+            {
                 d->yDay +=1;
+            }
         break;
         case RF_MAY:
             d->yDay = d->mDay+ ACCUM_DAYS_APRIL;
             if(d->isLeap == true)
+            {
                 d->yDay +=1;
+            }
         break;
         case RF_JUNE:
             d->yDay = d->mDay + ACCUM_DAYS_MAY;
             if(d->isLeap == true)
+            {
                 d->yDay +=1;
+            }
         break;
         case RF_JULY:
             d->yDay = d->mDay+ ACCUM_DAYS_JUNE;
             if(d->isLeap == true)
+            {
                 d->yDay +=1;
+            }
         break;
         case RF_AUGUST:
             d->yDay = d->mDay + ACCUM_DAYS_JULY;
             if(d->isLeap == true)
+            {
                 d->yDay +=1;
+            }
         break;
         case RF_SEPTEMBER:
             d->yDay = d->mDay+ ACCUM_DAYS_AUGUST;
@@ -371,28 +381,36 @@ void rfDate_AddDays(RF_Date* d,uint32_t g_days)
         case RF_OCTOBER:
             d->yDay = d->mDay+ ACCUM_DAYS_SEPTEMBER;
             if(d->isLeap == true)
+            {
                 d->yDay +=1;
+            }
         break;
         case RF_NOVEMBER:
             d->yDay = d->mDay+ ACCUM_DAYS_OCTOBER;
             if(d->isLeap == true)
+            {
                 d->yDay +=1;
+            }
         break;
         case RF_DECEMBER:
             d->yDay = d->mDay+ ACCUM_DAYS_NOVEMBER;
             if(d->isLeap == true)
+            {
                 d->yDay +=1;
+            }
         break;
     }
 
     //finally calculate what day of the week it should be
     d->wDay = d->wDay + (g_days%7);
     if(d->wDay > 6)
+    {
         d->wDay -=7;
+    }
 }
 
 //Removes a number of days
-void rfDate_SubDays(RF_Date* d,uint32_t g_days)
+void rfDate_SubDays(RF_Date* d, uint32_t g_days)
 {
     int32_t days = g_days;
 
@@ -404,9 +422,13 @@ void rfDate_SubDays(RF_Date* d,uint32_t g_days)
         rfDate_SubYears(d,1);
         //after removing a year we start at the previous year's last day
         if(d->isLeap == true)
+        {
             d->yDay = 366;
+        }
         else
+        {
             d->yDay = 365;
+        }
         d->mDay = 31;
         d->month = 12;
     }
@@ -434,9 +456,13 @@ void rfDate_SubDays(RF_Date* d,uint32_t g_days)
                 break;
                 case RF_FEBRUARY:
                     if(d->isLeap==true)
+                    {
                         d->mDay = 29;
+                    }
                     else
+                    {
                         d->mDay = 28;
+                    }
                 break;
                 default://rest of the months are 30
                     d->mDay = 30;
@@ -462,64 +488,86 @@ void rfDate_SubDays(RF_Date* d,uint32_t g_days)
         case RF_MARCH:
             d->yDay = d->mDay+ ACCUM_DAYS_FEBRUARY;
             if(d->isLeap == true)
+            {
                 d->yDay +=1;
+            }
         break;
         case RF_APRIL:
             d->yDay = d->mDay+ ACCUM_DAYS_MARCH;
             if(d->isLeap == true)
+            {
                 d->yDay +=1;
+            }
         break;
         case RF_MAY:
             d->yDay = d->mDay+ ACCUM_DAYS_APRIL;
             if(d->isLeap == true)
+            {
                 d->yDay +=1;
+            }
         break;
         case RF_JUNE:
             d->yDay = d->mDay + ACCUM_DAYS_MAY;
             if(d->isLeap == true)
+            {
                 d->yDay +=1;
+            }
         break;
         case RF_JULY:
             d->yDay = d->mDay+ ACCUM_DAYS_JUNE;
             if(d->isLeap == true)
+            {
                 d->yDay +=1;
+            }
         break;
         case RF_AUGUST:
             d->yDay = d->mDay + ACCUM_DAYS_JULY;
             if(d->isLeap == true)
+            {
                 d->yDay +=1;
+            }
         break;
         case RF_SEPTEMBER:
             d->yDay = d->mDay+ ACCUM_DAYS_AUGUST;
             if(d->isLeap == true)
+            {
                 d->yDay +=1;
+            }
         break;
         case RF_OCTOBER:
             d->yDay = d->mDay+ ACCUM_DAYS_SEPTEMBER;
             if(d->isLeap == true)
+            {
                 d->yDay +=1;
+            }
         break;
         case RF_NOVEMBER:
             d->yDay = d->mDay+ ACCUM_DAYS_OCTOBER;
             if(d->isLeap == true)
+            {
                 d->yDay +=1;
+            }
         break;
         case RF_DECEMBER:
             d->yDay = d->mDay+ ACCUM_DAYS_NOVEMBER;
             if(d->isLeap == true)
+            {
                 d->yDay +=1;
+            }
         break;
     }
 
     //finally calculate what day of the week it should be
     char weekDay = (char)d->wDay - (g_days%7);
     if(weekDay < 0)
+    {
         weekDay = 7-weekDay;
+    }
     d->wDay = weekDay;
 }
 
 // Adds a number of hours to the Date
-void rfDate_AddHours(RF_Date* d,uint32_t hours)
+void rfDate_AddHours(RF_Date* d, uint32_t hours)
 {
     unsigned char remDayHours = 24-d->hours;
     //if the given hours take us over a day
@@ -539,7 +587,7 @@ void rfDate_AddHours(RF_Date* d,uint32_t hours)
 }
 
 // Removes a number of hours from the Date
-void rfDate_SubHours(RF_Date* d,uint32_t hours)
+void rfDate_SubHours(RF_Date* d, uint32_t hours)
 {
     //if the given hours will take us to yesterday and beyond
     if(hours > d->hours)
@@ -558,7 +606,7 @@ void rfDate_SubHours(RF_Date* d,uint32_t hours)
 }
 
 // Adds a number of minutes to the Date
-void rfDate_AddMinutes(RF_Date* d,uint32_t minutes)
+void rfDate_AddMinutes(RF_Date* d, uint32_t minutes)
 {
     unsigned char remHoursMins = 60 - d->minutes;
     //if the given minutes take us over the hour
@@ -577,7 +625,7 @@ void rfDate_AddMinutes(RF_Date* d,uint32_t minutes)
     d->minutes += minutes;
 }
 // Removes a number of minutes from the Date
-void rfDate_SubMinutes(RF_Date* d,uint32_t minutes)
+void rfDate_SubMinutes(RF_Date* d, uint32_t minutes)
 {
     //if the given minutes will take us to the previous hour and beyond
     if(minutes > d->minutes)
@@ -597,7 +645,7 @@ void rfDate_SubMinutes(RF_Date* d,uint32_t minutes)
 
 
 // Adds a number of seconds to the Date
-void rfDate_AddSeconds(RF_Date* d,uint32_t seconds)
+void rfDate_AddSeconds(RF_Date* d, uint32_t seconds)
 {
     unsigned char remMinSeconds = 60 - d->seconds;
     //if the given seconds take us over the minute
@@ -608,7 +656,7 @@ void rfDate_AddSeconds(RF_Date* d,uint32_t seconds)
         d->seconds = 0; //since we just changed the minute
 
         //find out how many minutes these seconds would be and add them
-        rfDate_AddMinutes(d,(seconds/60)+1); //+1 is for the extra minutes we added due to minute change
+        rfDate_AddMinutes(d, (seconds/60)+1); //+1 is for the extra minutes we added due to minute change
         //now find the remaining seconds to add
         seconds = seconds%60;
     }
@@ -616,7 +664,7 @@ void rfDate_AddSeconds(RF_Date* d,uint32_t seconds)
     d->seconds += seconds;
 }
 // Removes a number of seconds from the Date
-void rfDate_SubSeconds(RF_Date* d,uint32_t seconds)
+void rfDate_SubSeconds(RF_Date* d, uint32_t seconds)
 {
     //if the given seconds will take us to the previous minute and beyond
     if(seconds > d->seconds)
@@ -636,7 +684,7 @@ void rfDate_SubSeconds(RF_Date* d,uint32_t seconds)
 
 #define UNDETERMINED 0
 // Returns the difference between two dates
-char rfDate_Diff(RF_Date* tDate,RF_Date* oDate,RF_Date* res)
+char rfDate_Diff(RF_Date* tDate, RF_Date* oDate, RF_Date* res)
 {
     //char relation = UNDETERMINED;
     //get the differences

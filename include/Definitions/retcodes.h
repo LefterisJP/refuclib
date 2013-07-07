@@ -62,6 +62,7 @@ enum {
         RE_STRING_TOFLOAT,  //Error in converting a string to a float. The string seems to not represent a float
         RE_STRING_TOFLOAT_UNDERFLOW,// While converting a string to a float the represented value caused underflow
         RE_STRING_VSPRINTF, // Inside a string function vsprintf failed
+        RE_STRING_APPEND, // Appending to a string failed
 
         /*General Errors*/
         RE_INPUT, //When a function has been given illegal input
@@ -117,6 +118,7 @@ enum {
         RE_FUNCGROUP_INIT_FAILURE,//Failure at the initialization of a function group
         RE_FUNCGROUP_ADD_FAILURE,//Failure at adding an element in a function group
         RE_LINKEDLIST_INIT_FAILURE, //Failure to initialize a linked list
+
         /* Math Errors */
         RE_MATH_RANDOM_BETWEEN_RANGE,//Error for when using a call to random numbers in a range with the max being smaller than the min
 
@@ -166,6 +168,7 @@ enum {
         RE_UTF8_INVALID_SEQUENCE,//General error for invalid UTF-8 byte sequence
         RE_UTF8_INVALID_CODE_POINT,//Error for attempting to encode an illegal unicode code point into UTF-8
         RE_UTF8_ENCODING, //Error during encoding a UTF-8 sequence
+        RE_UTF8_DECODING, // Errpr during decoding a UTF-8 sequence
 
         /* Other unicode and unicode file reading errors */
         RE_UTF16_ENCODING, // Error while encoding unicode codepoints into UTF-16
@@ -222,7 +225,7 @@ enum {
 
         /* TextFile Errors */
         RE_TEXTFILE_EOL_DETECT, //Occurs if there was a failure to auto-detect the End Of Line pattern during the initialization of a TextFile
-
+        RE_TEXTFILE_COPY, //Occurs when there is an error during copying a text file
 
         /* System Errors */
         RE_DIRECTORY_EXISTS, //Failure at creating a directory because it already exists
@@ -242,6 +245,7 @@ enum {
         RE_DIRECTORY_IO, // Occurs if there was a physical I/O error during the directory operation
 
         /* Local Memory Stack errors */
+        RE_LOCALMEMSTACK_INIT, // Initialization of local memory stack failed
         RE_LOCALMEMSTACK_PUSH, // Attempted to push more memory into the local memory stack than it can handle
         RE_LOCALMEMSTACK_POP, // Attempted to pop (free) more memory from the local memory stack than it currently has
         RE_LOCALMEMSTACK_INSUFFICIENT, // The Local Memory Stack remaining is insufficient for an operation

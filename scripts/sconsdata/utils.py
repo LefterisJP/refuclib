@@ -25,7 +25,8 @@ def build_msg(msg, msg_type="Error", env=None):
             raise BuildMsgError("Did not provide an environment for an "
                                 "Info build message and can't determine "
                                 "if SCons --debug=explain is given")
-        print("{}[INFO]: {}".format(msg_intro, msg))
+        if env.GetOption('debug') == ['explain']:
+            print("{}[INFO]: {}".format(msg_intro, msg))
     elif msg_type == "Warning":
         print("{}[WARNING]: {}".format(msg_intro, msg))
     else:

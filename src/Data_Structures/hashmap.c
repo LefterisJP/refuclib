@@ -133,7 +133,7 @@ static inline uint32_t HsiehHash(const char* data, int len)
     return hash;
 }
 
-static void i_InsertValue(RF_Hashslot** slots, RF_String* key,
+static char i_InsertValue(RF_Hashslot** slots, RF_String* key,
 /* @mutate void* TYPEPTR_OBJ_ONLY */
                           void* value, uint32_t size)
 {
@@ -147,7 +147,7 @@ static void i_InsertValue(RF_Hashslot** slots, RF_String* key,
     //if the slot is null initialize it
     if(s == NULL)
     {
-        RF_MALLOC(s, sizeof(RF_Hashslot))
+        RF_MALLOC(s, sizeof(RF_Hashslot), false);
         slots[i] = s;
         s->next = NULL;
     }
@@ -161,21 +161,29 @@ static void i_InsertValue(RF_Hashslot** slots, RF_String* key,
             {
                 /* @mutate ptr2Destroyr DESTROY */
                 m->ptr2Destroy(s->value);
-                /* @mutate ptr2Copyrp ASSIGN */
-                m->ptr2Copy(s->value, value);
+
+                /* @mutate ptr2Copyrp ASSIGN IFBLOCK return false; */
+                m->ptr2Copy(s->value, value)
+
             }
             pr = s;
             s = s->next;
         }
         //if we get here it means we need to allocate a new slot
-        RF_MALLOC(s, sizeof(RF_Hashslot))
+        RF_MALLOC(s, sizeof(RF_Hashslot), false);
         pr->next = s;
         s->next = NULL;
     }
     //finaly insert the key-value combo
-    rfString_Copy_IN(&s->key, key);
-    /* @mutate ptr2Copyrp ASSIGN */
-    m->ptr2Copy(s->value, value);
+    //copy key
+    if(rfString_Copy_IN(&s->key, key) == false)
+    {
+        return false;
+    }
+    //copy value
+    /* @mutate ptr2Copyrp ASSIGN IFBLOCK return false; */
+    m->ptr2Copy(s->value, value)
+    return true;
 }
 
 static void i_DestroySlots(RF_Hashslot** slots, uint32_t size)
@@ -198,31 +206,28 @@ static void i_DestroySlots(RF_Hashslot** slots, uint32_t size)
 }
 
 // Initializes a hashmap
-int32_t rfHashmap_Init(RF_Hashmap* m, uint32_t s)
+char rfHashmap_Init(RF_Hashmap* m, uint32_t s)
 {
     int i;
     m->size = s;
     m->occupied = 0;
-    RF_MALLOC(m->slots, sizeof(RF_Hashslot*)*m->size);
+    RF_MALLOC(m->slots, sizeof(RF_Hashslot*)*m->size, false);
     for(i = 0; i < m->size; i++)
     {
         m->slots[i] = NULL;
     }
-    return RF_SUCCESS;
+    return true;
 }
 
 // Allocates and returns a hashmap
 RF_Hashmap* rfHashmap_Create(uint32_t s)
 {
-    int i;
     RF_Hashmap* m;
-    RF_MALLOC(m, sizeof(RF_Hashmap))
-    m->size = s;
-    m->occupied = 0;
-    RF_MALLOC(m->slots, sizeof(RF_Hashslot*)*m->size);
-    for(i = 0; i < m->size; i++)
+    RF_MALLOC(m, sizeof(RF_Hashmap), NULL);
+    if(! rfHashmap_Init(m, s))
     {
-        m->slots[i] = NULL;
+        free(m);
+        return NULL;
     }
     return m;
 }
@@ -243,15 +248,20 @@ void rfHashmap_Destroy(RF_Hashmap* m)
 }
 
 // Insert a value into the Hashmap
-int32_t rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
+char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
                                   /* @mutate void* TYPEPTR_OBJ_ONLY */
                                   void* value)
 {
     uint32_t i;
     RF_Hashslot* s;
+    char ret = true;
     RF_ENTER_LOCAL_SCOPE()
 
-    i_InsertValue(m->slots, key, value, m->size);
+    if(i_InsertValue(m->slots, key, value, m->size) == false)
+    {
+        ret = false;
+        goto cleanup;
+    }
     m->occupied ++;
 
     //if the ratio of occupied over size is greaten than the load factor
@@ -263,9 +273,12 @@ int32_t rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
         //make a new hash map with double the size
         prsize = m->size;
         m->size *= 2;
-        RF_MALLOC(tmp, sizeof(RF_Hashslot*)*m->size);
+        RF_MALLOC_JMP(tmp, sizeof(RF_Hashslot*)*m->size,
+                      ret=false, cleanup);
         for(i = 0; i < m->size; i ++)
+        {
             tmp[i] = NULL;
+        }
         //rehash all the values
         for(i = 0; i < prsize; i ++)
         {
@@ -276,7 +289,11 @@ int32_t rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
                 while(s != 0)
                 {
                     /* @mutate s->value REFERENCE */
-                    i_InsertValue(tmp, &s->key, s->value, m->size);
+                    if(!i_InsertValue(tmp, &s->key, s->value, m->size))
+                    {
+                        ret = false;
+                        goto cleanup;
+                    }
                     s = s->next;
                 }
             }
@@ -286,8 +303,10 @@ int32_t rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
         free(m->slots);
         m->slots = tmp;
     }    
+
+  cleanup:
     RF_EXIT_LOCAL_SCOPE()
-    return RF_SUCCESS;
+    return ret;
 }
 
 char rfHashmap_Get(RF_Hashmap* m, RF_String* key,
@@ -296,6 +315,7 @@ char rfHashmap_Get(RF_Hashmap* m, RF_String* key,
 {
     uint32_t i;
     RF_Hashslot* s;
+    char ret = false;
     RF_ENTER_LOCAL_SCOPE()
     i = HsiehHash(rfString_Cstr(key), rfString_Length(key));
     i = i % m->size;
@@ -305,14 +325,18 @@ char rfHashmap_Get(RF_Hashmap* m, RF_String* key,
     {
         if(rfString_Equal(&s->key, key))
         {//if key is found get it
-            /* @mutate ptr2Copypr ASSIGN PODPTR POD_DL */
-            m->ptr2Copy(value, s->value);
-            RF_EXIT_LOCAL_SCOPE()
-            return true;
+
+            /* @mutate ptr2Copypr ASSIGN PODPTR POD_DL IFBLOCK goto cleanup; */
+            m->ptr2Copy(value, s->value)
+
+            ret = true;
+            goto cleanup;
         }
         //else proceed in the linked list chain
         s = s->next;
     }
+
+  cleanup:
     RF_EXIT_LOCAL_SCOPE()
-    return false;
+    return ret;
 }

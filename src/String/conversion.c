@@ -57,12 +57,18 @@
 //*----------------------------End of Includes------------------------------------------
 
 //Returns the strings contents as a UTF-16 buffer
-uint16_t* rfString_ToUTF16(const void* sP,uint32_t* length)
+uint16_t* rfString_ToUTF16(const void* sP, uint32_t* length)
 {
     uint32_t* codepoints,charsN;
     const RF_String* s = (const RF_String*) sP;
-    //get the unicode codepoints, no check here since RF_String is always guaranteed to have valid UTF-8 and as such valid codepoints
-    codepoints = rfUTF8_Decode(s->bytes,s->byteLength,&charsN);
+    //get the unicode codepoints
+    if((codepoints = rfUTF8_Decode(
+           s->bytes,s->byteLength,&charsN)) == NULL)
+    {
+        LOG_ERROR("Error during decoding a UTF-8 byte stream",
+                      RE_UTF8_DECODING)
+        return NULL;
+    }
     //encode them in UTF-16, no check here since it comes from an RF_String which is always guaranteed to have valid UTF-8 and as such valid codepoints
     return rfUTF16_Encode(codepoints,charsN,length);
 }
@@ -71,7 +77,7 @@ uint16_t* rfString_ToUTF16(const void* sP,uint32_t* length)
 uint32_t* rfString_ToUTF32(const void* sP,uint32_t* length)
 {
     const RF_String* s = (const RF_String*) sP;
-    //get the unicode codepoints, no check here since RF_String is always guaranteed to have valid UTF-8 and as such valid codepoints
+    //get the unicode codepoints
     return rfUTF8_Decode(s->bytes,s->byteLength,length);
 }
 
@@ -176,7 +182,7 @@ char rfString_Tokenize(const void* str,const void* sepP,uint32_t* tokensN,RF_Str
         return false;
     }
     //allocate the tokens
-    RF_MALLOC(*tokens,sizeof(RF_String) *(*tokensN));
+    RF_MALLOC(*tokens,sizeof(RF_String) *(*tokensN), false);
     //find the length of the separator
     uint32_t sepLen = sep->byteLength;
     char* s,*e;
@@ -186,7 +192,7 @@ char rfString_Tokenize(const void* str,const void* sepP,uint32_t* tokensN,RF_Str
         //find each substring
         e = strstr(s,sep->bytes);
         (*tokens)[i].byteLength = e-s;
-        RF_MALLOC((*tokens)[i].bytes,(*tokens)[i].byteLength+1);
+        RF_MALLOC((*tokens)[i].bytes,(*tokens)[i].byteLength+1, false);
         //put in the data
         strncpy((*tokens)[i].bytes,s,(*tokens)[i].byteLength);
         //null terminate
@@ -198,7 +204,7 @@ char rfString_Tokenize(const void* str,const void* sepP,uint32_t* tokensN,RF_Str
     }
     ///make sure that if it's the last substring we change strategy
     (*tokens)[i].byteLength = strlen(s);
-    RF_MALLOC((*tokens)[i].bytes,(*tokens)[i].byteLength+1);
+    RF_MALLOC((*tokens)[i].bytes,(*tokens)[i].byteLength+1, false);
     //put in the data
     strncpy((*tokens)[i].bytes,s,(*tokens)[i].byteLength);
     //null terminate

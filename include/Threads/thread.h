@@ -68,10 +68,15 @@ extern "C"
  **
  **/
 #ifdef RF_IAMHERE_FOR_DOXYGEN
-i_DECLIMEX_ RF_Thread* rfThread_Create(uint32_t flags,void* (*ptr2onExecution)(void*),void* data,uint64_t lmsSize );
+i_DECLIMEX_ RF_Thread* rfThread_Create(uint32_t flags,
+                                       void* (*ptr2onExecution)(void*),
+                                       void* data, uint64_t lmsSize );
 #else
 #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-    i_DECLIMEX_ RF_Thread* i_rfThread_Create(uint32_t flags,void* (*ptr2onExecution)(void*),void* data,uint64_t lmsSize );
+    i_DECLIMEX_ RF_Thread* i_rfThread_Create(
+        uint32_t flags,
+        void* (*ptr2onExecution)(void*),
+        void* data, uint64_t lmsSize );
     #define rfThread_Create(...)    RF_SELECT_FUNC(i_SELECT_RF_THREAD_CREATE,__VA_ARGS__)
     #define i_SELECT_RF_THREAD_CREATE3(...) i_rfThread_Create(__VA_ARGS__,RF_OPTION_LOCALSTACK_MEMORY_SIZE)
     #define i_SELECT_RF_THREAD_CREATE4(...) i_rfThread_Create(__VA_ARGS__)

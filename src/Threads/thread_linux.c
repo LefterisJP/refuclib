@@ -61,7 +61,14 @@ void* RF_THREAD_FUNCTION(void* param)
     RF_Thread* t = (RF_Thread*)param;
     //initialize the local memory stack of the thread
     RF_LocalMemoryStack lms;
-    rfLMS_Init(&lms,t->lmsSize);
+    if(!rfLMS_Init(&lms,t->lmsSize))
+    {
+        //TODO: Add the thread's address in the msg
+        LOG_ERROR(
+            "Failure to initialize a thread because its local memory "
+            "stack could not be initialized", RE_LOCALMEMSTACK_INIT)
+        return (void*)RE_LOCALMEMSTACK_INIT;
+    }
     //initialize the stdio for this thread
     rfInitStdio();
     //run the function
@@ -73,44 +80,59 @@ void* RF_THREAD_FUNCTION(void* param)
 
 //Allocates and returns a thread
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-RF_Thread* rfThread_Create(uint32_t flags,void* (*ptr2onExecution)(void*),void* data,uint64_t lmsSize )
+RF_Thread* rfThread_Create(uint32_t flags,
+                               void* (*ptr2onExecution)(void*),
+                               void* data,
+                               uint64_t lmsSize )
 #else
-RF_Thread* i_rfThread_Create(uint32_t flags,void* (*ptr2onExecution)(void*),void* data,uint64_t lmsSize )
+RF_Thread* i_rfThread_Create(uint32_t flags,
+                                 void* (*ptr2onExecution)(void*),
+                                 void* data,
+                                 uint64_t lmsSize )
 #endif
 {
     RF_Thread* ret;
-    RF_MALLOC(ret,sizeof(RF_Thread));
+    RF_MALLOC(ret, sizeof(RF_Thread), NULL);
     //initialize the thread
     if(rfThread_Init(ret,flags,ptr2onExecution,data,lmsSize) == false)
     {
         free(ret);
-        return 0;
+        return NULL;
     }
     //return
     return ret;
 }
 //Initialises a thread
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-char rfThread_Init(RF_Thread* t,uint32_t flags,void* (*ptr2onExecution)(void*),void* data,uint64_t lmsSize )
+char rfThread_Init(RF_Thread* t, uint32_t flags,
+                   void* (*ptr2onExecution)(void*), void* data,
+                   uint64_t lmsSize )
 #else
-char i_rfThread_Init(RF_Thread* t,uint32_t flags,void* (*ptr2onExecution)(void*),void* data,uint64_t lmsSize )
+char i_rfThread_Init(RF_Thread* t, uint32_t flags,
+                     void* (*ptr2onExecution)(void*), void* data,
+                     uint64_t lmsSize )
 #endif
 {
+    pthread_attr_t attributes;
     //get the data and the lms size
     t->data = data;
     t->lmsSize = lmsSize;
     //get the function given by the user
     if(ptr2onExecution != 0)
+    {
         t->ptr2onExecution = ptr2onExecution;
+    }
     else
     {
-        LOG_ERROR("Passed a null pointer for the thread's execution. The thread will be doing nothing, so it is meaningless",RE_THREAD_NULL_EXECUTION_FUNCTION);
+        LOG_ERROR(
+            "Passed a null pointer for the thread's execution. The thread"
+            " will be doing nothing, so it is meaningless",
+            RE_THREAD_NULL_EXECUTION_FUNCTION);
         return false;
     }
 
     //flags processing should happen here
     t->flags = 0;
-    pthread_attr_t attributes;
     pthread_attr_init(&attributes);
 
     //joinable or detached threads
@@ -124,9 +146,11 @@ char i_rfThread_Init(RF_Thread* t,uint32_t flags,void* (*ptr2onExecution)(void*)
     }
 
     //create the thread
-    if(pthread_create( &t->tHandle, &attributes, RF_THREAD_FUNCTION,data) != 0)
+    if(pthread_create(&t->tHandle, &attributes,
+                      RF_THREAD_FUNCTION, data) != 0)
     {
-        LOG_ERROR("Error during POSIX thread creation",RE_THREAD_CREATION);
+        LOG_ERROR("Error during POSIX thread creation",
+                  RE_THREAD_CREATION);
         return false;
     }
     //cleanup the attributes
@@ -157,7 +181,9 @@ char rfThread_Kill(RF_Thread* t)
     switch(err)
     {
         case ESRCH:
-            LOG_ERROR("No thread could be found with the given ID to kill",RE_THREAD_KILL)
+            LOG_ERROR(
+                "No thread could be found with the given ID to kill",
+                RE_THREAD_KILL)
         break;
         case 0:
             //all okay
@@ -165,7 +191,8 @@ char rfThread_Kill(RF_Thread* t)
             return true;
         break;
         default:
-            LOG_ERROR("pthread_cancel returned error %d",RE_THREAD_KILL,err)
+            LOG_ERROR(
+                "pthread_cancel returned error %d", RE_THREAD_KILL, err)
         break;
     }
 
@@ -186,16 +213,25 @@ int32_t rfThread_Join(void* thread)
         switch(err)
         {
             case EINVAL:
-                RETURN_LOG_ERROR("pthread_join failed due to the thread value not being joinable",RE_THREAD_NOTJOINABLE)
+                RETURN_LOG_ERROR(
+                    "pthread_join failed due to the thread value not "
+                    "being joinable", RE_THREAD_NOTJOINABLE)
             break;
             case ESRCH:
-                RETURN_LOG_ERROR("pthread_join failed due to the thread id not corresponding to any existing thread",RE_THREAD_INVALID)
+                RETURN_LOG_ERROR(
+                    "pthread_join failed due to the thread id not "
+                    "corresponding to any existing thread",
+                    RE_THREAD_INVALID)
             break;
             case EDEADLK:
-                RETURN_LOG_ERROR("pthread_join failed due to a deadlock being detected",RE_THREAD_DEADLOCK)
+                RETURN_LOG_ERROR(
+                    "pthread_join failed due to a deadlock being detected"
+                    ,RE_THREAD_DEADLOCK)
             break;
             default:
-                RETURN_LOG_ERROR("pthread_join failed with unknonwn error code: %d",RE_THREAD_JOIN,err)
+                RETURN_LOG_ERROR(
+                    "pthread_join failed with unknonwn error code: %d",
+                    RE_THREAD_JOIN,err)
             break;
         }
     }

@@ -12,7 +12,7 @@ void writeTest(char encoding,RF_StringX* buff)
 {
 	RF_TextFile outF,inF;
 	uint32_t i=0; 
-	rfInit();
+	EXPECT(rfInit(), true)
 	
 	EXPECT(RF_SUCCESS,rfTextFile_Init(&outF,RFS_("writefile"),RF_FILE_NEW,encoding,RF_EOL_LF))
 	EXPECT(RF_SUCCESS,rfTextFile_Write(&outF,RFS_("फ्रांस की एक अदालत ने पूर्व राष्ट्रपति निकोला सार्कोज़ी से ग़ैर-क़ानूनी राजनीतिक चंदे के आरोप को लेकर बारह घंटे लंबी पूछताछ की है और कहा है कि वो संदेह के दायरे में हैं.\n")))
@@ -38,7 +38,7 @@ int main()
 {
 	RF_StringX buffer;
 	
-	rfInit();
+	EXPECT(rfInit(), true)
 	//initialize the lines we are gonna use for checking
 	EXPECT(true,rfString_Init(&lines[0],"We are inserting a line before the first line of the file, replacing the previous first"))
 	EXPECT(true,rfString_Init(&lines[1],"फ्रांस की एक अदालत ने पूर्व राष्ट्रपति निकोला सार्कोज़ी से ग़ैर-क़ानूनी राजनीतिक चंदे के आरोप को लेकर बारह घंटे लंबी पूछताछ की है और कहा है कि वो संदेह के दायरे में हैं."))

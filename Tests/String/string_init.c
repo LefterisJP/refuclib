@@ -11,7 +11,7 @@ int main()
 	RF_String* sp1;
 	const uint16_t utf16Buffer[] = {0xD834,0xDD1E,0x6771,0x0};
 	const uint32_t utf32Buffer[] = {0x6771,0x4EAC,0x0};
-	rfInit();
+	EXPECT(rfInit(), true)
 	//initialize RF_Strings
 	EXPECT(true,rfString_Init(&s1, "This is the test of String initialization"))
 	EXPECT(true,rfString_Init(&s2,"%s %d %.3f %u","Printf style initialization",1337,3.141592,912341))
@@ -35,7 +35,7 @@ int main()
 	//testing conversions from String to StringX (this atm can never be zero but since it's a test anyway ...)
 	EXPECTNOT(0,(sx1 = rfStringX_FromString_OUT(&s1)))
 	EXPECTNOT(0,(sx2 = rfStringX_Create_buff(4096,"This is a StringX initialiation with a buffer")))
-	rfStringX_FromString_IN(&sx3,&s2);
+	EXPECT(rfStringX_FromString_IN(&sx3,&s2), true)
 	//simply print the stringXs to see if the conversion happened correctly
 	rfPrintf("%S\n",sx1);
 	rfPrintf("%S\n",sx2);
@@ -66,9 +66,9 @@ int main()
 	/*Testing assignments also since there are only 2 functions*/
 	
 	//expect succesfull assignments
-	rfString_Assign(&s1,RFS_("Having removed himself from the election campaign to concentrate on the storm, President Obama will now see at first hand just how destructive Hurricane Sandy has been. He'll travel to Atlantic City where the Republican governor, Chris Christie - normally a fierce critic - will show him scenes of widespread destruction along the Jersey Shore. They'll meet some of those who have lost homes, as well as the emergency teams who have been working around the clock since the weekend."));
+	EXPECT(rfString_Assign(&s1,RFS_("Having removed himself from the election campaign to concentrate on the storm, President Obama will now see at first hand just how destructive Hurricane Sandy has been. He'll travel to Atlantic City where the Republican governor, Chris Christie - normally a fierce critic - will show him scenes of widespread destruction along the Jersey Shore. They'll meet some of those who have lost homes, as well as the emergency teams who have been working around the clock since the weekend.")), true)
 	EXPECT(true,rfString_Equal(&s1,RFS_("Having removed himself from the election campaign to concentrate on the storm, President Obama will now see at first hand just how destructive Hurricane Sandy has been. He'll travel to Atlantic City where the Republican governor, Chris Christie - normally a fierce critic - will show him scenes of widespread destruction along the Jersey Shore. They'll meet some of those who have lost homes, as well as the emergency teams who have been working around the clock since the weekend.")))
-	rfStringX_Assign(sx2, RFS_("Δοκιμαζουμε την αναθεση για StringX"));
+	EXPECT(rfStringX_Assign(sx2, RFS_("Δοκιμαζουμε την αναθεση για StringX")), true)
 	EXPECT(true,rfString_Equal(sx2,RFS_("Δοκιμαζουμε την αναθεση για StringX")))
 	//expect true in all: testing assigning a unicode codepoint to a string (the +/-) sign
 	EXPECT(true,rfStringX_Assign_char(sx2,0xB1))

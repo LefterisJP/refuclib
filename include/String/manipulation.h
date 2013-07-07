@@ -54,12 +54,13 @@ extern "C"
  ** @lmsFunction
  ** @param thisstr The string to append to
  ** @param other The string to add to this string. @inhtype{String,StringX} @tmpSTR
+ ** @return Returns @c true for success and @c false otherwise
  ** @see rfString_Append_i()
  ** @see rfString_Append_f()
  ** @see rfString_Prepend()
  **
  **/
-i_DECLIMEX_ void rfString_Append(RF_String* thisstr,const void* other);
+i_DECLIMEX_ char rfString_Append(RF_String* thisstr,const void* other);
 
 
 /**
@@ -70,11 +71,12 @@ i_DECLIMEX_ void rfString_Append(RF_String* thisstr,const void* other);
  ** @notinherited{StringX}
  ** @param thisstr The string to append to
  ** @param i The integer to add
+ ** @return Returns @c true for success and @c false otherwise
  ** @see rfString_Append()
  ** @see rfString_Append_f()
  **
  **/
-i_DECLIMEX_ void rfString_Append_i(RF_String* thisstr,const int32_t i);
+i_DECLIMEX_ char rfString_Append_i(RF_String* thisstr,const int32_t i);
 
 /**
  ** @memberof RF_String
@@ -84,11 +86,12 @@ i_DECLIMEX_ void rfString_Append_i(RF_String* thisstr,const int32_t i);
  ** @notinherited{StringX}
  ** @param thisstr The string to append to
  ** @param f The float to add
+ ** @return Returns @c true for success and @c false otherwise
  ** @see rfString_Append()
  ** @see rfString_Append_i()
  **
  **/
-i_DECLIMEX_ void rfString_Append_f(RF_String* thisstr,const float f);
+i_DECLIMEX_ char rfString_Append_f(RF_String* thisstr,const float f);
 
 /**
  ** @memberof RF_String
@@ -98,10 +101,11 @@ i_DECLIMEX_ void rfString_Append_f(RF_String* thisstr,const float f);
  ** @lmsFunction
  ** @param thisstr The string to prepend to
  ** @param other The string to prepend to this string. @inhtype{String,StringX} @tmpSTR
+ ** @return Returns @c true for success and @c false otherwise
  ** @see rfString_Append()
  **
  **/
-i_DECLIMEX_ void rfString_Prepend(RF_String* thisstr,const void* other);
+i_DECLIMEX_ char rfString_Prepend(RF_String* thisstr,const void* other);
 
 
 //! @}
@@ -159,9 +163,10 @@ i_DECLIMEX_ char i_rfString_Remove(void* thisstr,const void* rstr,uint32_t numbe
  ** @lmsFunction
  ** @param thisstr The string to remove from @inhtype{String,StringX}
  ** @param keepstr A string all of whose characters will be kept in @c thisstr @inhtype{String,StringX} @tmpSTR
+ ** @return Returns @c true in success and @c false otherwise
  **
  **/
-i_DECLIMEX_ void rfString_KeepOnly(void* thisstr,const void* keepstr);
+i_DECLIMEX_ char rfString_KeepOnly(void* thisstr,const void* keepstr);
 
 
 /**
@@ -171,7 +176,9 @@ i_DECLIMEX_ void rfString_KeepOnly(void* thisstr,const void* keepstr);
  ** @isinherited{StringX}
  ** @param thisstr The string to prune from. @inhtype{String,StringX}
  ** @param n The number of characters to remove. Must be a positive integer.
- ** @return True if n characters got removed and false if there are not enough characters to remove. (in which case the string becomes empty)
+ ** @return True if n characters got removed and false if there are not 
+ ** enough characters to remove. (in which case the string becomes empty)
+ ** or in error
  ** @see rfString_PruneEnd()
  ** @see rfString_PruneMiddleB()
  ** @see rfString_PruneMiddleF()
@@ -186,7 +193,9 @@ i_DECLIMEX_ char rfString_PruneStart(void* thisstr,uint32_t n);
  ** @isinherited{StringX}
  ** @param thisstr The string to prune from. @inhtype{String,StringX}
  ** @param n The number of characters to remove. Must be a positive integer.
- ** @return True if n characters got removed and false if there are not enough characters to remove. (in which case the string becomes empty)
+ ** @return True if n characters got removed and false if there are not 
+ ** enough characters to remove. (in which case the string becomes empty)
+ ** or in error
  ** @see rfString_PruneStart()
  ** @see rfString_PruneMiddleB()
  ** @see rfString_PruneMiddleF()
@@ -237,7 +246,7 @@ i_DECLIMEX_ char rfString_PruneMiddleF(void* thisstr,uint32_t p,uint32_t n);
  ** @lmsFunction
  ** @param thisstr The string to search in. @inhtype{String,StringX}
  ** @param sub The substring to search for. @inhtype{String,StringX} @tmpSTR
- ** @return Returns true for success and false if none of @c sub characters were found inside the given String
+ ** @return Returns true for success and false if none of @c sub characters were found inside the given String or in error
  ** @see rfString_Trim()
  ** @see rfString_TrimEnd()
  **
@@ -254,7 +263,7 @@ i_DECLIMEX_ char rfString_TrimStart(void* thisstr,const void* sub);
  ** @lmsFunction
  ** @param thisstr The string to search in. @inhtype{String,StringX}
  ** @param sub The substring to search for. @inhtype{String,StringX} @tmpSTR
- ** @return Returns true for success and false if none of @c sub characters were found inside the given String
+ ** @return Returns true for success and false if none of @c sub characters were found inside the given String or in error
  ** @see rfString_Trim()
  ** @see rfString_TrimStart()
  **
@@ -271,7 +280,7 @@ i_DECLIMEX_ char rfString_TrimEnd(void* thisstr,const void* sub);
  ** @lmsFunction
  ** @param thisstr The string to search in. @inhtype{String,StringX}
  ** @param sub The substring to search for. @inhtype{String,StringX} @tmpSTR
- ** @return Returns true for success and false if none of @c sub characters were found inside the given String
+ ** @return Returns true for success and false if none of @c sub characters were found inside the given String or in error
  ** @see rfString_TrimStart()
  ** @see rfString_TrimEnd()
  **

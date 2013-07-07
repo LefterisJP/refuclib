@@ -102,7 +102,7 @@ i_DECLIMEX_ RF_Mutex* rfMutex_Create(uint32_t flags);
  ** + @c RE_MUTEX_INVALID: The given mutex value is invalid
  **
  **/
-i_DECLIMEX_ int32_t rfMutex_Init(RF_Mutex* m,uint32_t flags);
+i_DECLIMEX_ int32_t rfMutex_Init(RF_Mutex* m, uint32_t flags);
 
 /**
  ** @memberof RF_Mutex
@@ -158,7 +158,7 @@ i_DECLIMEX_ int32_t rfMutex_Lock(RF_Mutex* m);
  ** + @c RE_MUTEX_DEADLOCK: Error because the current thread already owns the mutex (POSIX only)
  **
  **/
-i_DECLIMEX_ int32_t rfMutex_TimedLock(RF_Mutex* m,uint32_t ms);
+i_DECLIMEX_ int32_t rfMutex_TimedLock(RF_Mutex* m, uint32_t ms);
 
 /**
  ** @memberof RF_Mutex

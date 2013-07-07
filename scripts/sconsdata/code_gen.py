@@ -381,29 +381,44 @@ class CodeGen():
            - If simple data types then plain old data assignment
            - If an object, then that objects's copy function
         """
+
+
         if("ptr2Copy" in mutate[0]):
             (arg1, arg2) = get_func2_args(line, "ptr2Copy")
             if type_d in self.obj_dict:
+                # read the IFBLOCK and get the rest of the arguments for
+                # as statements inside if
+                if "IFBLOCK" not in mutate:
+                    raise MutateError("For an assignment to objects, an "
+                                      "IFBLOCK argument has not been given",
+                                      file_name, line)
+                ifblock = ""
+                for i in range(mutate.index("IFBLOCK") + 1, len(mutate)):
+                    ifblock = ifblock + " " + mutate[i];
                 if mutate[0] == "ptr2Copyrr":
-                    return "{}(&{}, &{});\n".format(
+                    return "if(!{}(&{}, &{}))\n\t{{ {} }}\n".format(
                         self.obj_dict[type_d][obj.copy],
                         arg1,
-                        arg2)
+                        arg2,
+                        ifblock)
                 elif mutate[0] == "ptr2Copypp":
-                    return "{}({}, {});\n".format(
+                    return "if(!{}({},{}))\n\t{{ {} }}\n".format(
                         self.obj_dict[type_d][obj.copy],
                         arg1,
-                        arg2)
+                        arg2,
+                        ifblock)
                 elif mutate[0] == "ptr2Copypr":
-                    return "{}({}, &{});\n".format(
+                    return "if(!{}({},&{}))\n\t{{ {} }}\n".format(
                         self.obj_dict[type_d][obj.copy],
                         arg1,
-                        arg2)
+                        arg2,
+                        ifblock)
                 elif mutate[0] == "ptr2Copyrp":
-                    return "{}(&{}, {});\n".format(
+                    return "if(!{}(&{},{}))\n\t{{ {} }}\n".format(
                         self.obj_dict[type_d][obj.copy],
                         arg1,
-                        arg2)
+                        arg2,
+                        ifblock)
                 else:
                     raise MutateSourceError(mutate[0], file_name, line)
             else:

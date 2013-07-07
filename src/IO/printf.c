@@ -50,11 +50,14 @@
 
 int32_t rfPrintf(const char * format, ...)
 {
+    va_list args;
     int32_t ret;//note that no local scope macros are needed here since the arguments get evaluated in rfStringX_Formatv()
     //clear out the stdio buffer
-    rfStringX_Assign(&ioBuffer,RFS_(""));
+    if(!rfStringX_Assign(&ioBuffer, RFS_("")))
+    {
+        return RE_STRING_ASSIGNMENT;
+    }
     //now read the formatted string
-    va_list args;
     va_start(args,format);
     ret=rfStringX_Formatv(&ioBuffer,format,args);
     va_end(args);
@@ -70,11 +73,14 @@ int32_t rfPrintf(const char * format, ...)
 
 int32_t rfFPrintf(FILE* f,const char * format, ...)
 {
+    va_list args;
     int32_t ret;//note that no local scope macros are needed here since the arguments get evaluated in rfStringX_Formatv()
     //clear out the stdio buffer
-    rfStringX_Assign(&ioBuffer,RFS_(""));
+    if(!rfStringX_Assign(&ioBuffer, RFS_("")))
+    {
+        return RE_STRING_ASSIGNMENT;
+    }
     //now read the formatted string
-    va_list args;
     va_start(args,format);
     ret=rfStringX_Formatv(&ioBuffer,format,args);
     va_end(args);

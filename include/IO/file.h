@@ -80,11 +80,14 @@ extern "C"
  ** @param[out] bufferSize Give an @c uint32_t here to receive the capacity of the @c utf8 buffer in bytes
  ** @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file
  ** with reading this line
- ** @return Returns either a positive number for success that represents the number of bytes read from @c f and and error in case something goes wrong.
+ ** @return Returns either a positive number for success that represents 
+ ** the number of bytes read from @c f and and error in case something goes wrong.
  ** The possible errors to return are the same as rfFgets_UTF8()
  **
  **/
-i_DECLIMEX_ int32_t rfFReadLine_UTF8(FILE* f,char eol,char** utf8,uint32_t* byteLength,uint32_t* bufferSize,char* eof);
+i_DECLIMEX_ int32_t rfFReadLine_UTF8(FILE* f, char eol, char** utf8,
+                                     uint32_t* byteLength,
+                                     uint32_t* bufferSize, char* eof);
 /**
  ** @brief Reads a Big Endian UTF-16 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
  **
@@ -114,7 +117,8 @@ i_DECLIMEX_ int32_t rfFReadLine_UTF8(FILE* f,char eol,char** utf8,uint32_t* byte
  ** + @c RE_UTF8_ENCODING: Failed to encode the UTF-16 of the file descriptor into UTF-8
  **
  **/
-i_DECLIMEX_ int32_t rfFReadLine_UTF16BE(FILE* f,char eol,char** utf8,uint32_t* byteLength,char* eof);
+i_DECLIMEX_ int32_t rfFReadLine_UTF16BE(FILE* f, char eol, char** utf8,
+                                        uint32_t* byteLength, char* eof);
 /**
  ** @brief Reads a Little Endian UTF-16 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
  **
@@ -144,7 +148,8 @@ i_DECLIMEX_ int32_t rfFReadLine_UTF16BE(FILE* f,char eol,char** utf8,uint32_t* b
  ** + @c RE_UTF8_ENCODING: Failed to encode the UTF-16 of the file descriptor into UTF-8
  **
  **/
-i_DECLIMEX_ int32_t rfFReadLine_UTF16LE(FILE* f,char eol,char** utf8,uint32_t* byteLength,char* eof);
+i_DECLIMEX_ int32_t rfFReadLine_UTF16LE(FILE* f, char eol, char** utf8,
+                                        uint32_t* byteLength, char* eof);
 
 /**
  ** @brief Reads a Big Endian UTF-32 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
@@ -174,7 +179,8 @@ i_DECLIMEX_ int32_t rfFReadLine_UTF16LE(FILE* f,char eol,char** utf8,uint32_t* b
  ** + @c RE_UTF8_ENCODING: Failed to encode the UTF-16 of the file descriptor into UTF-8
  **
  **/
-i_DECLIMEX_ int32_t rfFReadLine_UTF32BE(FILE* f,char eol,char** utf8,uint32_t* byteLength,char* eof);
+i_DECLIMEX_ int32_t rfFReadLine_UTF32BE(FILE* f, char eol, char** utf8,
+                                        uint32_t* byteLength, char* eof);
 /**
  ** @brief Reads a Little Endian UTF-32 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
  **
@@ -203,7 +209,8 @@ i_DECLIMEX_ int32_t rfFReadLine_UTF32BE(FILE* f,char eol,char** utf8,uint32_t* b
  ** + @c RE_UTF8_ENCODING: Failed to encode the UTF-16 of the file descriptor into UTF-8
  **
  **/
-i_DECLIMEX_ int32_t rfFReadLine_UTF32LE(FILE* f,char eol,char** utf8,uint32_t* byteLength,char* eof);
+i_DECLIMEX_ int32_t rfFReadLine_UTF32LE(FILE* f, char eol, char** utf8,
+                                        uint32_t* byteLength, char* eof);
 
 /**
  ** @brief Gets a number of bytes from a BIG endian UTF-32 file descriptor
@@ -250,7 +257,8 @@ i_DECLIMEX_ int32_t rfFReadLine_UTF32LE(FILE* f,char eol,char** utf8,uint32_t* b
  ** + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
  **
  **/
-i_DECLIMEX_ int32_t rfFgets_UTF32BE(char* buff,uint32_t num,FILE* f,char* eof,char eol);
+i_DECLIMEX_ int32_t rfFgets_UTF32BE(char* buff, uint32_t num, FILE* f,
+                                    char* eof, char eol);
 /**
  ** @brief Gets a number of bytes from a Little endian UTF-32 file descriptor
  **
@@ -296,7 +304,8 @@ i_DECLIMEX_ int32_t rfFgets_UTF32BE(char* buff,uint32_t num,FILE* f,char* eof,ch
  ** + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
  **
  **/
-i_DECLIMEX_ int32_t rfFgets_UTF32LE(char* buff,uint32_t num,FILE* f,char* eof,char eol);
+i_DECLIMEX_ int32_t rfFgets_UTF32LE(char* buff, uint32_t num, FILE* f,
+                                    char* eof, char eol);
 
 /**
  ** @brief Gets a number of bytes from a BIG endian UTF-16 file descriptor
@@ -343,7 +352,8 @@ i_DECLIMEX_ int32_t rfFgets_UTF32LE(char* buff,uint32_t num,FILE* f,char* eof,ch
  ** + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
  **
  **/
-i_DECLIMEX_ int32_t rfFgets_UTF16BE(char* buff,uint32_t num,FILE* f,char* eof,char eol);
+i_DECLIMEX_ int32_t rfFgets_UTF16BE(char* buff, uint32_t num, FILE* f,
+                                    char* eof, char eol);
 /**
  ** @brief Gets a number of bytes from a Little endian UTF-16 file descriptor
  **
@@ -389,7 +399,8 @@ i_DECLIMEX_ int32_t rfFgets_UTF16BE(char* buff,uint32_t num,FILE* f,char* eof,ch
  ** + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
  **
  **/
-i_DECLIMEX_ int32_t rfFgets_UTF16LE(char* buff,uint32_t num,FILE* f,char* eof,char eol);
+i_DECLIMEX_ int32_t rfFgets_UTF16LE(char* buff, uint32_t num, FILE* f,
+                                    char* eof, char eol);
 /**
  ** @brief Gets a number of bytes from a UTF-8 file descriptor
  **
@@ -441,7 +452,8 @@ i_DECLIMEX_ int32_t rfFgets_UTF16LE(char* buff,uint32_t num,FILE* f,char* eof,ch
  ** + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
  **
  **/
-i_DECLIMEX_ int32_t rfFgets_UTF8(char* buff,uint32_t num,FILE* f,char* eof,char eol);
+i_DECLIMEX_ int32_t rfFgets_UTF8(char* buff, uint32_t num, FILE* f,
+                                 char* eof, char eol);
 
 /**
  ** @brief  Gets a unicode character from a UTF-8 file descriptor
@@ -481,7 +493,7 @@ i_DECLIMEX_ int32_t rfFgets_UTF8(char* buff,uint32_t num,FILE* f,char* eof,char 
  ** + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
  **
  **/
-i_DECLIMEX_ int32_t rfFgetc_UTF8(FILE* f,uint32_t *c,char cp);
+i_DECLIMEX_ int32_t rfFgetc_UTF8(FILE* f, uint32_t *c, char cp);
 /**
  ** @brief  Gets a unicode character from a UTF-16 Big Endian file descriptor
  **
@@ -515,7 +527,7 @@ i_DECLIMEX_ int32_t rfFgetc_UTF8(FILE* f,uint32_t *c,char cp);
  ** + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
  **
  **/
-i_DECLIMEX_ int32_t rfFgetc_UTF16BE(FILE* f,uint32_t *c,char cp);
+i_DECLIMEX_ int32_t rfFgetc_UTF16BE(FILE* f, uint32_t *c, char cp);
 /**
  ** @brief  Gets a unicode character from a UTF-16 Little Endian file descriptor
  **
@@ -549,7 +561,7 @@ i_DECLIMEX_ int32_t rfFgetc_UTF16BE(FILE* f,uint32_t *c,char cp);
  ** + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
  **
  **/
-i_DECLIMEX_ int32_t rfFgetc_UTF16LE(FILE* f,uint32_t *c,char cp);
+i_DECLIMEX_ int32_t rfFgetc_UTF16LE(FILE* f, uint32_t *c, char cp);
 /**
  ** @brief  Gets a unicode character from a UTF-32 Little Endian file descriptor
  **
@@ -576,7 +588,7 @@ i_DECLIMEX_ int32_t rfFgetc_UTF16LE(FILE* f,uint32_t *c,char cp);
  ** + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
  **
  **/
-i_DECLIMEX_ int32_t rfFgetc_UTF32LE(FILE* f,uint32_t *c);
+i_DECLIMEX_ int32_t rfFgetc_UTF32LE(FILE* f, uint32_t *c);
 /**
  ** @brief  Gets a unicode character from a UTF-32 Big Endian file descriptor
  **
@@ -603,7 +615,7 @@ i_DECLIMEX_ int32_t rfFgetc_UTF32LE(FILE* f,uint32_t *c);
  ** + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
  **
  **/
-i_DECLIMEX_ int32_t rfFgetc_UTF32BE(FILE* f,uint32_t *c);
+i_DECLIMEX_ int32_t rfFgetc_UTF32BE(FILE* f, uint32_t *c);
 
 /**
  ** @brief Moves a unicode character backwards in a big endian UTF-32 file stream
@@ -625,7 +637,7 @@ i_DECLIMEX_ int32_t rfFgetc_UTF32BE(FILE* f,uint32_t *c);
  ** + @c RE_FILE_MODE: If during reading the file the underlying file descriptor's mode was not correctly set for reading
  **
  **/
-i_DECLIMEX_ int32_t rfFback_UTF32BE(FILE* f,uint32_t *c);
+i_DECLIMEX_ int32_t rfFback_UTF32BE(FILE* f, uint32_t *c);
 /**
  ** @brief Moves a unicode character backwards in a little endian UTF-32 file stream
  **
@@ -652,7 +664,7 @@ i_DECLIMEX_ int32_t rfFback_UTF32BE(FILE* f,uint32_t *c);
  ** + @c RE_FILE_MODE: If during reading the file the underlying file descriptor's mode was not correctly set for reading
  **
  **/
-i_DECLIMEX_ int32_t rfFback_UTF32LE(FILE* f,uint32_t *c);
+i_DECLIMEX_ int32_t rfFback_UTF32LE(FILE* f, uint32_t *c);
 /**
  ** @brief Moves a unicode character backwards in a big endian UTF-16 file stream
  **
@@ -680,7 +692,7 @@ i_DECLIMEX_ int32_t rfFback_UTF32LE(FILE* f,uint32_t *c);
  ** + @c RE_FILE_MODE: If during reading the file the underlying file descriptor's mode was not correctly set for reading
  **
  **/
-i_DECLIMEX_ int32_t rfFback_UTF16BE(FILE* f,uint32_t *c);
+i_DECLIMEX_ int32_t rfFback_UTF16BE(FILE* f, uint32_t *c);
 /**
  ** @brief Moves a unicode character backwards in a little endian UTF-16 file stream
  **
@@ -708,7 +720,7 @@ i_DECLIMEX_ int32_t rfFback_UTF16BE(FILE* f,uint32_t *c);
  ** + @c RE_FILE_MODE: If during reading the file the underlying file descriptor's mode was not correctly set for reading
  **
  **/
-i_DECLIMEX_ int32_t rfFback_UTF16LE(FILE* f,uint32_t *c);
+i_DECLIMEX_ int32_t rfFback_UTF16LE(FILE* f, uint32_t *c);
 /**
  ** @brief Moves a unicode character backwards in a UTF-8 file stream
  **
@@ -736,7 +748,7 @@ i_DECLIMEX_ int32_t rfFback_UTF16LE(FILE* f,uint32_t *c);
  ** + @c RE_FILE_MODE: If during reading the file the underlying file descriptor's mode was not correctly set for reading
  **
  **/
-i_DECLIMEX_ int32_t rfFback_UTF8(FILE* f,uint32_t *c);
+i_DECLIMEX_ int32_t rfFback_UTF8(FILE* f, uint32_t *c);
 
 /**
  ** @brief Opens another process as a pipe
@@ -755,7 +767,7 @@ i_DECLIMEX_ int32_t rfFback_UTF8(FILE* f,uint32_t *c);
  ** If there was an error @c 0 is returned and an error is logged.
  **
  **/
-i_DECLIMEX_ FILE* rfPopen(void* command,const char* mode);
+i_DECLIMEX_ FILE* rfPopen(void* command, const char* mode);
 
 
 /**

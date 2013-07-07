@@ -12,7 +12,7 @@ int main()
 	RF_StringX sx1,sx2,sx3,sx4,sx5,sx6,sx7,sx8,sx9,sx10;
     FILE* futf8,*futf16,*futf32,*f;
     char eof;
-	rfInit();
+	EXPECT(rfInit(), true)
 	
 /// --> UTF8
 

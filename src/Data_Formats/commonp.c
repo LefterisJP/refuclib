@@ -251,19 +251,32 @@ RF_XMLTag* i_rfXML_SearchChild(RF_XML* x,RF_XMLTag* t,void* tNameP,void* childNa
  ** @return Returns true for succesful writting of the @c t XML tag and false otherwise
  **
  **/
-char i_rfXMLTag_PrintToFile(RF_XMLTag* t,RF_TextFile* f,RF_StringX* strBuff,uint32_t level)
+char i_rfXMLTag_PrintToFile(RF_XMLTag* t, RF_TextFile* f
+                            ,RF_StringX* strBuff, uint32_t level)
 {
     uint32_t i;
     //prepend the required number of tabs
     for(i = 0; i < level; i ++)
-        rfTextFile_Write(f,RFS_("\t"));
+        rfTextFile_Write(f, RFS_("\t"));
     //create the tag string
-    rfStringX_Assign(strBuff,RFS_("<%S",&t->name));
+    if(!rfStringX_Assign(strBuff, RFS_("<%S",&t->name)))
+    {
+        return false;
+    }
     for(i = 0; i < t->attributes.size; i ++)
     {
-        rfStringX_Append(strBuff,RFS_(" %S=\"%S\"",rfListP_Get(&t->attributes,i),rfListP_Get(&t->attribValues,i)));
+        if(rfStringX_Append(strBuff,
+                            RFS_(" %S=\"%S\"",
+                                 rfListP_Get(&t->attributes,i),
+                                 rfListP_Get(&t->attribValues,i))) == false)
+        {
+            return false;
+        }
     }
-    rfStringX_Append(strBuff,RFS_(">\n"));
+    if(rfStringX_Append(strBuff, RFS_(">\n")) == false)
+    {
+        return false;
+    }
     //print it
     if(rfTextFile_Write(f,strBuff) != RF_SUCCESS)
     {
@@ -390,7 +403,11 @@ int32_t i_rfXML_Parse(RF_XML* x,RF_XMLTag* currentTag)
                     else
                     {
                         rfXMLTag_AddContent(currentTag,&x->s);
-                        rfStringX_Assign(&x->s,RFS_(""));
+                        if(!rfStringX_Assign(&x->s,RFS_("")))
+                        {
+                            error = RE_STRING_ASSIGN;
+                            goto cleanup1;
+                        }
                     }
                 }
                 else//else depending on the '<' '</' found change the state
@@ -444,10 +461,10 @@ int32_t i_rfXML_Parse(RF_XML* x,RF_XMLTag* currentTag)
 cleanup1:
     //free up memory
     rfXML_Deinit(x);
-    return error;;
+    return error;
 }
 
-int32_t rfXML_GoNext_dsk(RF_XML* x,RF_XMLTag* t)
+int32_t rfXML_GoNext_dsk(RF_XML* x, RF_XMLTag* t)
 {
     int32_t parserState,error,level;
     foff_rft prPos;
@@ -457,7 +474,12 @@ int32_t rfXML_GoNext_dsk(RF_XML* x,RF_XMLTag* t)
     rfTextFile_GetOffset(&x->f,&prPos); /// cleanup1 -- go back to the file offset at function call
     level = 1;
     //make a copy of the buffer string in case we need to restore it
-    rfStringX_Copy_IN(&copyS,&x->s); /// cleanup2 -- to reset the string back
+    /// cleanup2 -- to reset the string back
+    if(rfStringX_Copy_IN(&copyS, &x->s) == false)
+    {
+        error = RE_XML_PARSE_FAILURE;
+        goto cleanup1;
+    }
     //any call of this function resets the no more children flag
     RF_BITFLAG_UNSET(x->flags,XML_NOCHILDREN);
     ///start parsing
@@ -541,7 +563,11 @@ int32_t rfXML_GoNext_dsk(RF_XML* x,RF_XMLTag* t)
                     else
                     {
                         rfXMLTag_AddContent(x->currentTag,&x->s);
-                        rfStringX_Assign(&x->s,RFS_(""));
+                        if(!rfStringX_Assign(&x->s,RFS_("")))
+                        {
+                            error = RE_STRING_ASSIGN;
+                            goto cleanup1;
+                        }
                     }
                 }
                 else//else depending on the '<' '</' found change the state
@@ -639,7 +665,8 @@ int32_t rfXML_GoNext_dsk(RF_XML* x,RF_XMLTag* t)
         }//parserstate switch closes
     }//end of main parsing loop
     ///if we get here then that is an error
-    LOG_ERROR("Corrupt XML file, caused getting out of the parsing loop. XML Parsing failed.",RE_XML_PARSE_FAILURE);
+    LOG_ERROR("Corrupt XML file, caused getting out of the parsing loop. "
+              "XML Parsing failed.", RE_XML_PARSE_FAILURE);
     error = RE_XML_PARSE_FAILURE;
 
 cleanup3: //Clean up the check string
@@ -647,7 +674,7 @@ cleanup3: //Clean up the check string
 cleanup2://Get the string back to its state as it was was before function call
     rfStringX_Deinit(&x->s);
     x->s = copyS;
-//cleanup1://get the file position back to the previous sibling
+cleanup1://get the file position back to the previous sibling
     rfTextFile_GoToOffset(&x->f,prPos,SEEK_SET);
     x->currentTag = startTag;
     return error;
@@ -667,7 +694,10 @@ int32_t rfXML_GoIn_dsk(RF_XML* x,uint32_t i)
     if(RF_BITFLAG_ON(x->flags,XML_NOCHILDREN))
         return RF_FAILURE;
     //make a copy of the buffer string in case we need to restore it
-    rfStringX_Copy_IN(&copyS,&x->s);
+    if(rfStringX_Copy_IN(&copyS,&x->s) == false)
+    {
+        return RF_FAILURE;
+    }
     ///start parsing
     parserState = TAG_CONTENTS;
     while(1)
@@ -760,7 +790,11 @@ int32_t rfXML_GoIn_dsk(RF_XML* x,uint32_t i)
                     else
                     {
                         //read a new line
-                        rfStringX_Assign(&x->s,RFS_(""));
+                        if(!rfStringX_Assign(&x->s,RFS_("")))
+                        {
+                            ret = RE_STRING_ASSIGN;
+                            goto cleanup1;
+                        }
                     }
                 }
                 else//else depending on the '<' '</' found change the state
@@ -845,12 +879,18 @@ int32_t rfXML_GoOut_dsk(RF_XML* x,char after)
         x->lastTag = x->currentTag = &x->root;
         rfTextFile_GoToOffset(&x->f,x->rootPos,SEEK_SET);
         x->lastLine = x->f.line-1;
-        rfStringX_Assign(&x->s,RFS_(""));
+        if(!rfStringX_Assign(&x->s,RFS_("")))
+        {
+            return RF_FAILURE;
+        }
         x->level = 0;
         return RF_SUCCESS;
     }
     //make a copy of the string at function call
-    rfStringX_Copy_IN(&copyS,&x->s);
+    if(rfStringX_Copy_IN(&copyS,&x->s) == false)
+    {
+        return RF_FAILURE;
+    }
     //lower the no children flag
     RF_BITFLAG_UNSET(x->flags,XML_NOCHILDREN);
     ///before case

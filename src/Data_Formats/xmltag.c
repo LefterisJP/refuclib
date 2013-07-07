@@ -69,7 +69,11 @@ RF_XMLTag* rfXMLTag_Create2(RF_XMLTag* parent,void* name)
     RF_MALLOC(x,sizeof(RF_XMLTag));
     //get the parent pointer and copy the name string
     x->parent = parent;
-    rfString_Copy_IN(&x->name,name);
+    if(!rfString_Copy_IN(&x->name,name))
+    {
+        RF_EXIT_LOCAL_SCOPE()
+        return NULL;
+    }
     //initialize the lists
     rfListP_Init(&x->children,RF_XMLTag,5,&rfXMLTag_Destroy,&rfXMLTag_Copy_OUT);//initial capacity of 5 children
     rfListP_Init(&x->attributes,RF_String,5,&rfString_Destroy,&rfString_Copy_OUT);//initial capacity of 5 attributes
@@ -98,7 +102,11 @@ RF_XMLTag* rfXMLTag_Createv(RF_XMLTag* parent,void* name,void* content,unsigned 
     RF_MALLOC(x,sizeof(RF_XMLTag));
     //get the parent pointer and copy the name string
     x->parent = parent;
-    rfString_Copy_IN(&x->name,name);
+    if(!rfString_Copy_IN(&x->name,name))
+    {
+        RF_EXIT_LOCAL_SCOPE()
+        return NULL;
+    }
     //initialize the lists
     rfListP_Init(&x->children,RF_XMLTag,5,&rfXMLTag_Destroy,&rfXMLTag_Copy_OUT);//initial capacity of 5 children
     rfListP_Init(&x->attributes,RF_String,5,&rfString_Destroy,&rfString_Copy_OUT);//initial capacity of 5 attributes
@@ -202,8 +210,14 @@ RF_XMLTag* rfXMLTag_CreateLocalv(RF_XMLTag* parent,void* nameP,void* contentP,un
        RF_String* attrName,*attrValue;
        i_rfLMS_Push(attrName,sizeof(RF_String));
        i_rfLMS_Push(attrValue,sizeof(RF_String));
-       rfString_Copy_IN(attrName,attrNameTMP);
-       rfString_Copy_IN(attrValue,attrValueTMP);
+       if(!rfString_Copy_IN(attrName,attrNameTMP))
+       {
+           return NULL;
+       }
+       if(!rfString_Copy_IN(attrValue,attrValueTMP))
+       {
+           return NULL;
+       }
 
        *(x->attributes.data+x->attributes.size) = attrName;
        x->attributes.size++;
@@ -218,10 +232,15 @@ RF_XMLTag* rfXMLTag_CreateLocalv(RF_XMLTag* parent,void* nameP,void* contentP,un
 //Initializes an XML Tag
 char rfXMLTag_Init3(RF_XMLTag* x,RF_XMLTag* parent,void* name)
 {
+    char ret = true;
     RF_ENTER_LOCAL_SCOPE()
 
     x->parent = parent;
-    rfString_Copy_IN(&x->name,name);
+    if(!rfString_Copy_IN(&x->name,name))
+    {
+        ret = false;
+        goto cleanup;
+    }
     //initialize the lists
     rfListP_Init(&x->children,RF_XMLTag,5,&rfXMLTag_Destroy,&rfXMLTag_Copy_OUT);//initial capacity of 5 children
     rfListP_Init(&x->attributes,RF_String,5,&rfString_Destroy,&rfString_Copy_OUT);//initial capacity of 5 attributes
@@ -232,8 +251,9 @@ char rfXMLTag_Init3(RF_XMLTag* x,RF_XMLTag* parent,void* name)
     if(parent!=0)
         rfXMLTag_AddTag_nocopy(parent,x);
 
+  cleanup:
     RF_EXIT_LOCAL_SCOPE()
-    return true;
+    return ret;
 }
 #endif
 
@@ -246,10 +266,15 @@ char rfXMLTag_Initv(RF_XMLTag* x,RF_XMLTag* parent,void* name,void* content,unsi
 {
     uint32_t i;
     va_list argList;
+    char ret = true;
     RF_ENTER_LOCAL_SCOPE()
 
     x->parent = parent;
-    rfString_Copy_IN(&x->name,name);
+    if(!rfString_Copy_IN(&x->name,name))
+    {
+        ret = false;
+        goto cleanup;
+    }
     //initialize the lists
     rfListP_Init(&x->children,RF_XMLTag,5,&rfXMLTag_Destroy,&rfXMLTag_Copy_OUT);//initial capacity of 5 children
     rfListP_Init(&x->attributes,RF_String,5,&rfString_Destroy,&rfString_Copy_OUT);//initial capacity of 5 attributes
@@ -272,34 +297,40 @@ char rfXMLTag_Initv(RF_XMLTag* x,RF_XMLTag* parent,void* name,void* content,unsi
     }
     va_end(argList);
 
+  cleanup:
     RF_EXIT_LOCAL_SCOPE()
-    return true;
+    return ret;
 }
 
 // Copies XML Tag @c src to XML Tag @c dst
-void rfXMLTag_Copy_IN(RF_XMLTag* dst,RF_XMLTag* src)
+char rfXMLTag_Copy_IN(RF_XMLTag* dst,RF_XMLTag* src)
 {
     dst->parent = src->parent;
-    rfString_Copy_IN(&dst->name,&src->name);
-    //copy the lists
-    rfListP_Copy_IN(&dst->children,&src->children);
-    rfListP_Copy_IN(&dst->attributes,&src->attributes);
-    rfListP_Copy_IN(&dst->attribValues,&src->attribValues);
-    rfStringX_Copy_IN(&dst->contents,&src->contents);
+    if(rfString_Copy_IN(&dst->name,&src->name) &&
+       rfListP_Copy_IN(&dst->children,&src->children) &&
+       rfListP_Copy_IN(&dst->attributes,&src->attributes) &&
+       rfListP_Copy_IN(&dst->attribValues,&src->attribValues) &&
+       rfStringX_Copy_IN(&dst->contents,&src->contents) )
+    {
+        return true;
+    }
+    return false;
 }
 //Allocates and returns a copy of the given XML Tag
 RF_XMLTag* rfXMLTag_Copy_OUT(RF_XMLTag* src)
 {
     RF_XMLTag* dst;
-    RF_MALLOC(dst,sizeof(RF_XMLTag));
+    RF_MALLOC(dst,sizeof(RF_XMLTag), NULL);
     dst->parent = src->parent;
-    rfString_Copy_IN(&dst->name,&src->name);
-    //copy the lists
-    rfListP_Copy_IN(&dst->children,&src->children);
-    rfListP_Copy_IN(&dst->attributes,&src->attributes);
-    rfListP_Copy_IN(&dst->attribValues,&src->attribValues);
-    rfStringX_Copy_IN(&dst->contents,&src->contents);
-    return dst;
+    if(rfString_Copy_IN(&dst->name,&src->name) &&
+       rfListP_Copy_IN(&dst->children,&src->children) &&
+       rfListP_Copy_IN(&dst->attributes,&src->attributes) &&
+       rfListP_Copy_IN(&dst->attribValues,&src->attribValues) &&
+       rfStringX_Copy_IN(&dst->contents,&src->contents) )
+    {
+        return dst;
+    }
+    return NULL;
 }
 
 //Destroys an XML tag
@@ -359,12 +390,19 @@ void rfXMLTag_AddAttribute(RF_XMLTag* t,void* attribName,void* attribValue)
 }
 
 //Adds content to the tag
-void rfXMLTag_AddContent(RF_XMLTag* t,void* c)
+char rfXMLTag_AddContent(RF_XMLTag* t, void* c)
 {
+    RF_String* content;
+    char ret = true;
     RF_ENTER_LOCAL_SCOPE()
-    RF_String* content = rfString_Copy_OUT(c);
-    rfStringX_Append(&t->contents,content);
+    content = rfString_Copy_OUT(c);
+    if( !content || 
+        !rfStringX_Append(&t->contents, content))
+    {
+        ret = false;
+    }
     RF_EXIT_LOCAL_SCOPE()
+    return ret;
 }
 
 //Gets the ith child tag of this tag
@@ -381,27 +419,25 @@ void rfXMLTag_RemoveChild(RF_XMLTag* t,uint32_t i)
 // Gets the ith attribute name of this tag
 char rfXMLTag_GetAttributeName(RF_XMLTag* t,uint32_t i,RF_String* name)
 {
-    RF_String* fromList = rfListP_Get(&t->attributes,i);
-    if(fromList == 0)
+    RF_String* fromList = rfListP_Get(&t->attributes, i);
+    if(fromList == 0 || !rfString_Copy_IN(name, fromList))
         return false;
-    rfString_Copy_IN(name,fromList);
     return true;
 }
 
 //Gets the ith attribute value of this tag
 char rfXMLTag_GetAttributeValue(RF_XMLTag* t,uint32_t i,RF_String* value)
 {
-    RF_String* fromList = rfListP_Get(&t->attribValues,i);
-    if(fromList == 0)
+    RF_String* fromList = rfListP_Get(&t->attribValues, i);
+    if(fromList == 0 || rfString_Copy_IN(value,fromList))
         return false;
-    rfString_Copy_IN(value,fromList);
     return true;
 }
 
 //Gets the ith line of content of the tag
-void rfXMLTag_GetContent(RF_XMLTag* t,RF_String* line)
+char rfXMLTag_GetContent(RF_XMLTag* t,RF_String* line)
 {
-    rfString_Copy_IN(line,&t->contents);
+    return rfString_Copy_IN(line,&t->contents);
 }
 
 
@@ -419,35 +455,72 @@ char rfXMLTag_ToStr_internal(RF_XMLTag* t,RF_StringX* strBuff,uint32_t level)
     uint32_t i;
     //prepend the required number of tabs
     for(i = 0; i < level; i ++)
-        rfStringX_Append(strBuff,RFS_("\t"));
+    {
+        if(rfStringX_Append(strBuff,RFS_("\t")) == false)
+        {
+            return false;
+        }
+    }
     //create the tag string
-    rfStringX_Append(strBuff,RFS_("<%S",&t->name));
+    if(rfStringX_Append(strBuff,RFS_("<%S",&t->name)) == false)
+    {
+        return false;
+    }
     for(i = 0; i < t->attributes.size; i ++)
     {
-        rfStringX_Append(strBuff,RFS_(" %S=\"%S\"",rfListP_Get(&t->attributes,i),rfListP_Get(&t->attribValues,i)));
+        if(rfStringX_Append(strBuff,
+                            RFS_(" %S=\"%S\"",
+                                 rfListP_Get(&t->attributes,i),
+                                 rfListP_Get(&t->attribValues,i))) == false)
+        {
+            return false;
+        }
     }
-    rfStringX_Append(strBuff,RFS_(">\n"));
+    if(!rfStringX_Append(strBuff, RFS_(">\n")))
+    {
+        return false;
+    }
     //also print the tag's contents(if any)
     if(rfString_Equal(&t->contents,RFS_(""))!= true)
     {
         for(i= 0; i< level; i ++)
-            rfStringX_Append(strBuff,RFS_("\t"));
-        rfStringX_Append(strBuff,RFS_("%S\n",&t->contents));
+        {
+            if(rfStringX_Append(strBuff, RFS_("\t")) == false)
+            {
+                return false;
+            }
+        }
+        if(rfStringX_Append(strBuff, RFS_("%S\n", &t->contents)) == false)
+        {
+            return false;
+        }
     }
     //recursively call this function for all the children of this tag
     for(i=0;i < t->children.size; i++)
     {
-        if(rfXMLTag_ToStr_internal((RF_XMLTag*)rfListP_Get(&t->children,i),strBuff,level+1) == false)
+        if(rfXMLTag_ToStr_internal(
+               (RF_XMLTag*)rfListP_Get(&t->children,i),
+               strBuff,
+               level+1) == false)
         {
-            LOG_ERROR("Failed to convert tag's \"<%S>\" No. %d child to a String",RE_XML_TOSTR,&t->name,i+1)
+            LOG_ERROR("Failed to convert tag's \"<%S>\" No. %d child to a"
+                      " String", RE_XML_TOSTR, &t->name, i+1)
             return false;
         }
     }
     //when done write the closing of the tag
     //prepend the required number of tabs
     for(i = 0; i < level; i ++)
-        rfStringX_Append(strBuff,RFS_("\t"));
-    rfStringX_Append(strBuff,RFS_("</%S>\n",&t->name));
+    {
+        if(rfStringX_Append(strBuff,RFS_("\t")) == false)
+        {
+            return false;
+        }
+    }
+    if(rfStringX_Append(strBuff,RFS_("</%S>\n",&t->name)) == false)
+    {
+        return false;
+    }
     //success
     return true;
 }

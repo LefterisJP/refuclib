@@ -172,8 +172,8 @@ int32_t rfXML_Init(RF_XML* ret,void* filenameP,char openFlag,char encoding)
             }
         }
         //perform a small check to see if there are tabs in the file or not
-        rfStringX_Copy_IN(&copyS,&ret->s);
-        if((error=rfTextFile_GetOffset(&ret->f,&prOff))!= RF_SUCCESS)
+        if(rfStringX_Copy_IN(&copyS,&ret->s) == false ||
+           (error=rfTextFile_GetOffset(&ret->f,&prOff)) != RF_SUCCESS)
         {
             goto cleanup3;
         }
@@ -425,23 +425,39 @@ int32_t rfXML_InsertStr(RF_XML* x,void* sP,char flags)
     //keep the line number of the added tag that will become the last line if all goes well
     lineN = x->lastLine+1;
     //create a new insertion string since it may be initialized in the local stack so can't replace anything in the original
-    rfStringX_FromString_IN(&nS,s);
+    if(rfStringX_FromString_IN(&nS, s) == false)
+    {
+        error = RE_STRING_INIT;//not sure if I should be doing this
+        goto cleanup1;
+    }
     //change all the newlines to newlines plus the proper amount of tabs +1 or spaces + 3 so that they are indented properly
     rfStringX_Init(&tabs,"");///cleanup 2 - deinit these strings
     if(RF_BITFLAG_ON(x->flags,XML_SPACES))
     {
         for(i=0;i<x->level;i++)
-            rfStringX_Append(&tabs,RFS_("   "));
+        {
+            if(rfStringX_Append(&tabs, RFS_("   ")) == false)
+            {
+                error = RE_STRING_APPEND;
+                goto cleanup2;
+            }
+        }
         rfStringX_Replace(&nS,RFS_("\n"),RFS_("\n%S   ",&tabs),0,0);
     }
     else
     {
-        for(i=0;i<x->level;i++)
-            rfStringX_Append(&tabs,RFS_("\t"));
+        for(i=0; i<x->level; i++)
+        {
+            if(rfStringX_Append(&tabs,RFS_("\t")) == false)
+            {
+                error = RE_STRING_APPEND;
+                goto cleanup2;
+            }
+        }
         rfStringX_Replace(&nS,RFS_("\n"),RFS_("\n%S\t",&tabs),0,0);
     }
 
-    if(RF_BITFLAG_ON(flags,XML_TAG_END))///insertion at end of tag
+    if(RF_BITFLAG_ON(flags, XML_TAG_END))///insertion at end of tag
     {
         RF_String before;
         //read until you get to the line that the tag closes

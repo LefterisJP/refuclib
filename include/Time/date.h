@@ -78,7 +78,7 @@ extern "C"
  ** @return Returns true for success and false for failure
  **
  **/
-i_DECLIMEX_ char rfDate_Init_Now(RF_Date* d,char local);
+i_DECLIMEX_ char rfDate_Init_Now(RF_Date* d, char local);
 
 /**
  ** @memberof RF_Date
@@ -105,7 +105,14 @@ i_DECLIMEX_ RF_Date* rfDate_Create_Now(char local);
  ** @return Returns true for success and false for failure
  **
  **/
-i_DECLIMEX_ char rfDate_Init(RF_Date* d,unsigned char wDay,unsigned char mDay,unsigned char month,uint16_t year,unsigned char hour,unsigned char min,unsigned char sec);
+i_DECLIMEX_ char rfDate_Init(RF_Date* d,
+                             unsigned char wDay,
+                             unsigned char mDay,
+                             unsigned char month,
+                             uint16_t year,
+                             unsigned char hour,
+                             unsigned char min,
+                             unsigned char sec);
 
 /**
  ** @memberof RF_Date
@@ -118,10 +125,17 @@ i_DECLIMEX_ char rfDate_Init(RF_Date* d,unsigned char wDay,unsigned char mDay,un
  ** @param hour The hour of the day. Legal values are from 0 to 23
  ** @param min The minutes of the hour. Legal values are from 0 to 59
  ** @param sec The seconds after the minutes. Legal values are from 0 to 59
- ** @return Returns true for success and false for failure
+ ** @return Returns an initialized @ref RF_Date for success and 
+ ** @c NULL for failure
  **
  **/
-i_DECLIMEX_ RF_Date* rfDate_Create(unsigned char wDay,unsigned char mDay,unsigned char month,uint16_t year,unsigned char hour,unsigned char min,unsigned char sec);
+i_DECLIMEX_ RF_Date* rfDate_Create(unsigned char wDay,
+                                   unsigned char mDay,
+                                   unsigned char month,
+                                   uint16_t year,
+                                   unsigned char hour,
+                                   unsigned char min,
+                                   unsigned char sec);
 
 //! @}
 //closing the doxygen group of date creation
@@ -147,7 +161,7 @@ i_DECLIMEX_ void rfDate_Destroy(RF_Date* d);
  ** @param years The number of years to add
  **
  **/
-i_DECLIMEX_ void rfDate_AddYears(RF_Date* d,uint32_t years);
+i_DECLIMEX_ void rfDate_AddYears(RF_Date* d, uint32_t years);
 /**
  ** @memberof RF_Date
  ** @brief Removes a number of years from the Date
@@ -156,7 +170,7 @@ i_DECLIMEX_ void rfDate_AddYears(RF_Date* d,uint32_t years);
  ** @param years The number of years to remove
  **
  **/
-i_DECLIMEX_ void rfDate_SubYears(RF_Date* d,uint32_t years);
+i_DECLIMEX_ void rfDate_SubYears(RF_Date* d, uint32_t years);
 
 /**
  ** @memberof RF_Date
@@ -166,7 +180,7 @@ i_DECLIMEX_ void rfDate_SubYears(RF_Date* d,uint32_t years);
  ** @param months The number of months to add
  **
  **/
-i_DECLIMEX_ void rfDate_AddMonths(RF_Date* d,uint32_t months);
+i_DECLIMEX_ void rfDate_AddMonths(RF_Date* d, uint32_t months);
 /**
  ** @memberof RF_Date
  ** @brief Removes a number of months from the Date
@@ -175,7 +189,7 @@ i_DECLIMEX_ void rfDate_AddMonths(RF_Date* d,uint32_t months);
  ** @param months The number of months to remove
  **
  **/
-i_DECLIMEX_ void rfDate_SubMonths(RF_Date* d,uint32_t months);
+i_DECLIMEX_ void rfDate_SubMonths(RF_Date* d, uint32_t months);
 
 /**
  ** @memberof RF_Date
@@ -185,7 +199,7 @@ i_DECLIMEX_ void rfDate_SubMonths(RF_Date* d,uint32_t months);
  ** @param days The number of days to add
  **
  **/
-i_DECLIMEX_ void rfDate_AddDays(RF_Date* d,uint32_t days);
+i_DECLIMEX_ void rfDate_AddDays(RF_Date* d, uint32_t days);
 /**
  ** @memberof RF_Date
  ** @brief Removes a number of days from the Date
@@ -194,7 +208,7 @@ i_DECLIMEX_ void rfDate_AddDays(RF_Date* d,uint32_t days);
  ** @param days The number of days to remove
  **
  **/
-i_DECLIMEX_ void rfDate_SubDays(RF_Date* d,uint32_t days);
+i_DECLIMEX_ void rfDate_SubDays(RF_Date* d, uint32_t days);
 
 /**
  ** @memberof RF_Date
@@ -204,7 +218,7 @@ i_DECLIMEX_ void rfDate_SubDays(RF_Date* d,uint32_t days);
  ** @param hours The number of hours to add
  **
  **/
-i_DECLIMEX_ void rfDate_AddHours(RF_Date* d,uint32_t hours);
+i_DECLIMEX_ void rfDate_AddHours(RF_Date* d, uint32_t hours);
 /**
  ** @memberof RF_Date
  ** @brief Removes a number of hours from the Date
@@ -213,7 +227,7 @@ i_DECLIMEX_ void rfDate_AddHours(RF_Date* d,uint32_t hours);
  ** @param hours The number of hours to remove
  **
  **/
-i_DECLIMEX_ void rfDate_SubHours(RF_Date* d,uint32_t hours);
+i_DECLIMEX_ void rfDate_SubHours(RF_Date* d, uint32_t hours);
 
 /**
  ** @memberof RF_Date
@@ -223,7 +237,7 @@ i_DECLIMEX_ void rfDate_SubHours(RF_Date* d,uint32_t hours);
  ** @param minutes The number of minutes to add
  **
  **/
-i_DECLIMEX_ void rfDate_AddMinutes(RF_Date* d,uint32_t minutes);
+i_DECLIMEX_ void rfDate_AddMinutes(RF_Date* d, uint32_t minutes);
 /**
  ** @memberof RF_Date
  ** @brief Removes a number of minutes from the Date
@@ -232,7 +246,7 @@ i_DECLIMEX_ void rfDate_AddMinutes(RF_Date* d,uint32_t minutes);
  ** @param minutes The number of minutes to remove
  **
  **/
-i_DECLIMEX_ void rfDate_SubMinutes(RF_Date* d,uint32_t minutes);
+i_DECLIMEX_ void rfDate_SubMinutes(RF_Date* d, uint32_t minutes);
 
 /**
  ** @memberof RF_Date
@@ -242,7 +256,7 @@ i_DECLIMEX_ void rfDate_SubMinutes(RF_Date* d,uint32_t minutes);
  ** @param seconds The number of seconds to add
  **
  **/
-i_DECLIMEX_ void rfDate_AddSeconds(RF_Date* d,uint32_t seconds);
+i_DECLIMEX_ void rfDate_AddSeconds(RF_Date* d, uint32_t seconds);
 /**
  ** @memberof RF_Date
  ** @brief Removes a number of seconds from the Date
@@ -251,7 +265,7 @@ i_DECLIMEX_ void rfDate_AddSeconds(RF_Date* d,uint32_t seconds);
  ** @param seconds The number of seconds to remove
  **
  **/
-i_DECLIMEX_ void rfDate_SubSeconds(RF_Date* d,uint32_t seconds);
+i_DECLIMEX_ void rfDate_SubSeconds(RF_Date* d, uint32_t seconds);
 //! @}
 //closing the Date Manipulation doxygen group
 

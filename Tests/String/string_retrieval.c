@@ -8,7 +8,7 @@ int main()
 	RF_String s1,s2,s3,s4,s5,s6,s7;
 	RF_String ret;
 
-	rfInit();
+	EXPECT(rfInit(), true)
 
 	
 	EXPECT(true,rfString_Init(&s1,"This is the test for String retrievals. We are testing retrieval in various situations"))

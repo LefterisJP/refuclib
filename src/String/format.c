@@ -3,13 +3,13 @@
 **
 ** Copyright (c) 2011-2013, Karapetsas Eleftherios
 ** All rights reserved.
-** 
+**
 ** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 **  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 **  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in
 **     the documentation and/or other materials provided with the distribution.
 **  3. Neither the name of the Original Author of Refu nor the names of its contributors may be used to endorse or promote products derived from
-** 
+**
 ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
 ** INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 ** DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
@@ -478,8 +478,13 @@ int32_t rfStringX_Formatv(RF_StringX *ret,const char* format,va_list args)
     {
         if(format[i]=='%')
         {
-            //append the part of the format string until before the '%' to the return string
-            rfStringX_Append_bytes(ret,RFS_(format+lastI),i-lastI);
+            // append the part of the format string until before the '%'
+            // to the return string
+            if(!rfStringX_Append_bytes(ret,RFS_(format+lastI),i-lastI))
+            {
+                error = RE_STRING_APPEND;
+                goto cleanup1;
+            }
             //read the format specifier to know what you have to read in now
             if( (extraChars = Parse_FormatSpecifier(format+i+1,&argData)) == 0)
             {
@@ -512,13 +517,40 @@ int32_t rfStringX_Formatv(RF_StringX *ret,const char* format,va_list args)
                         case LENGTH_CHAR:
                         case LENGTH_SHORT:
                         case LENGTH_INT:
-                            rfStringX_Append_int(ret,va_arg(args,int),argData.width,argData.precision,argData.flags);
+                            if(!rfStringX_Append_int(
+                                   ret,
+                                   va_arg(args,int),
+                                   argData.width,
+                                   argData.precision,
+                                   argData.flags))
+                            {
+                                error = RE_STRING_APPEND;
+                                goto cleanup1;
+                            }
                         break;
                         case LENGTH_LONG:
-                            rfStringX_Append_int(ret,va_arg(args,long),argData.width,argData.precision,argData.flags);
+                            if(!rfStringX_Append_int(
+                                   ret,
+                                   va_arg(args,long),
+                                   argData.width,
+                                   argData.precision,
+                                   argData.flags))
+                            {
+                                error = RE_STRING_APPEND;
+                                goto cleanup1;
+                            }
                         break;
                         case LENGTH_LONGLONG:
-                            rfStringX_Append_int(ret,va_arg(args,long long),argData.width,argData.precision,argData.flags);
+                            if(!rfStringX_Append_int(
+                                   ret,
+                                   va_arg(args,long long),
+                                   argData.width,
+                                   argData.precision,
+                                   argData.flags))
+                            {
+                                error = RE_STRING_APPEND;
+                                goto cleanup1;
+                            }
                         break;
 
                     }
@@ -531,13 +563,40 @@ int32_t rfStringX_Formatv(RF_StringX *ret,const char* format,va_list args)
                         case LENGTH_CHAR:
                         case LENGTH_SHORT:
                         case LENGTH_INT:
-                            rfStringX_Append_uint(ret,va_arg(args,unsigned int),argData.width,argData.precision,argData.flags);
+                            if(!rfStringX_Append_uint(
+                                   ret,
+                                   va_arg(args,unsigned int),
+                                   argData.width,
+                                   argData.precision,
+                                   argData.flags))
+                            {
+                                error = RE_STRING_APPEND;
+                                goto cleanup1;
+                            }
                         break;
                         case LENGTH_LONG:
-                            rfStringX_Append_uint(ret,va_arg(args,unsigned long),argData.width,argData.precision,argData.flags);
+                            if(!rfStringX_Append_uint(
+                                   ret,
+                                   va_arg(args,unsigned long),
+                                   argData.width,
+                                   argData.precision,
+                                   argData.flags))
+                            {
+                                error = RE_STRING_APPEND;
+                                goto cleanup1;
+                            }
                         break;
                         case LENGTH_LONGLONG:
-                            rfStringX_Append_uint(ret,va_arg(args,unsigned long long),argData.width,argData.precision,argData.flags);
+                            if(!rfStringX_Append_uint(
+                                   ret,
+                                   va_arg(args,unsigned long long),
+                                   argData.width,
+                                   argData.precision,
+                                   argData.flags))
+                            {
+                                error = RE_STRING_APPEND;
+                                goto cleanup1;
+                            }
                         break;
                     }
                 break;//end of Decimal unsigned int
@@ -548,13 +607,40 @@ int32_t rfStringX_Formatv(RF_StringX *ret,const char* format,va_list args)
                         case LENGTH_CHAR:
                         case LENGTH_SHORT:
                         case LENGTH_INT:
-                            rfStringX_Append_hex(ret,va_arg(args,unsigned int),argData.width,argData.precision,argData.flags);
+                            if(!rfStringX_Append_hex(
+                                   ret,
+                                   va_arg(args,unsigned int),
+                                   argData.width,
+                                   argData.precision,
+                                   argData.flags))
+                            {
+                                error = RE_STRING_APPEND;
+                                goto cleanup1;
+                            }
                         break;
                         case LENGTH_LONG:
-                            rfStringX_Append_hex(ret,va_arg(args,unsigned long),argData.width,argData.precision,argData.flags);
+                            if(!rfStringX_Append_hex(
+                                   ret,
+                                   va_arg(args,unsigned long),
+                                   argData.width,
+                                   argData.precision,
+                                   argData.flags))
+                            {
+                                error = RE_STRING_APPEND;
+                                goto cleanup1;
+                            }
                         break;
                         case LENGTH_LONGLONG:
-                            rfStringX_Append_hex(ret,va_arg(args,unsigned long long),argData.width,argData.precision,argData.flags);
+                            if(!rfStringX_Append_hex(
+                                   ret,
+                                   va_arg(args,unsigned long long),
+                                   argData.width,
+                                   argData.precision,
+                                   argData.flags))
+                            {
+                                error = RE_STRING_APPEND;
+                                goto cleanup1;
+                            }
                         break;
                     }
                 break;//end of Hexadecimal int
@@ -562,39 +648,106 @@ int32_t rfStringX_Formatv(RF_StringX *ret,const char* format,va_list args)
                 /* %s */
                 case SPECIFIER_CSTRING:
                     if(argData.precision == PRECISION_NONE)
-                        rfStringX_Append(ret,RFS_(va_arg(args,char*)));
+                    {
+                        if(!rfStringX_Append(
+                               ret,
+                               RFS_(va_arg(args,char*))))
+                        {
+                            error = RE_STRING_APPEND;
+                            goto cleanup1;
+                        }
+                    }
                     else
-                        rfStringX_Append_i(ret,RFS_(va_arg(args,char*)),argData.precision);
+                    {
+                        if(!rfStringX_Append_i(
+                               ret,
+                               RFS_(va_arg(args,char*)),
+                               argData.precision))
+                        {
+                            error = RE_STRING_APPEND;
+                            goto cleanup1;
+                        }
+                    }
                 break;
                 /* %S */
                 case SPECIFIER_RFSTRING:
                     if(argData.precision == PRECISION_NONE)
-                        rfStringX_Append(ret,va_arg(args,RF_String*));
+                    {
+                        if(!rfStringX_Append(
+                               ret,
+                               va_arg(args,RF_String*)))
+                        {
+                            error = RE_STRING_APPEND;
+                            goto cleanup1;
+                        }
+                    }
                     else
-                        rfStringX_Append_i(ret,va_arg(args,RF_String*),argData.precision);
+                    {
+                        if(!rfStringX_Append_i(
+                               ret,
+                               va_arg(args,RF_String*),
+                               argData.precision))
+                        {
+                            error = RE_STRING_APPEND;
+                            goto cleanup1;
+                        }
+                    }
                 break;
 
                 /* %% */
                 case SPECIFIER_PERCENT:
-                    rfStringX_Append_charutf8(ret,'%');
+                    if(!rfStringX_Append_charutf8(ret,'%'))
+                    {
+                        error = RE_STRING_APPEND;
+                        goto cleanup1;
+                    }
                 break;
 
                 /* %c */
                 case SPECIFIER_CHAR:
-                    rfStringX_Append_charutf8(ret,va_arg(args,uint32_t));
+                    if(!rfStringX_Append_charutf8(
+                           ret,
+                           va_arg(args,uint32_t)))
+                    {
+                        error = RE_STRING_APPEND;
+                        goto cleanup1;
+                    }
                 break;
 
                 /* %f or %F */
                 case SPECIFIER_FLOAT:
                     if(argData.precision == PRECISION_NONE)
+                    {
                         argData.precision = FLOAT_DEFAULT_PRECISION;
-                    rfStringX_Append_double(ret,va_arg(args,double),argData.width,argData.precision,argData.flags);
+                    }
+
+                    if(!rfStringX_Append_double(
+                           ret,
+                           va_arg(args,double),
+                           argData.width,
+                           argData.precision,
+                           argData.flags))
+                    {
+                        error = RE_STRING_APPEND;
+                        goto cleanup1;
+                    }
                 break;
                 /* %e or %E */
                 case SPECIFIER_SCIENTIFIC:
                     if(argData.precision == PRECISION_NONE)
+                    {
                         argData.precision = FLOAT_DEFAULT_PRECISION;
-                    rfStringX_Append_double_scientific(ret,va_arg(args,double),argData.width,argData.precision,argData.flags);
+                    }
+                    if(!rfStringX_Append_double_scientific(
+                           ret,
+                           va_arg(args,double),
+                           argData.width,
+                           argData.precision,
+                           argData.flags))
+                    {
+                        error = RE_STRING_APPEND;
+                        goto cleanup1;
+                    }
                 break;
 
 
@@ -603,7 +756,12 @@ int32_t rfStringX_Formatv(RF_StringX *ret,const char* format,va_list args)
     }//end of parsing the format string
 
     //append the last bytes until the end the end
-    rfStringX_Append_bytes(ret,RFS_(format+lastI),i-lastI);
+    if(!rfStringX_Append_bytes(ret,RFS_(format+lastI),i-lastI))
+    {
+        error = RE_STRING_APPEND;
+        //no going to cleanup1 since it's the end, if that changes
+        //add a goto here
+    }
 
 
 cleanup1:
@@ -614,7 +772,7 @@ cleanup1:
 
 
 
-//Formats an @ref RF_StringX according to the given format string and 
+//Formats an @ref RF_StringX according to the given format string and
 //variable arguments
 int32_t rfStringX_Format(RF_StringX *s,const char* format,...)
 {

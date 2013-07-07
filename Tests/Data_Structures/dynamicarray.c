@@ -15,12 +15,14 @@ int main()
     RF_DynamicArray_String a2, *a3;
     RF_String s, *sp;
     int i, v;
-    rfInit();
+    EXPECT(rfInit(), true)
 
     //Create a dynamic array of 5 ints capacity and add 10 ints to it
     EXPECT(rfDynamicArray_I_Init(&a1, 5), true)
     for(i = 0; i < 10; i++)
-        rfDynamicArray_I_Add(&a1, ints[i]);
+    {
+        EXPECT(rfDynamicArray_I_Add(&a1, ints[i]), true)
+    }
     //check that the 9th element is as expected
     EXPECT(rfDynamicArray_I_Get_IN(&a1, 9, &i), RF_SUCCESS)
     EXPECT(i == 2105, true)
@@ -56,7 +58,7 @@ int main()
     for(i = 0; i < 100; i ++)
     {
         EXPECT(rfDynamicArray_String_Add(&a2, RFS_("String %d",i)),
-               RF_SUCCESS)
+               true)
     }
     // testing Get_IN
     EXPECT(rfDynamicArray_String_Get_IN(&a2, 55, &s), RF_SUCCESS)

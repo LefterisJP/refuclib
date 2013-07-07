@@ -46,22 +46,22 @@
 RF_Mutex* rfMutex_Create(uint32_t flags)
 {
     RF_Mutex* ret;
-    RF_MALLOC(ret,sizeof(RF_Mutex));
+    RF_MALLOC(ret, sizeof(RF_Mutex), NULL);
     if( rfMutex_Init(ret,flags) != RF_SUCCESS)
     {
         free(ret);
-        return 0;
+        return NULL;
     }
     //success
     return ret;
 }
 // Initializes a mutex object
-int32_t rfMutex_Init(RF_Mutex* m,uint32_t flags)
+int32_t rfMutex_Init(RF_Mutex* m, uint32_t flags)
 {
-    //get attributes
+    int32_t error;
     pthread_mutexattr_t attributes;
-    pthread_mutexattr_init(&attributes);
-
+     //get attributes
+     pthread_mutexattr_init(&attributes); 
     //check for pthread attributes
     if(RF_BITFLAG_ON(flags,RF_MUTEX_NORMAL))
     {
@@ -77,30 +77,47 @@ int32_t rfMutex_Init(RF_Mutex* m,uint32_t flags)
     }
 
     //initialize the mutex
-    int32_t error  = pthread_mutex_init(&m->mutexObj,&attributes);
+    error  = pthread_mutex_init(&m->mutexObj,&attributes);
     if( error != 0)
     {
         switch(error)
         {
             case EAGAIN:
-                RETURN_LOG_ERROR("Failed to initialize a posix mutex object because the system lacked the necessary resources (other than memory) to initialize another mutex",
-                          RE_INSUFFICIENT_RESOURCES)
+                RETURN_LOG_ERROR(
+                "Failed to initialize a posix mutex object because the "
+                "system lacked the necessary resources (other than memory)"
+                " to initialize another mutex",
+                    RE_INSUFFICIENT_RESOURCES)
             break;
             case ENOMEM:
-                RETURN_LOG_ERROR("Failed to initialize a posix mutex object because of insufficient memory",RE_INSUFFICIENT_MEMORY)
+                RETURN_LOG_ERROR(
+                "Failed to initialize a posix mutex object because of "
+                "insufficient memory", RE_INSUFFICIENT_MEMORY)
             break;
             case EPERM:
-                RETURN_LOG_ERROR("Failed to initialize a posix mutex object because The caller does not have the privilege to perform the operation",RE_PERMISSION)
+                RETURN_LOG_ERROR(
+                    "Failed to initialize a posix mutex object because "
+                    "The caller does not have the privilege to perform "
+                    "the operation", RE_PERMISSION)
             break;
             case EBUSY:
-                RETURN_LOG_ERROR("Failed to initialize a posix mutex object because the implementation detected that argument mutex has already been initialized and not destroyed",
-                          RE_MUTEX_INVALID)
+                RETURN_LOG_ERROR("Failed to initialize a posix mutex "
+                                 "object because the implementation "
+                                 "detected that argument mutex has "
+                                 "already been initialized and not "
+                                 "destroyed",
+                                 RE_MUTEX_INVALID)
             break;
             case EINVAL:
-                RETURN_LOG_ERROR("Failed to initialize a posix mutex object because the flags/attributes passed to the function are invalid",RE_MUTEX_INVALID)
+                RETURN_LOG_ERROR(
+                    "Failed to initialize a posix mutex object because "
+                    "the flags/attributes passed to the function are "
+                    "invalid", RE_MUTEX_INVALID)
             break;
             default:
-                RETURN_LOG_ERROR("Failed to initialize a posix mutex object with error code %d",RE_MUTEX_INIT,error)
+                RETURN_LOG_ERROR(
+                    "Failed to initialize a posix mutex object with error"
+                    " code %d", RE_MUTEX_INIT, error)
             break;
         }
     }
@@ -112,7 +129,6 @@ int32_t rfMutex_Init(RF_Mutex* m,uint32_t flags)
     {
         rfMutex_Lock(m);
     }
-
     //success
     return RF_SUCCESS;
 }
@@ -120,47 +136,41 @@ int32_t rfMutex_Init(RF_Mutex* m,uint32_t flags)
 // Destroys the mutex and releases its memory.
 char rfMutex_Destroy(RF_Mutex* m)
 {
-   int32_t error = pthread_mutex_destroy(&m->mutexObj);
-   if(error != 0)
-   {
-       switch(error)
-       {
-           case EBUSY:
-                LOG_ERROR("Destroying a posix mutex failed because it is already locked or referenced by another thread",RE_MUTEX_DESTRUCTION);
-           break;
-           case EINVAL:
-                LOG_ERROR("Destroying a posix mutex failed because the value given to the function is not a valide mutex value",RE_MUTEX_DESTRUCTION);
-           break;
-           default:
-                LOG_ERROR("Destroying a posix mutex failed with error code: %d",RE_MUTEX_DESTRUCTION,error);
-           break;
-       }
-       return false;
-   }
-   free(m);
-   return true;
+    if(!rfMutex_Deinit(m))
+    {
+        return false;
+    }
+    free(m);
+    return true;
 }
 // Deinitializes the mutex
 char rfMutex_Deinit(RF_Mutex* m)
 {
-   int32_t error = pthread_mutex_destroy(&m->mutexObj);
-   if(error != 0)
-   {
-       switch(error)
-       {
-           case EBUSY:
-                LOG_ERROR("Destroying a posix mutex failed because it is already locked or referenced by another thread",RE_MUTEX_DESTRUCTION);
-           break;
-           case EINVAL:
-                LOG_ERROR("Destroying a posix mutex failed because the value given to the function is not a valide mutex value",RE_MUTEX_DESTRUCTION);
-           break;
-           default:
-                LOG_ERROR("Destroying a posix mutex failed with error code: %d",RE_MUTEX_DESTRUCTION,error);
-           break;
-       }
-       return false;
-   }
-   return true;
+    int32_t error = pthread_mutex_destroy(&m->mutexObj);
+    if(error != 0)
+    {
+        switch(error)
+        {
+            case EBUSY:
+                LOG_ERROR(
+                    "Destroying a posix mutex failed because it is "
+                    "already locked or referenced by another thread",
+                    RE_MUTEX_DESTRUCTION);
+                break;
+            case EINVAL:
+                LOG_ERROR("Destroying a posix mutex failed because the "
+                          "value given to the function is not a valid "
+                          "mutex value", RE_MUTEX_DESTRUCTION);
+                break;
+            default:
+                LOG_ERROR(
+                    "Destroying a posix mutex failed with error code: %d",
+                    RE_MUTEX_DESTRUCTION, error);
+                break;
+        }
+        return false;
+    }
+    return true;
 }
 
 
@@ -174,17 +184,28 @@ int32_t rfMutex_Lock(RF_Mutex* m)
        {
             break;
             case EINVAL:
-                RETURN_LOG_ERROR("Error during locking a posix mutex because the calling thread's priority is higher than the mutex's current\
-                          priority ceiling or due to invalid argument",RE_MUTEX_LOCK_INVALID)
+                RETURN_LOG_ERROR(
+                    "Error during locking a posix mutex because the "
+                    "calling thread's priority is higher than the "
+                    "mutex's current priority ceiling or due to invalid "
+                    "argument", RE_MUTEX_LOCK_INVALID)
             break;
             case EAGAIN:
-                RETURN_LOG_ERROR("Error during locking a posix mutex because the maximum number of recursive locks for the mutex has been reached.",RE_MUTEX_LOCK_NUM)
+                RETURN_LOG_ERROR(
+                    "Error during locking a posix mutex because the "
+                    "maximum number of recursive locks for the mutex has "
+                    "been reached.", RE_MUTEX_LOCK_NUM)
             break;
             case EDEADLK:
-                RETURN_LOG_ERROR("Error during locking a posix mutex because the current thread already owns the mutex",RE_MUTEX_DEADLOCK)
+                RETURN_LOG_ERROR(
+                    "Error during locking a posix mutex because the "
+                    "current thread already owns the mutex",
+                    RE_MUTEX_DEADLOCK)
             break;
             default:
-                RETURN_LOG_ERROR("Unknonwn Error during locking a posix mutex. Error code: %d",RE_MUTEX_LOCK,error)
+                RETURN_LOG_ERROR(
+                    "Unknonwn Error during locking a posix mutex. Error "
+                    "code: %d", RE_MUTEX_LOCK,error)
             break;
        }
    }
@@ -194,13 +215,17 @@ int32_t rfMutex_Lock(RF_Mutex* m)
 
 // Locks the mutex in the same fashion as the rfMutex_Lock function except that if the mutex is already locked then the calling thread is suspended only for the
 // amount of time given as the argument to this function
-int32_t rfMutex_TimedLock(RF_Mutex* m,uint32_t ms)
+int32_t rfMutex_TimedLock(RF_Mutex* m, uint32_t ms)
 {
     int error;
     //let's create the appropriate time structure
     struct timespec ts;
     if(clock_gettime(CLOCK_REALTIME, &ts) == -1)
-        RETURN_LOG_ERROR("Getting the system time failed. Can't perform a posix mutex timedwait. Returning error",RE_MUTEX_LOCK)
+    {
+        RETURN_LOG_ERROR(
+            "Getting the system time failed. Can't perform a posix mutex "
+            "timedwait. Returning error", RE_MUTEX_LOCK)
+        }
 
     //get the seconds
     time_t secs = ms/1000;
@@ -218,17 +243,28 @@ int32_t rfMutex_TimedLock(RF_Mutex* m,uint32_t ms)
                 return RE_MUTEX_TIMEOUT;
             break;
             case EINVAL:
-                RETURN_LOG_ERROR("Error during timed locking a posix mutex because the calling thread's priority is higher\
-                          than the mutex's current priority ceiling or due to invalid argument",RE_MUTEX_LOCK_INVALID)
+                RETURN_LOG_ERROR(
+                    "Error during timed locking a posix mutex because the"
+                    " calling thread's priority is higher than the mutex"
+                    "'s current priority ceiling or due to invalid "
+                    "argument", RE_MUTEX_LOCK_INVALID)
             break;
             case EAGAIN:
-                RETURN_LOG_ERROR("Error during timed locking a posix mutex because the maximum number of recursive locks for the mutex has been reached.",RE_MUTEX_LOCK_NUM)
+                RETURN_LOG_ERROR(
+                    "Error during timed locking a posix mutex because the"
+                    " maximum number of recursive locks for the mutex has"
+                    " been reached.", RE_MUTEX_LOCK_NUM)
             break;
             case EDEADLK:
-                RETURN_LOG_ERROR("Error during timed locking a posix mutex because the current thread already owns the mutex",RE_MUTEX_DEADLOCK)
+                RETURN_LOG_ERROR("Error during timed locking a posix "
+                                 "mutex because the current thread "
+                                 "already owns the mutex",
+                                 RE_MUTEX_DEADLOCK)
             break;
             default:
-                RETURN_LOG_ERROR("Error during timed locking a posix mutex. Error code: %d",RE_MUTEX_LOCK,error)
+                RETURN_LOG_ERROR("Error during timed locking a posix "
+                                 "mutex. Error code: %d",
+                                 RE_MUTEX_LOCK, error)
             break;
         }
     }
@@ -244,21 +280,31 @@ int32_t rfMutex_TryLock(RF_Mutex* m)
    switch(error)
    {
         case EINVAL:
-            RETURN_LOG_ERROR("Error during try locking a posix mutex because the calling thread's priority is higher than the\
-                      mutex's current priority ceiling or due to invalid argument",RE_MUTEX_LOCK_INVALID)
+            RETURN_LOG_ERROR(
+                "Error during try locking a posix mutex because the "
+                "calling thread's priority is higher than the mutex's "
+                "current priority ceiling or due to invalid argument",
+                RE_MUTEX_LOCK_INVALID)
         break;
         //already locked
         case EBUSY:
             return RE_MUTEX_BUSY;
         break;
         case EAGAIN:
-            RETURN_LOG_ERROR("Error during try locking a posix mutex because the maximum number of recursive locks for the mutex has been reached.",RE_MUTEX_LOCK_NUM)
+            RETURN_LOG_ERROR(
+                "Error during try locking a posix mutex because the "
+                "maximum number of recursive locks for the mutex has been"
+                " reached.", RE_MUTEX_LOCK_NUM)
         break;
         case EDEADLK:
-            RETURN_LOG_ERROR("Error during try locking a posix mutex because the current thread already owns the mutex",RE_MUTEX_DEADLOCK)
+            RETURN_LOG_ERROR(
+                "Error during try locking a posix mutex because the "
+                "current thread already owns the mutex", RE_MUTEX_DEADLOCK)
         break;
         default:
-            RETURN_LOG_ERROR("Error during try locking a posix mutex. Error code: %d",RE_MUTEX_LOCK,error)
+            RETURN_LOG_ERROR(
+                "Error during try locking a posix mutex. Error code: %d",
+                RE_MUTEX_LOCK,error)
         break;
    }
    //succcess
@@ -271,8 +317,11 @@ int32_t rfMutex_Unlock(RF_Mutex* m)
     int32_t error;
     error = pthread_mutex_unlock(&m->mutexObj);
     if(error != 0 )
-        RETURN_LOG_ERROR("Error during attempting to unlock a pthread_mutex. Error code: %d",RE_MUTEX_UNLOCK,error)
-
+    {
+        RETURN_LOG_ERROR(
+            "Error during attempting to unlock a pthread_mutex. Error "
+            "code: %d", RE_MUTEX_UNLOCK, error)
+    }
     //success
     return RF_SUCCESS;
 }

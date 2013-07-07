@@ -114,24 +114,39 @@ int32_t rfRemoveDir(void* dirnameP)
         switch(errno)
         {
             case EACCES:
-                LOG_ERROR("Failed to access directory \"%S\" because of insufficient permissions",RE_PERMISSION,dirname)
+                LOG_ERROR(
+                    "Failed to access directory \"%S\" because of "
+                    "insufficient permissions", RE_PERMISSION, dirname)
             break;
             case ELOOP:
-                LOG_ERROR("Too many symbolic links were encountered in resolving directory \"%S\"",RE_DIRECTORY_PARENT_LINKS,dirname)
+                LOG_ERROR(
+                    "Too many symbolic links were encountered in "
+                    "resolving directory \"%S\"",
+                    RE_DIRECTORY_PARENT_LINKS, dirname)
             break;
             case ENAMETOOLONG:
-                LOG_ERROR("Can't access directory \"%S\" because its name is too long for the filesystem",RE_DIRECTORY_NAMELENGTH,dirname)
+                LOG_ERROR(
+                    "Can't access directory \"%S\" because its name is "
+                    "too long for the filesystem",
+                    RE_DIRECTORY_NAMELENGTH,dirname)
             break;
             case ENOENT:
             case ENOTDIR:
-                LOG_ERROR("Failed to access directory \"%S\" because the given path was not found or is not a directory",RE_DIRECTORY_INVALID,dirname)
+                LOG_ERROR(
+                    "Failed to access directory \"%S\" because the given "
+                    "path was not found or is not a directory",
+                    RE_DIRECTORY_INVALID, dirname)
             break;
             case ENFILE:
             case EMFILE:
-                LOG_ERROR("Failed to access directory \"%S\" because too many files are currently open in the system",RE_DIRECTORY_TOOMANY_FILES,dirname)
+                LOG_ERROR("Failed to access directory \"%S\" because too "
+                          "many files are currently open in the system",
+                          RE_DIRECTORY_TOOMANY_FILES, dirname)
             break;
             default:
-                LOG_ERROR("Failed to access directory \"%S\" because of opendir() failure",RE_DIRECTORY_OPEN,dirname)
+                LOG_ERROR(
+                    "Failed to access directory \"%S\" because of "
+                    "opendir() failure", RE_DIRECTORY_OPEN, dirname)
             break;
         }
         ret = RF_LastError;
@@ -145,12 +160,20 @@ int32_t rfRemoveDir(void* dirnameP)
         if (strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
         {
             //create the full entry name
-            rfStringX_Assign(&path,RFS_("%S"RF_DIRSEP"%s",dirname,entry->d_name));
+            if(!rfStringX_Assign(
+                   &path,
+                   RFS_("%S"RF_DIRSEP"%s",dirname,entry->d_name)))
+            {
+                ret = RE_STRING_ASSIGNMENT;
+                goto cleanup1;
+            }
             //if this directory entry is a directory itself, call the function recursively
             if (entry->d_type == DT_DIR)
             {
                 if( (ret = rfRemoveDir(&path)) != RF_SUCCESS)
+                {
                     goto cleanup1;
+                }
                 //else we deleted that directory and we should go to the next entry of this directory
                 continue;
             }
@@ -161,29 +184,50 @@ int32_t rfRemoveDir(void* dirnameP)
                 {
                     case EACCES:
                     case EPERM:
-                        LOG_ERROR("When attempting to delete file \"%S\" permission is denied on a component of the \
-        path prefix, or write permission is denied on the parent directory of the file to be removed",RE_PERMISSION,&path)
+                        LOG_ERROR(
+                            "When attempting to delete file \"%S\" "
+                            "permission is denied on a component of the "
+                            "path prefix, or write permission is denied "
+                            "on the parent directory of the file to be "
+                            "removed", RE_PERMISSION, &path)
                     break;
                     case EBUSY:
-                        LOG_ERROR("When attempting to delete file \"%S\" permission is denied because it is currently\
-        used by some other proccess or by the system",RE_FILE_BUSY,&path)
+                        LOG_ERROR(
+                            "When attempting to delete file \"%S\" "
+                            "permission is denied because it is "
+                            "currently used by some other proccess or by "
+                            "the system", RE_FILE_BUSY, &path)
                     break;
                     case EINVAL:
                     case ENOENT:
                     case ENOTDIR:
-                        LOG_ERROR("When attempting to delete file \"%S\" permission is denied because the path argument is invalid or it is not a file",RE_FILE_NOTFILE,&path)
+                        LOG_ERROR(
+                            "When attempting to delete file \"%S\" "
+                            "permission is denied because the path "
+                            "argument is invalid or it is not a file",
+                            RE_FILE_NOTFILE, &path)
                     break;
                     case EIO:
-                        LOG_ERROR("When attempting to delete file \"%S\" a physical I/O error has occured",RE_FILE_IO,&path)
+                        LOG_ERROR(
+                            "When attempting to delete file \"%S\" a "
+                            "physical I/O error has occured",
+                            RE_FILE_IO, &path)
                     break;
                     case ENAMETOOLONG:
-                        LOG_ERROR("When attempting to delete file \"%S\" the given name is too long",RE_FILE_NAMELENGTH,&path)
+                        LOG_ERROR(
+                            "When attempting to delete file \"%S\" the "
+                            "given name is too long",
+                            RE_FILE_NAMELENGTH, &path)
                     break;
                     case EROFS:
-                        LOG_ERROR("When attempting to delete file \"%S\" the file resides in a read only file system",RE_FILE_RO,&path)
+                        LOG_ERROR(
+                            "When attempting to delete file \"%S\" the "
+                            "file resides in a read only file system",
+                            RE_FILE_RO, &path)
                     break;
                     default:
-                        LOG_ERROR("Failed to delete file \"%S\"",RE_FILE_DELETE,&path)
+                        LOG_ERROR("Failed to delete file \"%S\"",
+                                  RE_FILE_DELETE, &path)
                     break;
                 }
                 ret = RF_LastError;
@@ -200,51 +244,81 @@ int32_t rfRemoveDir(void* dirnameP)
         switch(errno)
         {
             case EOVERFLOW:
-                LOG_ERROR("During iteration of directory \"%S\" one of the values of the directory's file parameters can't be represented correctly",RE_DIRECTORY_FILES,dirname)
+                LOG_ERROR(
+                    "During iteration of directory \"%S\" one of the "
+                    "values of the directory's file parameters can't be "
+                    "represented correctly", RE_DIRECTORY_FILES, dirname)
             break;
             case EBADF:
-                LOG_ERROR("During iteration of directory \"%S\" the directory value was invalid",RE_DIRECTORY_INVALID,dirname)
+                LOG_ERROR("During iteration of directory \"%S\" the "
+                          "directory value was invalid", 
+                          RE_DIRECTORY_INVALID, dirname)
             break;
             case ENOENT:
-                 LOG_ERROR("During iteration of directory \"%S\" the current position of the directory stream was invalid",RE_DIRECTORY_STREAMPOS,dirname)
+                 LOG_ERROR(
+                     "During iteration of directory \"%S\" the current "
+                     "position of the directory stream was invalid",
+                     RE_DIRECTORY_STREAMPOS, dirname)
             break;
             default:
-                LOG_ERROR("During iteration of directory \"%S\" reading the directory failed",RE_DIRECTORY_READ,dirname)
+                LOG_ERROR(
+                    "During iteration of directory \"%S\" reading the "
+                    "directory failed", RE_DIRECTORY_READ, dirname)
             break;
         }
         ret = RF_LastError;
         goto cleanup1;
     }
     //finally delete the directory itself
-    if(rmdir(dirname->bytes)!=0)
+    if(rmdir(dirname->bytes) != 0)
     {
         switch(errno)
         {
             case EACCES:
             case EPERM:
-                LOG_ERROR("When attempting to delete directory \"%S\" permission is denied on a component of the \
-path prefix, or write permission is denied on the parent directory of the directory to be removed",RE_PERMISSION,dirname)
+                LOG_ERROR(
+                    "When attempting to delete directory \"%S\" "
+                    "permission is denied on a component of the path "
+                    "prefix, or write permission is denied on the parent "
+                    "directory of the directory to be removed",
+                    RE_PERMISSION,dirname)
             break;
             case EBUSY:
-                LOG_ERROR("When attempting to delete directory \"%S\" permission is denied because the directory is currently\
-used by some other proccess or by the system",RE_PERMISSION,dirname)
+                LOG_ERROR(
+                    "When attempting to delete directory \"%S\" "
+                    "permission is denied because the directory is "
+                    "currently used by some other proccess or by the "
+                    "system", RE_PERMISSION, dirname)
             break;
             case EINVAL:
             case ENOENT:
             case ENOTDIR:
-                LOG_ERROR("When attempting to delete directory \"%S\" permission is denied because the path argument is invalid or not a directory",RE_DIRECTORY_INVALID,dirname);
+                LOG_ERROR(
+                    "When attempting to delete directory \"%S\" "
+                    "permission is denied because the path argument is "
+                    "invalid or not a directory",RE_DIRECTORY_INVALID,
+                    dirname);
             break;
             case EIO:
-                LOG_ERROR("When attempting to delete directory \"%S\" a physical I/O error has occured",RE_DIRECTORY_IO,dirname)
+                LOG_ERROR(
+                    "When attempting to delete directory \"%S\" a "
+                    "physical I/O error has occured",
+                    RE_DIRECTORY_IO, dirname)
             break;
             case ENAMETOOLONG:
-                LOG_ERROR("When attempting to delete directory \"%S\" the given name is too long",RE_DIRECTORY_NAMELENGTH,dirname)
+                LOG_ERROR(
+                    "When attempting to delete directory \"%S\" the given"
+                    " name is too long", RE_DIRECTORY_NAMELENGTH, dirname)
             break;
             case EROFS:
-                LOG_ERROR("When attempting to delete directory \"%S\" the directory resides in a read only file system",RE_DIRECTORY_ROPARENT,dirname)
+                LOG_ERROR(
+                    "When attempting to delete directory \"%S\" the "
+                    "directory resides in a read only file system",
+                    RE_DIRECTORY_ROPARENT, dirname)
             break;
             default:
-                LOG_ERROR("Failed to delete directory \"%S\"",RE_DIRECTORY_DELETE,dirname)
+                LOG_ERROR("Failed to delete directory \"%S\"",
+                          RE_DIRECTORY_DELETE,dirname)
             break;
         }
         ret = RF_LastError;

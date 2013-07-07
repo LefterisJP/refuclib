@@ -467,7 +467,7 @@ i_DECLIMEX_ char i_rfString_After(const void* thisstr,const void* after,void* re
  ** + @c RF_STRINGX_ARGUMENT: Pass this bitflag option if the pointer you gave for initialization at @c result is of RF_StringX type
  ** @param parN The number of substrings to search for.
  ** @param ... The substrings to search for. @inhtype{String,StringX} @tmpSTR
- ** @return Returns true for success and false if the substring is not found in the parameter string.
+ ** @return Returns true for success and false if the substring is not found in the parameter string or in error
  ** @see rfString_After()
  ** @see rfString_Beforev()
  **

@@ -9,7 +9,7 @@ int main()
 	RF_StringX sx1;
 
 
-	rfInit();
+	EXPECT(rfInit(), true)
 
 
     //expect the fully formed compile command "gcc -c -I../../includes -Wall -O2 tocompile.c -o ./obj/tocompile.o"

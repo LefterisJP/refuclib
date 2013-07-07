@@ -53,10 +53,11 @@ extern "C"
  ** @lmsFunction
  ** @param thisstr The extended string to append to
  ** @param other The string to add to this string. @inhtype{String,StringX} @tmpSTR
+ ** @return Returns @c true in success and @c false otherwise
  ** @see rfStringsX_Prepend()
  **
  **/
-i_DECLIMEX_ void rfStringX_Append(RF_StringX* thisstr,const void* other);
+i_DECLIMEX_ char rfStringX_Append(RF_StringX* thisstr, const void* other);
 
 /**
  ** @memberof RF_StringX
@@ -68,10 +69,12 @@ i_DECLIMEX_ void rfStringX_Append(RF_StringX* thisstr,const void* other);
  ** @param thisstr The extended string to append to
  ** @param other The string to add to this string. @inhtype{String,StringX} @tmpSTR
  ** @param chars The number of chars of @c other to append to @c thisstr
+ ** @return Returns @c true in success and @c false otherwise
  ** @see rfStringsX_Prepend()
  **
  **/
-i_DECLIMEX_ void rfStringX_Append_i(RF_StringX* thisstr,const void* other,int chars);
+i_DECLIMEX_ char rfStringX_Append_i(RF_StringX* thisstr, 
+                                    const void* other, int chars);
 
 
 
@@ -81,20 +84,24 @@ i_DECLIMEX_ void rfStringX_Append_i(RF_StringX* thisstr,const void* other,int ch
  **
  ** @param thisstr The extended string to append to
  ** @param unichar The character to append to this string. It should be a unicode codepoint
+ ** @return Returns @c true in success and @c false otherwise
  ** @see rfStringsX_Prepend()
  **
  **/
-i_DECLIMEX_ void rfStringX_Append_char(RF_StringX* thisstr,uint32_t unichar);
+i_DECLIMEX_ char rfStringX_Append_char(RF_StringX* thisstr,
+                                       uint32_t unichar);
 /**
  ** @memberof RF_StringX
  ** @brief Appends a single utf8 character to this string
  **
  ** @param thisstr The extended string to append to
  ** @param utf8char The character to append to this string. It should be utf8-encoded
+ ** @return Returns @c true in success and @c false otherwise
  ** @see rfStringsX_Prepend()
  **
  **/
-i_DECLIMEX_ void rfStringX_Append_charutf8(RF_StringX* thisstr,uint32_t utf8char);
+i_DECLIMEX_ char rfStringX_Append_charutf8(RF_StringX* thisstr,
+                                           uint32_t utf8char);
 
 /**
  ** @memberof RF_StringX
@@ -118,9 +125,12 @@ i_DECLIMEX_ void rfStringX_Append_charutf8(RF_StringX* thisstr,uint32_t utf8char
  ** + @c RF_FORMATFLAG_NOSIGN: If no sign is going to be written, a blank space is inserted before the value.
  ** + @c RF_FORMATFLAG_PADZEROES: If this flag is specified and the given width if bigger than the value then it will be
  **   padded with 0s instead of empty spaces.
+  ** @return Returns @c true in success and @c false otherwise
  **
  **/
-i_DECLIMEX_ void rfStringX_Append_int(RF_StringX* thisstr,int64_t i,int width,int precision,char flags);
+i_DECLIMEX_ char rfStringX_Append_int(RF_StringX* thisstr, int64_t i,
+                                      int width, int precision,
+                                      char flags);
 /**
  ** @memberof RF_StringX
  ** @brief Appends an unsigned integer to the extended string following some specific parameters
@@ -143,9 +153,11 @@ i_DECLIMEX_ void rfStringX_Append_int(RF_StringX* thisstr,int64_t i,int width,in
  ** + @c RF_FORMATFLAG_NOSIGN: If no sign is going to be written, a blank space is inserted before the value.
  ** + @c RF_FORMATFLAG_PADZEROES: If this flag is specified and the given width if bigger than the value then it will be
  **   padded with 0s instead of empty spaces.
- **
+ ** @return Returns @c true in success and @c false otherwise
  **/
-i_DECLIMEX_ void rfStringX_Append_uint(RF_StringX* thisstr,uint64_t i,int width,int precision,char flags);
+i_DECLIMEX_ char rfStringX_Append_uint(RF_StringX* thisstr,
+                                       uint64_t i, int width,
+                                       int precision, char flags);
 
 /**
  ** @memberof RF_StringX
@@ -170,9 +182,11 @@ i_DECLIMEX_ void rfStringX_Append_uint(RF_StringX* thisstr,uint64_t i,int width,
  ** + @c RF_FORMATFLAG_PADZEROES: If this flag is specified and the given width if bigger than the value then it will be
  **   padded with 0s instead of empty spaces.
  ** + @c RF_FORMATFLAG_UPPER: If this flag is specified then uppercase letter are used to represent the hexadecimals
- **
+  ** @return Returns @c true in success and @c false otherwise
  **/
-i_DECLIMEX_ void rfStringX_Append_hex(RF_StringX* thisstr,uint64_t i,int width,int precision,char flags);
+i_DECLIMEX_ char rfStringX_Append_hex(RF_StringX* thisstr, uint64_t i,
+                                      int width, int precision,
+                                      char flags);
 
 /**
  ** @memberof RF_StringX
@@ -196,9 +210,11 @@ i_DECLIMEX_ void rfStringX_Append_hex(RF_StringX* thisstr,uint64_t i,int width,i
  ** + @c RF_FORMATFLAG_PADZEROES: If this flag is specified and the given width if bigger than the value then it will be
  **   padded with 0s instead of empty spaces.
  ** + @c RF_FORMATFLAG_UPPER: If this flag is specified then uppercase letter are used to represent the hexadecimals
- **
+ ** @return Returns @c true in success and @c false otherwise
  **/
-i_DECLIMEX_ void rfStringX_Append_double(RF_StringX* thisstr,double f,int width,int precision,char flags);
+i_DECLIMEX_ char rfStringX_Append_double(RF_StringX* thisstr, double f,
+                                         int width, int precision,
+                                         char flags);
 /**
  ** @memberof RF_StringX
  ** @brief Appends a float or double value to the extended string in scientific notation following some specific parameters
@@ -221,9 +237,11 @@ i_DECLIMEX_ void rfStringX_Append_double(RF_StringX* thisstr,double f,int width,
  ** + @c RF_FORMATFLAG_PADZEROES: If this flag is specified and the given width if bigger than the value then it will be
  **   padded with 0s instead of empty spaces.
  ** + @c RF_FORMATFLAG_UPPER: If this flag is specified then uppercase letter are used to represent the hexadecimals
- **
+ ** @return Returns @c true in success and @c false otherwise
  **/
-i_DECLIMEX_ void rfStringX_Append_double_scientific(RF_StringX* thisstr,double f,int width,int precision,char flags);
+i_DECLIMEX_ char rfStringX_Append_double_scientific(RF_StringX* thisstr,
+                                                    double f, int width,
+                                                    int precision,char flags);
 
 /**
  ** @memberof RF_StringX
@@ -232,10 +250,11 @@ i_DECLIMEX_ void rfStringX_Append_double_scientific(RF_StringX* thisstr,double f
  ** @lmsFunction
  ** @param thisstr The extended string to prepend to
  ** @param other The string to prepend to this string. @inhtype{String,StringX} @tmpSTR
+ ** @return Returns @c true in success and @c false otherwise
  ** @see rfStringX_Append()
  **
  **/
-i_DECLIMEX_ void rfStringX_Prepend(RF_StringX* thisstr,const void* other);
+i_DECLIMEX_ char rfStringX_Prepend(RF_StringX* thisstr, const void* other);
 
 
 
@@ -250,11 +269,13 @@ i_DECLIMEX_ void rfStringX_Prepend(RF_StringX* thisstr,const void* other);
  ** @param thisstr The extended string to insert to
  ** @param pos     The character position in the string to add it. Should be a positive (or zero) integer. If the position is over the string's size nothing happens.
  ** @param other   The string to add. @inhtype{String,StringX} @tmpSTR
+ ** @return Returns @c true in success and @c false otherwise
  ** @see rfStringX_Append()
  ** @see rfStringX_Prepend()
  **
  **/
-i_DECLIMEX_ void rfStringX_Insert(RF_StringX* thisstr,uint32_t pos,const void* other);
+i_DECLIMEX_ char rfStringX_Insert(RF_StringX* thisstr, uint32_t pos,
+                                  const void* other);
 
 //! @}
 /*------------------------------------------------------------------------ RF_StringX unsafe appending  functions-------------------------------------------------------------------------------*/
@@ -272,10 +293,13 @@ i_DECLIMEX_ void rfStringX_Insert(RF_StringX* thisstr,uint32_t pos,const void* o
  ** @param thisstr The extended string to append to
  ** @param other The string to add to this string. @inhtype{String,StringX} @tmpSTR
  ** @param bytes The number of bytes of @c other to append to @c thisstr
+ ** @return Returns @c true in success and @c false otherwise
  ** @see rfStringX_Append()
  **
  **/
-i_DECLIMEX_ void rfStringX_Append_bytes(RF_StringX* thisstr,const void* other,const int32_t bytes);
+i_DECLIMEX_ char rfStringX_Append_bytes(RF_StringX* thisstr,
+                                        const void* other,
+                                        const int32_t bytes);
 /**
  ** @memberof RF_StringX
  ** @brief Appends a cstring to this string
@@ -285,10 +309,12 @@ i_DECLIMEX_ void rfStringX_Append_bytes(RF_StringX* thisstr,const void* other,co
  ** @ref rfStringX_Append() and enclose the @c cstr with @ref RFS_()
  ** @param thisstr The extended string to append to
  ** @param cstr The cstring to add to this functions
+ ** @return Returns @c true in success and @c false otherwise
  ** @see rfStringX_Append()
  **
  **/
-i_DECLIMEX_ void rfStringX_Append_cstr(RF_StringX* thisstr,const char* cstr);
+i_DECLIMEX_ char rfStringX_Append_cstr(RF_StringX* thisstr,
+                                       const char* cstr);
 
 //! @}
 /*------------------------------------------------------------------------ RF_StringX replacing functions-------------------------------------------------------------------------------*/
@@ -311,7 +337,7 @@ i_DECLIMEX_ void rfStringX_Append_cstr(RF_StringX* thisstr,const char* cstr);
  **     Default search option is to @b match the case. For now this works only for characters of the english language.
  ** + @c RF_MATCH_WORD: If you to replace only exact matches of the substring. For example an exact replace for @e "HELLO" in the string
  **     @e "HELLOWORLD" would replace nothing. Default is with this flag off.
- ** @return Returns true in case of success, and false if the substring was not even found inside the string
+ ** @return Returns true in case of success, and false if the substring was not even found inside the string or for other error
  ** @see rfStringX_ReplaceBetween()
  **
  **/
@@ -347,7 +373,7 @@ i_DECLIMEX_ char i_rfStringX_Replace(RF_StringX* thisstr,const void* sstr,const 
  ** + @c RF_MATCH_WORD: If you to replace only exact matches of the substring. For example an exact replace for @e "HELLO" in the string
  **     @e "HELLOWORLD" would replace nothing. Default is with this flag off.
  ** @param i \rfoptional{0}. The specific between occurence to replace. Should range between 1 and infinity. If 0 all occurences will be replaced
- ** @return Returns true if the replacing happened and false if either the left or the right strings were not found
+ ** @return Returns true if the replacing happened and false if either the left or the right strings were not found or for error
  ** @see rfStringX_Replace()
  **
  **/

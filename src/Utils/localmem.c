@@ -52,14 +52,15 @@ i_THREAD__ RF_LocalMemoryStack* RF_LMS;
 
 
 // Initializes the local memory stack
-void rfLMS_Init(RF_LocalMemoryStack* lms,uint64_t size)
+char rfLMS_Init(RF_LocalMemoryStack* lms,uint64_t size)
 {
     lms->stackPtr = 0;
     lms->macroEvalsI = 0;
-    RF_MALLOC(lms->stack,size);
+    RF_MALLOC(lms->stack, size, false);
     memset(lms->macroEvals,0,4*RF_MAX_FUNC_ARGS);
     //also make the thread specific pointer point to this local memory stack
     RF_LMS = lms;
+    return true;
 }
 
 

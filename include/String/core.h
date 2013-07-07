@@ -160,10 +160,11 @@ RF_String* rfString_Create_unsafe(const char* s);
  ** @param str The string to initialize
  ** @param s The sequence of bytes for the characters in UTF-8 (the default).Can also follow a printf-like format which will be formatted with
  ** the variables that follow it. No check for valid bytestream is performed
+ ** @return Returns @c true for success and @c false otherwise
  ** @see rfString_Create_unsafe()
  **
  **/
-i_DECLIMEX_ void rfString_Init_unsafe(RF_String* str,const char* s);
+i_DECLIMEX_ char rfString_Init_unsafe(RF_String* str,const char* s);
 
 
 /**
@@ -293,11 +294,12 @@ i_DECLIMEX_ char rfString_Init_UTF32(RF_String* str,const uint32_t* s);
  ** Both strings should already be initialized and hold a value. It is an error to give null parameters.
  ** @param dest The destination string, which should get assigned
  ** @param source The source string, whose values to copy. @inhtype{String,StringX} @tmpSTR
+ ** @return Returns @c true for success and @c false otherwise
  ** @see rfString_Assign_char()
  ** @see rfStringX_Assign()
  **
  **/
-i_DECLIMEX_ void rfString_Assign(RF_String* dest,const void* source);
+i_DECLIMEX_ char rfString_Assign(RF_String* dest,const void* source);
 
 
 /**
@@ -344,11 +346,12 @@ i_DECLIMEX_ RF_String* rfString_Copy_OUT(const void* src);
  ** @param dst The string to copy in.
  ** @param src The string to copy from. @inhtype{String,StringX}
  ** If the value is bigger than the maximum number of characters then still all characters are copied.
+ ** @return Returns @c true for succesfull copying @c false otherwise
  ** @see rfString_Copy_OUT()
  ** @see rfString_Copy_chars()
  **
  **/
-i_DECLIMEX_ void rfString_Copy_IN(RF_String* dst,const void* src);
+i_DECLIMEX_ char rfString_Copy_IN(RF_String* dst,const void* src);
 /**
  ** @memberof RF_String
  ** @brief Copies a certain number of characters from a string
@@ -359,11 +362,13 @@ i_DECLIMEX_ void rfString_Copy_IN(RF_String* dst,const void* src);
  ** @param src The string to copy from. @inhtype{String,StringX}
  ** @param n The number of characters to copy from the @c src string
  ** If the value is bigger than the maximum number of characters then still all characters are copied.
+ ** @return Returns @c true for success and @c false otherwise
  ** @see rfString_Copy_IN()
  ** @see rfString_Copy_OUT()
  **
  **/
-i_DECLIMEX_ void rfString_Copy_chars(RF_String* dst,const void* src,uint32_t n);
+i_DECLIMEX_ char rfString_Copy_chars(RF_String* dst, const void* src,
+                                     uint32_t n);
 
 //! @}
 

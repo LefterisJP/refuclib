@@ -55,55 +55,73 @@
 
 
 // Appends the parameter String to this one
-void rfString_Append(RF_String* thisstr,const void* otherP)
+char rfString_Append(RF_String* thisstr,const void* otherP)
 {
     const RF_String* other = (const RF_String*)otherP;
+    char ret = true;
     RF_ENTER_LOCAL_SCOPE()
     ///@note Here if a null addition is given lots of actions are done but the result is safe and the same string as the one entered.
     ///A check here would result in an additional check for every appending so I decided against it
     //calculate the new length
     thisstr->byteLength +=other->byteLength;
     //reallocate this string to fit the new addition
-    RF_REALLOC(thisstr->bytes,char,thisstr->byteLength+1);
+    RF_REALLOC_JMP(thisstr->bytes, char, thisstr->byteLength+1,
+                   ret = false, cleanup);
     //add the string to this one
     strncat(thisstr->bytes,other->bytes,other->byteLength);
+
+  cleanup:
     RF_EXIT_LOCAL_SCOPE()
+    return ret;
 }
 
 // Appends an integer to the string
-void rfString_Append_i(RF_String* thisstr,const int32_t i)
+char rfString_Append_i(RF_String* thisstr,const int32_t i)
 {
     //create a new buffer for the string big enough to fit any number plus the original string
     char* buff;
-    RF_MALLOC(buff,thisstr->byteLength+15);//max uint32_t is 4,294,967,295 in most environment so 12 chars will certainly fit it
+    RF_MALLOC(buff, thisstr->byteLength+15, false);//max uint32_t is 4,294,967,295 in most environment so 12 chars will certainly fit it
     //put the int32_t inside the string
-    sprintf(buff,"%s%i",thisstr->bytes,i);
+    if(sprintf(buff,"%s%i",thisstr->bytes, i) < 0)
+    {
+        LOG_ERROR("During appending an int to a string sprintf failed",
+                  RE_STRING_APPEND);
+        return false;
+    }
     //free the previous c string
     free(thisstr->bytes);
     //point the string pointer to the new string
     thisstr->bytes = buff;
     thisstr->byteLength = strlen(thisstr->bytes);
+    return true;
 }
 // Appends a float to the string. <b>Can't be used with RF_StringX</b>
-void rfString_Append_f(RF_String* thisstr,const float f)
+char rfString_Append_f(RF_String* thisstr,const float f)
 {
     //a temporary buffer to hold the float and the string
     char* buff;
-    RF_MALLOC(buff,thisstr->byteLength+64);
+    RF_MALLOC(buff, thisstr->byteLength+64, false);
     //put the float inside the string
-    sprintf(buff,"%s%f",thisstr->bytes,f);
+    if(sprintf(buff,"%s%f",thisstr->bytes,f) < 0)
+    {
+        LOG_ERROR("During appending a float to a string sprintf failed",
+                  RE_STRING_APPEND);
+        return false;
+    }
     //free the previous c string
     free(thisstr->bytes);
     //point the string pointer to the new string
     thisstr->bytes = buff;
     thisstr->byteLength = strlen(thisstr->bytes);
+    return true;
 }
 
 // Prepends the parameter String to this string
-void rfString_Prepend(RF_String* thisstr,const void* otherP)
+char rfString_Prepend(RF_String* thisstr,const void* otherP)
 {
     const RF_String* other = (const RF_String*)otherP;
     uint32_t size;
+    char ret = true;
     int32_t i;//is not unsigned since it goes to -1 in the loop
     RF_ENTER_LOCAL_SCOPE()
     //keeep the original byte size of the string
@@ -111,13 +129,19 @@ void rfString_Prepend(RF_String* thisstr,const void* otherP)
     //calculate the new lengths
     thisstr->byteLength += other->byteLength;
     //reallocate this string to fit the new addition
-    RF_REALLOC(thisstr->bytes,char,thisstr->byteLength+1);
+    RF_REALLOC_JMP(thisstr->bytes, char, thisstr->byteLength+1,
+                   ret = false, cleanup);
     //move the pre-existing string to the end of the buffer, by dislocating each byte by cstrlen
     for(i =size; i >=0 ; i--)
+    {
         thisstr->bytes[i+other->byteLength] = thisstr->bytes[i];
+    }
     //and now add the new string to the start
     memcpy(thisstr->bytes,other->bytes,other->byteLength);
+
+  cleanup:
     RF_EXIT_LOCAL_SCOPE()
+    return ret;
 }
 
 //Removes all of the specifed string occurences from this String matching case or not, DOES NOT reallocate buffer size.
@@ -131,18 +155,19 @@ char i_rfString_Remove(void* thisstrP,const void* rstrP,uint32_t number,const ch
     const RF_String* rstr = (const RF_String*)rstrP;
     uint32_t i,count,occurences=0;
     int32_t bytePos;
-    char found = false;
+    char found = false, ret = true;
     RF_ENTER_LOCAL_SCOPE()
     //as long as we keep finding rstr in the string keep removing it
     do
     {   //if the substring is not found
-        if( (bytePos = rfString_FindBytePos(thisstr,rstr,options)) == RF_FAILURE)
+        if((bytePos = rfString_FindBytePos(
+                thisstr, rstr, options)) == RF_FAILURE)
         {
             //if we have not even found it once , we fail
             if(found == false)
             {
-                RF_EXIT_LOCAL_SCOPE()
-                return false;
+                ret = false;
+                goto cleanup;
             }
             else //else we are done
                 break;
@@ -162,26 +187,29 @@ char i_rfString_Remove(void* thisstrP,const void* rstrP,uint32_t number,const ch
         //count the number of occurences and if we reached the required amount, stop
         occurences++;
         if(occurences == number)
+        {
             break;
+        }
     }while(bytePos != RF_FAILURE);
-    //succcess
+
+  cleanup:
     RF_EXIT_LOCAL_SCOPE()
-    return true;
+    return ret;
 }
 
 //Removes all of the characters of the string except those specified
-void rfString_KeepOnly(void* thisstrP,const void* keepstrP)
+char rfString_KeepOnly(void* thisstrP,const void* keepstrP)
 {
     uint32_t keepLength,i,j,charValue,temp;
     uint32_t *keepChars;
     RF_String* thisstr = (RF_String*)thisstrP;
     const RF_String* keepstr = (const RF_String*)keepstrP;
-    char exists,charBLength;
+    char exists,charBLength, ret = true;
     RF_ENTER_LOCAL_SCOPE()
     //first let's get all of the characters of the keep string in an array
     i=0;
     keepLength = rfString_Length(keepstr);
-    RF_MALLOC(keepChars,4*keepLength);
+    RF_MALLOC_JMP(keepChars, 4*keepLength, ret = false, cleanup);
     rfString_Iterate_Start(keepstr,i,charValue)
         keepChars[i] = charValue;
     rfString_Iterate_End(i)
@@ -193,7 +221,9 @@ void rfString_KeepOnly(void* thisstrP,const void* keepstrP)
         for(j=0;j<keepLength; j++)
         {
             if(keepChars[j] == charValue)
+            {
                 exists = true;
+            }
         }
         //if it does not exist, move the string back to cover it so that it effectively gets deleted
         if(exists == false)
@@ -201,14 +231,22 @@ void rfString_KeepOnly(void* thisstrP,const void* keepstrP)
             charBLength = rfUTF8_FromCodepoint(charValue,&temp);
             //this is kind of a dirty way to do it. the rfString_Iterate_Start macro internally uses a byteIndex_ variable
             //we use that here to determine the current byteIndex_ of the string in the iteration and move the string backwards
-            memmove(thisstr->bytes+byteIndex_,thisstr->bytes+byteIndex_+charBLength,thisstr->byteLength-byteIndex_);
+            memmove(
+                thisstr->bytes+byteIndex_,
+                thisstr->bytes+byteIndex_+charBLength,
+                thisstr->byteLength-byteIndex_);
             thisstr->byteLength-=charBLength;
             continue;//by contiuing here we make sure that the current string position won't be moved to assure that we also check the newly move characters
         }
     rfString_Iterate_End(i)
     //before returning free the keep string's character array
     free(keepChars);
+
+#ifdef RF_OPTION_SAFE_MEMORY_ALLOCATION //only used for malloc fail
+  cleanup:
+#endif
     RF_EXIT_LOCAL_SCOPE()
+    return ret;
 }
 
 //Removes the first n characters from the start of the string
@@ -287,8 +325,9 @@ char rfString_PruneMiddleB(void* thisstrP,uint32_t p,uint32_t n)
     RF_String* thisstr = (RF_String*)thisstrP;
     //if we ask to remove more characters from the position that it would be possible do nothign and return false
     if(n>p+1)
+    {
         return false;
-
+    }
     //iterate the characters of the string
     uint32_t i,length;
     int32_t pBytePos,nBytePos;
@@ -308,16 +347,21 @@ char rfString_PruneMiddleB(void* thisstrP,uint32_t p,uint32_t n)
 
     //if the position was not found in the string do nothing
     if(pBytePos == -1 || nBytePos == -1)
+    {
         return false;
+    }
     //move the contents of the string to cover the removed characters and change its length
-    memmove(thisstr->bytes+nBytePos,thisstr->bytes+pBytePos,thisstr->byteLength-pBytePos+1);
+    memmove(
+        thisstr->bytes+nBytePos,
+        thisstr->bytes+pBytePos,
+        thisstr->byteLength-pBytePos+1);
     thisstr->byteLength -= (pBytePos-nBytePos);
 
     return true;
 }
 
 //Removes n characters from the position p of the string counting forwards. If there is no space, nothing is done and returns false.
-char rfString_PruneMiddleF(void* thisstrP,uint32_t p,uint32_t n)
+char rfString_PruneMiddleF(void* thisstrP, uint32_t p, uint32_t n)
 {
     RF_String* thisstr = (RF_String*)thisstrP;
     //iterate the characters of the string
@@ -327,7 +371,9 @@ char rfString_PruneMiddleF(void* thisstrP,uint32_t p,uint32_t n)
     RF_STRING_ITERATE_START(thisstr,length,i)
         //if we reach the number of characters passed as a parameter, note it
         if(length == p)
+        {
             pBytePos = i;
+        }
 
         if(length == p+n)
         {
@@ -339,7 +385,9 @@ char rfString_PruneMiddleF(void* thisstrP,uint32_t p,uint32_t n)
 
     //if the position was not found in the string do nothing
     if(pBytePos == -1 )
+    {
         return false;
+    }
 
     //if we did not find the byte position of p+n then we remove everything from pBytePos until the end of the string
     if(nBytePos == -1)
@@ -362,9 +410,13 @@ char rfString_PruneMiddleF(void* thisstrP,uint32_t p,uint32_t n)
 
 // Replaces all of the specified sstr substring from the String with rstr and reallocates size, unless the new size is smaller
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-char rfString_Replace(RF_String* thisstr,const void* sstrP,const void* rstrP,const uint32_t num,const char options)
+char rfString_Replace(RF_String* thisstr, const void* sstrP,
+                      const void* rstrP, const uint32_t num,
+                      const char options)
 #else
-char i_rfString_Replace(RF_String* thisstr,const void* sstrP,const void* rstrP,const uint32_t num,const char options)
+char i_rfString_Replace(RF_String* thisstr, const void* sstrP,
+                        const void* rstrP, const uint32_t num,
+                        const char options)
 #endif
 {
     const RF_String* sstr = (const RF_String*)sstrP;
@@ -375,25 +427,32 @@ char i_rfString_Replace(RF_String* thisstr,const void* sstrP,const void* rstrP,c
     //will keep the number of given instances to find
     uint32_t number = num;
     uint32_t diff,i,j;
+    char ret = true;
     RF_ENTER_LOCAL_SCOPE()
 
     //if the substring string is not even found return false
     if(rfString_FindBytePos(thisstr,sstr,options) == RF_FAILURE)
     {
-        RF_EXIT_LOCAL_SCOPE()
-        return false;
+        ret = false;
+        goto cleanup;
     }
     //create a buffer that will keep the byte positions
     uint32_t bSize = 50;
     int32_t * bytePositions;
-    RF_MALLOC(bytePositions,bSize*sizeof(int32_t));
+    RF_MALLOC_JMP(bytePositions, bSize*sizeof(int32_t),
+                  ret = false, cleanup);
     //if the given num is 0 just make sure we replace all
     if(number == 0)
         number = UINT_MAX;//max number of occurences
 
     //find how many occurences exist
-    rfStringX_FromString_IN(&temp,thisstr);
-    while( (bytePositions[foundN] = rfString_FindBytePos(&temp,sstr,options))  != RF_FAILURE)
+    if(!rfStringX_FromString_IN(&temp,thisstr))
+    {
+        ret = false;
+        goto cleanup;
+    }
+    while((bytePositions[foundN] = rfString_FindBytePos(
+               &temp, sstr, options))  != RF_FAILURE)
     {
         int32_t move = bytePositions[foundN] + sstr->byteLength;
         bytePositions[foundN] = bytePositions[foundN]+temp.bIndex;
@@ -405,7 +464,8 @@ char i_rfString_Replace(RF_String* thisstr,const void* sstrP,const void* rstrP,c
         if(foundN > bSize)
         {
             bSize *=2;
-            RF_REALLOC(bytePositions,int32_t,bSize);
+            RF_REALLOC_JMP(bytePositions, int32_t, bSize,
+                           ret = false, cleanup);
         }
         //if we found the required number of occurences break;
         if(foundN >= number)
@@ -423,13 +483,16 @@ char i_rfString_Replace(RF_String* thisstr,const void* sstrP,const void* rstrP,c
         diff = rstr->byteLength - sstr->byteLength;
         //reallocate the string to fit the new bigger size
         nSize= thisstr->byteLength +1 + number*diff;
-        RF_REALLOC(thisstr->bytes,char,nSize)
+        RF_REALLOC_JMP(thisstr->bytes, char, nSize, ret = false, cleanup);
         //now replace all the substrings one by one
         for(i = 0; i < number; i ++)
         {
-            memmove(thisstr->bytes+bytePositions[i]+sstr->byteLength+diff,thisstr->bytes+bytePositions[i]+sstr->byteLength,thisstr->byteLength+1-(bytePositions[i]+sstr->byteLength));
+            memmove(thisstr->bytes+bytePositions[i]+sstr->byteLength+diff,
+                    thisstr->bytes+bytePositions[i]+sstr->byteLength,
+                    thisstr->byteLength+1-(bytePositions[i]+sstr->byteLength));
             //copy in the replacement
-            memcpy(thisstr->bytes+bytePositions[i],rstr->bytes,rstr->byteLength);
+            memcpy(thisstr->bytes+bytePositions[i], rstr->bytes,
+                   rstr->byteLength);
             //also increase the original size (since now we moved the whole string by one replacement)
             thisstr->byteLength += diff;
             //also increase all the subsequent found byte positions since there is a change of string size
@@ -446,9 +509,12 @@ char i_rfString_Replace(RF_String* thisstr,const void* sstrP,const void* rstrP,c
         for(i =0; i < number; i ++)
         {
             //copy in the replacement
-            memcpy(thisstr->bytes+bytePositions[i],rstr->bytes,rstr->byteLength);
+            memcpy(thisstr->bytes+bytePositions[i], rstr->bytes,
+                   rstr->byteLength);
             //move all of the contents of the string to fit the replacement
-            memmove(thisstr->bytes+bytePositions[i]+rstr->byteLength,thisstr->bytes+bytePositions[i]+sstr->byteLength,thisstr->byteLength+1-(bytePositions[i]+sstr->byteLength));
+            memmove(thisstr->bytes+bytePositions[i]+rstr->byteLength,
+                    thisstr->bytes+bytePositions[i]+sstr->byteLength,
+                    thisstr->byteLength+1-(bytePositions[i]+sstr->byteLength));
             //reduce bytelength
             thisstr->byteLength -= diff;
             //also decrease all the subsequent found byte positions since there is a change of string size
@@ -460,12 +526,14 @@ char i_rfString_Replace(RF_String* thisstr,const void* sstrP,const void* rstrP,c
     else //replace and remove strings are equal
     {
         for(i = 0; i < number; i ++)
-            strncpy(thisstr->bytes+bytePositions[i],rstr->bytes,rstr->byteLength);
+            strncpy(thisstr->bytes+bytePositions[i], rstr->bytes,
+                    rstr->byteLength);
     }
     free(bytePositions);
-    //success
+    //end
+  cleanup:
     RF_EXIT_LOCAL_SCOPE()
-    return true;
+    return ret;
 }
 
 //Removes all characters of a substring only from the start of the String
@@ -479,9 +547,9 @@ char rfString_TrimStart(void* thisstrP,const void* subP)
 
     //firstly get all of the characters of the substring in an array
     subLength = rfString_Length(sub);
-    RF_MALLOC(subValues,4*subLength)
+    RF_MALLOC_JMP(subValues, 4*subLength, ret=false, cleanup);
     rfString_Iterate_Start(sub,i,charValue)
-    subValues[i] = charValue;
+        subValues[i] = charValue;
     rfString_Iterate_End(i)
 
     //iterate thisstring from the beginning
@@ -501,7 +569,9 @@ char rfString_TrimStart(void* thisstrP,const void* subP)
         }
         //if we get out of iterating the substring without having found a match, we get out of the iteration in general
         if(noMatch)
+        {
             break;
+        }
     RF_STRING_ITERATE_END(i,bytePos)
 
     //if we had any match
@@ -513,9 +583,13 @@ char rfString_TrimStart(void* thisstrP,const void* subP)
         //also change bytelength
         thisstr->byteLength -= bytePos;
     }
+
     //free stuff and return
     free(subValues);
 
+#ifdef RF_OPTION_SAFE_MEMORY_ALLOCATION //only used for malloc fail
+  cleanup:
+#endif
     RF_EXIT_LOCAL_SCOPE()
     return ret;
 }
@@ -531,9 +605,9 @@ char rfString_TrimEnd(void* thisstrP,const void* subP)
 
     //firstly get all of the characters of the substring in an array
     subLength = rfString_Length(sub);
-    RF_MALLOC(subValues,4*subLength)
+    RF_MALLOC_JMP(subValues, 4*subLength, ;, cleanup);
     rfString_Iterate_Start(sub,i,charValue)
-    subValues[i] = charValue;
+        subValues[i] = charValue;
     rfString_Iterate_End(i)
 
     //iterate thisstring from the end
@@ -554,7 +628,9 @@ char rfString_TrimEnd(void* thisstrP,const void* subP)
         }
         //if we get out of iterating the substring without having found a match, we get out of the iteration in general
         if(noMatch)
+        {
             break;
+        }
     RF_STRING_ITERATEB_END(i,bytePos)
 
     //if we had any match
@@ -568,6 +644,10 @@ char rfString_TrimEnd(void* thisstrP,const void* subP)
 
     //free stuff and return
     free(subValues);
+
+#ifdef RF_OPTION_SAFE_MEMORY_ALLOCATION //only used for malloc fail
+  cleanup:
+#endif
     RF_EXIT_LOCAL_SCOPE()
     return ret;
 }

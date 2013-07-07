@@ -230,9 +230,10 @@ i_DECLIMEX_ RF_TextFile* i_rfTextFile_Create(const void* name,char mode,char enc
  ** handler that points to the same textfile at the same position
  ** @param dst The destination textfile
  ** @param src The source textfile
+ ** @return Returns @c true for success and @c false otherwise
  **
  **/
-i_DECLIMEX_ void rfTextFile_Copy_IN(RF_TextFile* dst,RF_TextFile* src);
+i_DECLIMEX_ char rfTextFile_Copy_IN(RF_TextFile* dst, RF_TextFile* src);
 /**
  ** @memberof RF_TextFile
  ** @brief Allocates and returns a copy of an RF_TextFile handler
@@ -240,7 +241,7 @@ i_DECLIMEX_ void rfTextFile_Copy_IN(RF_TextFile* dst,RF_TextFile* src);
  ** This does not create a whole new textfile in disk. It just creates an identical
  ** handler that points to the same textfile at the same position
  ** @param src The source textfile
- ** @return A newly allocated copy of @c src
+ ** @return A newly allocated copy of @c src or @c NULL for error
  **
  **/
 i_DECLIMEX_ RF_TextFile* rfTextFile_Copy_OUT(RF_TextFile* src);
@@ -296,7 +297,7 @@ i_DECLIMEX_ void rfTextFile_Destroy(RF_TextFile* t);
  ** + @c RF_FAILURE: For a general unrecognized error
  **
  **/
-i_DECLIMEX_ int32_t rfTextFile_SetMode(RF_TextFile* t,char mode);
+i_DECLIMEX_ int32_t rfTextFile_SetMode(RF_TextFile* t, char mode);
 
 //! @}
 
@@ -347,7 +348,7 @@ i_DECLIMEX_ int32_t rfTextFile_SetMode(RF_TextFile* t,char mode);
  ** + @c RE_FILE_EOF: If the end of file is reached while attempting to move the required amount of @c linesN
  **
  **/
-i_DECLIMEX_ int32_t rfTextFile_MoveLines(RF_TextFile* t,int64_t linesN);
+i_DECLIMEX_ int32_t rfTextFile_MoveLines(RF_TextFile* t, int64_t linesN);
 
 
 /**
@@ -382,7 +383,7 @@ i_DECLIMEX_ int32_t rfTextFile_MoveLines(RF_TextFile* t,int64_t linesN);
  ** + @c RE_FILE_EOF: If the end of file is reached while attempting to move the required amount of @c linesN
  **
  **/
-i_DECLIMEX_ int32_t rfTextFile_MoveChars(RF_TextFile* t,int64_t charsN);
+i_DECLIMEX_ int32_t rfTextFile_MoveChars(RF_TextFile* t, int64_t charsN);
 
 /**
  ** @memberof RF_TextFile
@@ -400,7 +401,7 @@ i_DECLIMEX_ int32_t rfTextFile_MoveChars(RF_TextFile* t,int64_t charsN);
  ** @red rfFgetc_UTF32LE() depending on the text file's encoding
  **
  **/
-i_DECLIMEX_ int32_t rfTextFile_MoveChars_f(RF_TextFile* t,uint64_t charsN);
+i_DECLIMEX_ int32_t rfTextFile_MoveChars_f(RF_TextFile* t, uint64_t charsN);
 /**
  ** @memberof RF_TextFile
  ** @brief Moves the internal file pointer backward by an amount of characters
@@ -414,7 +415,7 @@ i_DECLIMEX_ int32_t rfTextFile_MoveChars_f(RF_TextFile* t,uint64_t charsN);
  ** @red rfFBack_UTF32LE() depending on the text file's encoding
  **
  **/
-i_DECLIMEX_ int32_t rfTextFile_MoveChars_b(RF_TextFile* t,uint64_t charsN);
+i_DECLIMEX_ int32_t rfTextFile_MoveChars_b(RF_TextFile* t, uint64_t charsN);
 
 /**
  ** @memberof RF_TextFile
@@ -435,7 +436,7 @@ i_DECLIMEX_ int32_t rfTextFile_MoveChars_b(RF_TextFile* t,uint64_t charsN);
  ** Any of the possible return values of the @ref rfTextFile_MoveLines() function
  **
  **/
-i_DECLIMEX_ int32_t rfTextFile_GoToLine(RF_TextFile* t,uint64_t lineN);
+i_DECLIMEX_ int32_t rfTextFile_GoToLine(RF_TextFile* t, uint64_t lineN);
 
 /**
  ** @memberof RF_TextFile
@@ -488,7 +489,8 @@ i_DECLIMEX_ int32_t rfTextFile_GoToLine(RF_TextFile* t,uint64_t lineN);
  ** + @c RE_INPUT: If @c origin is not a legal value or the combination of @c offset and @c origin does not make sense
  **
  **/
-i_DECLIMEX_ int32_t rfTextFile_GoToOffset(RF_TextFile* t,foff_rft offset,int origin);
+i_DECLIMEX_ int32_t rfTextFile_GoToOffset(RF_TextFile* t,foff_rft offset,
+                                          int origin);
 
 //! @}
 
@@ -525,12 +527,15 @@ i_DECLIMEX_ int32_t rfTextFile_GoToOffset(RF_TextFile* t,foff_rft offset,int ori
  **
  **/
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-i_DECLIMEX_ int32_t rfTextFile_ReadLine(RF_TextFile* t,RF_StringX* line,uint32_t characters);
-i_DECLIMEX_ int32_t rfTextFile_ReadLine2(RF_TextFile* t,RF_StringX* line);
+i_DECLIMEX_ int32_t rfTextFile_ReadLine(RF_TextFile* t, RF_StringX* line,
+                                        uint32_t characters);
+i_DECLIMEX_ int32_t rfTextFile_ReadLine2(RF_TextFile* t, RF_StringX* line);
 #else
 //in the default arguments case. breaking down the function into two different ones since that would simplify the 2 args call
-i_DECLIMEX_ int32_t i_rfTextFile_ReadLine3(RF_TextFile* t,RF_StringX* line,uint32_t characters);
-i_DECLIMEX_ int32_t rfTextFile_ReadLine2(RF_TextFile* t,RF_StringX* line);
+i_DECLIMEX_ int32_t i_rfTextFile_ReadLine3(RF_TextFile* t,
+                                           RF_StringX* line,
+                                           uint32_t characters);
+i_DECLIMEX_ int32_t rfTextFile_ReadLine2(RF_TextFile* t, RF_StringX* line);
 #define rfTextFile_ReadLine(...)  RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_TEXTFILE_READLINE,3,__VA_ARGS__)
 #define i_NPSELECT_RF_TEXTFILE_READLINE1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_ReadLine() accepts from 2 to 3 arguments\"")
 #define i_NPSELECT_RF_TEXTFILE_READLINE0(...) RF_SELECT_FUNC(i_SELECT_RF_TEXTFILE_READLINE,__VA_ARGS__)
@@ -554,7 +559,7 @@ i_DECLIMEX_ int32_t rfTextFile_ReadLine2(RF_TextFile* t,RF_StringX* line);
  ** + @c RE_FILE_GETFILEPOS: If the file's position could not be retrieved for some unknown reason
  **
  **/
-i_DECLIMEX_ int32_t rfTextFile_GetOffset(RF_TextFile* t,foff_rft* offset);
+i_DECLIMEX_ int32_t rfTextFile_GetOffset(RF_TextFile* t, foff_rft* offset);
 
 /**
  ** @memberof RF_TextFile
@@ -585,7 +590,9 @@ i_DECLIMEX_ int32_t rfTextFile_GetOffset(RF_TextFile* t,foff_rft* offset);
  ** is 0.
  **
  **/
-i_DECLIMEX_ int32_t rfTextFile_GetLine_begin(RF_TextFile* t,uint64_t lineN,RF_StringX* line);
+i_DECLIMEX_ int32_t rfTextFile_GetLine_begin(RF_TextFile* t,
+                                             uint64_t lineN,
+                                             RF_StringX* line);
 /**
  ** @memberof RF_TextFile
  ** @brief Gets a specific line from a Text File
@@ -614,7 +621,8 @@ i_DECLIMEX_ int32_t rfTextFile_GetLine_begin(RF_TextFile* t,uint64_t lineN,RF_St
  ** is 0.
  **
  **/
-i_DECLIMEX_ int32_t rfTextFile_GetLine(RF_TextFile* t,uint64_t lineN,RF_StringX* line);
+i_DECLIMEX_ int32_t rfTextFile_GetLine(RF_TextFile* t, uint64_t lineN,
+                                       RF_StringX* line);
 
 //! @}
 
@@ -648,7 +656,7 @@ i_DECLIMEX_ int32_t rfTextFile_GetLine(RF_TextFile* t,uint64_t lineN,RF_StringX*
  ** + @c RE_FILE_WRITE: There was a generic write error
  **
  **/
-i_DECLIMEX_ int32_t rfTextFile_Write(RF_TextFile* t,void* string);
+i_DECLIMEX_ int32_t rfTextFile_Write(RF_TextFile* t, void* string);
 
 
 /**
@@ -701,9 +709,11 @@ i_DECLIMEX_ int32_t rfTextFile_Write(RF_TextFile* t,void* string);
  **
  **/
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-i_DECLIMEX_ int32_t rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* string,char after);
+i_DECLIMEX_ int32_t rfTextFile_Insert(RF_TextFile* t, uint64_t lineN,
+                                      void* string, char after);
 #else
-i_DECLIMEX_ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* string,char after);
+i_DECLIMEX_ int32_t i_rfTextFile_Insert(RF_TextFile* t, uint64_t lineN,
+                                        void* string, char after);
 #define rfTextFile_Insert(...)  RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_TEXTFILE_INSERT,4,__VA_ARGS__)
 #define i_NPSELECT_RF_TEXTFILE_INSERT1(...)  RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Insert() accepts from 3 to 4 arguments\"")
 #define i_NPSELECT_RF_TEXTFILE_INSERT0(...)  RF_SELECT_FUNC(i_SELECT_RF_TEXTFILE_INSERT,__VA_ARGS__)
@@ -742,7 +752,7 @@ i_DECLIMEX_ int32_t i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* stri
  ** + @c RE_FILE_RENAME: If while trying to rename the temporary file to replace this one the renaming failed
  **
  **/
-i_DECLIMEX_ int32_t rfTextFile_Remove(RF_TextFile* t,uint64_t lineN);
+i_DECLIMEX_ int32_t rfTextFile_Remove(RF_TextFile* t, uint64_t lineN);
 
 /**
  ** @memberof RF_TextFile
@@ -787,7 +797,8 @@ i_DECLIMEX_ int32_t rfTextFile_Remove(RF_TextFile* t,uint64_t lineN);
  ** + @c RE_FILE_RENAME: If while trying to rename the temporary file to replace this one the renaming failed
  **
  **/
-i_DECLIMEX_ int32_t rfTextFile_Replace(RF_TextFile* t,uint64_t lineN,void* string);
+i_DECLIMEX_ int32_t rfTextFile_Replace(RF_TextFile* t, uint64_t lineN,
+                                       void* string);
 
 //! @}
 

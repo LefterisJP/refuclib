@@ -90,11 +90,11 @@ uint32_t rfString_GetChar(const void* str,uint32_t c)
 /*------------------------------------------------------------------------ RF_String retrieval functions-------------------------------------------------------------------------------*/
 
 //Returns a substring of this string
-char rfString_Substr(const void* thisstrP,uint32_t startPos,uint32_t charsN,RF_String* ret)
+char rfString_Substr(const void* thisstrP, uint32_t startPos,
+                     uint32_t charsN, RF_String* ret)
 {
     uint32_t charI,byteI,startI,endI;
-    char started,ended;
-    started = ended = false;
+    char started = false, ended = false;
     const RF_String* s = (const RF_String*)thisstrP;
     startI = endI = 0;
 
@@ -120,12 +120,13 @@ char rfString_Substr(const void* thisstrP,uint32_t startPos,uint32_t charsN,RF_S
             endI = byteI;
         }
         else//else the substring was not found
+        {
             return false;
+        }
     }
-
     //else success
     ret->byteLength = endI-startI;
-    ret->bytes = malloc(ret->byteLength+1);
+    RF_MALLOC(ret->bytes, ret->byteLength+1, false);
     strncpy(ret->bytes,s->bytes+startI,ret->byteLength);
     ret->bytes[ret->byteLength]='\0';
     return true;
@@ -134,9 +135,13 @@ char rfString_Substr(const void* thisstrP,uint32_t startPos,uint32_t charsN,RF_S
 
 //Finds if a substring exists inside a specific part of another string.
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-int32_t rfString_Find_i(const void* thisstr,const void* sstr,uint32_t startPos,uint32_t length,const char options)
+int32_t rfString_Find_i(const void* thisstr, const void* sstr,
+                        uint32_t startPos, uint32_t length,
+                        const char options)
 #else
-int32_t i_rfString_Find_i(const void* thisstr,const void* sstr,uint32_t startPos,uint32_t length,const char options)
+int32_t i_rfString_Find_i(const void* thisstr, const void* sstr,
+                          uint32_t startPos, uint32_t length,
+                          const char options)
 #endif
 {
     RF_String sub;
@@ -144,11 +149,15 @@ int32_t i_rfString_Find_i(const void* thisstr,const void* sstr,uint32_t startPos
     RF_ENTER_LOCAL_SCOPE()
     //if the substring does not exist fail
     if(rfString_Substr(thisstr,startPos,length,&sub) == false)
+    {
         goto cleanup1;
+    }
 
     //now search for the sstr substring inside the sub substring defined by length
     if((ret=rfString_Find(&sub,sstr,options)) != RF_FAILURE)
+    {
         ret += startPos;//if found make sure to return the proper position in the original string
+    }
     rfString_Deinit(&sub);//free the sub substring and return
 
 cleanup1:
@@ -167,9 +176,11 @@ int32_t i_rfString_Find(const void* str,const void* sstrP,const char options)
     const RF_String* thisstr = (const RF_String*)str;
     const RF_String* sstr = (const RF_String*)sstrP;
     int32_t ret = RF_FAILURE;
+    char* found = 0;
+    uint32_t i,j;
     RF_ENTER_LOCAL_SCOPE()
 
-    char* found = 0;
+
     //if we want to match the case of the string then it's a simple search of matching characters
     if( (RF_BITFLAG_ON( options,RF_CASE_IGNORE)) == false)
     {
@@ -216,8 +227,6 @@ int32_t i_rfString_Find(const void* str,const void* sstrP,const char options)
     }
 
     //else ignore case matching
-    uint32_t i,j;
-    //if(cstr[0] >= 0x41 && cstr[0] <= 0x5a)
     for(i=0;i<thisstr->byteLength; i ++)
     {
         //if i matches the start of the substring
@@ -227,8 +236,11 @@ int32_t i_rfString_Find(const void* str,const void* sstrP,const char options)
             if(sstr->bytes[j] >= 0x41 && sstr->bytes[j] <= 0x5a)
             {
                 //no match
-                if(sstr->bytes[j] != thisstr->bytes[i+j] && sstr->bytes[j]+32 != thisstr->bytes[i+j])
+                if(sstr->bytes[j] != thisstr->bytes[i+j] &&
+                   sstr->bytes[j]+32 != thisstr->bytes[i+j])
+                {
                     break;
+                }
                 //there is a match in the jth character so let's perform additional checks if needed
                 if(RF_BITFLAG_ON( options,RF_MATCH_WORD))
                 {
@@ -250,8 +262,11 @@ int32_t i_rfString_Find(const void* str,const void* sstrP,const char options)
             else if(sstr->bytes[j] >= 0x61 && sstr->bytes[j] <= 0x7a)
             {
                 //no match
-                if(sstr->bytes[j] != thisstr->bytes[i+j] && sstr->bytes[j]-32 != thisstr->bytes[i+j])
+                if(sstr->bytes[j] != thisstr->bytes[i+j] &&
+                   sstr->bytes[j]-32 != thisstr->bytes[i+j])
+                {
                     break;
+                }
                 //there is a match in the jth character so let's perform additional checks if needed
                 if(RF_BITFLAG_ON(options,RF_MATCH_WORD))
                 {
@@ -271,13 +286,16 @@ int32_t i_rfString_Find(const void* str,const void* sstrP,const char options)
             }
             //not a letter and no match
             else if(sstr->bytes[j] != thisstr->bytes[i+j])
+            {
                 break;//break off the substring search loop
+            }
 
             //if we get here and it's the last char of the substring we either found it or need to perform one last check for exact string
             if(j == sstr->byteLength-1)
             {
                 //only if the end of the string is not right after the substring
-                if( RF_BITFLAG_ON(options,RF_MATCH_WORD) && i+sstr->byteLength < thisstr->byteLength)
+                if(RF_BITFLAG_ON(options,RF_MATCH_WORD) &&
+                   i+sstr->byteLength < thisstr->byteLength)
                 {
                     switch(thisstr->bytes[i+sstr->byteLength])
                     {
@@ -302,7 +320,8 @@ cleanup1:
 
 
 //Applies a limited version of sscanf after the specified substring
-char rfString_ScanfAfter(const void* str,const void* afterstrP,const char* format,void* var)
+char rfString_ScanfAfter(const void* str, const void* afterstrP,
+                         const char* format, void* var)
 {
     const RF_String* thisstr = (const RF_String*)str;
     const RF_String* afterstr = (const RF_String*)afterstrP;
@@ -318,7 +337,7 @@ char rfString_ScanfAfter(const void* str,const void* afterstrP,const char* forma
     s = thisstr->bytes + (found-thisstr->bytes+afterstr->byteLength);
 
     //use sscanf
-    if(sscanf(s,format,var) <=0)
+    if(sscanf(s,format,var) <= 0)
     {
         goto cleanup1;
     }
@@ -331,9 +350,11 @@ cleanup1:
 
 //Counts how many times a substring s occurs inside the string
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-int32_t rfString_Count(const void* str,const void* sstr2,const char options)
+int32_t rfString_Count(const void* str, const void* sstr2,
+                       const char options)
 #else
-int32_t i_rfString_Count(const void* str,const void* sstr2,const char options)
+int32_t i_rfString_Count(const void* str, const void* sstr2,
+                         const char options)
 #endif
 {
     RF_String* thisstr = (RF_String*)str;
@@ -341,11 +362,11 @@ int32_t i_rfString_Count(const void* str,const void* sstr2,const char options)
     int32_t index = 0;
     int32_t move;
     int32_t n = 0;
-
     RF_ENTER_LOCAL_SCOPE()
 
     //as long as the substring is found in the string
-    while ((move = rfString_FindBytePos(thisstr,sstr,options)) != RF_FAILURE)
+    while((move = rfString_FindBytePos(
+               thisstr, sstr, options)) != RF_FAILURE)
     {
         move+= sstr->byteLength;
         //proceed searching inside the string and also increase the counter
@@ -366,9 +387,12 @@ int32_t i_rfString_Count(const void* str,const void* sstr2,const char options)
 
 //Initializes the given string as the first substring existing between the left and right parameter substrings.
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-char rfString_Between(const void* thisstrP,const void* lstrP,const void* rstrP,void* resultP,const char options)
+char rfString_Between(const void* thisstrP, const void* lstrP,
+                      const void* rstrP, void* resultP, const char options)
 #else
-char i_rfString_Between(const void* thisstrP,const void* lstrP,const void* rstrP,void* resultP,const char options)
+char i_rfString_Between(const void* thisstrP,const void* lstrP,
+                        const void* rstrP, void* resultP,
+                        const char options)
 #endif
 {
     int32_t start,end;
@@ -380,14 +404,14 @@ char i_rfString_Between(const void* thisstrP,const void* lstrP,const void* rstrP
     RF_ENTER_LOCAL_SCOPE()
 
     //find the left substring
-    if( (start = rfString_FindBytePos(thisstr,lstr,options))== RF_FAILURE)
+    if( (start = rfString_FindBytePos(thisstr,lstr,options)) == RF_FAILURE)
     {
         goto cleanup1;
     }
-    //get what is after it
+    //get what is after it, no check since we already found it
     rfString_After(thisstr,lstr,&temp,options);
     //find the right substring in the remaining part
-    if( (end = rfString_FindBytePos(&temp,rstr,options))== RF_FAILURE)
+    if( (end = rfString_FindBytePos(&temp,rstr,options)) == RF_FAILURE)
     {
         goto cleanup1;
     }
@@ -400,16 +424,22 @@ char i_rfString_Between(const void* thisstrP,const void* lstrP,const void* rstrP
         result->INH_String.byteLength = end;
         result->bSize = result->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
         result->bIndex = 0;
-        RF_MALLOC(result->INH_String.bytes,result->bSize)
-        memcpy(result->INH_String.bytes,thisstr->bytes+start+lstr->byteLength,result->INH_String.byteLength+1);
+        RF_MALLOC_JMP(result->INH_String.bytes, result->bSize,
+                      ret = false, cleanup1);
+        memcpy(result->INH_String.bytes,
+               thisstr->bytes+start+lstr->byteLength,
+               result->INH_String.byteLength+1);
         result->INH_String.bytes[end]= '\0';
     }
     else
     {
         RF_String* result = (RF_String*) resultP;
         result->byteLength = end;
-        RF_MALLOC(result->bytes,result->byteLength+1);
-        memcpy(result->bytes,thisstr->bytes+start+lstr->byteLength,result->byteLength+1);
+        RF_MALLOC_JMP(result->bytes, result->byteLength+1,
+                      ret = false, cleanup1);
+        memcpy(result->bytes,
+               thisstr->bytes+start+lstr->byteLength,
+               result->byteLength+1);
         result->bytes[end]= '\0';
     }
     //success
@@ -425,9 +455,8 @@ char rfString_Beforev(const void* thisstrP,void* resultP,const char options,cons
     const RF_String* thisstr = (const RF_String*)thisstrP;
     const RF_String* s;
     int32_t i,minPos,thisPos;
-
-    //will keep the argument list
     va_list argList;
+    char ret = true;
     //get the parameter characters
     va_start(argList,parN);
     RF_ENTER_LOCAL_SCOPE()
@@ -436,10 +465,13 @@ char rfString_Beforev(const void* thisstrP,void* resultP,const char options,cons
     for(i = 0; i < parN; i++)
     {
         s = (const RF_String*) va_arg(argList,RF_String*);
-        if( (thisPos= rfString_FindBytePos(thisstr,s,options))!= RF_FAILURE)
+        if( (thisPos= rfString_FindBytePos(
+                 thisstr, s, options))!= RF_FAILURE)
         {
             if(thisPos < minPos)      
+            {
                minPos = thisPos;
+            }
         }
     }
     va_end(argList);
@@ -447,8 +479,8 @@ char rfString_Beforev(const void* thisstrP,void* resultP,const char options,cons
     //if it is not found
     if(minPos == INT_MAX)
     {
-        RF_EXIT_LOCAL_SCOPE()
-        return false;
+        ret = false;
+        goto cleanup;
     }
     //if it is found initialize the substring for return
     if(options & RF_STRINGX_ARGUMENT)
@@ -457,102 +489,132 @@ char rfString_Beforev(const void* thisstrP,void* resultP,const char options,cons
         result->INH_String.byteLength = minPos;
         result->bSize = result->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
         result->bIndex = 0;
-        RF_MALLOC(result->INH_String.bytes,result->bSize)
-        memcpy(result->INH_String.bytes,thisstr->bytes,minPos);
+        RF_MALLOC_JMP(result->INH_String.bytes, result->bSize,
+                      ret = false, cleanup);
+        memcpy(result->INH_String.bytes, thisstr->bytes,minPos);
         result->INH_String.bytes[minPos]= '\0';
     }
     else
     {
         RF_String* result = (RF_String*) resultP;
         result->byteLength = minPos;
-        RF_MALLOC(result->bytes,minPos+1);
+        RF_MALLOC_JMP(result->bytes, minPos+1,
+                      ret = false, cleanup);
         memcpy(result->bytes,thisstr->bytes,minPos);
         result->bytes[minPos] = '\0';
     }
-    //success
+
+//end
+  cleanup:
     RF_EXIT_LOCAL_SCOPE()
-    return true;
+    return ret;
 }
 
 //Initializes the given string as the substring from the start until the given string is found
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-char rfString_Before(const void* thisstrP,const void* sstrP,void* resultP,const char options)
+char rfString_Before(const void* thisstrP, const void* sstrP,
+                     void* resultP, const char options)
 #else
-char i_rfString_Before(const void* thisstrP,const void* sstrP,void* resultP,const char options)
+char i_rfString_Before(const void* thisstrP, const void* sstrP,
+                       void* resultP, const char options)
 #endif
 {
     const RF_String* thisstr = (const RF_String*)thisstrP;
     const RF_String* sstr = (const RF_String*) sstrP;
-    int32_t ret;
+    int32_t rv;
+    char ret = true;
     RF_ENTER_LOCAL_SCOPE()
 
     //find the substring
-    if( (ret = rfString_FindBytePos(thisstr,sstr,options)) == RF_FAILURE)
+    if((rv = rfString_FindBytePos(thisstr,sstr,options)) == RF_FAILURE)
     {
-        RF_EXIT_LOCAL_SCOPE()
-        return false;
+        ret = false;
+        goto cleanup;
     }
     //if it is found initialize the substring for return
     if(options & RF_STRINGX_ARGUMENT)
     {
         RF_StringX* result = (RF_StringX*) resultP;
-        result->INH_String.byteLength = ret;
+        result->INH_String.byteLength = rv;
         result->bSize = result->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
         result->bIndex = 0;
-        RF_MALLOC(result->INH_String.bytes,result->bSize)
-        memcpy(result->INH_String.bytes,thisstr->bytes,result->INH_String.byteLength);
+        RF_MALLOC_JMP(result->INH_String.bytes, result->bSize,
+                      ret = false, cleanup);
+        memcpy(result->INH_String.bytes,
+               thisstr->bytes,result->INH_String.byteLength);
         result->INH_String.bytes[result->INH_String.byteLength]= '\0';
     }
     else
     {
         RF_String* result = (RF_String*) resultP;
-        result->byteLength = ret;
-        RF_MALLOC(result->bytes,result->byteLength+1);
-        memcpy(result->bytes,thisstr->bytes,result->byteLength);
+        result->byteLength = rv;
+        RF_MALLOC_JMP(result->bytes, result->byteLength+1,
+                      ret = false, cleanup);
+        memcpy(result->bytes, thisstr->bytes, result->byteLength);
         result->bytes[result->byteLength] = '\0';
     }
+
     //success
+  cleanup:
     RF_EXIT_LOCAL_SCOPE()
-    return true;
+    return ret;
 }
 
 
 // Initializes the given String with the substring located after (and not including) the after substring inside the parameter string. If the substring is not located the function returns false.
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-char rfString_After(const void* thisstrP,const void* afterP,void* resultP,const char options)
+char rfString_After(const void* thisstrP, const void* afterP,
+                    void* resultP, const char options)
 #else
-char i_rfString_After(const void* thisstrP,const void* afterP,void* resultP,const char options)
+char i_rfString_After(const void* thisstrP, const void* afterP,
+                      void* resultP, const char options)
 #endif
 {
     const RF_String* thisstr = (const RF_String*)thisstrP;
     const RF_String* after = (const RF_String*)afterP;
     int32_t bytePos;
+    char ret = true;
     RF_ENTER_LOCAL_SCOPE()
     //check for substring existence
-    if( (bytePos = rfString_FindBytePos(thisstr,after,options)) == RF_FAILURE)
+    if( (bytePos = rfString_FindBytePos(
+             thisstr, after, options)) == RF_FAILURE)
     {
-        RF_EXIT_LOCAL_SCOPE()
-        return false;
+        ret = false;
+        goto cleanup;
     }
     //done so let's get it. Notice the use of unsafe initialization
     if(options & RF_STRINGX_ARGUMENT)
     {
         RF_StringX* result = (RF_StringX*) resultP;
-        rfStringX_Init_unsafe(result,thisstr->bytes+bytePos+after->byteLength);
+        if(rfStringX_Init_unsafe(result,
+                                 thisstr->bytes+bytePos+after->byteLength)
+           == false)
+        {
+            ret = false;
+            goto cleanup;
+        }
     }
     else
     {
         RF_String* result = (RF_String*) resultP;
-        rfString_Init_unsafe(result,thisstr->bytes+bytePos+after->byteLength);
+        if(rfString_Init_unsafe(result,
+                                thisstr->bytes+bytePos+after->byteLength)
+           == false)
+        {
+            ret=false;
+            goto cleanup;
+        }
     }
-    //success
+
+  cleanup:
     RF_EXIT_LOCAL_SCOPE()
-    return true;
+    return ret;
 }
 
 
 //Initialize a string after the first of the given substrings found
-char rfString_Afterv(const void* thisstrP,void* resultP,const char options,const unsigned char parN,...)
+char rfString_Afterv(const void* thisstrP, void* resultP,
+                     const char options, const unsigned char parN, ...)
 {
     const RF_String* thisstr = (const RF_String*)thisstrP;
     const RF_String* s;
@@ -560,6 +622,7 @@ char rfString_Afterv(const void* thisstrP,void* resultP,const char options,const
     uint32_t minPosLength=0;
     //will keep the argument list
     va_list argList;
+    char ret = true;
     RF_ENTER_LOCAL_SCOPE()
     //get the parameter characters
     va_start(argList,parN);
@@ -568,7 +631,8 @@ char rfString_Afterv(const void* thisstrP,void* resultP,const char options,const
     for(i = 0; i < parN; i++)
     {
         s = (const RF_String*) va_arg(argList,RF_String*);
-        if( (thisPos= rfString_FindBytePos(thisstr,s,options))!= RF_FAILURE)
+        if( (thisPos= rfString_FindBytePos(
+                 thisstr, s, options))!= RF_FAILURE)
         {
             if(thisPos < minPos)
             {
@@ -581,8 +645,8 @@ char rfString_Afterv(const void* thisstrP,void* resultP,const char options,const
     //if it is not found
     if(minPos == INT_MAX)
     {
-        RF_EXIT_LOCAL_SCOPE()
-        return false;
+        ret = false;
+        goto cleanup;
     }
     //if it is found initialize the substring
     minPos += minPosLength;//go after the found substring
@@ -592,19 +656,27 @@ char rfString_Afterv(const void* thisstrP,void* resultP,const char options,const
         result->INH_String.byteLength = thisstr->byteLength-minPos;
         result->bSize = result->INH_String.byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
         result->bIndex = 0;
-        RF_MALLOC(result->INH_String.bytes,result->bSize)
-        memcpy(result->INH_String.bytes,thisstr->bytes+minPos,result->INH_String.byteLength);
+        RF_MALLOC_JMP(result->INH_String.bytes, result->bSize,
+                      ret = false, cleanup);
+        memcpy(result->INH_String.bytes,
+               thisstr->bytes+minPos,
+               result->INH_String.byteLength);
         result->INH_String.bytes[result->INH_String.byteLength]= '\0';
     }
     else
     {
         RF_String* result = (RF_String*) resultP;
         result->byteLength = thisstr->byteLength-minPos;
-        RF_MALLOC(result->bytes,result->byteLength);
-        memcpy(result->bytes,thisstr->bytes+minPos,result->byteLength);
+        RF_MALLOC_JMP(result->bytes, result->byteLength,
+                      ret = false, cleanup);
+        memcpy(result->bytes,
+               thisstr->bytes+minPos,
+               result->byteLength);
         result->bytes[result->byteLength] = '\0';
     }
-    //success
+
+    //end
+  cleanup:
     RF_EXIT_LOCAL_SCOPE()
-    return true;
+    return ret;
 }

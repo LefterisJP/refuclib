@@ -8,7 +8,7 @@ int main()
 	RF_StringX sx1,sx2,sx3,resx1;
 	RF_String res1,res2,res3;
 	
-	rfInit();
+	EXPECT(rfInit(), true)
 	
 	EXPECT(true,rfStringX_Init(&sx1,"中国共産党総書記に習近平氏　新指導部の７人発表"))
 	EXPECTNOT(RF_FAILURE,rfStringX_MoveAfter(&sx1,RFS_("に"),&res1,0))

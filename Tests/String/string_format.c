@@ -7,7 +7,8 @@ int main()
 {
 	RF_StringX s;
 	RF_String string,result;
-	rfInit();
+	
+  EXPECT(rfInit(), true)
 	
 	
 	EXPECT(true, rfStringX_Init_buff(&s, 4096, ""))

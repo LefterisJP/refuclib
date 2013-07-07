@@ -23,7 +23,7 @@ int main()
 {
 	RF_String s1,s2;
 
-	rfInit();
+	EXPECT(rfInit(), true)
 
     //expect 131 : This string's length
 	EXPECT(true,rfString_Init(&s1,"The president said he had set down a \"15-minute rule\"\

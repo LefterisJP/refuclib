@@ -74,7 +74,14 @@ static DWORD WINAPI RF_THREADX_FUNCTION(LPVOID  t)
     RF_ThreadX* thread = (RF_ThreadX*)t;
     //initialize the local memory stack of the thread
     RF_LocalMemoryStack lms;
-    rfLMS_Init(&lms,thread->INH_Thread.lmsSize);
+    if(!rfLMS_Init(&lms, thread->INH_Thread.lmsSize))
+    {
+        //TODO: Add the thread's address in the msg
+        LOG_ERROR(
+            "Failure to initialize a thread because its local memory "
+            "stack could not be initialized", RE_LOCALMEMSTACK_INIT)
+        return RE_LOCALMEMSTACK_INIT;
+    }
     //initialize the stdio for this thread
     rfInitStdio();
     //in RF_ThreadX the parameter to the main thread function is a pointer to the thread itself

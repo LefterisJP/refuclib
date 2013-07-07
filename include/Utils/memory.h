@@ -49,68 +49,150 @@
 //on the flag @c RF_OPTION_SAFE_MEMORY_ALLOCATION check their return
 //value or not
 
-//for realloc I check no matter what since it's a bit more complicated case than the other twoo
+//for realloc I check no matter what since it's a bit more complicated case than the other two
+
+
+
+
 /**
- ** Wrapper macro of the malloc() function that does check for memory allocation failure
+ ** Wrapper macro of the realloc() function that does check for memory
+ ** allocation failure. The function that calls it must return type of 
+ ** @c RETVAL_
  ** @param REALLOC_RETURN_ Give the pointer that you need to realloc here
  ** @param TYPE_ give the type of the pointer here
  ** @param SIZE_ Give the size parameter of realloc here
+ ** @param RETVAL_ This is what the calling function should return
+ ** if the memory allocarion fails
  **
  **/
-#define RF_REALLOC(REALLOC_RETURN_,TYPE_,SIZE_)  { TYPE_* i_TEMPPTR_ = realloc( (REALLOC_RETURN_),(SIZE_));\
-                                                  if(i_TEMPPTR_ == NULL)\
-                                                  {\
-                                                    DLOG_ERROR("realloc() failure",RE_REALLOC_FAILURE);\
-                                                    exit(RE_REALLOC_FAILURE);\
-                                                  }\
-                                                  REALLOC_RETURN_ = i_TEMPPTR_;\
-                                                  }
+#define RF_REALLOC(REALLOC_RETURN_, TYPE_, SIZE_, RETVAL_)              \
+    do{ TYPE_* i_TEMPPTR_ = realloc( (REALLOC_RETURN_),(SIZE_));        \
+        if(i_TEMPPTR_ == NULL)                                          \
+        {                                                               \
+            DLOG_ERROR("realloc() failure",RE_REALLOC_FAILURE);         \
+            return RETVAL_;                                             \
+        }                                                               \
+        REALLOC_RETURN_ = i_TEMPPTR_;                                   \
+    }while(0)
 
+/**
+ ** Wrapper macro of the realloc() function that does check for memory
+ ** allocation failure. The function that calls it must jump to its return
+ ** @param REALLOC_RETURN_ Give the pointer that you need to realloc here
+ ** @param TYPE_ give the type of the pointer here
+ ** @param SIZE_ Give the size parameter of realloc here
+ ** @param STMT_ A statement to execute before jumping. Give ';' for nothing
+ ** @param GOTOFLAG_ This is where the calling function should jump to
+ ** if the memory allocation fails
+ **
+ **/
+#define RF_REALLOC_JMP(REALLOC_RETURN_, TYPE_, SIZE_, STMT_, GOTOFLAG_)  \
+    do{ TYPE_* i_TEMPPTR_ = realloc( (REALLOC_RETURN_),(SIZE_));        \
+        if(i_TEMPPTR_ == NULL)                                          \
+        {                                                               \
+            DLOG_ERROR("realloc() failure",RE_REALLOC_FAILURE);         \
+            STMT_;                                                      \
+            goto GOTOFLAG_;                                             \
+        }                                                               \
+        REALLOC_RETURN_ = i_TEMPPTR_;                                   \
+    }while(0)
+
+
+/* ---- SAFE MEMORY ALLOCATION macros ---- */
 #ifdef RF_OPTION_SAFE_MEMORY_ALLOCATION
-/**
- ** Wrapper macro of the malloc() function that does check for memory allocation failure
- ** @param MALLOC_RETURN_ Give the pointer of that you want to point to malloc's return here
- ** @param MALLOC_SIZE_   Give the size parameter of malloc here
- **
- **/
-    #define RF_MALLOC(MALLOC_RETURN_,MALLOC_SIZE_)  { MALLOC_RETURN_ = malloc( (MALLOC_SIZE_) );\
-                                                     if(MALLOC_RETURN_ == NULL)\
-                                                     {\
-                                                        DLOG_ERROR(" malloc() failure",RE_MALLOC_FAILURE);\
-                                                        exit(RE_MALLOC_FAILURE);\
-                                                     } }
 
 /**
- ** Wrapper macro of the calloc() function that does check for memory allocation failure
- ** @param CALLOC_RETURN_ Give the pointer of that you want to point to calloc's return here
+ ** Wrapper macro of the malloc() function that does check for memory
+ ** allocation failure. The function that calls it must return value of
+ ** type @c RETVAL_
+ ** @param MALLOC_RETURN_ Give the pointer of that you want to point to
+ ** malloc's return here
+ ** @param MALLOC_SIZE_   Give the size parameter of malloc here
+ ** @param RETVAL_ This is what the calling function should return
+ ** if the memory allocarion fails
+ **/
+#define RF_MALLOC(MALLOC_RETURN_, MALLOC_SIZE_, RETVAL_)                \
+    do{ MALLOC_RETURN_ = malloc( (MALLOC_SIZE_) );                      \
+        if(MALLOC_RETURN_ == NULL)                                      \
+        {                                                               \
+            DLOG_ERROR(" malloc() failure",RE_MALLOC_FAILURE);          \
+            return RETVAL_;                                    \
+        } }while(0)
+
+/**
+ ** Wrapper macro of the malloc() function that does check for memory
+ ** allocation failure. The function that calls it must return be 
+ ** jumping to its return value
+ ** @param MALLOC_RETURN_ Give the pointer of that you want to point to
+ ** malloc's return here
+ ** @param MALLOC_SIZE_   Give the size parameter of malloc here
+ ** @param STMT_ A statement to execute before jumping. Give ';' for nothing
+ ** @param GOTOFLAG_ This is where the calling function should jump to
+ ** if the memory allocation fails
+ **/
+#define RF_MALLOC_JMP(MALLOC_RETURN_, MALLOC_SIZE_, STMT_, GOTOFLAG_)   \
+    do{ MALLOC_RETURN_ = malloc( (MALLOC_SIZE_) );                      \
+        if(MALLOC_RETURN_ == NULL)                                      \
+        {                                                               \
+            DLOG_ERROR(" malloc() failure",RE_MALLOC_FAILURE);          \
+            STMT_;                                                      \
+            goto GOTOFLAG_;                                             \
+        } }while(0)
+
+/**
+ ** Wrapper macro of the calloc() function that does check for memory
+ ** allocation failure.
+ ** @param CALLOC_RETURN_ Give the pointer of that you want to point to
+ ** calloc's return here
  ** @param CALLOC_NUM_    Give the number parameter of calloc here
  ** @param MALLOC_SIZE_   Give the size parameter of calloc here
+ ** @param RETVAL_ This is what the calling function should return
+ ** if the memory allocarion fails
  **
  **/
-    #define RF_CALLOC(CALLOC_RETURN_,CALLOC_NUM_,CALLOC_SIZE_)  { CALLOC_RETURN_ = calloc( (CALLOC_NUM_), (CALLOC_SIZE_) );\
-                                                     if(CALLOC_RETURN_ == NULL)\
-                                                     {\
-                                                        DLOG_ERROR(" calloc() failure",RE_CALLOC_FAILURE);\
-                                                        exit(RE_CALLOC_FAILURE);\
-                                                     } }
+#define RF_CALLOC(CALLOC_RETURN_,CALLOC_NUM_,CALLOC_SIZE_, RETVAL_)     \
+    do{ CALLOC_RETURN_ = calloc( (CALLOC_NUM_), (CALLOC_SIZE_) );       \
+        if(CALLOC_RETURN_ == NULL)                                      \
+        {                                                               \
+            DLOG_ERROR(" calloc() failure",RE_CALLOC_FAILURE);          \
+            return RETVAL_;                                             \
+        } }while(0)
 
+/**
+ ** Wrapper macro of the calloc() function that does check for memory
+ ** allocation failure and if it fails jumps to a goto flag
+ ** @param CALLOC_RETURN_ Give the pointer of that you want to point to
+ ** calloc's return here
+ ** @param CALLOC_NUM_    Give the number parameter of calloc here
+ ** @param MALLOC_SIZE_   Give the size parameter of calloc here
+ ** @param STMT_ A statement to execute before jumping. Give ';' for nothing
+ ** @param GOTOFLAG_ This is where the calling function should jump to
+ ** if the memory allocation fails
+ **
+ **/
+#define RF_CALLOC_JMP(CALLOC_RETURN_,CALLOC_NUM_,                       \
+                      CALLOC_SIZE_, STMT_, GOTOFLAG_)                   \
+    do{ CALLOC_RETURN_ = calloc( (CALLOC_NUM_), (CALLOC_SIZE_) );       \
+        if(CALLOC_RETURN_ == NULL)                                      \
+        {                                                               \
+            DLOG_ERROR(" calloc() failure",RE_CALLOC_FAILURE);          \
+            STMT_;
+            goto GOTOFLAG__;                                             \
+        } }while(0)
+
+/* ---- NOT SAFE MEMORY ALLOCATION macros ---- */
 #else
-/**
- ** Wrapper macro of the malloc() function that does NOT check for memory allocation failure
- ** @param MALLOC_RETURN_ Give the pointer of that you want to point to malloc's return here
- ** @param MALLOC_SIZE_   Give the size parameter of malloc here
- **
- **/
-    #define RF_MALLOC(MALLOC_RETURN_,MALLOC_SIZE_)  { MALLOC_RETURN_ = malloc( (MALLOC_SIZE_) );}
 
-/**
- ** Wrapper macro of the calloc() function that does NOT check for memory allocation failure
- ** @param CALLOC_RETURN_ Give the pointer of that you want to point to calloc's return here
- ** @param CALLOC_NUM_    Give the number parameter of calloc here
- ** @param MALLOC_SIZE_   Give the size parameter of calloc here
- **
- **/
-    #define RF_CALLOC(CALLOC_RETURN_,CALLOC_NUM_,CALLOC_SIZE_)  { CALLOC_RETURN_ = calloc( (CALLOC_NUM_), (CALLOC_SIZE_) );}
+#define RF_MALLOC(MALLOC_RETURN_,MALLOC_SIZE_, RETVAL_) \
+    MALLOC_RETURN_ = malloc( (MALLOC_SIZE_) )
+#define RF_MALLOC_JMP(MALLOC_RETURN_, MALLOC_SIZE_, STMT_, GOTOFLAG_)  \
+    MALLOC_RETURN_ = malloc( (MALLOC_SIZE_) )
+
+#define RF_CALLOC(CALLOC_RETURN_, CALLOC_NUM_, CALLOC_SIZE_, RETVAL_) \
+    CALLOC_RETURN_ = calloc( (CALLOC_NUM_), (CALLOC_SIZE_) )
+#define RF_CALLOC_JMP(CALLOC_RETURN_,CALLOC_NUM_,CALLOC_SIZE_,    \
+                      STMT_, GOTOFLAG_)                           \
+        CALLOC_RETURN_ = calloc( (CALLOC_NUM_), (CALLOC_SIZE_) )
 #endif
 
 #endif//include guards end
