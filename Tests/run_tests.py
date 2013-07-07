@@ -6,9 +6,8 @@
 
 import sys
 from libcompile import compileLib
-from tests import runTests
+from tests import runTests, TestsFail
 from args import parseArguments
-
 
 
 
@@ -24,19 +23,30 @@ for compiler in args.compilers:
     #compile a dynamic version of the library
     outName = compileLib(args.verbose, True, compiler)
     if(outName is False):
-        print("Compiling dynamic version of Refu with the {0} compiler "
+        print("Compiling dynamic version of Refulib with the {0} compiler "
               "failed. Skipping tests for this version...".format(compiler))
     else:
-        runTests(compiler, True, outName, logFile, args.verbose,
-                 args.debug, args.tests, args.fail_fast)
+        try:
+            runTests(compiler, True, outName, logFile, args.verbose,
+                     args.debug, args.tests, args.fail_fast)
+        except TestsFail as err:
+            print(err)
+            print("\nTests for the Dynamic version of Refulib and the "
+                  "{} compiler failed.\n".format(compiler))
+        
     #compile a static version of the library
     outName = compileLib(args.verbose, False, compiler)
     if(outName is False):
-        print("Compiling static version of Refu with the {0} compiler "
+        print("Compiling static version of Refulib with the {0} compiler "
               "failed. Skipping tests for this version...".format(compiler))
     else:
-        runTests(compiler, False, outName, logFile, args.verbose,
-                 args.debug, args.tests, args.fail_fast)
+        try:
+            runTests(compiler, False, outName, logFile, args.verbose,
+                     args.debug, args.tests, args.fail_fast)
+        except TestsFail as err:
+            print(err)
+            print("\nTests for the Static version of Refulib and the "
+                  "{} compiler failed.\n".format(compiler))
 
 print("\nAll tests have concluded. For more information you can check "
       "logfile: \"{0}\"".format(args.logfile))

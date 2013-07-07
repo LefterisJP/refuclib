@@ -43,7 +43,8 @@ def parseArguments():
     parser.add_argument("--fail-fast", dest="fail_fast", default=False,
                         action="store_true", help="When this flag is "
                         "specified then the execution of the tests will "
-                        "stop as soon as a single failure is detected")
+                        "stop as soon as a single failure or error is "
+                        "detected")
 
     args = parser.parse_args()
 

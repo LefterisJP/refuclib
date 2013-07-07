@@ -57,9 +57,9 @@ class TestsFail(Exception):
         self.msg = msg
 
     def __str__(self):
-        print("{}\n**QUITTING...".format(self.msg))
+        return "{}\n**QUITTING...".format(self.msg)
 
-def test(root, fileName, logFile, testExec, verbose):
+def test(root, fileName, logFile, testExec, verbose, fail_fast):
     """
         Tests a compiled test executable and compared it to the expected
         output
@@ -72,6 +72,7 @@ def test(root, fileName, logFile, testExec, verbose):
         --testExec: The name of the test executable
         --verbose: A boolean flag denoting if the tests should be verbose
                   or not
+        --fail_fast: A boolean flag denoting if the tests should fail fast
     """
     #Remove Tests/ part of the directory from the filename
     tempName = os.path.split(fileName)
@@ -94,6 +95,8 @@ def test(root, fileName, logFile, testExec, verbose):
         if(line!=expectedLine):
             if("*ERROR*:" in line):#it it's an expect error
                 report(logFile, "FAILED!\n\t {}".format(line))
+                if fail_fast:
+                    raise TestError(fileName, count)
             else:
                 report(logFile, "\n\t\tTest failed at expected "
                             "output line \"[{}]\"\n".format(
@@ -118,6 +121,8 @@ def test(root, fileName, logFile, testExec, verbose):
         report(logFile, "\t\tLast line we are sure succesfully executed "
                "is [{}]\n".format(str(line)))
         raise TestError(fileName, line)
+
+    return True
 
 def debugTest(root, fileName, logFile, testExec):
     """
@@ -223,15 +228,17 @@ def runTests(compiler, dynamic, outName, logFile, verbose,
                     if(debug):
                         debugTest(root, part, logFile, testExec)
                     else:
-                        test(root, part, logFile, testExec, verbose)
+                        test(root, part, logFile, testExec,
+                             verbose, fail_fast)
 
                 except TestError as err:
                     # for every error or failure we should also check
                     # the lirary's own log
                     copy_refu_log(logFile, root)
                     if(fail_fast):
-                        raise TestsFail("Test \"{}\" failed and --fail"
-                            "-hard was requested".format(part))
+                        raise TestsFail(
+                            "Test \"{}\" failed and --fail"
+                            "-fast was requested".format(part))
                 except CalledProcessError as err:
                     print("\tThere was an error while trying to run the "
                           "compiled "
@@ -245,7 +252,8 @@ def runTests(compiler, dynamic, outName, logFile, verbose,
                     # the lirary's own log
                     copy_refu_log(logFile, root)
                     if(fail_fast):
-                        raise TestsFail("Test \"{}\" failed and --fail"
+                        raise TestsFail(
+                            "Test \"{}\" failed and --fail"
                             "-hard was requested".format(part))
                 finally:
                     # cleaning up
