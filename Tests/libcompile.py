@@ -1,7 +1,8 @@
 import subprocess
 from subprocess import CalledProcessError
-import sys
+from output import print_nonl
 import os
+import sys
 import platform
 
 
@@ -34,7 +35,7 @@ def findOutput(dynamic):
 				return item;
 
 
-def compileLib(verbose,dynamic,compiler):
+def compileLib(verbose, dynamic, compiler):
     """Compile the refu library by invoking the appropriate refu builder
         --verbose: A boolean flag denoting if the output should be verbose
         --dynamic: A boolean flag denoting whether a dynamic or a static
@@ -47,10 +48,10 @@ def compileLib(verbose,dynamic,compiler):
     cleanDir(".")
 
     if dynamic:
-        print("--Compiling a dynamic version of the Refu library--")
+        print_nonl("==> Compiling a dynamic version of the Refu library...")
         arg = "shared"
     else:
-        print("--Compiling a static version of the Refu library--")
+        print_nonl("==> Compiling a static version of the Refu library...")
         arg = "static"
     
     # for now we give here all the options to generate extra sources that
@@ -78,7 +79,7 @@ def compileLib(verbose,dynamic,compiler):
             print("\n\t==Scons Output Starts==\n")
             for line in p.stdout:
                 line = line.decode("utf8")
-                sys.stdout.write("\t"+line)
+                print_nonl("\t"+line)
             print("\n\t==Scons Output Ends==\n")
         #wait until subprocess ends
         ret = p.poll();
@@ -89,7 +90,7 @@ def compileLib(verbose,dynamic,compiler):
                   "{}. Scons output follows:\n".format(ret))
             for line in p.stdout:
                 line = line.decode("utf8")
-                sys.stdout.write("\t"+line)
+                print_nonl("\t"+line)
             return False;
     except CalledProcessError as err:
         print("\tThere was an error while invoking scons to compile the library")
@@ -99,10 +100,10 @@ def compileLib(verbose,dynamic,compiler):
     #now find the output name
     outName = findOutput(dynamic)
     #if we get here it means success
-    if(dynamic):
-        print("--Dynamic version of the Refu library compiled Succesfully--\n\n");
+    if verbose:
+        print("*** Library compiling was successfull ***")
     else:
-        print("--Static version of the Refu library compiled Succesfully--\n\n");
+        print("SUCCESS!\n")
     #move the compiled binaries into the tests dir
     try:
         os.rename(os.path.join("..",outName),os.path.join("..","Tests",outName))

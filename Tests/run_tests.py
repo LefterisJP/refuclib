@@ -18,7 +18,7 @@ args = parseArguments()
 logFile = open(args.logfile, "w")
 #for each different compiler
 for compiler in args.compilers:
-    print("===Running Tests for the {0} Compiler===\n".format(compiler))
+    print("==> Running Tests for the {0} Compiler...\n".format(compiler))
 
     #compile a dynamic version of the library
     outName = compileLib(args.verbose, True, compiler)
@@ -31,7 +31,7 @@ for compiler in args.compilers:
                      args.debug, args.tests, args.fail_fast)
         except TestsFail as err:
             print(err)
-            print("\nTests for the Dynamic version of Refulib and the "
+            print("\n**Tests for the Dynamic version of Refulib and the "
                   "{} compiler failed.\n".format(compiler))
         
     #compile a static version of the library
@@ -45,7 +45,7 @@ for compiler in args.compilers:
                      args.debug, args.tests, args.fail_fast)
         except TestsFail as err:
             print(err)
-            print("\nTests for the Static version of Refulib and the "
+            print("\n**Tests for the Static version of Refulib and the "
                   "{} compiler failed.\n".format(compiler))
 
 print("\nAll tests have concluded. For more information you can check "

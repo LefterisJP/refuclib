@@ -1,22 +1,25 @@
 import subprocess
 from subprocess import CalledProcessError
-import os, os.path
-from testscompile import compileTest
+import os
 import shutil
 import time
 import platform
 import sys
 
+from testscompile import compileTest
+from output import print_nonl
+
 #the time by which to delay actions after compiling so as not to have conflicts
 #after copying/deleting binaries
 delay = 0.20
 
-def configureLinking(dynamic,root,outName):
+
+def configureLinking(dynamic, root, outName):
     """Deals with the library linking for each test"""
     if(dynamic):
         #if we are testing the dynamic lib in windows copy it to the
         #test  directory source so that the lib can be accessed
-        if(platform.system()=='Windows'):
+        if(platform.system() == 'Windows'):
             try:
                 os.remove(os.path.join(root,outName))
             except:
@@ -28,14 +31,18 @@ def report(log_file, string):
     print(string)
     log_file.write(string)
 
-def  copy_refu_log(log_file, root):
+def  check_library_log(log_file, root):
     """
        Copies the library log file into the output and into the 
-       tests log iff there is anything to report
+       tests log if and only if there is anything to report
+
+       log_file - The file to which the tests log is saved
+       root - The root directory where the current test is ran
     """
-    if(os.path.getsize(root) > 0):
+    refu_error_logf = os.path.join(root, "refuErrorLog")
+    if(os.path.getsize(refu_error_logf) > 0):
         report(log_file, "--Start of Library Log--")
-        l = open(os.path.join(root, "refuErrorLog"))
+        l = open(refu_error_logf)
         for line in l:
             report(log_file, line)
         report(log_file, "--End of Library Log--")
@@ -43,21 +50,27 @@ def  copy_refu_log(log_file, root):
 class TestError(Exception):
     """
        A simple Test Error exception, reporting test and line number
+       line_num can be None if we don't actually know the number of
+       the line of the error
     """
     def __init__(self, test_name, line_num):
         self.test_name = test_name
         self.line_num = line_num
-
+    
+    def __str__(self):
+        return "\t**TEST-FAIL**: {} failed at line {}".format(
+            self.test_name, self.line_num)
 
 class TestsFail(Exception):
     """
-       An exception thrown when the tests script must prematurely stop
+       An exception thrown when the tests for this build of the library
+       must prematurely stop
     """
     def __init__(self, msg):
         self.msg = msg
 
     def __str__(self):
-        return "{}\n**QUITTING...".format(self.msg)
+        return "**TESTS-FAILED**: {}".format(self.msg)
 
 def test(root, fileName, logFile, testExec, verbose, fail_fast):
     """
@@ -77,35 +90,41 @@ def test(root, fileName, logFile, testExec, verbose, fail_fast):
     #Remove Tests/ part of the directory from the filename
     tempName = os.path.split(fileName)
     fileName = os.path.join(os.path.split(tempName[0])[1] , tempName[1])
-    sys.stdout.write("\t--> Testing \"{}\"...".format(fileName))
+    print_nonl("\t--> Testing \"{}\"...".format(fileName))
     logFile.write("\t--> Testing \"{}\"...".format(fileName))
     #open the expected outputfile
     f = open(fileName+'.expect', 'r')
     #call the test
     p = subprocess.Popen(os.path.join('.',testExec),
                          cwd=root,stdout=subprocess.PIPE)
-    count = 1
-    for line in p.stdout:#for every line of the output
+    expected_stdout_lineN = 1
+    line = None
+    for line in p.stdout:
+        #read each line
         line = line.decode("utf8");
         line = line.replace("\r\n","\n")
-        if("passed >>" in line):
-            logFile.write("\t\t\t"+line+"\n")
+        #if it's just a position reporting line log it and continue
+        if "passed >>" in line:
+            logFile.write("\t\t\t{}\n".format(line))
             continue
-        expectedLine = f.readline()
-        if(line!=expectedLine):
-            if("*ERROR*:" in line):#it it's an expect error
+        #if not then let's check the expected stdout line
+        expected_stdout = f.readline()
+        if line != expected_stdout:
+            # if it's an EXPECT() macro error, report it
+            if "*ERROR*:" in line:
                 report(logFile, "FAILED!\n\t {}".format(line))
                 if fail_fast:
-                    raise TestError(fileName, count)
+                    raise TestError(fileName, expected_stdout_lineN)
+            # else it's an expected std output error
             else:
                 report(logFile, "\n\t\tTest failed at expected "
                             "output line \"[{}]\"\n".format(
-                                str(count)))
+                                str(expected_stdout_lineN)))
                 report(logFile, "\n\t\tExpected:\n\t\t\t{}\n\t\t"
                             "Found:\n\t\t\t{}\n".format(
-                                str(expectedLine), str(line)))
-                raise TestError(fileName, count)
-            count += 1
+                                str(expected_stdout), str(line)))
+                raise TestError(fileName, expected_stdout_lineN)
+            expected_stdout_lineN += 1
     #wait till the test subprocess ends
     ret = p.poll()
     while(ret is None):
@@ -114,12 +133,14 @@ def test(root, fileName, logFile, testExec, verbose, fail_fast):
     if ret is 0:
         report(logFile, "OK!\n")
     else:
-        report(logFile, "FAILED!\n\t\t Unexpected Return Value. Check "
-               "the logfile for details")
-        line = line.partition("[")[2]
-        line = line.partition("]")[0]
-        report(logFile, "\t\tLast line we are sure succesfully executed "
-               "is [{}]\n".format(str(line)))
+        report(logFile, "FAILED!\n\t\tUnexpected Return Value. Test "
+               "executable probably segfaulted.")
+        if line is not None:
+            line = line.partition("[")[2]
+            line = line.partition("]")[0]
+            report(logFile,
+                   "\t\tLast line we are sure succesfully executed "
+                   "is [{}]\n".format(str(line)))
         raise TestError(fileName, line)
 
     return True
@@ -143,7 +164,7 @@ def debugTest(root, fileName, logFile, testExec):
     for line in p.stdout:#for every line of the output
         line = line.decode("utf8")
         line = line.replace("\r\n", "\n")
-        sys.stdout.write("\t" + line)
+        print_nonl("\t" + line)
         logFile.write(line)
     #wait till the subprocess ends
     ret = p.poll()
@@ -177,16 +198,15 @@ def runTests(compiler, dynamic, outName, logFile, verbose,
         testExec = 'test.exe'
     else:
         testExec = 'test'
+
+    libtype_str = "static"
     if(dynamic):
-        logFile.write("---Starting Tests for the Dynamic version of Refu "
-                      "with the \"{}\" Compiler---\n\n".format(compiler))
-        print("--Starting Tests for the Dynamic version of Refu with the "
-              "\"{}\" Compiler---\n".format(compiler))
-    else:
-        logFile.write("---Starting Tests for the Static version of Refu "
-                      "with \"{}\" Compiler---\n\n".format(compiler))
-        print("---Starting Tests for the Static version of Refu with "
-              "\"{}\" Compiler---\n".format(compiler))
+        libtype_str = "dynamic"
+
+    report(logFile,
+           "===> Starting Tests for the {} version of Refu library with "
+           " the \"{}\" Compiler\n\n".format(libtype_str, compiler))
+
     # clean the tests directory from object files
     for root, dirs, files in os.walk("."):
         for f in files:
@@ -232,10 +252,11 @@ def runTests(compiler, dynamic, outName, logFile, verbose,
                              verbose, fail_fast)
 
                 except TestError as err:
-                    # for every error or failure we should also check
-                    # the lirary's own log
-                    copy_refu_log(logFile, root)
-                    if(fail_fast):
+                    #if there was a test error print it and also check
+                    #the library log
+                    print(err)
+                    check_library_log(logFile, root)
+                    if fail_fast:
                         raise TestsFail(
                             "Test \"{}\" failed and --fail"
                             "-fast was requested".format(part))
@@ -248,10 +269,9 @@ def runTests(compiler, dynamic, outName, logFile, verbose,
                     logFile.write("\tTest \"{}\" failed due to "
                                   "inability to run the "
                                   "executable\n".format(part))
-                    # for every error or failure we should also check
-                    # the lirary's own log
-                    copy_refu_log(logFile, root)
-                    if(fail_fast):
+                    #also check the library's log
+                    check_library_log(logFile, root)
+                    if fail_fast:
                         raise TestsFail(
                             "Test \"{}\" failed and --fail"
                             "-hard was requested".format(part))
@@ -273,7 +293,7 @@ def runTests(compiler, dynamic, outName, logFile, verbose,
                     # a better way to do this
                     time.sleep(delay)
     #after all tests have concluded clean up
-    sys.stdout.write("\n");
+    print_nonl("\n");
     logFile.write("\n");
     try:
         os.remove(os.path.join('.', testExec))

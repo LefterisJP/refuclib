@@ -13,7 +13,7 @@
 
 
 #define SIGNAL_POSITION()  \
-    rfPrintf("passed >> line [%d] of test file \"%s\"\n", \
+    rfPrintf_NOBUFF("passed >> line [%d] of test file \"%s\"\n", \
              __LINE__, __FILE__)
 
 

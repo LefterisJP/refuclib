@@ -13,7 +13,7 @@ void writeTest(char encoding,RF_StringX* buff)
     RF_TextFile outF,inF;
     uint32_t i=0; 
     EXPECT(rfInit(), true);
-	
+
     EXPECT(RF_SUCCESS,
            rfTextFile_Init(&outF,RFS_("writefile"),
                            RF_FILE_NEW,encoding,RF_EOL_LF));

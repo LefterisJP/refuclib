@@ -47,8 +47,7 @@ int main()
     RF_Hashmap_String* m3;
     int i, v;
     RF_String str;
-    rfInit();
-
+    EXPECT(rfInit(), true);
     // test a hashmap with some unicode keys
     EXPECT(true, rfHashmap_I_Init(&m1, 20));
     EXPECT(true, rfHashmap_I_Insert(&m1, RFS_("ενα"), 1));
