@@ -4,66 +4,65 @@
 **/
 
 
-//prevent stdout buffering. Must-have when debugging a test that crushes
-#define rfPrintf(...)	do{\
-	rfPrintf(__VA_ARGS__);\
-	fflush(stdout);}while(0)
+// prevent stdout buffering for test reports.
+// Must-have when debugging a test that crushes
+#define rfPrintf_NOBUFF(...)	\
+    do{                                         \
+        rfPrintf(__VA_ARGS__);                  \
+        fflush(stdout);}while(0)
 
 
-#define SIGNAL_POSITION() rfPrintf("passed >> line [%d] of test file \"%s\"\n",__LINE__,__FILE__);
+#define SIGNAL_POSITION()  \
+    rfPrintf("passed >> line [%d] of test file \"%s\"\n", \
+             __LINE__, __FILE__)
 
-//statement func is expected to return value. If it does not we print the location where it happened 
-#define EXPECT(i_value_, i_func_)	\
-    if((i_value_) != (i_func_))   \
-        rfPrintf("*ERROR*: A function or statement did not act as it was "\
-                 "expected to ==> at line [%d] of test file \"%s\"\n",\
-                 __LINE__,__FILE__);                                  \
-    else                                                              \
-        SIGNAL_POSITION()
-		
-//statement func is expected to return anything BUT value. If it does we print the location where it happened 
-#define EXPECTNOT(i_value_, i_func_)	\
-    if((i_value_) == (i_func_))   \
-        rfPrintf("*ERROR*: A function or statement did not act as it was " \
-                 "expected to ==> at line [%d] of test file \"%s\"\n",  \
-                 __LINE__,__FILE__);                                    \
-    else                                                          \
-        SIGNAL_POSITION()
 
-//statement func is expected to return something greater or equalto value. If it does not we print the location where it happened 
-#define EXPECTGE(i_value_, i_func_)	\
-    if((i_value_) < (i_func_))   \
-		rfPrintf("*ERROR*: A function or statement did not act as it was "\
-             "expected to ==> at line [%d] of test file \"%s\"\n",    \
-             __LINE__,__FILE__);                                      \
-    else                                                              \
-        SIGNAL_POSITION()
-			
-		
-//statement func is expected to return value. If it does not we print the location where it happened along with a message	
-#define EXPECT_MSG(i_value_, i_func_, msg)              \
-    if((i_value_) != (i_func_))   \
-		rfPrintf("*ERROR*: "msg" ==> at line [%d] of test file \"%s\"\n",\
-             __LINE__,__FILE__);                                     \
-    else                                                             \
-        SIGNAL_POSITION()
-		
-//statement func is expected to return anything BUT value. If it does we print the location where it happened along with a message	
-#define EXPECTNOT_MSG(i_value_, i_func_, msg)              \
-    if((i_value_) == (i_func_))   \
-		rfPrintf("*ERROR*: "msg" ==> at line [%d] of test file \"%s\"\n",\
-             __LINE__,__FILE__);                                     \
-    else                                                             \
-        SIGNAL_POSITION()
-	
-//statement func is expected to return something greater or equal to value. If it does not we print the location where it happened along with a message	
-#define EXPECTGE_MSG(i_value_, i_func_, msg)              \
-    if((i_value_) < (i_func_))   \
-		rfPrintf("*ERROR*: "msg" ==> at line [%d] of test file \"%s\"\n",\
-             __LINE__,__FILE__);                                     \
-    else                                                             \
-        SIGNAL_POSITION()
-	
-//For when we want to remove the whole checking and printing
-//#define EXPECT(a,b) b;
-//#define EXPECT_MSG(a,b,c) b;
+#define COMPARISON(value1_, value2_, cmp_)         \
+    do{                                                                 \
+        if((value1_) cmp_ (value2_))                                    \
+        {                                                               \
+            rfPrintf_NOBUFF(                                            \
+                "*ERROR*: A function or statement did not act as it was " \
+                "expected to ==> at line [%d] of test file \"%s\"\n",   \
+                __LINE__, __FILE__);                                    \
+        }                                                               \
+        else                                                            \
+        {                                                               \
+            SIGNAL_POSITION();                                          \
+        }                                                               \
+    }while(0)
+
+#define COMPARISON_MSG(value1_, value2_, cmp_, msg_)                    \
+    do{                                                                 \
+    if((value1_) cmp_ (value2_))                                        \
+    {                                                                   \
+        rfPrintf_NOBUFF(                                                \
+            "*ERROR*: "msg_" ==> at line [%d] of test file \"%s\"\n",   \
+            __LINE__, __FILE__);                                        \
+    }                                                                   \
+    else                                                                \
+    {                                                                   \
+        SIGNAL_POSITION();                                              \
+    }                                                                   \
+}while(0)
+
+// The EXPECT family of macros, used in the tests
+#define EXPECT(value1_, value2_)                \
+     COMPARISON(value1_, value2_, !=)
+
+#define EXPECT_MSG(value1_, value2_, message_)      \
+     COMPARISON_MSG(value1_, value2_, !=, message_)
+
+
+#define EXPECTNOT(value1_, value2_)\
+     COMPARISON(value1_, value2_, ==)		
+
+#define EXPECTNOT_MSG(value1_, value2_, message_)      \
+     COMPARISON_MSG(value1_, value2_, ==, message_)
+
+
+#define EXPECTGE(value1_, value2_)\
+     COMPARISON(value1_, value2_, <)		
+
+#define EXPECTGE_MSG(value1_, value2_, message_)      \
+     COMPARISON_MSG(value1_, value2_, <, message_)

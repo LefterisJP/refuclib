@@ -33,21 +33,21 @@ int checkUTF32(uint32_t* buff)
 
 int main()
 {
-	RF_String s1,s2,s3,s4,s5,s6,s7,s8;
-	RF_String* words;
-	uint32_t length,wordsN,i;
-	int num;
-	double dbl;
+    RF_String s1,s2,s3,s4,s5,s6,s7,s8;
+    RF_String* words;
+    uint32_t length,wordsN,i;
+    int num;
+    double dbl;
 
-	EXPECT(rfInit(), true)
+    EXPECT(rfInit(), true);
 
     //testing to lowercase and to uppercase
-	EXPECT(true,rfString_Init(&s1,"ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
-	rfString_ToLower(&s1);
-	EXPECT(true,rfString_Init(&s2,"abcdefghijklmnopqrstuvwxyz"));
+    EXPECT(true,rfString_Init(&s1,"ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
+    rfString_ToLower(&s1);
+    EXPECT(true,rfString_Init(&s2,"abcdefghijklmnopqrstuvwxyz"));
     rfString_ToUpper(&s2);
-    rfPrintf("%S\n",&s1);
-    rfPrintf("%S\n",&s2);
+    EXPECTGE(rfPrintf("%S\n",&s1), 0);
+    EXPECTGE(rfPrintf("%S\n",&s2), 0);
 
 
     //first create the string to test. Japanese(Adachiku) + MusicalSymbol(G clef)
@@ -59,23 +59,28 @@ int main()
     EXPECT(1,checkUTF16(rfString_ToUTF16(&s3,&length)));
 
     //expect 0(false) and 1(true) and 15042
-    rfString_Init(&s5,"15042");
+    EXPECT(rfString_Init(&s5,"15042"), true);
     EXPECT(false,rfString_ToInt(&s3,&num));
     EXPECT(true,rfString_ToInt(&s5,&num));
-    rfPrintf("%d\n",num);
+    EXPECTGE(rfPrintf("%d\n",num), 0);
 
     //expect RE_STRING_TOFLOAT and RF_SUCCESS and 3.141592
     EXPECT(true,rfString_Init(&s6,"3.141592"));
     EXPECT(RE_STRING_TOFLOAT,rfString_ToDouble(&s3,&dbl));
     EXPECT(RF_SUCCESS,rfString_ToDouble(&s6,&dbl));
-    rfPrintf("%f\n",dbl);
+    EXPECTGE(rfPrintf("%f\n",dbl), 0);
 
     //expect the sentence separated in words
-    EXPECT(true,rfString_Init(&s7,"Drug companies are facing mounting pressure to investigate reports that new medicines are being tested on some of the poorest people in India without their knowledge"));
+    EXPECT(true,
+           rfString_Init(
+               &s7,
+               "Drug companies are facing mounting pressure to investigate"
+               " reports that new medicines are being tested on some of "
+               "the poorest people in India without their knowledge"));
     EXPECT(true,rfString_Tokenize(&s7,RFS_(" "),&wordsN,&words));
     for(i=0;i<wordsN;i++)
     {
-        rfPrintf("%S\n",&words[i]);
+        EXPECTGE(rfPrintf("%S\n",&words[i]), 0);
     }
     //free stuff
     for(i = 0; i < wordsN; i++)
@@ -89,9 +94,15 @@ int main()
 
     //expect 10 (number of prefectures) and all true string comparisons marking the correct separation of Japanese prefectures by the prefecture kanji '県'
     //notice the last prefecture is missing its '県' kanji to not get an extra empty string token
-    EXPECT(true,rfString_Init(&s8,"新潟県富山県石川県福井県山梨県長野県岐阜県静岡県愛知県青森"));
+    EXPECT(true,
+           rfString_Init(&s8,
+                         "新潟県富山県石川県福井県山梨県長野県岐阜県静岡"
+                         "県愛知県青森"));
     EXPECT(true,rfString_Tokenize(&s8,RFS_("県"),&wordsN,&words));
-    EXPECT_MSG(10,wordsN,"Tokenization of some Japanese provinces did not give the expected tokens number");
+    EXPECT_MSG(10,
+               wordsN,
+               "Tokenization of some Japanese provinces did not give the "
+               "expected tokens number");
     EXPECT(true,rfString_Equal(RFS_("新潟"),&words[0]));//Niigata
     EXPECT(true,rfString_Equal(RFS_("富山"),&words[1]));//Toyama
     EXPECT(true,rfString_Equal(RFS_("石川"),&words[2]));//Ishikawa
@@ -102,11 +113,6 @@ int main()
     EXPECT(true,rfString_Equal(RFS_("静岡"),&words[7]));//Shizuoka
     EXPECT(true,rfString_Equal(RFS_("愛知"),&words[8]));//Aichi
     EXPECT(true,rfString_Equal(RFS_("青森"),&words[9]));//Aomori
-
-
-
-
-
 
 	return 0;
 }

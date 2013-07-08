@@ -486,9 +486,12 @@ int32_t rfStringX_Formatv(RF_StringX *ret,const char* format,va_list args)
                 goto cleanup1;
             }
             //read the format specifier to know what you have to read in now
-            if( (extraChars = Parse_FormatSpecifier(format+i+1,&argData)) == 0)
+            if( (extraChars = Parse_FormatSpecifier(format+i+1,
+                                                    &argData)) == 0)
             {
-                LOG_ERROR("Error at parsing an argument's format specifier",RF_LastError)
+                LOG_ERROR(
+                    "Error at parsing an argument's format specifier",
+                    RF_LastError)
                 error = RF_LastError;
                 goto cleanup1;
             }

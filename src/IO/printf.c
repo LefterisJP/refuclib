@@ -86,7 +86,9 @@ int32_t rfFPrintf(FILE* f,const char * format, ...)
     va_end(args);
     //check for error
     if(ret != RF_SUCCESS)
+    {
         return ret;
+    }
     //else return the number of bytes written
     ret = ioBuffer.INH_String.byteLength;
     rfString_Fwrite(&ioBuffer,f,RF_UTF8);
