@@ -45,6 +45,15 @@
     #include <String/string_decl.h> //for RF_String (ioBuffer type)
     #include <String/stringx_decl.h> //for RF_StringX (ioBuffer type)
     #include "IO/buff.ph"//for rfInitStdio()
+//for threads initialization
+    #ifdef REFU_WIN32_VERSION
+    #include <windows.h> //for HANDLE
+    #else
+    #include <pthread.h> //for pthread_t
+    #endif
+    #include <Threads/thread_flags.h> //for common Thread flags
+    #include <Threads/thread_decl.h> //for RF_Thread
+    #include <Threads/thread.h>
 //for error codes
     #include <Definitions/retcodes.h>
 //*---------------------System Specific Headers inclusion-------------------------------
@@ -130,6 +139,12 @@ char i_rfInit(char* errstr,char* logstr,uint64_t lmsSize)
     {
         LOG_ERROR("Could not initialize main thread's local memory stack",
             RE_LOCALMEMSTACK_INIT)
+        return false;
+    }
+
+    //initialize the threading system 
+    if(rfThreads_Init() == false)
+    {
         return false;
     }
 

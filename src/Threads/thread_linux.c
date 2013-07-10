@@ -50,8 +50,22 @@
     #include <Utils/localmem.h> //for LMS_Initialization
 //*---------------------libc Headers inclusion------------------------------------------
 #include <errno.h>
+#include <sys/types.h> //for getpid()
+#include <unistd.h> //for getpid()
 //*----------------------------End of Includes------------------------------------------
 
+static i_THREAD__ uintptr_t i_thread_id;
+
+uintptr_t rfThread_GetID()
+{
+    return i_thread_id;
+}
+
+char rfThreads_Init()
+{
+    i_thread_id = getpid();
+    return true;
+}
 
 // The function that serves as the starting address for an RF_Thread in Linux
 void* RF_THREAD_FUNCTION(void* param)
@@ -69,6 +83,8 @@ void* RF_THREAD_FUNCTION(void* param)
             "stack could not be initialized", RE_LOCALMEMSTACK_INIT)
         return (void*)RE_LOCALMEMSTACK_INIT;
     }
+    //save the address of this thread as id
+    i_thread_id = (uintptr_t)&t;
     //initialize the stdio for this thread
     rfInitStdio();
     //run the function

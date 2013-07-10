@@ -48,6 +48,7 @@ extern "C"
 
 
 
+
 /**
  ** @memberof RF_Thread
  ** @brief Allocates and returns a thread
@@ -169,6 +170,23 @@ void* rfThread_GetData(void* thread);
 #else
 #define rfThread_GetData(i_THREAD)  (i_THREAD)->data
 #endif
+
+
+/**
+ ** @brief Returns a unique identifier for the 
+ ** current thread.
+ **/
+i_DECLIMEX_ uintptr_t rfThread_GetID();
+
+
+/**
+ ** @brief Initializes the threading system.
+ **
+ ** The only thing that this currently does is
+ ** initialize the main thread's id with the pid of the process
+ **/
+i_DECLIMEX_ char rfThreads_Init();
+
 
 
 #ifdef __cplusplus
