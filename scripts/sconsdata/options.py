@@ -119,7 +119,15 @@ f.close()
 # ...and now check with the original to see if we should swap them
 # the reason for this check is to not always rebuild the library
 newF = open(temp_options_fname)
-oldF = open(options_fname)
+try:
+    oldF = open(options_fname)
+except:
+    #if the old options.h does not exist then simply rename the temporary
+    os.rename(temp_options_fname, options_fname)
+    newF.close()
+    build_msg("rf_options.h file was created because it did not already"
+              " exist", 'Info', env)
+    Return('')
 s = SequenceMatcher(None, newF.read(), oldF.read())
 ratio = s.ratio()
 newF.close()
