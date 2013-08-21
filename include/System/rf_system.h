@@ -198,6 +198,17 @@ i_DECLIMEX_ char rfDeleteFile(void* name);
  **/
 i_DECLIMEX_ char rfRenameFile(void* name, void* newName);
 
+
+/**
+ ** @brief Returns a unique address for the calling thread
+ **
+ ** For Linux it uses the gettid system call
+ ** and for Windows it needs to be implemented as it's not
+ ** currently supported.
+ ** @return A unique id representing the calling thread
+ **/
+i_DECLIMEX_ uintptr_t rfSystem_GetThreadID();
+
 //! @}
 //end of system group
 

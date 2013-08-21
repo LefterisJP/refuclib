@@ -16,8 +16,11 @@ def check_log_line_acceptable(line, test_name):
     """ Checks if line is an acceptable log line 
         for test named test_name
     """
-    acceptable_lines = acceptable_log_entries[os.path.basename(
-        test_name)]
+    try:
+        acceptable_lines = acceptable_log_entries[os.path.basename(
+            test_name)]
+    except: #if it's not in the acceptable list at all 
+        return False
     if acceptable_lines is None:
         return False
     return in_any(line in l for l in acceptable_lines)

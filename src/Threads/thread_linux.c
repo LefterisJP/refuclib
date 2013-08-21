@@ -50,10 +50,10 @@
 //for local memory initialization
     #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
     #include <Utils/localmem.h> //for LMS_Initialization
+//for getting the id of a thread via system call
+#include <System/rf_system.h> 
 /*------------- libc inclusion -------------*/
 #include <errno.h>
-#include <sys/types.h> //for getpid()
-#include <unistd.h> //for getpid()
 /*------------- End of includes -------------*/
 
 static i_THREAD__ uintptr_t i_thread_id;
@@ -65,7 +65,7 @@ uintptr_t rfThread_GetID()
 
 char rfThreads_Init()
 {
-    i_thread_id = getpid();
+    i_thread_id = rfSystem_GetThreadID();
     return true;
 }
 
@@ -85,8 +85,8 @@ void* RF_THREAD_FUNCTION(void* param)
                  "stack could not be initialized");
         return (void*)RE_LOCALMEMSTACK_INIT;
     }
-    //save the address of this thread as id
-    i_thread_id = (uintptr_t)&t;
+    i_thread_id = rfSystem_GetThreadID();
+
     //initialize the stdio for this thread
     rfInitStdio();
     //run the function

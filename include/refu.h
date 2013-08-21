@@ -53,6 +53,6 @@
 /* --------------------------------------------- Error logging ------------------------------------------------------- */
 #include <stdio.h>//for FILE* used inside printf.h
 #include <IO/printf.h> //for rfFpintf() used in the error logging macros
+#include <Threads/common.h> //for rfThread_GetID()
 #include <Utils/error.h>
-
 #endif//include guards end

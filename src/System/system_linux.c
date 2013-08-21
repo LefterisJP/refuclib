@@ -51,6 +51,10 @@
 /*------------- libc inclusion --------------*/
 #include <errno.h>
 #include <dirent.h>
+/*------------- system includes -------------*/
+#include <unistd.h> //for syscall and tid
+#include <sys/syscall.h> //for syscall and tid
+#include <sys/types.h> //for syscall and tid
 /*------------- End of includes -------------*/
 
 
@@ -253,4 +257,10 @@ char rfRenameFile(void* nameP, void* newNameP)
 #endif
     RF_EXIT_LOCAL_SCOPE();
     return ret;
+}
+
+
+uintptr_t rfSystem_GetThreadID()
+{
+    return syscall(SYS_gettid);
 }

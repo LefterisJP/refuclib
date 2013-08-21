@@ -98,7 +98,7 @@ extern i_DECLIMEX_ FILE* RF_Log_Stream;
 #define i_RP_LOG_ERROR_VARARGS1(i_msg_, ...)                            \
     do{                                                                 \
         rfFPrintf(RF_Log_Stream,                                        \
-                  "[ERROR] (thread: %x) [%s():"__FILE__":%d] "i_msg_"\n", \
+                  "[ERROR] (thread: 0x%x) [%s():"__FILE__":%d] "i_msg_"\n", \
                   rfThread_GetID(), __func__, __LINE__,                 \
                   __VA_ARGS__);                                         \
         fflush(RF_Log_Stream);                                          \
@@ -119,7 +119,7 @@ extern i_DECLIMEX_ FILE* RF_Log_Stream;
 #define i_RP_LOG_ERROR1(i_msg_)                                         \
     do{                                                                 \
              rfFPrintf(RF_Log_Stream,                                   \
-                       "[ERROR] (thread: %x) [%s():"__FILE__":%d] "i_msg_"\n", \
+                       "[ERROR] (thread: 0x%x) [%s():"__FILE__":%d] "i_msg_"\n", \
                        rfThread_GetID(), __func__, __LINE__);                    \
              fflush(RF_Log_Stream);                                     \
          }while(0)
@@ -165,7 +165,7 @@ extern i_DECLIMEX_ FILE* RF_Log_Stream;
 #define i_RP_LOG_INFO_VARARGS1(i_msg_, ...)                             \
         do{                                                             \
             rfFPrintf(RF_Log_Stream,                                     \
-                      "[INFO] (thread: %x) [%s():"__FILE__":%d] "i_msg_"\n", \
+                      "[INFO] (thread: 0x%x) [%s():"__FILE__":%d] "i_msg_"\n", \
                       rfThread_GetID(), __func__, __LINE__,             \
                       __VA_ARGS__);                                     \
             fflush(RF_Log_Stream);                                      \
@@ -186,7 +186,7 @@ extern i_DECLIMEX_ FILE* RF_Log_Stream;
 #define i_RP_LOG_INFO1(i_msg_)                                          \
         do{                                                             \
             rfFPrintf(RF_Log_Stream,                                    \
-                      "[INFO] (thread: %x) [%s():"__FILE__":%d] "i_msg_"\n", \
+                      "[INFO] (thread: 0x%x) [%s():"__FILE__":%d] "i_msg_"\n", \
                       rfThread_GetID(), __func__, __LINE__);                     \
             fflush(RF_Log_Stream);                                      \
         }while(0)
@@ -231,7 +231,7 @@ extern i_DECLIMEX_ FILE* RF_Log_Stream;
 #define i_RP_LOG_WARNING_VARARGS1(i_msg_, ...)                             \
         do{                                                             \
             rfFPrintf(RF_Log_Stream,                                     \
-                      "[WARNING] (thread: %x) [%s():"__FILE__":%d] "i_msg_"\n", \
+                      "[WARNING] (thread: 0x%x) [%s():"__FILE__":%d] "i_msg_"\n", \
                       rfThread_GetID(), __func__, __LINE__,             \
                       __VA_ARGS__);                                     \
             fflush(RF_Log_Stream);                                      \
@@ -252,7 +252,7 @@ extern i_DECLIMEX_ FILE* RF_Log_Stream;
 #define i_RP_LOG_WARNING1(i_msg_)                                          \
         do{                                                             \
             rfFPrintf(RF_Log_Stream,                                    \
-                      "[WARNING] (thread: %x) [%s():"__FILE__":%d] "i_msg_"\n", \
+                      "[WARNING] (thread: 0x%x) [%s():"__FILE__":%d] "i_msg_"\n", \
                       rfThread_GetID(), __func__, __LINE__);                     \
             fflush(RF_Log_Stream);                                      \
         }while(0)
