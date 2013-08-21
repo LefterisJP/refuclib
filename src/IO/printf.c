@@ -22,19 +22,17 @@
 **
 */
 
-
-
-//*---------------------Corrensponding Header inclusion---------------------------------
+/*------------- Corrensponding Header inclusion -------------*/
 #include <Definitions/imex.h> //for import export macro
 #include <Definitions/types.h>
 #include <stdio.h> //for FILE*
 #include <IO/printf.h>
-//*---------------------Module related inclusion----------------------------------------
+/*------------- Module related inclusion -------------*/
 #include <Definitions/threadspecific.h> //for the thread specific macro
 #include <String/string_decl.h>//for RF_String
 #include <String/stringx_decl.h>//for RF_StringX
 #include "buff.ph"//include the stdio private declaration of ioBuffer
-//*---------------------Outside module inclusion----------------------------------------
+/*------------- Outside Module inclusion -------------*/
 #include <Definitions/defarg.h> //for the default argument used in the following headers
 #include <stdarg.h> //for va_list() macros. Must come before <String/format.h>
 #include <String/format.h>
@@ -43,54 +41,73 @@
 #include <String/files.h> //for rfString_Fwrite()
 #include <String/unicode.h> //for the unicode macros
 
-#include <Definitions/retcodes.h>
-//*----------------------------End of Includes------------------------------------------
+//for the endianess check
+    #include <Utils/endianess.h>
+//for error logging
+    #include <Threads/common.h> //for rfThread_GetID()
+    #include <Utils/error.h>
+    #include <Definitions/retcodes.h>
+/*------------- End of includes -------------*/
 
 
 
-int32_t rfPrintf(const char * format, ...)
+int rfPrintf(const char * format, ...)
 {
     va_list args;
     int32_t ret;//note that no local scope macros are needed here since the arguments get evaluated in rfStringX_Formatv()
     //clear out the stdio buffer
     if(!rfStringX_Assign(&ioBuffer, RFS_("")))
     {
-        return RE_STRING_ASSIGNMENT;
+        RF_ERROR(0,"Failure to initialize the stdio buffer during printf");
+        return -1;
     }
     //now read the formatted string
     va_start(args,format);
-    ret=rfStringX_Formatv(&ioBuffer,format,args);
+    if(rfStringX_Formatv(&ioBuffer,format,args) == false)
+    {
+        RF_ERROR(0,"Failure to format a string during printf");
+        va_end(args);
+        return -1;
+    }
     va_end(args);
 
-    //check for error
-    if(ret != RF_SUCCESS)
-        return ret;
     //else return the number of bytes written
     ret = ioBuffer.INH_String.byteLength;
-    rfString_Fwrite(&ioBuffer,stdout,RF_UTF8);
+    if(!rfString_Fwrite(&ioBuffer, stdout, RF_UTF8))
+    {
+        RF_ERROR(0, "Failure to write the data to stdout during print");
+        return -1;
+    }
     return ret;
 }
 
-int32_t rfFPrintf(FILE* f,const char * format, ...)
+int rfFPrintf(FILE* f,const char * format, ...)
 {
     va_list args;
     int32_t ret;//note that no local scope macros are needed here since the arguments get evaluated in rfStringX_Formatv()
     //clear out the stdio buffer
     if(!rfStringX_Assign(&ioBuffer, RFS_("")))
     {
-        return RE_STRING_ASSIGNMENT;
+        RF_ERROR(0,"Failure to initialize the stdio buffer during fprintf");
+        return -1;
     }
     //now read the formatted string
     va_start(args,format);
-    ret=rfStringX_Formatv(&ioBuffer,format,args);
-    va_end(args);
-    //check for error
-    if(ret != RF_SUCCESS)
+    if(rfStringX_Formatv(&ioBuffer,format,args) == false)
     {
-        return ret;
+        RF_ERROR(0,"Failure to format a string during fprintf");
+        va_end(args);
+        return -1;
     }
+    va_end(args);
+
     //else return the number of bytes written
     ret = ioBuffer.INH_String.byteLength;
-    rfString_Fwrite(&ioBuffer,f,RF_UTF8);
+    if(!rfString_Fwrite(&ioBuffer, f, RF_UTF8, rfEndianess()))
+    {
+        RF_ERROR(0, "Failure to write the data to the the file during fprint");
+        return -1;
+    }
+
     return ret;
 }

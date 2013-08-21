@@ -67,7 +67,7 @@ int32_t i_rfStringX_MoveAfter(RF_StringX* thisstr,const void* subP,void* resultP
 {
     const RF_String* sub = (const RF_String*)subP;
     int32_t move;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
 
     //check for substring existence and return failure if not found
     if( (move = rfString_FindBytePos(thisstr,sub,options)) == RF_FAILURE)
@@ -113,7 +113,7 @@ int32_t i_rfStringX_MoveAfter(RF_StringX* thisstr,const void* subP,void* resultP
     }
     //return positions moved
   cleanup:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return move;
 }
 
@@ -189,7 +189,7 @@ char rfStringX_MoveAfterv(RF_StringX* thisstr, void* resultP,
     //will keep the argument list
     va_list argList;
     char ret = true;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
 
     // will keep the winning parameter length
     paramLen = 0;
@@ -261,7 +261,7 @@ char rfStringX_MoveAfterv(RF_StringX* thisstr, void* resultP,
 
   cleanup:
     //success
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 //Moves the internal string pointer after the substring formed by the @c left and @c right substrings
@@ -280,7 +280,7 @@ char i_rfStringX_MoveAfterPair(RF_StringX* thisstr, const void* leftP,
     const RF_String* left = (const RF_String*)leftP;
     const RF_String* right = (const RF_String*)rightP;
     char ret = true;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
 
     //check the occurence parameter
     if(occurence == 0)
@@ -352,6 +352,6 @@ char i_rfStringX_MoveAfterPair(RF_StringX* thisstr, const void* leftP,
 
   cleanup:
     //success
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }

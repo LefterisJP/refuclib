@@ -59,19 +59,13 @@ extern "C"
  ** retrieve it with @ref rfEndianess()
  ** + Initialize the local stack memory for the main thread
  **
- ** @param errstr \rfoptional{"refuErrorLog"} The filename of the error log
- ** to create and output the refu error log. You can provide any filename 
- ** except for
+ ** @param errstr \rfoptional{"refuclib.log"} The filename of the error log
+ ** to create and output the library's log output to.
+ **  You can provide any filename except for
  ** @c "stdout" and @c "stderr" because they will be interpreted as special
  ** values for which the standard output stream or the standard error 
  ** stream are used respectively
  ** If no value is provided the default value is @c "refuErrorLog"
- ** @param logstr \rfoptional{"refuInfoLog"} The filename of the info log 
- ** to create and output the refu info log. You can provide any filename 
- ** except for @c "stdout" and @c "stderr" because they will be interpreted
- ** as special values for which the standard output stream or the standard
- ** error stream are used respectively
- ** If no value is provided the default value is @c "refuInfoLog"
  ** @param lmsSize \rfoptional{RF_OPTION_LOCALSTACK_MEMORY_SIZE} The size
  ** of the main thread's local memory stack. This will be the size by 
  ** which the main thread's local memory stack will be initialized. 
@@ -83,23 +77,25 @@ extern "C"
  ** @return Returns @c true in success and @c false otherwise
  **/
 #ifdef RF_IAMHERE_FOR_DOXYGEN
-i_DECLIMEX_  char rfInit(char* errstr,char* logstr,uint64_t size);
+i_DECLIMEX_  char rfInit(char* logstr, uint64_t size);
 #else
 #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-    i_DECLIMEX_  char i_rfInit(char* errstr,char* logstr,uint64_t size);
-    #define rfInit(...) RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_INIT,3,__VA_ARGS__)
-    #define i_NPSELECT_RF_INIT1(...)  RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfStringInit() accepts from 0 to 3 arguments\"")
-    #define i_NPSELECT_RF_INIT0(...)  RF_SELECT_FUNC(i_SELECT_RF_INIT,__VA_ARGS__)
-    #define i_SELECT_RF_INIT3(...)  i_rfInit(__VA_ARGS__)
-    #define i_SELECT_RF_INIT2(...)  i_rfInit(__VA_ARGS__,\
-    RF_OPTION_LOCALSTACK_MEMORY_SIZE)
-    #define i_SELECT_RF_INIT1(...)  i_rfInit(__VA_ARGS__, "refuInfoLog",\
-    RF_OPTION_LOCALSTACK_MEMORY_SIZE)
-    #define i_SELECT_RF_INIT0(...)  i_rfInit("refuErrorLog",\
-    "refuInfoLog",                                          \
-    RF_OPTION_LOCALSTACK_MEMORY_SIZE)
+    i_DECLIMEX_  char i_rfInit(char* logstr, uint64_t size);
+#define rfInit(...) \
+    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_INIT, 2 ,__VA_ARGS__)
+
+#define i_NPSELECT_RF_INIT1(...)                                        \
+    RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function "    \
+                     "rfStringInit() accepts from 0 to 2 arguments\"")
+#define i_NPSELECT_RF_INIT0(...) \
+    RF_SELECT_FUNC(i_SELECT_RF_INIT,__VA_ARGS__)
+#define i_SELECT_RF_INIT2(...)  i_rfInit(__VA_ARGS__) 
+#define i_SELECT_RF_INIT1(...)  i_rfInit(__VA_ARGS__,  \
+                                         RF_OPTION_LOCALSTACK_MEMORY_SIZE)
+#define i_SELECT_RF_INIT0(...)  i_rfInit("refuclib.log",    \
+                                         RF_OPTION_LOCALSTACK_MEMORY_SIZE)
 #else
-    i_DECLIMEX_  char rfInit(char* errstr,char* logstr,uint64_t size);
+    i_DECLIMEX_  char rfInit(char* logstr,uint64_t size);
 #endif
 #endif
 //! @}

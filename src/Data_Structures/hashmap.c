@@ -33,7 +33,7 @@
 
 /* @omit end */
 
-//*---------------------Corrensponding Header inclusion---------------------------------
+/*------------- Corrensponding Header inclusion -------------*/
 /* @omit cond STRING */
 #include <Definitions/imex.h> //for import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
@@ -43,9 +43,9 @@
 /* @omit end */
 #include <Data_Structures/hashmap_decl.h> //for the struct declarations
 #include <Data_Structures/hashmap.h> 
-//*---------------------Module related inclusion----------------------------------------
+/*------------- Module related inclusion -------------*/
 
-//*---------------------Outside module inclusion----------------------------------------
+/*------------- Outside Module inclusion -------------*/
 //for error logging
     #include <stdio.h>//for FILE* used inside printf.h
     #include <IO/printf.h> //for rfFpintf() used in the error logging macros
@@ -70,9 +70,9 @@
 /* @omit end */
     #include <String/conversion.h> //for rfString_Cstr() 
     #include <String/retrieval.h> //for rfString_Length()
-//*---------------------libc Headers inclusion------------------------------------------
+/*------------- libc includes -------------*/
 #include <stdint.h> //used by hsieh's hash
-//*----------------------------End of Includes------------------------------------------
+/*------------- End of includes -------------*/
 
 // This hash function is taken from here
 // http://www.azillionmonkeys.com/qed/hash.html
@@ -255,7 +255,7 @@ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
     uint32_t i;
     RF_Hashslot* s;
     char ret = true;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
 
     if(i_InsertValue(m->slots, key, value, m->size) == false)
     {
@@ -305,7 +305,7 @@ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
     }    
 
   cleanup:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -316,7 +316,7 @@ char rfHashmap_Get(RF_Hashmap* m, RF_String* key,
     uint32_t i;
     RF_Hashslot* s;
     char ret = false;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
     i = HsiehHash(rfString_Cstr(key), rfString_Length(key));
     i = i % m->size;
     s = m->slots[i];
@@ -337,6 +337,6 @@ char rfHashmap_Get(RF_Hashmap* m, RF_String* key,
     }
 
   cleanup:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }

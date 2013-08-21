@@ -71,7 +71,8 @@ char rfLMS_Init(RF_LocalMemoryStack* lms, uint64_t size);
  ** which will be the allocated pointer memory position. In that respect
  ** the function works similarly to malloc()
  ** @param size The size of the block to allocate
- ** @return Returns a pointer to the allocated block or 0 for no more local memory available
+ ** @return Returns a pointer to the allocated block or NULL
+ **  for no more local memory available
  **
  **/
 i_DECLIMEX_ void* rfLMS_Push(uint64_t size);
@@ -84,9 +85,11 @@ i_DECLIMEX_ void* rfLMS_Push(uint64_t size);
  ** and in doing so essentially frees all the objects that were allocated
  ** to parts of the stack before that movement.
  ** @param t The stack value to which to pop the stack back to
+ ** @return Returns @c true for success and @c false if popping was 
+ ** attemped up to a point that has not yet been allocated
  **
  **/
-i_DECLIMEX_ void rfLMS_Pop(uint64_t t);
+i_DECLIMEX_ char rfLMS_Pop(uint64_t t);
 
 /**
  ** @memberof RF_LocalMemoryStack
@@ -99,9 +102,10 @@ i_DECLIMEX_ void rfLMS_Pop(uint64_t t);
  ** positions to find the one that is closer at the beginning and this 
  ** will be determined as the local memory stack pointer before the 
  ** function call
- **
+ ** @return Returns @c true for success and @c false if the maximum
+ ** specified number of function arguments has been used
  **/
-i_DECLIMEX_ void rfLMS_ArgsEval();
+i_DECLIMEX_ char rfLMS_ArgsEval();
 
 
 //functions to declare create old value data types on the local stack

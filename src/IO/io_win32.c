@@ -47,13 +47,21 @@ FILE* rfPopen(void* commandP,const char* mode)
 {
     FILE* ret = 0;
     RF_String* command = (RF_String*)commandP;
-    RF_ENTER_LOCAL_SCOPE()
-    if( strcmp(mode,"r") !=0 && strcmp(mode,"w")!=0)
-        LOG_ERROR("Invalide mode argument provided to rfPopen( )",RE_POPEN_INVALID_MODE)
-    else
-        ret = _popen(command->bytes,mode);
+    RF_ENTER_LOCAL_SCOPE();
+#if RF_OPTION_DEBUG
+    if( strcmp(mode,"r") != 0 && strcmp(mode,"w") != 0)
+    {
+        RF_ERROR(0, "Invalid mode argument provided to rfPopen()");
+        goto cleanup;
+    }
+#endif
 
-    RF_EXIT_LOCAL_SCOPE()
+    ret = _popen(command->bytes,mode);
+
+#if RF_OPTION_DEBUG
+  cleanup:
+#endif
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 

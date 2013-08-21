@@ -21,14 +21,15 @@
 **      ==END OF REFU LICENSE==
 **
 **/
-//*---------------------Corrensponding Header inclusion---------------------------------
+/*------------- Corrensponding Header inclusion -------------*/
 #include <Definitions/imex.h> //for import export macro
 #include <Definitions/types.h>//for fixed size data types
 #include <Data_Structures/binaryarray_decl.h> //for RF_BinarryArray
 #include <Data_Structures/binaryarray.h>
-//*---------------------Outside module inclusion----------------------------------------
+/*------------- Outside Module inclusion -------------*/
 //for error logging
     #include <stdio.h>//for FILE* used inside printf.h
+    #include <Threads/common.h> //for rfThread_GetID()
     #include <IO/printf.h> //for rfFpintf() used in the error logging macros
     #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
     #include <Utils/error.h>
@@ -36,18 +37,20 @@
     #include <stdlib.h> //for malloc, calloc,realloc and exit()
     #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
     #include <Utils/memory.h> //for refu memory allocation
-//*---------------------libc Headers inclusion------------------------------------------
+/*------------- libc inclusion --------------*/
 #include <string.h> //for memcpy
-//*----------------------------End of Includes------------------------------------------
+/*------------- End of includes -------------*/
 
 // Allocates and returns a binary array
 RF_BinaryArray* rfBinaryArray_Create(uint32_t size)
 {
     RF_BinaryArray* ret;
     RF_MALLOC(ret, sizeof(RF_BinaryArray), NULL);
-    //allocate enough bytes to encompass all of the values. Initializing everything to 0
-    RF_CALLOC(ret->data, size/8 +1, 1, NULL);
-    ret->size = size;
+    if(rfBinaryArray_Init(ret, size) == false)
+    {
+        free(ret);
+        ret = NULL;
+    }
     return ret;
 }
 // Initializes a binary array
@@ -71,10 +74,12 @@ char rfBinaryArray_Copy_IN(RF_BinaryArray* dst, RF_BinaryArray* src)
 RF_BinaryArray* rfBinaryArray_Copy_OUT(RF_BinaryArray* src)
 {
     RF_BinaryArray* dst;
-    RF_MALLOC(dst,sizeof(RF_BinaryArray), NULL);
-    dst->size = src->size;
-    RF_CALLOC(dst->data, dst->size/8+1, 1, NULL);
-    memcpy(dst->data, src->data, dst->size/8+1);
+    RF_MALLOC(dst, sizeof(RF_BinaryArray), NULL);
+    if(rfBinaryArray_Copy_IN(dst, src) == false)
+    {
+        free(dst);
+        dst = NULL;
+    }
     return dst;
 }
 
@@ -97,9 +102,9 @@ char rfBinaryArray_Get(RF_BinaryArray* a, uint32_t i, char* val)
     //check for out of bounds index
     if(i >= a->size)
     {
-        LOG_ERROR(
-            "Attempted to retrieve a value from a BinaryArray with an "
-            "index out of bounds", RE_INDEX_OUT_OF_BOUNDS);
+        RF_ERROR(0,
+                 "Attempted to retrieve a value from a BinaryArray with an "
+                 "index out of bounds");
         return false;
     }
 
@@ -126,9 +131,9 @@ char rfBinaryArray_Set(RF_BinaryArray* a, uint32_t i, char val)
    //check for out of bounds index
    if(i >= a->size)
    {
-       LOG_ERROR(
-           "Attempted to set a value of a BinaryArray with an index out "
-           "of bounds", RE_INDEX_OUT_OF_BOUNDS);
+       RF_ERROR(0,
+                "Attempted to set a value of a BinaryArray with an index out "
+                "of bounds");
        return false;
    }
 

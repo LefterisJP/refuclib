@@ -221,13 +221,14 @@ i_DECLIMEX_ char rfString_Init_f(RF_String* str,float f);
  ** @brief Allocates and returns a string with the given UTF-16 byte sequence.
  **
  ** @notinherited{StringX}
- ** Given characters have to be in UTF-16 and in the endianess of the system. They also have to be null terminated.
- ** @param s A buffer of 2-byte words representing the utf-16 byte sequence. Needs to be null terminated.
- ** @return Returns the initialized RF_string or null in case of failure to initialize, due to invalid utf-16 sequence or illegal endianess value
+ ** @param s A buffer of 2 bytes word representing the
+ **  utf-16 byte sequence.
+ ** Needs to be null terminated
+ ** @return Returns the initialized RF_string or null in case of failure to
+ ** initialize, due to invalid utf-16 sequence or illegal endianess value
  ** @see rfString_Init_UTF16()
  ** @see rfString_Create_fUTF16()
  ** @see rfString_Init_UTF16()
- **
  **/
 i_DECLIMEX_ RF_String* rfString_Create_UTF16(const uint16_t* s);
 /**
@@ -235,16 +236,15 @@ i_DECLIMEX_ RF_String* rfString_Create_UTF16(const uint16_t* s);
  ** @brief Initializes a string with the given UTF-16 byte sequence.
  **
  ** @notinherited{StringX}
- ** Given characters have to be in UTF-16 and in the endianess of the system. They also have to be null terminated.
  ** @param str The string to initialize
- ** @param s A buffer of 2-byte words representing the utf-16 byte sequence. Needs to be null terminated.
- ** @return Returns true for succesfull initialization and false otherwise due to invalid utf-16 sequence or illegal endianess value
+ ** @param s A buffer of 2 bytes word representing the
+ **  utf-16 byte sequence.
+ ** @return Returns true for succesfull initialization and false otherwise 
  ** @see rfString_Create_UTF16()
  ** @see rfString_Create_fUTF16()
  ** @see rfString_Init_UTF16()
- **
  **/
-i_DECLIMEX_ char rfString_Init_UTF16(RF_String* str,const uint16_t* s);
+i_DECLIMEX_ char rfString_Init_UTF16(RF_String* str, const uint16_t* s);
 
 /**
  ** @memberof RF_String

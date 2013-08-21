@@ -46,6 +46,12 @@ def parseArguments():
                         "stop as soon as a single failure or error is "
                         "detected")
 
+    parser.add_argument("-k", "--keep-exec", dest="keep_exec", default=False,
+                        action="store_true", help="When this is specified and "
+                        "either a specific test has been provided for running or"
+                        " fail fast has been requested the test executable is "
+                        "not cleaned after a test has concluded")
+
     args = parser.parse_args()
 
     if(not set(args.compilers).issubset(set(validCompilers))):

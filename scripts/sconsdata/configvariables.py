@@ -8,7 +8,10 @@ vars_for_compile_time = [
     'DYNAMICARRAY_CAPACITY_MULTIPLIER',
     'LOCALSTACK_MEMORY_SIZE',
     'THREADX_MSGQUEUE_SIZE',
-    'HASHMAP_LOAD_FACTOR'
+    'HASHMAP_LOAD_FACTOR',
+    'ERROR_LOGGING_LEVEL',
+    'WARNING_LOGGING_LEVEL',
+    'INFO_LOGGING_LEVEL',
 ]
 
 # These are variables from variables.py which are True/False
@@ -16,7 +19,7 @@ vars_for_compile_time = [
 truevars_for_compile_time = [
     'DEFAULT_ARGUMENTS',
     'SAFE_MEMORY_ALLOCATION',
-    'ERROR_LOGGING',
+    'DEBUG',
     'TEXTFILE_ADD_BOM'
 ]
 

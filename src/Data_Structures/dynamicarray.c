@@ -33,19 +33,20 @@
 
 /* @omit end */
 
-//*---------------------Corrensponding Header inclusion---------------------------------
+/*------------- Corrensponding Header inclusion -------------*/
 #include <Definitions/imex.h> //for import export macro
 #include <Definitions/types.h> //for fixed size data types
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <Preprocessor/rf_tokens.h>//for the defined library tokens
 #include <Data_Structures/dynamicarray_decl.h> 
 #include <Data_Structures/dynamicarray.h>
-//*---------------------Module related inclusion----------------------------------------
+/*------------- Module related inclusion -------------*/
 #include "common.ph"//for the common macro definitions
-//*---------------------Outside module inclusion----------------------------------------
+/*------------- Outside Module inclusion -------------*/
 //for error logging
     #include <stdio.h>//for FILE* used inside printf.h
     #include <IO/printf.h> //for rfFpintf() used in the error logging macros
+    #include <Threads/common.h> //for rfThread_GetID()
     #include <Utils/error.h>
 //for memory allocation macros
     #include <stdlib.h> //for malloc, calloc,realloc and exit()
@@ -62,7 +63,7 @@
     #include <stdint.h> //for UINT32_MAX used in RF_ENTER_LOCAL_SCOPE() macro
     #include <Utils/localscope.h>
     /* @omit end */
-//*----------------------------End of Includes------------------------------------------
+/*------------- End of includes -------------*/
 
 //Allocates and returns an array of objects
 RF_DynamicArray* rfDynamicArray_Create(
@@ -104,9 +105,8 @@ char rfDynamicArray_Init(
     //if the given size is 0
     if(elSize == 0)
     {
-        LOG_ERROR(
-            "Tried to initialize a list of objects which have zero size",
-            RE_LIST_INIT_FAILURE);
+        RF_ERROR(0,
+                 "Tried to initialize a list of objects which have zero size");
         return false;
     }
     /* @omit end */
@@ -219,7 +219,7 @@ char rfDynamicArray_Add(RF_DynamicArray* l, void* object)
 {
     char ret = true;
     /* @omitcond NONLMS */
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
     /* @omit end */
     //check if there is enough space in the list
     /* @mutate l->elementSize SIZE */
@@ -230,12 +230,14 @@ char rfDynamicArray_Add(RF_DynamicArray* l, void* object)
         /* @mutate void* TYPEPTR */
         void* testPtr = realloc(l->data,l->bufferCapacity);
         if(testPtr)
+        {
             l->data = testPtr;
+        }
         else
         {
-            LOG_ERROR("Realloc failed in adding an object to an array of "
-                      "Objects during an attempt to increase buffer"
-                      " capacity. Aborting program", RE_REALLOC_FAILURE);
+            RF_ERROR(0,"Realloc failed in adding an object to an array of "
+                     "Objects during an attempt to increase buffer"
+                     " capacity");
             ret = false;
             goto cleanup;
         }
@@ -249,7 +251,7 @@ char rfDynamicArray_Add(RF_DynamicArray* l, void* object)
 
   cleanup:
     /* @omitcond NONLMS */
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     /* @omit end */
     return ret;
 }
@@ -260,15 +262,15 @@ char rfDynamicArray_Add(RF_DynamicArray* l, void* object)
 int32_t rfDynamicArray_Get_IN(RF_DynamicArray* l, uint32_t i, void* ret)
 {
     /* @omitcond NONLMS */
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
     /* @omit end */
     //if the index goes over the buffer capacity
     if( i >= l->size)
     {
-        LOG_ERROR("Attempted to retrieve an element from an array with an"
-                  " index that is out of bounds", RE_INDEX_OUT_OF_BOUNDS);
+        RF_WARNING(2, "Attempted to retrieve an element from an array with an"
+                 " index that is out of bounds");
         /* @omitcond NONLMS */
-        RF_EXIT_LOCAL_SCOPE()
+        RF_EXIT_LOCAL_SCOPE();
         /* @omit end */
         return RE_INDEX_OUT_OF_BOUNDS;
     }
@@ -277,7 +279,7 @@ int32_t rfDynamicArray_Get_IN(RF_DynamicArray* l, uint32_t i, void* ret)
            /* @mutate l->elementSize SIZE */
            l->elementSize);
     /* @omitcond NONLMS */
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     /* @omit end */
     return RF_SUCCESS;
 }
@@ -300,8 +302,8 @@ void* rfDynamicArray_Get_OUT(
     //if the index goes over the buffer capacity
     if( i >= l->size)
     {
-        LOG_ERROR("Attempted to retrieve an element from an array with an"
-                  " index that is out of bounds", RE_INDEX_OUT_OF_BOUNDS);
+        RF_WARNING(2, "Attempted to retrieve an element from an array with an"
+                 " index that is out of bounds");
         *code = RE_INDEX_OUT_OF_BOUNDS;
         return 0;
     }
@@ -323,14 +325,14 @@ char rfDynamicArray_Set(
 {
     char ret = true;
     /* @omitcond NONLMS */
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
     /* @omit end */
     //if the index points to a non-yet set element
     if(i >= l->size)
     {
-        LOG_ERROR("Attempted to set an element in an array with an index "
-                  "out of bounds. If you want to add objects to the list"
-                  "use the Add function.", RE_INDEX_OUT_OF_BOUNDS)
+        RF_WARNING(2, "Attempted to set an element in an array with an index "
+                   "out of bounds. If you want to add objects to the list "
+                   "use the Add function.");
         ret = false;
         goto cleanup;
     }
@@ -343,7 +345,7 @@ char rfDynamicArray_Set(
 
   cleanup:
     /* @omitcond NONLMS */
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     /* @omit end */
     return ret;
 }
@@ -357,8 +359,8 @@ int32_t rfDynamicArray_Remove(RF_DynamicArray* l, uint32_t i)
     //if the index points to a non-yet set element
     if(i >= l->size)
     {
-        LOG_ERROR("Attempted to remove an element from an array with an"
-                  " index out of bounds", RE_INDEX_OUT_OF_BOUNDS)
+        RF_ERROR(0,"Attempted to remove an element from an array with an"
+                 " index out of bounds");
         return RE_INDEX_OUT_OF_BOUNDS;
     }
 
@@ -390,9 +392,9 @@ int32_t rfDynamicArray_Remove(RF_DynamicArray* l, uint32_t i)
             l->data = testPtr;
         else
         {
-            LOG_ERROR("Realloc failed in removing an object from an array"
-                      " during an attempt to shrink the buffer. Aborting "
-                      "program",RE_REALLOC_FAILURE);
+            RF_ERROR(0,"Realloc failed in removing an object from an array"
+                     " during an attempt to shrink the buffer. Aborting "
+                     "program");
             return RE_REALLOC_FAILURE;
         }
     }

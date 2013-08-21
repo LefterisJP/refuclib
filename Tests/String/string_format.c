@@ -45,7 +45,7 @@ int main()
 /**
  ** [STRINGXFORMAT]
  **/
-    EXPECT(RF_SUCCESS,
+    EXPECT(true,
            rfStringX_Format(&s,
                             "Printing a double with flags %15.9f",
                             0.12345678911));
@@ -75,13 +75,13 @@ int main()
     EXPECTGE(rfPrintf("%e\n", 42.0f), 0);
     EXPECTGE(rfPrintf("Force radix printing %#E\n", 42.0f), 0);
 	//since how this number can be printed can differ let's just test the power
-    EXPECT(RF_SUCCESS,
+    EXPECT(true,
            rfStringX_Format(&s, "Small num %.12E \n", 0.000003234));
     EXPECT(10, rfString_Find(&s, RFS_("3.23")));
     EXPECTNOT(RF_FAILURE,
               rfStringX_MoveAfter(&s, RFS_("-"), &result, 0)); //the E should be minus
     EXPECT(true, rfString_Equal(&s, RFS_("6 \n"))); //the E should be -6
-    EXPECT(RF_SUCCESS,
+    EXPECT(true,
            rfStringX_Format(&s,"Small num %.12E \n",0.000003234));
     EXPECTGE(rfPrintf("Negative %.2e\n", -567.2), 0);
 /**
@@ -98,7 +98,7 @@ int main()
   
   //GCC will give you a -Wmultichar warning in such a situation which
   //we ignore with the above #pragma 
-    EXPECT(RF_SUCCESS,
+    EXPECT(true,
            rfStringX_Format(
                &s,"You can safely input both ascii chars like '"
                "%c' and utf8 chars like '%c' or '%c'",
@@ -115,7 +115,7 @@ int main()
 /**
  ** [CSTRING]
  **/
-    EXPECT(RF_SUCCESS,
+    EXPECT(true,
            rfStringX_Format(&s, "C strings like \"%s\" are also supported",
                             "Hello World"));
     EXPECT(true,
@@ -130,7 +130,7 @@ int main()
  ** [REFUSTRING]
  **/
 	//Refu strings
-    EXPECT(RF_SUCCESS,
+    EXPECT(true,
            rfStringX_Format(
                &s,
                "An addition over usual printf is %%S for Refu "

@@ -20,35 +20,45 @@
 **
 **      ==END OF REFU LICENSE==
 **
-*/
-
-#ifndef RF_THREAD_MODULE_HEADERS
-#define RF_THREAD_MODULE_HEADERS
-
-#include <rf_options.h> //to see if we want both threads
-#ifdef RF_MODULE_THREAD
+**
+** -Threads/common.h
+** This declares some functions that deal with thread related globals
+** or commong functionality such as the id of the curent thread.
+**  DOES NOT deal with anything having to do with RF_Thread types.
+**
+---------------------For internal library include make sure to have----------------------------
 #include <Definitions/types.h> //for fixed size data types
 #include <Definitions/imex.h> //for the import export macro
-#include <Definitions/defarg.h> //for enabling default arguments
-#ifdef REFU_WIN32_VERSION
-    #include <windows.h> //for the WinThread HANDLE definition
-#elif defined(REFU_LINUX_VERSION)
-    #include <pthread.h> //for pthread_t
-#else
-    #error Unsupported Operating System
-#endif
-#include <Threads/thread_flags.h> //for common Thread flags
-#include <Threads/thread_decl.h> //for RF_Thread
-#include <Threads/thread.h>
-#include <Threads/common.h> //for rfThread_GetID()
-#else
-    #error Attempted to include RF_Thread without having compiled the library with the Threads module activated
+---------------------For internal library include make sure to have----------------------------
+*/
+#ifndef RF_THREAD_COMMON_H
+#define RF_THREAD_COMMON_H
+
+#ifdef __cplusplus
+extern "C"
+{///opening bracket for calling from C++
 #endif
 
 
-#ifdef RF_MODULE_THREADX
-#include <Threads/threadx_decl.h> //for RF_ThreadX
-#include <Threads/threadx.h>
+/**
+ ** @brief Returns a unique identifier for the 
+ ** current thread.
+ **/
+i_DECLIMEX_ uintptr_t rfThread_GetID();
+
+
+/**
+ ** @brief Initializes the threading system.
+ **
+ ** The only thing that this currently does is
+ ** initialize the main thread's id with the pid of the process
+ **/
+i_DECLIMEX_ char rfThreads_Init();
+
+
+#ifdef __cplusplus
+}///closing bracket for calling from C++
 #endif
+
 
 #endif//include guards end

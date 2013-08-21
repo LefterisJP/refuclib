@@ -61,52 +61,43 @@
  **
  **/
 
-#define i_rfLMS_Push(i_ptr_,i_size_)    do{\
+#define i_rfLMS_Push(i_ptr_, i_size_, i_FAIL_STMT_)    do{              \
     /* If the size of the stack plus the requested allocation goes beyond the stack size*/\
     if(RF_LMS->stackPtr+(i_size_) > RF_OPTION_LOCALSTACK_MEMORY_SIZE)\
     {\
-        LOG_ERROR("Local Stack Memory pushing error. Attempted to allocate more memory than currently available",RE_LOCALMEMSTACK_PUSH)\
-        i_ptr_ = 0;\
-    }\
+        RF_ERROR(0, "Local Stack Memory pushing error. Attempted to "   \
+                 "allocate more memory than currently available in the " \
+                 "local memory stack");                                                  \
+        i_ptr_ = 0;                                                     \
+        i_FAIL_STMT_;                                                   \
+    }                                                                   \
     /* else, just increase the stack pointer and return the rightful amount of memory */\
-    i_ptr_ = (void*)(RF_LMS->stack+RF_LMS->stackPtr);\
-    RF_LMS->stackPtr+= (i_size_);\
+    i_ptr_ = (void*)(RF_LMS->stack+RF_LMS->stackPtr);                   \
+    RF_LMS->stackPtr+= (i_size_);                                       \
     }while(0)
 
 
 /**
- ** Is the internal library version of the @ref rfLMS_Pop() function. Frees memory from the local stack.
- ** @param i_size_ The size to pop (free)
- **
+ ** Is the internal library version of @ref rfLMS_ArgsEval() function.
+ ** It keeps the stack pointer before a specific function's argument 
+ ** evaluation. So that we can know what stack pointer value to return 
+ ** to after a function with local objects finishes
+ ** @param i_FAIL_STMT_ is the statement to execute in case
+ ** of failure
  **/
-#define i_rfLMS_Pop(i_size_) \
-{\
-    if(i_size_ > RF_LMS->stackPtr)\
-    {\
-        LOG_ERROR("Local Stack Memory popping error. Attempted to pop the memory to a point in the stack that's not allocated yet",RE_LOCALMEMSTACK_POP)\
-    }\
-    else\
-        RF_LMS->stackPtr=i_size_;\
-}
-
-
-/**
- ** Is the internal library version of @ref rfLMS_ArgsEval() function. It keeps the
- ** stack pointer before a specific function's argument evaluation. So that we can know
- ** what stack pointer value to return to after a function with local objects finishes
- **
- **/
-#define i_rfLMS_ArgsEval() \
-{   /*Check if the function had more local object macros evaluation than the max number of arguments*/\
-    if(RF_LMS->macroEvalsI+1 >= RF_MAX_FUNC_ARGS)\
-    {\
-        LOG_ERROR("Local Stack Memory macro evaluation error. More macros than the specified maximum number of function arguments \"%d\" have been evaluated",\
-                  RE_LOCALMEMSTACK_MACROEVALS,RF_MAX_FUNC_ARGS)\
-        exit(RE_LOCALMEMSTACK_MACROEVALS);\
-    }\
-    RF_LMS->macroEvals[RF_LMS->macroEvalsI] = RF_LMS->stackPtr;\
-    RF_LMS->macroEvalsI++;\
-}
+#define i_rfLMS_ArgsEval(i_FAIL_STMT_) do{\
+        /*Check if the function had more local object macros evaluation than the max number of arguments*/ \
+        if(RF_LMS->macroEvalsI+1 >= RF_MAX_FUNC_ARGS)                   \
+        {                                                               \
+            RF_ERROR(0,"Local Stack Memory macro evaluation error. More" \
+                     " macros than the specified maximum number of "    \
+                     "function arguments \"%d\" have been evaluated",   \
+                     RF_MAX_FUNC_ARGS);                                 \
+            i_FAIL_STMT_;                                               \
+        }                                                       \
+        RF_LMS->macroEvals[RF_LMS->macroEvalsI] = RF_LMS->stackPtr; \
+        RF_LMS->macroEvalsI++;                                      \
+    }while(0)
 
 
 #endif//include guards end

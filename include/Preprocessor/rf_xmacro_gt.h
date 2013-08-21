@@ -31,6 +31,8 @@
  **
  **/
 #define RP_GT(v1_,v2_)  i_GT_##v1_##_##v2_
+#define RP_GT2(v1_,v2_)  i_GT_##v1_##_##v2_
+#define RP_GT3(v1_,v2_)  i_GT_##v1_##_##v2_
 
 /**
  ** These are the tokens for greater than 64 check

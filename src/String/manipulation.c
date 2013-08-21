@@ -22,24 +22,25 @@
 **
 */
 
-//*---------------------Corrensponding Header inclusion---------------------------------
+/*------------- Corrensponding Header inclusion -------------*/
 #include <Definitions/types.h> //for fixed size types needed in various places
 #include <String/string_decl.h>//for RF_String
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <String/manipulation.h>
-//*---------------------Module related inclusion----------------------------------------
+/*------------- Module related inclusion -------------*/
 #include <String/stringx_decl.h> //for RF_StringX
 #include <String/corex.h> //for rfStringX_Deinit() and rfStringX_FromString_IN
 #include <Utils/constcmp.h> //for RF_HEXEQ_C() used in the iteration macros
 #include <String/core.h> //for string iterations
 #include <String/retrieval.h> //for rfString_Length()
 #include "common.ph" //for required string private macros and functions
-//*---------------------Outside module inclusion----------------------------------------
+/*------------- Outside Module inclusion -------------*/
 #include <String/unicode.h> //for unicode functions
 //for error logging macros
     #include <stdio.h>//for FILE* used inside printf.h
     #include <IO/printf.h> //for rfFpintf() used in the error logging macros
+    #include <Threads/common.h> //for rfThread_GetID()
     #include <Utils/error.h>
 //for memory allocation macros
     #include <stdlib.h> //for malloc, calloc,realloc and exit()
@@ -51,7 +52,7 @@
     #include <string.h> //for memset()
     #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
     #include <Utils/localscope.h>
-//*----------------------------End of Includes------------------------------------------
+/*------------- End of includes -------------*/
 
 
 // Appends the parameter String to this one
@@ -59,19 +60,25 @@ char rfString_Append(RF_String* thisstr,const void* otherP)
 {
     const RF_String* other = (const RF_String*)otherP;
     char ret = true;
-    RF_ENTER_LOCAL_SCOPE()
-    ///@note Here if a null addition is given lots of actions are done but the result is safe and the same string as the one entered.
-    ///A check here would result in an additional check for every appending so I decided against it
-    //calculate the new length
+    RF_ENTER_LOCAL_SCOPE();
+
+#if RF_OPTION_DEBUG
+    if(other == NULL)
+    {
+        RF_WARNING(0, "Provided a NULL pointer for the other string argument");
+        ret = false;
+        goto cleanup;
+    }
+#endif
     thisstr->byteLength +=other->byteLength;
     //reallocate this string to fit the new addition
     RF_REALLOC_JMP(thisstr->bytes, char, thisstr->byteLength+1,
                    ret = false, cleanup);
     //add the string to this one
-    strncat(thisstr->bytes,other->bytes,other->byteLength);
+    strncat(thisstr->bytes, other->bytes, other->byteLength);
 
   cleanup:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -80,12 +87,22 @@ char rfString_Append_i(RF_String* thisstr,const int32_t i)
 {
     //create a new buffer for the string big enough to fit any number plus the original string
     char* buff;
-    RF_MALLOC(buff, thisstr->byteLength+15, false);//max uint32_t is 4,294,967,295 in most environment so 12 chars will certainly fit it
+    int rc;
+    RF_MALLOC(buff, thisstr->byteLength+15, false);//max uint32_t is 
+    //4,294,967,295 in most environment so 12 chars will certainly fit it
     //put the int32_t inside the string
-    if(sprintf(buff,"%s%i",thisstr->bytes, i) < 0)
+    if((rc=snprintf(buff, thisstr->byteLength+15,
+                    "%s%i", thisstr->bytes, i)) < 0)
     {
-        LOG_ERROR("During appending an int to a string sprintf failed",
-                  RE_STRING_APPEND);
+        RF_ERROR(0,"During appending an int to a string snprintf failed");
+        free(buff);
+        return false;
+    }
+    if(rc > thisstr->byteLength + 15)
+    {
+        RF_ERROR(0, "During appending an int to a string snprintf failed"
+                 "because of insufficient buffer size");
+        free(buff);
         return false;
     }
     //free the previous c string
@@ -100,12 +117,21 @@ char rfString_Append_f(RF_String* thisstr,const float f)
 {
     //a temporary buffer to hold the float and the string
     char* buff;
-    RF_MALLOC(buff, thisstr->byteLength+64, false);
+    int rc;
+    RF_MALLOC(buff, thisstr->byteLength + 64, false);
     //put the float inside the string
-    if(sprintf(buff,"%s%f",thisstr->bytes,f) < 0)
+    if((rc=snprintf(buff, thisstr->byteLength + 64,
+                    "%s%f",thisstr->bytes,f)) < 0)
     {
-        LOG_ERROR("During appending a float to a string sprintf failed",
-                  RE_STRING_APPEND);
+        RF_ERROR(0,"During appending a float to a string snprintf failed");
+        free(buff);
+        return false;
+    }
+    if(rc > thisstr->byteLength + 64)
+    {
+        RF_ERROR(0, "During appending a float to a string snprint failed "
+                 "due to insufficient buffer size");
+        free(buff);
         return false;
     }
     //free the previous c string
@@ -123,7 +149,17 @@ char rfString_Prepend(RF_String* thisstr,const void* otherP)
     uint32_t size;
     char ret = true;
     int32_t i;//is not unsigned since it goes to -1 in the loop
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
+
+#if RF_OPTION_DEBUG
+    if(other == NULL)
+    {
+        RF_WARNING(0, "Provided a NULL pointer for the other string argument");
+        ret = false;
+        goto cleanup;
+    }
+#endif
+
     //keeep the original byte size of the string
     size = thisstr->byteLength;
     //calculate the new lengths
@@ -140,15 +176,17 @@ char rfString_Prepend(RF_String* thisstr,const void* otherP)
     memcpy(thisstr->bytes,other->bytes,other->byteLength);
 
   cleanup:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
 //Removes all of the specifed string occurences from this String matching case or not, DOES NOT reallocate buffer size.
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-char rfString_Remove(void* thisstrP,const void* rstrP,uint32_t number,const char options)
+char rfString_Remove(void* thisstrP, const void* rstrP, uint32_t number,
+                     const char options)
 #else
-char i_rfString_Remove(void* thisstrP,const void* rstrP,uint32_t number,const char options)
+char i_rfString_Remove(void* thisstrP, const void* rstrP, uint32_t number,
+                       const char options)
 #endif
 {
     RF_String* thisstr = (RF_String*)thisstrP;
@@ -156,7 +194,17 @@ char i_rfString_Remove(void* thisstrP,const void* rstrP,uint32_t number,const ch
     uint32_t i,count,occurences=0;
     int32_t bytePos;
     char found = false, ret = true;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
+
+#if RF_OPTION_DEBUG
+    if(rstr == NULL)
+    {
+        RF_WARNING(0, "Provided a NULL pointer for the To Remove string argument");
+        ret = false;
+        goto cleanup;
+    }
+#endif
+
     //as long as we keep finding rstr in the string keep removing it
     do
     {   //if the substring is not found
@@ -172,7 +220,6 @@ char i_rfString_Remove(void* thisstrP,const void* rstrP,uint32_t number,const ch
             else //else we are done
                 break;
         }
-
         //substring found
         found = true;
         //move all of the string a position back
@@ -193,7 +240,7 @@ char i_rfString_Remove(void* thisstrP,const void* rstrP,uint32_t number,const ch
     }while(bytePos != RF_FAILURE);
 
   cleanup:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -205,7 +252,17 @@ char rfString_KeepOnly(void* thisstrP,const void* keepstrP)
     RF_String* thisstr = (RF_String*)thisstrP;
     const RF_String* keepstr = (const RF_String*)keepstrP;
     char exists,charBLength, ret = true;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
+
+#if RF_OPTION_DEBUG
+    if(keepstr == NULL)
+    {
+        RF_WARNING(0, "Provided a NULL pointer for the keep string argument");
+        ret = false;
+        goto cleanup;
+    }
+#endif
+
     //first let's get all of the characters of the keep string in an array
     i=0;
     keepLength = rfString_Length(keepstr);
@@ -225,10 +282,16 @@ char rfString_KeepOnly(void* thisstrP,const void* keepstrP)
                 exists = true;
             }
         }
-        //if it does not exist, move the string back to cover it so that it effectively gets deleted
+        //if it does not exist, move the string back to cover it so that it
+        // effectively gets deleted
         if(exists == false)
         {
-            charBLength = rfUTF8_FromCodepoint(charValue,&temp);
+            if((charBLength = rfUTF8_FromCodepoint(charValue,&temp)) < 0)
+            {
+                RF_ERROR(0,"Could not decode a codepoint into UTF-8");
+                ret = false;
+                goto cleanup2;
+            }
             //this is kind of a dirty way to do it. the rfString_Iterate_Start macro internally uses a byteIndex_ variable
             //we use that here to determine the current byteIndex_ of the string in the iteration and move the string backwards
             memmove(
@@ -239,13 +302,15 @@ char rfString_KeepOnly(void* thisstrP,const void* keepstrP)
             continue;//by contiuing here we make sure that the current string position won't be moved to assure that we also check the newly move characters
         }
     rfString_Iterate_End(i)
+
+
+    cleanup2:
     //before returning free the keep string's character array
     free(keepChars);
-
 #ifdef RF_OPTION_SAFE_MEMORY_ALLOCATION //only used for malloc fail
   cleanup:
 #endif
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -269,7 +334,8 @@ char rfString_PruneStart(void* thisstrP,uint32_t n)
         }
     RF_STRING_ITERATE_END(length,i)
 
-    //if the string does not have n chars to remove it becomes an empty string and we return failure
+    //if the string does not have n chars to remove it becomes an empty string
+    // and we return failure
     if(found == false)
     {
         thisstr->bytes[0] = '\0';
@@ -279,8 +345,9 @@ char rfString_PruneStart(void* thisstrP,uint32_t n)
 
     //move the string back to cover the empty places.reallocation here would be an overkill, everything will be freed together when the string gets freed
     for(i =0; i < thisstr->byteLength-nBytePos+1;i++ )
+    {
         thisstr->bytes[i] = thisstr->bytes[i+nBytePos];
-
+    }
     //get the new bytelength
     thisstr->byteLength -= nBytePos;
 
@@ -320,17 +387,18 @@ char rfString_PruneEnd(void* thisstrP,uint32_t n)
 }
 
 //Removes n characters from the position p of the string counting backwards. If there is no space to do so, nothing is done and returns false.
-char rfString_PruneMiddleB(void* thisstrP,uint32_t p,uint32_t n)
+char rfString_PruneMiddleB(void* thisstrP, uint32_t p, uint32_t n)
 {
     RF_String* thisstr = (RF_String*)thisstrP;
+    uint32_t i,length;
+    int32_t pBytePos,nBytePos;
     //if we ask to remove more characters from the position that it would be possible do nothign and return false
     if(n>p+1)
     {
         return false;
     }
     //iterate the characters of the string
-    uint32_t i,length;
-    int32_t pBytePos,nBytePos;
+
     pBytePos = nBytePos = -1;
     RF_STRING_ITERATE_START(thisstr,length,i)
         //if we reach the number of characters passed as a parameter, note it
@@ -427,8 +495,21 @@ char i_rfString_Replace(RF_String* thisstr, const void* sstrP,
     //will keep the number of given instances to find
     uint32_t number = num;
     uint32_t diff,i,j;
+    int32_t * bytePositions;
     char ret = true;
-    RF_ENTER_LOCAL_SCOPE()
+    uint32_t bSize = 50;
+
+    RF_ENTER_LOCAL_SCOPE();
+
+#if RF_OPTION_DEBUG
+    if(sstr == NULL || rstr == NULL)
+    {
+        RF_WARNING(0, "Provided a NULL pointer for either the search or "
+                   "for the replace string");
+        ret = false;
+        goto cleanup;
+    }
+#endif
 
     //if the substring string is not even found return false
     if(rfString_FindBytePos(thisstr,sstr,options) == RF_FAILURE)
@@ -437,8 +518,7 @@ char i_rfString_Replace(RF_String* thisstr, const void* sstrP,
         goto cleanup;
     }
     //create a buffer that will keep the byte positions
-    uint32_t bSize = 50;
-    int32_t * bytePositions;
+
     RF_MALLOC_JMP(bytePositions, bSize*sizeof(int32_t),
                   ret = false, cleanup);
     //if the given num is 0 just make sure we replace all
@@ -532,7 +612,7 @@ char i_rfString_Replace(RF_String* thisstr, const void* sstrP,
     free(bytePositions);
     //end
   cleanup:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -540,11 +620,19 @@ char i_rfString_Replace(RF_String* thisstr, const void* sstrP,
 char rfString_TrimStart(void* thisstrP,const void* subP)
 {
     RF_String* thisstr = (RF_String*) thisstrP;
-    const RF_String*sub = (const RF_String*) subP;
+    const RF_String* sub = (const RF_String*) subP;
     char ret = false,noMatch;
     uint32_t charValue,i = 0,*subValues,j,subLength,bytePos;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
 
+#if RF_OPTION_DEBUG
+    if(sub == NULL)
+    {
+        RF_WARNING(0, "Provided a NULL pointer for the substring argument");
+        ret = false;
+        goto cleanup;
+    }
+#endif
     //firstly get all of the characters of the substring in an array
     subLength = rfString_Length(sub);
     RF_MALLOC_JMP(subValues, 4*subLength, ret=false, cleanup);
@@ -590,19 +678,27 @@ char rfString_TrimStart(void* thisstrP,const void* subP)
 #ifdef RF_OPTION_SAFE_MEMORY_ALLOCATION //only used for malloc fail
   cleanup:
 #endif
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
 //Removes all characters of a substring starting from the end of the String
-char rfString_TrimEnd(void* thisstrP,const void* subP)
+char rfString_TrimEnd(void* thisstrP, const void* subP)
 {
     RF_String* thisstr = (RF_String*) thisstrP;
     const RF_String*sub = (const RF_String*) subP;
     char ret = false,noMatch;
-    uint32_t charValue,i = 0,*subValues,j,subLength,bytePos,lastBytePos=0,testity;
-    RF_ENTER_LOCAL_SCOPE()
+    uint32_t charValue,i = 0,*subValues,j,subLength,bytePos,lastBytePos=0;
+    RF_ENTER_LOCAL_SCOPE();
 
+#if RF_OPTION_DEBUG
+    if(sub == NULL)
+    {
+        RF_WARNING(0, "Provided a NULL pointer for the substring argument");
+        ret = false;
+        goto cleanup;
+    }
+#endif
     //firstly get all of the characters of the substring in an array
     subLength = rfString_Length(sub);
     RF_MALLOC_JMP(subValues, 4*subLength, ;, cleanup);
@@ -618,7 +714,7 @@ char rfString_TrimEnd(void* thisstrP,const void* subP)
         for(j = 0;j < subLength; j++)
         {
             //if we got a match
-            if((testity=rfString_BytePosToCodePoint(thisstr,bytePos)) == subValues[j])
+            if(rfString_BytePosToCodePoint(thisstr,bytePos) == subValues[j])
             {
                 ret = true;
                 noMatch = false;
@@ -648,16 +744,16 @@ char rfString_TrimEnd(void* thisstrP,const void* subP)
 #ifdef RF_OPTION_SAFE_MEMORY_ALLOCATION //only used for malloc fail
   cleanup:
 #endif
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
 //Removes all characters of a substring from both ends of the given String
 char rfString_Trim(void* thisstrP,const void* subP)
 {
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
     char res1 = rfString_TrimStart(thisstrP,subP);
     char res2 = rfString_TrimEnd(thisstrP,subP);
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return res1|res2;
 }

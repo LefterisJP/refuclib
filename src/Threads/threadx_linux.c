@@ -22,7 +22,7 @@
 **
 */
 
-//*---------------------Corrensponding Header inclusion---------------------------------
+/*------------- Corrensponding Header inclusion -------------*/
 #include <Definitions/types.h> //for fixed size data types
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
@@ -32,9 +32,10 @@
 #include <Threads/mutex_decl.h> //for RF_Mutex used in RF_ThreadX
 #include <Threads/threadx_decl.h> //for RF_ThreadX
 #include <Threads/threadx.h>
-//*---------------------Module related inclusion----------------------------------------
+/*------------- Module related inclusion -------------*/
 #include <Threads/mutex.h>
-//*---------------------Outside module inclusion----------------------------------------
+#include <Threads/common.h> //for rfThread_GetID()
+/*------------- Outside Module inclusion -------------*/
 //for io buffer initialization
     #include <Definitions/threadspecific.h> // for the thread specific keyword used in the ioBuffer
     #include <String/string_decl.h> //for RF_String (ioBuffer type)
@@ -53,10 +54,10 @@
     #include <Utils/localmem.h> //for initializing the local memory stack of this thread
 //for RF_BITFLAG_ON
     #include <Utils/bits.h>
-//*---------------------libc Headers inclusion------------------------------------------
+/*------------- libc inclusion -------------*/
 #include <errno.h>
 #include <string.h> //for memcpy() and memmove()
-//*----------------------------End of Includes------------------------------------------
+/*------------- End of includes -------------*/
 
 /**
 ** @internal
@@ -85,11 +86,13 @@ static void* RF_THREADX_FUNCTION(void* param)
     if(!rfLMS_Init(&lms,thread->INH_Thread.lmsSize))
     {
         //TODO: Add the thread's address in the msg
-        LOG_ERROR(
-            "Failure to initialize a thread because its local memory "
-            "stack could not be initialized", RE_LOCALMEMSTACK_INIT)
+        RF_ERROR(0,
+                 "Failure to initialize a thread because its local memory "
+                 "stack could not be initialized");
         return (void*)RE_LOCALMEMSTACK_INIT;
     }
+    //save the address of this thread as id
+    i_thread_id = (uintptr_t)&t;
     //initialize the stdio for this thread
     rfInitStdio();
     //run the thread function
@@ -147,18 +150,15 @@ char i_rfThreadX_Init(RF_ThreadX* t,
     t->INH_Thread.data = data;
     t->INH_Thread.lmsSize = lmsSize;
     //get the function given by the user
-    if(ptr2onExecution != 0)
+    if(ptr2onExecution == 0)
     {
-        t->INH_Thread.ptr2onExecution = (void*(*)(void*))ptr2onExecution;
-    }
-    else
-    {
-        LOG_ERROR(
-            "Passed a null pointer for the thread's execution. The thread"
-            " will be doing nothing, so it is meaningless",
-            RE_THREAD_NULL_EXECUTION_FUNCTION);
+        RF_ERROR(0,
+                 "Passed a null pointer for the thread's execution. The thread"
+                 " will be doing nothing, so it is meaningless");
         return false;
+
     }
+    t->INH_Thread.ptr2onExecution = (void*(*)(void*))ptr2onExecution;
 
     //Initializing ThreadX data here
     t->msgIndex = 0;

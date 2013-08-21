@@ -28,11 +28,16 @@ for compiler in args.compilers:
     else:
         try:
             runTests(compiler, True, outName, logFile, args.verbose,
-                     args.debug, args.tests, args.fail_fast)
+                     args.debug, args.tests, args.fail_fast, args.keep_exec)
         except TestsFail as err:
             print(err)
             print("\n**Tests for the Dynamic version of Refulib and the "
                   "{} compiler failed.\n".format(compiler))
+            if args.fail_fast:
+                print("Tests failed with the fail_fast flag on. No other "
+                      "versions will be attempted")
+                logFile.close()
+                sys.exit(0)
         
     #compile a static version of the library
     outName = compileLib(args.verbose, False, compiler)
@@ -42,11 +47,16 @@ for compiler in args.compilers:
     else:
         try:
             runTests(compiler, False, outName, logFile, args.verbose,
-                     args.debug, args.tests, args.fail_fast)
+                     args.debug, args.tests, args.fail_fast, args.keep_exec)
         except TestsFail as err:
             print(err)
             print("\n**Tests for the Static version of Refulib and the "
                   "{} compiler failed.\n".format(compiler))
+            if args.fail_fast:
+                print("Tests failed with the fail_fast flag on. No other "
+                      "versions will be attempted");
+                logFile.close()
+                sys.exit(0)
 
 print("\nAll tests have concluded. For more information you can check "
       "logfile: \"{0}\"".format(args.logfile))

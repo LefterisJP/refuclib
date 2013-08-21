@@ -31,7 +31,7 @@
 
 #include <rf_options.h> //to get the existence or not of default arguments
 
-//*------------------------------- A macro that hopefully generates an intelligible compiler error-------------------------------------
+/*-- A macro that hopefully generates an intelligible compiler error --*/
 #if defined(__GNUC__) || defined(__TINYC__) //GCC and TCC
     #define RF_COMPILE_ERROR(i_ERROR_STR)   ;_Pragma(i_ERROR_STR);\
                                         COMPILE_ERROR

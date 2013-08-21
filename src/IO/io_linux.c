@@ -21,11 +21,11 @@
 **      ==END OF REFU LICENSE==
 **
 **/
-//*---------------------Corresponding Header inclusion---------------------------------
+/*------------- Corrensponding Header inclusion -------------*/
 #include <Definitions/types.h> //for fixed size types
 #include <stdio.h> //for FILE*
 #include <Definitions/imex.h> //for the import export macro
-//*---------------------Outside module inclusion----------------------------------------
+/*------------- Outside Module inclusion -------------*/
 //for error logging
     #include <IO/printf.h> //for rfFpintf() used in the error logging macros
     #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
@@ -39,21 +39,30 @@
     #include <string.h> //for memset()
     #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
     #include <Utils/localscope.h> //for the local scope macros
-//*----------------------------End of Includes------------------------------------------
+/*------------- End of includes -------------*/
 
 
 //Opens another process as a pipe
-FILE* rfPopen(void* commandP,const char* mode)
+FILE* rfPopen(void* commandP, const char* mode)
 {
-    FILE* ret = 0;
+    FILE* ret = NULL;
     RF_String* command = (RF_String*)commandP;
-    RF_ENTER_LOCAL_SCOPE()
-    if( strcmp(mode,"r")!=0 && strcmp(mode,"w")!=0)
-        LOG_ERROR("Invalide mode argument provided to rfPopen( )",RE_POPEN_INVALID_MODE)
-    else
-        ret = popen(command->bytes,mode);
+    RF_ENTER_LOCAL_SCOPE();
 
-    RF_EXIT_LOCAL_SCOPE()
+#if RF_OPTION_DEBUG
+    if( strcmp(mode,"r") != 0 && strcmp(mode,"w") != 0)
+    {
+        RF_ERROR(0, "Invalid mode argument provided to rfPopen()");
+        goto cleanup;
+    }
+#endif
+
+    ret = popen(command->bytes,mode);
+
+#if RF_OPTION_DEBUG
+  cleanup:
+#endif
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 

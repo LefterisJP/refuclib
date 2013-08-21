@@ -46,15 +46,21 @@ typedef struct RF_TextFile
     FILE* f;
     //! The name of the file
     RF_String name;
-    //! The current line number. Basically represents the line that was last read by any of the file's functions
+    //! The current line number. Basically represents the line that was last
+    //! read by any of the file's functions
     uint64_t line;
     //! The encoding. Can be one of @c RF_UTF8, @c RF_UTF16 and @c RF_UTF32
     char encoding;
+    //! The endianess of the file. Can be one of @c RC_BIG_ENDIAN or
+    //! @c RF_LITTLE_ENDIAN
+    char endianess;
     //! A boolean flag denoting if the end of file was reached
     char eof;
-    //! the mode of textfile opening. Can be one of @c RF_FILE_READ, @c RF_FILE_WRITE and @c RF_FILE_READWRITE
+    //! the mode of textfile opening. Can be one of @c RF_FILE_READ, @c 
+    //!RF_FILE_WRITE and @c RF_FILE_READWRITE
     char mode;
-    //! the previous i/o operation on the file. Can be one of @c RF_FILE_READ, @c RF_FILE_WRITE
+    //! the previous i/o operation on the file. Can be one of @c RF_FILE_READ,
+    //! @c RF_FILE_WRITE
     char previousOp;
     //! A boolean flag denoting if the TextFile has a Byte Order Mark in the beginning or not
     char hasBom;

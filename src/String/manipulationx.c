@@ -23,20 +23,20 @@
 */
 
 
-//*---------------------Corrensponding Header inclusion---------------------------------
+/*------------- Corrensponding Header inclusion -------------*/
 #include <Definitions/types.h> //for fixed size types needed in various places
 #include <String/string_decl.h>//for RF_String
 #include <String/stringx_decl.h> //for RF_StringX
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <String/manipulationx.h>
-//*---------------------Module related inclusion----------------------------------------
+/*------------- Module related inclusion -------------*/
 #include <String/flags.h> //for the flags
 #include <String/core.h> //for rfString_Deinit
 #include <String/retrieval.h> //for rfString_Between and others
 #include <String/traversalx.h> //for rfStringX_MoveAfter() and other functions
 #include "common.ph" //for private string functions and macros
-//*---------------------Outside module inclusion----------------------------------------
+/*------------- Outside Module inclusion -------------*/
 #include <String/unicode.h> //for unicode functions
 //for the integer int and uint conversions
     #include <Definitions/inline.h> //for the inline declaration
@@ -47,6 +47,7 @@
 //for error logging macros
     #include <stdio.h>//for FILE* used inside printf.h
     #include <IO/printf.h> //for rfFpintf() used in the error logging macros
+    #include <Threads/common.h> //for rfThread_GetID()
     #include <Utils/error.h>
 //for memory allocation macros
     #include <stdlib.h> //for malloc, calloc,realloc and exit()
@@ -59,15 +60,24 @@
     #include <string.h> //for memset()
     #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
     #include <Utils/localscope.h>//for local scope macros
-//*----------------------------End of Includes------------------------------------------
+/*------------- End of includes -------------*/
 
 
 // Appends the parameter String to this extended string.
-char rfStringX_Append(RF_StringX* thisstr,const void* otherP)
+char rfStringX_Append(RF_StringX* thisstr, const void* otherP)
 {
     char ret = true;
     const RF_String* other = (const RF_String*)otherP;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
+
+#if RF_OPTION_DEBUG
+    if(other == NULL)
+    {
+        RF_WARNING(0, "Provided a NULL pointer for the other string argument");
+        ret = false;
+        goto cleanup;
+    }
+#endif
 
     //calculate the new byte length
     thisstr->INH_String.byteLength += other->byteLength;
@@ -80,7 +90,7 @@ char rfStringX_Append(RF_StringX* thisstr,const void* otherP)
     strncat(thisstr->INH_String.bytes, other->bytes, other->byteLength);
 
   cleanup:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -93,7 +103,16 @@ char rfStringX_Append_i(RF_StringX* thisstr, const void* otherP, int chars)
     uint32_t length = 0;
     unsigned end = 0;
     char ret = true;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
+
+#if RF_OPTION_DEBUG
+    if(other == NULL)
+    {
+        RF_WARNING(0, "Provided a NULL pointer for the other string argument");
+        ret = false;
+        goto cleanup;
+    }
+#endif
 
     //find out the bytelength of the requested char position
     RF_STRING_ITERATE_START(other,length,i);
@@ -105,9 +124,10 @@ char rfStringX_Append_i(RF_StringX* thisstr, const void* otherP, int chars)
     RF_STRING_ITERATE_END(length,i)
 
     //if the end is not found (requested out of bounds character) then just take all of the string
-    if(end==0)
+    if(end == 0)
+    {
         end = other->byteLength;
-
+    }
     //calculate the new bytelength
     thisstr->INH_String.byteLength += end;
     //if it does not fit inside the remaining size, reallocate the buffer
@@ -118,18 +138,18 @@ char rfStringX_Append_i(RF_StringX* thisstr, const void* otherP, int chars)
     strncat(thisstr->INH_String.bytes, other->bytes, end);
 
   cleanup:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
 //Appends a single unicode character to this string
 char rfStringX_Append_char(RF_StringX* thisstr, uint32_t unichar)
 {
-    char utf8[5],length;
-    if((length = rfUTF8_Encode_single(unichar,utf8)) == 0)
+    char utf8[5];
+    int length;
+    if((length = rfUTF8_Encode_single(unichar,utf8)) < 0)
     {
-        LOG_ERROR("Error at appending a unicode character to a string",
-                  RF_LastError);
+        RF_ERROR(0,"Encoding the given unicode codepoint to UTF8 failed");
         return false;
     }
 
@@ -174,7 +194,8 @@ char rfStringX_Append_charutf8(RF_StringX* thisstr,uint32_t utf8char)
     return true;
 }
 
-#define INTNUMBUFF 128
+/* max number of bytes used for an int */
+#define INTNUMBUFF 64
 //Appends an int to the extended string
 char rfStringX_Append_int(RF_StringX* thisstr, int64_t num, int width,
                           int precision, char flags)
@@ -195,7 +216,6 @@ char rfStringX_Append_int(RF_StringX* thisstr, int64_t num, int width,
         len=1;
         hasSign=1;
     }
-
 
 
     //turn the string into a number
@@ -310,7 +330,8 @@ char rfStringX_Append_uint(RF_StringX* thisstr, uint64_t num, int width,
 }
 
 //Appends an unsigned int as a Hexadecimal value to the extended string following some specific parameters
-char rfStringX_Append_hex(RF_StringX* thisstr,uint64_t num,int width,int precision,char flags)
+char rfStringX_Append_hex(RF_StringX* thisstr, uint64_t num, int width,
+                          int precision, char flags)
 {
     char buff[INTNUMBUFF];
     int len = 0;
@@ -530,6 +551,7 @@ char rfStringX_Append_double(RF_StringX* thisstr, double f, int width,
     //success
     return true;
 }
+
 //Appends a float or double value to the extended string in scientific notation following some specific parameters
 char rfStringX_Append_double_scientific(RF_StringX* thisstr, double f,
                                         int width, int precision,
@@ -538,7 +560,7 @@ char rfStringX_Append_double_scientific(RF_StringX* thisstr, double f,
     char* result,*str,*end,hasSign=0;
     int decpt,sign,len,start;
     result=doubleToStr(f, 3, 999, &decpt, &sign, &end);//for scientific notation calling doubleToStr() with 999 precision because there might be cases where
-    len=0;                                 //in normal notation the given precision would be enough but since the radix moves in scientific we would be left with less data than we need
+    len=0;      //in normal notation the given precision would be enough but since the radix moves in scientific we would be left with less data than we need
     start = thisstr->INH_String.byteLength;
     str = thisstr->INH_String.bytes+thisstr->INH_String.byteLength;
     //negative check
@@ -706,7 +728,17 @@ char rfStringX_Prepend(RF_StringX* thisstr, const void* otherP)
     int32_t i;//is not unsigned since it goes to -1 in the loop
     //keep the previous byte length
     uint32_t size = thisstr->INH_String.byteLength;
-    RF_ENTER_LOCAL_SCOPE()
+
+    RF_ENTER_LOCAL_SCOPE();
+#if RF_OPTION_DEBUG
+    if(other == NULL)
+    {
+        RF_WARNING(0, "Provided a NULL pointer for the other string argument");
+        ret = false;
+        goto cleanup;
+    }
+#endif 
+
 
     //get the new byte length
     thisstr->INH_String.byteLength += other->byteLength;
@@ -726,7 +758,7 @@ char rfStringX_Prepend(RF_StringX* thisstr, const void* otherP)
     memcpy(thisstr->INH_String.bytes,other->bytes,other->byteLength);
 
   cleanup:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -737,7 +769,16 @@ char rfStringX_Insert(RF_StringX* thisstr, uint32_t pos,
     const RF_String* other = (const RF_String*)otherP;
     uint32_t length,bytePos,size,i;
     char found = false, ret = true;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
+
+#if RF_OPTION_DEBUG
+    if(other == NULL)
+    {
+        RF_WARNING(0, "Provided a NULL pointer for the other string argument");
+        ret = false;
+        goto cleanup;
+    }
+#endif
 
     //keep the original byte length here
     size = thisstr->INH_String.byteLength;
@@ -772,7 +813,7 @@ char rfStringX_Insert(RF_StringX* thisstr, uint32_t pos,
     }
 
   cleanup:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -783,8 +824,16 @@ char rfStringX_Append_bytes(RF_StringX* thisstr, const void* otherP,
 {
     const RF_String* other = (const RF_String*)otherP;
     char ret = true;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
 
+#if RF_OPTION_DEBUG
+    if(other == NULL)
+    {
+        RF_WARNING(0, "Provided a NULL pointer for the other string argument");
+        ret = false;
+        goto cleanup;
+    }
+#endif
     //calculate the new bytelength
     thisstr->INH_String.byteLength += bytes;
     //if it does not fit inside the remaining size, reallocate the buffer
@@ -797,12 +846,19 @@ char rfStringX_Append_bytes(RF_StringX* thisstr, const void* otherP,
     strncat(thisstr->INH_String.bytes, other->bytes, bytes);
 
   cleanup:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 //Appends a cstring to this string
 char rfStringX_Append_cstr(RF_StringX* thisstr, const char* cstr)
 {
+#if RF_OPTION_DEBUG
+    if(cstr == NULL)
+    {
+        RF_WARNING(0, "Provided a NULL pointer for the c string argument");
+        return false;
+    }
+#endif
     //calculate the new bytelength
     thisstr->INH_String.byteLength += strlen(cstr);
     //if it does not fit inside the remaining size, reallocate the buffer
@@ -834,7 +890,17 @@ char i_rfStringX_Replace(RF_StringX* thisstr, const void* sstrP,
     uint32_t diff,i,j,start, bSize;
     int32_t* bytePositions;
     char ret = true;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
+
+#if RF_OPTION_DEBUG
+    if(sstr == NULL || rstr == NULL )
+    {
+        RF_WARNING(0, "Provided a NULL pointer for either the search or "
+                   "the replace string argument");
+        ret = false;
+        goto cleanup;
+    }
+#endif
 
     //if the substring string is not even found return false
     if(rfString_FindBytePos(thisstr,sstr,options) == RF_FAILURE)
@@ -962,15 +1028,19 @@ char i_rfStringX_Replace(RF_StringX* thisstr, const void* sstrP,
 #endif
     free(bytePositions);
   cleanup:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
 //Replaces what exists between the ith left and right substrings of this extended String.Utilizes the internal string pointer.
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-char rfStringX_ReplaceBetween(RF_StringX* thisstr,const void* leftP,const void* rightP,const void* rstrP,char options,uint32_t i)
+char rfStringX_ReplaceBetween(RF_StringX* thisstr, const void* leftP,
+                              const void* rightP, const void* rstrP,
+                              char options, uint32_t i)
 #else
-char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,const void* leftP,const void* rightP,const void* rstrP,char options,uint32_t i)
+char i_rfStringX_ReplaceBetween(RF_StringX* thisstr, const void* leftP,
+                                const void* rightP, const void* rstrP,
+                                char options, uint32_t i)
 #endif
 {
     const RF_String* left = (const RF_String*)leftP;
@@ -979,7 +1049,18 @@ char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,const void* leftP,const void
     uint32_t j,move,start = thisstr->bIndex;
     char found = false,ret=false;
     RF_String ss;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
+
+#if RF_OPTION_DEBUG
+    if(left == NULL || right == NULL || rstr = NULL)
+    {
+        RF_WARNING(0, "Provided a NULL pointer for either the left or the right "
+                   "or the replace string argument");
+        ret = false;
+        goto cleanup1;
+    }
+#endif
+
 
     if(i==0)//if we want all occurences replaced
     {
@@ -1060,7 +1141,7 @@ char i_rfStringX_ReplaceBetween(RF_StringX* thisstr,const void* leftP,const void
     //if we get here success
     ret=true;
 cleanup1:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 
 }

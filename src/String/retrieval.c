@@ -146,7 +146,7 @@ int32_t i_rfString_Find_i(const void* thisstr, const void* sstr,
 {
     RF_String sub;
     int32_t ret = RF_FAILURE;//the return value
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
     //if the substring does not exist fail
     if(rfString_Substr(thisstr,startPos,length,&sub) == false)
     {
@@ -161,7 +161,7 @@ int32_t i_rfString_Find_i(const void* thisstr, const void* sstr,
     rfString_Deinit(&sub);//free the sub substring and return
 
 cleanup1:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 // Finds the existence of String sstr inside this string, either matching case or not
@@ -178,7 +178,7 @@ int32_t i_rfString_Find(const void* str,const void* sstrP,const char options)
     int32_t ret = RF_FAILURE;
     char* found = 0;
     uint32_t i,j;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
 
 
     //if we want to match the case of the string then it's a simple search of matching characters
@@ -314,7 +314,7 @@ int32_t i_rfString_Find(const void* str,const void* sstrP,const char options)
     }//this string iteration ends
 
 cleanup1:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -326,7 +326,7 @@ char rfString_ScanfAfter(const void* str, const void* afterstrP,
     const RF_String* thisstr = (const RF_String*)str;
     const RF_String* afterstr = (const RF_String*)afterstrP;
     char* found,*s,ret=false;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
 
     //return false if the substring is not found
     if( (found = strstr(thisstr->bytes,afterstr->bytes)) ==0 )
@@ -344,7 +344,7 @@ char rfString_ScanfAfter(const void* str, const void* afterstrP,
     //success
     ret = true;
 cleanup1:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -362,7 +362,7 @@ int32_t i_rfString_Count(const void* str, const void* sstr2,
     int32_t index = 0;
     int32_t move;
     int32_t n = 0;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
 
     //as long as the substring is found in the string
     while((move = rfString_FindBytePos(
@@ -380,7 +380,7 @@ int32_t i_rfString_Count(const void* str, const void* sstr2,
     thisstr->bytes-=index;
     thisstr->byteLength += index;
     //success
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return n;
 }
 
@@ -401,7 +401,7 @@ char i_rfString_Between(const void* thisstrP,const void* lstrP,
     const RF_String* rstr = (const RF_String*)rstrP;
     RF_String temp;
     char ret= false;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
 
     //find the left substring
     if( (start = rfString_FindBytePos(thisstr,lstr,options)) == RF_FAILURE)
@@ -445,7 +445,7 @@ char i_rfString_Between(const void* thisstrP,const void* lstrP,
     //success
     ret = true;
 cleanup1:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -459,7 +459,7 @@ char rfString_Beforev(const void* thisstrP,void* resultP,const char options,cons
     char ret = true;
     //get the parameter characters
     va_start(argList,parN);
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
 
     minPos = INT_MAX;
     for(i = 0; i < parN; i++)
@@ -506,7 +506,7 @@ char rfString_Beforev(const void* thisstrP,void* resultP,const char options,cons
 
 //end
   cleanup:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -523,7 +523,7 @@ char i_rfString_Before(const void* thisstrP, const void* sstrP,
     const RF_String* sstr = (const RF_String*) sstrP;
     int32_t rv;
     char ret = true;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
 
     //find the substring
     if((rv = rfString_FindBytePos(thisstr,sstr,options)) == RF_FAILURE)
@@ -556,7 +556,7 @@ char i_rfString_Before(const void* thisstrP, const void* sstrP,
 
     //success
   cleanup:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -574,7 +574,7 @@ char i_rfString_After(const void* thisstrP, const void* afterP,
     const RF_String* after = (const RF_String*)afterP;
     int32_t bytePos;
     char ret = true;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
     //check for substring existence
     if( (bytePos = rfString_FindBytePos(
              thisstr, after, options)) == RF_FAILURE)
@@ -607,7 +607,7 @@ char i_rfString_After(const void* thisstrP, const void* afterP,
     }
 
   cleanup:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -623,7 +623,7 @@ char rfString_Afterv(const void* thisstrP, void* resultP,
     //will keep the argument list
     va_list argList;
     char ret = true;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
     //get the parameter characters
     va_start(argList,parN);
 
@@ -677,6 +677,6 @@ char rfString_Afterv(const void* thisstrP, void* resultP,
 
     //end
   cleanup:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }

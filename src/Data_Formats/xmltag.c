@@ -146,9 +146,9 @@ RF_XMLTag* rfXMLTag_CreateLocalv(RF_XMLTag* parent,void* nameP,void* contentP,un
     uint32_t i;
 
     //remember the stack pointer before this function
-    i_rfLMS_ArgsEval()
+    i_rfLMS_ArgsEval(return NULL)
 
-    i_rfLMS_Push(x,sizeof(RF_XMLTag));
+    i_rfLMS_Push(x,sizeof(RF_XMLTag), return NULL);
     if(x == 0)
     {
         LOG_ERROR("Memory allocation from the Local Memory Stack failed during XML tag allocation. \
@@ -159,25 +159,25 @@ RF_XMLTag* rfXMLTag_CreateLocalv(RF_XMLTag* parent,void* nameP,void* contentP,un
     ///get the parent pointer and copy the name string
     x->parent = parent;
     x->name.byteLength = name->byteLength;
-    i_rfLMS_Push(x->name.bytes,name->byteLength+1);
+    i_rfLMS_Push(x->name.bytes, name->byteLength+1, return NULL);
     memmove(x->name.bytes,name->bytes,name->byteLength+1);
     ///initialize the lists
     ///initialize the childrens list
-    i_rfLMS_Push(x->children.data,(sizeof(void*)*attrN)+1);
+    i_rfLMS_Push(x->children.data, (sizeof(void*)*attrN)+1, return NULL);
     x->children.bufferCapacity = sizeof(void*)+1;
     x->children.size = 0;
     x->children.ptr2Destroy = (void(*)(void*))rfString_Destroy;
     x->children.ptr2Copy = (void*(*)(void*))rfString_Copy_OUT;
     ///initialize attribute names list
     //allocate the data buffer and keep its size
-    i_rfLMS_Push(x->attributes.data,(sizeof(void*)*attrN)+1);
+    i_rfLMS_Push(x->attributes.data,(sizeof(void*)*attrN)+1, return NULL);
     x->attributes.bufferCapacity = attrN*sizeof(void*)+1;
     x->attributes.size = 0;
     x->attributes.ptr2Destroy =(void(*)(void*)) rfString_Destroy;
     x->attributes.ptr2Copy = (void*(*)(void*))rfString_Copy_OUT;
     ///initialize attribute values list
     //allocate the data buffer and keep its size
-    i_rfLMS_Push(x->attribValues.data,(sizeof(void*)*attrN)+1);
+    i_rfLMS_Push(x->attribValues.data,(sizeof(void*)*attrN)+1, return NULL);
     x->attribValues.bufferCapacity = attrN*sizeof(void*)+1;
     x->attribValues.size = 0;
     x->attribValues.ptr2Destroy = (void(*)(void*))rfString_Destroy;
@@ -188,7 +188,7 @@ RF_XMLTag* rfXMLTag_CreateLocalv(RF_XMLTag* parent,void* nameP,void* contentP,un
         x->contents.INH_String.byteLength = content->byteLength;
         x->contents.bIndex = 0;
         x->contents.bSize = content->byteLength+1;
-        i_rfLMS_Push(x->contents.INH_String.bytes,content->byteLength+1);
+        i_rfLMS_Push(x->contents.INH_String.bytes, content->byteLength+1, return NULL);
         memmove(x->contents.INH_String.bytes,content->bytes,content->byteLength+1);
     }
     else
@@ -196,7 +196,7 @@ RF_XMLTag* rfXMLTag_CreateLocalv(RF_XMLTag* parent,void* nameP,void* contentP,un
         x->contents.INH_String.byteLength = 1;
         x->contents.bIndex = 0;
         x->contents.bSize = 1;
-        i_rfLMS_Push(x->contents.INH_String.bytes,1);
+        i_rfLMS_Push(x->contents.INH_String.bytes, 1, return NULL);
         x->contents.INH_String.bytes[0] = '\0';
     }
 
@@ -208,8 +208,8 @@ RF_XMLTag* rfXMLTag_CreateLocalv(RF_XMLTag* parent,void* nameP,void* contentP,un
        RF_String* attrNameTMP  = va_arg(argList,RF_String*);
        RF_String* attrValueTMP = va_arg(argList,RF_String*);
        RF_String* attrName,*attrValue;
-       i_rfLMS_Push(attrName,sizeof(RF_String));
-       i_rfLMS_Push(attrValue,sizeof(RF_String));
+       i_rfLMS_Push(attrName,sizeof(RF_String), return NULL);
+       i_rfLMS_Push(attrValue,sizeof(RF_String), return NULL);
        if(!rfString_Copy_IN(attrName,attrNameTMP))
        {
            return NULL;

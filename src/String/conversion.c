@@ -23,18 +23,18 @@
 */
 
 
-//*---------------------Corrensponding Header inclusion---------------------------------
+/*------------- Corrensponding Header inclusion -------------*/
 #include <Definitions/types.h> //for fixed size types needed in various places
 #include <String/string_decl.h>//for RF_String
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <String/conversion.h>
-//*---------------------Module related inclusion----------------------------------------
+/*------------- Module related inclusion -------------*/
 #include <String/core.h>//for rfString_Equal
 #include <String/retrieval.h> //for rfString_Count
 #include <String/common.h> //for RFS_()
 #include "common.ph" //for required string private macros and functions
-//*---------------------Outside module inclusion----------------------------------------
+/*------------- Outside Module inclusion -------------*/
 #include <String/unicode.h>
 #include <Definitions/retcodes.h> //for error codes
 #include <Utils/constcmp.h> //for RF_HEXEQ_C() macro and others
@@ -49,36 +49,57 @@
     #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
     #include <stdio.h>//for FILE* used inside printf.h
     #include <IO/printf.h> //for rfFpintf() used in the error logging macros
-    #include <Utils/error.h> //for LOG_ERROR() macros
     #include <Utils/memory.h> //for refu memory allocation
-//*---------------------libc Headers inclusion------------------------------------------
+//for error logging
+    #include <Threads/common.h> //for rfThread_GetID()
+    #include <Utils/error.h> //for LOG_ERROR() macros
+/*------------- libc inclusion --------------*/
 #include <errno.h> //for errno
 #include <math.h> //for HUGE_VAL
-//*----------------------------End of Includes------------------------------------------
+/*------------- End of includes -------------*/
 
 //Returns the strings contents as a UTF-16 buffer
 uint16_t* rfString_ToUTF16(const void* sP, uint32_t* length)
 {
     uint32_t* codepoints,charsN;
+    uint16_t* utf16;
     const RF_String* s = (const RF_String*) sP;
+    RF_MALLOC(codepoints, s->byteLength*4, NULL);
     //get the unicode codepoints
-    if((codepoints = rfUTF8_Decode(
-           s->bytes,s->byteLength,&charsN)) == NULL)
+    if(!rfUTF8_Decode(s->bytes, s->byteLength, &charsN,
+                      codepoints, s->byteLength*4))
     {
-        LOG_ERROR("Error during decoding a UTF-8 byte stream",
-                      RE_UTF8_DECODING)
+        RF_ERROR(0,"Error during decoding a UTF-8 byte stream");
+        free(codepoints);
         return NULL;
     }
-    //encode them in UTF-16, no check here since it comes from an RF_String which is always guaranteed to have valid UTF-8 and as such valid codepoints
-    return rfUTF16_Encode(codepoints,charsN,length);
+    //encode them in UTF-16, no check here since it comes from an RF_String
+    // which is always guaranteed to have valid UTF-8 and as such valid codepoints
+    RF_MALLOC(utf16, s->byteLength*4, NULL);  
+    if(!rfUTF16_Encode(codepoints, charsN, length, utf16, s->byteLength*4))
+    {
+        RF_ERROR(0, "Error at encoding a buffer in UTF-16");
+        free(utf16);
+        free(codepoints);
+        utf16 = NULL;
+    }
+    free(codepoints);
+    return utf16;
 }
 
 //Returns the strings contents as a UTF-32 buffer
 uint32_t* rfString_ToUTF32(const void* sP,uint32_t* length)
 {
     const RF_String* s = (const RF_String*) sP;
+    uint32_t* cp;
+    RF_MALLOC(cp, s->byteLength*4, NULL);
     //get the unicode codepoints
-    return rfUTF8_Decode(s->bytes,s->byteLength,length);
+    if(!rfUTF8_Decode(s->bytes, s->byteLength, length, cp, s->byteLength*4))
+    {
+        RF_ERROR(0, "Error during decoding a UTF-8 byte stream");
+        cp = NULL;
+    }
+    return cp;
 }
 
 // Returns the cstring representation of the string
@@ -172,13 +193,13 @@ char rfString_Tokenize(const void* str,const void* sepP,uint32_t* tokensN,RF_Str
     const RF_String* thisstr = (const RF_String*)str;
     const RF_String* sep = (const RF_String*)sepP;
     uint32_t i;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
     //first find the occurences of the separator, and then the number of tokens
     *tokensN = rfString_Count(thisstr,sep,0)+1;
     //error checking
     if(*tokensN == 1)
     {
-        RF_EXIT_LOCAL_SCOPE()
+        RF_EXIT_LOCAL_SCOPE();
         return false;
     }
     //allocate the tokens
@@ -211,6 +232,6 @@ char rfString_Tokenize(const void* str,const void* sepP,uint32_t* tokensN,RF_Str
     (*tokens)[i].bytes[(*tokens)[i].byteLength] = '\0';
 
     //success
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return true;
 }

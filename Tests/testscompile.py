@@ -5,6 +5,8 @@ import os
 import platform
 import shlex
 
+from output import TestCompileError, report
+
 def compileTest(filename,dynamic,compiler,verbose,logFile):
     """Compiles a single test file from the tests depending on the compiler and library linking type
 
@@ -18,9 +20,9 @@ def compileTest(filename,dynamic,compiler,verbose,logFile):
         --logFile: The name of the logfile to print the output
     """
     if(dynamic):
-        target="test_shared";
+        target="test_shared"
     else:
-        target="test_static";
+        target="test_static"
 
     if(platform.system() == 'Windows'):
         sconsCall = ["scons.py", target,'-Q','COMPILER='+compiler,
@@ -30,40 +32,32 @@ def compileTest(filename,dynamic,compiler,verbose,logFile):
             sys.executable, target, compiler, filename)
 
     try:
-        p = subprocess.Popen(sconsCall,cwd="..",shell=True,stdout=subprocess.PIPE)
+        p = subprocess.Popen(sconsCall, cwd="..", shell=True, stdout=subprocess.PIPE)
         for line in p.stdout:
             if(verbose):
                 print("\t\t"+line.decode("utf8"));
         #wait till the subprocess ends
         ret = p.poll();
         while(ret == None):
-            ret=p.poll();
-        if(ret!=0):
-            if(verbose):
-                print("\t\tDuring compiling {0} the {1} compiler returned"
-                      "unsucessfully with return code {2}".format(
-                          filename,compiler.name,ret))
-            logFile.write("\t\tTesting of file \"{0}\" failed in the "
-                          "compilation stage\n".format(filename))
-            for line in p.stderr:
-                line = line.decode("utf8");
-                print("\t\t"+line)
-                logFile.write("\t\t"+line);
-            print("\t-->Testing \"{0}\" ... FAILED to compile".format(
-                filename))
-            logFile.write("\t-->Testing \"{0}\" ... FAILED to"
-                          " compile\n".format(filename))
-            return False
+            ret = p.poll()
+        if ret != 0:
+            report(logFile, "\t\tDuring compiling {0} the {1} compiler returned "
+                   "unsucessfully with return code {2}".format(
+                       filename, compiler, ret))
+            msg = ""
+            if p.stdout is not None:
+                for line in p.stdout:
+                    line = line.decode("utf8")
+                    msg = msg + line
+                    report(logFile, "\t\t"+line)
+            raise TestCompileError(filename, msg)
+                
     except CalledProcessError as err:
-        print("\t\tThere was an error while invoking the compiler for"
+        report(logFile, "\t\tThere was an error while invoking the compiler for"
               " test \"{0}\"".format(filename))
-        print("\t\tThe compiler returned [{0}] and the output "
+        report(logfile, "\t\tThe compiler returned [{0}] and the output "
               "was:".format(err.returncode))
-        print(err.output);
-        logFile.write("\t\tTesting of file \"{0}\" failed in the"
-                      " compilation stage\n".format(filename))
-        return False;
+        raise TestCompileError(filename, err.output)
     #success
     if(verbose):
         print("\t-> Succesfully compiled Test \"{0}\"".format(filename));
-    return True;

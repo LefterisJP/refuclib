@@ -171,7 +171,7 @@ modules.append(
 
 modules.append(
     Module("TEXTFILE", 
-           ['IO/textfile.c', 'IO/textfilep.c'],
+           ['IO/textfile.c'],
            macro = "RF_MODULE_IO_TEXTFILE",
            dependencies	= ['STRING'])
 )
@@ -252,14 +252,6 @@ modules.append(
                             'Threads/semaphore_linux.c'],
            macro = "RF_MODULE_THREAD")
 )
-
-modules.append(
-    Module("THREADSX",
-           win32_sources = ['Threads/threadx_win32.c'],
-           linux_sources = ['Threads/threadx_linux.c'],
-           macro = "RF_MODULE_THREADX")
-)
-
 
 modules.append(
     Module("SYSTEM",

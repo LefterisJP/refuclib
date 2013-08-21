@@ -23,27 +23,29 @@
 */
 
 
-//*---------------------Corrensponding Header inclusion---------------------------------
+/*------------- Corrensponding Header inclusion -------------*/
 #include <Definitions/types.h> //for fixed size types needed in various places
 #include <String/string_decl.h>//for RF_String
 #include <String/stringx_decl.h> //for RF_StringX
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <String/corex.h>
-//*---------------------Module related inclusion----------------------------------------
+/*------------- Module related inclusion -------------*/
 #include <String/traversalx.h> //for rfStringX_Reset()
 #include <stdarg.h> //needed for the va_list argument in rfStringX_Formatv() and also in the functions below
 #include <String/format.h> //for the String formatting function
 #include "common.ph" //for RF_STRINGX_REALLOC()
-//*---------------------Outside module inclusion----------------------------------------
+/*------------- Outside Module inclusion -------------*/
 //for endianess detection functionality
     #include <String/unicode.h> //for unicode functions such as rfUTF8_VerifySequence()
     #include <Utils/endianess.h> //for endianess detection
 //for error logging
     #include <stdio.h>//for FILE* used inside printf.h
     #include <IO/printf.h> //for rfFpintf() used in the error logging macros
+    #include <Threads/common.h> //for rfThread_GetID()
+    #include <errno.h> //for error reporting that needs it
     #include <Utils/error.h>
-
+    
 #include <Definitions/retcodes.h> //for error codes
 //for the ioBuffer
     #include <Definitions/threadspecific.h> // for the thread specific keyword used in the ioBuffer
@@ -58,7 +60,7 @@
 //for memory allocation macros
     #include <stdlib.h> //for malloc, calloc,realloc and exit()
     #include <Utils/memory.h> //for refu memory allocation
-//*----------------------------End of Includes------------------------------------------
+/*------------- End of includes -------------*/
 
 //Allocates and returns an extended String. Given characters have to be in UTF-8. A check for valide sequence of bytes is performed.
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
@@ -68,14 +70,15 @@ RF_StringX* i_rfStringX_Create(const char* lit,...)
 #endif
 {
     RF_StringX* ret;
-    va_list args;//note that no local scope macros are needed here since the arguments get evaluated in rfStringX_Formatv()
+    va_list args;//note that no local scope macros are needed here since the
+                 // arguments get evaluated in rfStringX_Formatv()
 
     va_start(args,lit);
     //read the var args
-    if(rfStringX_Formatv(&ioBuffer, lit, args) != RF_SUCCESS)
+    if(rfStringX_Formatv(&ioBuffer, lit, args) == false)
     {
-        LOG_ERROR("StringX creation failure due to failing at reading the "
-                  "formatted string", RF_LastError);
+        RF_ERROR(0,"StringX creation failure due to failing at reading the "
+                  "formatted string");
         return NULL;
     }
     va_end(args);
@@ -95,24 +98,12 @@ RF_StringX* i_rfStringX_Create(const char* lit,...)
 RF_StringX* i_NVrfStringX_Create(const char* lit)
 {
     RF_StringX* ret;
-    uint32_t byteLength;
-    //check the string literal for valid utf-8 byte sequence
-    if( rfUTF8_VerifySequence(lit,&byteLength) != RF_SUCCESS)
+    RF_MALLOC(ret, sizeof(RF_StringX), NULL);
+    if(i_NVrfStringX_Init(ret, lit) == false)
     {
-        LOG_ERROR("Error at StringX initialization due to invalid UTF-8 "
-                  "byte sequence", RE_STRING_INIT_FAILURE);
+        free(ret);
         return NULL;
     }
-    //initialize the string
-    RF_MALLOC(ret,sizeof(RF_StringX), NULL);
-    //get bytelength
-    ret->INH_String.byteLength = byteLength;
-    //allocate and populate the data
-    ret->bSize = byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
-    RF_MALLOC(ret->INH_String.bytes, ret->bSize, NULL);
-    strcpy(ret->INH_String.bytes,lit);
-    ret->bIndex = 0;
-
     return ret;
 }
 #endif
@@ -128,10 +119,10 @@ char i_rfStringX_Init(RF_StringX* str,const char* lit,...)
 
     va_start(args,lit);
     //read the var args
-    if(rfStringX_Formatv(&ioBuffer,lit,args) != RF_SUCCESS)
+    if(rfStringX_Formatv(&ioBuffer,lit,args) == false)
     {
-        LOG_ERROR("StringX initialization failure due to failing at "
-                  "reading the formatted string",RF_LastError);
+        RF_ERROR(0, "StringX initialization failure due to failing at "
+                 "reading the formatted string");
         return false;
     }
     va_end(args);
@@ -151,10 +142,10 @@ char i_NVrfStringX_Init(RF_StringX* str,const char* lit)
 {
     //check the string literal for valid utf-8 byte sequence
     uint32_t byteLength;
-    if( rfUTF8_VerifySequence(lit,&byteLength) != RF_SUCCESS)
+    if(!rfUTF8_VerifySequence(lit,&byteLength))
     {
-        LOG_ERROR("Error at StringX initialization due to invalid UTF-8 "
-                  "byte sequence", RE_STRING_INIT_FAILURE);
+        RF_ERROR(0,"Error at StringX initialization due to invalid UTF-8 "
+                 "byte sequence");
         return false;
     }
     //get bytelength
@@ -174,102 +165,11 @@ RF_StringX* rfStringX_Create_cp(uint32_t codepoint)
 {
     RF_StringX* ret;
     RF_MALLOC(ret, sizeof(RF_StringX), NULL);
-    //since this is an extended string let's be a bit more generous with 
-    //the buffer
-    ret->bSize = 5*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER;
-    RF_MALLOC(ret->INH_String.bytes,ret->bSize, NULL);
-    ret->bIndex = 0;
-
-    //if we only need a byte to encode it
-    if(RF_HEXLE_UI(codepoint,0x007f))
+    if(rfStringX_Init_cp(ret, codepoint) == false)
     {
-        ret->INH_String.bytes[0] = codepoint;
-        ret->INH_String.bytes[1] = '\0';
-        ret->INH_String.byteLength = 1;
-    }
-    //if we need 2 bytes to encode it
-    else if( RF_HEXGE_UI(codepoint,0x0080) 
-             && RF_HEXLE_UI(codepoint,0x07ff))
-    {
-        if(rfEndianess() == RF_LITTLE_ENDIAN)
-        {
-            //get the first bits of the first byte and encode them to the first byte
-            ret->INH_String.bytes[1] = (codepoint & 0x3F)|(0x02<<6);
-            //get the 5 following bits and encode them in the second byte
-            ret->INH_String.bytes[0] = ((codepoint & 0x7C0) >> 6)  | (0x6<<5);
-        }
-        else
-        {
-            //get the first bits of the first byte and encode them to the first byte
-            ret->INH_String.bytes[0] = (codepoint & 0x3F)|(0x02<<6);
-            //get the 5 following bits and encode them in the second byte
-            ret->INH_String.bytes[1] = ((codepoint & 0x7C0) >> 6)  | (0x6<<5);
-        }
-        ret->INH_String.bytes[2] = '\0';
-        ret->INH_String.byteLength = 2;
-    }
-    //if we need 3 bytes to encode it
-    else if( RF_HEXGE_UI(codepoint,0x0800) &&
-             RF_HEXLE_UI(codepoint,0x0ffff))
-    {
-        if(rfEndianess() == RF_LITTLE_ENDIAN)
-        {
-            //get the first bits of the first byte and encode them to the first byte
-            ret->INH_String.bytes[2] = (codepoint & 0x3F)|(0x02<<6);
-            //get the 6 following bits and encode them in the second byte
-            ret->INH_String.bytes[1] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
-            //get the 4 following bits and encode them in the third byte
-            ret->INH_String.bytes[0] = (((codepoint & 0xF000))>>12) | (0xE<<4);
-        }
-        else
-        {
-            //get the first bits of the first byte and encode them to the first byte
-            ret->INH_String.bytes[0] = (codepoint & 0x3F)|(0x02<<6);
-            //get the 6 following bits and encode them in the second byte
-            ret->INH_String.bytes[1] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
-            //get the 4 following bits and encode them in the third byte
-            ret->INH_String.bytes[2] = (((codepoint & 0xF000))>>12) | (0xE<<4);
-        }
-        ret->INH_String.bytes[3] = '\0';
-        ret->INH_String.byteLength = 3;
-    }
-    //if we need 4 bytes to encode it
-    else if( RF_HEXGE_UI(codepoint,0x10000) &&
-             RF_HEXLE_UI(codepoint,0x10ffff))
-    {
-        if(rfEndianess() == RF_LITTLE_ENDIAN)
-        {
-            //get the first bits of the first byte and encode them to the first byte
-            ret->INH_String.bytes[3] = (codepoint & 0x3F)|(0x02<<6);
-            //get the 6 following bits and encode them in the second byte
-            ret->INH_String.bytes[2] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
-            //get the 6 following bits and encode them in the third byte
-            ret->INH_String.bytes[1] = (((codepoint & 0x3F000))>>12) | (0x02<<6);
-            //get the 3 following bits and encode them in the fourth byte
-            ret->INH_String.bytes[0] = (((codepoint & 0x1C0000))>>18) | (0x1E<<3);
-        }
-        else
-        {
-            //get the first bits of the first byte and encode them to the first byte
-            ret->INH_String.bytes[0] = (codepoint & 0x3F)|(0x02<<6);
-            //get the 6 following bits and encode them in the second byte
-            ret->INH_String.bytes[1] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
-            //get the 6 following bits and encode them in the third byte
-            ret->INH_String.bytes[2] = (((codepoint & 0x3F000))>>12) | (0x02<<6);
-            //get the 3 following bits and encode them in the fourth byte
-            ret->INH_String.bytes[3] = (((codepoint & 0x1C0000))>>18) | (0x1E<<3);
-        }
-        ret->INH_String.bytes[4] = '\0';
-        ret->INH_String.byteLength = 4;
-    }
-    else
-    {
-        LOG_ERROR("Attempted to encode an invalid unicode code point into"
-                  " an extended string", RE_UTF8_INVALID_CODE_POINT);
-        rfStringX_Destroy(ret);
+        free(ret);
         return NULL;
     }
-
     return ret;
 }
 //Turns a unicode code point in an extended  String and initializes it (encoded in UTF-8)
@@ -278,6 +178,7 @@ char rfStringX_Init_cp(RF_StringX* str, uint32_t codepoint)
 
     //since this is an extended string let's be a bit more generous with the buffer
     str->bSize = 5*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER;
+    //TODO: Fix this ... mallocing everytime here is stupid
     RF_MALLOC(str->INH_String.bytes, str->bSize, false);
     str->bIndex = 0;
 
@@ -329,8 +230,8 @@ char rfStringX_Init_cp(RF_StringX* str, uint32_t codepoint)
     }
     else
     {
-        LOG_ERROR("Attempted to encode an invalid unicode code point into"
-                  " an extended string",RE_UTF8_INVALID_CODE_POINT);
+        RF_ERROR(0, "Attempted to encode an invalid unicode code point into"
+                 " an extended string",RE_UTF8_INVALID_CODE_POINT);
         free(str->INH_String.bytes);
         return false;
     }
@@ -341,77 +242,63 @@ char rfStringX_Init_cp(RF_StringX* str, uint32_t codepoint)
 //Allocates and returns a string with the given integer
 RF_StringX* rfStringX_Create_i(int32_t i)
 {
-    //the size of the int32_t buffer
-    int32_t numLen;
-    //put the int32_t into a buffer and turn it in a char*
-    char buff[12];//max uint32_t is 4,294,967,295 in most environment so 12 chars will certainly fit it
     RF_StringX* ret;
-    sprintf(buff,"%d",i);
-    numLen = strlen(buff)+1;
-
-    //initialize the string and return it
     RF_MALLOC(ret, sizeof(RF_String), NULL);
-    ret->bSize = numLen*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER;
-    RF_MALLOC(ret->INH_String.bytes, sizeof(char)*ret->bSize, NULL);
-    ret->INH_String.byteLength = numLen;
-    strcpy(ret->INH_String.bytes,buff);
+    if(rfStringX_Init_i(ret, i) == false)
+    {
+        free(ret);
+        return NULL;
+    }
     return ret;
 }
 //Initializes a string with the given integer
 char rfStringX_Init_i(RF_StringX* str,int32_t i)
 {
     //the size of the int32_t buffer
-    int32_t numLen;
-    //put the int32_t into a buffer and turn it in a char*
+    int32_t len;
     char buff[12];//max uint32_t is 4,294,967,295 in most environment so 12 chars will certainly fit it
-    sprintf(buff,"%d",i);
-    numLen = strlen(buff)+1;
 
-    str->bSize = numLen*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER;
+    if((len = sprintf(buff,"%d",i)) < 0)
+    {
+        RF_ERROR_PRINTF("String initialization from integer failed", "sprintf");
+        return false;
+    }
+
+    str->bSize = (len+1)*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER;
     RF_MALLOC(str->INH_String.bytes, sizeof(char)*str->bSize, false);
-    str->INH_String.byteLength = numLen;
-    strcpy(str->INH_String.bytes,buff);
+    str->INH_String.byteLength = len;
+    strcpy(str->INH_String.bytes, buff);
     return true;
 }
 // Allocates and returns an extended string with the given float.
 RF_StringX* rfStringX_Create_f(float f)
 {
-    //allocate a buffer for the float in characters
-    char* buff;
-    uint32_t len;
     RF_StringX* ret;
-    RF_MALLOC(buff,128, NULL);
-    sprintf(buff,"%f",f);
-    len = strlen(buff);
-
-    //initialize and return the string
     RF_MALLOC(ret, sizeof(RF_StringX), NULL);
-    ret->INH_String.byteLength = len;
-    ret->bSize = len*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
-    RF_MALLOC(ret->INH_String.bytes, ret->bSize, NULL);
-    ret->bIndex = 0;
-    strcpy(ret->INH_String.bytes,buff);
-    free(buff);
-
+    if(rfStringX_Init_f(ret, f) == false)
+    {
+        free(ret);
+        return NULL;
+    }
     return ret;
 }
 // Initializes an extended string with the given float.
-char rfStringX_Init_f(RF_StringX* str,float f)
+char rfStringX_Init_f(RF_StringX* str, float f)
 {
     //allocate a buffer for the float in characters
-    char* buff;
-    uint32_t len;
-    RF_MALLOC(buff,128, false);
-    sprintf(buff,"%f",f);
-    len = strlen(buff);
-
+    char buff[50];//TODO: find right number for this buff
+    int32_t len;
+    if((len = sprintf(buff, "%f", f)) < 0)
+    {
+        RF_ERROR_PRINTF("StringX initialization from float failed", "sprintf");
+        return false;
+    }
     //initialize and return the string
     str->INH_String.byteLength = len;
-    str->bSize = len*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
+    str->bSize = (len+1)*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER;
     RF_MALLOC(str->INH_String.bytes, str->bSize, false);
     str->bIndex = 0;
     strcpy(str->INH_String.bytes,buff);
-    free(buff);
 
     return true;
 }
@@ -419,7 +306,7 @@ char rfStringX_Init_f(RF_StringX* str,float f)
 
 // Allocates and returns an extended String allocating buffSize bytes buffer and puts str inside the buffer
 // If the contents of the string are bigger than the buffer Size then an error is logged but the String is initialized correctly
-// Given characters have to be in UTF-8. A check for valide sequence of bytes is performed.
+// Given characters have to be in UTF-8. A check for valid sequence of bytes is performed.
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
 RF_StringX* rfStringX_Create_buff(uint32_t buffSize,const char* lit,...)
 #else
@@ -427,14 +314,15 @@ RF_StringX* i_rfStringX_Create_buff(uint32_t buffSize,const char* lit,...)
 #endif
 {
     RF_StringX* ret;
-    va_list args;//note that no local scope macros are needed here since the arguments get evaluated in rfStringX_Formatv()
+    va_list args;//note that no local scope macros are needed here since the
+                 // arguments get evaluated in rfStringX_Formatv()
 
     va_start(args,lit);
     //read the var args
-    if(rfStringX_Formatv(&ioBuffer,lit,args)!=RF_SUCCESS)
+    if(rfStringX_Formatv(&ioBuffer, lit, args) == false)
     {
-        LOG_ERROR("StringX creation failure due to failing at reading the"
-                  " formatted string", RF_LastError);
+        RF_ERROR(0, "StringX creation failure due to error at reading the"
+                  " formatted string");
         return NULL;
     }
     va_end(args);
@@ -442,13 +330,13 @@ RF_StringX* i_rfStringX_Create_buff(uint32_t buffSize,const char* lit,...)
     RF_MALLOC(ret, sizeof(RF_StringX), NULL);
     ret->bSize = buffSize;
 
-    //make sure that the buff size fits the string
+    //Make sure that the buff size fits the string
     if(buffSize < ioBuffer.INH_String.byteLength+1)
     {
-        LOG_ERROR("At initialization of %s as Extended String the given "
+        RF_WARNING(0, "At initialization of %s as Extended String the given "
                   "buffer size does not fit the original String. The "
                   "buffer size is automatically adjusted to fit the "
-                  "string", RE_STRING_INIT_FAILURE, lit);
+                  "string", lit);
 
         //set the buffer size to double the given string's length
         ret->bSize = ioBuffer.INH_String.byteLength*
@@ -467,33 +355,12 @@ RF_StringX* i_rfStringX_Create_buff(uint32_t buffSize,const char* lit,...)
 RF_StringX* i_NVrfStringX_Create_buff(uint32_t buffSize,const char* lit)
 {
     RF_StringX* ret;
-    uint32_t byteLength;
-
-    //check the string literal for valid utf-8 byte sequence
-    if( rfUTF8_VerifySequence(lit,&byteLength) != RF_SUCCESS)
+    RF_MALLOC(ret, sizeof(RF_StringX), NULL);
+    if(i_NVrfStringX_Init_buff(ret, buffSize, lit) == false)
     {
-        LOG_ERROR("Error at StringX initialization due to invalid UTF-8 "
-                  "byte sequence", RE_STRING_INIT_FAILURE);
+        free(ret);
         return NULL;
     }
-    //initialize the string
-    RF_MALLOC(ret, sizeof(RF_StringX), NULL);
-    ret->bSize = buffSize;
-    //make sure that the buff size fits the string
-    if(buffSize < byteLength+1)
-    {
-        LOG_ERROR("At initialization of %s as Extended String the given "
-                  "buffer size does not fit the original String. The "
-                  "buffer size is automatically corrected to fit the "
-                  "string", RE_STRING_INIT_FAILURE, lit);
-        //set the buffer size to double the given string's length
-        ret->bSize = byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
-    }
-    //allocate and populate the data
-    RF_MALLOC(ret->INH_String.bytes, ret->bSize, NULL);
-    ret->bIndex = 0;
-    ret->INH_String.byteLength = byteLength;
-    strcpy(ret->INH_String.bytes,lit);
     return ret;
 }
 #endif
@@ -509,14 +376,15 @@ char i_rfStringX_Init_buff(RF_StringX* str, uint32_t buffSize,
                            const char* lit, ...)
 #endif
 {
-    va_list args;//note that no local scope macros are needed here since the arguments get evaluated in rfStringX_Formatv()
+    va_list args;//note that no local scope macros are needed here since
+                 // the arguments get evaluated in rfStringX_Formatv()
 
     va_start(args,lit);
     //read the var args
-    if(rfStringX_Formatv(&ioBuffer,lit,args)!=RF_SUCCESS)
+    if(rfStringX_Formatv(&ioBuffer,lit,args) == false)
     {
-        LOG_ERROR("StringX initialization failure due to failing at "
-                  "reading the formatted string", RF_LastError);
+        RF_ERROR(0, "StringX initialization failure due to failing at "
+                  "reading the formatted string");
         return false;
     }
     va_end(args);
@@ -525,10 +393,10 @@ char i_rfStringX_Init_buff(RF_StringX* str, uint32_t buffSize,
     //make sure that the buff size fits the string
     if(buffSize < ioBuffer.INH_String.byteLength+1)
     {
-        LOG_ERROR("At initialization of %s as Extended String the given "
+        RF_WARNING(0,"At initialization of %s as Extended String the given "
                   "buffer size does not fit the original String. The "
                   "buffer size is automatically corrected to fit the "
-                  "string", RE_STRING_INIT_FAILURE, lit);
+                   "string", lit);
         //set the buffer size to double the given string's length
         str->bSize = ioBuffer.INH_String.byteLength*
         RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
@@ -547,10 +415,10 @@ char i_NVrfStringX_Init_buff(RF_StringX* str, uint32_t buffSize,
 {
     //check the string literal for valid utf-8 byte sequence
     uint32_t byteLength;
-    if( rfUTF8_VerifySequence(lit,&byteLength) == RF_FAILURE)
+    if(!rfUTF8_VerifySequence(lit, &byteLength))
     {
-        LOG_ERROR("Error at StringX initialization due to invalid UTF-8 "
-                  "byte sequence", RE_STRING_INIT_FAILURE);
+        RF_ERROR(0, "Error at StringX initialization due to invalid UTF-8 "
+                  "byte sequence");
         return false;
     }
     //get the buffer size
@@ -558,10 +426,10 @@ char i_NVrfStringX_Init_buff(RF_StringX* str, uint32_t buffSize,
     //make sure that the buff size fits the string
     if(buffSize < byteLength+1)
     {
-        LOG_ERROR("At initialization of %s as Extended String the given "
+        RF_WARNING(0, "At initialization of %s as Extended String the given "
                   "buffer size does not fit the original String. The "
                   "buffer size is automatically corrected to fit the "
-                  "string", RE_STRING_INIT_FAILURE, lit);
+                  "string", lit);
         //set the buffer size to double the given string's length
         str->bSize = byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
     }
@@ -581,7 +449,7 @@ RF_StringX* rfStringX_Create_UTF16(const uint16_t* s)
 {
     RF_StringX* ret;
     RF_MALLOC(ret,sizeof(RF_StringX), NULL);
-    if(rfStringX_Init_UTF16(ret,s)==false)
+    if(rfStringX_Init_UTF16(ret, s) == false)
     {
         free(ret);
         return NULL;
@@ -595,25 +463,30 @@ char rfStringX_Init_UTF16(RF_StringX* str, const uint16_t* s)
     uint32_t* codepoints;
     uint32_t byteLength, characterLength, utf8ByteLength;
     char* utf8;
+
     byteLength = 0;
-    while(s[byteLength]!= 0 || s[byteLength+1]!=0)
+    while(s[byteLength/2] != 0)
     {
-        byteLength++;
+        byteLength += 2;
     }
     byteLength+=3;//for the last utf-16 null termination character
     RF_MALLOC(codepoints, byteLength*2, false); //allocate the codepoints
     //decode the byte stream into codepoints
-    if(rfUTF16_Decode((char*)s, &characterLength, codepoints) != RF_SUCCESS)
+    if(!rfUTF16_Decode((const char*)s, &characterLength, codepoints,
+                       byteLength*2))
     {
         free(codepoints);
-        LOG_ERROR("StringX initialization failed due to invalide UTF-16 "
-                  "sequence", RE_STRING_INIT_FAILURE);
+        RF_ERROR(0, "StringX initialization failed due to invalid UTF-16 "
+                  "sequence");
         return false;
     }
     //now encode these codepoints into UTF8
-    if((utf8 = rfUTF8_Encode(codepoints, characterLength,
-                             &utf8ByteLength)) == 0)
+    RF_MALLOC(utf8, characterLength*4, false);
+    if(!rfUTF8_Encode(codepoints, characterLength, &utf8ByteLength, utf8,
+           characterLength*4))
     {
+        RF_ERROR(0, "StringX initialization failed due to error at UTF8 "
+                 "encoding");
         free(codepoints);
         return false;
     }
@@ -645,16 +518,19 @@ char rfStringX_Init_UTF32(RF_StringX* str, const uint32_t* codeBuffer)
 {
     //find the length of the utf32 buffer in characters
     uint32_t length;
-    char* utf8;uint32_t utf8ByteLength;
+    char* utf8;
+    uint32_t utf8ByteLength;
     rfUTF32_Length(codeBuffer,length);
+
     //turn the codepoints into a utf-8 encoded buffer
-    if((utf8=rfUTF8_Encode(codeBuffer, length, &utf8ByteLength)) == 0)
+    RF_MALLOC(utf8, length*4, false);
+    if(!rfUTF8_Encode(codeBuffer, length, &utf8ByteLength, utf8, length*4))
     {
-        LOG_ERROR("Could not encode UTF32 codepoints into a UTF8 "
-                  "bytestream", RE_UTF8_ENCODING)
+        RF_ERROR(0, "Could not encode UTF32 codepoints into a UTF8 "
+                 "bytestream");
+        free(utf8);
         return false;//error
     }
-
     str->INH_String.bytes = (char*)utf8;
     str->bIndex = 0;
     str->bSize = utf8ByteLength+1;
@@ -668,15 +544,11 @@ RF_StringX* rfStringX_Create_unsafe(const char* lit)
     //initialize the string
     RF_StringX* ret;
     RF_MALLOC(ret, sizeof(RF_StringX), NULL);
-    //get bytelength
-    ret->INH_String.byteLength = strlen(lit);
-    //allocate and populate the data
-    ret->bSize = ret->INH_String.byteLength*
-    RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
-    RF_MALLOC(ret->INH_String.bytes, ret->bSize, NULL);
-    strcpy(ret->INH_String.bytes,lit);
-    ret->bIndex = 0;
-
+    if(rfStringX_Init_unsafe(ret, lit) == false)
+    {
+        free(ret);
+        return NULL;
+    }
     return ret;
 }
 
@@ -702,7 +574,7 @@ char rfStringX_Assign(RF_StringX* dst, const void* sourceP)
 {
     const RF_String* source = (const RF_String*)sourceP;
     char ret = true;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
     rfStringX_Reset(dst);//make sure that the destination's byte index is reset
     //only if the new string value won't fit in the buffer reallocate the buffer
     RF_STRINGX_REALLOC_JMP(dst, source->byteLength+1, ret=false, cleanup);
@@ -711,7 +583,7 @@ char rfStringX_Assign(RF_StringX* dst, const void* sourceP)
     dst->INH_String.byteLength = source->byteLength;
 
   cleanup:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -728,10 +600,10 @@ char rfStringX_Assign_char(RF_StringX* str,uint32_t codepoint)
         RF_REALLOC(str->INH_String.bytes, char,
                    5*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1, false);
     }
-    if((bytes=rfUTF8_Encode_single(codepoint, utf8)) == 0)
+    if((bytes=rfUTF8_Encode_single(codepoint, utf8)) < 0)
     {
-        LOG_ERROR("Assigning a character to an RF_StringX failed",
-                  RF_LastError);
+        RF_ERROR(0, "Assigning a character to an RF_StringX failed "
+                 "due to utf8 encoding");
         return false;
     }
     str->INH_String.byteLength = bytes;
@@ -743,15 +615,13 @@ char rfStringX_Assign_char(RF_StringX* str,uint32_t codepoint)
 // Returns an RF_StringX version of the parameter RF_String
 RF_StringX* rfStringX_FromString_OUT(const RF_String* s)
 {
-    //create the new string
     RF_StringX* ret;
     RF_MALLOC(ret, sizeof(RF_StringX), NULL);
-    //copy the bytes
-    ret->bSize = s->byteLength*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1;
-    RF_MALLOC(ret->INH_String.bytes, ret->bSize, NULL);
-    memcpy(ret->INH_String.bytes, s->bytes, s->byteLength+1);
-    ret->bIndex = 0;
-    ret->INH_String.byteLength = s->byteLength;
+    if(rfStringX_FromString_IN(ret, s) == false)
+    {
+        free(ret);
+        return NULL;
+    }
     return ret;
 }
 //Initializes an RF_StringX from an RF_string
@@ -771,27 +641,19 @@ char rfStringX_FromString_IN(RF_StringX* dst, const RF_String* src)
 //Creates a copy of an extended String and returns it
 RF_StringX* rfStringX_Copy_OUT(RF_StringX* s)
 {
-    //create the new string
     RF_StringX* ret;
     RF_MALLOC(ret, sizeof(RF_StringX), NULL);
-    //allocate the new string
-    RF_MALLOC(ret->INH_String.bytes, s->bSize, NULL);
-    //before copying make sure that the source string is copied from the beginning of its buffer
-    s->INH_String.bytes -= s->bIndex;
-    memcpy(ret->INH_String.bytes, s->INH_String.bytes, s->bSize);
-    //put the s->bytes back and put the copied bytes buffer to the same inex
-    s->INH_String.bytes += s->bIndex;
-    ret->INH_String.bytes += s->bIndex;
-    //copy the parameters
-    ret->bSize = s->bSize;
-    ret->bIndex = s->bIndex;
-    ret->INH_String.byteLength = s->INH_String.byteLength;
+    if(rfStringX_Copy_IN(ret, s) == false)
+    {
+        free(ret);
+        return NULL;
+    }
     return ret;
 }
 //Copies the given source string into the destination string.
 char rfStringX_Copy_IN(RF_StringX* dst,RF_StringX* src)
 {
-    //before copying make sure that the source string is copied from the beginning of its buffer
+    //assert that the source string is copied from the beginning of its buffer
     src->INH_String.bytes -= src->bIndex;
     //copy the bytes
     RF_MALLOC(dst->INH_String.bytes, src->bSize, false);
@@ -811,7 +673,7 @@ char rfStringX_Copy_chars(RF_StringX* dst, RF_StringX* src,
                           uint32_t charsN)
 {
     uint32_t i=0,bytePos;
-    //before copying make sure that the source string is copied from the beginning of its buffer
+    //assert that the source string is copied from the beginning of its buffer
     src->INH_String.bytes -= src->bIndex;
     //copy the bytes
     RF_MALLOC(dst->INH_String.bytes, src->bSize, false);
@@ -833,20 +695,22 @@ char rfStringX_Copy_chars(RF_StringX* dst, RF_StringX* src,
     return true;
 }
 
-/*-------------------------------------------------------------------------Methods to get rid of an RF_StringX-------------------------------------------------------------------------------*/
+/*--- Methods to get rid of an RF_StringX ---*/
 
-//Destroys an extended String and releases its memory.It is an error to give a NULL(0x0) string for deleting. Will most probably lead to a segmentation fault
+//Destroys an extended String and releases its memory
 void rfStringX_Destroy(RF_StringX* s)
 {
-    //an extended string can have moved its internal pointer forward, so we have to put it back at the origin to destroy the whole string freeing all the memory properly
+    //an extended string can have moved its internal pointer forward
+    //so we have to put it back at the origin to free properly
     s->INH_String.bytes -= s->bIndex;
     free(s->INH_String.bytes);
     free(s);
 }
-//Destroys only the contents of the Extended string without freeing the pointer itself.It is an error to give a NULL(0x0) string for deleting. Will most probably lead to a segmentation fault
+//Destroys only the contents of the Extended string 
 void rfStringX_Deinit(RF_StringX* s)
 {
-    //an extended string can have moved its internal pointer forward, so we have to put it back at the origin to destroy the whole string freeing all the memory properly
+    //an extended string can have moved its internal pointer forward
+    //so we have to put it back at the origin to free properly
     s->INH_String.bytes -= s->bIndex;
     free(s->INH_String.bytes);
 }

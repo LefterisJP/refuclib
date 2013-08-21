@@ -47,26 +47,34 @@ extern "C"
 
 /**
  ** @memberof RF_StringX
- ** @brief Formats an @ref RF_StringX according to the given format string and variable argument list
+ ** @brief Formats an @ref RF_StringX according to the given format string
+ **  and variable argument list
  **
- ** This implementation loosely interprets the C standard on  <a href="http://pubs.opengroup.org/onlinepubs/009695399/functions/printf.html">printf() and friends</a>. Specifically it has some additional rules
- ** and may not follow all that the standard says about printf so please check below for a full documentation of what this function does.
+ ** This implementation loosely interprets the C standard on  <a href="http://pubs.opengroup.org/onlinepubs/009695399/functions/printf.html"> 
+ ** printf() and friends</a>. Specifically it has some additional rules
+ ** and may not follow all that the standard says about printf so please check below for a 
+ ** full documentation of what this function does.
  **
- ** For an array of examples please visit the relevant @ref RF_StringsPGE_Formatted "section" of the String documentation.
+ ** For an array of examples please visit the relevant @ref RF_StringsPGE_Formatted
+ **  "section" of the String documentation.
  **
  ** @lmsFunction
- ** @param s Pass an @ref RF_StringX that is already initialized with a big enough buffer (if it is not it will be reallocated inside the function)
- ** inside which the string will be returned in the end. Note that all its previous contents shall be erased.
- ** @param format The formatted string which specifies what kind of arguments to expect. Everything will be copied inside @c s except
+ ** @param s Pass an @ref RF_StringX that is already initialized with a big
+ **  enough buffer (if it is not it will be reallocated inside the function)
+ ** inside which the string will be returned in the end. Note that all its
+ ** previous contents shall be erased.
+ ** @param format The formatted string which specifies what kind of arguments 
+ ** to expect. Everything will be copied inside @c s except
  ** for specific format specifiers which begin with the special character @c '%%'.
  **
- ** A format specifier follows this prototype: %[@c flags][@c width][.@c precision][@c length]@c specifier
+ ** A format specifier follows this prototype:
+ **  %[@c flags][@c width][.@c precision][@c length]@c specifier
  ** Everything but the @c specifier are optional.
  **
  ** | @b Specifier  | Output | Example|
  ** | :----: | :----:| :----: |
- ** | @b d or @b i | Signed integer                           | -1337             |
- ** | @b u      | Unsigned integer                         | 2034                          |
+ ** | @b d or @b i | Signed integer | -1337 |
+ ** | @b u      | Unsigned integer | 2034   |
  ** | @b x or @b X | Hexadecimal integer <br /> <p align="justify"> If the '#' flag is given then a "0x" shall be prepended to the hexadecimal. If '%%x' is given the the hexadecimals will be printed in lowercase and if '%%X' is given they will be in uppercase </p> | F, 0xFA, 0xc23 |
  ** | @b f or @b F | Floating point number <br/> <p align="justify">The argument shall be interpreted as a double and it will be printed as a floating point number with @c precision digits after the radix. Default precision is 6. The low-order digit shall be rounded in an implementation-defined manner. For infinity and nan "INF" and "NAN" shall be printed for @c %%F and "inf" and "nan" for @c %%f </p>  | 3.141592 , -0.0021   |
  ** | @b e or @b E | Scientific notation Floating point number <br/> <p align="justify">The argument shall be interpreted as a double and it will be printed as a scientific notation floating point number with @c precision digits after the radix. Default precision is 6. The low-order digit shall be rounded in an implementation-defined manner. For infinity and nan "INF" and "NAN" shall be printed for @c %%E and "inf" and "nan" for @c %%e </p>  | 3.141592e+0 , -2.1122E-4 |
@@ -103,18 +111,13 @@ extern "C"
  ** <tr><td> @c l</td><td>long int</td><td>unsigned long int</td><td></td><td></td><td></td><td></td></tr>
  ** <tr><td> @c ll</td><td>long long int</td><td>unsigned long long int</td><td></td><td></td><td></td><td></td></tr>
  ** </table>
- **
- **/
 
-/**
- ** @param argList A @c va_list which holds the extra arguments with which to format the string
- ** @return @c RF_SUCCESS for succesful formatting and error otherwise. Possible errors are:
- ** + @c RE_FORMAT_UNEXPECTEDCHAR: If during parsing the formatted string an unexpected character
- ** is encountered after the @c '%%'
- ** + @c RE_FORMAT_ILLEGALPRECISION: If an illegal precision flag has been detected in the formatted string
- **
+ ** @param argList A @c va_list which holds the extra arguments with which to
+ ** format the string
+ ** @return Returns @c true for success and @c false otherwise
  **/
-i_DECLIMEX_ int32_t rfStringX_Formatv(RF_StringX *s,const char* format,va_list argList);
+i_DECLIMEX_ char rfStringX_Formatv(RF_StringX *s, const char* format,
+                                   va_list argList);
 
 /**
  ** @memberof RF_StringX
@@ -125,7 +128,7 @@ i_DECLIMEX_ int32_t rfStringX_Formatv(RF_StringX *s,const char* format,va_list a
  ** @lmsFunction
  **
  **/
-i_DECLIMEX_ int32_t rfStringX_Format(RF_StringX *s,const char* format,...);
+i_DECLIMEX_ char rfStringX_Format(RF_StringX *s,const char* format,...);
 
 //! @}
 #ifdef __cplusplus

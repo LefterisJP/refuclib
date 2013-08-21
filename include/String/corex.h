@@ -326,12 +326,14 @@ i_DECLIMEX_ char i_NVrfStringX_Init_buff(RF_StringX* str,uint32_t buffSize,const
 
 /**
  ** @memberof RF_StringX
- ** @brief Allocates and returns an RF_StringX with the given UTF-16 byte sequence
+ ** @brief Allocates and returns an RF_StringX with the given
+ **  UTF-16 byte sequence
  **
- ** Given characters have to be in UTF-16 and in the endianess of the system. They also have to be null terminated.
- ** @param s A buffer of 2-byte words representing the utf-16 byte sequence. Needs to be null terminated
- ** @c RF_LITTLE_ENDIAN and @c RF_BIG_ENDIAN.
- ** @return Returns the initialized RF_stringX or null in case of failure to initialize, due to invalid utf-16 sequence or illegal endianess value
+ ** Given characters have to be in UTF-16 and in the endianess of the system.
+ ** They also have to be null terminated.
+ ** @param s A buffer of 2 byte words representing the utf-16 byte sequence.
+ ** @return Returns the initialized RF_stringX or null in case of failure to
+ **  initialize, due to invalid utf-16 sequence or illegal endianess value
  ** @see rfStringX_Init_UTF16()
  ** @see rfStringX_Create_UTF32()
  **
@@ -341,16 +343,17 @@ i_DECLIMEX_ RF_StringX* rfStringX_Create_UTF16(const uint16_t* s);
  ** @memberof RF_StringX
  ** @brief Initializes an RF_StringX with the given UTF-16 byte sequence
  **
- ** Given characters have to be in UTF-16 and in the endianess of the system. They also have to be null terminated.
+ ** Given characters have to be in UTF-16. They also have to be null terminated.
  ** @param str the String to initialize
- ** @param s A buffer of 2-byte words representing the utf-16 byte sequence. Needs to be null terminated
- ** @c RF_LITTLE_ENDIAN and @c RF_BIG_ENDIAN.
- ** @return Returns true for success or false in case of failure to initialize, due to invalid utf-16 sequence or illegal endianess value
+ ** @param s A buffer of 2 byte words representing the utf-16 byte sequence.
+ ** Needs to be null terminated
+ ** @return Returns true for success or false in case of failure to initialize
  ** @see rfStringX_Create_UTF16()
  ** @see rfStringX_Init_UTF32()
  **
  **/
-i_DECLIMEX_ char rfStringX_Init_UTF16(RF_StringX* str,const uint16_t* s);
+i_DECLIMEX_ char rfStringX_Init_UTF16(RF_StringX* str,
+                                      const uint16_t* s);
 
 /**
  ** @memberof RF_StringX

@@ -60,7 +60,7 @@ int32_t rfMakeDir(void* dirnameP,int mode)
 {
     RF_String* dirname = (RF_String*)dirnameP;
     int32_t error = RF_SUCCESS;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
 
     //make the directory
     if(_mkdir(dirname->bytes)!=0)
@@ -78,7 +78,7 @@ int32_t rfMakeDir(void* dirnameP,int mode)
         }
     }
 
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return error;
 }
 
@@ -91,7 +91,7 @@ int32_t rfRemoveDir(void* dirnameP)
     RF_StringX path;
     struct stat s;
     int32_t ret = RF_SUCCESS;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
 
     rfStringX_Init_buff(&path,1024,"");
     //open the directory
@@ -190,7 +190,7 @@ int32_t rfRemoveDir(void* dirnameP)
     }
 
 cleanup1:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -199,7 +199,7 @@ int32_t rfDeleteFile(void* nameP)
 {
     RF_String* name = (RF_String*)nameP;
     int32_t ret = RF_SUCCESS;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
 
     if(DeleteFile(name->bytes)==0)
     {
@@ -209,7 +209,7 @@ int32_t rfDeleteFile(void* nameP)
         ret = RE_FILE_DELETE;
     }
 
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 // Renames a file
@@ -218,7 +218,7 @@ int32_t rfRenameFile(void* nameP,void* newNameP)
     RF_String* name = (RF_String*)nameP;
     RF_String* newName = (RF_String*)newNameP;
     int32_t ret = RF_SUCCESS;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
 
     if(MoveFile(name->bytes,newName->bytes) ==0)
     {
@@ -228,7 +228,7 @@ int32_t rfRenameFile(void* nameP,void* newNameP)
         ret = RE_FILE_RENAME;
     }
 
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 

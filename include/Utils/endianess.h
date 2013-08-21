@@ -35,16 +35,12 @@
 #define RF_UTILS_ENDIANESS_H
 
 
-/**
- ** Defines little endian system
- **
- **/
-#define RF_LITTLE_ENDIAN    0
-/**
- ** Defines big endian system
- **
- **/
-#define RF_BIG_ENDIAN       1
+enum i_RF_ENDIANESS_TYPES 
+    {
+        RF_LITTLE_ENDIAN = 1,
+        RF_BIG_ENDIAN,
+        RF_ENDIANESS_UNKNOWN
+    };
 
 
 #ifdef __cplusplus
@@ -57,22 +53,23 @@ extern "C"
  ** @brief A function that returns the endianess of the system
  **
  ** @return The endianess of the system. Can be either @c RF_LITTLE_ENDIAN or @c RF_BIG_ENDIAN
- **
  **/
 i_DECLIMEX_ char rfEndianess();
-
+/**
+ ** @brief A function to return the endianess that is NOT used by the system 
+ ** 
+ **/ 
+i_DECLIMEX_ char rfOtherEndianess();
 /**
  ** Swaps the endianness of the variable
  ** @warning the & 0xXXXX makes sure that in the signed case we DO NOT get a wrong number.
  ** (Because when you shift right >> a signed number the bits get filled by the sign and not zeros
  ** @param v The Variable whose endianness we wanna change
- **
  **/
 i_DECLIMEX_ void rfSwapEndianUS(uint16_t* v);
 /**
  ** Swaps the endianness of the variable
  ** @param v The Variable whose endianness we wanna change
- **
  **/
 i_DECLIMEX_ void rfSwapEndianS(int16_t* v);
 /**
@@ -97,6 +94,13 @@ i_DECLIMEX_ void rfSwapEndianUL(uint32_t*   v);
 
 
 
+i_DECLIMEX_ void rfProcessByteOrderUS(uint16_t* v, int file_endianess);
+i_DECLIMEX_ void rfProcessByteOrderUI(uint32_t* v, int file_endianess);
+i_DECLIMEX_ void rfProcessByteOrderUSA(uint16_t* v, unsigned int length,
+                           int file_endianess);
+
+i_DECLIMEX_ void rfProcessByteOrderUIA(uint32_t* v, unsigned int length,
+                           int file_endianess);
 
 
 #ifdef __cplusplus

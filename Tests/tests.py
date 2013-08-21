@@ -7,12 +7,12 @@ import platform
 import sys
 
 from testscompile import compileTest
-from output import print_nonl
+from output import (print_nonl, report, TestError, TestsFail, TestCompileError)
+from log import check_library_log
 
 #the time by which to delay actions after compiling so as not to have conflicts
 #after copying/deleting binaries
 delay = 0.20
-
 
 def configureLinking(dynamic, root, outName):
     """Deals with the library linking for each test"""
@@ -26,51 +26,6 @@ def configureLinking(dynamic, root, outName):
                 pass
             shutil.copy(os.path.join(".",outName),os.path.join(root,outName))
 
-
-def report(log_file, string):
-    print(string)
-    log_file.write(string)
-
-def  check_library_log(log_file, root):
-    """
-       Copies the library log file into the output and into the 
-       tests log if and only if there is anything to report
-
-       log_file - The file to which the tests log is saved
-       root - The root directory where the current test is ran
-    """
-    refu_error_logf = os.path.join(root, "refuErrorLog")
-    if(os.path.getsize(refu_error_logf) > 0):
-        report(log_file, "--Start of Library Log--")
-        l = open(refu_error_logf)
-        for line in l:
-            report(log_file, line)
-        report(log_file, "--End of Library Log--")
-
-class TestError(Exception):
-    """
-       A simple Test Error exception, reporting test and line number
-       line_num can be None if we don't actually know the number of
-       the line of the error
-    """
-    def __init__(self, test_name, line_num):
-        self.test_name = test_name
-        self.line_num = line_num
-    
-    def __str__(self):
-        return "\t**TEST-FAIL**: {} failed at line {}".format(
-            self.test_name, self.line_num)
-
-class TestsFail(Exception):
-    """
-       An exception thrown when the tests for this build of the library
-       must prematurely stop
-    """
-    def __init__(self, msg):
-        self.msg = msg
-
-    def __str__(self):
-        return "**TESTS-FAILED**: {}".format(self.msg)
 
 def test(root, fileName, logFile, testExec, verbose, fail_fast):
     """
@@ -173,7 +128,7 @@ def debugTest(root, fileName, logFile, testExec):
 
 
 def runTests(compiler, dynamic, outName, logFile, verbose,
-             debug, tests, fail_fast):
+             debug, tests, fail_fast, keep_exec):
     """Runs the Tests of the Refu library
 
         --compiler: The name of the compiler
@@ -192,6 +147,8 @@ def runTests(compiler, dynamic, outName, logFile, verbose,
                  ones are.
         --fail_fast: A boolean flag denoting if the testing scripts should
                      stop right after a failure or not
+        --keep_exec: A boolean flag denoting if the executable of the test
+                     should be kept and not deleted under some circumstances
     """
     #test executable name is always test for now
     if(platform.system() == 'Windows'):
@@ -226,9 +183,20 @@ def runTests(compiler, dynamic, outName, logFile, verbose,
                     if(os.path.split(part)[1] not in tests):
                         continue
                 # compile it
-                if(compileTest(part+".c", dynamic, compiler, verbose,
-                               logFile) is False):
+                try:
+                    compileTest(part+".c", dynamic, compiler, verbose,
+                                logFile)
+                except TestCompileError as e:
+                    print(e)
+                    if fail_fast:
+
+                        raise TestsFail(
+                            "Test \"{}\" failed and --fail"
+                            "-fast was requested".format(part))
+
+                    print("Continuing with the compilation of the other tests")
                     continue#if it fails go to the next test
+
                 # after each compile add a small delay since the
                 # subsequent copy may fail
                 time.sleep(delay)
@@ -251,11 +219,11 @@ def runTests(compiler, dynamic, outName, logFile, verbose,
                         test(root, part, logFile, testExec,
                              verbose, fail_fast)
 
+                    # check the log for errors
+                    check_library_log(logFile, root, part)
                 except TestError as err:
-                    #if there was a test error print it and also check
-                    #the library log
+                    #if there was a test error print it
                     print(err)
-                    check_library_log(logFile, root)
                     if fail_fast:
                         raise TestsFail(
                             "Test \"{}\" failed and --fail"
@@ -269,15 +237,13 @@ def runTests(compiler, dynamic, outName, logFile, verbose,
                     logFile.write("\tTest \"{}\" failed due to "
                                   "inability to run the "
                                   "executable\n".format(part))
-                    #also check the library's log
-                    check_library_log(logFile, root)
                     if fail_fast:
                         raise TestsFail(
                             "Test \"{}\" failed and --fail"
                             "-hard was requested".format(part))
                 finally:
                     # cleaning up
-                    if(dynamic):
+                    if dynamic:
                         # also if we are testing the dynamic lib,
                         # delete its local copy
                         try:
@@ -285,10 +251,15 @@ def runTests(compiler, dynamic, outName, logFile, verbose,
                         except:
                             pass
                     #after finishing a test delete the executable
-                    try:
-                        os.remove(os.path.join(root, testExec))
-                    except:
-                        pass
+                    if ( not keep_exec and fail_fast or 
+                        (not keep_exec and len(tests) != 1)):
+                        try:
+                            os.remove(os.path.join(root, testExec))
+                        except:
+                            pass
+                    else:
+                        print("\t**Keeping the executable of the test "
+                              "as requested")
                     # adding some delay between tests until I figure out
                     # a better way to do this
                     time.sleep(delay)

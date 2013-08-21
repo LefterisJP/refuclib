@@ -36,7 +36,9 @@
 #include "rf_xmacro_eq.h" //for the equal macros
 
 #define i_RP_PASTE2(a__,b__)  a__##b__
-#define i_RP_PASTE2_2(a__,b__)  a__##b__  //second is for a second macro expansion frmo the same macro
+#define i_RP_PASTE2_2(a__,b__)  a__##b__ 
+#define i_RP_PASTE2_3(a__,b__)  a__##b__ 
+
 #define i_RP_PASTE3(a__,b__,c__)   a__##b__##c__
 #define i_RP_PASTE4(a__,b__,c__,d__)   a__##b__##c__##d__
 #define i_RP_PASTE5(a__,b__,c__,d__,e__)  a__##b__##c__##d__##e__
@@ -90,6 +92,40 @@ i_RP_ISEMPTY(                                                               \
  **
  **/
 
+
+/**
+ ** @brief Calls a function with specific arguments
+ **/
+#define RP_CALL(i_func_, ...) i_func_(__VA_ARGS__)
+
+
+/**
+ ** @brief Places argument @c i_move_arg at the end of a @c __VA_ARGS__ list
+ **/
+#define RP_END_OF_ARGLIST0(i_func_, i_move_arg_, ...) \
+    RP_CALL(i_func_, __VA_ARGS__, i_move_arg_)
+
+/**
+ ** @brief Places argument @c i_move_arg at the end of a @c __VA_ARGS__ list
+ ** while also having one argument at the beginning of that list
+ **/
+#define RP_END_OF_ARGLIST1(i_func_, i_arg1_, i_move_arg_, ...) \
+    RP_CALL(i_func_, i_arg1_, __VA_ARGS__, i_move_arg_)
+
+/**
+ ** @brief Places argument @c i_move_arg at the end of a @c __VA_ARGS__ list
+ ** while also having two arguments at the beginning of that list
+ **/
+#define RP_END_OF_ARGLIST2(i_func_, i_arg1_, i_arg2_, i_move_arg_, ...)  \
+    RP_CALL(i_func_, i_arg1_, i_arg2_, __VA_ARGS__, i_move_arg_)
+
+/**
+ ** @brief Places argument @c i_move_arg at the end of a @c __VA_ARGS__ list
+ ** while also having three arguments at the beginning of that list
+ **/
+#define RP_END_OF_ARGLIST3(i_func_, i_arg1_, i_arg2_, i_arg3_, i_move_arg_, ...) \
+    RP_CALL(i_func_, i_arg1_, i_arg2_, i_arg3_, __VA_ARGS__, i_move_arg_)
+
 /**
  ** @brief Counts the number of arguments
  **
@@ -130,7 +166,8 @@ i_RP_ISEMPTY(                                                               \
 #define  RP_RUN_FUNC2(FUNCNAME_,...)   FUNCNAME_(__VA_ARGS__)
 //This macro selects a function if I_COND is met
 #define i_RP_SELECT_FUNC_IF(i_FUNCNAME,i_COND,...)  i_RP_PASTE2(i_FUNCNAME,i_COND)(__VA_ARGS__)
-#define i_RP_SELECT_FUNC_IF2(i_FUNCNAME,i_COND,...)  i_RP_PASTE2_2(i_FUNCNAME,i_COND)(__VA_ARGS__)  //second is for a second macro expansion fron the same macro
+#define i_RP_SELECT_FUNC_IF2(i_FUNCNAME,i_COND,...)  i_RP_PASTE2_2(i_FUNCNAME,i_COND)(__VA_ARGS__)
+#define i_RP_SELECT_FUNC_IF3(i_FUNCNAME,i_COND,...)  i_RP_PASTE2_3(i_FUNCNAME,i_COND)(__VA_ARGS__) 
 
 //This macro helps select the function if the number of arguments is i_NARG
 #define RP_SELECT_FUNC_IF_NARGIS(i_FUNCNAME,i_NARG, ...)    i_RP_SELECT_FUNC_IF(i_FUNCNAME,RP_NARG_IS(i_NARG,__VA_ARGS__),__VA_ARGS__)
@@ -140,10 +177,16 @@ i_RP_ISEMPTY(                                                               \
 
 //This macro help select the function if the number of arguments is greater than the given one
 #define RF_SELECT_FUNC_IF_NARGGT(i_FUNCNAME,i_NARG,...) i_RP_SELECT_FUNC_IF(i_FUNCNAME,RP_NARG_GT(i_NARG,__VA_ARGS__),__VA_ARGS__)
-#define RF_SELECT_FUNC_IF_NARGGT2(i_FUNCNAME,i_NARG,...) i_RP_SELECT_FUNC_IF2(i_FUNCNAME,RP_NARG_GT(i_NARG,__VA_ARGS__),__VA_ARGS__) //second is for a second macro expansion from the same macro
+#define RF_SELECT_FUNC_IF_NARGGT2(i_FUNCNAME,i_NARG,...) i_RP_SELECT_FUNC_IF2(i_FUNCNAME,RP_NARG_GT2(i_NARG,__VA_ARGS__),__VA_ARGS__) //second is for a second macro expansion from the same macro
+#define RF_SELECT_FUNC_IF_NARGGT3(i_FUNCNAME,i_NARG,...) i_RP_SELECT_FUNC_IF3(i_FUNCNAME,RP_NARG_GT3(i_NARG,__VA_ARGS__),__VA_ARGS__)
+
 //The macro below returns true(token 1) or false(token0) depending on whether the number of args is greater than the one given at i_NARG
-#define RP_NARG_GT(i_NARG,...) i_RP_NARG_GT(RF_NARG(__VA_ARGS__),i_NARG)
 #define i_RP_NARG_GT(i_WANTED,i_GOT)    RP_GT(i_WANTED,i_GOT)
+#define i_RP_NARG_GT2(i_WANTED,i_GOT)    RP_GT2(i_WANTED,i_GOT)
+#define i_RP_NARG_GT3(i_WANTED,i_GOT)    RP_GT3(i_WANTED,i_GOT)
+#define RP_NARG_GT(i_NARG,...) i_RP_NARG_GT(RF_NARG(__VA_ARGS__),i_NARG)
+#define RP_NARG_GT2(i_NARG,...) i_RP_NARG_GT(RF_NARG(__VA_ARGS__),i_NARG)
+#define RP_NARG_GT3(i_NARG,...) i_RP_NARG_GT(RF_NARG(__VA_ARGS__),i_NARG)
 
 
 

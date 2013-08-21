@@ -53,20 +53,7 @@ extern "C"
  ** @memberof RF_Thread
  ** @brief Allocates and returns a thread
  **
- ** @param flags Bitflags parameters for the thread. Default is 0. Which means an RF_Thread that is joinable.
- ** Possible combination of values is:
- ** + @c RF_THREAD_DETACHED: This creates a detached thread. Detached thread means that it is of the fire and forget type.
- **      You can't join it with the owner thread later. If this flag is off then a joinable thread is created which means that
- **      you can use rfThread_Join on the thread from the main thread and the main thread's execution will be suspended until this thread
- **      has finished
- ** @param ptr2onExecution Give the address of the function you want to run as the main thread's execution function here
- ** @param data Give a pointer to the data to be passed to the thread
- ** @param lmsSize \rfoptional{RF_OPTION_LOCALSTACK_MEMORY_SIZE} The size of the thread's local stack memory. Provide a value here
- ** that shall determine the value of this thread's local memory stack size,that will be used for temporary objects initialized by macros
- ** such as @ref RFS_() and @ref RFXML_(). If inside that thread such objects are not initialized it is safe to give a small value or even 0
- ** to save memory. If no value is given then the default is to create a thread with the same value as that given in compiling with refu builder.
- ** @return Returns a pointer to the thread if succesfull or NULL in any other case
- **
+ ** Identical to @ref rfThread_Init()
  **/
 #ifdef RF_IAMHERE_FOR_DOXYGEN
 i_DECLIMEX_ RF_Thread* rfThread_Create(uint32_t flags,
@@ -90,20 +77,27 @@ i_DECLIMEX_ RF_Thread* rfThread_Create(uint32_t flags,
  ** @brief Initializes a thread
  **
  ** @param t The thread to initialize
- ** @param flags Bitflags parameters for the thread. Default is 0. Which means an RF_Thread that is joinable.
+ ** @param flags Bitflags parameters for the thread. Default is 0. Which means
+ ** an RF_Thread that is joinable.
  ** Possible combination of values is:
- ** + @c RF_THREAD_DETACHED: This creates a detached thread. Detached thread means that it is of the fire and forget type.
- **      You can't join it with the owner thread later. If this flag is off then a joinable thread is created which means that
- **      you can use rfThread_Join on the thread from the main thread and the main thread's execution will be suspended until this thread
- **      has finished
- ** @param ptr2onExecution Give the address of the function you want to run as the main thread's execution function here
+ ** + @c RF_THREAD_DETACHED: This creates a detached thread. Detached thread
+ **      means that it is of the fire and forget type. You can't join it with
+ **      the owner thread later. If this flag is off then a joinable thread
+ **      is created which means that you can use rfThread_Join on the thread
+ **      from the main thread and the main thread's execution will be suspended
+ **      until this thread has finished
+ ** @param ptr2onExecution Give the address of the function you want to run as
+ ** the main thread's execution function here
  ** @param data Give a pointer to the data to be passed to the thread
- ** @param lmsSize \rfoptional{RF_OPTION_LOCALSTACK_MEMORY_SIZE} The size of the thread's local stack memory. Provide a value here
- ** that shall determine the value of this thread's local memory stack size,that will be used for temporary objects initialized by macros
- ** such as @ref RFS_() and @ref RFXML_(). If inside that thread such objects are not initialized it is safe to give a small value or even 0
- ** to save memory. If no value is given then the default is to create a thread with the same value as that given in compiling with refu builder.
+ ** @param lmsSize \rfoptional{RF_OPTION_LOCALSTACK_MEMORY_SIZE} The size of the
+ ** thread's local stack memory. Provide a value here
+ ** that shall determine the value of this thread's local memory stack size, 
+ ** that will be used for temporary objects initialized by macros
+ ** such as @ref RFS_() and @ref RFXML_(). If inside that thread such objects 
+ ** are not initialized it is safe to give a small value or even 0
+ ** to save memory. If no value is given then the default is to create a thread
+ **  with the same value as that given in compiling with refu builder.
  ** @return Returns true for success and false for failure of initialization
- **
  **/
 #ifdef RF_IAMHERE_FOR_DOXYGEN
 i_DECLIMEX_ char rfThread_Init(RF_Thread* t,uint32_t flags,void* (*ptr2onExecution)(void*),void* data,uint64_t lmsSize);
@@ -117,12 +111,12 @@ i_DECLIMEX_ char rfThread_Init(RF_Thread* t,uint32_t flags,void* (*ptr2onExecuti
     i_DECLIMEX_ char rfThread_Init(RF_Thread* t,uint32_t flags,void* (*ptr2onExecution)(void*),void* data,uint64_t lmsSize );
 #endif
 #endif
+
 /**
  ** @memberof RF_Thread
  ** @brief Destroys a thread
  **
  ** @param t A pointer to the thread in question
- **
  **/
 i_DECLIMEX_ void rfThread_Destroy(RF_Thread* t);
 /**
@@ -135,7 +129,9 @@ i_DECLIMEX_ void rfThread_Deinit(RF_Thread* t);
 /**
  ** @brief Frees a thread but also immediately causes it to exit.
  **
- ** @warning This is a dangerous function because the target thread is forced to prematurely exit without having any chance to execute any user code that might be remaining
+ ** @warning This is a dangerous function because the target thread is forced
+ **  to prematurely exit without having any chance to execute any user code that
+ **  might be remaining
  ** @param t A pointer to the thread in question
  ** @return Returns true in success and false in thread deinit failure
  **
@@ -144,16 +140,18 @@ i_DECLIMEX_ char rfThread_Kill(RF_Thread* t);
 
 /**
  ** @memberof RF_Thread
- ** @brief Suspends execution of the calling thread until the target thread has terminated
+ ** @brief Suspends execution of the calling thread until the target thread
+ **  has terminated
  **
  ** If the target thread is detached in Linux this fails.
- ** @param t A pointer to the thread in question. Can be either RF_Thread or RF_ThreadX
- ** @return Returns RF_SUCCESS in success and an error code in case of an error. Possible errors are:
+ ** @param t A pointer to the thread in question. Can be either RF_Thread
+ **  or RF_ThreadX
+ ** @return Returns RF_SUCCESS in success and an error code in case of an error.
+ **  Possible errors are:
  ** + @c RE_THREAD_NOTJOINABLE: If The parameter thread is not joinable
- ** + @c RE_THREAD_JOIN: If there was a generic error in Joining
  ** + @c RE_THREAD_INVALID: The parameter thread is invalid
  ** + @c RE_THREAD_DEADLOCK: A deadlock has been detected due to the attempted joining.
- **
+ ** + @c Negative number if there was a generic error in joining
  **/
 i_DECLIMEX_ int32_t rfThread_Join(void* t);
 
@@ -161,7 +159,8 @@ i_DECLIMEX_ int32_t rfThread_Join(void* t);
  ** @memberof RF_Thread
  ** @brief Returns the data of the thread
  **
- ** @param thread A pointer to the thread in question. Can be either RF_Thread or RF_ThreadX
+ ** @param thread A pointer to the thread in question. Can be either RF_Thread
+ ** or RF_ThreadX
  ** @return Returns a @c void* to the Thread's data
  **
  **/
@@ -170,24 +169,6 @@ void* rfThread_GetData(void* thread);
 #else
 #define rfThread_GetData(i_THREAD)  (i_THREAD)->data
 #endif
-
-
-/**
- ** @brief Returns a unique identifier for the 
- ** current thread.
- **/
-i_DECLIMEX_ uintptr_t rfThread_GetID();
-
-
-/**
- ** @brief Initializes the threading system.
- **
- ** The only thing that this currently does is
- ** initialize the main thread's id with the pid of the process
- **/
-i_DECLIMEX_ char rfThreads_Init();
-
-
 
 #ifdef __cplusplus
 }///closing bracket for calling from C++

@@ -34,6 +34,7 @@
     #include <stdio.h>//for FILE* used inside printf.h
     #include <IO/printf.h> //for rfFpintf() used in the error logging macros
     #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
+    #include <Threads/common.h> //for rfThread_GetID()
     #include <Utils/error.h>
 //for memory allocation
     #include <stdlib.h> //for malloc, calloc,realloc and exit()
@@ -52,7 +53,7 @@ i_THREAD__ RF_LocalMemoryStack* RF_LMS;
 
 
 // Initializes the local memory stack
-char rfLMS_Init(RF_LocalMemoryStack* lms,uint64_t size)
+char rfLMS_Init(RF_LocalMemoryStack* lms, uint64_t size)
 {
     lms->stackPtr = 0;
     lms->macroEvalsI = 0;
@@ -70,8 +71,9 @@ void* rfLMS_Push(uint64_t size)
     uint32_t temp;
     if(RF_LMS->stackPtr+size > RF_OPTION_LOCALSTACK_MEMORY_SIZE)
     {
-        LOG_ERROR("Local Stack Memory pushing error. Attempted to allocate more memory than currently available",RE_LOCALMEMSTACK_PUSH)
-        return 0;
+         RF_ERROR(0, "Local Stack Memory pushing error. Attempted to "
+         "allocate more memory than currently available");
+        return NULL;
     }
     temp = RF_LMS->stackPtr;
     RF_LMS->stackPtr+=size;
@@ -80,26 +82,32 @@ void* rfLMS_Push(uint64_t size)
 
 
 //Frees some memory from the local memory stack
-void rfLMS_Pop(uint64_t size)
+char rfLMS_Pop(uint64_t size)
 {
     if(size > RF_LMS->stackPtr)
     {
-        LOG_ERROR("Local Stack Memory popping error. Attempted to pop the memory to a point in the stack that's not allocated yet",RE_LOCALMEMSTACK_POP);
-        return;
+         RF_ERROR(0, "Local Stack Memory popping error. Attempted to"
+                  " pop the memory to a point in the stack that's not "
+                  "allocated yet");
+        return false;
     }
     RF_LMS->stackPtr=size;
+    return true;
 }
 
 
 //Keeps the stack pointer before the specific macro evaluation
-void rfLMS_ArgsEval()
+char rfLMS_ArgsEval()
 {
     if(RF_LMS->macroEvalsI+1 >= RF_MAX_FUNC_ARGS)
     {
-        LOG_ERROR("Local Stack Memory macro evaluation error. More macros than the specified maximum number of function arguments \"%d\" have been evaluated",
-                  RE_LOCALMEMSTACK_MACROEVALS,RF_MAX_FUNC_ARGS);
-        exit(RE_LOCALMEMSTACK_MACROEVALS);
+        RF_ERROR(0, "Local Stack Memory macro evaluation error. More "
+                 "macros than the specified maximum number of function "
+                 "arguments \"%d\" have been evaluated", RF_MAX_FUNC_ARGS);
+        return false;
+
     }
     RF_LMS->macroEvals[RF_LMS->macroEvalsI] = RF_LMS->stackPtr;
     RF_LMS->macroEvalsI++;
+    return true;
 }

@@ -69,7 +69,7 @@
     do{ TYPE_* i_TEMPPTR_ = realloc( (REALLOC_RETURN_),(SIZE_));        \
         if(i_TEMPPTR_ == NULL)                                          \
         {                                                               \
-            DLOG_ERROR("realloc() failure",RE_REALLOC_FAILURE);         \
+            RF_ERROR(0, "realloc() failure");                           \
             return RETVAL_;                                             \
         }                                                               \
         REALLOC_RETURN_ = i_TEMPPTR_;                                   \
@@ -90,7 +90,7 @@
     do{ TYPE_* i_TEMPPTR_ = realloc( (REALLOC_RETURN_),(SIZE_));        \
         if(i_TEMPPTR_ == NULL)                                          \
         {                                                               \
-            DLOG_ERROR("realloc() failure",RE_REALLOC_FAILURE);         \
+            RF_ERROR(0, "realloc() failure");                            \
             STMT_;                                                      \
             goto GOTOFLAG_;                                             \
         }                                                               \
@@ -115,7 +115,7 @@
     do{ MALLOC_RETURN_ = malloc( (MALLOC_SIZE_) );                      \
         if(MALLOC_RETURN_ == NULL)                                      \
         {                                                               \
-            DLOG_ERROR(" malloc() failure",RE_MALLOC_FAILURE);          \
+            RF_ERROR(0, " malloc() failure");          \
             return RETVAL_;                                    \
         } }while(0)
 
@@ -134,7 +134,7 @@
     do{ MALLOC_RETURN_ = malloc( (MALLOC_SIZE_) );                      \
         if(MALLOC_RETURN_ == NULL)                                      \
         {                                                               \
-            DLOG_ERROR(" malloc() failure",RE_MALLOC_FAILURE);          \
+            RF_ERROR(0, "malloc() failure");           \
             STMT_;                                                      \
             goto GOTOFLAG_;                                             \
         } }while(0)
@@ -154,7 +154,7 @@
     do{ CALLOC_RETURN_ = calloc( (CALLOC_NUM_), (CALLOC_SIZE_) );       \
         if(CALLOC_RETURN_ == NULL)                                      \
         {                                                               \
-            DLOG_ERROR(" calloc() failure",RE_CALLOC_FAILURE);          \
+            RF_ERROR(0, "calloc() failure");                           \
             return RETVAL_;                                             \
         } }while(0)
 
@@ -175,7 +175,7 @@
     do{ CALLOC_RETURN_ = calloc( (CALLOC_NUM_), (CALLOC_SIZE_) );       \
         if(CALLOC_RETURN_ == NULL)                                      \
         {                                                               \
-            DLOG_ERROR(" calloc() failure",RE_CALLOC_FAILURE);          \
+        RF_ERROR(0, "calloc() failure");              \
             STMT_;
             goto GOTOFLAG__;                                             \
         } }while(0)

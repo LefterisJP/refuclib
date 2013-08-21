@@ -324,7 +324,7 @@ int32_t i_rfXML_ToFile(RF_XML* x, void* nameP,char encoding)
     {
         //delete the old file
         fclose(x->f.f);
-        if(rfDeleteFile(&x->f.name) != RF_SUCCESS)
+        if(!rfDeleteFile(&x->f.name))
         {
             rfTextFile_Deinit(&out);
             ret = RE_FILE_DELETE;
@@ -332,7 +332,7 @@ int32_t i_rfXML_ToFile(RF_XML* x, void* nameP,char encoding)
         }
         //rename the temp file to be the new file
         fclose(out.f);
-        if(rfRenameFile(RFS_(tmpNamePtr),&x->f.name) != RF_SUCCESS)
+        if(!rfRenameFile(RFS_(tmpNamePtr),&x->f.name))
         {
             rfTextFile_Deinit(&out);
             ret = RE_FILE_RENAME;

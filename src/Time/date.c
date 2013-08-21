@@ -21,26 +21,27 @@
 **      ==END OF REFU LICENSE==
 **
 **/
-//*---------------------Corresponding Header inclusion---------------------------------
+/*------------- Corrensponding Header inclusion -------------*/
 #include <Definitions/imex.h>//for import export macro
 #include <Definitions/types.h> //for fixed size types
 #include <Time/date_decl.h> //for RF_Date
 #include <Time/date.h>
-//*---------------------Module related inclusion----------------------------------------
+/*------------- Outside Module inclusion -------------*/
 #include "common.ph"//private time macros
 //*---------------------Outside module inclusion----------------------------------------
 //for error logging
     #include <stdio.h>//for FILE* used inside printf.h
     #include <IO/printf.h> //for rfFpintf() used in the error logging macros
+    #include <Threads/common.h> //for rfThread_GetID()
     #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
     #include <Utils/error.h>
 //for memory allocation
     #include <stdlib.h> //for malloc, calloc,realloc and exit()
     #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
     #include <Utils/memory.h> //for refu memory allocation
-//*---------------------libc Headers inclusion------------------------------------------
+/*------------- libc inclusion -------------*/
 #include <limits.h> //for the limit of ullong
-//*----------------------------End of Includes------------------------------------------
+/*------------- End of includes -------------*/
 
 
 //some definitions of accumulated days in the year after each month, used in various calculations
@@ -70,70 +71,71 @@ char rfDate_Init(RF_Date* d,
 {
     if(wDay > 6)
     {
-        LOG_ERROR(
-        "During initializing a Date Object an illegal value of %d was "
-        "given the day of the week. Legal values are from 0 to 6",
-            RE_DATE_ILLEGAL_PARAM, wDay);
+        RF_ERROR(1,
+                 "During initializing a Date Object an illegal value of %d was "
+                 "given the day of the week. Legal values are from 0 to 6"
+                 , wDay);
         return false;
     }
     d->wDay = wDay;
 
     if(mDay < 1 || mDay > 31)
     {
-        LOG_ERROR(
-        "During initializing a Date Object an illegal value of %d was "
-        "given for the day of the month. Legal values are from 1 to 31",
-            RE_DATE_ILLEGAL_PARAM,mDay);
+        RF_ERROR(1,
+                 "During initializing a Date Object an illegal value of %d was "
+                 "given for the day of the month. Legal values are from 1 to 31"
+                 ,mDay);
         return false;
     }
     d->mDay = mDay;
 
     if(month < 1 || month > 12 )
     {
-        LOG_ERROR(
-        "During initializing a Date Object an illegal value of %d was "
-        "given for the month. Legal values are from 1 to 12",
-        RE_DATE_ILLEGAL_PARAM,month);
+        RF_ERROR(1,
+                 "During initializing a Date Object an illegal value of %d was "
+                 "given for the month. Legal values are from 1 to 12"
+                 ,month);
         return false;
     }
     d->month = month;
 
     if(year < 1601 || year > 30827)
     {
-        LOG_ERROR("During initializing a Date Object an illegal value of"
-                  " %d was given for the year. Legal values are from 1601"
-                  " to 30827 due to limitations of the Windows version of"
-                  " the library", RE_DATE_ILLEGAL_PARAM, year);
+        RF_ERROR(1,
+                 "During initializing a Date Object an illegal value of"
+                 " %d was given for the year. Legal values are from 1601"
+                 " to 30827 due to limitations of the Windows version of"
+                 " the library", year);
         return false;
     }
     d->year = year;
 
     if(hour > 23)
     {
-        LOG_ERROR(
-            "During initializing a Date Object an illegal value of %d was"
-            " given for the hour. Legal values are from 0 to 23",
-            RE_DATE_ILLEGAL_PARAM,hour);
+        RF_ERROR(1,
+                 "During initializing a Date Object an illegal value of %d was"
+                 " given for the hour. Legal values are from 0 to 23",
+                 hour);
         return false;
     }
     d->hours = hour;
 
     if(minutes > 59)
     {
-        LOG_ERROR(
-            "During initializing a Date Object an illegal value of %d was"
-            " given for the minutes. Legal values are from 0 to 59",
-            RE_DATE_ILLEGAL_PARAM, minutes);
+        RF_ERROR(1,
+                 "During initializing a Date Object an illegal value of %d was"
+                 " given for the minutes. Legal values are from 0 to 59",
+                 minutes);
         return false;
     }
     d->minutes = minutes;
 
     if(sec > 59)
     {
-        LOG_ERROR(
-            "During initializing a Date Object an illegal value of %d was"
-            " given for the seconds. Legal values are from 0 to 59",
-            RE_DATE_ILLEGAL_PARAM, sec);
+        RF_ERROR(1,
+                 "During initializing a Date Object an illegal value of %d was"
+                 " given for the seconds. Legal values are from 0 to 59",
+                 sec);
         return false;
     }
     d->seconds = sec;
@@ -300,10 +302,9 @@ void rfDate_AddDays(RF_Date* d, uint32_t g_days)
                 remMonthDays = 31-d->mDay;
             break;
             default:
-                LOG_ERROR(
-                    "Unrecognized month value encountered. Should never "
-                    "come here. The date object must be corrupt",
-                    RE_DATE_ILLEGAL_MONTH);
+                RF_ERROR(0,
+                         "Unrecognized month value encountered. Should never "
+                         "come here. The date object must be corrupt");
                 remMonthDays = 0;
             break;
         }//end of month switch

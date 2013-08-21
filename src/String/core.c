@@ -24,25 +24,27 @@
 
 
 
-//*---------------------Corrensponding Header inclusion---------------------------------
+/*------------- Corrensponding Header inclusion -------------*/
 #include <Definitions/types.h> //for fixed size types needed in various places
 #include <String/string_decl.h>//for RF_String
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <Utils/constcmp.h> //for RF_HEXEQ_C() used in rfUTF8_IsContinuationByte() which itself is used in the iteration macros
 #include <String/core.h>
-//*---------------------Module related inclusion----------------------------------------
+/*------------- Module related inclusion -------------*/
 #include <String/stringx_decl.h> //for RF_StringX
 #include <stdarg.h> //needed for the va_list argument in rfStringX_Formatv() and also in the functions below
 #include <String/format.h> //for the String formatting function
 #include "common.ph"//for private string iteration
-//*---------------------Outside module inclusion----------------------------------------
+/*------------- Outside Module inclusion -------------*/
 #include <String/unicode.h> //for rfUTF8_VerifySequence()
 
 #include <Definitions/retcodes.h> //for error codes
 //for error logging
     #include <stdio.h>//for FILE* used inside printf.h
     #include <IO/printf.h> //for rfFpintf() used in the error logging macros
+    #include <Threads/common.h> //for rfThread_GetID()
+    #include <errno.h> //for error reporting that needs it
     #include <Utils/error.h>
 //for the io buffer
     #include <Definitions/threadspecific.h> // for the thread specific keyword used in the ioBuffer
@@ -55,25 +57,25 @@
 //for memory allocation macros
     #include <stdlib.h> //for malloc, calloc,realloc and exit()
     #include <Utils/memory.h> //for refu memory allocation
-//*----------------------------End of Includes------------------------------------------
+/*------------- End of includes -------------*/
 
 
 //Allocates and returns a string with the given characters a refu string with the given characters. Given characters have to be in UTF-8. A check for valide sequence of bytes is performed.
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-RF_String* rfString_Create(const char* s,...)
+RF_String* rfString_Create(const char* s, ...)
 #else
-RF_String* i_rfString_Create(const char* s,...)
+RF_String* i_rfString_Create(const char* s, ...)
 #endif
 {
     RF_String* ret;
-    va_list args;//note that no local scope macros are needed here since the arguments get evaluated in rfStringX_Formatv()
+    va_list args;//note that no local scope macros are needed here since the
 
     va_start(args,s);
     //read the var args
-    if(rfStringX_Formatv(&ioBuffer,s,args)!=RF_SUCCESS)
+    if(rfStringX_Formatv(&ioBuffer,s,args) == false)
     {
-        LOG_ERROR("String creation failure due to failing at reading the "
-                  "formatted string",RF_LastError);
+        RF_ERROR(0, "String creation failure due to failing at reading the "
+                 "formatted string");
         return NULL;
     }
     va_end(args);
@@ -85,48 +87,40 @@ RF_String* i_rfString_Create(const char* s,...)
     RF_MALLOC(ret->bytes, ret->byteLength+1, NULL);
     memcpy(ret->bytes, ioBuffer.INH_String.bytes, ret->byteLength+1);
 
-
     return ret;
 }
 #ifdef RF_OPTION_DEFAULT_ARGUMENTS
 RF_String* i_NVrfString_Create(const char* s)
 {
     RF_String* ret;
-    uint32_t byteLength;
-
-    //check for validity of the given sequence and get the character length
-    if( rfUTF8_VerifySequence(s,&byteLength) != RF_SUCCESS)
+    RF_MALLOC(ret, sizeof(RF_String), NULL);
+    if(i_NVrfString_Init(ret, s) == false)
     {
-        LOG_ERROR("Error at String Allocation due to invalid UTF-8 byte "
-                  "sequence", RE_STRING_INIT_FAILURE);
+        free(ret);
         return NULL;
     }
-    RF_MALLOC(ret, sizeof(RF_String), NULL);
-    //get length
-    ret->byteLength = byteLength;
-    //now that we know the length we can allocate the buffer and copy the bytes
-    RF_MALLOC(ret->bytes, ret->byteLength+1, NULL);
-    memcpy(ret->bytes, s, ret->byteLength+1);
-
     return ret;
 }
 #endif
 
 
-// Initializes a string with the given characters. Given characters have to be in UTF-8. A check for valid sequence of bytes is performed.<b>Can't be used with RF_StringX</b>
+// Initializes a string with the given characters. Given characters have to be
+// in UTF-8. A check for valid sequence of bytes is performed.
+// <b>Can't be used with RF_StringX</b>
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-char rfString_Init(RF_String* str,const char* s,...)
+char rfString_Init(RF_String* str, const char* s, ...)
 #else
-char i_rfString_Init(RF_String* str,const char* s,...)
+char i_rfString_Init(RF_String* str, const char* s, ...)
 #endif
 {
-    va_list args;//note that no local scope macros are needed here since the arguments get evaluated in rfStringX_Formatv()
-
+    va_list args;//note that no local scope macros are needed here since the 
+                 //arguments get evaluated in rfStringX_Formatv()
     va_start(args,s);
     //read the var args
-    if(rfStringX_Formatv(&ioBuffer,s,args)!=RF_SUCCESS)
+    if(rfStringX_Formatv(&ioBuffer,s,args) == false)
     {
-        LOG_ERROR("String creation failure due to failing at reading the formatted string",RF_LastError);
+        RF_ERROR(0, "String creation failure due to failing at reading the "
+                 "formatted string");
         return false;
     }
     va_end(args);
@@ -140,14 +134,14 @@ char i_rfString_Init(RF_String* str,const char* s,...)
     return true;
 }
 #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-char i_NVrfString_Init(RF_String* str,const char* s)
+char i_NVrfString_Init(RF_String* str, const char* s)
 {
     //check for validity of the given sequence and get the character length
     uint32_t byteLength;
-    if( rfUTF8_VerifySequence(s,&byteLength) != RF_SUCCESS)
+    if(!rfUTF8_VerifySequence(s,&byteLength))
     {
-        LOG_ERROR("Error at String Initialization due to invalid UTF-8 "
-                  "byte sequence", RE_STRING_INIT_FAILURE);
+        RF_ERROR(0, "Error at String Initialization due to invalid UTF-8 "
+                 "byte sequence");
         return false;
     }
 
@@ -229,8 +223,8 @@ char rfString_Init_cp(RF_String* str, uint32_t codepoint)
     }
     else
     {
-        LOG_ERROR("Attempted to encode an invalid unicode code point into"
-                  " a string", RE_UTF8_INVALID_CODE_POINT);
+        RF_ERROR(0, "Attempted to encode an invalid unicode code point into"
+                 " a string");
         free(str->bytes);
         return false;
     }
@@ -242,33 +236,30 @@ char rfString_Init_cp(RF_String* str, uint32_t codepoint)
 // Allocates and returns a string with the given integer
 RF_String* rfString_Create_i(int32_t i)
 {
-    //the size of the int32_t buffer
-    int32_t numLen;
-    //put the int32_t into a buffer and turn it in a char*
-    char buff[12];//max uint32_t is 4,294,967,295 in most environment so 12 chars will certainly fit it
-    sprintf(buff,"%d",i);
-    numLen = strlen(buff);
-
     //initialize the string and return it
     RF_String* ret;
     RF_MALLOC(ret, sizeof(RF_String), NULL);
-    ret->byteLength = numLen;
-    RF_MALLOC(ret->bytes, numLen+1, NULL);
-    strcpy(ret->bytes,buff);
+    if(rfString_Init_i(ret, i) == false)
+    {
+        free(ret);
+        return NULL;
+    }
     return ret;
 }
 // Initializes a string with the given integer.
 char rfString_Init_i(RF_String* str, int32_t i)
 {
     //the size of the int32_t buffer
-    int32_t numLen;
+    int32_t len;
     //put the int32_t into a buffer and turn it in a char*
     char buff[12];//max uint32_t is 4,294,967,295 in most environment so 12 chars will certainly fit it
-    sprintf(buff,"%d",i);
-    numLen = strlen(buff);
-
-    str->byteLength = numLen;
-    RF_MALLOC(str->bytes, numLen+1, false);
+    if((len = sprintf(buff, "%d", i)) < 0)
+    {
+        RF_ERROR_PRINTF("String initialization from integer failed", "sprintf");
+        return false;
+    }
+    str->byteLength = len;
+    RF_MALLOC(str->bytes, len+1, false);
     strcpy(str->bytes, buff);
 
     return true;
@@ -277,37 +268,30 @@ char rfString_Init_i(RF_String* str, int32_t i)
 // Allocates and returns a string with the given float
 RF_String* rfString_Create_f(float f)
 {
-    //allocate a buffer for the float in characters
-    char* buff;
     RF_String* ret;
-    uint32_t len;
-    RF_MALLOC(buff, 128, NULL);
-    sprintf(buff, "%f", f);
-    len = strlen(buff);
-
-    //initialize and return the string
     RF_MALLOC(ret, sizeof(RF_String), NULL);
-    ret->byteLength = len;
-    RF_MALLOC(ret->bytes, len+1, NULL);
-    strcpy(ret->bytes,buff);
-    free(buff);
-
+    if(rfString_Init_f(ret, f) == false)
+    {
+        free(ret);
+        return NULL;
+    }
     return ret;
 }
 // Initializes a string with the given float
 char rfString_Init_f(RF_String* str,float f)
 {
-    //allocate a buffer for the float in characters
-    char* buff;
-    uint32_t len;
-    RF_MALLOC(buff, 128, false);
-    sprintf(buff,"%f",f);
-    len = strlen(buff);
+    char buff[50];//a buffer to hold the string float, TODO: check if size if ok
+    int32_t len;
+
+    if((len = sprintf(buff,"%f",f)) < 0)
+    {
+        RF_ERROR_PRINTF("String initialization from float failed", "sprintf");
+        return false;
+    }
 
     str->byteLength = len;
     RF_MALLOC(str->bytes, len+1, false);
     strcpy(str->bytes, buff);
-    free(buff);
 
     //success
     return true;
@@ -320,7 +304,7 @@ RF_String* rfString_Create_UTF16(const uint16_t* s)
 {
     RF_String* ret;
     RF_MALLOC(ret, sizeof(RF_String), NULL);
-    if(rfString_Init_UTF16(ret,s)==false)
+    if(rfString_Init_UTF16(ret, s) == false)
     {
         free(ret);
         return NULL;
@@ -331,33 +315,38 @@ RF_String* rfString_Create_UTF16(const uint16_t* s)
 //Initializes a string with the given UTF-16 byte sequence. Given characters
 // have to be in UTF-16. A check for valid sequence of bytes is performed.
 // <b>Can't be used with RF_StringX</b>
-char rfString_Init_UTF16(RF_String* str,const uint16_t* s)
+char rfString_Init_UTF16(RF_String* str, const uint16_t* s)
 {
     //decode the utf-16 and get the code points
     uint32_t* codepoints;
     uint32_t byteLength, characterLength, utf8ByteLength;
     char* utf8;
+
     byteLength = 0;
-    while(s[byteLength]!= 0 || s[byteLength+1]!=0)
+    while(s[byteLength/2]!= 0)
     {
-        byteLength++;
+        byteLength += 2;
     }
     byteLength+=3;//for the last utf-16 null termination character
     RF_MALLOC(codepoints, byteLength*2, false); //allocate the codepoints
     //parse the given byte stream normally since it has to be in the 
     //endianess of the system
-    if(rfUTF16_Decode((char*)s, &characterLength, codepoints) != RF_SUCCESS)
+    if(!rfUTF16_Decode((const char*)s, &characterLength, codepoints,
+                       byteLength*2))
     {
         free(codepoints);
-        LOG_ERROR("String initialization failed due to invalide UTF-16 "
-                  "sequence",RE_STRING_INIT_FAILURE);
+        RF_ERROR(0, "String initialization failed due to invalide UTF-16 "
+                 "sequence");
         return false;
     }
     //now encode these codepoints into UTF8
-    if( (utf8 = rfUTF8_Encode(codepoints,characterLength,
-                              &utf8ByteLength))==0)
+    RF_MALLOC(utf8, characterLength*4, false);
+    if(!rfUTF8_Encode(codepoints,characterLength,
+                      &utf8ByteLength, utf8, characterLength*4))
     {
+        RF_ERROR(0, "String initialization failed during encoding in UTF8");
         free(codepoints);
+        free(utf8);
         return false;
     }
     //success
@@ -388,13 +377,13 @@ char rfString_Init_UTF32(RF_String* str, const uint32_t* codeBuffer)
     rfUTF32_Length(codeBuffer,length);
 
     //turn the codepoints into a utf-8 encoded buffer
-    if((utf8=rfUTF8_Encode(codeBuffer, length, &utf8ByteLength)) == 0)
+    RF_MALLOC(utf8, length*4, false);
+    if(!rfUTF8_Encode(codeBuffer, length, &utf8ByteLength, utf8, length*4))
     {
-        LOG_ERROR("Could not properly encode the UTF32 buffer into UTF8",
-                  RE_UTF8_ENCODING);
+        RF_ERROR(0, "Could not properly encode a UTF32 buffer into UTF8");
+        free(utf8);
         return false;
     }
-
     str->bytes = utf8;
     str->byteLength = utf8ByteLength;
     return true;
@@ -431,7 +420,7 @@ char rfString_Assign(RF_String* dest,const void* sourceP)
 {
     const RF_String* source = (const RF_String*)sourceP;
     char ret = true;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
     //only if the new string value won't fit in the buffer reallocate the buffer (let's avoid unecessary reallocs)
     if(source->byteLength > dest->byteLength)
     {
@@ -443,7 +432,7 @@ char rfString_Assign(RF_String* dest,const void* sourceP)
     //and fix the lengths
     dest->byteLength = source->byteLength;
   cleanup:
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -503,15 +492,15 @@ char rfString_Assign_char(RF_String* str,uint32_t codepoint)
     }
     else
     {
-        LOG_ERROR("Attempted to encode an invalid unicode code point into "
-                  "a string", RE_UTF8_INVALID_CODE_POINT);
+        RF_ERROR(0, "Attempted to encode an invalid unicode code point into"
+                 " a string");
         return false;
     }
 
     return true;
 }
 
-/*------------------------------------------------------------------------ RF_String copying functions-------------------------------------------------------------------------------*/
+/*--- RF_String copying functions ---*/
 
 
 //Creates and returns an allocated copy of the given string
@@ -521,13 +510,12 @@ RF_String* rfString_Copy_OUT(const void* srcP)
     //create the new string
     RF_String* ret;
     RF_MALLOC(ret, sizeof(RF_String), NULL);
-    //get the length
-    ret->byteLength = src->byteLength;
-    //copy the bytes
-    RF_MALLOC(ret->bytes, ret->byteLength+1, NULL);
-    memcpy(ret->bytes, src->bytes, ret->byteLength+1);
+    if(rfString_Copy_IN(ret, src) == false)
+    {
+        free(ret);
+        return NULL;
+    }
     return ret;
-
 }
 // Copies all the contents of a string to another
 char rfString_Copy_IN(RF_String* dst, const void* srcP)
@@ -560,21 +548,21 @@ char rfString_Copy_chars(RF_String* dst, const void* srcP, uint32_t charsN)
 }
 
 
-/*-------------------------------------------------------------------------Methods to get rid of an RF_String-------------------------------------------------------------------------------*/
+/*--- Methods to get rid of an RF_String ---*/
 
-// Deletes a string object and also frees its pointer.It is an error to give a NULL(0x0) string for deleting. Will most probably lead to a segmentation fault
+// Deletes a string object and also frees its pointer.
 void rfString_Destroy(RF_String* s)
 {
     free(s->bytes);
     free(s);
 }
-// Deletes a string object only, not its memory.It is an error to give a NULL(0x0) string for deleting. Will most probably lead to a segmentation fault
+// Deletes a string object only, not its memory.
 void rfString_Deinit(RF_String* s)
 {
     free(s->bytes);
 }
 
-/*-------------------------------------------------------------------------Equality check-------------------------------------------------------------------------------*/
+/*--- Equality check ---*/
 
 // Compares two Strings and returns true if they are equal and false otherwise
 char rfString_Equal(const void* s1P,const void* s2P)
@@ -582,19 +570,21 @@ char rfString_Equal(const void* s1P,const void* s2P)
     const RF_String* s1 = (const RF_String*)s1P;
     const RF_String* s2 = (const RF_String*)s2P;
     char ret = false;
-    RF_ENTER_LOCAL_SCOPE()
+    RF_ENTER_LOCAL_SCOPE();
     if( strcmp(s1->bytes,s2->bytes)==0)
     {
         ret = true;
     }
-    RF_EXIT_LOCAL_SCOPE()
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
-/*-------------------------------------------------------------------------2 functions used in the iteration macros-------------------------------------------------------------------------------*/
+/*--- 2 functions used in the iteration macros ---*/
 
-//Retrieves the unicode code point of the parameter bytepos of the string. If the byte position is not the start of a character 0 is returned. This is an internal function, there is no need to use it. <i>Can be used with StringX</i>
-uint32_t rfString_BytePosToCodePoint(const void* str,uint32_t i)
+//Retrieves the unicode code point of the parameter bytepos of the string. 
+//If the byte position is not the start of a character 0 is returned. This is 
+//an internal function, there is no need to use it. <i>Can be used with StringX</i>
+uint32_t rfString_BytePosToCodePoint(const void* str, uint32_t i)
 {
     uint32_t codePoint=0;
     const RF_String* thisstr = (const RF_String*)str;
@@ -644,7 +634,8 @@ uint32_t rfString_BytePosToCodePoint(const void* str,uint32_t i)
     return codePoint;
 }
 //Retrieves character position of a byte position
-uint32_t rfString_BytePosToCharPos(const void* thisstrP,uint32_t bytepos,char before)
+uint32_t rfString_BytePosToCharPos(const void* thisstrP,uint32_t bytepos,
+                                   char before)
 {
     ///here there is no check if this is actually a byte pos inside the string's
     ///byte buffer. The programmer should have made sure it is before hand. This is why it is

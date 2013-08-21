@@ -99,6 +99,21 @@ vars.Add(
 
 
 
+vars.Add(
+    'ERROR_LOGGING_LEVEL', 'This option specified the error logging level'
+    'that the log macros will be using. If greater than the level of the'
+    ' macro then it will kick in', 2)
+
+vars.Add(
+    'WARNING_LOGGING_LEVEL', 'This option specified the warning logging level'
+    'that the log macros will be using. If greater than the level of the'
+    ' macro then it will kick in', 2)
+
+vars.Add(
+    'INFO_LOGGING_LEVEL', 'This option specified the Info logging level'
+    'that the log macros will be using. If greater than the level of the'
+    ' macro then it will kick in', 2)
+
                  
 vars.Add('DEBUG', "This option determines if this will be a Debug Build (0"
          "or 1), and if more than 1 it can indicate a different debug level",
@@ -120,13 +135,6 @@ vars.Add(
                  'malloc and calloc are called normally.Accepted values '
                  'for this option are \'yes\' and \'no\'.'
                  ,'no' ))
-
-vars.Add(
-    BoolVariable('ERROR_LOGGING', 'If \'yes\' then the library\'s '
-                 'error logging will be verbose which basically means that '
-                 'all error and info logging macros will be activated '
-                 'and will be printed in the appropriate log file'
-                 ' stream.', 'yes'))
 
 vars.Add('FGETS_READ_BYTESN', 'This option is the number of bytes that will '
          'be read each time by the library\'s version of fgets. Must be a '

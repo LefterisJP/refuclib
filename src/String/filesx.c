@@ -23,7 +23,7 @@
 */
 
 
-//*---------------------Corrensponding Header inclusion---------------------------------
+/*------------- Corrensponding Header inclusion -------------*/
 #include <stdio.h> //for FILE*
 #include <IO/common.h> //for RF_EOL macros
 #include <Definitions/imex.h> //for the import export macro
@@ -32,15 +32,17 @@
 #include <String/string_decl.h>//for RF_String
 #include <String/stringx_decl.h>//for RF_StringX
 #include <String/filesx.h>
-//*---------------------Module related inclusion----------------------------------------
+/*------------- Module related inclusion -------------*/
 #include <String/common.h> // for RFS_()
 #include <String/manipulationx.h> //for rfStringX_Append and others
 #include <String/traversalx.h> //for rfStringX_Reset and others
 #include <IO/file.h> //for rfReadLine family  of functions
-//*---------------------Outside module inclusion----------------------------------------
+/*------------- Outside Module inclusion -------------*/
 //for error logging macros
     #include <IO/printf.h> //for rfFpintf() used in the error logging macros
-    #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
+    #include <Definitions/defarg.h> //since ERROR macros use argument counting
+    #include <Threads/common.h> //for rfThread_GetID()
+    #include <errno.h> //for error reporting that needs it
     #include <Utils/error.h>
 //for memory allocation macros
 #include <stdlib.h> //for malloc, calloc,realloc and exit()
@@ -48,167 +50,117 @@
 #include <Utils/memory.h> //for refu memory allocation
 //for the endianess macros
 #include <Utils/endianess.h> //for the endianess macros
-//*-----------------------------Libc inclusion------------------------------------------
+/*------------- Libc inclusion -------------*/
 #include <string.h> //for memcpy()
-//*----------------------------End of Includes------------------------------------------
+/*------------- End of includes -------------*/
 
 
-//Allocates and returns an extended string from file parsing. The file's encoding must be UTF-8.If for some reason (like EOF reached) no string can be read then null is returned
-RF_StringX* rfStringX_Create_fUTF8(FILE* f, char* eof,char eol)
+
+
+// Allocates and returns an RF_StringX from a file descriptor
+RF_StringX* rfStringX_FCreate(FILE* f, char* eof, char eol,
+                              int encoding, int endianess)
 {
     RF_StringX* ret;
     RF_MALLOC(ret, sizeof(RF_StringX), NULL);
-    if(rfStringX_Init_fUTF8(ret, f, eof, eol) < 0)
+    if(rfStringX_FInit(ret, f, eof, eol, encoding, endianess) == false)
     {
         free(ret);
         ret = NULL;
     }
     return ret;
 }
-//Initializes an extended string from file parsing. The file's encoding must be UTF-8.If for some reason (like EOF reached) no string can be read then null is returned
-int32_t rfStringX_Init_fUTF8(RF_StringX* str,FILE* f,char* eof,char eol)
+
+// Initializes RF_String from a file descriptor
+char rfStringX_FInit(RF_StringX* str, FILE* f, char* eof, char eol,
+                     int encoding, int endianess)
 {
-    int32_t bytesN;
-    if((bytesN = rfFReadLine_UTF8(
-            f, eol, &str->INH_String.bytes, &str->INH_String.byteLength,
-            &str->bSize,eof)) < 0)
+    switch(encoding)
     {
-        RETURN_LOG_ERROR("Failed to initialize StringX from a UTF-8 file",
-                         bytesN)
+        case RF_UTF8:
+            if(!rfFReadLine_UTF8(f, eol, &str->INH_String.bytes,
+                                 &str->INH_String.byteLength, &str->bSize, eof))
+            {
+                RF_ERROR(0, "Failed to initialize a StringX from a UTF-8 file");
+                return false;
+            }
+            break;
+        case RF_UTF16:
+            if(!rfFReadLine_UTF16(f, eol, &str->INH_String.bytes,
+                                  &str->INH_String.byteLength,
+                                  eof, &str->bSize, endianess))
+            {
+                RF_ERROR(0, "Failure to initialize a StringX from reading"
+                         " a UTF-16 file");
+                return false;
+            }
+            break;
+        case RF_UTF32:
+            if(!rfFReadLine_UTF32(f, eol, &str->INH_String.bytes,
+                                  &str->INH_String.byteLength, eof,
+                                  &str->bSize, endianess))
+            {
+                RF_ERROR(0, "Failure to initialize a StringX from reading"
+                         " a UTF-32 file");
+                return false;
+            }
+            break;
+#if RF_OPTION_DEBUG
+        default:
+            RF_WARNING(0, "Provided an illegal encoding value to function "
+                       "rfStringX_Init_f()");
+            return false;
+            break;
+#endif
     }
 
     //success
     str->bIndex = 0;
-    return bytesN;
+    return true;
 }
-//Assigns to an extended String from UTF-8 file parsing
-int32_t rfStringX_Assign_fUTF8(RF_StringX* str,FILE*f,char* eof,char eol)
+
+//Assigns to a StringX from file parsing
+char rfStringX_FAssign(RF_StringX* str, FILE* f, char* eof, char eol,
+                       int encoding, int endianess)
 {
-    int32_t bytesN;
-    uint32_t utf8ByteLength,utf8BufferSize;//bufferSize unused in this function
-    char* utf8 = 0;
-    if((bytesN = rfFReadLine_UTF8(
-            f, eol, &utf8, &utf8ByteLength, &utf8BufferSize, eof)) < 0)
+    uint32_t utf8ByteLength, bytes_read;
+    char* utf8 = 0, ret = true;
+    switch(encoding)
     {
-        RETURN_LOG_ERROR("Failed to assign the contents of a UTF-8 file "
-                         "to a StringX", bytesN)
+        case RF_UTF8:
+            if(!rfFReadLine_UTF8(f, eol, &utf8, &utf8ByteLength, &bytes_read, eof))
+            {
+                RF_ERROR(0, "Failed to assign the contents of a UTF-8 file "
+                         "to a StringX");
+                return false;
+            }
+            break;
+        case RF_UTF16:
+            if(!rfFReadLine_UTF16(f, eol, &utf8, &utf8ByteLength, eof,
+                                  &bytes_read, endianess))
+            {
+                RF_ERROR(0,"Failure to assign the contents of a "
+                         "UTF-16 file to a StringX");
+                return false;
+            }
+            break;
+        case RF_UTF32:
+            if(!rfFReadLine_UTF32(f, eol, &utf8, &utf8ByteLength, eof,
+                                  &bytes_read, endianess))
+            {
+                RF_ERROR(0, "Failure to assign to a StringX from reading "
+                         "a UTF-32 file");
+                return false;
+            }
+            break;
+#if RF_OPTION_DEBUG
+        default:
+            RF_WARNING(0, "Provided an illegal encoding value to function "
+                       "rfStringX_Assign_f()");
+            return false;
+            break;
+#endif
     }
-
-    //assign it to the string
-    rfStringX_Reset(str);
-    if(str->bSize <= utf8ByteLength+1)
-    {
-        str->bSize = (utf8ByteLength+1)*2;
-        RF_REALLOC_JMP(str->INH_String.bytes, char, str->bSize,
-                       bytesN = RE_REALLOC_FAILURE, cleanup);
-    }
-    memcpy(str->INH_String.bytes,utf8,utf8ByteLength+1);
-    str->INH_String.byteLength = utf8ByteLength;
-
-  cleanup:
-    //free the file'sutf8 buffer
-    free(utf8);
-    return bytesN;
-}
-//Appends to an extended String from UTF-8 file parsing
-int32_t rfStringX_Append_fUTF8(RF_StringX* str, FILE*f,
-                               char* eof, char eol)
-{
-    int32_t bytesN;
-    uint32_t utf8ByteLength,utf8BufferSize;//bufferSize unused in this function
-    char* utf8 = 0;
-    if((bytesN = rfFReadLine_UTF8(f, eol, &utf8, &utf8ByteLength,
-                                  &utf8BufferSize,eof)) < 0)
-    {
-        RETURN_LOG_ERROR("Failed to assign the contents of a UTF-8 file "
-                         "to a StringX", bytesN)
-    }
-
-   //append the utf8 to the given string
-   if(rfStringX_Append(str,RFS_(utf8)) == false)
-   {
-       //means error
-       bytesN = RE_STRING_APPEND;
-   }
-   //free the file's utf8 buffer
-   free(utf8);
-   return bytesN;
-}
-
-//Allocates and returns an extended string from file parsing. The file's encoding must be UTF-16.If for some reason (like EOF reached) no string can be read then null is returned. A check for a valid sequence of bytes is performed.
-RF_StringX* rfStringX_Create_fUTF16(FILE* f, char endianess,
-                                    char* eof, char eol)
-{
-    RF_StringX* ret;
-    RF_MALLOC(ret, sizeof(RF_StringX), NULL);
-    if(rfStringX_Init_fUTF16(ret, f, endianess, eof, eol) < 0)
-    {
-        free(ret);
-        ret = NULL;
-    }
-    return ret;
-}
-//Initializes an extended string from file parsing. The file's encoding must be UTF-16.If for some reason (like EOF reached) no string can be read then null is returned. A check for a valid sequence of bytes is performed.
-int32_t rfStringX_Init_fUTF16(RF_StringX* str,FILE* f, char endianess,char* eof,char eol)
-{
-    int32_t bytesN;
-    //depending on the file's endianess
-    if(endianess == RF_LITTLE_ENDIAN)
-    {
-        if((bytesN = rfFReadLine_UTF16LE(
-                f, eol, &str->INH_String.bytes,
-                &str->INH_String.byteLength,eof)) < 0)
-        {
-            RETURN_LOG_ERROR("Failure to initialize a StringX from "
-                             "reading a UTF-16 file", bytesN)
-        }
-
-    }//end of little endian
-    else//big endian
-    {
-        if((bytesN = rfFReadLine_UTF16BE(
-                f, eol, &str->INH_String.bytes,
-                &str->INH_String.byteLength, eof)) < 0)
-        {
-            RETURN_LOG_ERROR("Failure to initialize a StringX from "
-                             "reading a UTF-16 file", bytesN)
-        }
-
-    }//end of big endian case
-    //success
-    str->bIndex = 0;
-    str->bSize = 0;
-    return bytesN;
-}
-
-//Assigns to an already initialized String from File parsing
-int32_t rfStringX_Assign_fUTF16(RF_StringX* str, FILE* f, char endianess,
-                                char* eof, char eol)
-{
-    uint32_t utf8ByteLength;
-    int32_t bytesN;
-    char* utf8 = 0;
-    //depending on the file's endianess
-    if(endianess == RF_LITTLE_ENDIAN)
-    {
-        if((bytesN = rfFReadLine_UTF16LE(f, eol, &utf8, &utf8ByteLength,
-                                         eof)) < 0)
-        {
-            RETURN_LOG_ERROR("Failure to assign the contents of a Little "
-                             "Endian UTF-16 file to a StringX", bytesN)
-        }
-
-    }//end of little endian
-    else//big endian
-    {
-        if((bytesN = rfFReadLine_UTF16BE(
-                f, eol, &utf8, &utf8ByteLength, eof)) < 0)
-        {
-            LOG_ERROR("Failure to assign the contents of a Big Endian "
-                      "UTF-16 file to a StringX", bytesN)
-        }
-
-    }//end of big endian case
     //success
     //assign it to the string
     rfStringX_Reset(str);
@@ -216,178 +168,68 @@ int32_t rfStringX_Assign_fUTF16(RF_StringX* str, FILE* f, char endianess,
     {
         str->bSize = (utf8ByteLength+1)*2;
         RF_REALLOC_JMP(str->INH_String.bytes, char, str->bSize,
-                       bytesN = RE_REALLOC_FAILURE, cleanup);
+                       ret = false, cleanup);
     }
-    memcpy(str->INH_String.bytes,utf8,utf8ByteLength+1);
+    memcpy(str->INH_String.bytes, utf8, utf8ByteLength+1);
     str->INH_String.byteLength = utf8ByteLength;
 
   cleanup:
-    //free the file'sutf8 buffer
-    free(utf8);
-    return bytesN;
-}
-
-//Appends to an already initialized String from File parsing
-int32_t rfStringX_Append_fUTF16(RF_StringX* str, FILE* f, char endianess,
-                                char* eof, char eol)
-{
-    char*utf8;
-    uint32_t utf8ByteLength;
-    int32_t bytesN;
-    //depending on the file's endianess
-    if(endianess == RF_LITTLE_ENDIAN)
-    {
-        if((bytesN = rfFReadLine_UTF16LE(f, eol, &utf8, &utf8ByteLength,
-                                         eof)) < 0)
-        {
-            RETURN_LOG_ERROR("Failure to append the contents of a Little "
-                             "Endian UTF-16 file to a StringX", bytesN)
-        }
-
-    }//end of little endian
-    else//big endian
-    {
-        if((bytesN = rfFReadLine_UTF16BE(f, eol, &utf8, &utf8ByteLength,
-                                         eof)) < 0)
-            LOG_ERROR("Failure to append the contents of a Big Endian "
-                      "UTF-16 file to a StringX", bytesN)
-
-    }//end of big endian case
-
-    if(rfStringX_Append(str,RFS_(utf8)) == false)
-    {
-        //error
-        bytesN = RE_STRING_APPEND;
-    }
-    free(utf8);
-    return bytesN;
-}
-
-// Allocates and returns an extended string from file parsing. The file's encoding must be UTF-32.If for some reason (like EOF reached) no string can be read then null is returned. A check for a valid sequence of bytes is performed.
-RF_StringX* rfStringX_Create_fUTF32(FILE* f, char endianess,
-                                    char* eof,char eol)
-{
-    RF_StringX* ret;
-    RF_MALLOC(ret, sizeof(RF_StringX), NULL);
-    if(rfStringX_Init_fUTF32(ret,f,endianess,eof,eol) < 0)
-    {
-        free(ret);
-        ret = NULL;
-    }
-    return ret;
-}
-// Initializes an extended string from file parsing. The file's encoding must be UTF-32.If for some reason (like EOF reached) no string can be read then null is returned. A check for a valid sequence of bytes is performed.
-int32_t rfStringX_Init_fUTF32(RF_StringX* str, FILE* f, char endianess,
-                              char* eof,char eol)
-{
-    int32_t bytesN;
-    //depending on the file's endianess
-    if(endianess == RF_LITTLE_ENDIAN)
-    {
-        if((bytesN = rfFReadLine_UTF32LE(
-                f, eol, &str->INH_String.bytes,
-                &str->INH_String.byteLength,eof)) <0)
-        {
-            RETURN_LOG_ERROR("Failure to initialize a StringX from "
-                             "reading a Little Endian UTF-32 file", bytesN)
-        }
-
-    }//end of little endian
-    else//big endian
-    {
-        if((bytesN = rfFReadLine_UTF32BE(
-                f, eol, &str->INH_String.bytes,
-                &str->INH_String.byteLength,eof)) < 0)
-        {
-            RETURN_LOG_ERROR("Failure to initialize a StringX from "
-                             "reading a Big Endian UTF-32 file", bytesN)
-        }
-
-    }//end of big endian case
-    //success
-    str->bIndex = 0;
-    str->bSize = 0;
-    return bytesN;
-}
-//Assigns the contents of a UTF-32 file to an extended string
-int32_t rfStringX_Assign_fUTF32(RF_StringX* str, FILE* f, char endianess,
-                                char* eof, char eol)
-{
-    int32_t bytesN;
-    char*utf8;
-    uint32_t utf8ByteLength;
-    //depending on the file's endianess
-    if(endianess == RF_LITTLE_ENDIAN)
-    {
-        if((bytesN = rfFReadLine_UTF32LE(
-                f, eol, &utf8,&utf8ByteLength, eof)) < 0)
-        {
-            RETURN_LOG_ERROR("Failure to assign to a StringX from reading"
-                             " a Little Endian UTF-32 file",bytesN)
-        }
-    }//end of little endian
-    else//big endian
-    {
-        if((bytesN = rfFReadLine_UTF32BE(
-                f, eol, &utf8, &utf8ByteLength, eof)) < 0)
-        {
-            RETURN_LOG_ERROR("Failure to assign to a StringX from "
-                             "reading a Big Endian UTF-32 file", bytesN)
-        }
-
-    }//end of big endian case
-    //success
-    //assign it to the string
-    rfStringX_Reset(str);
-    if(str->bSize <= utf8ByteLength+1)
-    {
-        str->bSize = (utf8ByteLength+1)*2;
-        RF_REALLOC_JMP(str->INH_String.bytes, char, str->bSize,
-                       bytesN = RE_REALLOC_FAILURE, cleanup);
-    }
-    memcpy(str->INH_String.bytes,utf8,utf8ByteLength+1);
-    str->INH_String.byteLength = utf8ByteLength;
-
-  cleanup:
-    //free the file'sutf8 buffer
-    free(utf8);
-    return bytesN;
-}
-//Appends the contents of a UTF-32 file to an extended string
-int32_t rfStringX_Append_fUTF32(RF_StringX* str,FILE* f,char endianess, char* eof,char eol)
-{
-    int32_t bytesN;
-    char*utf8;
-    uint32_t utf8ByteLength;
-    //depending on the file's endianess
-    if(endianess == RF_LITTLE_ENDIAN)
-    {
-        if((bytesN = rfFReadLine_UTF32LE(f, eol, &utf8, &utf8ByteLength,
-                                         eof)) < 0)
-        {
-            RETURN_LOG_ERROR("Failure to append to a StringX from reading"
-                             " a Little Endian UTF-32 file", bytesN)
-        }
-
-    }//end of little endian
-    else//big endian
-    {
-        if((bytesN = rfFReadLine_UTF32BE(f, eol, &utf8, &utf8ByteLength,
-                                         eof)) < 0)
-        {
-            RETURN_LOG_ERROR("Failure to append to a StringX from reading"
-                             " a Big Endian UTF-32 file", bytesN)
-        }
-
-    }//end of big endian case
-
-    //append it
-    if(rfStringX_Append(str, RFS_(utf8)) == false)
-    {
-        //error
-        bytesN = RE_STRING_APPEND;
-    }
     //free the file's utf8 buffer
     free(utf8);
-    return bytesN;
+    return ret;
+}
+
+//Appends to a String from UTF-8 file parsing
+char rfStringX_FAppend(RF_StringX* str, FILE* f, char* eof, char eol,
+                      int encoding, int endianess)
+{
+    uint32_t utf8ByteLength, bytes_read;
+    char* utf8 = 0, ret = true;
+
+    switch(encoding)
+    {
+        case RF_UTF8:
+            if(!rfFReadLine_UTF8(f, eol, &utf8,
+                                 &utf8ByteLength, &bytes_read, eof))
+            {
+                RF_ERROR(0, "Failed to append to a StringX from reading "
+                         "a UTF-8 file");
+                return false;
+            }
+            break;
+        case RF_UTF16:
+            if(!rfFReadLine_UTF16(f, eol, &utf8, &utf8ByteLength, eof,
+                                  &bytes_read, endianess))
+            {
+                RF_ERROR(0,"Failure to append the contents of a "
+                         "UTF-16 file to a StringX");
+                return false;
+            }
+            break;
+        case RF_UTF32:
+            if(!rfFReadLine_UTF32(f, eol, &utf8, &utf8ByteLength, eof,
+                                  &bytes_read, endianess))
+            {
+                RF_ERROR(0, "Failure to append to a StringX from reading "
+                         "a UTF-32 file");
+                return false;
+            }
+            break;
+#if RF_OPTION_DEBUG
+        default:
+            RF_WARNING(0, "Provided an illegal encoding value to function "
+                       "rfString_Append_f()");
+            return false;
+            break;
+#endif
+    }
+    //append the utf8 to the given string
+    if(rfStringX_Append(str, RFS_(utf8)) == false)
+    {
+        RF_ERROR(0, "Failed to append a utf8 buffer to a stringX");
+        ret = false;
+    }
+    //free the file's decoded utf8 buffer
+    free(utf8);
+    return ret;
 }

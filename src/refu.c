@@ -22,12 +22,13 @@
 **
 */
 
-//*---------------------Corrensponding Header inclusion---------------------------------
+/*------------- Corrensponding Header inclusion -------------*/
+#include <rf_options.h>
 #include <Definitions/imex.h> //import export macro
 #include <Definitions/types.h> //fixed size data types
 #include <Definitions/defarg.h> //to enable default arguments
 #include <Utils/libinit.h> //for the init function
-//*---------------------Outside module inclusion----------------------------------------
+/*------------- Outside Module inclusion -------------*/
 //for detecting endianess
     #ifdef REFU_LINUX_VERSION
     #include <time.h> //for clockid_t used in the System info structure
@@ -37,6 +38,8 @@
     #include <Definitions/threadspecific.h> //for the thread specific attribute
     #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
     #include <Utils/localmem.h>//for local memory stack functions
+//for true/false
+    #include <Definitions/retcodes.h> 
 //for error logging
     #include <stdio.h>//for FILE* used inside printf.h
     #include <IO/printf.h> //for rfFpintf() used in the error logging macros
@@ -46,56 +49,40 @@
     #include <String/stringx_decl.h> //for RF_StringX (ioBuffer type)
     #include "IO/buff.ph"//for rfInitStdio()
 //for threads initialization
-    #ifdef REFU_WIN32_VERSION
-    #include <windows.h> //for HANDLE
-    #else
-    #include <pthread.h> //for pthread_t
-    #endif
-    #include <Threads/thread_flags.h> //for common Thread flags
-    #include <Threads/thread_decl.h> //for RF_Thread
-    #include <Threads/thread.h>
-//for error codes
-    #include <Definitions/retcodes.h>
-//*---------------------System Specific Headers inclusion-------------------------------
+    #include <Threads/common.h>
+/*------------- System Specific includes -------------*/
 #ifdef REFU_WIN32_VERSION
     #include <windows.h> //for QueryPerformanceFrequency() and other related flags
 #endif
-//*---------------------libc Headers inclusion------------------------------------------
+/*------------- libc includes -------------*/
 #include <string.h> //for strcmp
-//*----------------------------End of Includes------------------------------------------
+/*------------- End of includes -------------*/
 
 
 
-//Initializes the ReFu library
+//Initializes the Refu library
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-char rfInit(char* errstr,char* logstr,uint64_t lmsSize)
+char rfInit(char* logstr,uint64_t lmsSize)
 #else
-char i_rfInit(char* errstr,char* logstr,uint64_t lmsSize)
+char i_rfInit(char* logstr,uint64_t lmsSize)
 #endif
 {
-    //initialize last error and open the log files or redirect to the standard stream
-    RF_LastError = 0;
+
     //initialize the refu stdio
     rfInitStdio();
-
-    if(strcmp(errstr,"stderr") == 0)
-        rfStdErr = stderr;
-    else if(strcmp(errstr,"stdout")== 0)
-        rfStdErr = stdout;
+    
+    //initialize regu log stream
+    if(strcmp(logstr,"stderr") == 0)
+        RF_Log_Stream = stderr;
+    else if(strcmp(logstr,"stdout")== 0)
+        RF_Log_Stream = stdout;
     else//just open the given file
     {
-        rfStdErr = fopen(errstr,"w");
+        RF_Log_Stream = fopen(logstr,"w");
         //Send the standard error also to the same file stream as the chosen rfStdErr
-        if(freopen(errstr,"w",stderr) ==0)
-            printf("Failed to reopen stderr stream to the given file name \"%s\"",errstr);
+        if(freopen(logstr,"w",stderr) ==0)
+            printf("Failed to reopen stderr stream to the given file name \"%s\"",logstr);
     }
-
-    if(strcmp(logstr,"stderr") == 0)
-        rfStdLog = stderr;
-    else if(strcmp(logstr,"stdout")== 0)
-        rfStdLog = stdout;
-    else
-        rfStdLog = fopen(logstr,"w");
 
     //detect system endianess and save it in rfSysInfo
     i_DetectEndianess();
@@ -112,9 +99,8 @@ char i_rfInit(char* errstr,char* logstr,uint64_t lmsSize)
         {
             if(clock_getres(CLOCK_REALTIME,0) == -1)
             {
-                LOG_ERROR("No high resolution timer is supported. Even "
-                          "CLOCK_REALTIME initialization failed.",
-                          RE_TIMER_HIGHRES_UNSUPPORTED);
+                RF_ERROR(0,"No high resolution timer is supported. Even "
+                         "CLOCK_REALTIME initialization failed.");
                 rfSysInfo.hasHighResTimer = false;
             }
             else
@@ -137,8 +123,9 @@ char i_rfInit(char* errstr,char* logstr,uint64_t lmsSize)
     //initialize the main thread's local stack memory
     if(rfLMS_Init(&RF_MainLMS,lmsSize) == false)
     {
-        LOG_ERROR("Could not initialize main thread's local memory stack",
-            RE_LOCALMEMSTACK_INIT)
+        RF_ERROR(0,
+                 "Could not initialize main thread's local memory stack");
+
         return false;
     }
 

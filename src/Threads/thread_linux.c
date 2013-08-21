@@ -21,7 +21,7 @@
 **      ==END OF REFU LICENSE==
 **
 */
-//*---------------------Corrensponding Header inclusion---------------------------------
+/*------------- Corrensponding Header inclusion -------------*/
 #include <Definitions/types.h> //for fixed size data types
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
@@ -29,7 +29,9 @@
 #include <Threads/thread_flags.h> //for common Thread flags
 #include <Threads/thread_decl.h> //for RF_Thread
 #include <Threads/thread.h>
-//*---------------------Outside module inclusion----------------------------------------
+/*------------- Module related inclusion -------------*/
+#include <Threads/common.h>
+/*------------- Outside Module inclusion -------------*/
 //for error logging
     #include <stdio.h>//for FILE* used inside printf.h
     #include <IO/printf.h> //for rfFpintf() used in the error logging macros
@@ -48,11 +50,11 @@
 //for local memory initialization
     #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
     #include <Utils/localmem.h> //for LMS_Initialization
-//*---------------------libc Headers inclusion------------------------------------------
+/*------------- libc inclusion -------------*/
 #include <errno.h>
 #include <sys/types.h> //for getpid()
 #include <unistd.h> //for getpid()
-//*----------------------------End of Includes------------------------------------------
+/*------------- End of includes -------------*/
 
 static i_THREAD__ uintptr_t i_thread_id;
 
@@ -78,9 +80,9 @@ void* RF_THREAD_FUNCTION(void* param)
     if(!rfLMS_Init(&lms,t->lmsSize))
     {
         //TODO: Add the thread's address in the msg
-        LOG_ERROR(
-            "Failure to initialize a thread because its local memory "
-            "stack could not be initialized", RE_LOCALMEMSTACK_INIT)
+        RF_ERROR(0,
+                 "Failure to initialize a thread because its local memory "
+                 "stack could not be initialized");
         return (void*)RE_LOCALMEMSTACK_INIT;
     }
     //save the address of this thread as id
@@ -140,10 +142,9 @@ char i_rfThread_Init(RF_Thread* t, uint32_t flags,
     }
     else
     {
-        LOG_ERROR(
-            "Passed a null pointer for the thread's execution. The thread"
-            " will be doing nothing, so it is meaningless",
-            RE_THREAD_NULL_EXECUTION_FUNCTION);
+        RF_ERROR(0,
+                 "Passed a null pointer for the thread's execution. The thread"
+                 " will be doing nothing, so it is meaningless");
         return false;
     }
 
@@ -165,8 +166,7 @@ char i_rfThread_Init(RF_Thread* t, uint32_t flags,
     if(pthread_create(&t->tHandle, &attributes,
                       RF_THREAD_FUNCTION, data) != 0)
     {
-        LOG_ERROR("Error during POSIX thread creation",
-                  RE_THREAD_CREATION);
+        RF_ERROR(0, "Error during POSIX thread creation");
         return false;
     }
     //cleanup the attributes
@@ -197,9 +197,8 @@ char rfThread_Kill(RF_Thread* t)
     switch(err)
     {
         case ESRCH:
-            LOG_ERROR(
-                "No thread could be found with the given ID to kill",
-                RE_THREAD_KILL)
+            RF_ERROR(0,
+                     "No thread could be found with the given ID to kill");
         break;
         case 0:
             //all okay
@@ -207,8 +206,8 @@ char rfThread_Kill(RF_Thread* t)
             return true;
         break;
         default:
-            LOG_ERROR(
-                "pthread_cancel returned error %d", RE_THREAD_KILL, err)
+            RF_ERROR(0,
+                     "pthread_cancel returned error %d", err);
         break;
     }
 
@@ -229,25 +228,27 @@ int32_t rfThread_Join(void* thread)
         switch(err)
         {
             case EINVAL:
-                RETURN_LOG_ERROR(
+                RF_ERROR(0,
                     "pthread_join failed due to the thread value not "
-                    "being joinable", RE_THREAD_NOTJOINABLE)
+                         "being joinable");
+                return RE_THREAD_NOTJOINABLE;
             break;
             case ESRCH:
-                RETURN_LOG_ERROR(
-                    "pthread_join failed due to the thread id not "
-                    "corresponding to any existing thread",
-                    RE_THREAD_INVALID)
+                RF_ERROR(0,
+                         "pthread_join failed due to the thread id not "
+                         "corresponding to any existing thread");
+                return RE_THREAD_INVALID;
             break;
             case EDEADLK:
-                RETURN_LOG_ERROR(
-                    "pthread_join failed due to a deadlock being detected"
-                    ,RE_THREAD_DEADLOCK)
+                RF_ERROR(0,
+                         "pthread_join failed due to a deadlock being detected");
+                return RE_THREAD_DEADLOCK;
             break;
             default:
-                RETURN_LOG_ERROR(
-                    "pthread_join failed with unknonwn error code: %d",
-                    RE_THREAD_JOIN,err)
+                RF_ERROR(0,
+                         "pthread_join failed with unknonwn error code: %d",
+                         err);
+                return -1;
             break;
         }
     }

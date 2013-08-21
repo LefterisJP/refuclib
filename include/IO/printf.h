@@ -55,7 +55,8 @@ extern "C"
  ** @lmsFunction
  ** @param format The formatted string to print
  ** @param ... Extra arguments to output to the string
- ** @return The number of @c bytes written to the stdout
+ ** @return The number of @c bytes written to the stdout or negative number
+ ** fo rfailure
  **
  **/
 i_DECLIMEX_ int rfPrintf(const char * format, ...);
@@ -67,7 +68,7 @@ i_DECLIMEX_ int rfPrintf(const char * format, ...);
  ** @param f The file descriptor into which to output the formatted string
  ** @param format The formatted string to print
  ** @param ... Extra arguments to output to the string
- ** @return The number of @c bytes written to @c f
+ ** @return The number of @c bytes written to @c f or negative number for failure
  **
  **/
 i_DECLIMEX_ int rfFPrintf(FILE* f,const char * format, ...);

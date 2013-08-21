@@ -56,699 +56,284 @@ extern "C"
 ** @{
 **/
 
-/**
- ** @brief Reads a UTF-8 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
- **
- ** The file descriptor at @c f must have been opened in <b>binary</b> and not text mode. That means that if under
- ** Windows make sure to call fopen with "wb", "rb" e.t.c. instead of the simple "w", "r" e.t.c. since the initial
- ** default value under Windows is text mode. Alternatively you can set the initial value using _get_fmode() and
- ** _set_fmode(). For more information take a look at the msdn pages here:
- ** http://msdn.microsoft.com/en-us/library/ktss1a9b.aspx
- **
- ** Depending on the argument value given at @c eol the extra @c '\r' characters or any others for more
- ** exotic file line endings will be skipped and not appear in the returned buffer.
- **
- ** @param[in] f The file descriptor to read
- ** @param[in] eol The End Of Line type that this file uses. Legal values are:
- ** + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
- ** + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
- ** + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as the end of line signal
- **
- ** @param[out] utf8 Give here a refence to an unitialized char* that will be allocated inside the function
- ** and contain the utf8 byte buffer. Needs to be freed by the caller explicitly later
- ** @param[out] byteLength Give an @c uint32_t here to receive the length of the @c utf8 buffer in bytes
- ** @param[out] bufferSize Give an @c uint32_t here to receive the capacity of the @c utf8 buffer in bytes
- ** @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file
- ** with reading this line
- ** @return Returns either a positive number for success that represents 
- ** the number of bytes read from @c f and and error in case something goes wrong.
- ** The possible errors to return are the same as rfFgets_UTF8()
- **
- **/
-i_DECLIMEX_ int32_t rfFReadLine_UTF8(FILE* f, char eol, char** utf8,
-                                     uint32_t* byteLength,
-                                     uint32_t* bufferSize, char* eof);
-/**
- ** @brief Reads a Big Endian UTF-16 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
- **
- ** The file descriptor at @c f must have been opened in <b>binary</b> and not text mode. That means that if under
- ** Windows make sure to call fopen with "wb", "rb" e.t.c. instead of the simple "w", "r" e.t.c. since the initial
- ** default value under Windows is text mode. Alternatively you can set the initial value using _get_fmode() and
- ** _set_fmode(). For more information take a look at the msdn pages here:
- ** http://msdn.microsoft.com/en-us/library/ktss1a9b.aspx
- **
- ** Depending on the argument value given at @c eol the extra @c '\r' characters or any others for more
- ** exotic file line endings will be skipped and not appear in the returned buffer.
- **
- ** @param[in] f The file descriptor to read
- ** @param[in] eol The End Of Line type that this file uses. Legal values are:
- ** + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
- ** + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
- ** + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as the end of line signal
- **
- ** @param[out] utf8 Give here a refence to an unitialized char* that will be allocated inside the function
- ** and contain the utf8 byte buffer. Needs to be freed by the caller explicitly later
- ** @param[out] byteLength Give an @c uint32_t here to receive the length of the @c utf8 buffer in bytes
- ** @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file
- ** with reading this line
- ** @return Returns either a positive number for success that represents the number of bytes read from @c f and and error in case something goes wrong.
- ** + Any error that can be returned by @ref rfFgets_UTF16BE()
- ** + @c RE_UTF16_INVALID_SEQUENCE: Failed to decode the UTF-16 byte stream of the file descriptor
- ** + @c RE_UTF8_ENCODING: Failed to encode the UTF-16 of the file descriptor into UTF-8
- **
- **/
-i_DECLIMEX_ int32_t rfFReadLine_UTF16BE(FILE* f, char eol, char** utf8,
-                                        uint32_t* byteLength, char* eof);
-/**
- ** @brief Reads a Little Endian UTF-16 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
- **
- ** The file descriptor at @c f must have been opened in <b>binary</b> and not text mode. That means that if under
- ** Windows make sure to call fopen with "wb", "rb" e.t.c. instead of the simple "w", "r" e.t.c. since the initial
- ** default value under Windows is text mode. Alternatively you can set the initial value using _get_fmode() and
- ** _set_fmode(). For more information take a look at the msdn pages here:
- ** http://msdn.microsoft.com/en-us/library/ktss1a9b.aspx
- **
- ** Depending on the argument value given at @c eol the extra @c '\r' characters or any others for more
- ** exotic file line endings will be skipped and not appear in the returned buffer.
- **
- ** @param[in] f The file descriptor to read
- ** @param[in] eol The End Of Line type that this file uses. Legal values are:
- ** + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
- ** + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
- ** + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as the end of line signal
- **
- ** @param[out] utf8 Give here a refence to an unitialized char* that will be allocated inside the function
- ** and contain the utf8 byte buffer. Needs to be freed by the caller explicitly later
- ** @param[out] byteLength Give an @c uint32_t here to receive the length of the @c utf8 buffer in bytes
- ** @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file
- ** with reading this line
- ** @return Returns either a positive number for success that represents the number of bytes read from @c f and and error in case something goes wrong.
- ** + Any error that can be returned by @ref rfFgets_UTF16LE()
- ** + @c RE_UTF16_INVALID_SEQUENCE: Failed to decode the UTF-16 byte stream of the file descriptor
- ** + @c RE_UTF8_ENCODING: Failed to encode the UTF-16 of the file descriptor into UTF-8
- **
- **/
-i_DECLIMEX_ int32_t rfFReadLine_UTF16LE(FILE* f, char eol, char** utf8,
-                                        uint32_t* byteLength, char* eof);
 
 /**
- ** @brief Reads a Big Endian UTF-32 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
+ ** @brief Reads a UTF-8 file descriptor until end of line or EOF is found and
+ **  returns a UTF-8 byte buffer
  **
- ** The file descriptor at @c f must have been opened in <b>binary</b> and not text mode. That means that if under
- ** Windows make sure to call fopen with "wb", "rb" e.t.c. instead of the simple "w", "r" e.t.c. since the initial
- ** default value under Windows is text mode. Alternatively you can set the initial value using _get_fmode() and
+ ** The file descriptor at @c f must have been opened in <b>binary</b> and not
+ ** text mode. That means that if under
+ ** Windows make sure to call fopen with "wb", "rb" e.t.c. instead of the 
+ ** simple "w", "r" e.t.c. since the initial
+ ** default value under Windows is text mode. Alternatively you can set the 
+ ** initial value using _get_fmode() and
  ** _set_fmode(). For more information take a look at the msdn pages here:
  ** http://msdn.microsoft.com/en-us/library/ktss1a9b.aspx
  **
- ** Depending on the argument value given at @c eol the extra @c '\r' characters or any others for more
- ** exotic file line endings will be skipped and not appear in the returned buffer.
+ ** Depending on the argument value given at @c eol the extra @c '\r' characters
+ **  or any others for more exotic file line endings will be skipped and not 
+ ** appear in the returned buffer.
  **
  ** @param[in] f The file descriptor to read
  ** @param[in] eol The End Of Line type that this file uses. Legal values are:
- ** + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
- ** + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
- ** + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as the end of line signal
+ ** + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as
+ **      the end of line signal
+ ** + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as
+ **      the end of line signal
+ ** + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as
+ **      the end of line signal
  **
- ** @param[out] utf8 Give here a refence to an unitialized char* that will be allocated inside the function
- ** and contain the utf8 byte buffer. Needs to be freed by the caller explicitly later
- ** @param[out] byteLength Give an @c uint32_t here to receive the length of the @c utf8 buffer in bytes
- ** @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file
- ** with reading this line
- ** @return Returns either a positive number for success that represents the number of bytes read from @c f and and error in case something goes wrong.
- ** + Any error that can be returned by @ref rfFgets_UTF32BE()
- ** + @c RE_UTF8_ENCODING: Failed to encode the UTF-16 of the file descriptor into UTF-8
+ ** @param[out] utf8 Give here a refence to an unitialized char* that will be
+ ** allocated inside the function and contain the utf8 byte buffer. Needs to
+ ** be freed by the caller explicitly later
+ ** @param[out] byteLength Give an @c uint32_t here to receive the length
+ **  of the @c utf8 buffer in bytes. This is also the number of bytes read
+ ** from the file
+ ** @param[out] bufferSize Give an @c uint32_t here to receive the capacity
+ ** of the @c utf8 buffer in bytes
+ ** @param[out] eof Pass a pointer to a char to receive a true or false
+ **  value in case the end of file with reading this line
  **
+ ** @return Returns @c true for success and @c false for an error occuring.
+ ** Even if there is an error the number of bytes read given by @c byteLength
+ ** can be trusted.
  **/
-i_DECLIMEX_ int32_t rfFReadLine_UTF32BE(FILE* f, char eol, char** utf8,
-                                        uint32_t* byteLength, char* eof);
-/**
- ** @brief Reads a Little Endian UTF-32 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
- **
- ** The file descriptor at @c f must have been opened in <b>binary</b> and not text mode. That means that if under
- ** Windows make sure to call fopen with "wb", "rb" e.t.c. instead of the simple "w", "r" e.t.c. since the initial
- ** default value under Windows is text mode. Alternatively you can set the initial value using _get_fmode() and
- ** _set_fmode(). For more information take a look at the msdn pages here:
- ** http://msdn.microsoft.com/en-us/library/ktss1a9b.aspx
- **
- ** Depending on the argument value given at @c eol the extra @c '\r' characters or any others for more
- ** exotic file line endings will be skipped and not appear in the returned buffer.
- **
- ** @param[in] f The file descriptor to read
- ** @param[in] eol The End Of Line type that this file uses. Legal values are:
- ** + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
- ** + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
- ** + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as the end of line signal
- **
- ** @param[out] utf8 Give here a refence to an unitialized char* that will be allocated inside the function
- ** and contain the utf8 byte buffer. Needs to be freed by the caller explicitly later
- ** @param[out] byteLength Give an @c uint32_t here to receive the length of the @c utf8 buffer in bytes
- ** @param[out] eof Pass a pointer to a char to receive a true or false value in case the end of file
- ** with reading this line
- ** @return Returns either a positive number for success that represents the number of bytes read from @c f and and error in case something goes wrong.
- ** + Any error that can be returned by @ref rfFgets_UTF32LE()
- ** + @c RE_UTF8_ENCODING: Failed to encode the UTF-16 of the file descriptor into UTF-8
- **
- **/
-i_DECLIMEX_ int32_t rfFReadLine_UTF32LE(FILE* f, char eol, char** utf8,
-                                        uint32_t* byteLength, char* eof);
+i_DECLIMEX_ char rfFReadLine_UTF8(FILE* f, char eol, char** utf8,
+                                  uint32_t* byteLength,
+                                  uint32_t* bufferSize, char* eof);
 
 /**
- ** @brief Gets a number of bytes from a BIG endian UTF-32 file descriptor
+ ** @brief Reads a UTF-16 file descriptor until end of line or
+ ** EOF is found and returns a UTF-8 byte buffer
  **
- ** This is a function that's similar to c library fgets but it also returns the number of bytes read. Reads in from the file until @c num bytes
- ** have been read or new line or EOF character has been encountered.
- **
- ** The character pattern that shall be considered as newline signal depends on the value the user passes to the @c eol argument.
- **
- ** The function will read until @c num characters are read and if @c num
- ** would take us to the middle of a UTF32 character then the next character shall also be read
- ** and the function will return the number of bytes read.
- ** Since the function null terminates the buffer the given @c buff needs to be of at least
- ** @c num+7 size to cater for the worst case.
- **
- ** The final bytestream stored inside @c buff is in the endianess of the system.
- **
- ** If right after the last character read comes the EOF, the function
- ** shall detect so and assign @c true to @c eof.
- **
- ** The file descriptor at @c f must have been opened in <b>binary</b> and not text mode. That means that if under
- ** Windows make sure to call fopen with "wb", "rb" e.t.c. instead of the simple "w", "r" e.t.c. since the initial
- ** default value under Windows is text mode. Alternatively you can set the initial value using _get_fmode() and
- ** _set_fmode(). For more information take a look at the msdn pages here:
- ** http://msdn.microsoft.com/en-us/library/ktss1a9b.aspx
- **
- ** @param[in] buff A buffer to be filled with the contents of the file. Should be of size at least @c num+7
- ** @param[in] num The maximum number of bytes to read from within the file NOT including the null terminating character(which in itelf is 4 bytes). Should be a multiple of 4
- ** @param[in] f A valid FILE descriptor from which to read the bytes
- ** @param[out] eof Pass a reference to a char to receive a true/false value for whether EOF has been reached.
- ** @param[in] eol The End Of Line type that this file uses. Legal values are:
- ** + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
- ** + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
- ** + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as the end of line signal
- **
- ** @return Returns the actual number of bytes read or an error if there was a problem.
- ** The possible errors are:
- ** + @c RE_FILE_READ: If during reading the file there was an unknown read error
- ** + @c RE_FILE_READ_BLOCK: If the read operation failed due to the file descriptor being occupied by another thread
- ** + @c RE_FILE_MODE: If during reading the file the file descriptor's mode was not correctly set for reading
- ** + @c RE_FILE_POS_OVERFLOW: If during reading, the current file position can't be represented by the system
- ** + @c RE_INTERRUPT: If during reading, there was a system interrupt
- ** + @c RE_FILE_IO: If there was a physical I/O error
- ** + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
- **
+ ** The function works just like @ref rfReadLine_UTF8() but for UTF-16
+ ** and as such has an extra endianess parameter.
+ ** @param endianess Can be either:
+ ** + @c RF_BIG_ENDIAN: If the file stream you want to read is encoded in 
+ **   big endian 
+ ** + @c RF_LITTLE_ENDIAN: If the file stream you want to read is encoded in
+ **  little endian
+ ** @param bytes_read: The number of bytes succesfully read from the file
+ ** descriptor
  **/
-i_DECLIMEX_ int32_t rfFgets_UTF32BE(char* buff, uint32_t num, FILE* f,
-                                    char* eof, char eol);
-/**
- ** @brief Gets a number of bytes from a Little endian UTF-32 file descriptor
- **
- ** This is a function that's similar to c library fgets but it also returns the number of bytes read. Reads in from the file until @c num bytes
- ** have been read or new line or EOF character has been encountered.
- **
- ** The character pattern that shall be considered as newline signal depends on the value the user passes to the @c eol argument.
- **
- ** The function will read until @c num characters are read and if @c num
- ** would take us to the middle of a UTF32 character then the next character shall also be read
- ** and the function will return the number of bytes read.
- ** Since the function null terminates the buffer the given @c buff needs to be of at least
- ** @c num+7 size to cater for the worst case.
- **
- ** The final bytestream stored inside @c buff is in the endianess of the system.
- **
- ** If right after the last character read comes the EOF, the function
- ** shall detect so and assign @c true to @c eof.
- **
- ** The file descriptor at @c f must have been opened in <b>binary</b> and not text mode. That means that if under
- ** Windows make sure to call fopen with "wb", "rb" e.t.c. instead of the simple "w", "r" e.t.c. since the initial
- ** default value under Windows is text mode. Alternatively you can set the initial value using _get_fmode() and
- ** _set_fmode(). For more information take a look at the msdn pages here:
- ** http://msdn.microsoft.com/en-us/library/ktss1a9b.aspx
- **
- ** @param[in] buff A buffer to be filled with the contents of the file. Should be of size at least @c num+7
- ** @param[in] num The maximum number of bytes to read from within the file NOT including the null terminating character(which in itelf is 4 bytes). Should be a multiple of 4
- ** @param[in] f A valid FILE descriptor from which to read the bytes
- ** @param[out] eof Pass a reference to a char to receive a true/false value for whether EOF has been reached.
- ** @param[in] eol The End Of Line type that this file uses. Legal values are:
- ** + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
- ** + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
- ** + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as the end of line signal
- **
- ** @return Returns the actual number of bytes read or an error if there was a problem.
- ** The possible errors are:
- ** + @c RE_FILE_READ: If during reading the file there was an unknown read error
- ** + @c RE_FILE_READ_BLOCK: If the read operation failed due to the file descriptor being occupied by another thread
- ** + @c RE_FILE_MODE: If during reading the file the file descriptor's mode was not correctly set for reading
- ** + @c RE_FILE_POS_OVERFLOW: If during reading, the current file position can't be represented by the system
- ** + @c RE_INTERRUPT: If during reading, there was a system interrupt
- ** + @c RE_FILE_IO: If there was a physical I/O error
- ** + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
- **
- **/
-i_DECLIMEX_ int32_t rfFgets_UTF32LE(char* buff, uint32_t num, FILE* f,
-                                    char* eof, char eol);
+i_DECLIMEX_ char rfFReadLine_UTF16(FILE* f, char eol, char** utf8,
+                                   uint32_t* byteLength, char* eof,
+                                   uint32_t* bytes_read, int endianess);
 
 /**
- ** @brief Gets a number of bytes from a BIG endian UTF-16 file descriptor
+ ** @brief Reads a  UTF-32 file descriptor until end of line
+ **  or EOF is found and returns a UTF-8 byte buffer
+ ** 
+ ** The function works just like @ref rfReadLine_UTF8() but for UTF-32
+ ** @param endianess Can be either:
+ ** + @c RF_BIG_ENDIAN: If the file stream you want to read is encoded in 
+ **   big endian 
+ ** + @c RF_LITTLE_ENDIAN: If the file stream you want to read is encoded in
+ **  little endian
+ ** @param bytes_read: The number of bytes succesfully read from the file
+ ** descriptor
+ **/
+i_DECLIMEX_ char rfFReadLine_UTF32(FILE* f, char eol, char** utf8,
+                                   uint32_t* byteLength, char* eof,
+                                   uint32_t* bytes_read, int endianess);
+
+
+/**
+ ** @brief Gets a number of bytes from a UTF-32 file descriptor
  **
- ** This is a function that's similar to c library fgets but it also returns the number of bytes read. Reads in from the file until @c num bytes
+ ** This function is similar to @ref rfFgets_UTF8() only for UTF32
+ ** @param endianess Can be either:
+ ** + @c RF_BIG_ENDIAN: If the file stream you want to read is encoded in 
+ **   big endian 
+ ** + @c RF_LITTLE_ENDIAN: If the file stream you want to read is encoded in
+ **  little endian
+ **/
+i_DECLIMEX_ char rfFgets_UTF32(char* buff, uint32_t num, FILE* f,
+                               char* eof, char eol, uint32_t* bytes_read,
+                               int endianess);
+
+/**
+ ** @brief Gets a number of bytes from a UTF-16 file descriptor
+ **
+ ** This function is similar to @ref rfFgets_UTF8() only for UTF16 and as such
+ ** has an extra endianess parameter
+ ** @param endianess Can be either:
+ ** + @c RF_BIG_ENDIAN: If the file stream you want to read is encoded in 
+ **   big endian 
+ ** + @c RF_LITTLE_ENDIAN: If the file stream you want to read is encoded in
+ **  little endian
+ **/
+i_DECLIMEX_ char rfFgets_UTF16(char* buff, uint32_t num, FILE* f,
+                                 char* eof, char eol, uint32_t* bytes_read,
+                                 int endianess);
+
+
+/**
+ ** @brief Gets a number of bytes from a UTF8 file descriptor
+ **
+ ** This is a function that's similar to c library fgets but it also returns 
+ ** the number of bytes read. Reads in from the file until @c num bytes
  ** have been read or new line or EOF character has been encountered.
  **
- ** The character pattern that shall be considered as newline signal depends on the value the user passes to the @c eol argument.
+ ** The character pattern that shall be considered as newline signal depends
+ **  on the value the user passes to the @c eol argument.
  **
  ** The function will read until @c num characters are read and if @c num
- ** would take us to the middle of a UTF16 character then the next character shall also be read
+ ** would take us to the middle of a UTF16 character then the next character
+ **  shall also be read
  ** and the function will return the number of bytes read.
- ** Since the function null terminates the buffer the given @c buff needs to be of at least
- ** @c num+5 size to cater for the worst case.
+ ** Since the function null terminates the buffer the given @c buff needs to be
+ ** of at least @c num+5 size to cater for the worst case.
  **
  ** The final bytestream stored inside @c buff is in the endianess of the system.
  **
  ** If right after the last character read comes the EOF, the function
  ** shall detect so and assign @c true to @c eof.
  **
- ** The file descriptor at @c f must have been opened in <b>binary</b> and not text mode. That means that if under
- ** Windows make sure to call fopen with "wb", "rb" e.t.c. instead of the simple "w", "r" e.t.c. since the initial
- ** default value under Windows is text mode. Alternatively you can set the initial value using _get_fmode() and
+ ** The file descriptor at @c f must have been opened in <b>binary</b> and 
+ ** not text mode. That means that if under
+ ** Windows make sure to call fopen with "wb", "rb" e.t.c. instead of the
+ ** simple "w", "r" e.t.c. since the initial
+ ** default value under Windows is text mode. Alternatively you can set the
+ **  initial value using _get_fmode() and
  ** _set_fmode(). For more information take a look at the msdn pages here:
  ** http://msdn.microsoft.com/en-us/library/ktss1a9b.aspx
  **
- ** @param[in] buff A buffer to be filled with the contents of the file. Should be of size at least @c num+5
- ** @param[in] num The maximum number of bytes to read from within the file NOT including the null terminating character(which in itelf is 2 bytes). Should be a multiple of 2
+ ** @param[in] buff A buffer to be filled with the contents of the file.
+ **  Should be of size at least @c num+5
+ ** @param[in] num The maximum number of bytes to read from within the file
+ **  NOT including the null terminating character(which in itelf is 2 bytes).
+ **  Should be a multiple of 2
  ** @param[in] f A valid FILE descriptor from which to read the bytes
- ** @param[out] eof Pass a reference to a char to receive a true/false value for whether EOF has been reached.
+ ** @param[out] eof Pass a reference to a char to receive a true/false value
+ **  for whether EOF has been reached.
  ** @param[in] eol The End Of Line type that this file uses. Legal values are:
- ** + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
- ** + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
- ** + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as the end of line signal
+ ** + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as
+ **      the end of line signal
+ ** + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as
+ **      the end of line signal
+ ** + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as
+ **      the end of line signal
+
+ ** @param[out] bytes_read Pass a pointer to a uint32_t to get the number of
+ ** bytes read from this function. Even if an error occured this number should
+ ** contain how many bytes were read until that point.
  **
- ** @return Returns the actual number of bytes read or an error if there was a problem.
- ** The possible errors are:
- ** + @c RE_FILE_READ: If during reading the file there was an unknown read error
- ** + @c RE_FILE_READ_BLOCK: If the read operation failed due to the file descriptor being occupied by another thread
- ** + @c RE_FILE_MODE: If during reading the file the file descriptor's mode was not correctly set for reading
- ** + @c RE_FILE_POS_OVERFLOW: If during reading, the current file position can't be represented by the system
- ** + @c RE_INTERRUPT: If during reading, there was a system interrupt
- ** + @c RE_FILE_IO: If there was a physical I/O error
- ** + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
- **
+ ** @return Returns @c true for success and @c false for an error occuring.
+ ** Even if there is an error the number of bytes read can be trusted
  **/
-i_DECLIMEX_ int32_t rfFgets_UTF16BE(char* buff, uint32_t num, FILE* f,
-                                    char* eof, char eol);
-/**
- ** @brief Gets a number of bytes from a Little endian UTF-16 file descriptor
- **
- ** This is a function that's similar to c library fgets but it also returns the number of bytes read. Reads in from the file until @c num bytes
- ** have been read or new line or EOF character has been encountered.
- **
- ** The character pattern that shall be considered as newline signal depends on the value the user passes to the @c eol argument.
- **
- ** The function will read until @c num characters are read and if @c num
- ** would take us to the middle of a UTF16 character then the next character shall also be read
- ** and the function will return the number of bytes read.
- ** Since the function null terminates the buffer the given @c buff needs to be of at least
- ** @c num+5 size to cater for the worst case.
- **
- ** The final bytestream stored inside @c buff is in the endianess of the system.
- **
- ** If right after the last character read comes the EOF, the function
- ** shall detect so and assign @c true to @c eof.
- **
- ** The file descriptor at @c f must have been opened in <b>binary</b> and not text mode. That means that if under
- ** Windows make sure to call fopen with "wb", "rb" e.t.c. instead of the simple "w", "r" e.t.c. since the initial
- ** default value under Windows is text mode. Alternatively you can set the initial value using _get_fmode() and
- ** _set_fmode(). For more information take a look at the msdn pages here:
- ** http://msdn.microsoft.com/en-us/library/ktss1a9b.aspx
- **
- ** @param[in] buff A buffer to be filled with the contents of the file. Should be of size at least @c num+2
- ** @param[in] num The maximum number of bytes to read from within the file NOT including the null terminating character(which in itelf is 2 bytes). Should be a multiple of 2
- ** @param[in] f A valid FILE descriptor from which to read the bytes
- ** @param[out] eof Pass a reference to a char to receive a true/false value for whether EOF has been reached.
- ** @param[in] eol The End Of Line type that this file uses. Legal values are:
- ** + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
- ** + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
- ** + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as the end of line signal
- **
- ** @return Returns the actual number of bytes read or an error if there was a problem.
- ** The possible errors are:
- ** + @c RE_FILE_READ: If during reading the file there was an unknown read error
- ** + @c RE_FILE_READ_BLOCK: If the read operation failed due to the file descriptor being occupied by another thread
- ** + @c RE_FILE_MODE: If during reading the file the file descriptor's mode was not correctly set for reading
- ** + @c RE_FILE_POS_OVERFLOW: If during reading, the current file position can't be represented by the system
- ** + @c RE_INTERRUPT: If during reading, there was a system interrupt
- ** + @c RE_FILE_IO: If there was a physical I/O error
- ** + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
- **
- **/
-i_DECLIMEX_ int32_t rfFgets_UTF16LE(char* buff, uint32_t num, FILE* f,
-                                    char* eof, char eol);
-/**
- ** @brief Gets a number of bytes from a UTF-8 file descriptor
- **
- ** This is a function that's similar to c library fgets but it also returns the number of bytes read. Reads in from the file until @c num characters
- ** have been read or new line or EOF character has been encountered.
- **
- ** The character pattern that shall be considered as newline signal depends on the value the user passes to the @c eol argument.
- **
- ** The function  automatically adds a null termination character at the end of
- ** @c buff but this character is not included in the returned actual number of bytes.
- **
- ** The function will read until @c num characters are read and if @c num
- ** would take us to the middle of a UTF8 character then the next character shall also be read
- ** and the function will return the number of bytes read.
- ** Since the function null terminates the buffer the given @c buff needs to be of at least
- ** @c num+4 size to cater for the worst case.
- **
- ** If right after the last character read comes the EOF, the function
- ** shall detect so and assign @c true to @c eof.
- **
- ** The file descriptor at @c f must have been opened in <b>binary</b> and not text mode. That means that if under
- ** Windows make sure to call fopen with "wb", "rb" e.t.c. instead of the simple "w", "r" e.t.c. since the initial
- ** default value under Windows is text mode. Alternatively you can set the initial value using _get_fmode() and
- ** _set_fmode(). For more information take a look at the msdn pages here:
- ** http://msdn.microsoft.com/en-us/library/ktss1a9b.aspx
- **
- ** @param[in] buff A buffer to be filled with the contents of the file. Should of size at least @c num+4
- ** @param[in] num The maximum number of bytes to read from within the file NOT including the null terminating character(which in itelf is 1 byte)
- ** @param[in] f A valid FILE descriptor from which to read the bytes
- ** @param[out] eof Pass a reference to a char to receive a true/false value for whether EOF has been reached.
- ** @param[in] eol The End Of Line type that this file uses. Legal values are:
- ** + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end of line signal
- ** + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as the end of line signal
- ** + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as the end of line signal
- **
- ** @return Returns the actual number of bytes read or an error if there was a problem.
- ** The possible errors are:
- ** + @c RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE: If an invalid UTF-8 byte has been found
- ** + @c RE_UTF8_INVALID_SEQUENCE_CONBYTE: If during parsing the file we were expecting a continuation
- ** byte and did not find it
- ** + @c RE_UTF8_INVALID_SEQUENCE_END: If the null character is encountered in between bytes that should
- ** have been continuation bytes
- ** + @c RE_FILE_READ: If during reading the file there was an unknown read error
- ** + @c RE_FILE_READ_BLOCK: If the read operation failed due to the file descriptor being occupied by another thread
- ** + @c RE_FILE_MODE: If during reading the file the file descriptor's mode was not correctly set for reading
- ** + @c RE_FILE_POS_OVERFLOW: If during reading, the current file position can't be represented by the system
- ** + @c RE_INTERRUPT: If during reading, there was a system interrupt
- ** + @c RE_FILE_IO: If there was a physical I/O error
- ** + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
- **
- **/
-i_DECLIMEX_ int32_t rfFgets_UTF8(char* buff, uint32_t num, FILE* f,
-                                 char* eof, char eol);
+i_DECLIMEX_ char rfFgets_UTF8(char* buff, uint32_t num, FILE* f,
+                              char* eof, char eol, uint32_t* bytes_read);
 
 /**
  ** @brief  Gets a unicode character from a UTF-8 file descriptor
  **
- ** This function attempts to assume a more modern fgetc() role for UTF-8 encoded files.
- ** Reads bytes from the File descriptor @c f until a full UTF-8 unicode character has been read
+ ** This function attempts to assume a more modern fgetc() role for UTF-8 
+ ** encoded files. Reads bytes from the File descriptor @c f until a full 
+ ** UTF-8 unicode character has been read
  **
- ** After this function the file pointer will have moved either by @c 1, @c 2, @c 3 or @c 4
- ** bytes if the return value is positive. You can see how much by checking the return value.
+ ** After this function the file pointer will have moved either by @c 1, @c 2,
+ **  @c 3 or @c 4 bytes if the return value is positive.
+ **  You can see how much by checking the return value.
  **
- ** You shall need to provide an integer at @c c to contain either the decoded Unicode
- ** codepoint or the UTF-8 endoced byte depending on the value of the @c cp argument.
+ ** You shall need to provide an integer at @c c to contain either the decoded 
+ ** unicode codepoint or the UTF-8 endoced byte depending on the value
+ **  of the @c cp argument.
  **
- ** @param f A valid FILE descriptor from which to read the bytes
- ** @param c Pass an int that will receive either the unicode code point value or
- ** the UTF8 bytes depending on the value of the @c cp flag
- ** @param cp A boolean flag. If @c true then the int passed at @c c will contain the unicode code point
- ** of the read character, so the UTF-8 will be decoded.
- ** If @c false the int passed at @c c will contain the value of the read bytes in UTF-8 without any decoding
- ** @return Returns the number of bytes read (either @c 1, @c 2, @c 3 or @c 4) or an error if the function
- ** fails for some reason. Possible error values are:
- ** + @c RE_FILE_EOF: The end of file has been found while reading.
- ** Also if the end of file is encountered
- ** in the middle of a UTF-8 encoded character where we would be expecting something different
- ** @c RE_UTF8_INVALID_SEQUENCE_END is logged.
- ** + @c RE_UTF8_INVALID_SEQUENCE_INVALID_BYTE: If an invalid UTF-8 byte has been found
- ** + @c RE_UTF8_INVALID_SEQUENCE_CONBYTE: If during parsing the file we were expecting a continuation
- ** byte and did not find it
- ** + @c RE_UTF8_INVALID_SEQUENCE_END: If the null character is encountered in between bytes that should
- ** have been continuation bytes
- ** + @c RE_FILE_READ: If during reading the file there was an unknown read error
- ** + @c RE_FILE_READ_BLOCK: If the read operation failed due to the file descriptor being occupied by another thread
- ** + @c RE_FILE_MODE: If during reading the file the file descriptor's mode was not correctly set for reading
- ** + @c RE_FILE_POS_OVERFLOW: If during reading, the current file position can't be represented by the system
- ** + @c RE_INTERRUPT: If during reading, there was a system interrupt
- ** + @c RE_FILE_IO: If there was a physical I/O error
- ** + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
- **
+ ** @param[in] f A valid FILE descriptor from which to read the bytes
+ ** @param[in] c Pass an int that will receive either the unicode code point
+ ** value or the UTF8 bytes depending on the value of the @c cp flag
+ ** @param[in] cp A boolean flag. If @c true then the int passed at @c c will
+ ** contain the unicode code point of the read character, so the UTF-8 
+ ** will be decoded.
+ ** If @c false the int passed at @c c will contain the value of the read 
+ ** bytes in UTF-8 without any decoding
+ ** @param[out] eof The function will use this as a flag to denote if EOF
+ **  is reached.
+ ** @return Returns the number of bytes read (either @c 1, @c 2, @c 3 or @c 4) 
+ ** or a negative number if the function fails. If the EOF is reached then 
+ ** @c eof will be set to @c true but the function will still return a negative.
  **/
-i_DECLIMEX_ int32_t rfFgetc_UTF8(FILE* f, uint32_t *c, char cp);
-/**
- ** @brief  Gets a unicode character from a UTF-16 Big Endian file descriptor
- **
- ** This function attempts to assume a more modern fgetc() role for UTF-16 encoded files.
- ** Reads bytes from the File descriptor @c f until a full UTF-16 unicode character has been read
- **
- ** After this function the file pointer will have moved either by @c 2 or @c 4
- ** bytes if the return value is positive. You can see how much by checking the return value.
- **
- ** You shall need to provide an integer at @c c to contain either the decoded Unicode
- ** codepoint or the Bigendian encoded UTF-16 bytes depending on the value of @c the cp argument.
- **
- ** @param f A valid FILE descriptor from which to read the bytes
- ** @param c Pass an int that will receive either the unicode code point value or
- ** the UTF16 bytes depending on the value of the @c cp flag
- ** @param cp A boolean flag. If @c true then the int passed at @c c will contain the unicode code point
- ** of the read character, so the UTF-16 will be decoded.
- ** If @c false the int passed at @c c will contain the value of the read bytes in UTF-16 without any decoding
- ** @return Returns the number of bytes read (either @c 2 or @c 4) or an error if the function
- ** fails for some reason. Possible error values are:
- ** + @c RE_UTF16_INVALID_SEQUENCE: Either the read word or its surrogate pair if 4 bytes were read held illegal values
- ** + @c RE_UTF16_NO_SURRPAIR: According to the first read word a surrogate pair was expected but none was found
- ** + @c RE_FILE_EOF: The end of file has been found while reading. If the end of file is encountered
- ** while we expect a UTF-16 surrogate an @c RE_UTF16_NO_SURRPAIR error is also logged.
- ** + @c RE_FILE_READ: If during reading the file there was an unknown read error
- ** + @c RE_FILE_READ_BLOCK: If the read operation failed due to the file descriptor being occupied by another thread
- ** + @c RE_FILE_MODE: If during reading the file the file descriptor's mode was not correctly set for reading
- ** + @c RE_FILE_POS_OVERFLOW: If during reading, the current file position can't be represented by the system
- ** + @c RE_INTERRUPT: If during reading, there was a system interrupt
- ** + @c RE_FILE_IO: If there was a physical I/O error
- ** + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
- **
- **/
-i_DECLIMEX_ int32_t rfFgetc_UTF16BE(FILE* f, uint32_t *c, char cp);
-/**
- ** @brief  Gets a unicode character from a UTF-16 Little Endian file descriptor
- **
- ** This function attempts to assume a more modern fgetc() role for UTF-16 encoded files.
- ** Reads bytes from the File descriptor @c f until a full UTF-16 unicode character has been read
- **
- ** After this function the file pointer will have moved either by @c 2 or @c 4
- ** bytes if the return value is positive. You can see how much by checking the return value.
- **
- ** You shall need to provide an integer at @c c to contain either the decoded Unicode
- ** codepoint or the Bigendian encoded UTF-16 bytes depending on the value of @c the cp argument.
- **
- ** @param f A valid FILE descriptor from which to read the bytes
- ** @param c Pass an int that will receive either the unicode code point value or
- ** the UTF16 bytes depending on the value of the @c cp flag
- ** @param cp A boolean flag. If @c true then the int passed at @c c will contain the unicode code point
- ** of the read character, so the UTF-16 will be decoded.
- ** If @c false the int passed at @c c will contain the value of the read bytes in UTF-16 without any decoding
- ** @return Returns the number of bytes read (either @c 2 or @c 4) or an error if the function
- ** fails for some reason. Possible error values are:
- ** + @c RE_UTF16_INVALID_SEQUENCE: Either the read word or its surrogate pair if 4 bytes were read held illegal values
- ** + @c RE_UTF16_NO_SURRPAIR: According to the first read word a surrogate pair was expected but none was found
- ** + @c RE_FILE_EOF: The end of file has been found while reading. If the end of file is encountered
- ** while we expect a UTF-16 surrogate an @c RE_UTF16_NO_SURRPAIR error is also logged.
- ** + @c RE_FILE_READ: If during reading the file there was an unknown read error
- ** + @c RE_FILE_READ_BLOCK: If the read operation failed due to the file descriptor being occupied by another thread
- ** + @c RE_FILE_MODE: If during reading the file the file descriptor's mode was not correctly set for reading
- ** + @c RE_FILE_POS_OVERFLOW: If during reading, the current file position can't be represented by the system
- ** + @c RE_INTERRUPT: If during reading, there was a system interrupt
- ** + @c RE_FILE_IO: If there was a physical I/O error
- ** + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
- **
- **/
-i_DECLIMEX_ int32_t rfFgetc_UTF16LE(FILE* f, uint32_t *c, char cp);
-/**
- ** @brief  Gets a unicode character from a UTF-32 Little Endian file descriptor
- **
- ** This function attempts to assume a more modern fgetc() role for UTF-32 encoded files.
- ** Reads bytes from the File descriptor @c f until a full UTF-32 unicode character has been read
- **
- ** After this function the file pointer will have moved by @c 4
- ** bytes if the return value is positive.
- **
- ** You shall need to provide an integer at @c to contain the UTF-32 codepoint.
- **
- ** @param f A valid FILE descriptor from which to read the bytes
- ** @param c Pass an int that will receive either the unicode code point value or
- ** the UTF16 bytes depending on the value of the @c cp flag
- ** If @c false the int passed at @c c will contain the value of the read bytes in UTF-16 without any decoding
- ** @return Returns either @c RF_SUCCESS for succesfull readin or one of the following errors:
- ** + @c RE_FILE_EOF: The end of file has been found while reading.
- ** + @c RE_FILE_READ: If during reading the file there was an unknown read error
- ** + @c RE_FILE_READ_BLOCK: If the read operation failed due to the file descriptor being occupied by another thread
- ** + @c RE_FILE_MODE: If during reading the file the file descriptor's mode was not correctly set for reading
- ** + @c RE_FILE_POS_OVERFLOW: If during reading, the current file position can't be represented by the system
- ** + @c RE_INTERRUPT: If during reading, there was a system interrupt
- ** + @c RE_FILE_IO: If there was a physical I/O error
- ** + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
- **
- **/
-i_DECLIMEX_ int32_t rfFgetc_UTF32LE(FILE* f, uint32_t *c);
-/**
- ** @brief  Gets a unicode character from a UTF-32 Big Endian file descriptor
- **
- ** This function attempts to assume a more modern fgetc() role for UTF-32 encoded files.
- ** Reads bytes from the File descriptor @c f until a full UTF-32 unicode character has been read
- **
- ** After this function the file pointer will have moved by @c 4
- ** bytes if the return value is positive.
- **
- ** You shall need to provide an integer at @c to contain the UTF-32 codepoint.
- **
- ** @param f A valid FILE descriptor from which to read the bytes
- ** @param c Pass an int that will receive either the unicode code point value or
- ** the UTF16 bytes depending on the value of the @c cp flag
- ** If @c false the int passed at @c c will contain the value of the read bytes in UTF-16 without any decoding
- ** @return Returns either @c RF_SUCCESS for succesfull readin or one of the following errors:
- ** + @c RE_FILE_EOF: The end of file has been found while reading.
- ** + @c RE_FILE_READ: If during reading the file there was an unknown read error
- ** + @c RE_FILE_READ_BLOCK: If the read operation failed due to the file descriptor being occupied by another thread
- ** + @c RE_FILE_MODE: If during reading the file the file descriptor's mode was not correctly set for reading
- ** + @c RE_FILE_POS_OVERFLOW: If during reading, the current file position can't be represented by the system
- ** + @c RE_INTERRUPT: If during reading, there was a system interrupt
- ** + @c RE_FILE_IO: If there was a physical I/O error
- ** + @c RE_FILE_NOSPACE: If reading failed due to insufficient storage space
- **
- **/
-i_DECLIMEX_ int32_t rfFgetc_UTF32BE(FILE* f, uint32_t *c);
+i_DECLIMEX_ int rfFgetc_UTF8(FILE* f, uint32_t *c, char cp, char* eof);
+
 
 /**
- ** @brief Moves a unicode character backwards in a big endian UTF-32 file stream
+ ** @brief  Gets a unicode character from a UTF-16 file descriptor
  **
- ** @param f The file stream
- ** @param c Returns the character we moved back to as a unicode codepoint
- ** @return Returns either @c RF_SUCCESS for success or one of the following errors:
- ** + @c RE_FILE_POS_OVERFLOW: If during trying to read the current file's position it can't be represented by the system
- ** + @c RE_FILE_BAD: If The file descriptor is corrupt/illegal
- ** + @c RE_FILE_NOTFILE: If the file descriptor is not a file but something else. e.g. socket.
- ** + @c RE_FILE_GETFILEPOS: If the file's position could not be retrieved for some unknown reason
- ** + @c RE_FILE_WRITE_BLOCK: While attempting to move the file pointer, it was occupied by another thread, and the no block flag was set
- ** + @c RE_INTERRUPT: Operating on the file failed due to a system interrupt
- ** + @c RE_FILE_IO: There was a physical I/O error
- ** + @c RE_FILE_NOSPACE: There was no space on the device holding the file
- ** + @c RE_FILE_NOTFILE: The device we attempted to manipulate is non-existent
- ** + @c RE_FILE_READ: If during reading the file there was an error
- ** + @c RE_FILE_READ_BLOCK: If during reading the file the read operation failed due to the file being occupied by another thread
- ** + @c RE_FILE_MODE: If during reading the file the underlying file descriptor's mode was not correctly set for reading
- **
+ ** This function acts just like @ref rfFgetc_UTF8() but for UTF16
+ ** The main difference is that it also takes endianess into account
+ ** and as such has en extra argument to that effect.
+ ** @param endianess Can be either:
+ ** + @c RF_BIG_ENDIAN: If the file stream you want to read is encoded in 
+ **   big endian 
+ ** + @c RF_LITTLE_ENDIAN: If the file stream you want to read is encoded in
+ **  little endian
  **/
-i_DECLIMEX_ int32_t rfFback_UTF32BE(FILE* f, uint32_t *c);
+i_DECLIMEX_ int rfFgetc_UTF16(FILE* f, uint32_t *c, char cp,
+                                int endianess, char* eof);
+
+/**
+ ** @brief  Gets a unicode character from a UTF-32  file descriptor
+ **
+ ** This function acts just like @ref rfFgetc_UTF8() but for UTF32 with the
+ ** difference that it has no option to return the decoded character since it 
+ ** makes no sense for UTF32 and that it accepts an endianess argument.
+ ** @param endianess Can be either:
+ ** + @c RF_BIG_ENDIAN: If the file stream you want to read is encoded in 
+ **   big endian 
+ ** + @c RF_LITTLE_ENDIAN: If the file stream you want to read is encoded in
+ **  little endian
+ **/
+i_DECLIMEX_ int rfFgetc_UTF32(FILE* f, uint32_t *c, int endianess, char* eof);
+
+
 /**
  ** @brief Moves a unicode character backwards in a little endian UTF-32 file stream
  **
- ** The file descriptor at @c f must have been opened in <b>binary</b> and not text mode. That means that if under
- ** Windows make sure to call fopen with "wb", "rb" e.t.c. instead of the simple "w", "r" e.t.c. since the initial
- ** default value under Windows is text mode. Alternatively you can set the initial value using _get_fmode() and
- ** _set_fmode(). For more information take a look at the msdn pages here:
- ** http://msdn.microsoft.com/en-us/library/ktss1a9b.aspx
- **
- ** @param f The file stream
- ** @param c Returns the character we moved back to as a unicode codepoint
- ** @return Returns either @c RF_SUCCESS for success or one of the following errors:
- ** + @c RE_FILE_POS_OVERFLOW: If during trying to read the current file's position it can't be represented by the system
- ** + @c RE_FILE_BAD: If The file descriptor is corrupt/illegal
- ** + @c RE_FILE_NOTFILE: If the file descriptor is not a file but something else. e.g. socket.
- ** + @c RE_FILE_GETFILEPOS: If the file's position could not be retrieved for some unknown reason
- ** + @c RE_FILE_WRITE_BLOCK: While attempting to move the file pointer, it was occupied by another thread, and the no block flag was set
- ** + @c RE_INTERRUPT: Operating on the file failed due to a system interrupt
- ** + @c RE_FILE_IO: There was a physical I/O error
- ** + @c RE_FILE_NOSPACE: There was no space on the device holding the file
- ** + @c RE_FILE_NOTFILE: The device we attempted to manipulate is non-existent
- ** + @c RE_FILE_READ: If during reading the file there was an error
- ** + @c RE_FILE_READ_BLOCK: If during reading the file the read operation failed due to the file being occupied by another thread
- ** + @c RE_FILE_MODE: If during reading the file the underlying file descriptor's mode was not correctly set for reading
- **
+ ** This function acts just like @ref rfFback_UTF8() except that it is 
+ ** implemented for UTF-32 encoded byte streams and that it also accepts
+ ** an endianess arument.
+ ** @param endianess Can be either:
+ ** + @c RF_BIG_ENDIAN: If the file stream you want to read is encoded in 
+ **   big endian 
+ ** + @c RF_LITTLE_ENDIAN: If the file stream you want to read is encoded in
+ **  little endian
+ ** @return Returns either @c 4 for success or negative for failure
  **/
-i_DECLIMEX_ int32_t rfFback_UTF32LE(FILE* f, uint32_t *c);
+i_DECLIMEX_ int rfFback_UTF32(FILE* f, uint32_t *c, int endianess);
+
 /**
- ** @brief Moves a unicode character backwards in a big endian UTF-16 file stream
+ ** @brief Moves a unicode character backwards in a UTF-16 file stream
  **
- ** The file descriptor at @c f must have been opened in <b>binary</b> and not text mode. That means that if under
- ** Windows make sure to call fopen with "wb", "rb" e.t.c. instead of the simple "w", "r" e.t.c. since the initial
- ** default value under Windows is text mode. Alternatively you can set the initial value using _get_fmode() and
- ** _set_fmode(). For more information take a look at the msdn pages here:
- ** http://msdn.microsoft.com/en-us/library/ktss1a9b.aspx
- **
- ** @param f The file stream
- ** @param c Returns the character we moved back to as a unicode codepoint
- ** @return Returns either the number of bytes moved backwards (either @c 4 or @c 2) for success or one of the following errors:
- ** + @c RE_UTF16_INVALID_SEQUENCE: Either the read word or its surrogate pair if 4 bytes were read held illegal values
- ** + @c RE_FILE_POS_OVERFLOW: If during trying to read the current file's position it can't be represented by the system
- ** + @c RE_FILE_BAD: If The file descriptor is corrupt/illegal
- ** + @c RE_FILE_NOTFILE: If the file descriptor is not a file but something else. e.g. socket.
- ** + @c RE_FILE_GETFILEPOS: If the file's position could not be retrieved for some unknown reason
- ** + @c RE_FILE_WRITE_BLOCK: While attempting to move the file pointer, it was occupied by another thread, and the no block flag was set
- ** + @c RE_INTERRUPT: Operating on the file failed due to a system interrupt
- ** + @c RE_FILE_IO: There was a physical I/O error
- ** + @c RE_FILE_NOSPACE: There was no space on the device holding the file
- ** + @c RE_FILE_NOTFILE: The device we attempted to manipulate is non-existent
- ** + @c RE_FILE_READ: If during reading the file there was an error
- ** + @c RE_FILE_READ_BLOCK: If during reading the file the read operation failed due to the file being occupied by another thread
- ** + @c RE_FILE_MODE: If during reading the file the underlying file descriptor's mode was not correctly set for reading
- **
+ ** This function acts just like @ref rfFback_UTF8() except that it is 
+ ** implemented for UTF-16 encoded byte streams and that it also accepts
+ ** an endianess arument.
+ ** @param endianess Can be either:
+ ** + @c RF_BIG_ENDIAN: If the file stream you want to read is encoded in 
+ **   big endian 
+ ** + @c RF_LITTLE_ENDIAN: If the file stream you want to read is encoded in
+ **  little endian
+ ** @return Returns either @c 2 or @c 4 for success and negative for failure
  **/
-i_DECLIMEX_ int32_t rfFback_UTF16BE(FILE* f, uint32_t *c);
-/**
- ** @brief Moves a unicode character backwards in a little endian UTF-16 file stream
- **
- ** The file descriptor at @c f must have been opened in <b>binary</b> and not text mode. That means that if under
- ** Windows make sure to call fopen with "wb", "rb" e.t.c. instead of the simple "w", "r" e.t.c. since the initial
- ** default value under Windows is text mode. Alternatively you can set the initial value using _get_fmode() and
- ** _set_fmode(). For more information take a look at the msdn pages here:
- ** http://msdn.microsoft.com/en-us/library/ktss1a9b.aspx
- **
- ** @param f The file stream
- ** @param c Returns the character we moved back to as a unicode codepoint
- ** @return Returns either the number of bytes moved backwards (either @c 4 or @c 2) for success or one of the following errors:
- ** + @c RE_UTF16_INVALID_SEQUENCE: Either the read word or its surrogate pair if 4 bytes were read held illegal values
- ** + @c RE_FILE_POS_OVERFLOW: If during trying to read the current file's position it can't be represented by the system
- ** + @c RE_FILE_BAD: If The file descriptor is corrupt/illegal
- ** + @c RE_FILE_NOTFILE: If the file descriptor is not a file but something else. e.g. socket.
- ** + @c RE_FILE_GETFILEPOS: If the file's position could not be retrieved for some unknown reason
- ** + @c RE_FILE_WRITE_BLOCK: While attempting to move the file pointer, it was occupied by another thread, and the no block flag was set
- ** + @c RE_INTERRUPT: Operating on the file failed due to a system interrupt
- ** + @c RE_FILE_IO: There was a physical I/O error
- ** + @c RE_FILE_NOSPACE: There was no space on the device holding the file
- ** + @c RE_FILE_NOTFILE: The device we attempted to manipulate is non-existent
- ** + @c RE_FILE_READ: If during reading the file there was an error
- ** + @c RE_FILE_READ_BLOCK: If during reading the file the read operation failed due to the file being occupied by another thread
- ** + @c RE_FILE_MODE: If during reading the file the underlying file descriptor's mode was not correctly set for reading
- **
- **/
-i_DECLIMEX_ int32_t rfFback_UTF16LE(FILE* f, uint32_t *c);
+i_DECLIMEX_ int rfFback_UTF16(FILE* f, uint32_t *c, int endianess);
+
 /**
  ** @brief Moves a unicode character backwards in a UTF-8 file stream
  **
- ** The file descriptor at @c f must have been opened in <b>binary</b> and not text mode. That means that if under
- ** Windows make sure to call fopen with "wb", "rb" e.t.c. instead of the simple "w", "r" e.t.c. since the initial
- ** default value under Windows is text mode. Alternatively you can set the initial value using _get_fmode() and
- ** _set_fmode(). For more information take a look at the msdn pages here:
- ** http://msdn.microsoft.com/en-us/library/ktss1a9b.aspx
+ ** The file descriptor at @c f must have been opened in <b>binary</b> and not
+ ** text mode. That means that if under Windows make sure to call fopen with 
+ ** "wb", "rb" e.t.c. instead of the simple "w", "r" e.t.c. since the initial
+ ** default value under Windows is text mode. Alternatively you can set the
+ **  initial value using _get_fmode() and _set_fmode(). For more information
+ **  take a look at the msdn pages here:
+ **  http://msdn.microsoft.com/en-us/library/ktss1a9b.aspx
  **
  ** @param f The file stream
  ** @param c Returns the character we moved back to as a unicode codepoint
- ** @return Returns either the number of bytes moved backwards for success (either @c 4, @c 3, @c 2 or @c 1) or one of the following errors:
- ** + @c RE_UTF8_INVALID_SEQUENCE: If during moving bacwards in the file unexpected UTF-8 bytes were found
- ** + @c RE_FILE_POS_OVERFLOW: If during trying to read the current file's position it can't be represented by the system
- ** + @c RE_FILE_BAD: If The file descriptor is corrupt/illegal
- ** + @c RE_FILE_NOTFILE: If the file descriptor is not a file but something else. e.g. socket.
- ** + @c RE_FILE_GETFILEPOS: If the file's position could not be retrieved for some unknown reason
- ** + @c RE_FILE_WRITE_BLOCK: While attempting to move the file pointer, it was occupied by another thread, and the no block flag was set
- ** + @c RE_INTERRUPT: Operating on the file failed due to a system interrupt
- ** + @c RE_FILE_IO: There was a physical I/O error
- ** + @c RE_FILE_NOSPACE: There was no space on the device holding the file
- ** + @c RE_FILE_NOTFILE: The device we attempted to manipulate is non-existent
- ** + @c RE_FILE_READ: If during reading the file there was an error
- ** + @c RE_FILE_READ_BLOCK: If during reading the file the read operation failed due to the file being occupied by another thread
- ** + @c RE_FILE_MODE: If during reading the file the underlying file descriptor's mode was not correctly set for reading
- **
+ ** @return Returns either the number of bytes moved backwards for success
+ ** (either @c 4, @c 3, @c 2 or @c 1) or negative number for error
  **/
-i_DECLIMEX_ int32_t rfFback_UTF8(FILE* f, uint32_t *c);
+i_DECLIMEX_ int rfFback_UTF8(FILE* f, uint32_t *c);
 
 /**
  ** @brief Opens another process as a pipe

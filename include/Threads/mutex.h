@@ -63,19 +63,7 @@ extern "C"
  ** @memberof RF_Mutex
  ** @brief Allocates and returns a mutex object
  **
- ** @param flags Hints for the creation of the mutex. Possible bitflag values/combinations:
- ** <ul><li><b>For all OS</b>: @c RF_MUTEX_LOCK_AT_INIT, means that the mutex object will be locked at the beginning and owned by the calling thread</li>
- ** <li><b>For Linux</b>:
- ** <ul><li>@c RF_MUTEX_NORMAL, The effect is as if calling @c PTHREAD_MUTEX_NORMAL attribute at creation which means that when you attempt to lock
- ** the mutex when owned by another thread, the calling thread is suspended forever</li>
- ** <li>@c RF_MUTEX_RECURSIVE, The effect is as if calling @c PTHREAD_MUTEX_RECURSIVE attribute at creation which means that when you attempt to lock
- ** the mutex when owned by another thread, the calling thread returns immediately with a success return code. The number of times the thread owning the mutex has locked it is recorded in the mutex.
- ** The owning thread must call @ref rfMutex_Unlock the same number of times before the mutex returns to the unlocked state</li>
- ** <li>@c RF_MUTEX_ERRORCHECK, The effect is as if calling @c PTHREAD_MUTEX_ERRORCHECK attribute at creation which means that when you attempt to lock
- ** the mutex when owned by another thread, the calling thread returns immediately with the error code RF_MUTEX_DEADLOCK</li></ul>
- ** </li></ul>
- ** @return Returns the newly allocated mutex for success or false for failure
- **
+ ** For more infor look at @ref rfMutex_Init()
  **/
 i_DECLIMEX_ RF_Mutex* rfMutex_Create(uint32_t flags);
 /**
@@ -83,45 +71,47 @@ i_DECLIMEX_ RF_Mutex* rfMutex_Create(uint32_t flags);
  ** @brief Initializes a mutex object
  **
  ** @param m The mutex to initialize
- ** @param flags Hints for the creation of the mutex. Possible bitflag values/combinations:
- ** <ul><li><b>For all OS</b>: @c RF_MUTEX_LOCK_AT_INIT, means that the mutex object will be locked at the beginning and owned by the calling thread</li>
+ ** @param flags Hints for the creation of the mutex. Possible bitflag
+ ** values/combinations:
+ ** <ul><li><b>For all OS</b>: @c RF_MUTEX_LOCK_AT_INIT, means that the mutex
+ ** object will be locked at the beginning and owned by the calling thread</li>
  ** <li><b>For Linux</b>:
- ** <ul><li>@c RF_MUTEX_NORMAL, The effect is as if calling @c PTHREAD_MUTEX_NORMAL attribute at creation which means that when you attempt to lock
- ** the mutex when owned by another thread, the calling thread is suspended forever</li>
- ** <li>@c RF_MUTEX_RECURSIVE, The effect is as if calling @c PTHREAD_MUTEX_RECURSIVE attribute at creation which means that when you attempt to lock
- ** the mutex when owned by another thread, the calling thread returns immediately with a success return code. The number of times the thread owning the mutex has locked it is recorded in the mutex.
- ** The owning thread must call @ref rfMutex_Unlock the same number of times before the mutex returns to the unlocked state</li>
- ** <li>@c RF_MUTEX_ERRORCHECK, The effect is as if calling @c PTHREAD_MUTEX_ERRORCHECK attribute at creation which means that when you attempt to lock
- ** the mutex when owned by another thread, the calling thread returns immediately with the error code RF_MUTEX_DEADLOCK</li></ul>
+ ** <ul><li>@c RF_MUTEX_NORMAL, The effect is as if calling 
+ ** @c PTHREAD_MUTEX_NORMAL attribute at creation which means that when
+ ** you attempt to lock the mutex when owned by another thread, the calling 
+ ** thread is suspended forever</li>
+ ** <li>@c RF_MUTEX_RECURSIVE, The effect is as if calling 
+ ** @c PTHREAD_MUTEX_RECURSIVE attribute at creation which means that when
+ ** you attempt to lock the mutex when owned by another thread, the calling
+ ** thread returns immediately with a success return code. The number of times
+ ** the thread owning the mutex has locked it is recorded in the mutex.
+ ** The owning thread must call @ref rfMutex_Unlock the same number of times
+ ** before the mutex returns to the unlocked state</li>
+ ** <li>@c RF_MUTEX_ERRORCHECK, The effect is as if calling 
+ ** @c PTHREAD_MUTEX_ERRORCHECK attribute at creation which means that when you
+ ** attempt to lock the mutex when owned by another thread, the calling thread
+ ** returns immediately with the error code RF_MUTEX_DEADLOCK</li></ul>
  ** </li></ul>
- ** @return RF_SUCCESS for success and an error otherwise. Possible error values are:
- ** + @c RE_MUTEX_INIT: Generix mutex init error
- ** + @c RE_INSUFFICIENT_RESOURCES: Insufficient system resources to allocate a new mutex (POSIX only)
- ** + @c RE_INSUFFICIENT_MEMORY: Insufficient system memory to allocate a new mutex (POSIX only)
- ** + @c RE_PERMISSION: Insufficient permission to initialize a new mutex (POSIX only)
- ** + @c RE_MUTEX_INVALID: The given mutex value is invalid
- **
+ ** @return Returns @c true in success and @c false in failure
  **/
-i_DECLIMEX_ int32_t rfMutex_Init(RF_Mutex* m, uint32_t flags);
+i_DECLIMEX_ char rfMutex_Init(RF_Mutex* m, uint32_t flags);
 
 /**
  ** @memberof RF_Mutex
  ** @brief Destroys the mutex and releases its memory
  **
- ** Make sure that it is not owned by any thread at the time you use this function
- ** @param m The mutex in question
- ** @return Returns true in succesfull destruction and false with error logging otherwise
- **
+ ** For more information refer to @ref rfMutex_Destroy()
  **/
 i_DECLIMEX_ char rfMutex_Destroy(RF_Mutex* m);
 /**
  ** @memberof RF_Mutex
  ** @brief Deinitializes the mutex
  **
- ** Make sure that it is not owned by any thread at the time you use this function
+ ** Make sure that it is not owned by any thread at the time you
+ ** use this function
  ** @param m The mutex in question
- ** @return Returns true in succesfull destruction and false with error logging otherwise
- **
+ ** @return Returns @c true in succesfull destruction and false with
+ ** error logging otherwise
  **/
 i_DECLIMEX_ char rfMutex_Deinit(RF_Mutex* m);
 
@@ -130,60 +120,54 @@ i_DECLIMEX_ char rfMutex_Deinit(RF_Mutex* m);
  ** @memberof RF_Mutex
  ** @brief Locks the mutex
  **
- ** If the mutex is already locked by another thread then this suspends the calling thread until the mutex is unlocked. Behaviour will only vary if
- ** The system is in Linux and using POSIX threads where the behaviour will depend on the flags given at mutex initialization.
+ ** If the mutex is already locked by another thread then this suspends the
+ ** calling thread until the mutex is unlocked. Behaviour will only vary if
+ ** The system is in Linux and using POSIX threads where the behaviour will
+ ** depend on the flags given at mutex initialization.
  ** @param m The mutex in question
- ** @return Returns @c RF_SUCCESS in case of success and error otherwise. Possible error values are:
- ** + @c RE_MUTEX_LOCK: For generic mutex lock error
- ** + @c RE_MUTEX_LOCK_INVALID: For the mutex value being invalid or being unable to get locked due to priorities
- ** + @c RE_MUTEX_LOCK_NUM: Error because the maximum number of recursive locks for the mutex has been reached. (POSIX only)
- ** + @c RE_MUTEX_DEADLOCK: Error because the current thread already owns the mutex (POSIX only)
- **
+ ** @return Returns @c true for successfully locking the mutex and @c false for
+ ** failing
  **/
-i_DECLIMEX_ int32_t rfMutex_Lock(RF_Mutex* m);
+i_DECLIMEX_ char rfMutex_Lock(RF_Mutex* m);
 
 /**
  ** @memberof RF_Mutex
  ** @brief Locks the mutex but with a time limit
  **
- ** This function works in the same fashion as the @ref rfMutex_Lock function except that if the mutex is already locked then the calling thread is suspended only for the
- ** amount of time given as the argument to this function
- ** @param m The mutex in question
- ** @param ms The millisecond to wait for the mutex to unlock if it's already locked
- ** @return Returns @c RF_SUCCESS in case of success or error. The possible errors are:
- ** + @c RE_MUTEX_LOCK: For generic mutex lock error
- ** + @c RE_MUTEX_LOCK_INVALID: For the mutex value being invalid or being unable to get locked due to priorities
- ** + @c RE_MUTEX_TIMEOUT: The @c ms timeout value has elapsed
- ** + @c RE_MUTEX_LOCK_NUM: Error because the maximum number of recursive locks for the mutex has been reached. (POSIX only)
- ** + @c RE_MUTEX_DEADLOCK: Error because the current thread already owns the mutex (POSIX only)
- **
+ ** This function works in the same fashion as the @ref rfMutex_Lock() function
+ ** except that if the mutex is already locked then the calling thread is
+ ** suspended only for the amount of time given as the argument to this function
+ ** @param[in] m The mutex in question
+ ** @param[in[ ms The milliseconds to wait for the mutex to unlock if
+ ** it's already locked
+ ** @param[out] expire A flag denoting if @c ms millisecons have passed 
+ ** without being able to acquire the mutex. Check for this to be @c true 
+ ** if the function fails
+ ** @return Returns @c true for successfully locking the mutex and @c false for
+ ** failing
  **/
-i_DECLIMEX_ int32_t rfMutex_TimedLock(RF_Mutex* m, uint32_t ms);
+i_DECLIMEX_ char rfMutex_TimedLock(RF_Mutex* m, uint32_t ms, char* expire);
 
 /**
  ** @memberof RF_Mutex
  ** @brief Tries to Lock the mutex
  **
  ** If the mutex is already locked by another thread then an error code is returned.
- ** @param m The mutex in question
- ** @return Returns RF_SUCCESS in case of success and error otherwise. Possible errors are:
- ** + @c RE_MUTEX_LOCK: For generic mutex lock error
- ** + @c RE_MUTEX_LOCK_INVALID: For the mutex value being invalid or being unable to get locked due to priorities
- ** + @c RE_MUTEX_BUSY: If the mutex is already locked by another thread.
- ** + @c RE_MUTEX_LOCK_NUM: Error because the maximum number of recursive locks for the mutex has been reached. (POSIX only)
- ** + @c RE_MUTEX_DEADLOCK: Error because the current thread already owns the mutex (POSIX only)
- **
+ ** @param[in] m The mutex in question
+ ** @oaram[out] busy A flag denoting if the mutex is already locked by another
+ ** thread 
+ ** @return Returns @c true for successfully locking the mutex and @c false for
+ ** failing
  **/
-i_DECLIMEX_ int32_t rfMutex_TryLock(RF_Mutex* m);
+i_DECLIMEX_ char rfMutex_TryLock(RF_Mutex* m, char* busy);
 
 /**
  ** @memberof RF_Mutex
  ** @brief Unlocks and releases ownership of a mutex object
  ** @param m The mutex in question
- ** @return Returns @c RF_SUCCESS in case of success and @c RE_MUTEX_UNLOCK otherwise
- **
+ ** Returns @c true in succesfull release and @c false otherwise
  **/
-i_DECLIMEX_  int32_t rfMutex_Unlock(RF_Mutex* m);
+i_DECLIMEX_  char rfMutex_Unlock(RF_Mutex* m);
 
 #ifdef __cplusplus
 }///closing bracket for calling from C++
