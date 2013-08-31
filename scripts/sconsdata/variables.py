@@ -71,6 +71,7 @@ vars.Add(
                      'STRING',
                      'IO', 'TEXTFILE',
                      'DATA_STRUCTURES', 
+                     'INTRUSIVE_LIST',
                      'LIST', 
                      'DYNAMIC_ARRAY',
                      'BINARY_ARRAY',

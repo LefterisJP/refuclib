@@ -176,6 +176,14 @@ modules.append(
            dependencies	= ['STRING'])
 )
 
+
+modules.append(
+    Module("INTRUSIVE_LIST",
+           ['Data_Structures/intrusive_list.c'],
+           macro = "RF_MODULE_INTRUSIVE_LIST",
+       )
+)
+
 modules.append(
     Module("LIST",
            ['Data_Structures/list.c'],
