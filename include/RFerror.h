@@ -20,64 +20,22 @@
 **
 **      ==END OF REFU LICENSE==
 **
-**
-** -IO/printf.h
-** Declares the Refu library's printf family of functions
-**
-------For internal library include make sure to have------(mirror: RFprintf.h)
+** Just a convenient header to include all needed headers for error/warning/info
+** logging
+*/
+
+#ifndef RF_ERROR_MODULE_HEADERS
+#define RF_ERROR_MODULE_HEADERS
+
+#include <rf_options.h> //for the logging level defines
+#include <stdio.h>//for FILE* used inside printf.h
 #include <Definitions/imex.h> //for import export macro
 #include <Definitions/types.h>
-#include <stdio.h> //for FILE*
-#include <IO/printf.h>
-------For internal library include make sure to have------
-*/
-#ifndef RF_PRINTF_H
-#define RF_PRINTF_H
+#include <IO/printf.h> //for rfFpintf() used in the error logging macros
+#include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
+#include <Threads/common.h> //for rfThread_GetID()
+#include <errno.h>  //only if using the stdlibrary functions that report errors with it
+#include <Utils/error.h>
 
 
-#ifdef __cplusplus
-extern "C"
-{///opening bracket for calling from C++
-#endif
-
-
-
-/**
-** @defgroup RF_stdioGRP stdio
-** @addtogroup RF_stdioGRP
-** @{
-**/
-
-/**
- ** @brief Prints a formatted string to the stdout
- **
- ** For more information take a look at @ref rfStringX_Formatv()
- ** @lmsFunction
- ** @param format The formatted string to print
- ** @param ... Extra arguments to output to the string
- ** @return The number of @c bytes written to the stdout or negative number
- ** fo rfailure
- **
- **/
-i_DECLIMEX_ int rfPrintf(const char * format, ...);
-/**
- ** @brief Prints a formatted string to the a file descriptor
- **
- ** For more information take a look at @ref rfStringX_Formatv()
- ** @lmsFunction
- ** @param f The file descriptor into which to output the formatted string
- ** @param format The formatted string to print
- ** @param ... Extra arguments to output to the string
- ** @return The number of @c bytes written to @c f or negative number for failure
- **
- **/
-i_DECLIMEX_ int rfFPrintf(FILE* f,const char * format, ...);
-
-//!@}
-//end of the Doxygen RF_stdioGRP group
-
-#ifdef __cplusplus
-}///closing bracket for calling from C++
-#endif
-
-#endif//include guards end
+#endif //include guards end

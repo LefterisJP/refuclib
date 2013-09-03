@@ -26,7 +26,7 @@
 ** Defines the error and info logging macros
 **
 **
----------------------For internal library include make sure to have----------------------------
+------For internal library include make sure to have------(mirror: RFerror.h)
 #include <rf_options.h> //for the logging level defines
 #include <stdio.h>//for FILE* used inside printf.h
 #include <Definitions/imex.h> //for import export macro
@@ -36,7 +36,7 @@
 #include <Threads/common.h> //for rfThread_GetID()
 #include <errno.h>  //only if using the stdlibrary functions that report errors with it
 #include <Utils/error.h>
----------------------For internal library include make sure to have----------------------------
+------For internal library include make sure to have------
 */
 #ifndef RF_UTILS_ERROR_H
 #define RF_UTILS_ERROR_H

@@ -24,10 +24,11 @@
 **
 **
 ** --Utils/memory.h
-** This file simply contains some macros that allow for easy tweaking of memory allocation and freeing.
-** In the future may contain specific memory allocation algorithm
+** This file simply contains some macros that allow for easy tweaking of memory 
+** allocation and freeing.In the future may contain specific memory allocation
+** algorithm
 **
----------------------For internal library include make sure to have----------------------------
+------For internal library include make sure to have------(mirror: RFmemory.h)
 #include <stdlib.h> //for malloc, calloc,realloc and exit()
 #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
 #include <stdio.h>//for FILE* used inside printf.h
@@ -37,7 +38,7 @@
 #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
 #include <Utils/error.h> //for RF_ERROR() macros family
 #include <Utils/memory.h> //for refu memory allocation
----------------------For internal library include make sure to have----------------------------
+------For internal library include make sure to have------
 */
 #ifndef RF_MEMORY_H
 #define RF_MEMORY_H
