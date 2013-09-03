@@ -20,16 +20,21 @@
 **
 **      ==END OF REFU LICENSE==
 **
-** Just a convenient header to include all needed headers for endianess
-** related code
+** Just a convenient header to include all needed headers for memory allocation
+** related functions
 */
 
-#ifndef RF_ENDIANESS_MODULE_HEADERS
-#define RF_ENDIANESS_MODULE_HEADERS
+#ifndef RF_MEMORY_MODULE_HEADERS
+#define RF_MEMORY_MODULE_HEADERS
 
-#include <Definitions/types.h>//for fixed size data types
-#include <Definitions/imex.h> //for the import export macro
-#include <Utils/endianess.h>
+#include <stdlib.h> //for malloc, calloc,realloc and exit()
+#include <Definitions/retcodes.h> //for error codes, logged in allocation failure
+#include <stdio.h>//for FILE* used inside printf.h
+#include <Definitions/imex.h> //for import export macro used inside <Utils/error.h>
+#include <Definitions/types.h> //for fixed size data types used inside <Utils/error.h>
+#include <IO/printf.h> //for rfFpintf() used in the error logging macros
+#include <Definitions/defarg.h> //since RF_ERROR macros use argument counting
+#include <Utils/error.h> //for RF_ERROR() macros family
+#include <Utils/memory.h> //for refu memory allocation
 
-
-#endif//include guards end
+#endif //include guards end
