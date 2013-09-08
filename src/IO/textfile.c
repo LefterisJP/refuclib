@@ -33,7 +33,12 @@
 #include <IO/textfile.h>
 /*------------- Module related inclusion -------------*/
 #include "io.ph"//for private I/O macros
+
+//neded by IO/file.h
+#include <Definitions/inline.h> //for inline definitions
+#include <String/conversion.h> // for rfString_Cstr
 #include <IO/file.h> //for all the IO functions
+
 #include "textfile.ph"//for the private textfile functionality
 #include <String/unicode.h> //for rfReadLine family of functions
 /*------------- Outside Module inclusion -------------*/
@@ -44,7 +49,6 @@
 #include <String/manipulation.h>
 #include <String/filesx.h> //for rfStringX file functions
 #include <String/files.h> //for rfStringX file functions
-#include <String/conversion.h> //for rfString_Cstr()
 //for return codes
     #include <Definitions/retcodes.h> //for error codes
 //for error logging

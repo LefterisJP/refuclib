@@ -198,6 +198,17 @@ i_DECLIMEX_ char rfDeleteFile(void* name);
  **/
 i_DECLIMEX_ char rfRenameFile(void* name, void* newName);
 
+/**
+ ** @brief Check that a file exists
+ **
+ ** This functions checks if file @c name exists
+ ** @lmsFunction
+ ** @param name A string with the name and path of the file to check
+ ** @inhtype{String,StringX} @tmpSTR
+ ** @return Returns @c true if the file exists and @c false otherwise
+ **/
+i_DECLIMEX_ char rfFileExists(void* name);
+
 
 /**
  ** @brief Returns a unique address for the calling thread

@@ -47,8 +47,14 @@
 #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
 #include <Utils/memory.h> //for refu memory allocation
 
-#include <Utils/endianess.h> //for Endianess swapping functions
+//for Endianess swapping functions
+#include <Utils/endianess.h>
+
+//Needed for IO/file.h
+#include <Definitions/inline.h> //for inline definitions
+#include <IO/common.h> //for stat_rft
 #include <IO/file.h> //for rfReadLine family  of functions
+
 #include "../IO/io.ph" //for IO_WRITE_CHECK() macro
 //for local scope macros
 #include <Definitions/threadspecific.h> //for the thread specific attribute

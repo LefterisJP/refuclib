@@ -29,11 +29,21 @@
 #include <stdio.h> //for FILE*
 #include <Definitions/types.h> //for fixed size types needed in various places
 #include <Definitions/imex.h> //for the import export macro
+#include <Definitions/inline.h> //for inline definitions
+#include <IO/common.h> //for stat_rft
+#include <String/string_decl.h> //for RF_String
+#include <String/conversion.h> // for rfString_Cstr
 #include <IO/file.h>
 ---------------------For internal library include make sure to have----------------------------
 */
 #ifndef REFU_IO_FILE_H
 #define REFU_IO_FILE_H
+
+#ifdef _MSC_VER
+#error TODO
+#else
+#include <sys/stat.h>
+#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -41,13 +51,39 @@ extern "C"
 #endif
 
 
-///Fseek and Ftelll definitions
+#if _FILE_OFFSET_BITS == 64
+
+//Fseek and Ftell definitions
 #ifdef _MSC_VER
     #define rfFseek(i_FILE_,i_OFFSET_,i_WHENCE_)    _fseeki64(i_FILE_,i_OFFSET_,i_WHENCE_)
     #define rfFtell(i_FILE_)                        _ftelli64(i_FILE_)
 #else
     #define rfFseek(i_FILE_,i_OFFSET_,i_WHENCE_)    fseeko64(i_FILE_,i_OFFSET_,i_WHENCE_)
     #define rfFtell(i_FILE_)                        ftello64(i_FILE_)
+#endif
+
+#ifdef _MSC_VER
+
+#error TODO
+
+#else
+i_INLINE_DECL int rfStat(RF_String* f, stat_rft* buffer)
+{
+    return stat(rfString_Cstr(f), (struct stat*)buffer);
+}
+#endif
+
+#else /* __ FILE_OFFSET_BITS != 64 */
+
+//Fseek and Ftell definitions
+#ifdef _MSC_VER
+    #define rfFseek(i_FILE_,i_OFFSET_,i_WHENCE_)    fseek(i_FILE_,i_OFFSET_,i_WHENCE_)
+    #define rfFtell(i_FILE_)                        ftell(i_FILE_)
+#else
+    #define rfFseek(i_FILE_,i_OFFSET_,i_WHENCE_)    fseeko(i_FILE_,i_OFFSET_,i_WHENCE_)
+    #define rfFtell(i_FILE_)                        ftello(i_FILE_)
+#endif
+
 #endif
 
 /**

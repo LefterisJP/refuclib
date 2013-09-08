@@ -24,15 +24,34 @@
 #ifndef RF_COMMON_FLAGS_H
 #define RF_COMMON_FLAGS_H
 
+#include <sys/types.h>
+
 /**
  ** This is the type that represents the file offset
- **
  **/
+#if _FILE_OFFSET_BITS == 64
+
 #ifdef _MSC_VER
 typedef __int64 foff_rft;
 #else
-#include <sys/types.h>
 typedef off64_t foff_rft;
+#endif
+
+/* for now, don't have a stat_t equivalent in windows */
+typedef struct stat64 stat_rft;
+
+#else /* __ FILE_OFFSET_BITS != 64 */
+
+#ifdef _MSC_VER
+typedef __int32 foff_rft;
+#else
+
+typedef off_t foff_rft;
+#endif
+
+/* for now, don't have a stat_t equivalent in windows */
+typedef struct stat stat_rft;
+
 #endif
 
 /**

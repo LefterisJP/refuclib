@@ -36,7 +36,13 @@
 #include <String/common.h> // for RFS_()
 #include <String/manipulationx.h> //for rfStringX_Append and others
 #include <String/traversalx.h> //for rfStringX_Reset and others
+
+//Needed for IO/file.h
+#include <Definitions/inline.h> //for inline definitions
+#include <IO/common.h> //for stat_rft
+#include <String/conversion.h> //for rfString_Cstr()
 #include <IO/file.h> //for rfReadLine family  of functions
+
 /*------------- Outside Module inclusion -------------*/
 //for error logging macros
     #include <IO/printf.h> //for rfFpintf() used in the error logging macros

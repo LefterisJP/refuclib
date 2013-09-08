@@ -25,6 +25,10 @@
 #include <stdio.h> //for FILE*
 #include <Definitions/types.h> //for fixed size types needed in various places
 #include <Definitions/imex.h> //for the import export macro
+#include <Definitions/inline.h> //for inline definitions
+#include <IO/common.h> //for stat_rft
+#include <String/string_decl.h> //for RF_String
+#include <String/conversion.h> // for rfString_Cstr
 #include <IO/file.h>
 /*------------- Module related inclusion -------------*/
 #include <IO/common.h> //for common I/O flags and definitions
@@ -1094,3 +1098,6 @@ int rfFback_UTF8(FILE* f, uint32_t *c)
     return i;
 }
 
+
+//for creation of external symbol
+i_INLINE_INS int rfStat(RF_String* f, stat_rft* buffer);

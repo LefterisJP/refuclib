@@ -31,6 +31,7 @@
 #include <Definitions/defarg.h> //for the default argument declared string functions that are included below
 #include <String/common.h> //for RFS_()
 #include <String/corex.h> //for rfStringX_Init_buff() and others
+#include <String/conversion.h> // for rfString_Cstr()
 //for error logging
     #include <stdio.h>//for FILE* used inside printf.h
     #include <Threads/common.h> //for rfThread_GetID()
@@ -46,6 +47,11 @@
     #include <string.h> //for memset()
     #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
     #include <Utils/localscope.h>
+//for IO/file function definitions
+    #include <IO/common.h> //stat_rft definition
+    #include <Definitions/inline.h> //for inline definitions
+    #include <IO/common.h> //for stat_rft
+    #include <IO/file.h> //rfStat() definition
 /*------------- System specific inclusion --------------*/
 #include <unistd.h> //for rmdir()
 /*------------- libc inclusion --------------*/
@@ -259,6 +265,13 @@ char rfRenameFile(void* nameP, void* newNameP)
     return ret;
 }
 
+
+char rfFileExists(void* name)
+{
+    stat_rft sb;   
+    RF_String* file_name = name;
+    return (rfStat(file_name, &sb) == 0);
+}
 
 uintptr_t rfSystem_GetThreadID()
 {
