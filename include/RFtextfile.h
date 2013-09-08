@@ -37,6 +37,7 @@
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <Definitions/retcodes.h> //for booleans
 #include <IO/common.h> //for common I/O flags and definitions
+#include <Utils/endianess.h> //for the endianess macros
 #include <IO/textfile.h>
 
 //for File manipulation
