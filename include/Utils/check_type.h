@@ -54,10 +54,10 @@
  */
 #if __GNUC__
 #define check_type(expr, type)			\
-	((typeof(expr) *)0 != (type *)0)
+	((__typeof__(expr) *)0 != (type *)0)
 
 #define check_types_match(expr1, expr2)		\
-	((typeof(expr1) *)0 != (typeof(expr2) *)0)
+	((__typeof__(expr1) *)0 != (__typeof__(expr2) *)0)
 
 #else //not gcc speficic
 

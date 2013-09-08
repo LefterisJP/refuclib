@@ -27,6 +27,7 @@
 ---------------------For internal library include make sure to have----------------------------
 #include <Definitions/types.h> //for fixed size data types
 #include <Definitions/imex.h>  //for import export macro
+#include <Definitions/retcodes.h> //for booleans
 #include <System/rf_system.h>
 ---------------------For internal library include make sure to have----------------------------
 */
@@ -152,7 +153,7 @@ extern "C"
  ** + @c RFP_ISVTX: This is the sticky bit
  ** @return Returns @c true for success and @c false for error
  **/
-i_DECLIMEX_ char rfMakeDir(void* dirname,int mode);
+i_DECLIMEX_ bool rfMakeDir(void* dirname,int mode);
 
 /**
  ** @brief Removes a directory and all its files recursively
@@ -170,7 +171,7 @@ i_DECLIMEX_ char rfMakeDir(void* dirname,int mode);
  ** @inhtype{String,StringX} @tmpSTR
  ** @return Returns @c true for success and @c false otherwise
  **/
-i_DECLIMEX_ char rfRemoveDir(void* dirname);
+i_DECLIMEX_ bool rfRemoveDir(void* dirname);
 
 
 /**
@@ -182,7 +183,7 @@ i_DECLIMEX_ char rfRemoveDir(void* dirname);
  ** @inhtype{String,StringX} @tmpSTR
  ** @return Returns @c true for success and @c false for failure
  **/
-i_DECLIMEX_ char rfDeleteFile(void* name);
+i_DECLIMEX_ bool rfDeleteFile(void* name);
 
 
 /**
@@ -196,7 +197,7 @@ i_DECLIMEX_ char rfDeleteFile(void* name);
  ** @inhtype{String,StringX} @tmpSTR
  ** @return Returns @c true for success and @c false if an error occured
  **/
-i_DECLIMEX_ char rfRenameFile(void* name, void* newName);
+i_DECLIMEX_ bool rfRenameFile(void* name, void* newName);
 
 /**
  ** @brief Check that a file exists
@@ -207,7 +208,7 @@ i_DECLIMEX_ char rfRenameFile(void* name, void* newName);
  ** @inhtype{String,StringX} @tmpSTR
  ** @return Returns @c true if the file exists and @c false otherwise
  **/
-i_DECLIMEX_ char rfFileExists(void* name);
+i_DECLIMEX_ bool rfFileExists(void* name);
 
 
 /**

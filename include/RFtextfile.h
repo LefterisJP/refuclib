@@ -35,6 +35,7 @@
 #include <IO/textfile_decl.h> //for RF_Textfile
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
+#include <Definitions/retcodes.h> //for booleans
 #include <IO/common.h> //for common I/O flags and definitions
 #include <IO/textfile.h>
 

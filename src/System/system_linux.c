@@ -24,6 +24,7 @@
 /*------------- Corrensponding Header inclusion -------------*/
 #include <Definitions/types.h> //for fixed size data types
 #include <Definitions/imex.h>  //for import export macro
+#include <Definitions/retcodes.h> //for boolean
 #include <System/rf_system.h>
 /*------------- Outside Module inclusion -------------*/
 #include <String/string_decl.h> //for RF_String
@@ -39,7 +40,6 @@
     #include <Utils/error.h>
 //for memory allocation
     #include <stdlib.h> //for malloc, calloc,realloc and exit()
-    #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
     #include <Utils/memory.h> //for refu memory allocation
 //for local scope macros
     #include <Definitions/threadspecific.h> //for the thread specific attribute
@@ -65,10 +65,10 @@
 
 
 //Creates a directory
-char rfMakeDir(void* dirnameP,int mode)
+bool rfMakeDir(void* dirnameP,int mode)
 {
     RF_String* dirname = (RF_String*)dirnameP;
-    char ret = true;
+    bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
 
 #if RF_OPTION_DEBUG
@@ -96,10 +96,10 @@ char rfMakeDir(void* dirnameP,int mode)
 }
 
 //Removes a directory and all its files
-char rfRemoveDir(void* dirnameP)
+bool rfRemoveDir(void* dirnameP)
 {
     RF_String* dirname = (RF_String*)dirnameP;
-    char ret = true;
+    bool ret = true;
     DIR* dir;
     struct dirent *entry;
     RF_StringX path;
@@ -107,7 +107,7 @@ char rfRemoveDir(void* dirnameP)
     RF_ENTER_LOCAL_SCOPE();
 
 #if RF_OPTION_DEBUF
-    if(diname == NULL)
+    if(dirname == NULL)
     {
         RF_ERROR(0, "Null string given for the dirname argument");
         ret = false;
@@ -204,10 +204,10 @@ cleanup1:
 }
 
 //Deletes a file
-char rfDeleteFile(void* nameP)
+bool rfDeleteFile(void* nameP)
 {
     RF_String* name = (RF_String*)nameP;
-    char ret = true;
+    bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
 
 #if RF_OPTION_DEBUG
@@ -234,11 +234,11 @@ char rfDeleteFile(void* nameP)
 }
 
 // Renames a file
-char rfRenameFile(void* nameP, void* newNameP)
+bool rfRenameFile(void* nameP, void* newNameP)
 {
     RF_String* name = (RF_String*)nameP;
     RF_String* newName = (RF_String*)newNameP;
-    char ret = true;
+    bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
 
 #if RF_OPTION_DEBUG
@@ -266,7 +266,7 @@ char rfRenameFile(void* nameP, void* newNameP)
 }
 
 
-char rfFileExists(void* name)
+bool rfFileExists(void* name)
 {
     stat_rft sb;   
     RF_String* file_name = name;

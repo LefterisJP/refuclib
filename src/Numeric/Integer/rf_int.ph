@@ -108,11 +108,11 @@ i_INLINE_DECL int uintToStr(uint64_t i,char* buff)
     return j;
 }
 
-static char hexU [] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ,'A', 'B', 'C', 'D', 'E', 'F' };
-static char hexL [] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ,'a', 'b', 'c', 'd', 'e', 'f' };
-
+extern char hexU [];
+extern char hexL [];
 i_INLINE_DECL int uintToUHexStr(uint64_t i,char* buff)
 {
+
     int len=0,k=0;
     do
     {

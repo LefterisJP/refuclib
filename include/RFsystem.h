@@ -29,6 +29,7 @@
 
 #include <Definitions/types.h> //for fixed size data types
 #include <Definitions/imex.h>  //for import export macro
+#include <Definitions/retcodes.h> //for booleans
 #include <System/rf_system.h>
 
 #else

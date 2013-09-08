@@ -29,6 +29,7 @@
 #include <IO/common.h> //for stat_rft
 #include <String/string_decl.h> //for RF_String
 #include <String/conversion.h> // for rfString_Cstr
+#include <Definitions/retcodes.h> //for error codes, logged in allocation failure
 #include <IO/file.h>
 /*------------- Module related inclusion -------------*/
 #include <IO/common.h> //for common I/O flags and definitions
@@ -47,7 +48,6 @@
     #include <Utils/endianess.h>
     #include <String/unicode.h> //for rfUTF8_IsContinuationbyte
 //for constant compare macros
-    #include <Definitions/retcodes.h> //for true,false and other return codes
     #include <Utils/constcmp.h> //for RF_HEXLE_US() macro and others
 /*------------- libc inclusion --------------*/
 #include <string.h>//for memcpy e.t.c.
@@ -55,7 +55,7 @@
 
 // Reads a UTF-8 file descriptor until end of line or EOF is found and
 // returns a UTF-8 byte buffer
-char rfFReadLine_UTF8(FILE* f, char eol, char** utf8,
+bool rfFReadLine_UTF8(FILE* f, char eol, char** utf8,
                       uint32_t* byteLength,
                       uint32_t* bufferSize, char* eof)
 {
@@ -116,7 +116,7 @@ char rfFReadLine_UTF8(FILE* f, char eol, char** utf8,
     return true;
 }
 //Reads a Little Endian UTF-16 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
-char rfFReadLine_UTF16(FILE* f, char eol, char** utf8,
+bool rfFReadLine_UTF16(FILE* f, char eol, char** utf8,
                          uint32_t* byteLength, char* eof,
                          uint32_t* bytes_read, int endianess)
 {
@@ -210,7 +210,7 @@ char rfFReadLine_UTF16(FILE* f, char eol, char** utf8,
 
 
 //Reads a UTF-32 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
-char rfFReadLine_UTF32(FILE* f, char eol, char** utf8,
+bool rfFReadLine_UTF32(FILE* f, char eol, char** utf8,
                        uint32_t* byteLength, char* eof,
                        uint32_t* bytes_read, int endianess)
 {
@@ -294,12 +294,12 @@ char rfFReadLine_UTF32(FILE* f, char eol, char** utf8,
 
 
 //This is a function that's similar to c library fgets but it also returns the number of bytes read and works for UTF-32 encoded files
-char rfFgets_UTF32(char* buff, uint32_t num, FILE* f,
+bool rfFgets_UTF32(char* buff, uint32_t num, FILE* f,
                    char* eofReached, char eol, uint32_t* bytes_read,
                    int endianess)
 {
     uint32_t c;
-    char eolReached;
+    bool eolReached;
     //initialization
     *eofReached = eolReached = false;
     *bytes_read = 0;
@@ -388,7 +388,7 @@ char rfFgets_UTF32(char* buff, uint32_t num, FILE* f,
 }
 
 //Gets a number of bytes from a UTF-16 file descriptor
-char rfFgets_UTF16(char* buff, uint32_t num, FILE* f,
+bool rfFgets_UTF16(char* buff, uint32_t num, FILE* f,
                    char* eofReached, char eol, uint32_t* bytes_read,
                    int endianess)
 {
@@ -485,12 +485,12 @@ char rfFgets_UTF16(char* buff, uint32_t num, FILE* f,
 }
 
 //Gets a number of bytes from a UTF-8 file descriptor
-char  rfFgets_UTF8(char* buff, uint32_t num, FILE* f,
+bool rfFgets_UTF8(char* buff, uint32_t num, FILE* f,
                    char* eofReached, char eol, uint32_t* bytes_read)
 {
     uint32_t c;
     int32_t bytesN;
-    char eolReached;
+    bool eolReached;
     //initialization
     *eofReached = eolReached = false;
     *bytes_read = 0;

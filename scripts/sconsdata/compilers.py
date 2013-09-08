@@ -31,7 +31,11 @@ compilers = {}
 #GCC
 compilers['gcc'] = Compiler(
     name='gcc',
-    coptions={'all': ['-static-libgcc'], 'Windows': [], 'Linux': []},
+    coptions={'all': ['-static-libgcc',
+                      '-std=gnu99' #gnu99 for c99 + gcc extensions (e.g: typeof)
+                      ], 
+              'Windows': [],
+              'Linux': []},
     cflags={'all': {}, 'Windows': {}, 'Linux': {'_GNU_SOURCE': None}},
     lflags={'all': [], 'Windows': [], 'Linux': []},
     libs={'all': [], 'Windows': [], 'Linux': ['rt', 'pthread']},

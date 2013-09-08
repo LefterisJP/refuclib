@@ -30,6 +30,7 @@
 #include <Definitions/types.h> //for fixed size types needed in various places
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/inline.h> //for inline definitions
+#include <Definitions/retcodes.h> //for booleans
 #include <IO/common.h> //for stat_rft
 #include <String/string_decl.h> //for RF_String
 #include <String/conversion.h> // for rfString_Cstr
@@ -134,7 +135,7 @@ i_INLINE_DECL int rfStat(RF_String* f, stat_rft* buffer)
  ** Even if there is an error the number of bytes read given by @c byteLength
  ** can be trusted.
  **/
-i_DECLIMEX_ char rfFReadLine_UTF8(FILE* f, char eol, char** utf8,
+i_DECLIMEX_ bool rfFReadLine_UTF8(FILE* f, char eol, char** utf8,
                                   uint32_t* byteLength,
                                   uint32_t* bufferSize, char* eof);
 
@@ -152,7 +153,7 @@ i_DECLIMEX_ char rfFReadLine_UTF8(FILE* f, char eol, char** utf8,
  ** @param bytes_read: The number of bytes succesfully read from the file
  ** descriptor
  **/
-i_DECLIMEX_ char rfFReadLine_UTF16(FILE* f, char eol, char** utf8,
+i_DECLIMEX_ bool rfFReadLine_UTF16(FILE* f, char eol, char** utf8,
                                    uint32_t* byteLength, char* eof,
                                    uint32_t* bytes_read, int endianess);
 
@@ -169,7 +170,7 @@ i_DECLIMEX_ char rfFReadLine_UTF16(FILE* f, char eol, char** utf8,
  ** @param bytes_read: The number of bytes succesfully read from the file
  ** descriptor
  **/
-i_DECLIMEX_ char rfFReadLine_UTF32(FILE* f, char eol, char** utf8,
+i_DECLIMEX_ bool rfFReadLine_UTF32(FILE* f, char eol, char** utf8,
                                    uint32_t* byteLength, char* eof,
                                    uint32_t* bytes_read, int endianess);
 
@@ -184,7 +185,7 @@ i_DECLIMEX_ char rfFReadLine_UTF32(FILE* f, char eol, char** utf8,
  ** + @c RF_LITTLE_ENDIAN: If the file stream you want to read is encoded in
  **  little endian
  **/
-i_DECLIMEX_ char rfFgets_UTF32(char* buff, uint32_t num, FILE* f,
+i_DECLIMEX_ bool rfFgets_UTF32(char* buff, uint32_t num, FILE* f,
                                char* eof, char eol, uint32_t* bytes_read,
                                int endianess);
 
@@ -199,7 +200,7 @@ i_DECLIMEX_ char rfFgets_UTF32(char* buff, uint32_t num, FILE* f,
  ** + @c RF_LITTLE_ENDIAN: If the file stream you want to read is encoded in
  **  little endian
  **/
-i_DECLIMEX_ char rfFgets_UTF16(char* buff, uint32_t num, FILE* f,
+i_DECLIMEX_ bool rfFgets_UTF16(char* buff, uint32_t num, FILE* f,
                                  char* eof, char eol, uint32_t* bytes_read,
                                  int endianess);
 
@@ -258,7 +259,7 @@ i_DECLIMEX_ char rfFgets_UTF16(char* buff, uint32_t num, FILE* f,
  ** @return Returns @c true for success and @c false for an error occuring.
  ** Even if there is an error the number of bytes read can be trusted
  **/
-i_DECLIMEX_ char rfFgets_UTF8(char* buff, uint32_t num, FILE* f,
+i_DECLIMEX_ bool rfFgets_UTF8(char* buff, uint32_t num, FILE* f,
                               char* eof, char eol, uint32_t* bytes_read);
 
 /**

@@ -37,6 +37,7 @@
 //neded by IO/file.h
 #include <Definitions/inline.h> //for inline definitions
 #include <String/conversion.h> // for rfString_Cstr
+#include <Definitions/retcodes.h> //for error codes, logged in allocation failure
 #include <IO/file.h> //for all the IO functions
 
 #include "textfile.ph"//for the private textfile functionality
@@ -49,8 +50,7 @@
 #include <String/manipulation.h>
 #include <String/filesx.h> //for rfStringX file functions
 #include <String/files.h> //for rfStringX file functions
-//for return codes
-    #include <Definitions/retcodes.h> //for error codes
+
 //for error logging
     #include <Threads/common.h> //for rfThread_GetID()
     #include <IO/printf.h> //for rfFpintf() used in the error logging macros

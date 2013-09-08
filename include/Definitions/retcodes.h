@@ -33,13 +33,21 @@
 #define RF_SUCCESS                      0
 #define RF_FAILURE                      -1
 
-//define true and false if we are calling from C
+/* defining true/false/bool */
 #ifndef __cplusplus
+
+/* for C99 code assume we have stdbool.h */
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+    #include <stdbool.h> 
+#else
     #define true 1
     #define TRUE 1
     #define FALSE 0
     #define false 0
+    typedef int bool;
 #endif
+
+#endif//end of not c++
 
 // This macro defines the highest error value used by the refu library.
 // As a user it is is safe to define errors with values more negative

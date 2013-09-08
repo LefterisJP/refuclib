@@ -41,6 +41,7 @@
 #include <Definitions/inline.h> //for inline definitions
 #include <IO/common.h> //for stat_rft
 #include <String/conversion.h> //for rfString_Cstr()
+#include <Definitions/retcodes.h> //for error codes, logged in allocation failure
 #include <IO/file.h> //for rfReadLine family  of functions
 
 /*------------- Outside Module inclusion -------------*/
@@ -52,7 +53,6 @@
     #include <Utils/error.h>
 //for memory allocation macros
 #include <stdlib.h> //for malloc, calloc,realloc and exit()
-#include <Definitions/retcodes.h> //for error codes, logged in allocation failure
 #include <Utils/memory.h> //for refu memory allocation
 //for the endianess macros
 #include <Utils/endianess.h> //for the endianess macros
