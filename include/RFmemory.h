@@ -34,6 +34,7 @@
 #include <Definitions/types.h> //for fixed size data types used inside <Utils/error.h>
 #include <IO/printf.h> //for rfFpintf() used in the error logging macros
 #include <Definitions/defarg.h> //since RF_ERROR macros use argument counting
+#include <Threads/common.h> //for rfThread_GetID() used by RF_ERROR()
 #include <Utils/error.h> //for RF_ERROR() macros family
 #include <Utils/memory.h> //for refu memory allocation
 

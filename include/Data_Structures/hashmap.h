@@ -39,10 +39,11 @@
 /* @omit start */
 
 /*
- * This file is a TEMPLATE. It does not actually get compiled at all
- * anywhere inside the library. Depending on the options you provide
+ * This file is a generic TEMPLATE. Depending on the options you provide
  * in scons though various specializations of this file will get
- * generated during building the library
+ * generated during building the library. If you want to use the actual file
+ * as it is in its generic mode then you have to provide the "generic" 
+ * argument inside the data structure's specialization argument during build
  */
 
 /* @omit end */
@@ -60,16 +61,40 @@ extern "C"
  ** Initializes a hashmap data structure
  ** @param m The hashmap to initialize
  ** @param s The initial size of the map in "buckets"
+ ** @param object_size The size of the generic object stored in the 
+ ** hashmap. Only used in the generic case of the specialization
+ ** @param ptr2Copy A pointer to a copy function for the generic object.
+ ** Only used in the generic case of the specialization
+ ** @param ptr2Destroy A pointer to a destroy function for the generic object.
+ ** Only used in the generic case of the specialization
  ** @return @c true for success and @c false otherwise
  */
-i_DECLIMEX_ char rfHashmap_Init(RF_Hashmap* m, uint32_t s);
+i_DECLIMEX_ char rfHashmap_Init(RF_Hashmap* m, uint32_t s
+/* @omit start */
+                                ,uint32_t object_size
+                                ,char (*ptr2Copy)(void*, void*)
+                                ,void (*ptr2Destroy)(void*)
+/* @omit end */
+);
 
 /**
  ** Allocates and returns a hashmap data structure
  ** @param s The initial size of the map in "buckets"
+ ** @param object_size The size of the generic object stored in the 
+ ** hashmap. Only used in the generic case of the specialization
+ ** @param ptr2Copy A pointer to a copy function for the generic object.
+ ** Only used in the generic case of the specialization
+ ** @param ptr2Destroy A pointer to a destroy function for the generic object.
+ ** Only used in the generic case of the specialization
  ** @return The allocated @ref RF_Hashmap or @c NULL if there is an error
  */
-i_DECLIMEX_ RF_Hashmap* rfHashmap_Create(uint32_t s);
+i_DECLIMEX_ RF_Hashmap* rfHashmap_Create(uint32_t s
+/* @omit start */
+                                ,uint32_t object_size
+                                ,char (*ptr2Copy)(void*, void*)
+                                ,void (*ptr2Destroy)(void*)
+/* @omit end */
+);
 
 /**
  ** Deinitializes a hashmap

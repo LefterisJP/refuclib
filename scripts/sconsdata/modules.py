@@ -60,6 +60,11 @@ class Module:
                 parent_dir = os.path.dirname(fullname)
                 #for every type of data given for the module
                 for d_type in arg_env[self.has_template]:
+                    #if the generic type is requested
+                    if d_type == "generic":
+                        sources.extend(self.sources)
+                        continue
+
                     #generate the requested extra sources for each
                     codegen.code_gen(name, parent_dir, refu_dir,
                              d_type, self.gen_name_sub)
@@ -102,10 +107,11 @@ def create_includes(name, parent_dir, root, types_list):
         os.path.join(root, "include", parent_dir, name + "_extra.h"),
         "w")
     for type_symbol in types_list:
-        f.write("#include <{}/{}_decl.h>\n".format(parent_dir,
-                                                   name + "_" + type_symbol))
-        f.write("#include <{}/{}.h>\n".format(parent_dir,
-                                              name + "_" + type_symbol))
+        if type_symbol != "generic":
+            f.write("#include <{}/{}_decl.h>\n".format(parent_dir,
+                                                       name + "_" + type_symbol))
+            f.write("#include <{}/{}.h>\n".format(parent_dir,
+                                                  name + "_" + type_symbol))
     f.close()
 
 def setup_modules(arg_env, env, targetSystem, refu_dir, code_gen):

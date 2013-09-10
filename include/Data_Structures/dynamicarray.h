@@ -37,10 +37,11 @@
 /* @omit start */
 
 /*
- * This file is a TEMPLATE. It does not actually get compiled at all
- * anywhere inside the library. Depending on the options you provide
+ * This file is a generic TEMPLATE. Depending on the options you provide
  * in scons though various specializations of this file will get
- * generated during building the library
+ * generated during building the library. If you want to use the actual file
+ * as it is in its generic mode then you have to provide the "generic" 
+ * argument inside the data structure's specialization argument during build
  */
 
 /* @omit end */

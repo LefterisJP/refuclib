@@ -188,7 +188,8 @@ class CodeGen():
                           "UI32": "uint32_t",
                           "I164": "int64_t",
                           "UI64": "uint64_t",
-                          "String": "RF_String"
+                          "String": "RF_String",
+                          "generic": "generic",
             }
 
             self.obj_dict = {

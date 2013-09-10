@@ -63,12 +63,12 @@ typedef struct RF_Hashmap
     uint32_t size;
     uint32_t occupied;
     /* @omit start */
+    //! The size of the generic object used for values
+    uint32_t object_size;    
     //! The destruction (deinit) function for the values of the map
     void (*ptr2Destroy)(void*);
     //! The copy function for the values of the map
     char (*ptr2Copy)(void*, void*);
-    //! The equality function for the value of the map
-    char (*ptr2Equal)(void*, void*);
     /* @omit end */
 }RF_Hashmap;
 

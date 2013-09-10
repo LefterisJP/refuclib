@@ -41,10 +41,58 @@ char* m3_values[] = {
     "Bucharest"
 };
 
+/* a generic object, to try the generic hashmap */
+typedef struct an_object
+{
+    int num;
+    float f;
+    RF_String s;
+}an_object;
+
+static char an_object_copy(an_object* a, an_object* b)
+{
+    a->num = b->num;
+    a->f = b->f;
+    return rfString_Copy_IN(&a->s, &b->s);
+}
+
+static void an_object_destroy(an_object* a)
+{
+    rfString_Deinit(&a->s);
+}
+
+
+
+static void test_generic_map(RF_Hashmap* m)
+{
+    int i;
+    an_object obj;
+
+    //populate the hashmap
+    for(i = 0; i < 20; i ++)
+    {
+        obj.num = i;
+        obj.f = (float) i;
+        rfString_Init(&obj.s, "%d", i);
+        EXPECT(true, rfHashmap_Insert(m, RFS_("%d",i), &obj));
+    }
+
+    //test it
+    for(i = 0; i < 20; i++)
+    {
+        EXPECT(rfHashmap_Get(m, RFS_("%d",i), &obj), true);
+        EXPECT(obj.num == i, true);
+        EXPECT(obj.f == (float)i, true);
+        EXPECT(rfString_Equal(&obj.s, RFS_("%d", i)), true );
+    }
+
+}
+
 int main()
 {
     RF_Hashmap_I m1, m2;
     RF_Hashmap_String* m3;
+    RF_Hashmap m;
     int i, v;
     RF_String str;
     EXPECT(rfInit(), true);
@@ -104,6 +152,13 @@ int main()
         EXPECT(true, rfString_Equal(&str, RFS_("%s", m3_values[i])));
     }
     rfHashmap_String_Destroy(m3);
+
+
+    EXPECT(rfHashmap_Init(&m, 20, sizeof(an_object),
+                          (char(*)(void*, void*))an_object_copy,
+                          (void(*)(void*))an_object_destroy), true);
+    test_generic_map(&m);
+    rfHashmap_Deinit(&m);
 
     return 0;
 }
