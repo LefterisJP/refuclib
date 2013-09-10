@@ -6,6 +6,98 @@ import time
 import platform
 import sys
 
+
+tests_dict = { 
+    "dynamicarray": {
+        "sources": [os.path.join("Data_Structures", "dynamicarray.c")],
+        "root": "Data_Structures"
+    },
+    "hashmap": {
+        "sources": [os.path.join("Data_Structures", "hashmap.c")],
+        "root": "Data_Structures"
+    },
+    "intrusive_list": {
+        "sources": [os.path.join("Data_Structures", "intrusive_list.c")],
+        "root": "Data_Structures"
+    },
+    "list": {
+        "sources": [os.path.join("Data_Structures", "list.c")],
+        "root": "Data_Structures"
+    },
+
+    "string_accessor": {
+        "sources": [os.path.join("String", "string_accessor.c")],
+        "root": "String"
+    },
+    "string_additions": {
+        "sources": [os.path.join("String", "string_additions.c")],
+        "root": "String"
+    },
+    "string_conversion": {
+        "sources": [os.path.join("String", "string_conversion.c")],
+        "root": "String"
+    },
+    "string_copying": {
+        "sources": [os.path.join("String", "string_copying.c")],
+        "root": "String"
+    },
+    "string_filedescriptors": {
+        "sources": [os.path.join("String", "string_filedescriptors.c")],
+        "root": "String"
+    },
+    "string_format": {
+        "sources": [os.path.join("String", "string_format.c")],
+        "root": "String"
+    },
+    "string_init": {
+        "sources": [os.path.join("String", "string_init.c")],
+        "root": "String"
+    },
+    "string_iteration": {
+        "sources": [os.path.join("String", "string_iteration.c")],
+        "root": "String"
+    },
+    "string_positionalretrieval": {
+        "sources": [os.path.join("String", "string_positionalretrieval.c")],
+        "root": "String"
+    },
+    "string_removals": {
+        "sources": [os.path.join("String", "string_removals.c")],
+        "root": "String"
+    },
+    "string_replace": {
+        "sources": [os.path.join("String", "string_replace.c")],
+        "root": "String"
+    },
+    "string_retrieval": {
+        "sources": [os.path.join("String", "string_retrieval.c")],
+        "root": "String"
+    },
+    "string_traversal": {
+        "sources": [os.path.join("String", "string_traversal.c")],
+        "root": "String"
+    },
+
+    "system_files": {
+        "sources": [os.path.join("System", "system_files.c")],
+        "root": "System"
+    },
+
+    "textfile_lineend": {
+        "sources": [os.path.join("TextFile", "textfile_lineend.c")],
+        "root": "TextFile"
+    },
+    "textfile_read": {
+        "sources": [os.path.join("TextFile", "textfile_read.c")],
+        "root": "TextFile"
+    },
+    "textfile_write": {
+        "sources": [os.path.join("TextFile", "textfile_write.c")],
+        "root": "TextFile"
+    }
+}
+
+
 from testscompile import compileTest
 from output import (print_nonl, report, TestError, TestsFail, TestCompileError)
 from log import check_library_log
@@ -27,7 +119,7 @@ def configureLinking(dynamic, root, outName):
             shutil.copy(os.path.join(".",outName),os.path.join(root,outName))
 
 
-def test(root, fileName, logFile, testExec, verbose, fail_fast):
+def test(root, test_name, logFile, testExec, verbose, fail_fast):
     """
         Tests a compiled test executable and compared it to the expected
         output
@@ -35,20 +127,18 @@ def test(root, fileName, logFile, testExec, verbose, fail_fast):
 
         --root: The root directory of the test compared to the Tests
                 directory
-        --fileName: The filename of the test
+        --fileName: The name of the test in the test_dict 
+        (hence also the .expect)
         --logFile: The name of the logfile
         --testExec: The name of the test executable
         --verbose: A boolean flag denoting if the tests should be verbose
                   or not
         --fail_fast: A boolean flag denoting if the tests should fail fast
     """
-    #Remove Tests/ part of the directory from the filename
-    tempName = os.path.split(fileName)
-    fileName = os.path.join(os.path.split(tempName[0])[1] , tempName[1])
-    print_nonl("\t--> Testing \"{}\"...".format(fileName))
-    logFile.write("\t--> Testing \"{}\"...".format(fileName))
+    print_nonl("\t--> Testing \"{}\"...".format(test_name))
+    logFile.write("\t--> Testing \"{}\"...".format(test_name))
     #open the expected outputfile
-    f = open(fileName+'.expect', 'r')
+    f = open(os.path.join(root, "{}.expect".format(test_name)), 'r')
     #call the test
     p = subprocess.Popen(os.path.join('.',testExec),
                          cwd=root,stdout=subprocess.PIPE)
@@ -69,7 +159,7 @@ def test(root, fileName, logFile, testExec, verbose, fail_fast):
             if "*ERROR*:" in line:
                 report(logFile, "FAILED!\n\t {}".format(line))
                 if fail_fast:
-                    raise TestError(fileName, expected_stdout_lineN)
+                    raise TestError(test_name, expected_stdout_lineN)
             # else it's an expected std output error
             else:
                 report(logFile, "\n\t\tTest failed at expected "
@@ -78,7 +168,7 @@ def test(root, fileName, logFile, testExec, verbose, fail_fast):
                 report(logFile, "\n\t\tExpected:\n\t\t\t{}\n\t\t"
                             "Found:\n\t\t\t{}\n".format(
                                 str(expected_stdout), str(line)))
-                raise TestError(fileName, expected_stdout_lineN)
+                raise TestError(test_name, expected_stdout_lineN)
             expected_stdout_lineN += 1
     #wait till the test subprocess ends
     ret = p.poll()
@@ -96,24 +186,20 @@ def test(root, fileName, logFile, testExec, verbose, fail_fast):
             report(logFile,
                    "\t\tLast line we are sure succesfully executed "
                    "is [{}]\n".format(str(line)))
-        raise TestError(fileName, line)
+        raise TestError(test_name, line)
 
     return True
 
-def debugTest(root, fileName, logFile, testExec):
+def debugTest(root, test_name, logFile, testExec):
     """
         Debugs a compiled test executable by just spitting out its output
         --root: The root directory of the test compared to the Tests directory
-        --fileName: The filename of the test
+        --test_name: The name of the test
         --logFile: The name of the logfile
         --testExec: The name of the test executable
     """
-    #Remove Tests/ part of the directory from the filename
-    tempName = os.path.split(fileName)
-    fileName = os.path.join(os.path.split(tempName[0])[1] , tempName[1])
-
     report(logFile, 
-           "\t**Testing \"{}\" in Debug Mode**\n".format(fileName))
+           "\t**Testing \"{}\" in Debug Mode**\n".format(test_name))
     p = subprocess.Popen(os.path.join('.', testExec), cwd=root, 
                              stdout=subprocess.PIPE)
     for line in p.stdout:#for every line of the output
@@ -169,100 +255,94 @@ def runTests(compiler, dynamic, outName, logFile, verbose,
         for f in files:
             if(f.endswith(('.o','.obj'))):
                 os.remove(os.path.join(root, f))
+
     # Recursively iterate all the files in the Tests directory
-    for root, dirs, files in os.walk("."):
-        for f in files:
-            fullname = os.path.join(root, f)
-            fullname = fullname.replace('.', 'Tests', 1)
-            # if it's a test get it's equivalent .c file
-            if(fullname.endswith(".expect")):
-                part = fullname.partition(".expect")[0]
-                # check to see if the user provided specific tests, and if
-                # he did check to see if this is one of them
-                if(tests):
-                    if(os.path.split(part)[1] not in tests):
-                        continue
-                # compile it
+    for key, value in tests_dict.iteritems():
+        # check to see if the user provided specific tests, and if
+        # he did check to see if this is one of them
+        if(tests and key not in tests):
+                continue
+        # compile it
+        try:
+            compileTest(key, value["sources"], dynamic, compiler, verbose,
+                            logFile)
+        except TestCompileError as e:
+            print(e)
+            if fail_fast:
+
+                raise TestsFail(
+                    "Test \"{}\" failed and --fail"
+                    "-fast was requested".format(part))
+
+            print("Continuing with the compilation of the other tests")
+            continue#if it fails go to the next test
+
+        # after each compile add a small delay since the
+        # subsequent copy may fail
+        time.sleep(delay)
+        # move the executable to the specific test directory its
+        #source was and if there was one there already delete it
+        try:
+            os.remove(os.path.join(value["root"], testExec))
+        except:
+            pass
+        os.rename(os.path.join(".", testExec),
+                  os.path.join(value["root"], testExec))
+        #deal with the library linking for each test
+        configureLinking(dynamic, value["root"], outName)
+
+        #test it
+        try:
+            if(debug):
+                debugTest(value["root"], key, logFile, testExec)
+            else:
+                test(value["root"], key, logFile, testExec,
+                     verbose, fail_fast)
+
+            # check the log for errors
+            check_library_log(logFile, value["root"], key)
+        except TestError as err:
+            #if there was a test error print it
+            print(err)
+            if fail_fast:
+                raise TestsFail(
+                    "Test \"{}\" failed and --fail"
+                    "-fast was requested".format(key))
+        except CalledProcessError as err:
+            print("\tThere was an error while trying to run the "
+                  "compiled "
+                  "executable for test \"{}\"".format(key))
+            print("\tThe output was:")
+            print(err.output)
+            logFile.write("\tTest \"{}\" failed due to "
+                          "inability to run the "
+                          "executable\n".format(key))
+            if fail_fast:
+                raise TestsFail(
+                    "Test \"{}\" failed and --fail"
+                    "-hard was requested".format(key))
+        finally:
+            # cleaning up
+            if dynamic:
+                # also if we are testing the dynamic lib,
+                # delete its local copy
                 try:
-                    compileTest(part+".c", dynamic, compiler, verbose,
-                                logFile)
-                except TestCompileError as e:
-                    print(e)
-                    if fail_fast:
-
-                        raise TestsFail(
-                            "Test \"{}\" failed and --fail"
-                            "-fast was requested".format(part))
-
-                    print("Continuing with the compilation of the other tests")
-                    continue#if it fails go to the next test
-
-                # after each compile add a small delay since the
-                # subsequent copy may fail
-                time.sleep(delay)
-                # move the executable to the specific test directory its
-                #source was and if there was one there already delete it
-                try:
-                    os.remove(os.path.join(root, testExec))
+                    os.remove(os.path.join(value["root"], outName))
                 except:
                     pass
-                os.rename(os.path.join(".", testExec),
-                          os.path.join(root, testExec))
-                #deal with the library linking for each test
-                configureLinking(dynamic, root, outName)
-
-                #test it
+            #after finishing a test delete the executable
+            if ( not keep_exec and fail_fast or 
+                (not keep_exec and len(tests) != 1)):
                 try:
-                    if(debug):
-                        debugTest(root, part, logFile, testExec)
-                    else:
-                        test(root, part, logFile, testExec,
-                             verbose, fail_fast)
-
-                    # check the log for errors
-                    check_library_log(logFile, root, part)
-                except TestError as err:
-                    #if there was a test error print it
-                    print(err)
-                    if fail_fast:
-                        raise TestsFail(
-                            "Test \"{}\" failed and --fail"
-                            "-fast was requested".format(part))
-                except CalledProcessError as err:
-                    print("\tThere was an error while trying to run the "
-                          "compiled "
-                          "executable for test \"{}\"".format(part))
-                    print("\tThe output was:")
-                    print(err.output)
-                    logFile.write("\tTest \"{}\" failed due to "
-                                  "inability to run the "
-                                  "executable\n".format(part))
-                    if fail_fast:
-                        raise TestsFail(
-                            "Test \"{}\" failed and --fail"
-                            "-hard was requested".format(part))
-                finally:
-                    # cleaning up
-                    if dynamic:
-                        # also if we are testing the dynamic lib,
-                        # delete its local copy
-                        try:
-                            os.remove(os.path.join(root, outName))
-                        except:
-                            pass
-                    #after finishing a test delete the executable
-                    if ( not keep_exec and fail_fast or 
-                        (not keep_exec and len(tests) != 1)):
-                        try:
-                            os.remove(os.path.join(root, testExec))
-                        except:
-                            pass
-                    else:
-                        print("\t**Keeping the executable of the test "
-                              "as requested")
-                    # adding some delay between tests until I figure out
-                    # a better way to do this
-                    time.sleep(delay)
+                    os.remove(os.path.join(value["root"], testExec))
+                except:
+                    pass
+            else:
+                print("\t**Keeping the executable of the test "
+                      "as requested")
+            # adding some delay between tests until I figure out
+            # a better way to do this
+            time.sleep(delay)
     #after all tests have concluded clean up
     print_nonl("\n");
     logFile.write("\n");

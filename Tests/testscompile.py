@@ -7,11 +7,12 @@ import shlex
 
 from output import TestCompileError, report
 
-def compileTest(filename,dynamic,compiler,verbose,logFile):
+def compileTest(test_name, test_sources, dynamic, compiler, verbose, logFile):
     """Compiles a single test file from the tests depending on the compiler and library linking type
 
-        --filename: The name of the file to compile without the 
-        .c extension (to also match it with .expect)
+        --test_name: The name of the test. This also matches the .expect file 
+        if existing
+        --test_sources: A list of test sources to compile
         --dynamic: A boolean value denoting if the linking should be done
         with a dynamic/shared library or not (static)
         --compiler: The name of the compiler with which to do the compiling
@@ -24,12 +25,16 @@ def compileTest(filename,dynamic,compiler,verbose,logFile):
     else:
         target="test_static"
 
+    sources_string = "__TEST_SOURCES="
+    for s in test_sources:
+        sources_string = sources_string+s+","
+    sources_string = sources_string[:-1]
+
     if(platform.system() == 'Windows'):
-        sconsCall = ["scons.py", target,'-Q','COMPILER='+compiler,
-                     '__TEST_SOURCE='+filename]
+        sconsCall = ["scons.py", target,'-Q','COMPILER='+compiler, sources_string]
     else:
-        sconsCall = "{} scons.py {} -Q COMPILER={} __TEST_SOURCE={}".format(
-            sys.executable, target, compiler, filename)
+        sconsCall = "{} scons.py {} -Q COMPILER={} {}".format(
+            sys.executable, target, compiler, sources_string)
 
     try:
         p = subprocess.Popen(sconsCall, cwd="..", shell=True, stdout=subprocess.PIPE)
@@ -41,23 +46,23 @@ def compileTest(filename,dynamic,compiler,verbose,logFile):
         while(ret == None):
             ret = p.poll()
         if ret != 0:
-            report(logFile, "\t\tDuring compiling {0} the {1} compiler returned "
+            report(logFile, "\t\tDuring compiling test {0} the {1} compiler returned "
                    "unsucessfully with return code {2}".format(
-                       filename, compiler, ret))
+                       test_name, compiler, ret))
             msg = ""
             if p.stdout is not None:
                 for line in p.stdout:
                     line = line.decode("utf8")
                     msg = msg + line
                     report(logFile, "\t\t"+line)
-            raise TestCompileError(filename, msg)
+            raise TestCompileError(test_name, msg)
                 
     except CalledProcessError as err:
         report(logFile, "\t\tThere was an error while invoking the compiler for"
-              " test \"{0}\"".format(filename))
+              " test \"{0}\"".format(test_name))
         report(logfile, "\t\tThe compiler returned [{0}] and the output "
               "was:".format(err.returncode))
-        raise TestCompileError(filename, err.output)
+        raise TestCompileError(test_name, err.output)
     #success
     if(verbose):
-        print("\t-> Succesfully compiled Test \"{0}\"".format(filename));
+        print("\t-> Succesfully compiled Test \"{0}\"".format(test_name));

@@ -60,7 +60,7 @@ class Module:
                 parent_dir = os.path.dirname(fullname)
                 #for every type of data given for the module
                 for d_type in arg_env[self.has_template]:
-                    #if the generic type is requested
+                    #if the generic type is requested, simply take the template
                     if d_type == "generic":
                         sources.extend(self.sources)
                         continue
@@ -68,11 +68,15 @@ class Module:
                     #generate the requested extra sources for each
                     codegen.code_gen(name, parent_dir, refu_dir,
                              d_type, self.gen_name_sub)
-                    #and of course add it to the sources to compile
-                    sources.append(
-                        os.path.join(parent_dir,
-                                     name + "_" + d_type + ".c")
-                    )
+
+                    # add it to the sources to compile if it's a library type
+                    # if not it's the user's responsibility to copy the generated
+                    # .c file into his project
+                    if d_type in codegen.library_types:
+                        sources.append(
+                            os.path.join(parent_dir,
+                                         name + "_" + d_type + ".c")
+                        )
 
                 #TODO: add lines to rftokens.h
                 #create the extra include file

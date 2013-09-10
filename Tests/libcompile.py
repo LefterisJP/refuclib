@@ -59,7 +59,7 @@ def compileLib(verbose, dynamic, compiler):
     # each module tested this will need to change. And as for the extra
     # objects, omg look at all these escape characters >.<
     extra_source_opts = (
-        " EXTRA_OBJECTS=[[\\\"test_object\\\",\\\"test_obj\\\",\\\"Tests/ExtraObjects/test.c\\\",\\\"Tests/ExtraObjects/test.h\\\",[\\\"test_destroy\\\",\\\"test_copy\\\",\\\"test_equal\\\",[]]]]"
+        " EXTRA_OBJECTS=[[\\\"test_object\\\",\\\"test_obj\\\",\\\"Tests/ExtraObjects/test.h\\\",[\\\"test_destroy\\\",\\\"test_copy\\\",\\\"test_equal\\\",[]]]]"
         " LIST=I,String,test_object DYNAMIC_ARRAY=I,String "
         "HASHMAP=I,String,generic "
     )

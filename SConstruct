@@ -26,9 +26,10 @@ legalBuildTargets = [
     'scripts/sconsdata/args_before_config.py')
 #create the code_gen object and add all the extra objects
 code_gen = CodeGen(refu_dir)
-extra_sources = []
+# generate the extra sources for any extra objects
+# they should later be copied into the project that wants to use them
 for o in extra_objects:
-    extra_sources.append(code_gen.add_object(o, refu_dir))
+    code_gen.add_object(o, refu_dir)
 
 
 # Create an intermediate environment to read the build variables
@@ -59,8 +60,6 @@ env.Append(LINKFLAGS=temp['LINKER_SHARED_FLAGS'])
 if 'shared' in COMMAND_LINE_TARGETS or 'static' in COMMAND_LINE_TARGETS:
     (modules, sources) = setup_modules(temp, env, targetSystem,
                                        refu_dir, code_gen)
-    #also add the extra sources (if any) given by the extra objects
-    sources.extend(extra_sources)
 
 #setup the variables of the configuration file
 setupConfigVars(temp, env)
@@ -138,8 +137,12 @@ if 'test_shared' in COMMAND_LINE_TARGETS:
     #TODO: For other compilers in Linux do something similar
     env.Append(LINKFLAGS="-Wl,-rpath="+os.path.join(os.getcwd(),
                                                     'Tests'))
+    test_sources = []
+    for f in temp['__TEST_SOURCES']:
+        f = os.path.join('Tests', f)
+        test_sources.append(f)
     test_shared = env.Program(os.path.join('Tests', 'test'),
-                              os.path.join(temp['__TEST_SOURCE']))
+                              test_sources)
     env.Alias('test_shared', test_shared)
 
 if 'test_static' in COMMAND_LINE_TARGETS:
@@ -149,8 +152,13 @@ if 'test_static' in COMMAND_LINE_TARGETS:
     env.Append(CCFLAGS='-g')
     outName = env['LIBPREFIX']+outName+env['LIBSUFFIX']
     env.Append(LIBS=File(os.path.join('Tests', outName)))
+
+    test_sources = []
+    for f in temp['__TEST_SOURCES']:
+        f = os.path.join('Tests', f)
+        test_sources.append(f)
     test_static = env.Program(os.path.join('Tests', 'test'),
-                              os.path.join(temp['__TEST_SOURCE']))
+                              test_sources)
     env.Alias('test_static', test_static)
 #generate help text for the variables
 Help(vars.GenerateHelpText(env))

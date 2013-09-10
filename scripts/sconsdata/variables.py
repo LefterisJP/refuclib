@@ -1,4 +1,6 @@
 import os
+
+from utils import build_msg
 # -- Get the user provided options --
 
 Import('allowedCompilers config_file code_gen')
@@ -16,16 +18,27 @@ def checkCompilerValue(key,value,environment):
         value = 'gcc'
     return True
 
+def sources_string_to_list(s):
+    if s == "":
+        build_msg("No test sources provided.", "Error")
+        Exit(-1)
+    sources = s.split(',')
+    sources_list = [','.join(sources[n:]) for n in range(len(sources))]
+    return sources_list
+
+
+
 # Initialize the variables object
 vars = Variables(config_file)
 
 # Add Variable Options which don't have to do with the actual building of
 # the library
-vars.Add(
-    PathVariable('__TEST_SOURCE','This is a special option used when '
-                 'compiling a source file for the testing framework which '
-                 'denotes the name of that specific file', None,
-                 PathVariable.PathIsFile))
+vars.Add('__TEST_SOURCES','This is a special option used when '
+         'compiling a source file for the testing framework which '
+         'denotes the names of the sources of a specific test.'
+         'Should be a comma separated list.',
+         converter=sources_string_to_list)
+
 vars.Add(
     BoolVariable('__TEST_BUILD','This is a special option which if passed '
                  'to scons signifies that no library will be built but a '

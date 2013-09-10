@@ -144,6 +144,8 @@ def check_extra_args(line, mutate, type_d):
     #in any other case just return line as is
     return line
 
+
+
 class CodeGen():
     """
        This class encapsulates all of the code generating functionality
@@ -174,6 +176,21 @@ class CodeGen():
             "REMOVE": self.handle_REMOVE,
             "REPLACE": self.handle_REPLACE
         }
+
+        # types that can be safely templated from within the library
+        self.library_types = { "I": "int",
+                          "UI": "unsigned int",
+                          "I8": "int8_t",
+                          "UI8": "uint8_t",
+                          "I16": "int16_t",
+                          "UI16": "uint16_t",
+                          "I32": "int32_t",
+                          "UI32": "uint32_t",
+                          "I164": "int64_t",
+                          "UI64": "uint64_t",
+                          "String": "RF_String",
+                          "generic": "generic",
+            }
 
         if os.path.isfile(os.path.join(refu_root, json_file_name)):
             self.load_data_from_json(json_file_name)
@@ -226,8 +243,6 @@ class CodeGen():
          functions
          source_name -- The name of the object as defined in the source
          code
-         source -- the path to the source file which implements the code
-         of the functions of this object
          header -- the path to the header file that defines the functions
          and the struct of this object
          l -- Another list to act as the key of the obj_dict. This will
@@ -235,36 +250,33 @@ class CodeGen():
              - destroy function for the object
              - copy function for the object
              - compare function for the object
-             - A list of headers needed to compile the source file
+             - A list of headers needed to compile the generated source file
 
         Returns: The source that should be appended to the sources for
         compiling
         """        
-        # sanity check for source and header
+        # sanity check for header
         if not os.path.isfile(obj_list[2]):
-            raise ExtraObjectError(obj[0], "Provided source file {} does "
-                                   "not exist".format(obj_list[2]))
-        if not os.path.isfile(obj_list[3]):
             raise ExtraObjectError(obj_list[0], "Provided header file {} does "
-                                   "not exist".format(obj_list[3]))
-        source_name = os.path.basename(obj_list[2])
-        header_name = os.path.basename(obj_list[3])
-        header_abs = os.path.abspath(obj_list[3])
-        new_source_path = os.path.join(refu_dir, "src",
-                                       "Generated", source_name)
+                                   "not exist".format(obj_list[1]))
+
+        header_name = os.path.basename(obj_list[2])
+        header_abs = os.path.abspath(obj_list[2])
+        # new_source_path = os.path.join(refu_dir, "src",
+        #                                "Generated", "{}.c".format()
         #now copy the source into src/Generated
-        inF = open(obj_list[2])
-        outF = open(new_source_path, 'w')
-        for line in inF:
-            if "#include" in line and header_name in line:
-                #replace the include call with the full path
-                outF.write("#include \"{}\"".format(header_abs))
-                continue
-            #else simply copy
-            outF.write(line)
+        # inF = open(obj_list[2])
+        # outF = open(new_source_path, 'w')
+        # for line in inF:
+        #     if "#include" in line and header_name in line:
+        #         #replace the include call with the full path
+        #         outF.write("#include \"{}\"".format(header_abs))
+        #         continue
+        #     #else simply copy
+        #     outF.write(line)
         #finally add the object to type and obj dict
         self.type_dict[obj_list[0]] = obj_list[1]
-        self.obj_dict[obj_list[0]] = obj_list[4]
+        self.obj_dict[obj_list[0]] = obj_list[3]
         #and append the header to the extra headers
         self.obj_dict[obj_list[0]][obj.headers].append(header_abs)
 
@@ -273,11 +285,10 @@ class CodeGen():
         if os.path.isfile(fname):
            os.remove(fname)
         self.save_data_to_json(fname)
-
         #finally return the path to the new source relative to the root
-        inF.close()
-        outF.close()
-        return os.path.join("Generated", source_name)
+        # inF.close()
+        # outF.close()
+        # return os.path.join("Generated", source_name)
 
         
         
