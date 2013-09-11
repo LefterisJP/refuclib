@@ -147,8 +147,8 @@ def test(root, test_name, logFile, testExec, verbose, fail_fast):
 
         --root: The root directory of the test compared to the Tests
                 directory
-        --fileName: The name of the test in the test_dict 
-        (hence also the .expect)
+        --test_name: The name of the test in the test_dict 
+        (hence also the .expect if existing)
         --logFile: The name of the logfile
         --testExec: The name of the test executable
         --verbose: A boolean flag denoting if the tests should be verbose
@@ -157,11 +157,16 @@ def test(root, test_name, logFile, testExec, verbose, fail_fast):
     """
     print_nonl("\t--> Testing \"{}\"...".format(test_name))
     logFile.write("\t--> Testing \"{}\"...".format(test_name))
-    #open the expected outputfile
-    f = open(os.path.join(root, "{}.expect".format(test_name)), 'r')
+    #try to open the expected outputfile
+    try:
+        f = open(os.path.join(root, "{}.expect".format(test_name)), 'r')
+        expected_output = True
+    except:
+        expected_output = False
     #call the test
     p = subprocess.Popen(os.path.join('.',testExec),
                          cwd=root,stdout=subprocess.PIPE)
+
     expected_stdout_lineN = 1
     line = None
     for line in p.stdout:
@@ -172,22 +177,23 @@ def test(root, test_name, logFile, testExec, verbose, fail_fast):
         if "passed >>" in line:
             logFile.write("\t\t\t{}\n".format(line))
             continue
-        #if not then let's check the expected stdout line
-        expected_stdout = f.readline()
-        if line != expected_stdout:
-            # if it's an EXPECT() macro error, report it
-            if "*ERROR*:" in line:
-                report(logFile, "FAILED!\n\t {}".format(line))
-                if fail_fast:
-                    raise TestError(test_name, expected_stdout_lineN)
-            # else it's an expected std output error
-            else:
-                report(logFile, "\n\t\tTest failed at expected "
-                            "output line \"[{}]\"\n".format(
-                                str(expected_stdout_lineN)))
-                report(logFile, "\n\t\tExpected:\n\t\t\t{}\n\t\t"
-                            "Found:\n\t\t\t{}\n".format(
-                                str(expected_stdout), str(line)))
+        #if not then let's check the expected stdout line if we got one
+        if expected_output:
+            expected_stdout = f.readline()
+            if line != expected_stdout:
+                # if it's an EXPECT() macro error, report it
+                if "*ERROR*:" in line:
+                    report(logFile, "FAILED!\n\t {}".format(line))
+                    if fail_fast:
+                        raise TestError(test_name, expected_stdout_lineN)
+                # else it's an expected std output error
+                else:
+                    report(logFile, "\n\t\tTest failed at expected "
+                           "output line \"[{}]\"\n".format(
+                               str(expected_stdout_lineN)))
+                    report(logFile, "\n\t\tExpected:\n\t\t\t{}\n\t\t"
+                           "Found:\n\t\t\t{}\n".format(
+                               str(expected_stdout), str(line)))
                 raise TestError(test_name, expected_stdout_lineN)
             expected_stdout_lineN += 1
     #wait till the test subprocess ends
