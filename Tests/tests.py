@@ -6,6 +6,26 @@ import time
 import platform
 import sys
 
+from testscompile import compileTest
+from output import (print_nonl, report, TestError, TestsFail, TestCompileError)
+from log import check_library_log
+
+def copy_sources_for_list():
+    """ Copies the extra object generated source for the list test """
+    try:
+        os.rename(os.path.join("..", "src", "Data_Structures",
+                               "list_test_object.c"),
+                  os.path.join("Data_Structures", "list_test_object.c"))
+    except:
+        print_nonl("During preparation of the list test, could not copy "
+                   "the generated sources")
+
+def cleanup_for_list():
+    """ Cleansup the copied file for the list test """
+    try:
+        os.remove(os.path.join("Data_Structures", "list_test_object.c"))
+    except:
+        pass
 
 tests_dict = { 
     "dynamicarray": {
@@ -21,8 +41,11 @@ tests_dict = {
         "root": "Data_Structures"
     },
     "list": {
-        "sources": [os.path.join("Data_Structures", "list.c")],
-        "root": "Data_Structures"
+        "sources": [os.path.join("Data_Structures", "list.c"),
+                    os.path.join("Data_Structures", "list_test_object.c")],
+        "root": "Data_Structures",
+        "action_before_compile": copy_sources_for_list,
+        "cleanup_after_test": cleanup_for_list
     },
 
     "string_accessor": {
@@ -96,11 +119,6 @@ tests_dict = {
         "root": "TextFile"
     }
 }
-
-
-from testscompile import compileTest
-from output import (print_nonl, report, TestError, TestsFail, TestCompileError)
-from log import check_library_log
 
 #the time by which to delay actions after compiling so as not to have conflicts
 #after copying/deleting binaries
@@ -262,6 +280,9 @@ def runTests(compiler, dynamic, outName, logFile, verbose,
         # he did check to see if this is one of them
         if(tests and key not in tests):
                 continue
+        #if there is any action to do before compiling do it
+        if value["action_before_compile"] is not None:
+            value["action_before_compile"]()
         # compile it
         try:
             compileTest(key, value["sources"], dynamic, compiler, verbose,
@@ -323,6 +344,9 @@ def runTests(compiler, dynamic, outName, logFile, verbose,
                     "-hard was requested".format(key))
         finally:
             # cleaning up
+            if value["cleanup_after_test"] is not None:
+                value["cleanup_after_test"]()
+
             if dynamic:
                 # also if we are testing the dynamic lib,
                 # delete its local copy

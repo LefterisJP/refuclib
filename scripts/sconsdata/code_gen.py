@@ -262,19 +262,7 @@ class CodeGen():
 
         header_name = os.path.basename(obj_list[2])
         header_abs = os.path.abspath(obj_list[2])
-        # new_source_path = os.path.join(refu_dir, "src",
-        #                                "Generated", "{}.c".format()
-        #now copy the source into src/Generated
-        # inF = open(obj_list[2])
-        # outF = open(new_source_path, 'w')
-        # for line in inF:
-        #     if "#include" in line and header_name in line:
-        #         #replace the include call with the full path
-        #         outF.write("#include \"{}\"".format(header_abs))
-        #         continue
-        #     #else simply copy
-        #     outF.write(line)
-        #finally add the object to type and obj dict
+
         self.type_dict[obj_list[0]] = obj_list[1]
         self.obj_dict[obj_list[0]] = obj_list[3]
         #and append the header to the extra headers
@@ -285,10 +273,7 @@ class CodeGen():
         if os.path.isfile(fname):
            os.remove(fname)
         self.save_data_to_json(fname)
-        #finally return the path to the new source relative to the root
-        # inF.close()
-        # outF.close()
-        # return os.path.join("Generated", source_name)
+
 
         
         
