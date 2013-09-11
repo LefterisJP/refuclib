@@ -19,8 +19,6 @@ def checkCompilerValue(key,value,environment):
     return True
 
 def sources_string_to_list(s):
-    import pdb 
-    pdb.set_trace()
     if s == "":
         build_msg("No test sources provided.", "Error")
         Exit(-1)

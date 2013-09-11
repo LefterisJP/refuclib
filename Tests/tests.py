@@ -42,7 +42,9 @@ tests_dict = {
     },
     "list": {
         "sources": [os.path.join("Data_Structures", "list.c"),
-                    os.path.join("Data_Structures", "list_test_object.c")],
+                    os.path.join("Data_Structures", "list_test_object.c"),
+                    os.path.join("ExtraObjects", "test.c"),
+                ],
         "root": "Data_Structures",
         "action_before_compile": copy_sources_for_list,
         "cleanup_after_test": cleanup_for_list
@@ -281,8 +283,9 @@ def runTests(compiler, dynamic, outName, logFile, verbose,
         if(tests and key not in tests):
                 continue
         #if there is any action to do before compiling do it
-        if value["action_before_compile"] is not None:
+        if "action_before_compile" in value:
             value["action_before_compile"]()
+
         # compile it
         try:
             compileTest(key, value["sources"], dynamic, compiler, verbose,
@@ -344,7 +347,7 @@ def runTests(compiler, dynamic, outName, logFile, verbose,
                     "-hard was requested".format(key))
         finally:
             # cleaning up
-            if value["cleanup_after_test"] is not None:
+            if "cleanup_after_test" in value:
                 value["cleanup_after_test"]()
 
             if dynamic:

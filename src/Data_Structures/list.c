@@ -40,8 +40,6 @@
 #include <Preprocessor/rf_tokens.h>//for the defined library tokens
 #include <Data_Structures/list_decl.h>
 #include <Data_Structures/list.h>
-/*------------- Module related inclusion -------------*/
-#include "common.ph"//for the common macro def
 /*------------- Outside Module inclusion -------------*/
 //for error logging
     #include <stdio.h>//for FILE* used inside printf.h
