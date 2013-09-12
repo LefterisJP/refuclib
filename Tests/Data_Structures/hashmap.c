@@ -67,20 +67,21 @@ static void test_generic_map(RF_Hashmap* m)
 {
     int i;
     an_object obj;
-
+    bool exists;
     //populate the hashmap
     for(i = 0; i < 20; i ++)
     {
         obj.num = i;
         obj.f = (float) i;
         rfString_Init(&obj.s, "%d", i);
-        EXPECT(true, rfHashmap_Insert(m, RFS_("%d",i), &obj));
+        EXPECT(true, rfHashmap_Insert_Copy(m, RFS_("%d",i), &obj, &exists));
+        EXPECT(false, exists);
     }
 
     //test it
     for(i = 0; i < 20; i++)
     {
-        EXPECT(rfHashmap_Get(m, RFS_("%d",i), &obj), true);
+        EXPECT(rfHashmap_Get_Copy(m, RFS_("%d",i), &obj), true);
         EXPECT(obj.num == i, true);
         EXPECT(obj.f == (float)i, true);
         EXPECT(rfString_Equal(&obj.s, RFS_("%d", i)), true );
@@ -95,22 +96,34 @@ int main()
     RF_Hashmap m;
     int i, v;
     RF_String str;
+    bool exists;
     EXPECT(rfInit(), true);
     // test a hashmap with some unicode keys
     EXPECT(true, rfHashmap_I_Init(&m1, 20));
-    EXPECT(true, rfHashmap_I_Insert(&m1, RFS_("ενα"), 1));
-    EXPECT(true, rfHashmap_I_Insert(&m1, RFS_("δυο"), 2));
-    EXPECT(true, rfHashmap_I_Insert(&m1, RFS_("τρια"), 3));
-    EXPECT(true, rfHashmap_I_Insert(&m1, RFS_("τεσσερα"), 4));
-    EXPECT(true, rfHashmap_I_Insert(&m1, RFS_("πεντε"), 5));
-    EXPECT(true, rfHashmap_I_Insert(&m1, RFS_("εξι"), 6));
-    EXPECT(true, rfHashmap_I_Insert(&m1, RFS_("εφτα"), 7));
-    EXPECT(true, rfHashmap_I_Insert(&m1, RFS_("οκτω"), 8));
-    EXPECT(true, rfHashmap_I_Insert(&m1, RFS_("εννια"), 9));
-    EXPECT(true, rfHashmap_I_Insert(&m1, RFS_("δεκα"), 10));
-    EXPECT(true, rfHashmap_I_Get(&m1, RFS_("οκτω"), &i));
+    EXPECT(true, rfHashmap_I_Insert_Copy(&m1, RFS_("ενα"), 1, &exists));
+    EXPECT(false, exists);
+    EXPECT(true, rfHashmap_I_Insert_Copy(&m1, RFS_("δυο"), 2, &exists));
+    EXPECT(false, exists);
+    EXPECT(true, rfHashmap_I_Insert_Copy(&m1, RFS_("τρια"), 3, &exists));
+    EXPECT(false, exists);
+    EXPECT(true, rfHashmap_I_Insert_Copy(&m1, RFS_("τεσσερα"), 4, &exists));
+    EXPECT(false, exists);
+    EXPECT(true, rfHashmap_I_Insert_Copy(&m1, RFS_("πεντε"), 5, &exists));
+    EXPECT(false, exists);
+    EXPECT(true, rfHashmap_I_Insert_Copy(&m1, RFS_("εξι"), 6, &exists));
+    EXPECT(false, exists);
+    EXPECT(true, rfHashmap_I_Insert_Copy(&m1, RFS_("εφτα"), 7, &exists));
+    EXPECT(false, exists);
+    EXPECT(true, rfHashmap_I_Insert_Copy(&m1, RFS_("οκτω"), 8, &exists));
+    EXPECT(false, exists);
+    EXPECT(true, rfHashmap_I_Insert_Copy(&m1, RFS_("εννια"), 9, &exists));
+    EXPECT(false, exists);
+    EXPECT(true, rfHashmap_I_Insert_Copy(&m1, RFS_("δεκα"), 10, &exists));
+    EXPECT(false, exists);
+
+    EXPECT(true, rfHashmap_I_Get_Copy(&m1, RFS_("οκτω"), &i));
     EXPECT(i == 8, true);
-    EXPECT(true, rfHashmap_I_Get(&m1, RFS_("τρια"), &i));
+    EXPECT(true, rfHashmap_I_Get_Copy(&m1, RFS_("τρια"), &i));
     EXPECT(i == 3, true);
     
     rfHashmap_I_Deinit(&m1);
@@ -118,14 +131,16 @@ int main()
     EXPECT(true, rfHashmap_I_Init(&m2, 10));
     for(i = 0; i < 20; i++)
     {
-        EXPECT(true, rfHashmap_I_Insert(
+        EXPECT(true, rfHashmap_I_Insert_Copy(
                    &m2,
                    RFS_("%d", nums[i]),
-                   nums[i]));
+                   nums[i],
+                   &exists));
+        EXPECT(false, exists);
     }
     for(i = 0; i < 20; i++)
     {
-        EXPECT(true, rfHashmap_I_Get(
+        EXPECT(true, rfHashmap_I_Get_Copy(
                    &m2,
                    RFS_("%d", nums[i]),
                    &v));
@@ -138,14 +153,16 @@ int main()
     EXPECTNOT(m3, NULL);
     for(i = 0; i < 13; i ++)
     {
-        EXPECT(true, rfHashmap_String_Insert(
+        EXPECT(true, rfHashmap_String_Insert_Copy(
                    m3,
                    RFS_("%s", m3_keys[i]),
-                   RFS_("%s", m3_values[i])));
+                   RFS_("%s", m3_values[i]),
+                   &exists));
+        EXPECT(false, exists);
     }
     for(i = 0; i < 13; i ++)
     {
-        EXPECT(true, rfHashmap_String_Get(
+        EXPECT(true, rfHashmap_String_Get_Copy(
                    m3,
                    RFS_("%s", m3_keys[i]),
                    &str));

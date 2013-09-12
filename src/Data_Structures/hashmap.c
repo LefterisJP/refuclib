@@ -41,6 +41,7 @@
 #include <Definitions/types.h> //for fixed size data types
 #include <String/string_decl.h> //for RF_String
 /* @omit end */
+#include <Definitions/retcodes.h> //for error codes, bool
 #include <Data_Structures/hashmap_decl.h> //for the struct declarations
 #include <Data_Structures/hashmap.h> 
 /*------------- Module related inclusion -------------*/
@@ -52,7 +53,6 @@
     #include <Utils/error.h>
 //for memory allocation macros
     #include <stdlib.h> //for malloc, calloc,realloc and exit()
-    #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
     #include <Utils/memory.h> //for refu memory allocation
 
 //for local scope
@@ -134,7 +134,8 @@ static inline uint32_t HsiehHash(const char* data, int len)
 }
 
 
-static char i_InsertValue(RF_Hashslot** slots, RF_String* key,
+static char i_InsertValue_Copy(RF_Hashslot** slots, RF_String* key,
+                                       bool* exists,
 /* @mutate void* TYPEPTR_OBJ_ONLY */
                           void* value, uint32_t size
 /* @omit start */
@@ -147,7 +148,8 @@ static char i_InsertValue(RF_Hashslot** slots, RF_String* key,
 {
     uint32_t i;
     RF_Hashslot* s, *pr;
-    
+
+    *exists = false;
     i = HsiehHash(rfString_Cstr(key), rfString_Length(key));
     i = i % size;
     s = slots[i];
@@ -167,16 +169,11 @@ static char i_InsertValue(RF_Hashslot** slots, RF_String* key,
     {
         while(s != NULL)
         {
-            // if key already exist in the table let's replace the value
-            // (there are many other possible things to do here)
+            // if key already exist in the table
             if(rfString_Equal(&s->key, key))
             {
-                /* @mutate ptr2Destroyr DESTROY */
-                ptr2Destroy(s->value);
-
-                /* @mutate ptr2Copyrp ASSIGN IFBLOCK return false; */
-                ptr2Copy(s->value, value);
-
+                *exists = true;
+                return false;
             }
             pr = s;
             s = s->next;
@@ -202,7 +199,70 @@ static char i_InsertValue(RF_Hashslot** slots, RF_String* key,
     return true;
 }
 
-static void i_DestroySlots(RF_Hashslot** slots, uint32_t size 
+
+static char i_InsertValue(RF_Hashslot** slots, RF_String* key,
+                          bool* exists,
+/* @mutate void* TYPEPTR_OBJ_ONLY */
+                          void* value, uint32_t size
+/* @omit start */
+                          ,uint32_t object_size
+/* @omit end */
+    )
+{
+    uint32_t i;
+    RF_Hashslot* s, *pr;
+    
+    *exists = false;
+    i = HsiehHash(rfString_Cstr(key), rfString_Length(key));
+    i = i % size;
+    s = slots[i];
+
+    //if the slot is null initialize it
+    if(s == NULL)
+    {
+        RF_MALLOC(s, sizeof(RF_Hashslot), false);
+        slots[i] = s;
+/* @omit start */
+        // we have to allocate the value for the generic case
+        RF_MALLOC(s->value, object_size, false);
+/* @omit end */
+        s->next = NULL;
+    }
+    else
+    {
+        while(s != NULL)
+        {
+            // if key already exists in the table
+            if(rfString_Equal(&s->key, key))
+            {
+                *exists = true;
+                return false;
+            }
+            pr = s;
+            s = s->next;
+        }
+        //if we get here it means we need to allocate a new slot
+        RF_MALLOC(s, sizeof(RF_Hashslot), false);
+        pr->next = s;
+/* @omit start */
+        // we have to allocate the value for the generic case
+        RF_MALLOC(s->value, object_size, false);
+/* @omit end */
+        s->next = NULL;
+    }
+    //finaly insert the key-value combo
+    //copy key
+    if(rfString_Copy_IN(&s->key, key) == false)
+    {
+        return false;
+    }
+    //shallow copy
+    /* @mutate memcpy MEMCPY */
+    memcpy(&s->value, value, object_size);
+    return true;
+}
+
+static void i_DestroySlots_Copy(RF_Hashslot** slots, uint32_t size 
                            /* @omit start */
                            ,void (*ptr2Destroy)(void*)
                            /* @omit end */
@@ -220,6 +280,23 @@ static void i_DestroySlots(RF_Hashslot** slots, uint32_t size
             rfString_Deinit(&tmp->key);
             /* @mutate ptr2Destroyr DESTROY */
             ptr2Destroy(tmp->value);
+            free(tmp);
+        }
+    }
+}
+
+static void i_DestroySlots(RF_Hashslot** slots, uint32_t size)
+{
+    int i;
+    RF_Hashslot* s,*tmp;
+    for(i = 0;i < size;i++)
+    {
+        s = slots[i];
+        while(s != NULL)
+        {
+            tmp = s;
+            s = s->next;
+            rfString_Deinit(&tmp->key);
             free(tmp);
         }
     }
@@ -277,16 +354,26 @@ RF_Hashmap* rfHashmap_Create(uint32_t s
 
 
 // Deinitializes a hashmap
-void rfHashmap_Deinit(RF_Hashmap* m)
+void rfHashmap_Deinit_Copy(RF_Hashmap* m)
 {
-    i_DestroySlots(m->slots, m->size
+    i_DestroySlots_Copy(m->slots, m->size
 /* @omit start */
                    ,m->ptr2Destroy
 /* @omit end */
 );
 }
+// Destroys a hashmap
+void rfHashmap_Destroy_Copy(RF_Hashmap* m)
+{
+    rfHashmap_Deinit_Copy(m);
+    free(m);
+}
 
-
+// Deinitializes a hashmap
+void rfHashmap_Deinit(RF_Hashmap* m)
+{
+    i_DestroySlots(m->slots, m->size);
+}
 // Destroys a hashmap
 void rfHashmap_Destroy(RF_Hashmap* m)
 {
@@ -294,17 +381,18 @@ void rfHashmap_Destroy(RF_Hashmap* m)
     free(m);
 }
 
-// Insert a value into the Hashmap
-char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
-                                  /* @mutate void* TYPEPTR_OBJ_ONLY */
-                                  void* value)
+// Insert a copy of a value into the Hashmap
+char rfHashmap_Insert_Copy(RF_Hashmap* m, RF_String* key,
+                           /* @mutate void* TYPEPTR_OBJ_ONLY */
+                           void* value,
+                           bool* exists)
 {
     uint32_t i;
     RF_Hashslot* s;
     char ret = true;
     RF_ENTER_LOCAL_SCOPE();
 
-    if(i_InsertValue(m->slots, key, value, m->size
+    if(i_InsertValue_Copy(m->slots, key, exists, value, m->size
 /* @omit start */
                      ,m->object_size, m->ptr2Copy, m->ptr2Destroy
 /* @omit end */
@@ -340,7 +428,8 @@ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
                 while(s != 0)
                 {
                     /* @mutate s->value REFERENCE */
-                    if(!i_InsertValue(tmp, &s->key, s->value, m->size
+                    if(!i_InsertValue_Copy(tmp, &s->key, exists, s->value,
+                                           m->size
 /* @omit start */
                                       ,m->object_size, m->ptr2Copy, m->ptr2Destroy
 /* @omit end */
@@ -354,7 +443,7 @@ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
             }
         }
         //replace the current slots array with the rehashed one and free
-        i_DestroySlots(m->slots, prsize
+        i_DestroySlots_Copy(m->slots, prsize
 /* @omit start */
                        ,m->ptr2Destroy
 /* @omit end */
@@ -368,9 +457,114 @@ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
     return ret;
 }
 
+
+// Insert a value into the Hashmap
+char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
+                      /* @mutate void* TYPEPTR_OBJ_ONLY */
+                      void* value,
+                      bool* exists)
+{
+    uint32_t i;
+    RF_Hashslot* s;
+    char ret = true;
+    RF_ENTER_LOCAL_SCOPE();
+
+    if(i_InsertValue(m->slots, key, exists, value, m->size
+/* @omit start */
+                     ,m->object_size
+/* @omit end */
+) == false)
+    {
+        ret = false;
+        goto cleanup;
+    }
+    m->occupied ++;
+
+    //if the ratio of occupied over size is greaten than the load factor
+    if( FLCMP_G((float)m->occupied / (float)m->size,
+            RF_OPTION_HASHMAP_LOAD_FACTOR))
+    {
+        uint32_t prsize;
+        RF_Hashslot** tmp;
+        //make a new hash map with double the size
+        prsize = m->size;
+        m->size *= 2;
+        RF_MALLOC_JMP(tmp, sizeof(RF_Hashslot*)*m->size,
+                      ret=false, cleanup);
+        for(i = 0; i < m->size; i ++)
+        {
+            tmp[i] = NULL;
+        }
+        //rehash all the values
+        for(i = 0; i < prsize; i ++)
+        {
+            if(m->slots[i] != 0)
+            {   //if there is value in the slot
+                //enter the value and all of its linked descendants
+                s = m->slots[i];
+                while(s != 0)
+                {
+                    /* @mutate s->value REFERENCE */
+                    if(!i_InsertValue(tmp, &s->key, exists, s->value,
+                                      m->size
+/* @omit start */
+                                      ,m->object_size
+/* @omit end */
+                           ))
+                    {
+                        ret = false;
+                        goto cleanup;
+                    }
+                    s = s->next;
+                }
+            }
+        }
+        //replace the current slots array with the rehashed one and free
+        i_DestroySlots(m->slots, prsize);
+        free(m->slots);
+        m->slots = tmp;
+    }    
+
+  cleanup:
+    RF_EXIT_LOCAL_SCOPE();
+    return ret;
+}
+
+
 char rfHashmap_Get(RF_Hashmap* m, RF_String* key,
-                               /* @mutate void* TYPEPTR */
-                               void* value)
+                   /* @mutate void* TYPEPTR */
+                   void* value)
+{
+    uint32_t i;
+    RF_Hashslot* s;
+    char ret = false;
+    RF_ENTER_LOCAL_SCOPE();
+    i = HsiehHash(rfString_Cstr(key), rfString_Length(key));
+    i = i % m->size;
+    s = m->slots[i];
+
+    while(s != NULL)
+    {
+        if(rfString_Equal(&s->key, key))
+        {//if key is found get it
+
+            /* @mutate m->object_size SIZE */
+            memcpy(value, &s->value, m->object_size);
+            ret = true;
+            goto cleanup;
+        }
+        //else proceed in the linked list chain
+        s = s->next;
+    }
+
+  cleanup:
+    RF_EXIT_LOCAL_SCOPE();
+    return ret;
+}
+
+char rfHashmap_Get_Copy(RF_Hashmap* m, RF_String* key,
+                        /* @mutate void* TYPEPTR */
+                        void* value)
 {
     uint32_t i;
     RF_Hashslot* s;

@@ -122,6 +122,28 @@ def get_func2_args(line, func_name):
     arg2 = arg2.strip()
     return (arg1, arg2)
 
+def get_func3_args(line, func_name):
+    """
+       Returns a tuple with the arguments of a 3 arguments function
+    """
+    part = line.partition(func_name+"(")
+    #count how many open parentheses we had before
+    openP = part[0].count("(")
+    line = part[2]
+    part = line.partition(",")
+    arg1 = part[0].strip()
+    #take only the relevant parenetheses part
+    arg2 = part[2]
+    part = arg2.partition(",")
+    arg2 = part[0].strip()
+    arg3 = part[2]
+    for i in range(openP):
+        arg3 = arg3.rpartition(")")[0]
+    arg3 = arg3.rpartition(")")[0]
+    arg3 = arg3.strip()
+    return (arg1, arg2, arg3)
+
+
 def check_extra_args(line, mutate, type_d):
     """
        Checks for extra mutate arguments and applies some transformations
@@ -174,7 +196,8 @@ class CodeGen():
             "DESTROY": self.handle_DESTROY,
             "INITIALIZE_TO_ZERO": self.handle_INITIALIZE_TO_ZERO,
             "REMOVE": self.handle_REMOVE,
-            "REPLACE": self.handle_REPLACE
+            "REPLACE": self.handle_REPLACE,
+            "MEMCPY": self.handle_MEMCPY
         }
 
         # types that can be safely templated from within the library
@@ -373,6 +396,62 @@ class CodeGen():
 
 
 
+    def handle_assign_function(self, line, mutate,
+                               type_d, file_name, func_name):
+        (arg1, arg2) = get_func2_args(line, func_name)
+        if type_d in self.obj_dict:
+            # read the IFBLOCK and get the rest of the arguments for
+            # as statements inside if
+            if "IFBLOCK" not in mutate:
+                raise MutateError("For an assignment to objects, an "
+                                  "IFBLOCK argument has not been given",
+                                  file_name, line)
+            ifblock = ""
+            for i in range(mutate.index("IFBLOCK") + 1, len(mutate)):
+                ifblock = ifblock + " " + mutate[i];
+            if mutate[0] == "{}rr".format(func_name):
+                return "if(!{}(&{}, &{}))\n\t{{ {} }}\n".format(
+                    self.obj_dict[type_d][obj.copy],
+                    arg1,
+                    arg2,
+                    ifblock)
+            elif mutate[0] == "{}pp".format(func_name):
+                return "if(!{}({},{}))\n\t{{ {} }}\n".format(
+                    self.obj_dict[type_d][obj.copy],
+                    arg1,
+                    arg2,
+                    ifblock)
+            elif mutate[0] == "{}pr".format(func_name):
+                return "if(!{}({},&{}))\n\t{{ {} }}\n".format(
+                    self.obj_dict[type_d][obj.copy],
+                    arg1,
+                    arg2,
+                    ifblock)
+            elif mutate[0] == "{}rp".format(func_name):
+                return "if(!{}(&{},{}))\n\t{{ {} }}\n".format(
+                    self.obj_dict[type_d][obj.copy],
+                    arg1,
+                    arg2,
+                    ifblock)
+            else:
+                raise MutateSourceError(mutate[0], file_name, line)
+        else:
+            if "PODPTR" in mutate:
+                if "POD_DLR" in mutate: # dereference POD left and right
+                    return "*({}) = *({});\n".format(arg1, arg2);
+                elif "POD_DL" in mutate: # derefence POD left
+                    return "*({}) = {};\n".format(arg1, arg2);
+                elif "POD_DR" in mutate: # dereference POD right
+                    return "{} = *({});\n".format(arg1, arg2);
+                elif "POD_NDR" in mutate: # do not dereference POD at all
+                    return "{} = {};\n".format(arg1, arg2);
+                else:
+                    raise MutateError("Unknown ptr2Copy handler for POD "
+                                      "data has been given", file_name,
+                                      line)
+            else:
+                return "{} = {};\n".format(arg1, arg2)
+
     def handle_ASSIGN(self, line, mutate, type_d, file_name):
         """
            Performs the mutation of the generic template code for
@@ -380,64 +459,24 @@ class CodeGen():
            - If simple data types then plain old data assignment
            - If an object, then that objects's copy function
         """
-
-
         if("ptr2Copy" in mutate[0]):
-            (arg1, arg2) = get_func2_args(line, "ptr2Copy")
-            if type_d in self.obj_dict:
-                # read the IFBLOCK and get the rest of the arguments for
-                # as statements inside if
-                if "IFBLOCK" not in mutate:
-                    raise MutateError("For an assignment to objects, an "
-                                      "IFBLOCK argument has not been given",
-                                      file_name, line)
-                ifblock = ""
-                for i in range(mutate.index("IFBLOCK") + 1, len(mutate)):
-                    ifblock = ifblock + " " + mutate[i];
-                if mutate[0] == "ptr2Copyrr":
-                    return "if(!{}(&{}, &{}))\n\t{{ {} }}\n".format(
-                        self.obj_dict[type_d][obj.copy],
-                        arg1,
-                        arg2,
-                        ifblock)
-                elif mutate[0] == "ptr2Copypp":
-                    return "if(!{}({},{}))\n\t{{ {} }}\n".format(
-                        self.obj_dict[type_d][obj.copy],
-                        arg1,
-                        arg2,
-                        ifblock)
-                elif mutate[0] == "ptr2Copypr":
-                    return "if(!{}({},&{}))\n\t{{ {} }}\n".format(
-                        self.obj_dict[type_d][obj.copy],
-                        arg1,
-                        arg2,
-                        ifblock)
-                elif mutate[0] == "ptr2Copyrp":
-                    return "if(!{}(&{},{}))\n\t{{ {} }}\n".format(
-                        self.obj_dict[type_d][obj.copy],
-                        arg1,
-                        arg2,
-                        ifblock)
-                else:
-                    raise MutateSourceError(mutate[0], file_name, line)
-            else:
-                if "PODPTR" in mutate:
-                    if "POD_DLR" in mutate: # dereference POD left and right
-                        return "*({}) = *({});\n".format(arg1, arg2);
-                    elif "POD_DL" in mutate: # derefence POD left
-                        return "*({}) = {};\n".format(arg1, arg2);
-                    elif "POD_DR" in mutate: # dereference POD right
-                        return "{} = *({});\n".format(arg1, arg2);
-                    elif "POD_NDR" in mutate: # do not dereference POD at all
-                        return "{} = {};\n".format(arg1, arg2);
-                    else:
-                        raise MutateError("Unknown ptr2Copy handler for POD "
-                                          "data has been given", file_name,
-                                          line)
-                else:
-                    return "{} = {};\n".format(arg1, arg2)
+            return self.handle_assign_function(line, mutate, type_d,
+                                               file_name, "ptr2Copy")
         else:
             raise MutateSourceError(mutate[0], file_name, line)
+
+    def handle_MEMCPY(self, line, mutate, type_d, file_name):
+        """
+           Performs the mutation of the generic template code for
+           shallow copying objects.
+        """
+        #kind of a hack but when mutating ignore all '&' operators
+        line = line.replace("&", "")
+        (arg1, arg2, arg3) = get_func3_args(line, "memcpy")
+        if type_d in self.obj_dict:
+            return "{} = *{};\n".format(arg1, arg2)
+        else:
+            return "{} = {};\n".format(arg1, arg2)
 
     def handle_DESTROY(self, line, mutate, type_d, file_name):
         """

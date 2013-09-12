@@ -31,6 +31,7 @@
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <Preprocessor/rf_tokens.h>//for the defined library tokens
 #include <String/string_decl.h> //for RF_String
+#include <Definitions/retcodes.h> //for error codes, bool
 #include <Data_Structures/hashmap_decl.h> //for the struct declarations
 #include <Data_Structures/hashmap.h>
 ---------------------For internal library include make sure to have----------------------------
@@ -109,23 +110,71 @@ i_DECLIMEX_ void rfHashmap_Deinit(RF_Hashmap* m);
 i_DECLIMEX_ void rfHashmap_Destroy(RF_Hashmap* m);
 
 /**
+ ** Deinitializes a hashmap and calls destruction function
+ ** on all objects. Should be called for maps populated
+ ** with _Copy functions.
+ ** @param m The map to deinitialize
+ */
+i_DECLIMEX_ void rfHashmap_Deinit_Copy(RF_Hashmap* m);
+
+/**
+ ** Destroys a hashmap and calls destruction function
+ ** on all objects. Should be called for maps populated
+ ** with _Copy functions.
+ ** @param m The map to destroy
+ */
+i_DECLIMEX_ void rfHashmap_Destroy_Copy(RF_Hashmap* m);
+
+/**
+ ** Insert a value into the Hashmap by copying it using the provided
+ ** copy function if there is one provided
+ ** @param m The map to insert the @c value into
+ ** @param key An @ref RF_String representing the key to associate with
+ ** the particular value
+ ** @param exists Pass a boolean here to check whether the key
+ ** already exists in the table
+ ** @param value The value to insert into the hashmap
+ ** @return @c true if all is fine and @c false otherwise
+ */
+i_DECLIMEX_ char rfHashmap_Insert_Copy(RF_Hashmap* m, RF_String* key,
+                                       /* @mutate void* TYPEPTR_OBJ_ONLY */
+                                       void* value,
+                                       bool* exists);
+
+/**
  ** Insert a value into the Hashmap
  ** @param m The map to insert the @c value into
  ** @param key An @ref RF_String representing the key to associate with
  ** the particular value
  ** @param value The value to insert into the hashmap
+ ** @param exists Pass a boolean here to check whether the key
+ ** already exists in the table
  ** @return @c true if all is fine and @c false otherwise
  */
-i_DECLIMEX_ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
+i_DECLIMEX_ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key, 
                                   /* @mutate void* TYPEPTR_OBJ_ONLY */
-                                  void* value);
+                                  void* value,
+                                  bool* exists);
+
+/**
+ ** Query a value for a key of the hashmap. Copies the value
+ ** @param m The map to query
+ ** @param key An @ref RF_String with the key to query the map for
+ ** @param value If @c key exists in the map then @c value will contain the
+ ** value associated with this key. Is a deep copy.
+ ** @return If the @c key exists in the map then @c true will be returned.
+ ** Otherwise @c false will be returned
+ */
+i_DECLIMEX_ char rfHashmap_Get_Copy(RF_Hashmap* m, RF_String* key,
+                               /* @mutate void* TYPEPTR */
+                               void* value);
 
 /**
  ** Query a value for a key of the hashmap
  ** @param m The map to query
  ** @param key An @ref RF_String with the key to query the map for
  ** @param value If @c key exists in the map then @c value will contain the
- ** value associated with this key.
+ ** value associated with this key. Is a shallow copy
  ** @return If the @c key exists in the map then @c true will be returned.
  ** Otherwise @c false will be returned
  */
