@@ -235,38 +235,40 @@ class CodeGen():
         inF.close()
     
 
-    def add_object(self, obj_list, refu_dir):
+    def add_object(self, extra_dict, refu_dir):
         """
-       Adds an object to the code generation. The parameter is one list
-         with the following elements
+       Adds an object to the code generation. The parameter is one dict
+        with the following keys:
          name -- The name of the object. Will be appended to all of the
          functions
          source_name -- The name of the object as defined in the source
          code
-         header -- the path to the header file that defines the functions
+         header_name -- the path to the header file that defines the functions
          and the struct of this object
-         l -- Another list to act as the key of the obj_dict. This will
-         contain:
-             - destroy function for the object
-             - copy function for the object
-             - compare function for the object
-             - A list of headers needed to compile the generated source file
+         destroy_func -- destroy function for the object
+         copy_fund -- copy function for the object
+         equals_func -- compare function for the object
 
         Returns: The source that should be appended to the sources for
         compiling
         """        
         # sanity check for header
-        if not os.path.isfile(obj_list[2]):
-            raise ExtraObjectError(obj_list[0], "Provided header file {} does "
-                                   "not exist".format(obj_list[1]))
+        if not os.path.isfile(extra_dict["header_name"]):
+            raise ExtraObjecterror(extra_dict["name"], "Provided header file {} "
+                                   "does not exist".format(extra_dict["header+name"]))
+                              
+        header_name = os.path.basename(extra_dict["header_name"])
+        header_abs = os.path.abspath(extra_dict["header_name"])
 
-        header_name = os.path.basename(obj_list[2])
-        header_abs = os.path.abspath(obj_list[2])
+        self.type_dict[extra_dict["name"]] = extra_dict["source_name"]
+        self.obj_dict[extra_dict["name"]] = [
+            extra_dict["destroy_func"],
+            extra_dict["copy_func"],
+            extra_dict["equals_func"],
+            []]
 
-        self.type_dict[obj_list[0]] = obj_list[1]
-        self.obj_dict[obj_list[0]] = obj_list[3]
         #and append the header to the extra headers
-        self.obj_dict[obj_list[0]][obj.headers].append(header_abs)
+        self.obj_dict[extra_dict["name"]][obj.headers].append(header_abs)
 
         #since a new object has been added save it to the json file
         fname = os.path.join(refu_dir, json_file_name)

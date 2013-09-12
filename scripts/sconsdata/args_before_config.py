@@ -3,13 +3,17 @@ import os
 
 from utils import build_msg
 
-def extraobjects_to_list(s):
+def extraobjects_to_dict(s):
     """
-       A function to convert the extra objects string to a list
+       A function to convert the extra objects string to a dict
     """
     # print("--\n{}\n--\n".format(s))
     if s == "":
-        return []
+        return {}
+    s = s.replace(":", "\":\"")
+    s = s.replace("{", "{\"")
+    s = s.replace("}", "\"}")
+    s = s.replace(",", "\",\"")
     try:
         return ast.literal_eval(s)
     except Exception as err:
@@ -36,26 +40,19 @@ args_before.Add(
     'With this option you can provide extra object types to the template system'
     ' so that they can be added as possible specialization options for data '
     'structures and other modules that may use them. The syntax to achieve '
-    'this is a bit challenging. You have to provide it as a string that will'
-    ' be interpreted as a python literal. This string must contain a list of '
-    'lists. Note the usage of \"\".\n'
-    'Each member of that list must be in the form of:\n'
-    '[\"name\", \"source_name\", \"source\", \"header\",'
-    ' [\"destroy_function\", \"copy_function\", \"compare_function\",'
-    '  ["header1", \"header2\"] ] ]'
-    '\n\nFollowing is an explanation of the lists members:\n'
-    '\tname -- The name of the object. Will be appended to all of the functions\n'
-    '\tsource_name -- The name of the object as defined in the source code\n'
-    '\tsource -- the path to the source file which implements the code of the functions of this object\n'
-    '\theader -- the path to the header file that defines the functions and '
-    'the struct of this object\n'
-    '\tAnother list to act as the key of the obj_dict. This will contain\n'
-    '\t\t- destroy function for the object\n'
-    '\t\t- copy function for the object\n'
-    '\t\t- compare function for the object\n'
-    '\t\t- A list of headers needed to compile the source file\n',
+    'this is the following:'
+    ' EXTRA_OBJECTS=\"[{name:test_object,'
+    'source_name:test_obj,'
+    'header_name:Tests/ExtraObjects/test.h,'
+    'destroy_func:test_destroy,'
+    'copy_func:test_copy,'
+    'equals_func:test_equal'
+    '}, ..., ... ]'
+    'Simply replace test with the object in question. Notice there is no need'
+    'to encircle keys or values of the dict with \"\". They are added by the '
+    'build script. You only need to enclose the whole dictionary once in \"\"',
     '',
-    converter=extraobjects_to_list)
+    converter=extraobjects_to_dict)
 
 #return the variables, and make sure the paths are absolute
 temp = Environment(variables=args_before)
