@@ -133,6 +133,97 @@ static inline uint32_t HsiehHash(const char* data, int len)
     return hash;
 }
 
+// Initializes a hashmap
+char rfHashmap_Init(RF_Hashmap* m, uint32_t s
+/* @omit start */
+                    ,uint32_t object_size
+                    ,char (*ptr2Copy)(void*, void*)
+                    ,void (*ptr2Destroy)(void*)
+/* @omit end */
+)
+{
+    int i;
+    m->size = s;
+    m->occupied = 0;
+/* @omit start */
+    m->object_size = object_size;
+    m->ptr2Copy = ptr2Copy;
+    m->ptr2Destroy = ptr2Destroy;
+/* @omit end */
+    RF_MALLOC(m->slots, sizeof(RF_Hashslot*)*m->size, false);
+    for(i = 0; i < m->size; i++)
+    {
+        m->slots[i] = NULL;
+    }
+    return true;
+}
+
+// Allocates and returns a hashmap
+RF_Hashmap* rfHashmap_Create(uint32_t s
+/* @omit start */
+                             ,uint32_t object_size
+                             ,char (*ptr2Copy)(void*, void*)
+                             ,void (*ptr2Destroy)(void*)
+/* @omit end */
+)
+{
+    RF_Hashmap* m;
+    RF_MALLOC(m, sizeof(RF_Hashmap), NULL);
+    if(! rfHashmap_Init(m, s
+/* @omit start */
+                        ,object_size
+                        ,ptr2Copy
+                        ,ptr2Destroy
+/* @omit end */
+))
+    {
+        free(m);
+        return NULL;
+    }
+    return m;
+}
+
+/* @omitcond POD */
+/* shallow and deep copy distinction makes no sense for plain old data */
+
+static void i_DestroySlots_Copy(RF_Hashslot** slots, uint32_t size 
+                           /* @omit start */
+                           ,void (*ptr2Destroy)(void*)
+                           /* @omit end */
+)
+{
+    int i;
+    RF_Hashslot* s,*tmp;
+    for(i = 0;i < size;i++)
+    {
+        s = slots[i];
+        while(s != NULL)
+        {
+            tmp = s;
+            s = s->next;
+            rfString_Deinit(&tmp->key);
+            /* @mutate ptr2Destroyr DESTROY */
+            ptr2Destroy(tmp->value);
+            free(tmp);
+        }
+    }
+}
+
+// Deinitializes a hashmap
+void rfHashmap_Deinit_Copy(RF_Hashmap* m)
+{
+    i_DestroySlots_Copy(m->slots, m->size
+/* @omit start */
+                   ,m->ptr2Destroy
+/* @omit end */
+);
+}
+// Destroys a hashmap
+void rfHashmap_Destroy_Copy(RF_Hashmap* m)
+{
+    rfHashmap_Deinit_Copy(m);
+    free(m);
+}
 
 static char i_InsertValue_Copy(RF_Hashslot** slots, RF_String* key,
                                        bool* exists,
@@ -197,188 +288,6 @@ static char i_InsertValue_Copy(RF_Hashslot** slots, RF_String* key,
     /* @mutate ptr2Copyrp ASSIGN IFBLOCK return false; */
     ptr2Copy(s->value, value);
     return true;
-}
-
-
-static char i_InsertValue(RF_Hashslot** slots, RF_String* key,
-                          bool* exists,
-/* @mutate void* TYPEPTR_OBJ_ONLY */
-                          void* value, uint32_t size
-/* @omit start */
-                          ,uint32_t object_size
-/* @omit end */
-    )
-{
-    uint32_t i;
-    RF_Hashslot* s, *pr;
-    
-    *exists = false;
-    i = HsiehHash(rfString_Cstr(key), rfString_Length(key));
-    i = i % size;
-    s = slots[i];
-
-    //if the slot is null initialize it
-    if(s == NULL)
-    {
-        RF_MALLOC(s, sizeof(RF_Hashslot), false);
-        slots[i] = s;
-/* @omit start */
-        // we have to allocate the value for the generic case
-        RF_MALLOC(s->value, object_size, false);
-/* @omit end */
-        s->next = NULL;
-    }
-    else
-    {
-        while(s != NULL)
-        {
-            // if key already exists in the table
-            if(rfString_Equal(&s->key, key))
-            {
-                *exists = true;
-                return false;
-            }
-            pr = s;
-            s = s->next;
-        }
-        //if we get here it means we need to allocate a new slot
-        RF_MALLOC(s, sizeof(RF_Hashslot), false);
-        pr->next = s;
-/* @omit start */
-        // we have to allocate the value for the generic case
-        RF_MALLOC(s->value, object_size, false);
-/* @omit end */
-        s->next = NULL;
-    }
-    //finaly insert the key-value combo
-    //copy key
-    if(rfString_Copy_IN(&s->key, key) == false)
-    {
-        return false;
-    }
-    //shallow copy
-    /* @mutate memcpy MEMCPY */
-    memcpy(&s->value, value, object_size);
-    return true;
-}
-
-static void i_DestroySlots_Copy(RF_Hashslot** slots, uint32_t size 
-                           /* @omit start */
-                           ,void (*ptr2Destroy)(void*)
-                           /* @omit end */
-)
-{
-    int i;
-    RF_Hashslot* s,*tmp;
-    for(i = 0;i < size;i++)
-    {
-        s = slots[i];
-        while(s != NULL)
-        {
-            tmp = s;
-            s = s->next;
-            rfString_Deinit(&tmp->key);
-            /* @mutate ptr2Destroyr DESTROY */
-            ptr2Destroy(tmp->value);
-            free(tmp);
-        }
-    }
-}
-
-static void i_DestroySlots(RF_Hashslot** slots, uint32_t size)
-{
-    int i;
-    RF_Hashslot* s,*tmp;
-    for(i = 0;i < size;i++)
-    {
-        s = slots[i];
-        while(s != NULL)
-        {
-            tmp = s;
-            s = s->next;
-            rfString_Deinit(&tmp->key);
-            free(tmp);
-        }
-    }
-}
-
-// Initializes a hashmap
-char rfHashmap_Init(RF_Hashmap* m, uint32_t s
-/* @omit start */
-                    ,uint32_t object_size
-                    ,char (*ptr2Copy)(void*, void*)
-                    ,void (*ptr2Destroy)(void*)
-/* @omit end */
-)
-{
-    int i;
-    m->size = s;
-    m->occupied = 0;
-/* @omit start */
-    m->object_size = object_size;
-    m->ptr2Copy = ptr2Copy;
-    m->ptr2Destroy = ptr2Destroy;
-/* @omit end */
-    RF_MALLOC(m->slots, sizeof(RF_Hashslot*)*m->size, false);
-    for(i = 0; i < m->size; i++)
-    {
-        m->slots[i] = NULL;
-    }
-    return true;
-}
-
-// Allocates and returns a hashmap
-RF_Hashmap* rfHashmap_Create(uint32_t s
-/* @omit start */
-                             ,uint32_t object_size
-                             ,char (*ptr2Copy)(void*, void*)
-                             ,void (*ptr2Destroy)(void*)
-/* @omit end */
-)
-{
-    RF_Hashmap* m;
-    RF_MALLOC(m, sizeof(RF_Hashmap), NULL);
-    if(! rfHashmap_Init(m, s
-/* @omit start */
-                        ,object_size
-                        ,ptr2Copy
-                        ,ptr2Destroy
-/* @omit end */
-))
-    {
-        free(m);
-        return NULL;
-    }
-    return m;
-}
-
-
-// Deinitializes a hashmap
-void rfHashmap_Deinit_Copy(RF_Hashmap* m)
-{
-    i_DestroySlots_Copy(m->slots, m->size
-/* @omit start */
-                   ,m->ptr2Destroy
-/* @omit end */
-);
-}
-// Destroys a hashmap
-void rfHashmap_Destroy_Copy(RF_Hashmap* m)
-{
-    rfHashmap_Deinit_Copy(m);
-    free(m);
-}
-
-// Deinitializes a hashmap
-void rfHashmap_Deinit(RF_Hashmap* m)
-{
-    i_DestroySlots(m->slots, m->size);
-}
-// Destroys a hashmap
-void rfHashmap_Destroy(RF_Hashmap* m)
-{
-    rfHashmap_Deinit(m);
-    free(m);
 }
 
 // Insert a copy of a value into the Hashmap
@@ -455,6 +364,109 @@ char rfHashmap_Insert_Copy(RF_Hashmap* m, RF_String* key,
   cleanup:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
+}
+
+
+/* @omit end */ /* POD cond end */
+
+
+
+
+
+
+
+
+static char i_InsertValue(RF_Hashslot** slots, RF_String* key,
+                          bool* exists,
+/* @mutate void* TYPEPTR_OBJ_ONLY */
+                          void* value, uint32_t size
+/* @omit start */
+                          ,uint32_t object_size
+/* @omit end */
+    )
+{
+    uint32_t i;
+    RF_Hashslot* s, *pr;
+    
+    *exists = false;
+    i = HsiehHash(rfString_Cstr(key), rfString_Length(key));
+    i = i % size;
+    s = slots[i];
+
+    //if the slot is null initialize it
+    if(s == NULL)
+    {
+        RF_MALLOC(s, sizeof(RF_Hashslot), false);
+        slots[i] = s;
+/* @omit start */
+        // we have to allocate the value for the generic case
+        RF_MALLOC(s->value, object_size, false);
+/* @omit end */
+        s->next = NULL;
+    }
+    else
+    {
+        while(s != NULL)
+        {
+            // if key already exists in the table
+            if(rfString_Equal(&s->key, key))
+            {
+                *exists = true;
+                return false;
+            }
+            pr = s;
+            s = s->next;
+        }
+        //if we get here it means we need to allocate a new slot
+        RF_MALLOC(s, sizeof(RF_Hashslot), false);
+        pr->next = s;
+/* @omit start */
+        // we have to allocate the value for the generic case
+        RF_MALLOC(s->value, object_size, false);
+/* @omit end */
+        s->next = NULL;
+    }
+    //finaly insert the key-value combo
+    //copy key
+    if(rfString_Copy_IN(&s->key, key) == false)
+    {
+        return false;
+    }
+    //shallow copy
+    /* @mutate memcpy MEMCPY */
+    memcpy(&s->value, value, object_size);
+    return true;
+}
+
+static void i_DestroySlots(RF_Hashslot** slots, uint32_t size)
+{
+    int i;
+    RF_Hashslot* s,*tmp;
+    for(i = 0;i < size;i++)
+    {
+        s = slots[i];
+        while(s != NULL)
+        {
+            tmp = s;
+            s = s->next;
+            rfString_Deinit(&tmp->key);
+            free(tmp);
+        }
+    }
+}
+
+
+
+// Deinitializes a hashmap
+void rfHashmap_Deinit(RF_Hashmap* m)
+{
+    i_DestroySlots(m->slots, m->size);
+}
+// Destroys a hashmap
+void rfHashmap_Destroy(RF_Hashmap* m)
+{
+    rfHashmap_Deinit(m);
+    free(m);
 }
 
 

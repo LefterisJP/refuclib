@@ -58,10 +58,21 @@ class OmitConditionError(Exception):
     def __init__(self, condition, file_name, line):
         self.condition = condition
         self.file_name = file_name
+        self.line = line
     def __str__(self):
         return ("Unrecognized omit condition \"{}\" found in the"
         "source of {} at \n\"{}\"".format(
             self.condition, self.file_name, self.line)
+        )
+
+class OmitInbalanceError(Exception):
+    def __init__(self, ondition, file_name, line):
+        self.file_name = file_name
+        self.line = line
+    def __str__(self):
+        return ("Inbalanced omit found in the"
+        "source of {} at \n\"{}\"".format(
+            self.file_name, self.line)
         )
 
 class ExtraObjectError(Exception):
@@ -343,7 +354,7 @@ class CodeGen():
                                    name_subs,
                                )
         except (MutateError, MutateSourceError, MutateTargetError,
-                OmitConditionError) as err:
+                OmitConditionError, InbalancedOmitError) as err:
             print type(err)
             print(err)
             raise err
@@ -619,6 +630,7 @@ class CodeGen():
         inF = open(name, "r")
         outF = open(newName, "w")
         omitting = False
+        omit_counter = 0
         omitting_next = False
         mutating = False
         mutate = []
@@ -642,15 +654,24 @@ class CodeGen():
             if omit_cond in line:
                 if self.handle_omit_cond(line, type_d, name) == True:
                     omitting = True
+                    omit_counter += 1
                     continue
             if not omitting and omit_start in line:
+                omit_counter += 1
                 omitting = True
                 continue
             elif not omitting and omit_next in line:
                 omitting_next = True
                 continue
+            elif omitting and omit_start in line:
+                omit_counter += 1
+                continue
             elif omitting and omit_end in line:
-                omitting = False
+                omit_counter -= 1
+                if omit_counter == 0:
+                    omitting = False
+                elif omit_counter < 0:
+                    raise InbalancedOmitError(name, line)
                 continue
             elif omitting:
                 continue

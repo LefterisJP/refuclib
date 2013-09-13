@@ -109,6 +109,43 @@ i_DECLIMEX_ void rfHashmap_Deinit(RF_Hashmap* m);
  */
 i_DECLIMEX_ void rfHashmap_Destroy(RF_Hashmap* m);
 
+
+/**
+ ** Insert a value into the Hashmap
+ ** @param m The map to insert the @c value into
+ ** @param key An @ref RF_String representing the key to associate with
+ ** the particular value
+ ** @param value The value to insert into the hashmap
+ ** @param exists Pass a boolean here to check whether the key
+ ** already exists in the table
+ ** @return @c true if all is fine and @c false otherwise
+ */
+i_DECLIMEX_ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key, 
+                                  /* @mutate void* TYPEPTR_OBJ_ONLY */
+                                  void* value,
+                                  bool* exists);
+
+
+
+/**
+ ** Query a value for a key of the hashmap
+ ** @param m The map to query
+ ** @param key An @ref RF_String with the key to query the map for
+ ** @param value If @c key exists in the map then @c value will contain the
+ ** value associated with this key. Is a shallow copy
+ ** @return If the @c key exists in the map then @c true will be returned.
+ ** Otherwise @c false will be returned
+ */
+i_DECLIMEX_ char rfHashmap_Get(RF_Hashmap* m, RF_String* key,
+                               /* @mutate void* TYPEPTR */
+                               void* value);
+
+/* @omit cond POD */
+
+/* distinction between shallow and deep copy functions
+   makes no sense in plain old data types
+ */
+
 /**
  ** Deinitializes a hashmap and calls destruction function
  ** on all objects. Should be called for maps populated
@@ -142,21 +179,6 @@ i_DECLIMEX_ char rfHashmap_Insert_Copy(RF_Hashmap* m, RF_String* key,
                                        bool* exists);
 
 /**
- ** Insert a value into the Hashmap
- ** @param m The map to insert the @c value into
- ** @param key An @ref RF_String representing the key to associate with
- ** the particular value
- ** @param value The value to insert into the hashmap
- ** @param exists Pass a boolean here to check whether the key
- ** already exists in the table
- ** @return @c true if all is fine and @c false otherwise
- */
-i_DECLIMEX_ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key, 
-                                  /* @mutate void* TYPEPTR_OBJ_ONLY */
-                                  void* value,
-                                  bool* exists);
-
-/**
  ** Query a value for a key of the hashmap. Copies the value
  ** @param m The map to query
  ** @param key An @ref RF_String with the key to query the map for
@@ -169,18 +191,7 @@ i_DECLIMEX_ char rfHashmap_Get_Copy(RF_Hashmap* m, RF_String* key,
                                /* @mutate void* TYPEPTR */
                                void* value);
 
-/**
- ** Query a value for a key of the hashmap
- ** @param m The map to query
- ** @param key An @ref RF_String with the key to query the map for
- ** @param value If @c key exists in the map then @c value will contain the
- ** value associated with this key. Is a shallow copy
- ** @return If the @c key exists in the map then @c true will be returned.
- ** Otherwise @c false will be returned
- */
-i_DECLIMEX_ char rfHashmap_Get(RF_Hashmap* m, RF_String* key,
-                               /* @mutate void* TYPEPTR */
-                               void* value);
+/* @omit end */
 
 #ifdef __cplusplus
 }///closing bracket for calling from C++
