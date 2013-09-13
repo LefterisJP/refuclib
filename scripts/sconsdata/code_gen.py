@@ -7,8 +7,6 @@ def enum(*sequential, **named):
     enums = dict(zip(sequential, range(len(sequential))), **named)
     return type('Enum', (), enums)
 
-obj = enum("destroy", "copy", "compare", "headers")
-
 json_file_name = "temp_build_data.json"
 
 
@@ -244,18 +242,21 @@ class CodeGen():
             }
 
             self.obj_dict = {
-                "String": ["rfString_Deinit", "rfString_Copy_IN", "rfString_Equal",
-                           ["Definitions/imex.h", # for import export macro
-                            "Definitions/defarg.h", # for default arguments
-                            "Preprocessor/rf_tokens.h", #for defined library tokens
-                            "Definitions/types.h",  #for fixed size data types
-                            "String/string_decl.h",  #for RF_String
-                            "String/core.h"]  #for Equal, Copy_IN and Deinit
-                       ]
-            }            
+                "String": {
+                    "destroy_func": "rfString_Deinit",
+                    "copy_func": "rfString_Copy_IN",
+                    "compare_func": "rfString_Equal",
+                    "headers": ["Definitions/imex.h", # for import export macro
+                                "Definitions/defarg.h", # for default arguments
+                                "Preprocessor/rf_tokens.h", #for defined library tokens
+                                "Definitions/types.h",  #for fixed size data types
+                                "String/string_decl.h",  #for RF_String
+                                "String/core.h"]  #for Equal, Copy_IN and Deinit
+                }
+            }
 
 
-    def save_data_to_json(self, filename):            
+    def save_data_to_json(self, filename):
         outF = open(filename, 'w')
         temp_list = [self.type_dict, self.obj_dict]
         outF.write(json.dumps(temp_list))
@@ -267,54 +268,27 @@ class CodeGen():
         self.type_dict = data[0]
         self.obj_dict = data[1]
         inF.close()
-    
+
 
     def add_object(self, extra_dict, refu_dir):
         """
-       Adds an object to the code generation. The parameter is one dict
-        with the following keys:
-         name -- The name of the object. Will be appended to all of the
-         functions
-         source_name -- The name of the object as defined in the source
-         code
-         header_name -- the path to the header file that defines the functions
-         and the struct of this object
-         destroy_func -- destroy function for the object
-         copy_fund -- copy function for the object
-         equals_func -- compare function for the object
-
-        Returns: The source that should be appended to the sources for
-        compiling
-        """        
-        # sanity check for header
-        if not os.path.isfile(extra_dict["header_name"]):
-            raise ExtraObjecterror(extra_dict["name"], "Provided header file {} "
-                                   "does not exist".format(extra_dict["header+name"]))
-                              
-        header_name = os.path.basename(extra_dict["header_name"])
-        header_abs = os.path.abspath(extra_dict["header_name"])
-
+        Adds an object to the code generation.
+        Look at args_before_config.py for the details
+        """
         self.type_dict[extra_dict["name"]] = extra_dict["source_name"]
-        self.obj_dict[extra_dict["name"]] = [
-            extra_dict["destroy_func"],
-            extra_dict["copy_func"],
-            extra_dict["equals_func"],
-            []]
-
-        #and append the header to the extra headers
-        self.obj_dict[extra_dict["name"]][obj.headers].append(header_abs)
+        self.obj_dict[extra_dict["name"]] = {
+            "destroy_func": extra_dict.get("destroy_func"),
+            "copy_func": extra_dict.get("copy_func"),
+            "compare_func": extra_dict.get("compare_func"),
+            "headers": extra_dict.get("headers"),
+            "store_type": extra_dict.get("store_type")
+        }
 
         #since a new object has been added save it to the json file
         fname = os.path.join(refu_dir, json_file_name)
         if os.path.isfile(fname):
            os.remove(fname)
         self.save_data_to_json(fname)
-
-
-        
-        
-        
-
 
 
     def code_gen(self, name, parent_dir, root, type_d, name_subs):
@@ -378,24 +352,30 @@ class CodeGen():
         if "ptr2Equal" in mutate[0]:
             (arg1, arg2) = get_func2_args(line, "ptr2Equal")
             if type_d in self.obj_dict:
+                if self.obj_dict[type_d]["compare_func"] is None:
+                    raise MutateError( "Source template requires compare "
+                                       "function while none was given at "
+                                       "definition",
+                                       file_name, line)
+
                 if mutate[0] == "ptr2Equalpr":
                     return "if({}({}, &{}))\n".format(
-                        self.obj_dict[type_d][obj.compare],
+                        self.obj_dict[type_d]["compare_func"],
                         arg1,
                         arg2)
                 elif mutate[0] == "ptr2Equalpp":
                     return "if({}({}, {}))\n".format(
-                        self.obj_dict[type_d][obj.compare],
+                        self.obj_dict[type_d]["compare_func"],
                         arg1,
                         arg2)
                 elif mutate[0] == "ptr2Equalrr":
                     return "if({}(&{}, &{}))\n".format(
-                        self.obj_dict[type_d][obj.compare],
+                        self.obj_dict[type_d]["compare_func"],
                         arg1,
                         arg2)
                 elif mutate[0] == "ptr2Equalrp":
                     return "if({}(&{}, {}))\n".format(
-                        self.obj_dict[type_d][obj.compare],
+                        self.obj_dict[type_d]["compare_func"],
                         arg1,
                         arg2)
                 else:
@@ -411,6 +391,11 @@ class CodeGen():
                                type_d, file_name, func_name):
         (arg1, arg2) = get_func2_args(line, func_name)
         if type_d in self.obj_dict:
+            if self.obj_dict[type_d]["copy_func"] is None:
+                raise MutateError( "Source template requires copy "
+                                   "function while none was given at "
+                                   "definition",
+                                   file_name, line)
             # read the IFBLOCK and get the rest of the arguments for
             # as statements inside if
             if "IFBLOCK" not in mutate:
@@ -422,25 +407,25 @@ class CodeGen():
                 ifblock = ifblock + " " + mutate[i];
             if mutate[0] == "{}rr".format(func_name):
                 return "if(!{}(&{}, &{}))\n\t{{ {} }}\n".format(
-                    self.obj_dict[type_d][obj.copy],
+                    self.obj_dict[type_d]["copy_func"],
                     arg1,
                     arg2,
                     ifblock)
             elif mutate[0] == "{}pp".format(func_name):
                 return "if(!{}({},{}))\n\t{{ {} }}\n".format(
-                    self.obj_dict[type_d][obj.copy],
+                    self.obj_dict[type_d]["copy_func"],
                     arg1,
                     arg2,
                     ifblock)
             elif mutate[0] == "{}pr".format(func_name):
                 return "if(!{}({},&{}))\n\t{{ {} }}\n".format(
-                    self.obj_dict[type_d][obj.copy],
+                    self.obj_dict[type_d]["copy_func"],
                     arg1,
                     arg2,
                     ifblock)
             elif mutate[0] == "{}rp".format(func_name):
                 return "if(!{}(&{},{}))\n\t{{ {} }}\n".format(
-                    self.obj_dict[type_d][obj.copy],
+                    self.obj_dict[type_d]["copy_func"],
                     arg1,
                     arg2,
                     ifblock)
@@ -499,13 +484,18 @@ class CodeGen():
         if("ptr2Destroy" in mutate[0]):
             arg = get_func1_args(line, "ptr2Destroy")
             if type_d in self.obj_dict:
+                if self.obj_dict[type_d]["destroy_func"] is None:
+                    raise MutateError( "Source template requires destroy "
+                                       "function while none was given at "
+                                       "definition",
+                                       file_name, line)
                 if mutate[0] == "ptr2Destroyr":
                     return "{}(&{});\n".format(
-                        self.obj_dict[type_d][obj.destroy],
+                        self.obj_dict[type_d]["destroy_func"],
                         arg)
                 elif mutate[0] == "ptr2Destroyp":
                     return "{}({});\n".format(
-                        self.obj_dict[type_d][obj.destroy],
+                        self.obj_dict[type_d]["destroy_func"],
                         arg)
                 else:
                     raise MutateSourceError(mutate[0], file_name, line)
@@ -641,7 +631,7 @@ class CodeGen():
             outF.write("/**\n"
                        " ** ---- Headers added by the building script specifically"
                        " for {} ----\n*/\n\n".format(self.type_dict[type_d]))
-            for header in self.obj_dict[type_d][obj.headers]:
+            for header in self.obj_dict[type_d]["headers"]:
                 if type_d in self.refu_objects:
                     outF.write("#include <{}>\n".format(header))
                 else:

@@ -61,10 +61,10 @@ def compileLib(verbose, dynamic, compiler):
     extra_source_opts = (
         " EXTRA_OBJECTS=\"[{name:test_object,"
         "source_name:test_obj,"
-        "header_name:Tests/ExtraObjects/test.h,"
+        "headers:[../ExtraObjects/test.h],"
         "destroy_func:test_destroy,"
         "copy_func:test_copy,"
-        "equals_func:test_equal"
+        "compare_func:test_equal"
         "}]\""
         " LIST=I,String,test_object DYNAMIC_ARRAY=I,String "
         "HASHMAP=I,String,generic "
