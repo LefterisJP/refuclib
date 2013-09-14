@@ -1,15 +1,15 @@
 import os
 import platform
 
-SConscript('scripts/sconsdata/compilers.py')
-SConscript('scripts/sconsdata/modules.py')
+SConscript('build_script/compilers.py')
+SConscript('build_script/modules.py')
 
 
-from scripts.sconsdata.modules import setup_modules
-from scripts.sconsdata.compilers import setupCompiler
-from scripts.sconsdata.configvariables import setupConfigVars
-from scripts.sconsdata.cleanup import clean_generated_files
-from scripts.sconsdata.code_gen import CodeGen
+from build_script.modules import setup_modules
+from build_script.compilers import setupCompiler
+from build_script.configvariables import setupConfigVars
+from build_script.cleanup import clean_generated_files
+from build_script.code_gen import CodeGen
 
 sourceDir = 'src'
 targetSystem = platform.system()
@@ -23,7 +23,7 @@ legalBuildTargets = [
 
 # read the configuration file variable and the extra objects
 (config_file, extra_objects, refu_dir, args_before) = SConscript(
-    'scripts/sconsdata/args_before_config.py')
+    'build_script/args_before_config.py')
 #create the code_gen object and add all the extra objects
 code_gen = CodeGen(refu_dir)
 # generate the extra sources for any extra objects
@@ -33,7 +33,7 @@ for o in extra_objects:
 
 
 # Create an intermediate environment to read the build variables
-vars = SConscript('scripts/sconsdata/variables.py',
+vars = SConscript('build_script/variables.py',
                   exports='allowedCompilers config_file code_gen')
 temp = Environment(variables=vars)
 
@@ -70,7 +70,7 @@ systemAttributes = SConscript('scripts/systemcheck/systemcheck.py',
                               exports='compiler')
 #only if actually building create the options file
 if 'shared' in COMMAND_LINE_TARGETS or 'static' in COMMAND_LINE_TARGETS:
-    SConscript('scripts/sconsdata/options.py',
+    SConscript('build_script/options.py',
                exports='modules env targetSystem systemAttributes refu_dir')
 
 outName = temp['OUTPUT_NAME']

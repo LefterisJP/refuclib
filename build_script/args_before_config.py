@@ -61,12 +61,17 @@ args_before.Add(PathVariable(
     'CONFIG_FILE',
     'This is the path to the configuration file where all the variables'
     'will be read from.',
-    '../../refu.config',
+    os.path.abspath(os.path.join(os.pardir, 'refu.config')),
     PathVariable.PathIsFile))
 
 args_before.Add(
-    PathVariable('REFU_DIR', 'The root directory of the refu library.'
-                 ' Absolute value', '../..', PathVariable.PathIsDir))
+    PathVariable(
+        'REFU_DIR', 'The root directory of the refu library.'
+        ' Absolute value',
+        os.path.abspath(os.pardir),
+        PathVariable.PathIsDir
+    )
+)
 
 args_before.Add(
     'EXTRA_OBJECTS',
