@@ -4,6 +4,7 @@ import os
 from utils import build_msg
 
 store_type_values = ['all', 'shallow', 'deep']
+extra_dict_required_keys = ['name', 'source_name', 'headers']
 
 def validate_extra_objects(extra_dict):
     """
@@ -11,12 +12,18 @@ def validate_extra_objects(extra_dict):
     provided contains sane data
     """
     for obj in extra_dict:
+        if not all(key in obj for key in extra_dict_required_keys):
+            build_msg("The dictionary of an extra object must contain at least"
+                      " the following keys: {}".format(', '.join(
+                          extra_dict_required_keys)
+            ))
+            Exit(-1)
         if ("store_type" in obj.keys() and
             obj["store_type"] not in store_type_values):
             build_msg("Illegal value given for extra object \"store_type\" key."
                       "Legal values are: [{}]".format(', '.join(
                           store_type_values
-                      )))
+            )))
             Exit(-1)
 
     return extra_dict
@@ -69,7 +76,7 @@ args_before.Add(
     'this is the following:'
     ' EXTRA_OBJECTS=\"[{name:test_object,'
     'source_name:test_obj,'
-    'headers:[Tests/ExtraObjects/test.h],'
+    'headers:[Tests/ExtraObjects/test.h,<include/something.h>, ...],'
     'destroy_func:test_destroy,'
     'copy_func:test_copy,'
     'compare_func:test_equal'

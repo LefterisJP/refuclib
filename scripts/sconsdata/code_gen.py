@@ -263,6 +263,9 @@ class CodeGen():
                                 "String/core.h"]  #for Equal, Copy_IN and Deinit
                 }
             }
+        self.omitting = False
+        self.omit_counter = 0
+        self.omitting_next = False
 
 
     def save_data_to_json(self, filename):
@@ -292,7 +295,6 @@ class CodeGen():
             "headers": extra_dict.get("headers"),
             "store_type": extra_dict.get("store_type")
         }
-
         #since a new object has been added save it to the json file
         fname = os.path.join(refu_dir, json_file_name)
         if os.path.isfile(fname):
@@ -609,8 +611,9 @@ class CodeGen():
 
     def handle_omit_cond(self, line, type_d, file_name, line_num):
         """
-           Handles omits with conditions
+           Handles omits with conditions. True means omitting
         """
+        ret = False
         part = line.partition(omit_cond)
         if part[0] == line:
             raise ParsingError("Could not find beginning of @omit cond "
@@ -627,38 +630,75 @@ class CodeGen():
         for cond in conditions:
             if "OBJECT" == cond:
                 if type_d in self.obj_dict:
-                    return True;
+                    ret = True
             elif "POD" == cond:
                 if type_d not in self.obj_dict:
-                    return True;
+                    ret = True
             elif "NONLMS" == cond:
                 if type_d not in self.lms_list:
-                    return True;
+                    ret = True
             elif "STRING" == cond:
                 if type_d == "String":
-                    return True;
+                    ret = True;
             elif "SHALLOW_COPY_ONLY" == cond:
                 if(type_d in self.obj_dict and
-                   self.obj_dict.get("store_type") == "shallow"):
-                    return True
+                   self.obj_dict[type_d].get("store_type") == "shallow"):
+                    ret = True
             elif "DEEP_COPY_ONLY" == cond:
                 if(type_d in self.obj_dict and
-                   self.obj_dict.get("store_type") == "deep"):
-                    return True
+                   self.obj_dict[type_d].get("store_type") == "deep"):
+                    ret = True
             else:
                 raise OmitConditionError(cond, file_name, line_num)
 
-        return False
+        return ret
 
+
+
+    def parser_check_omits(self, line, type_d, name, line_num):
+        """
+        Checks off a line as far as @omit statements are concerned
+        Returns either:
+        True -- line should be skipped
+        False -- keep parsing
+        """
+
+        if self.omitting_next:
+            self.omitting_next = False
+            return True
+
+        if not self.omitting and omit_cond in line:
+            self.omitting = self.handle_omit_cond(line, type_d, name, line_num)
+            if self.omitting:
+                self.omit_counter += 1
+        elif not self.omitting and omit_start in line:
+            self.omit_counter += 1
+            self.omitting = True
+        elif not self.omitting and omit_next in line:
+            self.omitting_next = True
+        elif self.omitting and omit_start in line:
+            self.omit_counter += 1
+        elif self.omitting and omit_end in line:
+            self.omit_counter -= 1
+            if self.omit_counter == 0:
+                self.omitting = False
+            elif self.omit_counter < 0:
+                raise OmitInbalanceError(name, line_num)
+
+        return (
+            self.omitting or
+            any(c in line for c in [omit_next, omit_start, omit_end, omit_cond])
+        )
 
 
 
     def gen_single_source(self, name, newName, type_d, name_subs):
+        """
+        This is the main parsing function to generate a file
+        from a template
+        """
         inF = open(name, "r")
         outF = open(newName, "w")
-        omitting = False
-        omit_counter = 0
-        omitting_next = False
         mutating = False
         mutate = []
         line_num = 0
@@ -673,36 +713,14 @@ class CodeGen():
                 if type_d in self.refu_objects:
                     outF.write("#include <{}>\n".format(header))
                 else:
-                    outF.write("#include \"{}\"\n".format(header))
+                    if header.startswith("<"):
+                        outF.write("#include {}\n".format(header))
+                    else:
+                        outF.write("#include \"{}\"\n".format(header))
+
         #start creating the source from the generic template
         for line in inF:
-            line_num += 1
-            if omitting_next:
-                omitting_next = False
-                continue
-            if omit_cond in line:
-                if self.handle_omit_cond(line, type_d, name, line_num) == True:
-                    omitting = True
-                    omit_counter += 1
-                    continue
-            if not omitting and omit_start in line:
-                omit_counter += 1
-                omitting = True
-                continue
-            elif not omitting and omit_next in line:
-                omitting_next = True
-                continue
-            elif omitting and omit_start in line:
-                omit_counter += 1
-                continue
-            elif omitting and omit_end in line:
-                omit_counter -= 1
-                if omit_counter == 0:
-                    omitting = False
-                elif omit_counter < 0:
-                    raise OmitInbalanceError(name, line_num)
-                continue
-            elif omitting:
+            if self.parser_check_omits(line, type_d, name, line_num):
                 continue
             #else we check for name substitution
             line = check_line_for_name_sub(line, name_subs, type_d)

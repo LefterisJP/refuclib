@@ -87,7 +87,7 @@ vars.Add(
                      'LIST', 
                      'DYNAMIC_ARRAY',
                      'BINARY_ARRAY',
-                     'HASMAP',
+                     'HASHMAP',
                      'TIME', 'DATE',
                      'XML',
                      'THREADS', 'THREADS_SIMPLE', 'THREADS_X',
