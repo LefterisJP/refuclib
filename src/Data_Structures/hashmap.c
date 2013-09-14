@@ -3,13 +3,13 @@
 **
 ** Copyright (c) 2011-2013, Karapetsas Eleftherios
 ** All rights reserved.
-** 
+**
 ** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 **  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 **  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in
 **     the documentation and/or other materials provided with the distribution.
 **  3. Neither the name of the Original Author of Refu nor the names of its contributors may be used to endorse or promote products derived from
-** 
+**
 ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
 ** INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 ** DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
@@ -34,7 +34,7 @@
 /* @omit end */
 
 /*------------- Corrensponding Header inclusion -------------*/
-/* @omit cond STRING */
+/* @omitcond STRING */
 #include <Definitions/imex.h> //for import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <Preprocessor/rf_tokens.h>//for the defined library tokens
@@ -43,7 +43,7 @@
 /* @omit end */
 #include <Definitions/retcodes.h> //for error codes, bool
 #include <Data_Structures/hashmap_decl.h> //for the struct declarations
-#include <Data_Structures/hashmap.h> 
+#include <Data_Structures/hashmap.h>
 /*------------- Module related inclusion -------------*/
 
 /*------------- Outside Module inclusion -------------*/
@@ -65,10 +65,10 @@
     #include <float.h>
     #include <Utils/constcmp.h>
 // String module inclusions
-/* @omit cond STRING */
+/* @omitcond STRING */
     #include <String/core.h> //for rfString_Equal
 /* @omit end */
-    #include <String/conversion.h> //for rfString_Cstr() 
+    #include <String/conversion.h> //for rfString_Cstr()
     #include <String/retrieval.h> //for rfString_Length()
 /*------------- libc includes -------------*/
 #include <stdint.h> //used by hsieh's hash
@@ -183,10 +183,11 @@ RF_Hashmap* rfHashmap_Create(uint32_t s
     return m;
 }
 
-/* @omitcond POD */
-/* shallow and deep copy distinction makes no sense for plain old data */
 
-static void i_DestroySlots_Copy(RF_Hashslot** slots, uint32_t size 
+/* -- Deep copy storage functions start -- */
+/* @omitcond POD SHALLOW_COPY_ONLY */
+
+static void i_DestroySlots_Copy(RF_Hashslot** slots, uint32_t size
                            /* @omit start */
                            ,void (*ptr2Destroy)(void*)
                            /* @omit end */
@@ -233,7 +234,7 @@ static char i_InsertValue_Copy(RF_Hashslot** slots, RF_String* key,
                           ,uint32_t object_size
                           ,char (*ptr2Copy)(void*, void*),
                           void (*ptr2Destroy)(void*)
-                          
+
 /* @omit end */
     )
 {
@@ -359,7 +360,7 @@ char rfHashmap_Insert_Copy(RF_Hashmap* m, RF_String* key,
 );
         free(m->slots);
         m->slots = tmp;
-    }    
+    }
 
   cleanup:
     RF_EXIT_LOCAL_SCOPE();
@@ -367,14 +368,46 @@ char rfHashmap_Insert_Copy(RF_Hashmap* m, RF_String* key,
 }
 
 
-/* @omit end */ /* POD cond end */
+char rfHashmap_Get_Copy(RF_Hashmap* m, RF_String* key,
+                        /* @mutate void* TYPEPTR */
+                        void* value)
+{
+    uint32_t i;
+    RF_Hashslot* s;
+    char ret = false;
+    RF_ENTER_LOCAL_SCOPE();
+    i = HsiehHash(rfString_Cstr(key), rfString_Length(key));
+    i = i % m->size;
+    s = m->slots[i];
+
+    while(s != NULL)
+    {
+        if(rfString_Equal(&s->key, key))
+        {//if key is found get it
+
+            /* @mutate ptr2Copypr ASSIGN PODPTR POD_DL IFBLOCK goto cleanup; */
+            m->ptr2Copy(value, s->value);
+
+            ret = true;
+            goto cleanup;
+        }
+        //else proceed in the linked list chain
+        s = s->next;
+    }
+
+  cleanup:
+    RF_EXIT_LOCAL_SCOPE();
+    return ret;
+}
+
+/* @omit end */
+/* -- Deep copy storage functions end -- */
 
 
 
 
-
-
-
+/* -- Shallow copy storage functions start -- */
+/* @omitcond DEEP_COPY_ONLY */
 
 static char i_InsertValue(RF_Hashslot** slots, RF_String* key,
                           bool* exists,
@@ -387,7 +420,7 @@ static char i_InsertValue(RF_Hashslot** slots, RF_String* key,
 {
     uint32_t i;
     RF_Hashslot* s, *pr;
-    
+
     *exists = false;
     i = HsiehHash(rfString_Cstr(key), rfString_Length(key));
     i = i % size;
@@ -535,7 +568,7 @@ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
         i_DestroySlots(m->slots, prsize);
         free(m->slots);
         m->slots = tmp;
-    }    
+    }
 
   cleanup:
     RF_EXIT_LOCAL_SCOPE();
@@ -574,34 +607,5 @@ char rfHashmap_Get(RF_Hashmap* m, RF_String* key,
     return ret;
 }
 
-char rfHashmap_Get_Copy(RF_Hashmap* m, RF_String* key,
-                        /* @mutate void* TYPEPTR */
-                        void* value)
-{
-    uint32_t i;
-    RF_Hashslot* s;
-    char ret = false;
-    RF_ENTER_LOCAL_SCOPE();
-    i = HsiehHash(rfString_Cstr(key), rfString_Length(key));
-    i = i % m->size;
-    s = m->slots[i];
-
-    while(s != NULL)
-    {
-        if(rfString_Equal(&s->key, key))
-        {//if key is found get it
-
-            /* @mutate ptr2Copypr ASSIGN PODPTR POD_DL IFBLOCK goto cleanup; */
-            m->ptr2Copy(value, s->value);
-
-            ret = true;
-            goto cleanup;
-        }
-        //else proceed in the linked list chain
-        s = s->next;
-    }
-
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
-}
+/* -- Shallow copy storage functions end -- */
+/* @omit end */

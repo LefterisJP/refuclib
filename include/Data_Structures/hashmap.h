@@ -43,7 +43,7 @@
  * This file is a generic TEMPLATE. Depending on the options you provide
  * in scons though various specializations of this file will get
  * generated during building the library. If you want to use the actual file
- * as it is in its generic mode then you have to provide the "generic" 
+ * as it is in its generic mode then you have to provide the "generic"
  * argument inside the data structure's specialization argument during build
  */
 
@@ -62,7 +62,7 @@ extern "C"
  ** Initializes a hashmap data structure
  ** @param m The hashmap to initialize
  ** @param s The initial size of the map in "buckets"
- ** @param object_size The size of the generic object stored in the 
+ ** @param object_size The size of the generic object stored in the
  ** hashmap. Only used in the generic case of the specialization
  ** @param ptr2Copy A pointer to a copy function for the generic object.
  ** Only used in the generic case of the specialization
@@ -81,7 +81,7 @@ i_DECLIMEX_ char rfHashmap_Init(RF_Hashmap* m, uint32_t s
 /**
  ** Allocates and returns a hashmap data structure
  ** @param s The initial size of the map in "buckets"
- ** @param object_size The size of the generic object stored in the 
+ ** @param object_size The size of the generic object stored in the
  ** hashmap. Only used in the generic case of the specialization
  ** @param ptr2Copy A pointer to a copy function for the generic object.
  ** Only used in the generic case of the specialization
@@ -96,6 +96,9 @@ i_DECLIMEX_ RF_Hashmap* rfHashmap_Create(uint32_t s
                                 ,void (*ptr2Destroy)(void*)
 /* @omit end */
 );
+
+
+/* @omitcond DEEP_COPY_ONLY */
 
 /**
  ** Deinitializes a hashmap
@@ -120,7 +123,7 @@ i_DECLIMEX_ void rfHashmap_Destroy(RF_Hashmap* m);
  ** already exists in the table
  ** @return @c true if all is fine and @c false otherwise
  */
-i_DECLIMEX_ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key, 
+i_DECLIMEX_ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
                                   /* @mutate void* TYPEPTR_OBJ_ONLY */
                                   void* value,
                                   bool* exists);
@@ -140,9 +143,13 @@ i_DECLIMEX_ char rfHashmap_Get(RF_Hashmap* m, RF_String* key,
                                /* @mutate void* TYPEPTR */
                                void* value);
 
-/* @omit cond POD */
+/* @omit end */
 
-/* distinction between shallow and deep copy functions
+
+/* @omitcond POD SHALLOW_COPY_ONLY */
+
+/*
+   distinction between shallow and deep copy functions
    makes no sense in plain old data types
  */
 

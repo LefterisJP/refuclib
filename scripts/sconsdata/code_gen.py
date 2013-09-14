@@ -1,6 +1,7 @@
 import shutil
 import os
 import json
+import sys
 from time import gmtime, strftime
 
 def enum(*sequential, **named):
@@ -26,7 +27,7 @@ class MutateTargetError(Exception):
         self.line = line
     def __str__(self):
         return ("Unrecognized mutation target type \"{}\" found in the "
-        "source of {} at \n\"{}\"".format(
+        "source of {} at line:\"{}\"".format(
             self.target_type, self.file_name, self.line)
         )
 
@@ -37,7 +38,7 @@ class MutateSourceError(Exception):
         self.line = line
     def __str__(self):
         return ("Unrecognized mutation source type \"{}\" found in the "
-        "source of {} at \n\"{}\"".format(
+        "source of {} at line:\"{}\"".format(
             self.source_type, self.file_name, self.line)
         )
 
@@ -48,7 +49,18 @@ class MutateError(Exception):
         self.line = line
     def __str__(self):
         return ("Mutation Error: \"{}\" "
-                "in {} at \n\"{}\"".format(
+                "in {} at line:\"{}\"".format(
+                    self.msg, self.file_name, self.line)
+        )
+
+class ParsingError(Exception):
+    def __init__(self, msg, file_name, line):
+        self.file_name = file_name
+        self.msg = msg
+        self.line = line
+    def __str__(self):
+        return ("Parsing Error: \"{}\" "
+                "in {} at line:\"{}\"".format(
                     self.msg, self.file_name, self.line)
         )
 
@@ -59,7 +71,7 @@ class OmitConditionError(Exception):
         self.line = line
     def __str__(self):
         return ("Unrecognized omit condition \"{}\" found in the"
-        "source of {} at \n\"{}\"".format(
+        "source of {} at line:\"{}\"".format(
             self.condition, self.file_name, self.line)
         )
 
@@ -69,7 +81,7 @@ class OmitInbalanceError(Exception):
         self.line = line
     def __str__(self):
         return ("Inbalanced omit found in the"
-        "source of {} at \n\"{}\"".format(
+        "source of {} at line:\"{}\"".format(
             self.file_name, self.line)
         )
 
@@ -183,10 +195,7 @@ class CodeGen():
     """
 
     refu_objects = [ "String" ]
-
     lms_list = ["String"]
-
-
 
     def __init__(self, refu_root):
         """
@@ -328,19 +337,24 @@ class CodeGen():
                                    name_subs,
                                )
         except (MutateError, MutateSourceError, MutateTargetError,
-                OmitConditionError, InbalancedOmitError) as err:
+                OmitConditionError, OmitInbalanceError, ParsingError) as err:
             print type(err)
             print(err)
             raise err
         except Exception as err:
-            print("Unknown Problems during code generation. Error type:")
-            print type(err)
+            print("Unexpected Problems during code generation")
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print("\tError type:{} \n\tFile Name:{}"
+                  "\n\tError: {}\n\tLine number: {}".format(
+                  exc_type, fname, str(err), exc_tb.tb_lineno))
             raise err
 
 
 
 
-    def handle_COMPARE(self, line, mutate, type_d, file_name):
+
+    def handle_COMPARE(self, line, mutate, type_d, file_name, line_num):
         """
            Performs the mutation of the generic template code for
            comparing objects. It either gets changed into:
@@ -356,7 +370,7 @@ class CodeGen():
                     raise MutateError( "Source template requires compare "
                                        "function while none was given at "
                                        "definition",
-                                       file_name, line)
+                                       file_name, line_num)
 
                 if mutate[0] == "ptr2Equalpr":
                     return "if({}({}, &{}))\n".format(
@@ -379,29 +393,30 @@ class CodeGen():
                         arg1,
                         arg2)
                 else:
-                    raise MutateSourceError(mutate[0], file_name, line)
+                    raise MutateSourceError(mutate[0], file_name, line_num)
             else:
                 return "if({} == {})\n".format(arg1, arg2)
         else:
-            raise MutateSourceError(mutate[0], file_name, line)
+            raise MutateSourceError(mutate[0], file_name, line_num)
 
 
 
     def handle_assign_function(self, line, mutate,
-                               type_d, file_name, func_name):
+                               type_d, file_name, func_name,
+                               line_num):
         (arg1, arg2) = get_func2_args(line, func_name)
         if type_d in self.obj_dict:
             if self.obj_dict[type_d]["copy_func"] is None:
                 raise MutateError( "Source template requires copy "
                                    "function while none was given at "
                                    "definition",
-                                   file_name, line)
+                                   file_name, line_num)
             # read the IFBLOCK and get the rest of the arguments for
             # as statements inside if
             if "IFBLOCK" not in mutate:
                 raise MutateError("For an assignment to objects, an "
                                   "IFBLOCK argument has not been given",
-                                  file_name, line)
+                                  file_name, line_num)
             ifblock = ""
             for i in range(mutate.index("IFBLOCK") + 1, len(mutate)):
                 ifblock = ifblock + " " + mutate[i];
@@ -430,7 +445,7 @@ class CodeGen():
                     arg2,
                     ifblock)
             else:
-                raise MutateSourceError(mutate[0], file_name, line)
+                raise MutateSourceError(mutate[0], file_name, line_num)
         else:
             if "PODPTR" in mutate:
                 if "POD_DLR" in mutate: # dereference POD left and right
@@ -444,11 +459,11 @@ class CodeGen():
                 else:
                     raise MutateError("Unknown ptr2Copy handler for POD "
                                       "data has been given", file_name,
-                                      line)
+                                      line_num)
             else:
                 return "{} = {};\n".format(arg1, arg2)
 
-    def handle_ASSIGN(self, line, mutate, type_d, file_name):
+    def handle_ASSIGN(self, line, mutate, type_d, file_name, line_num):
         """
            Performs the mutation of the generic template code for
            copying objects. It either gets changed into:
@@ -457,11 +472,12 @@ class CodeGen():
         """
         if("ptr2Copy" in mutate[0]):
             return self.handle_assign_function(line, mutate, type_d,
-                                               file_name, "ptr2Copy")
+                                               file_name, "ptr2Copy",
+                                               line_num)
         else:
-            raise MutateSourceError(mutate[0], file_name, line)
+            raise MutateSourceError(mutate[0], file_name, line_num)
 
-    def handle_MEMCPY(self, line, mutate, type_d, file_name):
+    def handle_MEMCPY(self, line, mutate, type_d, file_name, line_num):
         """
            Performs the mutation of the generic template code for
            shallow copying objects.
@@ -474,7 +490,7 @@ class CodeGen():
         else:
             return "{} = {};\n".format(arg1, arg2)
 
-    def handle_DESTROY(self, line, mutate, type_d, file_name):
+    def handle_DESTROY(self, line, mutate, type_d, file_name, line_num):
         """
            Performs the mutation of the generic template code for
            destroying objects. It either gets changed into:
@@ -488,7 +504,7 @@ class CodeGen():
                     raise MutateError( "Source template requires destroy "
                                        "function while none was given at "
                                        "definition",
-                                       file_name, line)
+                                       file_name, line_num)
                 if mutate[0] == "ptr2Destroyr":
                     return "{}(&{});\n".format(
                         self.obj_dict[type_d]["destroy_func"],
@@ -498,11 +514,11 @@ class CodeGen():
                         self.obj_dict[type_d]["destroy_func"],
                         arg)
                 else:
-                    raise MutateSourceError(mutate[0], file_name, line)
+                    raise MutateSourceError(mutate[0], file_name, line_num)
             else:
                 return "";
 
-    def handle_INITIALIZE_TO_ZERO(self, line, mutate, type_d, file_name):
+    def handle_INITIALIZE_TO_ZERO(self, line, mutate, type_d, file_name, line_num):
         """
            If type is not plain old data, mutate[0] (mutate_from) is changed
            into a compound literal structure initialization to ZERO
@@ -514,7 +530,7 @@ class CodeGen():
         else:
             return line
 
-    def handle_INIT(self, line, mutate, type_d, file_name):
+    def handle_INIT(self, line, mutate, type_d, file_name, line_num):
         """
             If type is not plain old data, mutate[0] (mutate_from) is changed
             into the initialization function of the data structure's object
@@ -523,7 +539,7 @@ class CodeGen():
         """
         return line
 
-    def handle_REFERENCE(self, line, mutate, type_d, file_name):
+    def handle_REFERENCE(self, line, mutate, type_d, file_name, line_num):
         """
            If type is not plain old data, mutate[0] (mutate_from) is changed
            into a reference
@@ -533,20 +549,20 @@ class CodeGen():
         else:
             return line
 
-    def handle_TYPE(self, line, mutate, type_d, file_name):
+    def handle_TYPE(self, line, mutate, type_d, file_name, line_num):
         """
            mutate[0] (mutate_from) is changed into the type
         """
         return line.replace(mutate[0], self.type_dict[type_d])
 
-    def handle_SIZE(self, line, mutate, type_d, file_name):
+    def handle_SIZE(self, line, mutate, type_d, file_name, line_num):
         """
            mutate[0] (mutate_from) is changed into the size of the type
         """
         return line.replace(mutate[0], "sizeof({})".format(
             self.type_dict[type_d]))
 
-    def handle_TYPEPTR_OBJ_ONLY(self, line, mutate, type_d, file_name):
+    def handle_TYPEPTR_OBJ_ONLY(self, line, mutate, type_d, file_name, line_num):
         """
            mutate[0] (mutate_from) is changed into the type if the type is
            plain old data. If not then it's changed into type pointer
@@ -556,62 +572,83 @@ class CodeGen():
         else:
             return line.replace(mutate[0], self.type_dict[type_d])
 
-    def handle_TYPEPTR(self, line, mutate, type_d, file_name):
+    def handle_TYPEPTR(self, line, mutate, type_d, file_name, line_num):
         """
            mutate[0] (mutate_from) is changed into type pointer
         """
         return line.replace(mutate[0], self.type_dict[type_d]+"*")
 
-    def handle_REMOVE(self, line, mutate, type_d, file_name):
+    def handle_REMOVE(self, line, mutate, type_d, file_name, line_num):
         """
             Handle the simple case of requesting removal of something
         """
         return line.replace(mutate[0], "")
 
-    def handle_REPLACE(self, line, mutate, type_d, file_name):
+    def handle_REPLACE(self, line, mutate, type_d, file_name, line_num):
         """
             Handle the simple case of requesting replacing something
             with something else
         """
         if len(mutate) != 3:
             raise MutateError("Incorrect arguments given for replacement",
-                              file_name, line)
+                              file_name, line_num)
 
         return line.replace(mutate[0], mutate[2])
 
-    def handle_mutate(self, mutate, type_d, line, name):
+    def handle_mutate(self, mutate, type_d, line, name, line_num):
         if len(mutate) < 2:
             raise MutateError("mutate list with less than 2 arguments passed "
-                              "to handler", name, line)
+                              "to handler", name, line_num)
         #if the 2nd argument to mutate is unknown we got a problem
         if mutate[1] not in self.handle_dict:
-            raise MutateTargetError(mutate[1], name, line)
+            raise MutateTargetError(mutate[1], name, line_num)
         # handle any extra arguments first
         line = check_extra_args(line, mutate, type_d)
         # and then call the "main" handler
-        return self.handle_dict[mutate[1]](line, mutate, type_d, name)
+        return self.handle_dict[mutate[1]](line, mutate, type_d, name, line_num)
 
-    def handle_omit_cond(self, line, type_d, filename):
+    def handle_omit_cond(self, line, type_d, file_name, line_num):
         """
            Handles omits with conditions
         """
-        line = line.partition(omit_cond)[2]
-        cond = line.partition(" ")[0]
-        if cond == "OBJECT":
-            if type_d in self.obj_dict:
-                return True;
-        elif cond == "POD":
-            if type_d not in self.obj_dict:
-                return True;
-        elif cond == "NONLMS":
-            if type_d not in self.lms_list:
-                return True;
-        elif cond == "STRING":
-            if type_d == "String":
-                return True;
-        else:
-            raise OmitConditionError(cond, filename, line)
-        return False;
+        part = line.partition(omit_cond)
+        if part[0] == line:
+            raise ParsingError("Could not find beginning of @omit cond "
+                               "statement", file_name, line_num)
+        line = part[2]
+
+        part = line.partition("*/")
+        if part[0] == line:
+            raise ParsingError("Comment did not end at the same line for "
+                               "@omit cond statement", file_name, line_num)
+        line = part[0]
+
+        conditions = line.split()
+        for cond in conditions:
+            if "OBJECT" == cond:
+                if type_d in self.obj_dict:
+                    return True;
+            elif "POD" == cond:
+                if type_d not in self.obj_dict:
+                    return True;
+            elif "NONLMS" == cond:
+                if type_d not in self.lms_list:
+                    return True;
+            elif "STRING" == cond:
+                if type_d == "String":
+                    return True;
+            elif "SHALLOW_COPY_ONLY" == cond:
+                if(type_d in self.obj_dict and
+                   self.obj_dict.get("store_type") == "shallow"):
+                    return True
+            elif "DEEP_COPY_ONLY" == cond:
+                if(type_d in self.obj_dict and
+                   self.obj_dict.get("store_type") == "deep"):
+                    return True
+            else:
+                raise OmitConditionError(cond, file_name, line_num)
+
+        return False
 
 
 
@@ -624,6 +661,7 @@ class CodeGen():
         omitting_next = False
         mutating = False
         mutate = []
+        line_num = 0
         outF.write(gen_template_intro_str(name, self.type_dict[type_d]))
         #if the type is an object and it needs to have any extra headers
         if type_d in self.obj_dict and name.endswith(".c"):
@@ -638,11 +676,12 @@ class CodeGen():
                     outF.write("#include \"{}\"\n".format(header))
         #start creating the source from the generic template
         for line in inF:
+            line_num += 1
             if omitting_next:
                 omitting_next = False
                 continue
             if omit_cond in line:
-                if self.handle_omit_cond(line, type_d, name) == True:
+                if self.handle_omit_cond(line, type_d, name, line_num) == True:
                     omitting = True
                     omit_counter += 1
                     continue
@@ -661,7 +700,7 @@ class CodeGen():
                 if omit_counter == 0:
                     omitting = False
                 elif omit_counter < 0:
-                    raise InbalancedOmitError(name, line)
+                    raise OmitInbalanceError(name, line_num)
                 continue
             elif omitting:
                 continue
@@ -670,7 +709,7 @@ class CodeGen():
             #we also check for mutation
             if mutating is True:
                 mutating = False
-                line = self.handle_mutate(mutate, type_d, line, name)
+                line = self.handle_mutate(mutate, type_d, line, name, line_num)
                 mutate[:] = []
                 #now proceed to write the line
             elif mutate_cmd in line:
