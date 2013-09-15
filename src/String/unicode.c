@@ -174,7 +174,7 @@ int rfUTF8_Encode_single(const uint32_t codepoint, char* utf8)
     }
     ///success
     utf8[i] = '\0';
-    return i-1;
+    return i;
 }
 
 //Takes a utf8 buffer and decodes it into unicode codepoints

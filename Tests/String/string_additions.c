@@ -6,7 +6,7 @@
 int main()
 {
 	  RF_String s1,s2,s3,s4;
-	  RF_StringX sx1,sx2;
+	  RF_StringX sx1,sx2, sx3;
 
 	  EXPECT(rfInit(), true);
 
@@ -85,5 +85,18 @@ int main()
                     "Barack Obama has won a second term as US president "
                     "after winning the crucial battleground of Ohio, "
                     "taking him past the 270 margin.")));
+
+
+    EXPECT(rfStringX_Init(&sx3, "Testing appending a cha"),
+           true);
+    EXPECT(rfStringX_Append_char(&sx3, (uint32_t)'r'), true);
+    EXPECT(rfString_Equal(
+               &sx3, RFS_("Testing appending a char")), true);
+#pragma GCC diagnostic ignored "-Wmultichar"
+    EXPECT(rfStringX_Append_charutf8(&sx3, (uint32_t)'研'), true);
+    EXPECT(rfString_Equal(
+               &sx3, RFS_("Testing appending a char研")), true);
+
+
 	return 0;
 }

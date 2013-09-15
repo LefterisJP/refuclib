@@ -600,7 +600,7 @@ char rfStringX_Assign_char(RF_StringX* str,uint32_t codepoint)
         RF_REALLOC(str->INH_String.bytes, char,
                    5*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER+1, false);
     }
-    if((bytes=rfUTF8_Encode_single(codepoint, utf8)) < 0)
+    if((bytes=rfUTF8_Encode_single(codepoint, utf8)) <= 0)
     {
         RF_ERROR(0, "Assigning a character to an RF_StringX failed "
                  "due to utf8 encoding");

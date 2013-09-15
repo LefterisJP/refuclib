@@ -147,7 +147,7 @@ char rfStringX_Append_char(RF_StringX* thisstr, uint32_t unichar)
 {
     char utf8[5];
     int length;
-    if((length = rfUTF8_Encode_single(unichar,utf8)) < 0)
+    if((length = rfUTF8_Encode_single(unichar,utf8)) <= 0)
     {
         RF_ERROR(0,"Encoding the given unicode codepoint to UTF8 failed");
         return false;
