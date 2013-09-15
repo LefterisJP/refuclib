@@ -316,6 +316,15 @@ i_DECLIMEX_ char rfString_Assign(RF_String* dest,const void* source);
  **/
 i_DECLIMEX_ char rfString_Assign_char(RF_String* thisstr,uint32_t character);
 
+/**
+ ** @memberof RF_String
+ ** @brief Makes sure that a string is NULL
+ **/
+#define rfString_Null(i_STRING) do{               \
+        (i_STRING)->byteLength = 0;               \
+        (i_STRING)->bytes = NULL;                 \
+}while(0)
+
 //! @}
 
 
@@ -423,6 +432,13 @@ i_DECLIMEX_ void rfString_Deinit(RF_String* s);
  **
  **/
 i_DECLIMEX_ char rfString_Equal(const void* s1,const void* s2);
+
+/**
+ ** @memberof RF_String
+ ** @brief Checks that a string is null
+ **/
+#define rfString_IsNull(i_STRING)                               \
+    ((i_STRING)->byteLength == 0 && (i_STRING)->bytes == NULL)
 
 //! @}
 

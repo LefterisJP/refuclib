@@ -70,5 +70,11 @@ int main()
            rfString_Equal(&sx6,
                           RFS_("に開催される、野球日本代表とキューバ代表に"
                                "よる国際試合")));
+
+    //testing null strings
+    rfStringX_Null(&sx3);
+    EXPECT(rfStringX_IsNull(&sx3), true);
+    rfString_Null(&s1);
+    EXPECT(rfString_IsNull(&s1), true);
 	return 0;
 }

@@ -421,6 +421,24 @@ i_DECLIMEX_ char rfStringX_Assign_char(RF_StringX* thisstr,uint32_t character);
 
 /**
  ** @memberof RF_StringX
+ ** @brief Makes sure that a string is NULL
+ **/
+#define rfStringX_Null(i_STRING) do{            \
+        (i_STRING)->INH_String.byteLength = 0;  \
+        (i_STRING)->INH_String.bytes = NULL;    \
+        (i_STRING)->bIndex = 0;                 \
+        (i_STRING)->bSize = 0;                  \
+}while(0)
+
+/**
+ ** @memberof RF_StringX
+ ** @brief Checks that a string is null
+ **/
+#define rfStringX_IsNull(i_STRING) \
+    ((i_STRING)->INH_String.byteLength == 0 && (i_STRING)->INH_String.bytes == NULL)
+
+/**
+ ** @memberof RF_StringX
  ** @cppignore
  ** @brief Creates an RF_StringX from an RF_string
  **
