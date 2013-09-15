@@ -1,3 +1,5 @@
+#!/usr/bin/env python2
+
 # This is the main testing script for the Refu library project
 # All examples and tests are compiled and tested, being compared with
 # the expected output. At the end of the script a list with the results of all

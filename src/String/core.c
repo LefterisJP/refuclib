@@ -503,12 +503,14 @@ char rfString_Assign_char(RF_String* str,uint32_t codepoint)
 /*--- RF_String copying functions ---*/
 
 
+
+
 //Creates and returns an allocated copy of the given string
 RF_String* rfString_Copy_OUT(const void* srcP)
 {
     const RF_String* src = (const RF_String*)srcP;
-    //create the new string
     RF_String* ret;
+    //create the new string
     RF_MALLOC(ret, sizeof(RF_String), NULL);
     if(rfString_Copy_IN(ret, src) == false)
     {

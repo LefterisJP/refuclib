@@ -318,7 +318,11 @@ i_DECLIMEX_ char rfString_Assign_char(RF_String* thisstr,uint32_t character);
 
 /**
  ** @memberof RF_String
- ** @brief Makes sure that a string is NULL
+ ** @brief Nullifies a String
+ ** @warning Use null strings at your own risk. None of the RF_Sting/X
+ ** functions currently test for them
+ ** A safer and easier alternative is to assigg an empty string and
+ * check for it with @ref rfString_IsEmpty()
  **/
 #define rfString_Null(i_STRING) do{               \
         (i_STRING)->byteLength = 0;               \
@@ -439,6 +443,15 @@ i_DECLIMEX_ char rfString_Equal(const void* s1,const void* s2);
  **/
 #define rfString_IsNull(i_STRING)                               \
     ((i_STRING)->byteLength == 0 && (i_STRING)->bytes == NULL)
+
+
+/**
+ ** @memberof RF_String
+ ** @isinherited{StringX}
+ ** @brief Checks that a string is empty. 
+ **/
+#define rfString_IsEmpty(i_STRING)              \
+    (rfString_Equal((i_STRING), RFS_("")))
 
 //! @}
 

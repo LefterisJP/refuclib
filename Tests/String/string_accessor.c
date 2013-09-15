@@ -22,7 +22,7 @@ int checkEqual(char* b1,char* b2)
 int main()
 {
     RF_String s1,s2;
-    
+    RF_StringX sx1;
     EXPECT(rfInit(), true);
 
     //expect 131 : This string's length
@@ -62,6 +62,16 @@ int main()
     //expect 10: (character position of byte position 28 and if it is a continuation byte take the next char which is '国')
     EXPECT(10,rfString_BytePosToCharPos(&s2,28,false));
 
+    //testing null strings
+    rfStringX_Null(&sx1);
+    EXPECT(rfStringX_IsNull(&sx1), true);
+    rfString_Null(&s2);
+    EXPECT(rfString_IsNull(&s2), true);
 
+    //testing empty string
+    EXPECT(rfString_Init(&s2, ""), true);
+    EXPECT(rfString_IsEmpty(&s2), true);
+    EXPECT(rfStringX_Init(&sx1, ""), true);
+    EXPECT(rfString_IsEmpty(&sx1), true);
 	return 0;
 }
