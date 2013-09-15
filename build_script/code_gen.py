@@ -704,7 +704,12 @@ class CodeGen():
         line_num = 0
         outF.write(gen_template_intro_str(name, self.type_dict[type_d]))
         #if the type is an object and it needs to have any extra headers
-        if type_d in self.obj_dict and name.endswith(".c"):
+        if((type_d in self.obj_dict ) and
+           (
+               (name.endswith(".c")) or
+               (type_d not in self.refu_objects)
+        )):
+
             #simply add them
             outF.write("/**\n"
                        " ** ---- Headers added by the building script specifically"
@@ -715,7 +720,7 @@ class CodeGen():
                 else:
                     if header.startswith("<"):
                         outF.write("#include {}\n".format(header))
-                    else:
+                    elif name.endswith(".c"): # relative headers go only in source
                         outF.write("#include \"{}\"\n".format(header))
 
         #start creating the source from the generic template
