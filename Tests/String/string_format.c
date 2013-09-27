@@ -144,6 +144,9 @@ int main()
                &s,
                RFS_("An addition over usual printf is %S for Refu"
                     " Strings like \"これはストリングです。\"")));
+
+    EXPECTGE(rfPrintf("Testing string with RFS_ %S eleos", RFS_("it works")), 0);
+    
 /**
  ** [REFUSTRING]
  **/
