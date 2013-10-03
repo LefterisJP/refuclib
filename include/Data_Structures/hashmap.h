@@ -97,6 +97,27 @@ i_DECLIMEX_ RF_Hashmap* rfHashmap_Create(uint32_t s
 /* @omit end */
 );
 
+/**
+ ** @brief Iterates a hashmap
+ **
+ ** This function iterates through all of the values of the map 
+ ** and invokes the given function @c act for each value
+ ** @param m The hashmap to iterate
+ ** @param act The function to execute for each iterated hashmap
+ ** It should return a bool which should always be @c true unless
+ ** the iteration should stop abruptly. Its arguments are:
+ ** - A pointer to the value for iteration (or copy if Plain old data)
+ ** - An extra void* for any extra data the user may want to pass to the
+ **   function
+ ** @param user_data Any extra data that you may want to pass to iteration.
+ ** They will be passed on to the act function. You can simply pass @c NULL
+ ** @return Returns @c true if all of the values got iterated succesfully
+ ** and @c false if not. Breaking out of iteration will also cause a
+ ** @c false return value.
+ */
+/* @mutate void* TYPEPTR_OBJ_ONLY */
+i_DECLIMEX_ bool rfHashmap_Iterate(RF_Hashmap* m, bool (*act)(void*,
+                                                              void*), void* user_data);
 
 /* @omitcond DEEP_COPY_ONLY */
 

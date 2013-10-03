@@ -183,6 +183,27 @@ RF_Hashmap* rfHashmap_Create(uint32_t s
     return m;
 }
 
+/* @mutate void* TYPEPTR_OBJ_ONLY */
+bool rfHashmap_Iterate(RF_Hashmap* m, bool (*act)(void*,
+                                                  void*), void* user_data)
+{
+    RF_Hashslot* slot;
+    int i;
+    for(i = 0; i < m->size; i++)
+    {
+        slot = m->slots[i];
+        while(slot != NULL)
+        {
+            /* @mutate & REMOVE POD */
+            if(!act(&slot->value, user_data))
+            {
+                return false;
+            }
+            slot = slot->next;
+        }
+    }
+    return true;
+}
 
 /* -- Deep copy storage functions start -- */
 /* @omitcond POD SHALLOW_COPY_ONLY */

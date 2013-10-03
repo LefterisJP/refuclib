@@ -583,7 +583,10 @@ class CodeGen():
     def handle_REMOVE(self, line, mutate, type_d, file_name, line_num):
         """
             Handle the simple case of requesting removal of something
+            If there is a specific condition in mutate check for it.
         """
+        if "POD" in mutate and type_d in self.obj_dict:
+            return line
         return line.replace(mutate[0], "")
 
     def handle_REPLACE(self, line, mutate, type_d, file_name, line_num):

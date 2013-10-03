@@ -41,6 +41,8 @@ char* m3_values[] = {
     "Bucharest"
 };
 
+#define m3_size (sizeof(m3_values)/sizeof(char*))
+
 /* a generic object, to try the generic hashmap */
 typedef struct an_object
 {
@@ -61,7 +63,26 @@ static void an_object_destroy(an_object* a)
     rfString_Deinit(&a->s);
 }
 
-
+/* function used to test hashmap iteration for String:String hashmap */
+static bool string_on_iterate(RF_String* s, void* user_data)
+{
+    int i;
+    bool success = false;
+    static bool found[m3_size] = {false, false, false, false, false, false,
+                                  false, false, false, false, false, false
+    };
+    for(i = 0; i < m3_size; i++)
+    {
+        if(rfString_Equal(s, RFS_(m3_values[i])) && !found[i])
+        {
+            found[i] = true;
+            success = true;
+            break;
+        }
+    }
+    EXPECT(success, true);
+    return true;
+}
 
 static void test_generic_map(RF_Hashmap* m)
 {
@@ -151,7 +172,7 @@ int main()
     // test a hashmap of string keys and values
     m3 = rfHashmap_String_Create(10);
     EXPECTNOT(m3, NULL);
-    for(i = 0; i < 13; i ++)
+    for(i = 0; i < m3_size; i ++)
     {
         EXPECT(true, rfHashmap_String_Insert_Copy(
                    m3,
@@ -160,7 +181,7 @@ int main()
                    &exists));
         EXPECT(false, exists);
     }
-    for(i = 0; i < 13; i ++)
+    for(i = 0; i < m3_size; i ++)
     {
         EXPECT(true, rfHashmap_String_Get_Copy(
                    m3,
@@ -168,9 +189,11 @@ int main()
                    &str));
         EXPECT(true, rfString_Equal(&str, RFS_("%s", m3_values[i])));
     }
+    //also in this hashmap test the iteration function
+    EXPECT(true, rfHashmap_String_Iterate(m3, string_on_iterate, NULL));
     rfHashmap_String_Destroy(m3);
-
-
+    
+    // test non library object hashmap
     EXPECT(rfHashmap_Init(&m, 20, sizeof(an_object),
                           (char(*)(void*, void*))an_object_copy,
                           (void(*)(void*))an_object_destroy), true);
