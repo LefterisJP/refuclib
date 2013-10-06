@@ -167,6 +167,9 @@ int main()
                    &v));
         EXPECT(v == nums[i], true);
     }
+    /* also test the out function */
+    v = rfHashmap_I_Get_OUT(&m2, RFS_("4"));
+    EXPECT(v, 4);
     rfHashmap_I_Deinit(&m2);
 
     // test a hashmap of string keys and values

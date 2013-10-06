@@ -628,5 +628,35 @@ char rfHashmap_Get(RF_Hashmap* m, RF_String* key,
     return ret;
 }
 
+/* @mutate void* TYPEPTR_OBJ_ONLY */
+i_DECLIMEX_ void* rfHashmap_Get_OUT(RF_Hashmap* m, RF_String* key)
+{
+    uint32_t i;
+    RF_Hashslot* s;
+    /* @mutate void* TYPEPTR_OBJ_ONLY */
+    void* ret = 0;
+    RF_ENTER_LOCAL_SCOPE();
+    i = HsiehHash(rfString_Cstr(key), rfString_Length(key));
+    i = i % m->size;
+    s = m->slots[i];
+
+    while(s != NULL)
+    {
+        if(rfString_Equal(&s->key, key))
+        {//if key is found get it
+
+            /* @mutate & REMOVE POD */
+            ret = &s->value;
+            goto cleanup;
+        }
+        //else proceed in the linked list chain
+        s = s->next;
+    }
+
+  cleanup:
+    RF_EXIT_LOCAL_SCOPE();
+    return ret;
+}
+
 /* -- Shallow copy storage functions end -- */
 /* @omit end */

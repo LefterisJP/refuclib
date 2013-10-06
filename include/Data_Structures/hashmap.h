@@ -164,6 +164,16 @@ i_DECLIMEX_ char rfHashmap_Get(RF_Hashmap* m, RF_String* key,
                                /* @mutate void* TYPEPTR */
                                void* value);
 
+/**
+ ** Query a value for a key of the hashmap giving a pointer to that value
+ ** @param m The map to query
+ ** @param key An @ref RF_String with the key to query the map for
+ ** @return If the value for the key exist a pointer to a shallow copy of it
+ ** will be returned. If not NULL.
+ */
+/* @mutate void* TYPEPTR_OBJ_ONLY */
+i_DECLIMEX_ void* rfHashmap_Get_OUT(RF_Hashmap* m, RF_String* key);
+
 /* @omit end */
 
 
