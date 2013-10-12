@@ -1,14 +1,53 @@
 import os
 from code_gen import CodeGen
+from utils import build_msg
+
 
 class TemplateSourcesError(Exception):
-    def __init__(self, module_name, sources_num):
+    def __init__(self, module_name):
         self.module_name = module_name
-        self.sources_num = sources_num
     def __str__(self):
-        return ("Template module \"{}\" contains {} source files which is"
-        "more than the limitation of 1".format(self.module_name,
-                                               str(self.sources_num)))
+        return ("Template module \"{}\" contains {} no non-template"
+                "source files and generic data structure has been "
+                "requested".format(self.module_name))
+class TemplateFileError(Exception):
+    def __init__(self, filename, msg):
+        self.filename = filename
+        self.msg = msg
+    def __str__(self):
+        return "Problem with template file \"{}\"\n{}".format(self.filename,
+                                                              self.msg)
+
+def analyze_templates_dict(tdict):
+    """ 
+    Reads the template files and determines the directory
+    name and the template name
+    """
+    #TODO: The name is always the same just like the parent
+    # dir with the way the library currently works.
+    # Maybe make the code reflect that?
+    ret = []
+    for key, value in tdict.iteritems():
+        d = {"parent_dir": os.path.dirname(value)}
+        name = os.path.basename(value)
+
+        if key == "simple":
+            d["type"] = ""
+            d["source_suffix"] = ""
+            d["name"] = name[:len(name) - 10]
+        elif key == "shallow":
+            d["type"] = "shallow"
+            d["source_suffix"] = "s"
+            d["name"] = name[:len(name) - 18]
+        elif key == "deep":
+            d["type"] = "deep"
+            d["source_suffix"] = "d"
+            d["name"] = name[:len(name) - 15]
+        else:
+            raise TemplateFileError(value,
+                                    "Unrecognized template data structure type")
+        ret.append(d)
+    return ret
 
 class Module:
     """Represents a module of the code with its names, its list of sources
@@ -16,7 +55,7 @@ class Module:
     """
     def __init__(self,name,sources=[], macro="", win32_sources=[],
                  linux_sources=[], dependencies=[], has_template="",
-                 gen_name_sub=[]):
+                 template_files={}, gen_name_sub=[]):
             self.name = name
             self.sources = sources
             self.macro = macro
@@ -24,8 +63,10 @@ class Module:
             self.linux_sources = linux_sources
             self.dependencies = dependencies
             self.has_template = has_template
+            self.template_files = template_files
             self.gen_name_sub = gen_name_sub
             self.extra_generated = False
+
 
     def add(self, sources, env, targetSystem, arg_env, refu_dir,
             deps=[], check=True, codegen=None):
@@ -48,40 +89,32 @@ class Module:
         if(self.has_template != ""):
             #if any data types are requested for this module
             if arg_env[self.has_template] != []:
-                #take the name from the first (and only) source
-                fullname = self.sources[0]
-                #for template there should be only one source
-                if len(self.sources) != 1:
-                    raise TemplateSourcesError(self.name,
-                                               len(self.sources))
-                name = os.path.basename(fullname)
-                #get rid of .c
-                name = name[:len(name)-2]
-                parent_dir = os.path.dirname(fullname)
+                dstruct_types = analyze_templates_dict(self.template_files)
                 #for every type of data given for the module
                 for d_type in arg_env[self.has_template]:
-                    #if the generic type is requested, simply take the template
+                    #if the generic type is requested, add the source files
                     if d_type == "generic":
+                        if self.sources == []:
+                            raise TemplateSourcesError(self.name)
                         sources.extend(self.sources)
                         continue
 
                     #generate the requested extra sources for each
-                    codegen.code_gen(name, parent_dir, refu_dir,
-                             d_type, self.gen_name_sub)
+                    generated_sources = codegen.code_gen(
+                        dstruct_types, refu_dir,
+                        d_type, self.gen_name_sub)
 
                     # add it to the sources to compile if it's a library type
                     # if not it's the user's responsibility to copy the generated
                     # .c file into his project
                     if d_type in codegen.library_types:
-                        sources.append(
-                            os.path.join(parent_dir,
-                                         name + "_" + d_type + ".c")
-                        )
+                        sources.extend(generated_sources)
 
                 #TODO: add lines to rftokens.h
                 #create the extra include file
-                create_includes(name, parent_dir,
-                                refu_dir,  arg_env[self.has_template])
+                create_includes(dstruct_types,
+                                refu_dir,  arg_env[self.has_template],
+                                codegen.obj_dict)
                 #add the appropriate define to include
                 #the extra headers for the source we generated
                 env.Append(CPPDEFINES= {self.macro+"_EXTRA": None})
@@ -102,20 +135,28 @@ class Module:
                         m.add(sources, env, targetSystem, arg_env,
                               refu_dir, deps, True, codegen)
 
-def create_includes(name, parent_dir, root, types_list):
+def create_includes(dstruct_types, root, types_list, obj_dict):
     """
         Creates the include files needed for each of the generated
         source files.
     """
     f = open(
-        os.path.join(root, "include", parent_dir, name + "_extra.h"),
-        "w")
+        os.path.join(
+            root, "include", dstruct_types[0]['parent_dir'],
+            dstruct_types[0]['name'] + "_extra.h"), "w")
     for type_symbol in types_list:
         if type_symbol != "generic":
-            f.write("#include <{}/{}_decl.h>\n".format(parent_dir,
-                                                       name + "_" + type_symbol))
-            f.write("#include <{}/{}.h>\n".format(parent_dir,
-                                                  name + "_" + type_symbol))
+            for dstruct in dstruct_types:
+                if dstruct['type'] == 'deep' and type_symbol not in obj_dict:
+                    continue
+                if dstruct['type'] != "":
+                    pre = dstruct['name'] + "_" + dstruct['type'] + "_" + type_symbol
+                else:
+                    pre = dstruct['name'] + "_" + type_symbol
+                f.write("#include <{}/{}_decl.h>\n".format(
+                    dstruct['parent_dir'], pre))
+                f.write("#include <{}/{}.h>\n".format(
+                    dstruct['parent_dir'], pre))
     f.close()
 
 def setup_modules(arg_env, env, targetSystem, refu_dir, code_gen):
@@ -196,9 +237,10 @@ modules.append(
 
 modules.append(
     Module("LIST",
-           ['Data_Structures/list.c'],
+           [],
            macro = "RF_MODULE_LIST",
            has_template = "LIST",
+           template_files = {"simple": "Data_Structures/list.ctemplate"},
            gen_name_sub = ["RF_L_Node",
                            "RF_List",
                            "rfList",
@@ -210,9 +252,10 @@ modules.append(
 
 modules.append(
     Module("DYNAMIC_ARRAY",
-           ['Data_Structures/dynamicarray.c'],
+           [],
            macro = "RF_MODULE_DYNAMICARRAY",
            has_template = "DYNAMIC_ARRAY",
+           template_files = {"simple": "Data_Structures/dynamicarray.ctemplate"},
            gen_name_sub = ["RF_DynamicArray",
                            "rfDynamicArray",
                            "RF_DYNAMICARRAY",
@@ -225,6 +268,8 @@ modules.append(
            ['Data_Structures/hashmap.c'],
            macro = "RF_MODULE_HASHMAP",
            has_template = "HASHMAP",
+           template_files = {"shallow": "Data_Structures/hashmap_shallow.ctemplate",
+                             "deep": "Data_Structures/hashmap_deep.ctemplate"},
            gen_name_sub = ["RF_Hashmap",
                            "rfHashmap",
                            "RF_HASHMAP",

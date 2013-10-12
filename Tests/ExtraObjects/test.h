@@ -1,7 +1,7 @@
 typedef struct test_obj
 {
-int a;	
-int b;
+    int a;	
+    int b;
 }test_obj;
 
 int test_init(test_obj* t);

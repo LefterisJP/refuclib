@@ -34,12 +34,25 @@
 #include <Data_Structures/hasmap.h>
 ---------------------For internal library include make sure to have----------------------------
 */
+
+/* @omit start */
+
+/*
+ * This file is a TEMPLATE. It does not actually get compiled at all
+ * anywhere inside the library. Depending on the options you provide
+ * in scons though various specializations of this file will get
+ * generated during building the library
+ */
+
+/* @omit end */
+
 #ifndef RF_HASHMAP_DECL_H
 #define RF_HASHMAP_DECL_H
 
 typedef struct RF_Hashslot
 {
     RF_String key;
+    /* @mutate void* TYPE */
     void*  value;
     struct RF_Hashslot* next;
 }RF_Hashslot;
@@ -50,6 +63,8 @@ typedef struct RF_Hashmap
     uint32_t size;
     uint32_t occupied;
 }RF_Hashmap;
+
+
 
 
 #endif//include guards end

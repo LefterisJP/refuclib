@@ -22,14 +22,25 @@
 **
 **/
 
+/* @omit start */
+
+/*
+ * This file is a TEMPLATE. It does not actually get compiled at all
+ * anywhere inside the library. Depending on the options you provide
+ * in scons though various specializations of this file will get
+ * generated during building the library
+ */
+
+/* @omit end */
 
 /*------------- Corrensponding Header inclusion -------------*/
+/* @omitcond STRING */
 #include <Definitions/imex.h> //for import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <Preprocessor/rf_tokens.h>//for the defined library tokens
 #include <Definitions/types.h> //for fixed size data types
 #include <String/string_decl.h> //for RF_String
-
+/* @omit end */
 #include <Definitions/retcodes.h> //for error codes, bool
 #include <Data_Structures/hashmap_decl.h> //for the struct declarations
 #include <Data_Structures/hashmap.h>
@@ -54,7 +65,9 @@
     #include <float.h>
     #include <Utils/constcmp.h>
 // String module inclusions
+/* @omitcond STRING */
     #include <String/core.h> //for rfString_Equal
+/* @omit end */
     #include <String/conversion.h> //for rfString_Cstr()
     #include <String/retrieval.h> //for rfString_Length()
 /*------------- libc includes -------------*/
@@ -126,7 +139,6 @@ char rfHashmap_Init(RF_Hashmap* m, uint32_t s)
     int i;
     m->size = s;
     m->occupied = 0;
-
     RF_MALLOC(m->slots, sizeof(RF_Hashslot*)*m->size, false);
     for(i = 0; i < m->size; i++)
     {
@@ -148,8 +160,9 @@ RF_Hashmap* rfHashmap_Create(uint32_t s)
     return m;
 }
 
-bool rfHashmap_Iterate(RF_Hashmap* m,
-                       bool (*act)(void*, void*), void* user_data)
+/* @mutate void* TYPEPTR_OBJ_ONLY */
+bool rfHashmap_Iterate(RF_Hashmap* m, bool (*act)(void*,
+                                                  void*), void* user_data)
 {
     RF_Hashslot* slot;
     int i;
@@ -158,7 +171,8 @@ bool rfHashmap_Iterate(RF_Hashmap* m,
         slot = m->slots[i];
         while(slot != NULL)
         {
-            if(!act(slot->value, user_data))
+            /* @mutate & REMOVE POD */
+            if(!act(&slot->value, user_data))
             {
                 return false;
             }
@@ -168,9 +182,9 @@ bool rfHashmap_Iterate(RF_Hashmap* m,
     return true;
 }
 
-
 static char i_InsertValue(RF_Hashslot** slots, RF_String* key,
                           bool* exists,
+/* @mutate void* TYPEPTR_OBJ_ONLY */
                           void* value, uint32_t size)
 {
     uint32_t i;
@@ -213,7 +227,8 @@ static char i_InsertValue(RF_Hashslot** slots, RF_String* key,
         return false;
     }
     //shallow copy
-    s->value = value;
+    /* @mutate memcpy MEMCPY */
+    memcpy(&s->value, value, object_size);
     return true;
 }
 
@@ -251,6 +266,7 @@ void rfHashmap_Destroy(RF_Hashmap* m)
 
 // Insert a value into the Hashmap
 char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
+                      /* @mutate void* TYPEPTR_OBJ_ONLY */
                       void* value,
                       bool* exists)
 {
@@ -266,7 +282,7 @@ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
     }
     m->occupied ++;
 
-    //if the ratio of occupied over size is greater than the load factor
+    //if the ratio of occupied over size is greaten than the load factor
     if( FLCMP_G((float)m->occupied / (float)m->size,
             RF_OPTION_HASHMAP_LOAD_FACTOR))
     {
@@ -290,6 +306,7 @@ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
                 s = m->slots[i];
                 while(s != 0)
                 {
+                    /* @mutate s->value REFERENCE */
                     if(!i_InsertValue(tmp, &s->key, exists, s->value,
                                       m->size))
                     {
@@ -311,11 +328,14 @@ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
     return ret;
 }
 
-i_DECLIMEX_ void* rfHashmap_Get(RF_Hashmap* m, RF_String* key)
+/* @mutate void* TYPEPTR_OBJ_ONLY */
+i_DECLIMEX_ void* rfHashmap_Get(RF_Hashmap* m, RF_String* key, bool* found)
 {
     uint32_t i;
     RF_Hashslot* s;
+    /* @mutate void* TYPEPTR_OBJ_ONLY */
     void* ret = 0;
+    *found = false;
     RF_ENTER_LOCAL_SCOPE();
     i = HsiehHash(rfString_Cstr(key), rfString_Length(key));
     i = i % m->size;
@@ -325,7 +345,10 @@ i_DECLIMEX_ void* rfHashmap_Get(RF_Hashmap* m, RF_String* key)
     {
         if(rfString_Equal(&s->key, key))
         {//if key is found get it
-            ret = s->value;
+
+            /* @mutate & REMOVE POD */
+            ret = &s->value;
+            *found = true;
             goto cleanup;
         }
         //else proceed in the linked list chain
@@ -336,4 +359,3 @@ i_DECLIMEX_ void* rfHashmap_Get(RF_Hashmap* m, RF_String* key)
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
-

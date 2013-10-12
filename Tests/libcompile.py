@@ -56,8 +56,7 @@ def compileLib(verbose, dynamic, compiler):
     
     # for now we give here all the options to generate extra sources that
     # all the tests need. In the future if the library compiles again for
-    # each module tested this will need to change. And as for the extra
-    # objects, omg look at all these escape characters >.<
+    # each module tested this will need to change.
     extra_source_opts = (
         " EXTRA_OBJECTS=\"[{name:test_object,"
         "source_name:test_obj,"

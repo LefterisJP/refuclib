@@ -23,8 +23,7 @@
 **
 ** --Data_Structures/hashmap.h
 ** This header declares functions that operate on RF_Hashmap, a simple
-** separate chaining with linked list hash map implementation that associates
-** RF_String types with void pointers. It's a shallow copy data structure.
+** separate chaining with linked list hash map implementation
 **
 ---------------------For internal library include make sure to have----------------------------
 #include <Definitions/imex.h> //for import export macro
@@ -38,6 +37,17 @@
 ---------------------For internal library include make sure to have----------------------------
 */
 
+/* @omit start */
+
+/*
+ * This file is a generic TEMPLATE. Depending on the options you provide
+ * in scons though various specializations of this file will get
+ * generated during building the library. If you want to use the actual file
+ * as it is in its generic mode then you have to provide the "generic"
+ * argument inside the data structure's specialization argument during build
+ */
+
+/* @omit end */
 
 #ifndef RF_HASHMAP_H
 #define RF_HASHMAP_H
@@ -84,7 +94,7 @@ i_DECLIMEX_ RF_Hashmap* rfHashmap_Create(uint32_t s);
  ** @param act The function to execute for each iterated hashmap
  ** It should return a bool which should always be @c true unless
  ** the iteration should stop abruptly. Its arguments are:
- ** - A pointer to the value for iteration
+ ** - A pointer to the value for iteration (or copy if Plain old data)
  ** - An extra void* for any extra data the user may want to pass to the
  **   function
  ** @param user_data Any extra data that you may want to pass to iteration.
@@ -93,8 +103,9 @@ i_DECLIMEX_ RF_Hashmap* rfHashmap_Create(uint32_t s);
  ** and @c false if not. Breaking out of iteration will also cause a
  ** @c false return value.
  */
-i_DECLIMEX_ bool rfHashmap_Iterate(RF_Hashmap* m, 
-                                   bool (*act)(void*, void*), void* user_data);
+/* @mutate void* TYPEPTR_OBJ_ONLY */
+i_DECLIMEX_ bool rfHashmap_Iterate(RF_Hashmap* m, bool (*act)(void*,
+                                                              void*), void* user_data);
 
 /**
  ** Deinitializes a hashmap
@@ -120,6 +131,7 @@ i_DECLIMEX_ void rfHashmap_Destroy(RF_Hashmap* m);
  ** @return @c true if all is fine and @c false otherwise
  */
 i_DECLIMEX_ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
+                                  /* @mutate void* TYPEPTR_OBJ_ONLY */
                                   void* value,
                                   bool* exists);
 
@@ -127,14 +139,13 @@ i_DECLIMEX_ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
  ** Query a value for a key of the hashmap giving a pointer to that value
  ** @param m The map to query
  ** @param key An @ref RF_String with the key to query the map for
- ** @return If the value for the key exist a pointer to a shallow copy of it
+ ** @param found Pass a reference to a boolean which will contain
+ ** @c true if the value has been found and @c false otherwise
+ ** @return If the value for the key exist a pointer to it
  ** will be returned. If not NULL.
  */
-i_DECLIMEX_ void* rfHashmap_Get(RF_Hashmap* m, RF_String* key);
-
-
-
-
+/* @mutate void* TYPEPTR_OBJ_ONLY */
+i_DECLIMEX_ void* rfHashmap_Get(RF_Hashmap* m, RF_String* key, bool* found);
 
 #ifdef __cplusplus
 }///closing bracket for calling from C++

@@ -224,6 +224,14 @@ tests_list = [
          [os.path.join("Data_Structures", "hashmap.c")],
          "Data_Structures"),
 
+    Test("hashmap_shallowcopy",
+         [os.path.join("Data_Structures", "hashmap_shallowcopy.c")],
+         "Data_Structures"),
+
+    Test("hashmap_deepcopy",
+         [os.path.join("Data_Structures", "hashmap_deepcopy.c")],
+         "Data_Structures"),
+
     Test("intrusive_list",
          [os.path.join("Data_Structures", "intrusive_list.c")],
          "Data_Structures"),
