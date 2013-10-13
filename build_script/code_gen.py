@@ -4,6 +4,8 @@ import json
 import sys
 from time import gmtime, strftime
 
+from templates import Template, TemplateGeneratedStructure
+
 def enum(*sequential, **named):
     enums = dict(zip(sequential, range(len(sequential))), **named)
     return type('Enum', (), enums)
@@ -274,8 +276,7 @@ class CodeGen():
         self.obj_dict = data[1]
         inF.close()
 
-    def check_line_for_name_sub(self, line, subs, type_d,
-                                source_suffix, header_suffix):
+    def check_line_for_name_sub(self, line, subs, type_d, structure):
         """
         Replaces the name subs from the template for this line.
 
@@ -285,20 +286,21 @@ class CodeGen():
         or 'shallow' is added. Shallow copies of POD should also not get a source
         suffix since POD can only be shallow copied.
         """
-        if header_suffix == "shallow" and type_d not in self.obj_dict:
-            reps = "_" + type_d
-            rephs = "_" + header_suffix + "_" + type_d
-        elif source_suffix != "":
-            reps = source_suffix + "_" + type_d
-            rephs = "_" + header_suffix + "_" + type_d
-        else:
-            reps = "_" + type_d
-            rephs = "_" + type_d
+        if "@INCLUDE_DECL_H" in line:
+            line = line.replace("@INCLUDE_DECL_H", 
+                                "#include <Data_Structures/{}_decl.h>".format(
+                                    structure.header_prefix
+            ))
+            return line
+        elif "@INCLUDE_H" in line:
+            line = line.replace("@INCLUDE_H",
+                                "#include <Data_Structures/{}.h>".format(
+                                    structure.header_prefix
+            ))
+            return line
         for s in subs:
-            if s in line and "#include" in line:
-                line = line.replace(s, s + rephs)
-            elif s in line:
-                line = line.replace(s, s + reps)
+            if s in line:
+                line = line.replace(s, s + structure.source_prefix + "_" + type_d)
         return line
 
 
@@ -322,7 +324,7 @@ class CodeGen():
         self.save_data_to_json(fname)
 
 
-    def code_gen(self, dstruct_types, root, type_d, name_subs):
+    def code_gen(self, template, structure, root, type_d, name_subs):
         """
             This is the main function that creates the 3 source files
             for the named template according to the specified parameters.
@@ -331,76 +333,55 @@ class CodeGen():
 
             The function returns a list of the generated source files
         """
-        generated_sources = []
         try:
-            # for each type of data structure in template files create the files
-            for dstruct in dstruct_types:
+            #generate _decl.h
+            self.gen_single_source(
+                os.path.join(
+                    root, "include",
+                    template.parent_dir,
+                    structure.old_header_prefix + "_decl.htemplate"),
+                os.path.join(
+                    root, "include",
+                    template.parent_dir,
+                    structure.header_prefix + "_decl.h"),
+                type_d,
+                name_subs,
+                structure
+            )
 
-                source_suffix = dstruct['source_suffix']
-                if type_d not in self.obj_dict:
-                    #POD don't have a deep data structure
-                    if dstruct['type'] == "deep": 
-                        continue
-                    #POD always go with shallow so no extra suffix needed
-                    source_suffix = ""
+            #generate .h
+            self.gen_single_source(
+                os.path.join(
+                    root, "include",
+                    template.parent_dir,
+                    structure.old_header_prefix + ".htemplate"),
+                os.path.join(
+                    root, "include",
+                    template.parent_dir,
+                    structure.header_prefix + ".h"),
+                type_d,
+                name_subs,
+                structure
+            )
+            #generate .c
+            self.gen_single_source(
+                os.path.join(
+                    root, "src",
+                    template.parent_dir,
+                    structure.old_header_prefix + ".ctemplate"),
+                os.path.join(
+                    root, "src",
+                    template.parent_dir,
+                    structure.header_prefix + ".c"),
+                type_d,
+                name_subs,
+                structure
+            )
 
-                if dstruct['type'] != "":
-                    oldpre = dstruct['name'] + "_" + dstruct['type']
-                    newpre = dstruct['name'] + "_" + dstruct['type'] + "_" + type_d
-                else:
-                    oldpre = dstruct['name']
-                    newpre = dstruct['name'] + "_" + type_d
-                #generate _decl.h
-                self.gen_single_source(
-                    os.path.join(
-                        root, "include",
-                        dstruct['parent_dir'],
-                        oldpre + "_decl.htemplate"),
-                    os.path.join(
-                        root, "include",
-                        dstruct['parent_dir'],
-                        newpre + "_decl.h"),
-                    type_d,
-                    name_subs,
-                    source_suffix,
-                    dstruct['type']
-                )
-
-                #generate .h
-                self.gen_single_source(
-                    os.path.join(
-                        root, "include",
-                        dstruct['parent_dir'],
-                        oldpre + ".htemplate"),
-                    os.path.join(
-                        root, "include",
-                        dstruct['parent_dir'],
-                        newpre + ".h"),
-                    type_d,
-                    name_subs,
-                    source_suffix,
-                    dstruct['type']
-                )
-                #generate .c
-                self.gen_single_source(
-                    os.path.join(
-                        root, "src",
-                        dstruct['parent_dir'],
-                        oldpre + ".ctemplate"),
-                    os.path.join(
-                        root, "src",
-                        dstruct['parent_dir'],
-                        newpre + ".c"),
-                    type_d,
-                    name_subs,
-                    source_suffix,
-                    dstruct['type']
-                )
-
-                #remember the source from parent dir and down
-                generated_sources.append(os.path.join(dstruct['parent_dir'],
-                                                      newpre + ".c"
-                ))
+            #remember the source from parent dir and down
+            return os.path.join(template.parent_dir,
+                                structure.header_prefix + ".c"
+            )
 
 
         except (MutateError, MutateSourceError, MutateTargetError,
@@ -762,8 +743,7 @@ class CodeGen():
 
 
 
-    def gen_single_source(self, name, newName, type_d, name_subs,
-                          source_suffix, header_suffix):
+    def gen_single_source(self, name, newName, type_d, name_subs, structure):
         """
         This is the main parsing function to generate a file
         from a template
@@ -801,7 +781,7 @@ class CodeGen():
                 continue
             #else we check for name substitution
             line = self.check_line_for_name_sub(line, name_subs, type_d,
-                                                source_suffix, header_suffix)
+                                                structure)
             #we also check for mutation
             if mutating is True:
                 mutating = False

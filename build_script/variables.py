@@ -85,7 +85,7 @@ vars.Add(
                      'DATA_STRUCTURES', 
                      'INTRUSIVE_LIST',
                      'LIST', 
-                     'DYNAMIC_ARRAY',
+                     'DYNAMICARRAY',
                      'BINARY_ARRAY',
                      'HASHMAP',
                      'TIME', 'DATE',
@@ -100,7 +100,7 @@ vars.Add(
                  'create', [], code_gen.type_dict))
 
 vars.Add(
-    ListVariable('DYNAMIC_ARRAY',
+    ListVariable('DYNAMICARRAY',
                  'These are options specific to the dynamic array '
                  'module. They specify what types of dynamic arrays to '
                  'create', [], code_gen.type_dict))

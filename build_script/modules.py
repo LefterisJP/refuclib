@@ -2,6 +2,7 @@ import os
 from code_gen import CodeGen
 from utils import build_msg
 
+from templates import Template, TemplateGeneratedStructure
 
 class TemplateSourcesError(Exception):
     def __init__(self, module_name):
@@ -10,44 +11,6 @@ class TemplateSourcesError(Exception):
         return ("Template module \"{}\" contains {} no non-template"
                 "source files and generic data structure has been "
                 "requested".format(self.module_name))
-class TemplateFileError(Exception):
-    def __init__(self, filename, msg):
-        self.filename = filename
-        self.msg = msg
-    def __str__(self):
-        return "Problem with template file \"{}\"\n{}".format(self.filename,
-                                                              self.msg)
-
-def analyze_templates_dict(tdict):
-    """ 
-    Reads the template files and determines the directory
-    name and the template name
-    """
-    #TODO: The name is always the same just like the parent
-    # dir with the way the library currently works.
-    # Maybe make the code reflect that?
-    ret = []
-    for key, value in tdict.iteritems():
-        d = {"parent_dir": os.path.dirname(value)}
-        name = os.path.basename(value)
-
-        if key == "simple":
-            d["type"] = ""
-            d["source_suffix"] = ""
-            d["name"] = name[:len(name) - 10]
-        elif key == "shallow":
-            d["type"] = "shallow"
-            d["source_suffix"] = "s"
-            d["name"] = name[:len(name) - 18]
-        elif key == "deep":
-            d["type"] = "deep"
-            d["source_suffix"] = "d"
-            d["name"] = name[:len(name) - 15]
-        else:
-            raise TemplateFileError(value,
-                                    "Unrecognized template data structure type")
-        ret.append(d)
-    return ret
 
 class Module:
     """Represents a module of the code with its names, its list of sources
@@ -89,7 +52,10 @@ class Module:
         if(self.has_template != ""):
             #if any data types are requested for this module
             if arg_env[self.has_template] != []:
-                dstruct_types = analyze_templates_dict(self.template_files)
+                template = Template(self.name, self.template_files, 
+                                    arg_env[self.has_template],
+                                    codegen.obj_dict
+                )
                 #for every type of data given for the module
                 for d_type in arg_env[self.has_template]:
                     #if the generic type is requested, add the source files
@@ -98,11 +64,14 @@ class Module:
                             raise TemplateSourcesError(self.name)
                         sources.extend(self.sources)
                         continue
-
+                        
                     #generate the requested extra sources for each
-                    generated_sources = codegen.code_gen(
-                        dstruct_types, refu_dir,
-                        d_type, self.gen_name_sub)
+                    generated_sources = []
+                    for _, structure in template.structures[d_type].iteritems():
+                        generated_sources.append(codegen.code_gen(
+                            template, structure, refu_dir,
+                            d_type, self.gen_name_sub
+                        ))
 
                     # add it to the sources to compile if it's a library type
                     # if not it's the user's responsibility to copy the generated
@@ -112,9 +81,7 @@ class Module:
 
                 #TODO: add lines to rftokens.h
                 #create the extra include file
-                create_includes(dstruct_types,
-                                refu_dir,  arg_env[self.has_template],
-                                codegen.obj_dict)
+                create_includes(template, refu_dir)
                 #add the appropriate define to include
                 #the extra headers for the source we generated
                 env.Append(CPPDEFINES= {self.macro+"_EXTRA": None})
@@ -135,28 +102,21 @@ class Module:
                         m.add(sources, env, targetSystem, arg_env,
                               refu_dir, deps, True, codegen)
 
-def create_includes(dstruct_types, root, types_list, obj_dict):
+def create_includes(template, root):
     """
         Creates the include files needed for each of the generated
         source files.
     """
     f = open(
         os.path.join(
-            root, "include", dstruct_types[0]['parent_dir'],
-            dstruct_types[0]['name'] + "_extra.h"), "w")
-    for type_symbol in types_list:
-        if type_symbol != "generic":
-            for dstruct in dstruct_types:
-                if dstruct['type'] == 'deep' and type_symbol not in obj_dict:
-                    continue
-                if dstruct['type'] != "":
-                    pre = dstruct['name'] + "_" + dstruct['type'] + "_" + type_symbol
-                else:
-                    pre = dstruct['name'] + "_" + type_symbol
-                f.write("#include <{}/{}_decl.h>\n".format(
-                    dstruct['parent_dir'], pre))
-                f.write("#include <{}/{}.h>\n".format(
-                    dstruct['parent_dir'], pre))
+            root, "include", template.parent_dir, template.name + "_extra.h"), "w")
+    for structure in template.iterate():
+        f.write("#include <{}/{}_decl.h>\n".format(
+            template.parent_dir, structure.header_prefix
+        ))
+        f.write("#include <{}/{}.h>\n".format(
+            template.parent_dir, structure.header_prefix
+        ))
     f.close()
 
 def setup_modules(arg_env, env, targetSystem, refu_dir, code_gen):
@@ -251,10 +211,10 @@ modules.append(
 
 
 modules.append(
-    Module("DYNAMIC_ARRAY",
+    Module("DYNAMICARRAY",
            [],
            macro = "RF_MODULE_DYNAMICARRAY",
-           has_template = "DYNAMIC_ARRAY",
+           has_template = "DYNAMICARRAY",
            template_files = {"simple": "Data_Structures/dynamicarray.ctemplate"},
            gen_name_sub = ["RF_DynamicArray",
                            "rfDynamicArray",

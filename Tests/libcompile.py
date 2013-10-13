@@ -65,7 +65,7 @@ def compileLib(verbose, dynamic, compiler):
         "copy_func:test_copy,"
         "compare_func:test_equal"
         "}]\""
-        " LIST=I,String,test_object DYNAMIC_ARRAY=I,String "
+        " LIST=I,String,test_object DYNAMICARRAY=I,String "
         "HASHMAP=I,String,generic "
     )
 

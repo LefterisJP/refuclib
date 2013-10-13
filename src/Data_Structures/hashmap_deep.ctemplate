@@ -42,8 +42,8 @@
 #include <String/string_decl.h> //for RF_String
 /* @omit end */
 #include <Definitions/retcodes.h> //for error codes, bool
-#include <Data_Structures/hashmap_decl.h> //for the struct declarations
-#include <Data_Structures/hashmap.h>
+@INCLUDE_DECL_H
+@INCLUDE_H
 /*------------- Module related inclusion -------------*/
 
 /*------------- Outside Module inclusion -------------*/
