@@ -67,7 +67,7 @@ i_DECLIMEX_ @DATA_STRUCT*  rfDynamicArray_Create(uint32_t numElements);
  ** @param array The array to initialize
  ** @return true in case of succesfull initialization and false otherwise
  **/
-i_DECLIMEX_ char  rfDynamicArray_Init(@DATA_STRUCT* array,
+i_DECLIMEX_ bool rfDynamicArray_Init(@DATA_STRUCT* array,
                                       uint32_t numElements);
 
 /**
@@ -77,7 +77,7 @@ i_DECLIMEX_ char  rfDynamicArray_Init(@DATA_STRUCT* array,
  ** @param src The array to copy from
  ** @return Returns @c true in succesfull copying and false otherwise
  **/
-i_DECLIMEX_ char rfDynamicArray_Copy_IN(@DATA_STRUCT* dst,
+i_DECLIMEX_ bool rfDynamicArray_Copy_IN(@DATA_STRUCT* dst,
                                         @DATA_STRUCT* src);
 /**
  ** @brief Creates and returns an allocated copy of the given 
@@ -117,7 +117,7 @@ i_DECLIMEX_ void rfDynamicArray_Deinit(@DATA_STRUCT* l);
  **
  ** @return Returns @c true for success and @c false otherwise
  **/
-i_DECLIMEX_ char rfDynamicArray_Add(@DATA_STRUCT* l, @TYPEPTR object);
+i_DECLIMEX_ bool rfDynamicArray_Add(@DATA_STRUCT* l, @TYPEPTR object);
 
 
 /**
@@ -129,11 +129,11 @@ i_DECLIMEX_ char rfDynamicArray_Add(@DATA_STRUCT* l, @TYPEPTR object);
  ** @param i The index of the element to retrieve
  ** @param ret A pointer to the object you need to populate with the
  ** retrieved data
- ** @return @c RF_SUCCESS if the object was retrieved succesfully and 
- ** @c RE_INDEX_OUT_OF_BOUNDS if the index is out of bounds
+ ** @return @c true if the object was retrieved succesfully and 
+ ** @c false if the index is out of bounds
  **
  **/
-i_DECLIMEX_ int32_t rfDynamicArray_Get_IN(
+i_DECLIMEX_ bool rfDynamicArray_Get_IN(
     @DATA_STRUCT* l,
     uint32_t i,
     @TYPEPTR ret
@@ -144,16 +144,15 @@ i_DECLIMEX_ int32_t rfDynamicArray_Get_IN(
  **
  ** @param l The array from which to retrieve
  ** @param i The index of the element to retrieve
- ** @param code Contains @c RF_SUCCESS if all went well with the object
- ** retrieval and @c RE_INDEX_OUT_OF_BOUNDS if there was an index out of bounds
- ** @return If @c code contains @c RF_SUCCESS then it returns the 
- ** value of the array at @c i. If there is a failure this will return
- ** @c NULL
+ ** @param ret_code Is @c true if all went ok with the object retrieval
+ ** and @c false if there was an index out of bounds
+ ** @return the value of the array at @c i. 
+ ** If there is a failure this will return @c NULL
  **/
 i_DECLIMEX_ @TYPEPTR rfDynamicArray_Get_OUT(
     @DATA_STRUCT* l,
     uint32_t i,
-    int32_t* code
+    bool* ret_code
 );
 
 /**
@@ -168,7 +167,7 @@ i_DECLIMEX_ @TYPEPTR rfDynamicArray_Get_OUT(
  ** @return True if the element got set succesfully and false if this 
  ** is a yet unset index
  **/
-i_DECLIMEX_ char rfDynamicArray_Set(
+i_DECLIMEX_ bool rfDynamicArray_Set(
     @DATA_STRUCT* l,
     uint32_t i,
     @TYPEPTR e

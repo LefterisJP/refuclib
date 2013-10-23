@@ -68,7 +68,7 @@ i_DECLIMEX_ @DATA_STRUCT*  rfDynamicArray_Create(uint32_t numElements);
  ** @return true in case of succesfull initialization and false otherwise
  **
  **/
-i_DECLIMEX_ char  rfDynamicArray_Init(
+i_DECLIMEX_ bool rfDynamicArray_Init(
     @DATA_STRUCT* array,
     uint32_t numElements);
 
@@ -79,7 +79,7 @@ i_DECLIMEX_ char  rfDynamicArray_Init(
  ** @param src The array to copy from
  ** @return Returns @c true in succesfull copying and false otherwise
  **/
-i_DECLIMEX_ char rfDynamicArray_Copy_IN(@DATA_STRUCT* dst,
+i_DECLIMEX_ bool rfDynamicArray_Copy_IN(@DATA_STRUCT* dst,
                                         @DATA_STRUCT* src);
 /**
  ** @brief Creates and returns an allocated copy of the given 
@@ -119,23 +119,23 @@ i_DECLIMEX_ void rfDynamicArray_Deinit(@DATA_STRUCT* l);
  **
  ** @return Returns @c true for success and @c false otherwise
  **/
-i_DECLIMEX_ char rfDynamicArray_Add(@DATA_STRUCT* l, @TYPEPTR object);
+i_DECLIMEX_ bool rfDynamicArray_Add(@DATA_STRUCT* l, @TYPEPTR object);
 
 /**
  ** @brief Returns an object from the array
  **
  ** @param l The array from which to retrieve
  ** @param i The index of the element to retrieve
- ** @param code Contains @c RF_SUCCESS if all went well with the object
- ** retrieval and @c RE_INDEX_OUT_OF_BOUNDS if there was an index out of bounds
- ** @return If @c code contains @c RF_SUCCESS then it returns the 
+ ** @param ret_code Is @c true if all went ok with the object retrieval
+ ** and @c false if there was an index out of bounds
+ ** @return If @c code is @c true then it returns the 
  ** value of the array at @c i. If there is a failure this will return
  ** @c NULL
  **/
 i_DECLIMEX_ @TYPEPTR rfDynamicArray_Get(
     @DATA_STRUCT* l,
     uint32_t i,
-    int32_t* code
+    bool* ret_code
 );
 
 /**
@@ -150,7 +150,7 @@ i_DECLIMEX_ @TYPEPTR rfDynamicArray_Get(
  ** is over the capacity of the array
  **
  **/
-i_DECLIMEX_ char rfDynamicArray_Set(
+i_DECLIMEX_ bool rfDynamicArray_Set(
     @DATA_STRUCT* l,
     uint32_t i,
     @TYPEPTR e

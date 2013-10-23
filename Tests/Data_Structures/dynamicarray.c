@@ -14,8 +14,8 @@ int main()
     RF_DynamicArray_I a1;
     RF_DynamicArray_String a2, *a3;
     RF_String s, *sp;
-    int i;
-    int ret, code;
+    int i, ret;
+    bool code;
     EXPECT(rfInit(), true);
 
     //Create a dynamic array of 5 ints capacity and add 10 ints to it
@@ -26,7 +26,7 @@ int main()
     }
     //check that the 9th element is as expected
     ret = rfDynamicArray_I_Get(&a1, 9, &code);
-    EXPECT(code, RF_SUCCESS);
+    EXPECT(code, true);
     EXPECT(ret, 2105);
 
     //now delete some items
@@ -39,7 +39,7 @@ int main()
     for(i = 0; i< 7; i++)
     {
         ret = rfDynamicArray_I_Get(&a1, i, &code);
-        EXPECT(code, RF_SUCCESS);
+        EXPECT(code, true);
         EXPECT(ret, ints_adel[i]);
     }
     
@@ -54,7 +54,7 @@ int main()
     for(i = 0; i< 7; i++)
     {
         ret = rfDynamicArray_I_Get(&a1, i, &code);
-        EXPECT(code, RF_SUCCESS);
+        EXPECT(code, true);
         EXPECT(ret, ints_aset[i]);
     }
 
@@ -74,7 +74,7 @@ int main()
 
     // testing Get_OUT
     sp = rfDynamicArray_String_Get_OUT(&a2, 86, &code);
-    EXPECT(code, RF_SUCCESS);
+    EXPECT(code, true);
     EXPECT(rfString_Equal(sp, RFS_("String 86")), true);
 
     // making a copy
@@ -89,17 +89,17 @@ int main()
     // the copy should have them all correctly
     for(i = 0; i < 100; i++)
     {
-        EXPECT(rfDynamicArray_String_Get_IN(a3, i, &s), RF_SUCCESS);
+        EXPECT(rfDynamicArray_String_Get_IN(a3, i, &s), true);
         EXPECT(rfString_Equal(&s, RFS_("String %d", i)), true);
     }
 
     // the original should start from 51 and have nothing after index 51
     for(i = 0; i < 50; i++)
     {
-        EXPECT(rfDynamicArray_String_Get_IN(&a2, i, &s), RF_SUCCESS);
+        EXPECT(rfDynamicArray_String_Get_IN(&a2, i, &s), true);
         EXPECT(rfString_Equal(&s, RFS_("String %d", i + 50 )), true);
     }
-    EXPECTNOT(rfDynamicArray_String_Get_IN(&a2, 51, &s), RF_SUCCESS);
+    EXPECTNOT(rfDynamicArray_String_Get_IN(&a2, 51, &s), true);
 
     return 0;
 }

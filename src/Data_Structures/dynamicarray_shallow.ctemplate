@@ -77,7 +77,7 @@ $ENDIF
     return ret;
 }
 //Initialises an array of objects
-char rfDynamicArray_Init(@DATA_STRUCT* array, uint32_t numElements)
+bool rfDynamicArray_Init(@DATA_STRUCT* array, uint32_t numElements)
 {
     //allocate the data buffer
     array->bufferCapacity = @OBJECT_SIZE * numElements;
@@ -87,7 +87,7 @@ char rfDynamicArray_Init(@DATA_STRUCT* array, uint32_t numElements)
     return true;
 }
 
-char rfDynamicArray_Copy_IN(@DATA_STRUCT* dst, @DATA_STRUCT* src)
+bool rfDynamicArray_Copy_IN(@DATA_STRUCT* dst, @DATA_STRUCT* src)
 {
     uint32_t i;
     dst->bufferCapacity = src->bufferCapacity;
@@ -129,9 +129,9 @@ void rfDynamicArray_Deinit(@DATA_STRUCT* l)
 }
 
 // Adds a new object at the end of the array
-char rfDynamicArray_Add(@DATA_STRUCT* l, @TYPEPTR object)
+bool rfDynamicArray_Add(@DATA_STRUCT* l, @TYPEPTR object)
 {
-    char ret = true;
+    bool ret = true;
 $IF @LMS
     RF_ENTER_LOCAL_SCOPE();
 $ENDIF
@@ -171,27 +171,27 @@ $ENDIF
 @TYPEPTR rfDynamicArray_Get(
     @DATA_STRUCT* l,
     uint32_t i,
-    int32_t* code)
+    bool* code)
 {
     //if the index goes over the buffer capacity
     if( i >= l->size)
     {
         RF_WARNING(2, "Attempted to retrieve an element from an array with an"
                  " index that is out of bounds");
-        *code = RE_INDEX_OUT_OF_BOUNDS;
+        *code = false;
         return 0;
     }
 
-    *code = RF_SUCCESS;
+    *code = true;
     return @SHALLOW_PTR_ARITHMETIC(l->data + i);
 }
 
-char rfDynamicArray_Set(
+bool rfDynamicArray_Set(
     @DATA_STRUCT* l,
     uint32_t i,
     @TYPEPTR e)
 {
-    char ret = true;
+    bool ret = true;
 $IF @LMS
     RF_ENTER_LOCAL_SCOPE();
 $ENDIF

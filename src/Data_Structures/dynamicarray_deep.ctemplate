@@ -77,7 +77,7 @@ $ENDIF
     return ret;
 }
 
-char rfDynamicArray_Init(
+bool rfDynamicArray_Init(
     @DATA_STRUCT* array,
     uint32_t numElements)
 {
@@ -90,7 +90,7 @@ char rfDynamicArray_Init(
 }
 
 
-char rfDynamicArray_Copy_IN(@DATA_STRUCT* dst, @DATA_STRUCT* src)
+bool rfDynamicArray_Copy_IN(@DATA_STRUCT* dst, @DATA_STRUCT* src)
 {
     uint32_t i;
     dst->bufferCapacity = src->bufferCapacity;
@@ -144,9 +144,9 @@ void rfDynamicArray_Destroy(@DATA_STRUCT* l)
 }
 
 
-char rfDynamicArray_Add(@DATA_STRUCT* l, @TYPEPTR object)
+bool rfDynamicArray_Add(@DATA_STRUCT* l, @TYPEPTR object)
 {
-    char ret = true;
+    bool ret = true;
 $IF @LMS
     RF_ENTER_LOCAL_SCOPE();
 $ENDIF
@@ -185,7 +185,7 @@ $ENDIF
     return ret;
 }
 
-int32_t rfDynamicArray_Get_IN(@DATA_STRUCT* l, uint32_t i, @TYPEPTR ret)
+bool rfDynamicArray_Get_IN(@DATA_STRUCT* l, uint32_t i, @TYPEPTR ret)
 {
 $IF @LMS
     RF_ENTER_LOCAL_SCOPE();
@@ -198,13 +198,13 @@ $ENDIF
 $IF @LMS
         RF_EXIT_LOCAL_SCOPE();
 $ENDIF
-        return RE_INDEX_OUT_OF_BOUNDS;
+        return false;
     }
     memcpy(ret, l->data + i, @OBJECT_SIZE);
 $IF @LMS
     RF_EXIT_LOCAL_SCOPE();
 $ENDIF
-    return RF_SUCCESS;
+    return true;
 }
 
 
@@ -213,28 +213,28 @@ $ENDIF
 @TYPEPTR rfDynamicArray_Get_OUT(
     @DATA_STRUCT* l,
     uint32_t i,
-    int32_t* code)
+    bool* code)
 {
     //if the index goes over the buffer capacity
     if( i >= l->size)
     {
         RF_WARNING(2, "Attempted to retrieve an element from an array with an"
                  " index that is out of bounds");
-        *code = RE_INDEX_OUT_OF_BOUNDS;
+        *code = false;
         return NULL;
     }
    
-    *code = RF_SUCCESS;
+    *code = true;
     return l->data + i;
 }
 
 
-char rfDynamicArray_Set(
+bool rfDynamicArray_Set(
     @DATA_STRUCT* l,
     uint32_t i,
     @TYPEPTR e)
 {
-    char ret = true;
+    bool ret = true;
 $IF @LMS
     RF_ENTER_LOCAL_SCOPE();
 $ENDIF
