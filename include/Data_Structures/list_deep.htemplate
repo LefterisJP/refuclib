@@ -1,0 +1,167 @@
+/**
+**      ==Start OF REFU LICENSE==
+**
+** Copyright (c) 2011-2013, Karapetsas Eleftherios
+** All rights reserved.
+** 
+** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+**  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+**  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in
+**     the documentation and/or other materials provided with the distribution.
+**  3. Neither the name of the Original Author of Refu nor the names of its contributors may be used to endorse or promote products derived from
+** 
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+** INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+** DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+** SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+** WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**
+**      ==END OF REFU LICENSE==
+**
+**
+** --Data_Structures/list.h
+** This header declares functions that operate on RF_List, a single
+** linked list data structure
+**
+---------------------For internal library include make sure to have----------------------------
+#include <Definitions/imex.h> //for import export macro
+#include <Definitions/types.h> //for fixed size data types
+#include <Definitions/defarg.h> //for enabling default arguments
+#include <Preprocessor/rf_tokens.h>//for the defined library tokens
+#include <Data_Structures/linkedlist_decl.h>
+#include <Data_Structures/linkedlist.h>
+---------------------For internal library include make sure to have----------------------------
+*/
+
+$IF 0
+/*
+ * This file is a generic TEMPLATE. Depending on the options you provide
+ * in scons though various specializations of this file will get
+ * generated during building the library. If you want to use the actual file
+ * as it is in its generic mode then you have to provide the "generic" 
+ * argument inside the data structure's specialization argument during build
+ */
+$ENDIF
+
+#ifndef RF_LIST_H
+#define RF_LIST_H
+
+#ifdef __cplusplus
+extern "C"
+{///opening bracket for calling from C++
+#endif
+
+/**
+ ** @brief Allocates and returns a single linked list of objects
+ **
+ ** @return Returns true in succesfull initialization and false otherwise
+ **/
+i_DECLIMEX_ @DATA_STRUCT*  rfList_Create();
+
+/**
+ ** @brief Initializes a single linked list of objects
+ **
+ ** @param l the list to initialize
+ ** @return Returns true in succesfull initialization and false otherwise
+ **/
+i_DECLIMEX_ char  rfList_Init(@DATA_STRUCT* l);
+
+/**
+ ** @brief Copies src into dst
+ **
+ ** @param dst The new list copy to create
+ ** @param src The list to copy from
+ ** @return Returns @c true in successful copying @c false otherwise
+ **
+ **/
+i_DECLIMEX_ char rfList_Copy_IN(@DATA_STRUCT* dst,
+                                @DATA_STRUCT* src);
+/**
+ ** @brief Creates and returns an allocated copy of the given 
+ **        list
+ **
+ ** @param src The list to copy from
+ ** @return An allocated copy of the given list
+ **
+ **/
+i_DECLIMEX_ @DATA_STRUCT* rfList_Copy_OUT(@DATA_STRUCT* src);
+
+/**
+ ** @brief Destroys a single linked list of objects, calling the 
+ ** destructing function for each
+ **
+ ** @param a The list to destroy
+ **
+ **/
+i_DECLIMEX_ void rfList_Destroy(@DATA_STRUCT* a);
+
+/**
+ ** @brief Deinitializes a single linked list of objects, calling the
+ ** destructing function for each
+ **
+ ** @param a The list to destroy
+ **
+ **/
+i_DECLIMEX_ void rfList_Deinit(@DATA_STRUCT* a);
+
+
+/**
+ ** @brief Adds an element to a single linked list
+ **
+ ** The element gets a deep copy using the copy function passed to the
+ ** list.
+ **
+ ** @param a The list to add to
+ ** @param e A pointer to the element to add
+ ** @return Returns @c true in succesfull addition of an element in the
+ ** list and @c false otherwise
+ **
+ **/
+i_DECLIMEX_ char rfList_Add(@DATA_STRUCT* a, @TYPEPTR e);
+
+/**
+ ** @brief Deletes an element from a single linked list by calling
+ ** the destruction and the comparison functions.
+ **
+ ** @param a The list to delete the element from
+ ** @param e A pointer to the element to search for in the list and
+ ** if found then delete
+ ** @return Returns @c true if the element is found and deleted from the
+ ** list and @c false otherwise
+ **/
+i_DECLIMEX_ char rfList_Delete(@DATA_STRUCT* a, @TYPEPTR e);
+
+
+
+/**
+ ** @brief Searches if an element exists in the list 
+ **
+ ** @param a The list in which to search for the element
+ ** @param e A pointer to the element to search for in the list
+ ** @return Returns @c true if the element is found and false otherwise
+ **/
+i_DECLIMEX_ char rfList_Has(@DATA_STRUCT* a, @TYPEPTR ret);
+
+/**
+ ** This macro is used to iterate a list from each start node until
+ ** its end node.
+ ** @param i_LIST_ A pointer to the linked list to iterate
+ ** @param i_DATA_PTR_ A pointer of the type of data you have stored in
+ ** the linked list. In every iteration this pointer will point to the 
+ ** current data. If the type is plain old data this is not a pointer.
+ **/
+#define rfList_Iterate(i_LIST_, i_DATA_PTR_) \
+    @NODE* i_anode_ptr_ = (i_LIST_)->start->next;\
+    for(i_DATA_PTR_ = (&i_anode_ptr_->data);        \
+        i_anode_ptr_->next != 0;                   \
+        i_anode_ptr_ = i_anode_ptr_->next,         \
+        i_DATA_PTR_ = (&i_anode_ptr_->data))
+    
+
+#ifdef __cplusplus
+}///closing bracket for calling from C++
+#endif
+
+#endif// end of include guards

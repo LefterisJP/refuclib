@@ -21,7 +21,7 @@
 **      ==END OF REFU LICENSE==
 **
 ** --Data_Structures/list.h
-** This header declares functions that operate on RF_HashMap, a hash 
+** This header declares functions that operate on a hash 
 ** map/table data structure
 **
 ---------------------For internal library include make sure to have----------------------------
@@ -35,34 +35,31 @@
 ---------------------For internal library include make sure to have----------------------------
 */
 
-/* @omit start */
-
+$IF 0
 /*
  * This file is a TEMPLATE. It does not actually get compiled at all
  * anywhere inside the library. Depending on the options you provide
  * in scons though various specializations of this file will get
  * generated during building the library
  */
-
-/* @omit end */
+$ENDIF
 
 #ifndef RF_HASHMAP_DECL_H
 #define RF_HASHMAP_DECL_H
 
-typedef struct RF_Hashslot
+typedef struct @NODE
 {
     RF_String key;
-    /* @mutate void* TYPE */
-    void*  value;
-    struct RF_Hashslot* next;
-}RF_Hashslot;
+    @TYPEPTR  value;
+    struct @NODE* next;
+}@NODE;
 
-typedef struct RF_Hashmap
+typedef struct @DATA_STRUCT
 {
-    RF_Hashslot** slots;
+    @NODE** slots;
     uint32_t size;
     uint32_t occupied;
-}RF_Hashmap;
+}@DATA_STRUCT;
 
 
 

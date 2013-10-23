@@ -37,8 +37,7 @@
 ---------------------For internal library include make sure to have----------------------------
 */
 
-/* @omit start */
-
+$IF 0
 /*
  * This file is a generic TEMPLATE. Depending on the options you provide
  * in scons though various specializations of this file will get
@@ -46,8 +45,7 @@
  * as it is in its generic mode then you have to provide the "generic"
  * argument inside the data structure's specialization argument during build
  */
-
-/* @omit end */
+$ENDIF
 
 #ifndef RF_HASHMAP_H
 #define RF_HASHMAP_H
@@ -62,28 +60,16 @@ extern "C"
  ** Initializes a hashmap data structure
  ** @param m The hashmap to initialize
  ** @param s The initial size of the map in "buckets"
- ** @param object_size The size of the generic object stored in the
- ** hashmap. Only used in the generic case of the specialization
- ** @param ptr2Copy A pointer to a copy function for the generic object.
- ** Only used in the generic case of the specialization
- ** @param ptr2Destroy A pointer to a destroy function for the generic object.
- ** Only used in the generic case of the specialization
  ** @return @c true for success and @c false otherwise
  */
-i_DECLIMEX_ char rfHashmap_Init(RF_Hashmap* m, uint32_t s);
+i_DECLIMEX_ char rfHashmap_Init(@DATA_STRUCT* m, uint32_t s);
 
 /**
  ** Allocates and returns a hashmap data structure
  ** @param s The initial size of the map in "buckets"
- ** @param object_size The size of the generic object stored in the
- ** hashmap. Only used in the generic case of the specialization
- ** @param ptr2Copy A pointer to a copy function for the generic object.
- ** Only used in the generic case of the specialization
- ** @param ptr2Destroy A pointer to a destroy function for the generic object.
- ** Only used in the generic case of the specialization
- ** @return The allocated @ref RF_Hashmap or @c NULL if there is an error
+ ** @return The allocated Hashmap or @c NULL if there is an error
  */
-i_DECLIMEX_ RF_Hashmap* rfHashmap_Create(uint32_t s);
+i_DECLIMEX_ @DATA_STRUCT* rfHashmap_Create(uint32_t s);
 
 /**
  ** @brief Iterates a hashmap
@@ -103,21 +89,22 @@ i_DECLIMEX_ RF_Hashmap* rfHashmap_Create(uint32_t s);
  ** and @c false if not. Breaking out of iteration will also cause a
  ** @c false return value.
  */
-/* @mutate void* TYPEPTR_OBJ_ONLY */
-i_DECLIMEX_ bool rfHashmap_Iterate(RF_Hashmap* m, bool (*act)(void*,
-                                                              void*), void* user_data);
+
+i_DECLIMEX_ bool rfHashmap_Iterate(@DATA_STRUCT* m,
+                                   bool (*act)(@TYPEPTR, void*),
+                                   void* user_data);
 
 /**
  ** Deinitializes a hashmap
  ** @param m The map to deinitialize
  */
-i_DECLIMEX_ void rfHashmap_Deinit(RF_Hashmap* m);
+i_DECLIMEX_ void rfHashmap_Deinit(@DATA_STRUCT* m);
 
 /**
  ** Destroys a hashmap
  ** @param m The map to destroy
  */
-i_DECLIMEX_ void rfHashmap_Destroy(RF_Hashmap* m);
+i_DECLIMEX_ void rfHashmap_Destroy(@DATA_STRUCT* m);
 
 
 /**
@@ -130,9 +117,8 @@ i_DECLIMEX_ void rfHashmap_Destroy(RF_Hashmap* m);
  ** already exists in the table
  ** @return @c true if all is fine and @c false otherwise
  */
-i_DECLIMEX_ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
-                                  /* @mutate void* TYPEPTR_OBJ_ONLY */
-                                  void* value,
+i_DECLIMEX_ char rfHashmap_Insert(@DATA_STRUCT* m, RF_String* key,
+                                  @TYPEPTR value,
                                   bool* exists);
 
 /**
@@ -144,8 +130,7 @@ i_DECLIMEX_ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
  ** @return If the value for the key exist a pointer to it
  ** will be returned. If not NULL.
  */
-/* @mutate void* TYPEPTR_OBJ_ONLY */
-i_DECLIMEX_ void* rfHashmap_Get(RF_Hashmap* m, RF_String* key, bool* found);
+i_DECLIMEX_ @TYPEPTR rfHashmap_Get(@DATA_STRUCT* m, RF_String* key, bool* found);
 
 #ifdef __cplusplus
 }///closing bracket for calling from C++

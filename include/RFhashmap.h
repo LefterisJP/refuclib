@@ -33,8 +33,6 @@
 #include <Preprocessor/rf_tokens.h>//for the defined library tokens
 #include <String/string_decl.h> //for RF_String
 #include <Definitions/retcodes.h> //for error codes, bool
-#include <Data_Structures/hashmap_decl.h> //for the struct declarations
-#include <Data_Structures/hashmap.h>
 
 #ifdef RF_MODULE_HASHMAP_EXTRA
 #include <Data_Structures/hashmap_extra.h>

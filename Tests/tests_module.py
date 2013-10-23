@@ -11,7 +11,7 @@ def copy_sources_for_list():
     """ Copies the extra object generated source for the list test """
     try:
         os.rename(os.path.join("..", "src", "Data_Structures",
-                               "list_test_object.c"),
+                               "list_deep_test_object.c"),
                   os.path.join("Data_Structures", "list_test_object.c"))
     except:
         print_nonl("During preparation of the list test, could not copy "
@@ -224,11 +224,11 @@ tests_list = [
          [os.path.join("Data_Structures", "hashmap.c")],
          "Data_Structures"),
 
-    Test("hashmap_shallowcopy",
+    Test("hashmap_shallow",
          [os.path.join("Data_Structures", "hashmap_shallowcopy.c")],
          "Data_Structures"),
 
-    Test("hashmap_deepcopy",
+    Test("hashmap_deep",
          [os.path.join("Data_Structures", "hashmap_deepcopy.c")],
          "Data_Structures"),
 

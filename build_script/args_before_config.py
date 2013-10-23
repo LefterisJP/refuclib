@@ -32,7 +32,6 @@ def extraobjects_to_dict(s):
     """
        A function to convert the extra objects string to a dict
     """
-    # print("--\n{}\n--\n".format(s))
     if s == "":
         return {}
     # that's a pretty stupid way to make the dict/list be all strings but
@@ -53,7 +52,6 @@ def extraobjects_to_dict(s):
         build_msg("The EXTRA_OBJECTS string provided could not be properly"
                   " evaluated as a python literal", "Error")
         Exit(-1)
-
 
 
 args_before = Variables()
@@ -82,6 +80,7 @@ args_before.Add(
     ' EXTRA_OBJECTS=\"[{name:test_object,'
     'source_name:test_obj,'
     'headers:[Tests/ExtraObjects/test.h,<include/something.h>, ...],'
+    'extra_obj_dirs:[/path.to/dir1, /path/to/dir2],'
     'destroy_func:test_destroy,'
     'copy_func:test_copy,'
     'compare_func:test_equal'
@@ -90,9 +89,12 @@ args_before.Add(
     'Simply replace test with the object in question. Notice there is no need'
     'to encircle keys or values of the dict with \"\". They are added by the '
     'build script. You only need to enclose the whole dictionary once in \"\"'
-    'From the above keys only up to the header name are required',
+    'From the above keys only up to the header name are required'
+    'For a more full documentation of possible values please look at the code',
     '',
     converter=extraobjects_to_dict)
+
+                
 
 #return the variables, and make sure the paths are absolute
 temp = Environment(variables=args_before)

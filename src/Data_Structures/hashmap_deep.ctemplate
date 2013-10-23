@@ -22,28 +22,26 @@
 **
 **/
 
-/* @omit start */
-
+$IF 0
 /*
  * This file is a TEMPLATE. It does not actually get compiled at all
  * anywhere inside the library. Depending on the options you provide
  * in scons though various specializations of this file will get
  * generated during building the library
  */
-
-/* @omit end */
+$ENDIF
 
 /*------------- Corrensponding Header inclusion -------------*/
-/* @omitcond STRING */
+$IFNOT @STRING
 #include <Definitions/imex.h> //for import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <Preprocessor/rf_tokens.h>//for the defined library tokens
 #include <Definitions/types.h> //for fixed size data types
 #include <String/string_decl.h> //for RF_String
-/* @omit end */
+$ENDIF
 #include <Definitions/retcodes.h> //for error codes, bool
-@INCLUDE_DECL_H
-@INCLUDE_H
+$INCLUDE @DECL_H
+$INCLUDE @H
 /*------------- Module related inclusion -------------*/
 
 /*------------- Outside Module inclusion -------------*/
@@ -65,9 +63,9 @@
     #include <float.h>
     #include <Utils/constcmp.h>
 // String module inclusions
-/* @omitcond STRING */
+$IFNOT @STRING
     #include <String/core.h> //for rfString_Equal
-/* @omit end */
+$ENDIF
     #include <String/conversion.h> //for rfString_Cstr()
     #include <String/retrieval.h> //for rfString_Length()
 /*------------- libc includes -------------*/
@@ -134,12 +132,12 @@ static inline uint32_t HsiehHash(const char* data, int len)
 }
 
 // Initializes a hashmap
-char rfHashmap_Init(RF_Hashmap* m, uint32_t s)
+char rfHashmap_Init(@DATA_STRUCT* m, uint32_t s)
 {
     int i;
     m->size = s;
     m->occupied = 0;
-    RF_MALLOC(m->slots, sizeof(RF_Hashslot*)*m->size, false);
+    RF_MALLOC(m->slots, sizeof(@NODE*)*m->size, false);
     for(i = 0; i < m->size; i++)
     {
         m->slots[i] = NULL;
@@ -148,10 +146,10 @@ char rfHashmap_Init(RF_Hashmap* m, uint32_t s)
 }
 
 // Allocates and returns a hashmap
-RF_Hashmap* rfHashmap_Create(uint32_t s)
+@DATA_STRUCT* rfHashmap_Create(uint32_t s)
 {
-    RF_Hashmap* m;
-    RF_MALLOC(m, sizeof(RF_Hashmap), NULL);
+    @DATA_STRUCT* m;
+    RF_MALLOC(m, sizeof(@DATA_STRUCT), NULL);
     if(! rfHashmap_Init(m, s))
     {
         free(m);
@@ -160,11 +158,11 @@ RF_Hashmap* rfHashmap_Create(uint32_t s)
     return m;
 }
 
-/* @mutate void* TYPEPTR_OBJ_ONLY */
-bool rfHashmap_Iterate(RF_Hashmap* m, bool (*act)(void*,
-                                                  void*), void* user_data)
+bool rfHashmap_Iterate(@DATA_STRUCT* m,
+                       bool (*act)(@TYPEPTR, void*),
+                       void* user_data)
 {
-    RF_Hashslot* slot;
+    @NODE* slot;
     int i;
     for(i = 0; i < m->size; i++)
     {
@@ -182,10 +180,10 @@ bool rfHashmap_Iterate(RF_Hashmap* m, bool (*act)(void*,
 }
 
 
-static void i_DestroySlots(RF_Hashslot** slots, uint32_t size)
+static void i_DestroySlots(@NODE** slots, uint32_t size)
 {
     int i;
-    RF_Hashslot* s,*tmp;
+    @NODE* s,*tmp;
     for(i = 0;i < size;i++)
     {
         s = slots[i];
@@ -194,31 +192,29 @@ static void i_DestroySlots(RF_Hashslot** slots, uint32_t size)
             tmp = s;
             s = s->next;
             rfString_Deinit(&tmp->key);
-            /* @mutate ptr2Destroyr DESTROY */
-            ptr2Destroy(tmp->value);
+            @OBJECT_DESTROY(&tmp->value);
             free(tmp);
         }
     }
 }
 
 // Deinitializes a hashmap
-void rfHashmap_Deinit(RF_Hashmap* m)
+void rfHashmap_Deinit(@DATA_STRUCT* m)
 {
     i_DestroySlots(m->slots, m->size);
 }
 // Destroys a hashmap
-void rfHashmap_Destroy(RF_Hashmap* m)
+void rfHashmap_Destroy(@DATA_STRUCT* m)
 {
     rfHashmap_Deinit(m);
     free(m);
 }
 
-static char i_InsertValue(RF_Hashslot** slots, RF_String* key, bool* exists,
-/* @mutate void* TYPEPTR_OBJ_ONLY */
-                          void* value, uint32_t size)
+static char i_InsertValue(@NODE** slots, RF_String* key, bool* exists,
+                          @TYPEPTR value, uint32_t size)
 {
     uint32_t i;
-    RF_Hashslot* s, *pr;
+    @NODE* s, *pr;
 
     *exists = false;
     i = HsiehHash(rfString_Cstr(key), rfString_Length(key));
@@ -228,7 +224,7 @@ static char i_InsertValue(RF_Hashslot** slots, RF_String* key, bool* exists,
     //if the slot is null initialize it
     if(s == NULL)
     {
-        RF_MALLOC(s, sizeof(RF_Hashslot), false);
+        RF_MALLOC(s, sizeof(@NODE), false);
         slots[i] = s;
         s->next = NULL;
     }
@@ -246,7 +242,7 @@ static char i_InsertValue(RF_Hashslot** slots, RF_String* key, bool* exists,
             s = s->next;
         }
         //if we get here it means we need to allocate a new slot
-        RF_MALLOC(s, sizeof(RF_Hashslot), false);
+        RF_MALLOC(s, sizeof(@NODE), false);
         pr->next = s;
         s->next = NULL;
     }
@@ -257,19 +253,20 @@ static char i_InsertValue(RF_Hashslot** slots, RF_String* key, bool* exists,
         return false;
     }
     //copy value
-    /* @mutate ptr2Copyrp ASSIGN IFBLOCK return false; */
-    ptr2Copy(s->value, value);
+    if(!@OBJECT_COPY(&s->value, value))
+    {
+        return false;
+    }
     return true;
 }
 
 // Insert a copy of a value into the Hashmap
-char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
-                           /* @mutate void* TYPEPTR_OBJ_ONLY */
-                           void* value,
-                           bool* exists)
+char rfHashmap_Insert(@DATA_STRUCT* m, RF_String* key,
+                      @TYPEPTR value,
+                      bool* exists)
 {
     uint32_t i;
-    RF_Hashslot* s;
+    @NODE* s;
     char ret = true;
     RF_ENTER_LOCAL_SCOPE();
 
@@ -281,15 +278,15 @@ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
     m->occupied ++;
 
     //if the ratio of occupied over size is greaten than the load factor
-    if( FLCMP_G((float)m->occupied / (float)m->size,
-            RF_OPTION_HASHMAP_LOAD_FACTOR))
+    if(FLCMP_G((float)m->occupied / (float)m->size,
+               RF_OPTION_HASHMAP_LOAD_FACTOR))
     {
         uint32_t prsize;
-        RF_Hashslot** tmp;
+        @NODE** tmp;
         //make a new hash map with double the size
         prsize = m->size;
         m->size *= 2;
-        RF_MALLOC_JMP(tmp, sizeof(RF_Hashslot*)*m->size,
+        RF_MALLOC_JMP(tmp, sizeof(@NODE*)*m->size,
                       ret=false, cleanup);
         for(i = 0; i < m->size; i ++)
         {
@@ -304,8 +301,7 @@ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
                 s = m->slots[i];
                 while(s != 0)
                 {
-                    /* @mutate s->value REFERENCE */
-                    if(!i_InsertValue(tmp, &s->key, exists, s->value,
+                    if(!i_InsertValue(tmp, &s->key, exists, &s->value,
                                       m->size))
                     {
                         ret = false;
@@ -327,12 +323,11 @@ char rfHashmap_Insert(RF_Hashmap* m, RF_String* key,
 }
 
 
-char rfHashmap_Get_IN(RF_Hashmap* m, RF_String* key,
-                        /* @mutate void* TYPEPTR */
-                        void* value)
+char rfHashmap_Get_IN(@DATA_STRUCT* m, RF_String* key,
+                      @TYPEPTR value)
 {
     uint32_t i;
-    RF_Hashslot* s;
+    @NODE* s;
     char ret = false;
     RF_ENTER_LOCAL_SCOPE();
     i = HsiehHash(rfString_Cstr(key), rfString_Length(key));
@@ -343,10 +338,10 @@ char rfHashmap_Get_IN(RF_Hashmap* m, RF_String* key,
     {
         if(rfString_Equal(&s->key, key))
         {//if key is found get it
-
-            /* @mutate ptr2Copypr ASSIGN PODPTR POD_DL IFBLOCK goto cleanup; */
-            m->ptr2Copy(value, s->value);
-
+            if(!@OBJECT_COPY(value, &s->value))
+            {
+                goto cleanup;
+            }
             ret = true;
             goto cleanup;
         }
@@ -359,13 +354,11 @@ char rfHashmap_Get_IN(RF_Hashmap* m, RF_String* key,
     return ret;
 }
 
-/* @mutate void* TYPEPTR */
-void* rfHashmap_Get_OUT(RF_Hashmap* m, RF_String* key)
+@TYPEPTR rfHashmap_Get_OUT(@DATA_STRUCT* m, RF_String* key)
 {
     uint32_t i;
-    RF_Hashslot* s;
-    /* @mutate void* TYPEPTR */
-    void* ret = NULL;
+    @NODE* s;
+    @TYPEPTR ret = NULL;
     RF_ENTER_LOCAL_SCOPE();
     i = HsiehHash(rfString_Cstr(key), rfString_Length(key));
     i = i % m->size;

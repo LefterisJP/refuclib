@@ -64,17 +64,17 @@ static bool string_on_iterate(RF_String* s, void* user_data)
 
 int main()
 {
-    RF_Hashmapd_String* m3;
+    RF_Hashmap_String* m3;
     int i;
     RF_String str, *strp;
     bool exists;
     EXPECT(rfInit(), true);
 
-    m3 = rfHashmapd_String_Create(10);
+    m3 = rfHashmap_String_Create(10);
     EXPECTNOT(m3, NULL);
     for(i = 0; i < m3_size; i ++)
     {
-        EXPECT(true, rfHashmapd_String_Insert(
+        EXPECT(true, rfHashmap_String_Insert(
                    m3,
                    RFS_("%s", m3_keys[i]),
                    RFS_("%s", m3_values[i]),
@@ -84,7 +84,7 @@ int main()
     for(i = 0; i < m3_size; i ++)
     {
         /* test the Get_IN function which copies the get value */
-        EXPECT(true, rfHashmapd_String_Get_IN(
+        EXPECT(true, rfHashmap_String_Get_IN(
                    m3,
                    RFS_("%s", m3_keys[i]),
                    &str));
@@ -93,14 +93,14 @@ int main()
     }
     for(i = 0; i < m3_size; i ++)
     {
-        /* test the Get_IN function which copies the get value */
-        strp = rfHashmapd_String_Get_OUT(m3, RFS_("%s", m3_keys[i]));
+        /* test the Get_OUT function */
+        strp = rfHashmap_String_Get_OUT(m3, RFS_("%s", m3_keys[i]));
         EXPECTNOT(strp, NULL);
         EXPECT(true, rfString_Equal(strp, RFS_("%s", m3_values[i])));
     }
     //also in this hashmap test the iteration function
-    EXPECT(true, rfHashmapd_String_Iterate(m3, string_on_iterate, NULL));
-    rfHashmapd_String_Destroy(m3);
+    EXPECT(true, rfHashmap_String_Iterate(m3, string_on_iterate, NULL));
+    rfHashmap_String_Destroy(m3);
 
     return 0;
 }

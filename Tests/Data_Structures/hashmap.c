@@ -54,7 +54,7 @@ static void test_generic_map(RF_Hashmap* m)
     //test it
     for(i = 0; i < 20; i++)
     {
-        EXPECTNOT((obj = rfHashmap_Get(m, RFS_("%d",i))), NULL);
+        EXPECTNOT((obj = rfHashmap_Get(m, RFS_("%d",i), &exists)), NULL);
         EXPECT(obj->num == i, true);
         EXPECT(obj->f == (float)i, true);
         EXPECT(rfString_Equal(&obj->s, RFS_("%d", i)), true );

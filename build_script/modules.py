@@ -18,7 +18,8 @@ class Module:
     """
     def __init__(self,name,sources=[], macro="", win32_sources=[],
                  linux_sources=[], dependencies=[], has_template="",
-                 template_files={}, gen_name_sub=[]):
+                 template_files={}, gen_name_sub=[],
+                 template_data_struct = None, template_node = None):
             self.name = name
             self.sources = sources
             self.macro = macro
@@ -28,6 +29,8 @@ class Module:
             self.has_template = has_template
             self.template_files = template_files
             self.gen_name_sub = gen_name_sub
+            self.template_data_struct = template_data_struct
+            self.template_node = template_node
             self.extra_generated = False
 
 
@@ -53,13 +56,18 @@ class Module:
             #if any data types are requested for this module
             if arg_env[self.has_template] != []:
                 template = Template(self.name, self.template_files, 
+                                    self.template_data_struct,
+                                    self.template_node,
                                     arg_env[self.has_template],
-                                    codegen.obj_dict
+                                    codegen.obj_dict,
+                                    codegen.type_dict,
+                                    codegen.refu_objects,
+                                    codegen.lms_list
                 )
                 #for every type of data given for the module
                 for d_type in arg_env[self.has_template]:
                     #if the generic type is requested, add the source files
-                    if d_type == "generic":
+                    if d_type == "no_template":
                         if self.sources == []:
                             raise TemplateSourcesError(self.name)
                         sources.extend(self.sources)
@@ -200,12 +208,16 @@ modules.append(
            [],
            macro = "RF_MODULE_LIST",
            has_template = "LIST",
-           template_files = {"simple": "Data_Structures/list.ctemplate"},
-           gen_name_sub = ["RF_L_Node",
-                           "RF_List",
-                           "rfList",
-                           "RF_LIST",
-                           "list"]
+           template_files = {
+               "shallow": "Data_Structures/list_shallow.ctemplate",
+               "deep": "Data_Structures/list_deep.ctemplate"
+           },
+           template_data_struct = "RF_List",
+           template_node = "RF_L_Node",
+           gen_name_sub = [                        
+               "rfList",
+               "RF_LIST",
+           ]
        )
 )
 
@@ -215,11 +227,15 @@ modules.append(
            [],
            macro = "RF_MODULE_DYNAMICARRAY",
            has_template = "DYNAMICARRAY",
-           template_files = {"simple": "Data_Structures/dynamicarray.ctemplate"},
-           gen_name_sub = ["RF_DynamicArray",
-                           "rfDynamicArray",
-                           "RF_DYNAMICARRAY",
-                           "dynamicarray"]
+           template_files = {
+               "deep": "Data_Structures/dynamicarray_deep.ctemplate",
+               "shallow": "Data_Structures/dynamicarray_shallow.ctemplate"
+           },
+           template_data_struct = "RF_DynamicArray",
+           gen_name_sub = [
+               "rfDynamicArray",
+               "RF_DYNAMICARRAY"
+           ]
        )
 )
 
@@ -230,12 +246,12 @@ modules.append(
            has_template = "HASHMAP",
            template_files = {"shallow": "Data_Structures/hashmap_shallow.ctemplate",
                              "deep": "Data_Structures/hashmap_deep.ctemplate"},
-           gen_name_sub = ["RF_Hashmap",
-                           "rfHashmap",
-                           "RF_HASHMAP",
-                           "hashmap",
-                           "RF_Hashslot"
-                       ]
+           template_data_struct = "RF_Hashmap",
+           template_node = "RF_Hashslot",
+           gen_name_sub = [
+               "rfHashmap",
+               "RF_HASHMAP",
+           ]
        )
 )
 

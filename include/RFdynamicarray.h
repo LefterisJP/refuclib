@@ -29,6 +29,7 @@
 
 #include <Definitions/imex.h> //for import export macro
 #include <Definitions/types.h> //for fixed size data types
+#include <Definitions/retcodes.h> //for error codes, bool
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <Preprocessor/rf_tokens.h>//for the defined library tokens
 

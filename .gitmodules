@@ -1,0 +1,3 @@
+[submodule "build_script/pycparser"]
+	path = build_script/pycparser
+	url = git@github.com:LefterisJP/pycparser.git

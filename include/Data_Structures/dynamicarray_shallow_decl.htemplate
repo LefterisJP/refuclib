@@ -21,46 +21,45 @@
 **      ==END OF REFU LICENSE==
 **
 */
+#ifndef RF_DYNAMICARRAY_DECL_H
+#define RF_DYNAMICARRAY_DECL_H
 
-/* @omit start */
-
+$IF 0
 /*
  * This file is a TEMPLATE. It does not actually get compiled at all
  * anywhere inside the library. Depending on the options you provide
  * in scons though various specializations of this file will get
  * generated during building the library
  */
+$ENDIF
 
-/* @omit end */
-
-#ifndef RF_LIST_DECL_H
-#define RF_LIST_DECL_H
-
-
-typedef struct RF_L_Node
+/**
+ ** @internal
+ ** @author Lefteris
+ ** @date 10/07/2011
+ ** @endinternal
+ ** @brief An array of objects that can grow on demand
+ **
+ ** Functions to add, remove and retrieve
+ ** object from the list exist.
+ **
+ ** Normal usage is to set an initial capacity of the list and then whenever
+ ** more objects are added the capacity gets increased if it goes over the
+ ** buffer and it also gets decreased if many objects are removed.
+ ** So this is a datastructure to use if you need something that adjusts its
+ ** size when needed.
+ **
+ **/
+typedef struct @DATA_STRUCT
 {
-    struct RF_L_Node* next;
-    /* @mutate void* TYPE */
-    void* data;
-}RF_L_Node;
+    //! The current buffer capacity in bytes
+    uint32_t bufferCapacity;
+    //! The size of the array in elements (how many elements are actually 
+    //! occupying the array right now). So the next element will go to
+    //! index = size
+    uint32_t size;
+    @TYPEPTR_SHALLOW data;
+}@DATA_STRUCT;
 
-typedef struct RF_List
-{
-    //! The first node of the linked list
-    struct RF_L_Node* start;
-    //! The last node of the linked list
-    struct RF_L_Node* end;
-    /* @omit start */
-
-    //! An element's size
-    uint32_t element_size;
-    //! The destruction (deinit) function for the elements of the list
-    void (*ptr2Destroy)(void*);
-    //! The copy function for the elements of the list
-    char (*ptr2Copy)(void*, void*);
-    //! The equality function for the elements of the list
-    char (*ptr2Equal)(void*, void*);
-    /* @omit end */
-}RF_List;
 
 #endif//include guards end

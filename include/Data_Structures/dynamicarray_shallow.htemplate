@@ -22,11 +22,12 @@
 **
 **
 ** --Data_Structures/dynamicarray.h
-** This header declares functions to operate on RF_DynamicArray
+** This header declares functions to operate on a Dynamic Array
 **
 ---------------------For internal library include make sure to have----------------------------
 #include <Definitions/imex.h> //for import export macro
 #include <Definitions/types.h> //for fixed size data types
+#include <Definitions/retcodes.h> //for error codes, bool
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <Preprocessor/rf_tokens.h>//for the defined library tokens
 #include <Data_Structures/dynamicarray_decl.h>
@@ -34,8 +35,7 @@
 ---------------------For internal library include make sure to have----------------------------
 */
 
-/* @omit start */
-
+$IF 0
 /*
  * This file is a generic TEMPLATE. Depending on the options you provide
  * in scons though various specializations of this file will get
@@ -43,8 +43,7 @@
  * as it is in its generic mode then you have to provide the "generic" 
  * argument inside the data structure's specialization argument during build
  */
-
-/* @omit end */
+$ENDIF
 
 #ifndef RF_DYNAMICARRAY_H
 #define RF_DYNAMICARRAY_H
@@ -55,23 +54,14 @@ extern "C"
 #endif
 
 /**
- ** @memberof RF_DynamicArray
- ** @brief Allocates and returns a dynamic array
+ ** @brief Allocates and returns a shallow dynamic array
  **
  ** @return The allocated array
  **/
-i_DECLIMEX_ RF_DynamicArray*  rfDynamicArray_Create(
-    uint32_t numElements
-    /* @omit start */
-    , uint32_t elementSize,
-    void (*ptr2Destroy)(void*),
-    char (*ptr2Copy)(void*,void*)
-    /* @omit end */
-);
+i_DECLIMEX_ @DATA_STRUCT*  rfDynamicArray_Create(uint32_t numElements);
  
 
 /**
- ** @memberof RF_DynamicArray
  ** @brief Initializes a dynamic array
  **
  ** @param array The array to initialize
@@ -79,126 +69,59 @@ i_DECLIMEX_ RF_DynamicArray*  rfDynamicArray_Create(
  **
  **/
 i_DECLIMEX_ char  rfDynamicArray_Init(
-    RF_DynamicArray* array,
-    uint32_t numElements
-    /* @omit start */
-    , uint32_t elSize,
-    void (*ptr2Destroy)(void*),
-    char (*ptr2Copy)(void*,void*)
-    /* @omit end */
-);
+    @DATA_STRUCT* array,
+    uint32_t numElements);
 
 /**
- ** @memberof RF_DynamicArray
- ** @brief Copies RF_DynamicArray @c src into RF_DynamicArray @c dst
+ ** @brief Copies @DATA_STRUCT @c src into @DATA_STRUCT @c dst
  **
  ** @param dst The new array copy to create
  ** @param src The array to copy from
  ** @return Returns @c true in succesfull copying and false otherwise
  **/
-i_DECLIMEX_ char rfDynamicArray_Copy_IN(RF_DynamicArray* dst,
-                                        RF_DynamicArray* src);
+i_DECLIMEX_ char rfDynamicArray_Copy_IN(@DATA_STRUCT* dst,
+                                        @DATA_STRUCT* src);
 /**
- ** @memberof RF_DynamicArray
  ** @brief Creates and returns an allocated copy of the given 
- ** RF_DynamicArray
+ ** @DATA_STRUCT
  **
  ** @param src The array to copy from
- ** @return An allocated RF_DynamicArray copy of the given array
+ ** @return An allocated @DATA_STRUCT copy of the given array
  **
  **/
-i_DECLIMEX_ RF_DynamicArray* rfDynamicArray_Copy_OUT(RF_DynamicArray* src);
+i_DECLIMEX_ @DATA_STRUCT* rfDynamicArray_Copy_OUT(@DATA_STRUCT* src);
 
 /**
- ** @memberof RF_DynamicArray
- ** @brief Destroys a array of objects releasing their memory and calling
- ** the destructing function if it exists
+ ** @brief Destroys a array of objects 
  **
- ** If for some reason you do not want to call the destruction
- ** function of the given objects at array destruction use
- ** @ref rfDynamicArray_Destroy_nofree()
  ** @param l The array to destroy
  **
  **/
-i_DECLIMEX_ void rfDynamicArray_Destroy(RF_DynamicArray* l);
-/**
- ** @memberof RF_DynamicArray
- ** @brief Destroys a array of objects without calling individual object 
- ** destructing function
- **
- ** For a function that deletes the array and calls the appropriate
- ** destruction function for each individual object refer to
- ** @ref rfDynamicArray_Destroy()
- ** @param l The array to destroy
- **
- **/
-i_DECLIMEX_ void rfDynamicArray_Destroy_nofree(RF_DynamicArray* l);
-/**
- ** @memberof RF_DynamicArray
- ** @brief Deinitializes a array of objects releasing their memory and 
- ** calling the destructing function if it exists
- **
- ** If for some reason you do not want to call the destruction
- ** function of the given objects at array deinitialization use
- ** @ref rfDynamicArray_Deinit_nofree()
- ** @param l The array to deinitialize
- **
- **/
-i_DECLIMEX_ void rfDynamicArray_Deinit(RF_DynamicArray* l);
-/**
- ** @memberof RF_DynamicArray
- ** @brief Deinitializes a array of objects without calling individual object destructing function
- **
- ** For a function that deinitializes the array and calls the appropriate
- ** destruction function for each individual object refer to
- ** @ref rfDynamicArray_Deinit()
- ** @param l The array to deinitialize
- **
- **/
-i_DECLIMEX_ void rfDynamicArray_Deinit_nofree(RF_DynamicArray* l);
+i_DECLIMEX_ void rfDynamicArray_Destroy(@DATA_STRUCT* l);
 
 /**
- ** @memberof RF_DynamicArray
+ ** @memberof @DATA_STRUCT
+ ** @brief Deinitializes a array of objects
+ **
+ ** @param l The array to deinitialize
+ **
+ **/
+i_DECLIMEX_ void rfDynamicArray_Deinit(@DATA_STRUCT* l);
+
+/**
  ** @brief Adds a new object to the array
  **
  ** The @c object is added in the array right after the last element and
  **  if it does not fit in the buffer, a reallocation happens.
- ** If the @c object is Plain old Data then it's simply appended to the 
- ** array while if it's any other type created by the template its copy
- ** function is called.
  ** @param l The array in which to add the object
  ** @param object The object to add. For plain old data types simply add
  ** it here. For objects make sure to pass a pointer to the object
  **
  ** @return Returns @c true for success and @c false otherwise
  **/
-/* @mutate void* TYPEPTR_OBJ_ONLY */
-i_DECLIMEX_ char rfDynamicArray_Add(RF_DynamicArray* l, void* object);
-
+i_DECLIMEX_ char rfDynamicArray_Add(@DATA_STRUCT* l, @TYPEPTR object);
 
 /**
- ** @memberof RF_DynamicArray
- ** @brief Retrieves an object from the array
- **
- ** The object will be placed in the passed parameter @c ret. It must
- ** be a reference of the appropriate type.
- ** @param l The array from which to retrieve
- ** @param i The index of the element to retrieve
- ** @param ret A pointer to the object you need to populate with the
- ** retrieved data
- ** @return @c RF_SUCCESS if the object was retrieved succesfully and 
- ** @c RE_INDEX_OUT_OF_BOUNDS if the index is out of bounds
- **
- **/
-i_DECLIMEX_ int32_t rfDynamicArray_Get_IN(
-    RF_DynamicArray* l,
-    uint32_t i,
-/* @mutate void* TYPEPTR */
-    void* ret
-);
-
-/**
- ** @memberof RF_DynamicArray
  ** @brief Returns an object from the array
  **
  ** @param l The array from which to retrieve
@@ -209,20 +132,16 @@ i_DECLIMEX_ int32_t rfDynamicArray_Get_IN(
  ** value of the array at @c i. If there is a failure this will return
  ** @c NULL
  **/
-/* @mutate void* TYPEPTR_OBJ_ONLY */
-i_DECLIMEX_ void* rfDynamicArray_Get_OUT(
-    RF_DynamicArray* l,
+i_DECLIMEX_ @TYPEPTR rfDynamicArray_Get(
+    @DATA_STRUCT* l,
     uint32_t i,
     int32_t* code
 );
 
 /**
- ** @memberof RF_DynamicArray
- ** @brief Sets a copy of the given object to the specified array index
+ ** @brief Sets the given object in the specified array index
  **
- ** @c object is copied into the @c i index of the array. If the object is
- ** plain old data type then it is simply placed there while if it is an 
- ** object type its copy function is called.
+ ** @c object is put into the @c i index of the array.
  ** @param l The array for which to set the object
  ** @param i The index of the object to set
  ** @param e A pointer to the object to add.
@@ -232,30 +151,22 @@ i_DECLIMEX_ void* rfDynamicArray_Get_OUT(
  **
  **/
 i_DECLIMEX_ char rfDynamicArray_Set(
-    RF_DynamicArray* l,
+    @DATA_STRUCT* l,
     uint32_t i,
-/* @mutate void* TYPEPTR_OBJ_ONLY */
-    void* e
+    @TYPEPTR e
 );
 
 /**
- ** @memberof RF_DynamicArray
  ** @brief Removes an object from the array.
  **
  ** All objects get moved to make up for the freed up space and if there
  ** is too much space left the array gets reallocated downwards.
- ** Also the destructor of the object at index @c i is called if given.
- ** For a function
- ** that removes the object without calling the destructor take a look at
- ** @ref rfDynamicArray_Remove_nofree()
  ** @param l The array from which to remove
  ** @param i The index of the element to remove
- ** @return Returns RF_SUCCESS if the object at @c i was succesfully removed
- ** and @c RE_INDEX_OUT_OF_BOUNDS if there is no element at @c i. Additionally
- ** if during reallocation downwards there is an error this function can 
- ** return @c RE_REALLOC_FAILURE
+ ** @return Returns true if the object at @c i was succesfully removed
+ ** and @c false if there is no element at @c i or there was another error
  **/
-i_DECLIMEX_ int32_t rfDynamicArray_Remove(RF_DynamicArray* l, uint32_t i);
+i_DECLIMEX_ bool rfDynamicArray_Remove(@DATA_STRUCT* l, uint32_t i);
 
 #ifdef __cplusplus
 }///closing bracket for calling from C++

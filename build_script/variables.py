@@ -111,7 +111,6 @@ vars.Add(
                  'create', [], code_gen.type_dict))
 
 
-
 vars.Add(
     'ERROR_LOGGING_LEVEL', 'This option specified the error logging level'
     'that the log macros will be using. If greater than the level of the'

@@ -22,24 +22,22 @@
 **
 **/
 
-/* @omit start */
-
+$IF 0
 /*
  * This file is a TEMPLATE. It does not actually get compiled at all
  * anywhere inside the library. Depending on the options you provide
  * in scons though various specializations of this file will get
  * generated during building the library
  */
-
-/* @omit end */
+$ENDIF
 
 /*------------- Corrensponding Header inclusion -------------*/
 #include <Definitions/imex.h> //for import export macro
 #include <Definitions/types.h> //for fixed size data types
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <Preprocessor/rf_tokens.h>//for the defined library tokens
-@INCLUDE_DECL_H
-@INCLUDE_H
+$INCLUDE @DECL_H
+$INCLUDE @H
 /*------------- Outside Module inclusion -------------*/
 //for error logging
     #include <stdio.h>//for FILE* used inside printf.h
@@ -60,18 +58,11 @@
 /*------------- End of includes -------------*/
 
 
-RF_List*  rfList_Create(
-    /* @omit start */
-    uint32_t elSize,
-    void (*ptr2Destroy)(void*),
-    char (*ptr2Copy)(void*, void*),
-    char (*ptr2Equal)(void*, void*)
-    /* @omit end */
-)
+@DATA_STRUCT* rfList_Create()
 {
-    RF_List* ret;
+    @DATA_STRUCT* ret;
     //allocate the list
-    RF_MALLOC(ret, sizeof(RF_List), NULL);
+    RF_MALLOC(ret, sizeof(@DATA_STRUCT), NULL);
     if(rfList_Init(ret) == false)
     {
         free(ret);
@@ -81,68 +72,37 @@ RF_List*  rfList_Create(
 }
 
 
-char rfList_Init(
-    RF_List* l
-    /* @omit start */
-    ,uint32_t elSize,
-    void (*ptr2Destroy)(void*),
-    char (*ptr2Copy)(void*, void*),
-    char (*ptr2Equal)(void*, void*)
-    /* @omit end */
-)
+char rfList_Init(@DATA_STRUCT* l)
 {
-    /* @omit start */
-    if(elSize == 0)
-    {
-        RF_ERROR(0,"Tried to create an array of objects with zero sized "
-                 "elements");
-        return false;
-    }
-    /* @omit end */
     //allocate the first node
-    RF_MALLOC(l->start, sizeof(RF_L_Node), false);
-    /* @mutate 0 INITIALIZE_TO_ZERO */
-    l->start->data = 0;
+    RF_MALLOC(l->start, sizeof(@NODE), false);
+    //no need to initialize the data of the first node, can be garbage
     l->start->next = 0;
     l->end = l->start;
-    /* @omit start */
-    l->element_size = elSize;
-    l->ptr2Destroy = ptr2Destroy;
-    l->ptr2Copy = ptr2Copy;
-    l->ptr2Equal = ptr2Equal;
-    /* @omit end */
     return true;
 }
 
 
 
-char rfList_Copy_IN(RF_List* dst,
-                    RF_List* src)
+char rfList_Copy_IN(@DATA_STRUCT* dst,
+                    @DATA_STRUCT* src)
 {
-    RF_L_Node* n = src->start->next, *c, *pr = 0;
-    /* @omit start */
-    dst->element_size = src->element_size;
-    dst->ptr2Destroy = src->ptr2Destroy;
-    dst->ptr2Copy = src->ptr2Copy;
-    dst->ptr2Equal = src->ptr2Equal;
-    /* @omit end */
+    @NODE* n = src->start->next, *c, *pr = 0;
 
     //allocate first node
-    RF_MALLOC(c, sizeof(RF_L_Node), false);
-    /* @mutate 0 INITIALIZE_TO_ZERO */
-    c->data = 0;
+    RF_MALLOC(c, sizeof(@NODE), false);
     c->next = 0;
     dst->start = c;
     pr = c;
     while(n != 0)
     {
         //allocate a node
-        RF_MALLOC(c, sizeof(RF_L_Node), false);
+        RF_MALLOC(c, sizeof(@NODE), false);
         //copy its data
-        /* @omit next */
-        RF_MALLOC(c->data, src->element_size, false);
-        /* @mutate ptr2Copyrr ASSIGN IFBLOCK return false; */
-        src->ptr2Copy(c->data, n->data);
+        if(!@OBJECT_COPY(&c->data, &n->data))
+        {
+            return false;
+        }
         c->next = 0;
         //connect it to the previous one
         pr->next = c;
@@ -154,10 +114,10 @@ char rfList_Copy_IN(RF_List* dst,
     return true;
 }
 
-RF_List* rfList_Copy_OUT(RF_List* src)
+@DATA_STRUCT* rfList_Copy_OUT(@DATA_STRUCT* src)
 {
-    RF_List* dst;
-    RF_MALLOC(dst, sizeof(RF_List), NULL);
+    @DATA_STRUCT* dst;
+    RF_MALLOC(dst, sizeof(@DATA_STRUCT), NULL);
     if(rfList_Copy_IN(dst, src) == false)
     {
         free(dst);
@@ -167,139 +127,114 @@ RF_List* rfList_Copy_OUT(RF_List* src)
 }
 
 
-void rfList_Destroy(RF_List* a)
+void rfList_Deinit(@DATA_STRUCT* a)
 {
-    RF_L_Node* n = a->start->next, *p;
+    @NODE* n = a->start->next, *p;
     while(n != 0)
     {
         p = n;
         n = n->next;
         //free this node
-        /* @mutate ptr2Destroyr DESTROY */
-        a->ptr2Destroy(p->data);
-        free(p);
-    }
-    //finally free start node and the whole list
-    free(a->start);
-    free(a);
-}
-
-
-void rfList_Deinit(RF_List* a)
-{
-    RF_L_Node* n = a->start->next, *p;
-    while(n != 0)
-    {
-        p = n;
-        n = n->next;
-        //free this node
-        /* @mutate ptr2Destroyr DESTROY */
-        a->ptr2Destroy(p->data);
+        @OBJECT_DESTROY(&p->data);
         free(p);
     }
     //finally free start node
     free(a->start);
 }
 
-/* @mutate void* TYPEPTR_OBJ_ONLY */
-char rfList_Add(RF_List* a, void* e)
+void rfList_Destroy(@DATA_STRUCT* a)
 {
-    RF_L_Node* n;
+    rfList_Deinit(a);
+    free(a);
+}
+
+char rfList_Add(@DATA_STRUCT* a, @TYPEPTR e)
+{
+    @NODE* n;
     char ret = true;
-    /* @omitcond NONLMS */
+$IF @LMS
     RF_ENTER_LOCAL_SCOPE();
-    /* @omit end */
-    RF_MALLOC_JMP(n, sizeof(RF_L_Node), ret = false, cleanup);
+$ENDIF
+    RF_MALLOC_JMP(n, sizeof(@NODE), ret = false, cleanup);
     n->next = 0;
+
     //add the data to the node
-    /* @omit next */
-    RF_MALLOC(n->data, sizeof(a->element_size), ret = false, cleanup);
-
-    /* @mutate ptr2Copyrp ASSIGN IFBLOCK ret=false; goto cleanup; */
-    a->ptr2Copy(n->data, e);
-
+    if(!@OBJECT_COPY(&n->data, e))
+    {
+        ret = false;
+        goto cleanup;
+    }
 
     //connect the new node to the linked list
     a->end->next = n;
     a->end = n;
-/* @omitcond OBJECT */
-#ifdef RF_OPTION_SAFE_MEMORY_ALLOCATION
-/* @omit end */
+
   cleanup:
-/* @omitcond OBJECT */
-#endif
-/* @omit end */
-    /* @omitcond NONLMS */
+$IF @LMS
     RF_EXIT_LOCAL_SCOPE();
-    /* @omit end */
+$ENDIF
     return ret;
 }
 
-/* @mutate void* TYPEPTR_OBJ_ONLY */
-char rfList_Delete(RF_List* a, void* e)
+char rfList_Delete(@DATA_STRUCT* a, @TYPEPTR e)
 {
-    RF_L_Node* n = a->start->next;
-    RF_L_Node* pr = a->start;
-    /* @omitcond NONLMS */
+    @NODE* n = a->start->next;
+    @NODE* pr = a->start;
+$IF @LMS
     RF_ENTER_LOCAL_SCOPE();
-    /* @omit end */
+$ENDIF
     while(n != 0)
     {
-        /* @mutate ptr2Equalpr COMPARE */
-        if(a->ptr2Equal(e, n->data))
+        if(@OBJECT_COMPARE(e, &n->data))
         {
             if(n == a->end)
             {//if this is the last node
-                /* @mutate ptr2Destroyr DESTROY */
-                a->ptr2Destroy(n->data);
+                @OBJECT_DESTROY(&n->data);
                 pr->next = 0;
                 a->end = pr;
                 free(n);
-                /* @omitcond NONLMS */
+$IF @LMS
                 RF_EXIT_LOCAL_SCOPE();
-                /* @omit end */
+$ENDIF
                 return true;
             }
             //else it's somewhere in between
-            /* @mutate ptr2Destroyr DESTROY */
-            a->ptr2Destroy(n->data);
+            @OBJECT_DESTROY(&n->data);
             pr->next = n->next;
             free(n);
-            /* @omitcond NONLMS */
+$IF @LMS
             RF_EXIT_LOCAL_SCOPE();
-            /* @omit end */
+$ENDIF
             return true;
         }
         pr = n;
         n = n->next;
     }
-    /* @omitcond NONLMS */
+$IF @LMS
     RF_EXIT_LOCAL_SCOPE();
-    /* @omit end */
+$ENDIF
     return false;
 }
 
-/* @mutate void* TYPEPTR_OBJ_ONLY */
-char rfList_Has(RF_List* a, void* e)
+char rfList_Has(@DATA_STRUCT* a, @TYPEPTR e)
 {
-    RF_L_Node* n = a->start->next;
-    /* @omitcond NONLMS */
+    @NODE* n = a->start->next;
+$IF @LMS
     RF_ENTER_LOCAL_SCOPE();
-    /* @omit end */
+$ENDIF
     while(n != 0)
     {
-        /* @mutate ptr2Equalpr COMPARE */
-        if(a->ptr2Equal(e, n->data))
+        if(@OBJECT_COMPARE(e, &n->data))
         {
-            /* @omitcond NONLMS */
+$IF @LMS
             RF_EXIT_LOCAL_SCOPE();
-            /* @omit end */
+$ENDIF
             return true;
         }
         n = n->next;
     }while(n != 0);
-    /* @omitcond NONLMS */
+$IF @LMS
     RF_EXIT_LOCAL_SCOPE();
-    /* @omit end */
+$ENDIF
     return false;
 }

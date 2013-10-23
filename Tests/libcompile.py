@@ -61,13 +61,15 @@ def compileLib(verbose, dynamic, compiler):
         " EXTRA_OBJECTS=\"[{name:test_object,"
         "source_name:test_obj,"
         "headers:[../ExtraObjects/test.h],"
+        "dirs:[Tests/Data_Structures],"
         "destroy_func:test_destroy,"
         "copy_func:test_copy,"
         "compare_func:test_equal"
-        "}]\""
-        " LIST=I,String,test_object DYNAMICARRAY=I,String "
-        "HASHMAP=I,String,generic "
+        "}]\" "
     )
+    extra_source_opts += "LIST=I,String,test_object "
+    extra_source_opts += "DYNAMICARRAY=I,String "
+    extra_source_opts += "HASHMAP=I,String,generic "
 
     if platform.system() == 'Windows':
         sconsCall = ['scons.py', arg, 'COMPILER='+compiler,

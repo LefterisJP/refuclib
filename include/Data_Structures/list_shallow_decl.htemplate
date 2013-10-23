@@ -21,57 +21,32 @@
 **      ==END OF REFU LICENSE==
 **
 */
-#ifndef RF_DYNAMICARRAY_DECL_H
-#define RF_DYNAMICARRAY_DECL_H
 
-/* @omit start */
-
+$IF 0
 /*
  * This file is a TEMPLATE. It does not actually get compiled at all
  * anywhere inside the library. Depending on the options you provide
  * in scons though various specializations of this file will get
  * generated during building the library
  */
+$ENDIF
 
-/* @omit end */
+#ifndef RF_LIST_DECL_H
+#define RF_LIST_DECL_H
 
-/**
- ** @internal
- ** @author Lefteris
- ** @date 10/07/2011
- ** @endinternal
- ** @brief An array of objects that can grow on demand
- **
- ** Functions to add, remove and retrieve
- ** object from the list exist.
- **
- ** Normal usage is to set an initial capacity of the list and then whenever
- ** more objects are added the capacity gets increased if it goes over the
- ** buffer and it also gets decreased if many objects are removed.
- ** So this is a datastructure to use if you need something that adjusts its
- ** size when needed.
- **
- **/
-typedef struct RF_DynamicArray
+
+typedef struct @NODE
 {
-    //! The current buffer capacity in bytes
-    uint32_t bufferCapacity;
-    //! The size of the array in elements (how many elements are actually 
-    //! occupying the array right now). So the next element will go to
-    // index = size
-    uint32_t size;
+    struct @NODE* next;
+    @TYPEPTR data;
+}@NODE;
 
-    /* @mutate void* TYPEPTR */
-    void* data;
-    /* @omit start */
-    //! An element's size
-    uint32_t elementSize;
-    //! A Function pointer for the destruction of the objects
-    void (*ptr2Destroy)(void*);
-    //! A Function pointer for the copying of the objects
-    char (*ptr2Copy)(void*,void*);
-    /* @omit end */
-}RF_DynamicArray;
-
+typedef struct @DATA_STRUCT
+{
+    //! The first node of the linked list
+    struct @NODE* start;
+    //! The last node of the linked list
+    struct @NODE* end;
+}@DATA_STRUCT;
 
 #endif//include guards end

@@ -5,7 +5,8 @@ import sys
 from time import gmtime, strftime
 
 from templates import Template, TemplateGeneratedStructure
-
+from ctemplate_parser import TemplateParser, Template_FuncCall
+from ctemplate_preprocessor import Template_Preprocessor
 def enum(*sequential, **named):
     enums = dict(zip(sequential, range(len(sequential))), **named)
     return type('Enum', (), enums)
@@ -104,85 +105,17 @@ mutate_cmd = "/* @mutate"
 addinc_start = "/* @additional_includes start */"
 addinc_end = "/* @additional_includes end */"
 
-def get_func1_args(line, func_name):
-    """
-       Returns the argument of an 1 argument function
-    """
-    part = line.partition(func_name+"(")
-    #count how many open parentheses we had before
-    openP = part[0].count("(")
+
+def replace_func_call(line, funcname, replace_str):
+    part = line.partition(funcname + "(")
+    clean_line = part[0]
+    clean_line = clean_line + replace_str
+    
     line = part[2]
-    #take only the relevant parenetheses part
-    arg = line
-    for i in range(openP):
-        arg = arg.rpartition(")")[0]
-    arg = arg.rpartition(")")[0]
-    arg = arg.strip()
-    return arg
+    part = line.partition(")")
 
-def get_func2_args(line, func_name):
-    """
-       Returns a tuple with the arguments of a 2 arguments function
-    """
-    part = line.partition(func_name+"(")
-    #count how many open parentheses we had before
-    openP = part[0].count("(")
-    line = part[2]
-    part = line.partition(",")
-    arg1 = part[0].strip()
-    #take only the relevant parenetheses part
-    arg2 = part[2]
-    for i in range(openP):
-        arg2 = arg2.rpartition(")")[0]
-    arg2 = arg2.rpartition(")")[0]
-    arg2 = arg2.strip()
-    return (arg1, arg2)
-
-def get_func3_args(line, func_name):
-    """
-       Returns a tuple with the arguments of a 3 arguments function
-    """
-    part = line.partition(func_name+"(")
-    #count how many open parentheses we had before
-    openP = part[0].count("(")
-    line = part[2]
-    part = line.partition(",")
-    arg1 = part[0].strip()
-    #take only the relevant parenetheses part
-    arg2 = part[2]
-    part = arg2.partition(",")
-    arg2 = part[0].strip()
-    arg3 = part[2]
-    for i in range(openP):
-        arg3 = arg3.rpartition(")")[0]
-    arg3 = arg3.rpartition(")")[0]
-    arg3 = arg3.strip()
-    return (arg1, arg2, arg3)
-
-
-def check_extra_args(line, mutate, type_d):
-    """
-       Checks for extra mutate arguments and applies some transformations
-       on the line right before the main handler
-    """
-    #no extra args
-    if len(mutate) < 3:
-        return line
-
-    #silly method to get rid of element size
-    if mutate[2] == "NOSIZE":
-        line = line.replace("*dst->elementSize", "")
-        line = line.replace("*src->elementSize", "")
-        line = line.replace("*l->elementSize", "")
-        line = line.replace("dst->elementSize", "")
-        line = line.replace("src->elementSize", "")
-        line = line.replace("l->elementSize", "")
-        return line
-
-    #in any other case just return line as is
-    return line
-
-
+    clean_line += part[2]
+    return clean_line
 
 class CodeGen():
     """
@@ -191,26 +124,22 @@ class CodeGen():
 
     refu_objects = [ "String" ]
     lms_list = ["String"]
+    
+
 
     def __init__(self, refu_root):
         """
            Initializes the codegen object, either creating the object and
            types dicts and list or loading them from a file
         """
-        self.handle_dict = {
-            "TYPE": self.handle_TYPE,
-            "TYPEPTR": self.handle_TYPEPTR,
-            "TYPEPTR_OBJ_ONLY": self.handle_TYPEPTR_OBJ_ONLY,
-            "SIZE": self.handle_SIZE,
-            "REFERENCE": self.handle_REFERENCE,
-            "ASSIGN": self.handle_ASSIGN,
-            "COMPARE": self.handle_COMPARE,
-            "INIT": self.handle_INIT,
-            "DESTROY": self.handle_DESTROY,
-            "INITIALIZE_TO_ZERO": self.handle_INITIALIZE_TO_ZERO,
-            "REMOVE": self.handle_REMOVE,
-            "REPLACE": self.handle_REPLACE,
-            "MEMCPY": self.handle_MEMCPY
+
+        self.functions = {
+            "@OBJECT_INIT_DEFAULT": self.handle_object_init_default,
+            "@OBJECT_COPY": self.handle_object_copy,
+            "@OBJECT_DESTROY": self.handle_object_destroy,
+            "@OBJECT_COMPARE": self.handle_object_compare,
+            "@ASSIGN": self.handle_assign,
+            "@SHALLOW_PTR_ARITHMETIC": self.handle_shallow_ptr_arithmetic,
         }
 
         # types that can be safely templated from within the library
@@ -225,7 +154,8 @@ class CodeGen():
                           "I164": "int64_t",
                           "UI64": "uint64_t",
                           "String": "RF_String",
-                          "generic": "generic",
+                          "generic": "void*",
+                          "no_template": "no_template"
             }
 
         if os.path.isfile(os.path.join(refu_root, json_file_name)):
@@ -242,11 +172,12 @@ class CodeGen():
                           "I164": "int64_t",
                           "UI64": "uint64_t",
                           "String": "RF_String",
-                          "generic": "generic",
+                          "generic": "void*",
             }
 
             self.obj_dict = {
                 "String": {
+                    "init_default_func": "",
                     "destroy_func": "rfString_Deinit",
                     "copy_func": "rfString_Copy_IN",
                     "compare_func": "rfString_Equal",
@@ -276,31 +207,126 @@ class CodeGen():
         self.obj_dict = data[1]
         inF.close()
 
-    def check_line_for_name_sub(self, line, subs, type_d, structure):
-        """
-        Replaces the name subs from the template for this line.
 
-        If the template is of specialized type then a suffix is added. For example
-        a 'd' for deep and an 's' for shallow.
-        But if the line is an include the equivalent full header suffix like 'deep'
-        or 'shallow' is added. Shallow copies of POD should also not get a source
-        suffix since POD can only be shallow copied.
+
+    def handle_object_copy(self, line, structure, keyword, line_num):
+        line = line.replace(
+            keyword,
+            self.obj_dict[structure.type_symbol]["copy_func"]
+        )
+        return line
+
+    def handle_object_init_default(self, line, structure, keyword, line_num):
         """
-        if "@INCLUDE_DECL_H" in line:
-            line = line.replace("@INCLUDE_DECL_H", 
-                                "#include <Data_Structures/{}_decl.h>".format(
-                                    structure.header_prefix
+           If the object does have a default initialization function then
+           it is used. If not the line is totally omitted.
+        """
+        if self.obj_dict[structure.type_symbol].get("init_default_func"):
+            line = line.replace(
+                keyword,
+                self.obj_dict[structure.type_symbol]["init_default_func"]
+            )
+        else:
+            line = ""
+        return line
+
+    def handle_assign(self, line, structure, keyword, line_num):
+        if structure.copy_type == 'shallow':
+            call = self.Template_Parser.query(keyword, line_num)
+            arg1 = call.args[0]
+            arg2 = call.args[1]
+            arg1_type = call.get_arg_type(arg1)
+            arg2_type = call.get_arg_type(arg2)
+            arg1_name = call.get_arg_name(arg1)
+            arg2_name = call.get_arg_name(arg2)
+            if structure.type_symbol != 'generic':
+                if '*' in arg1_type and '*' in arg2_type:
+                    line = replace_func_call(line, keyword,
+                                             "*({}) = *({})".format(
+                                                 arg1_name, arg2_name
+                                             )
+                    )
+                elif '*' in arg1_type and '*' not in arg2_type:
+                    line = replace_func_call(line, keyword,
+                                             "*({}) = {}".format(
+                                                 arg1_name, arg2_name
+                                             )
+                    )
+                elif '*' not in arg1_type and '*' in arg2_type:
+                    line = replace_func_call(line, keyword,
+                                             "{} = *({})".format(
+                                                 arg1_name, arg2_name
+                                             )
+                    )
+                else:
+                    line = replace_func_call(line, keyword,
+                                             "{} = {}".format(
+                                                 arg1_name, arg2_name
+                                             )
+                    )
+            else: # generic (void*) case
+                line = replace_func_call(line, keyword,
+                                         "(char*)({} * sizeof(void*))"
+                                         " = {};".format(arg1_name, arg2_name))
+        else: #only used in shallow templates for now
+            raise Exception #TODO
+        return line
+
+    def handle_shallow_ptr_arithmetic(self, line, structure, keyword, line_num):
+        if structure.copy_type != 'shallow':
+            raise Exception #todo
+
+        call = self.Template_Parser.query(keyword, line_num)
+        arg = call.args[0]
+        arg_type = call.get_arg_type(arg)
+        arg_name = call.get_arg_name(arg)
+
+
+        if structure.type_symbol != 'generic':
+            # If it's in a return don't forget to dereference
+            if call.has_extra("IN_RETURN"):
+                line = replace_func_call(line, keyword, "*({})".format(arg_name))
+            else:
+                line = replace_func_call(line, keyword, arg_name)
+        else: #generic (void*) case
+            line = replace_func_call(line, keyword,
+                                     "(char*)({} * sizeof(void*)".format(
+                                         arg_name)
+            )
+        return line
+
+    def handle_object_destroy(self, line, structure, keyword, line_num):
+        line = line.replace(
+            keyword,
+            self.obj_dict[structure.type_symbol]["destroy_func"]
+        )
+        return line
+
+    def handle_object_compare(self, line, structure, keyword, line_num):
+        call = self.Template_Parser.query(keyword, line_num)
+        arg1 = call.args[0]
+        arg2 = call.args[1]
+        arg1_name = call.get_arg_name(arg1)
+        arg2_name = call.get_arg_name(arg2)
+        if (structure.copy_type == 'deep' or 
+            (
+                structure.copy_type == 'shallow' and
+                structure.type_symbol in self.obj_dict
+        )):
+            line = line.replace(
+                keyword,
+                self.obj_dict[structure.type_symbol]["compare_func"]
+            )
+        else: #shallow and POD, means simple comparison of POD
+            line = replace_func_call(line, keyword,
+                                     "{} == {}".format(arg1_name, arg2_name
             ))
-            return line
-        elif "@INCLUDE_H" in line:
-            line = line.replace("@INCLUDE_H",
-                                "#include <Data_Structures/{}.h>".format(
-                                    structure.header_prefix
-            ))
-            return line
-        for s in subs:
-            if s in line:
-                line = line.replace(s, s + structure.source_prefix + "_" + type_d)
+        return line
+
+    def check_functions(self, line, structure, line_num):
+        for key, value in self.functions.iteritems():
+            if key + "(" in line:
+                line = value(line, structure, key, line_num)
         return line
 
 
@@ -310,11 +336,41 @@ class CodeGen():
         Look at args_before_config.py for the details
         """
         self.type_dict[extra_dict["name"]] = extra_dict["source_name"]
+
         self.obj_dict[extra_dict["name"]] = {
+            # FUNCTION: void default_init_func(obj):
+            # initializes an empty object.
+            # obj         The object to initialize
+            # Can be omitted
+            "default_init_func": extra_dict.get("default_init_func"),
+            # FUNCTION: void destroy(obj):
+            # Destroys an object
+            # obj         The object to destroy
             "destroy_func": extra_dict.get("destroy_func"),
+            # FUNCTION: bool copy(destination, source)
+            # Copies an object to another
+            # destination  The object to copy to
+            # source       The object to copy from
+            # RETURN       True in success and false in failure
             "copy_func": extra_dict.get("copy_func"),
+            # FUNCTION: bool compare(obj1, obj2)
+            # Compares an object with another
+            # obj1         The first object to compare
+            # obj2         The second object to compare
+            # RETURN       True if they are considered the same and false if not
             "compare_func": extra_dict.get("compare_func"),
+
+            
+            # A list of headers that the object needs to add them to the 
+            # generated source file
             "headers": extra_dict.get("headers"),
+            # The directory/directories where the files generated by the 
+            # template will go. You need to give this only if you have provided
+            # headers that are relatively include from those directories so 
+            # that the template parser will know where to find stuff
+            "dirs": extra_dict.get("dirs"),
+            # The store type of the data structure that will be generated
+            # for the object. Can be one of ['both', 'deep', 'shallow']
             "store_type": extra_dict.get("store_type")
         }
         #since a new object has been added save it to the json file
@@ -375,7 +431,11 @@ class CodeGen():
                     structure.header_prefix + ".c"),
                 type_d,
                 name_subs,
-                structure
+                structure,
+                [
+                    os.path.join(root, "include"),
+                    os.path.join(root, "src", template.parent_dir)
+                ]
             )
 
             #remember the source from parent dir and down
@@ -389,418 +449,46 @@ class CodeGen():
             print type(err)
             print(err)
             raise err
-        except Exception as err:
-            print("Unexpected Problems during code generation")
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print("\tError type:{} \n\tFile Name:{}"
-                  "\n\tError: {}\n\tLine number: {}".format(
-                  exc_type, fname, str(err), exc_tb.tb_lineno))
-            raise err
 
         return generated_sources
 
-
-
-
-
-    def handle_COMPARE(self, line, mutate, type_d, file_name, line_num):
-        """
-           Performs the mutation of the generic template code for
-           comparing objects. It either gets changed into:
-           - If simple data types then plain old data equals comparison
-           - If an object, then that objects's equals/comparison function
-             with the arguments address ('r'eference or 'p'ointer) being
-             decided by the structure of mutate[0] (mutate_from)
-        """
-        if "ptr2Equal" in mutate[0]:
-            (arg1, arg2) = get_func2_args(line, "ptr2Equal")
-            if type_d in self.obj_dict:
-                if self.obj_dict[type_d]["compare_func"] is None:
-                    raise MutateError( "Source template requires compare "
-                                       "function while none was given at "
-                                       "definition",
-                                       file_name, line_num)
-
-                if mutate[0] == "ptr2Equalpr":
-                    return "if({}({}, &{}))\n".format(
-                        self.obj_dict[type_d]["compare_func"],
-                        arg1,
-                        arg2)
-                elif mutate[0] == "ptr2Equalpp":
-                    return "if({}({}, {}))\n".format(
-                        self.obj_dict[type_d]["compare_func"],
-                        arg1,
-                        arg2)
-                elif mutate[0] == "ptr2Equalrr":
-                    return "if({}(&{}, &{}))\n".format(
-                        self.obj_dict[type_d]["compare_func"],
-                        arg1,
-                        arg2)
-                elif mutate[0] == "ptr2Equalrp":
-                    return "if({}(&{}, {}))\n".format(
-                        self.obj_dict[type_d]["compare_func"],
-                        arg1,
-                        arg2)
-                else:
-                    raise MutateSourceError(mutate[0], file_name, line_num)
-            else:
-                return "if({} == {})\n".format(arg1, arg2)
-        else:
-            raise MutateSourceError(mutate[0], file_name, line_num)
-
-
-
-    def handle_assign_function(self, line, mutate,
-                               type_d, file_name, func_name,
-                               line_num):
-        (arg1, arg2) = get_func2_args(line, func_name)
-        if type_d in self.obj_dict:
-            if self.obj_dict[type_d]["copy_func"] is None:
-                raise MutateError( "Source template requires copy "
-                                   "function while none was given at "
-                                   "definition",
-                                   file_name, line_num)
-            # read the IFBLOCK and get the rest of the arguments for
-            # as statements inside if
-            if "IFBLOCK" not in mutate:
-                raise MutateError("For an assignment to objects, an "
-                                  "IFBLOCK argument has not been given",
-                                  file_name, line_num)
-            ifblock = ""
-            for i in range(mutate.index("IFBLOCK") + 1, len(mutate)):
-                ifblock = ifblock + " " + mutate[i];
-            if mutate[0] == "{}rr".format(func_name):
-                return "if(!{}(&{}, &{}))\n\t{{ {} }}\n".format(
-                    self.obj_dict[type_d]["copy_func"],
-                    arg1,
-                    arg2,
-                    ifblock)
-            elif mutate[0] == "{}pp".format(func_name):
-                return "if(!{}({},{}))\n\t{{ {} }}\n".format(
-                    self.obj_dict[type_d]["copy_func"],
-                    arg1,
-                    arg2,
-                    ifblock)
-            elif mutate[0] == "{}pr".format(func_name):
-                return "if(!{}({},&{}))\n\t{{ {} }}\n".format(
-                    self.obj_dict[type_d]["copy_func"],
-                    arg1,
-                    arg2,
-                    ifblock)
-            elif mutate[0] == "{}rp".format(func_name):
-                return "if(!{}(&{},{}))\n\t{{ {} }}\n".format(
-                    self.obj_dict[type_d]["copy_func"],
-                    arg1,
-                    arg2,
-                    ifblock)
-            else:
-                raise MutateSourceError(mutate[0], file_name, line_num)
-        else:
-            if "PODPTR" in mutate:
-                if "POD_DLR" in mutate: # dereference POD left and right
-                    return "*({}) = *({});\n".format(arg1, arg2);
-                elif "POD_DL" in mutate: # derefence POD left
-                    return "*({}) = {};\n".format(arg1, arg2);
-                elif "POD_DR" in mutate: # dereference POD right
-                    return "{} = *({});\n".format(arg1, arg2);
-                elif "POD_NDR" in mutate: # do not dereference POD at all
-                    return "{} = {};\n".format(arg1, arg2);
-                else:
-                    raise MutateError("Unknown ptr2Copy handler for POD "
-                                      "data has been given", file_name,
-                                      line_num)
-            else:
-                return "{} = {};\n".format(arg1, arg2)
-
-    def handle_ASSIGN(self, line, mutate, type_d, file_name, line_num):
-        """
-           Performs the mutation of the generic template code for
-           copying objects. It either gets changed into:
-           - If simple data types then plain old data assignment
-           - If an object, then that objects's copy function
-        """
-        if("ptr2Copy" in mutate[0]):
-            return self.handle_assign_function(line, mutate, type_d,
-                                               file_name, "ptr2Copy",
-                                               line_num)
-        else:
-            raise MutateSourceError(mutate[0], file_name, line_num)
-
-    def handle_MEMCPY(self, line, mutate, type_d, file_name, line_num):
-        """
-           Performs the mutation of the generic template code for
-           shallow copying objects.
-        """
-        #kind of a hack but when mutating ignore all '&' operators
-        line = line.replace("&", "")
-        (arg1, arg2, arg3) = get_func3_args(line, "memcpy")
-        if type_d in self.obj_dict:
-            return "{} = *{};\n".format(arg1, arg2)
-        else:
-            return "{} = {};\n".format(arg1, arg2)
-
-    def handle_DESTROY(self, line, mutate, type_d, file_name, line_num):
-        """
-           Performs the mutation of the generic template code for
-           destroying objects. It either gets changed into:
-           - If simple data types then omit
-           - If an object, then that objects's destroy function
-        """
-        if("ptr2Destroy" in mutate[0]):
-            arg = get_func1_args(line, "ptr2Destroy")
-            if type_d in self.obj_dict:
-                if self.obj_dict[type_d]["destroy_func"] is None:
-                    raise MutateError( "Source template requires destroy "
-                                       "function while none was given at "
-                                       "definition",
-                                       file_name, line_num)
-                if mutate[0] == "ptr2Destroyr":
-                    return "{}(&{});\n".format(
-                        self.obj_dict[type_d]["destroy_func"],
-                        arg)
-                elif mutate[0] == "ptr2Destroyp":
-                    return "{}({});\n".format(
-                        self.obj_dict[type_d]["destroy_func"],
-                        arg)
-                else:
-                    raise MutateSourceError(mutate[0], file_name, line_num)
-            else:
-                return "";
-
-    def handle_INITIALIZE_TO_ZERO(self, line, mutate, type_d, file_name, line_num):
-        """
-           If type is not plain old data, mutate[0] (mutate_from) is changed
-           into a compound literal structure initialization to ZERO
-        """
-        if type_d in self.obj_dict:
-            return line.replace(mutate[0],
-                                "(const struct {}) {{0}}".format(
-                self.type_dict[type_d]))
-        else:
-            return line
-
-    def handle_INIT(self, line, mutate, type_d, file_name, line_num):
-        """
-            If type is not plain old data, mutate[0] (mutate_from) is changed
-            into the initialization function of the data structure's object
-
-            TODO: If actually needed anywhere
-        """
-        return line
-
-    def handle_REFERENCE(self, line, mutate, type_d, file_name, line_num):
-        """
-           If type is not plain old data, mutate[0] (mutate_from) is changed
-           into a reference
-        """
-        if type_d in self.obj_dict:
-            return line.replace(mutate[0],"&"+mutate[0] )
-        else:
-            return line
-
-    def handle_TYPE(self, line, mutate, type_d, file_name, line_num):
-        """
-           mutate[0] (mutate_from) is changed into the type
-        """
-        return line.replace(mutate[0], self.type_dict[type_d])
-
-    def handle_SIZE(self, line, mutate, type_d, file_name, line_num):
-        """
-           mutate[0] (mutate_from) is changed into the size of the type
-        """
-        return line.replace(mutate[0], "sizeof({})".format(
-            self.type_dict[type_d]))
-
-    def handle_TYPEPTR_OBJ_ONLY(self, line, mutate, type_d, file_name, line_num):
-        """
-           mutate[0] (mutate_from) is changed into the type if the type is
-           plain old data. If not then it's changed into type pointer
-        """
-        if type_d in self.obj_dict:
-            return line.replace(mutate[0], self.type_dict[type_d]+"*")
-        else:
-            return line.replace(mutate[0], self.type_dict[type_d])
-
-    def handle_TYPEPTR(self, line, mutate, type_d, file_name, line_num):
-        """
-           mutate[0] (mutate_from) is changed into type pointer
-        """
-        return line.replace(mutate[0], self.type_dict[type_d]+"*")
-
-    def handle_REMOVE(self, line, mutate, type_d, file_name, line_num):
-        """
-            Handle the simple case of requesting removal of something
-            If there is a specific condition in mutate check for it.
-        """
-        if "POD" in mutate and type_d in self.obj_dict:
-            return line
-        return line.replace(mutate[0], "")
-
-    def handle_REPLACE(self, line, mutate, type_d, file_name, line_num):
-        """
-            Handle the simple case of requesting replacing something
-            with something else
-        """
-        if len(mutate) != 3:
-            raise MutateError("Incorrect arguments given for replacement",
-                              file_name, line_num)
-
-        return line.replace(mutate[0], mutate[2])
-
-    def handle_mutate(self, mutate, type_d, line, name, line_num):
-        if len(mutate) < 2:
-            raise MutateError("mutate list with less than 2 arguments passed "
-                              "to handler", name, line_num)
-        #if the 2nd argument to mutate is unknown we got a problem
-        if mutate[1] not in self.handle_dict:
-            raise MutateTargetError(mutate[1], name, line_num)
-        # handle any extra arguments first
-        line = check_extra_args(line, mutate, type_d)
-        # and then call the "main" handler
-        return self.handle_dict[mutate[1]](line, mutate, type_d, name, line_num)
-
-    def handle_omit_cond(self, line, type_d, file_name, line_num):
-        """
-           Handles omits with conditions. True means omitting
-        """
-        ret = False
-        part = line.partition(omit_cond)
-        if part[0] == line:
-            raise ParsingError("Could not find beginning of @omit cond "
-                               "statement", file_name, line_num)
-        line = part[2]
-
-        part = line.partition("*/")
-        if part[0] == line:
-            raise ParsingError("Comment did not end at the same line for "
-                               "@omit cond statement", file_name, line_num)
-        line = part[0]
-
-        conditions = line.split()
-        for cond in conditions:
-            if "OBJECT" == cond:
-                if type_d in self.obj_dict:
-                    ret = True
-            elif "POD" == cond:
-                if type_d not in self.obj_dict:
-                    ret = True
-            elif "NONLMS" == cond:
-                if type_d not in self.lms_list:
-                    ret = True
-            elif "STRING" == cond:
-                if type_d == "String":
-                    ret = True;
-            elif "SHALLOW_COPY_ONLY" == cond:
-                if(type_d in self.obj_dict and
-                   self.obj_dict[type_d].get("store_type") == "shallow"):
-                    ret = True
-            elif "DEEP_COPY_ONLY" == cond:
-                if(type_d in self.obj_dict and
-                   self.obj_dict[type_d].get("store_type") == "deep"):
-                    ret = True
-            else:
-                raise OmitConditionError(cond, file_name, line_num)
-
-        return ret
-
-
-
-    def parser_check_omits(self, line, type_d, name, line_num):
-        """
-        Checks off a line as far as @omit statements are concerned
-        Returns either:
-        True -- line should be skipped
-        False -- keep parsing
-        """
-
-        if self.omitting_next:
-            self.omitting_next = False
-            return True
-
-        if not self.omitting and omit_cond in line:
-            self.omitting = self.handle_omit_cond(line, type_d, name, line_num)
-            if self.omitting:
-                self.omit_counter += 1
-        elif not self.omitting and omit_start in line:
-            self.omit_counter += 1
-            self.omitting = True
-        elif not self.omitting and omit_next in line:
-            self.omitting_next = True
-        elif self.omitting and omit_start in line:
-            self.omit_counter += 1
-        elif self.omitting and omit_end in line:
-            self.omit_counter -= 1
-            if self.omit_counter == 0:
-                self.omitting = False
-            elif self.omit_counter < 0:
-                raise OmitInbalanceError(name, line_num)
-
-        return (
-            self.omitting or
-            any(c in line for c in [omit_next, omit_start, omit_end, omit_cond])
-        )
-
-
-
-    def gen_single_source(self, name, newName, type_d, name_subs, structure):
+    def gen_single_source(self, name, newName, type_d,
+                          name_subs, structure, incl_dirs=None):
         """
         This is the main parsing function to generate a file
         from a template
         """
-        inF = open(name, "r")
+        preprocessor = Template_Preprocessor(name, structure)
+        pf = preprocessor.preprocess(
+            name,
+            self.obj_dict[structure.type_symbol]["headers"] if self.obj_dict.get(structure.type_symbol) else None,
+            name_subs
+        )
+
+        pf.flush()
+
+        # we only need to parse the AST for sources
+        # since that's when we need some meta information
+        # about the code to know how to replace stuff
+        if name.endswith('.ctemplate'):
+            extra_dirs = None
+            if type_d in self.obj_dict:
+                extra_dirs = self.obj_dict[type_d].get("dirs")
+            self.Template_Parser = TemplateParser(pf.name, incl_dirs,
+                                                  extra_dirs)
+            self.Template_Parser.process()
+        
+
+        inF = open(pf.name, "r")
         outF = open(newName, "w")
-        mutating = False
-        mutate = []
-        line_num = 0
-        outF.write(gen_template_intro_str(name, self.type_dict[type_d]))
+        line_num = 1
+        outF.write(gen_template_intro_str(name, structure.type_source_name))
 
-        #if the type is an object and it needs to have any extra headers
-        if((type_d in self.obj_dict ) and
-           (
-               (name.endswith(".ctemplate")) or
-               (type_d not in self.refu_objects)
-        )):
-
-            #simply add them
-            outF.write("/**\n"
-                       " ** ---- Headers added by the building script specifically"
-                       " for {} ----\n*/\n\n".format(self.type_dict[type_d]))
-            for header in self.obj_dict[type_d]["headers"]:
-                if type_d in self.refu_objects:
-                    outF.write("#include <{}>\n".format(header))
-                else:
-                    if header.startswith("<"):
-                        outF.write("#include {}\n".format(header))
-                    elif name.endswith(".ctemplate"): # relative headers go only in source
-                        outF.write("#include \"{}\"\n".format(header))
-
-        #start creating the source from the generic template
         for line in inF:
-            if self.parser_check_omits(line, type_d, name, line_num):
-                continue
-            #else we check for name substitution
-            line = self.check_line_for_name_sub(line, name_subs, type_d,
-                                                structure)
-            #we also check for mutation
-            if mutating is True:
-                mutating = False
-                line = self.handle_mutate(mutate, type_d, line, name, line_num)
-                mutate[:] = []
-                #now proceed to write the line
-            elif mutate_cmd in line:
-                mutating = True
-                line = line.replace(mutate_cmd, "")
-                line = line.lstrip()
-                l = line.split()
-                for arg in l:
-                    # if it's the end of the comment break
-                    if "*/" in arg:
-                        break
-                    #else add a mutate argument
-                    mutate.append(arg)
-                continue
+            line = self.check_functions(line, structure, line_num)
+
             #all writes happen here
             outF.write(line)
+            line_num += 1
         inF.close()
         outF.close()
