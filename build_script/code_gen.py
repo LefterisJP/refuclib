@@ -5,7 +5,9 @@ import sys
 from time import gmtime, strftime
 
 from templates import Template, TemplateGeneratedStructure
-from ctemplate_parser import TemplateParser, Template_FuncCall
+from ctemplate_parser import (
+    TemplateParser, Template_FuncCall, TemplateParserError
+)
 from ctemplate_preprocessor import Template_Preprocessor
 def enum(*sequential, **named):
     enums = dict(zip(sequential, range(len(sequential))), **named)
@@ -23,84 +25,6 @@ def gen_template_intro_str(module_name, type_name):
         " */\n\n\n"
     ).format(strftime("%Y-%m-%d %H:%M:%S", gmtime()), module_name, type_name)
 
-class MutateTargetError(Exception):
-    def __init__(self, target_type, file_name, line):
-        self.target_type = target_type
-        self.file_name = file_name
-        self.line = line
-    def __str__(self):
-        return ("Unrecognized mutation target type \"{}\" found in the "
-        "source of {} at line:\"{}\"".format(
-            self.target_type, self.file_name, self.line)
-        )
-
-class MutateSourceError(Exception):
-    def __init__(self, source_type, file_name, line):
-        self.source_type = source_type
-        self.file_name = file_name
-        self.line = line
-    def __str__(self):
-        return ("Unrecognized mutation source type \"{}\" found in the "
-        "source of {} at line:\"{}\"".format(
-            self.source_type, self.file_name, self.line)
-        )
-
-class MutateError(Exception):
-    def __init__(self, msg, file_name, line):
-        self.file_name = file_name
-        self.msg = msg
-        self.line = line
-    def __str__(self):
-        return ("Mutation Error: \"{}\" "
-                "in {} at line:\"{}\"".format(
-                    self.msg, self.file_name, self.line)
-        )
-
-class ParsingError(Exception):
-    def __init__(self, msg, file_name, line):
-        self.file_name = file_name
-        self.msg = msg
-        self.line = line
-    def __str__(self):
-        return ("Parsing Error: \"{}\" "
-                "in {} at line:\"{}\"".format(
-                    self.msg, self.file_name, self.line)
-        )
-
-class OmitConditionError(Exception):
-    def __init__(self, condition, file_name, line):
-        self.condition = condition
-        self.file_name = file_name
-        self.line = line
-    def __str__(self):
-        return ("Unrecognized omit condition \"{}\" found in the"
-        "source of {} at line:\"{}\"".format(
-            self.condition, self.file_name, self.line)
-        )
-
-class OmitInbalanceError(Exception):
-    def __init__(self, ondition, file_name, line):
-        self.file_name = file_name
-        self.line = line
-    def __str__(self):
-        return ("Inbalanced omit found in the"
-        "source of {} at line:\"{}\"".format(
-            self.file_name, self.line)
-        )
-
-class ExtraObjectError(Exception):
-    def __init__(self, name, msg):
-        self.name = name
-        self.msg = msg
-    def __str__(self):
-        return "Extra Object \"{}\" Related Error:\n{}".format(self.name,
-                                                               self.msg)
-
-omit_start = "/* @omit start */"
-omit_cond = "/* @omitcond "
-omit_end = "/* @omit end */"
-omit_next = "/* @omit next */"
-mutate_cmd = "/* @mutate"
 
 addinc_start = "/* @additional_includes start */"
 addinc_end = "/* @additional_includes end */"
@@ -189,9 +113,6 @@ class CodeGen():
                                 "String/core.h"]  #for Equal, Copy_IN and Deinit
                 }
             }
-        self.omitting = False
-        self.omit_counter = 0
-        self.omitting_next = False
 
 
     def save_data_to_json(self, filename):
@@ -444,8 +365,7 @@ class CodeGen():
             )
 
 
-        except (MutateError, MutateSourceError, MutateTargetError,
-                OmitConditionError, OmitInbalanceError, ParsingError) as err:
+        except (TemplateParserError)as err:
             print type(err)
             print(err)
             raise err

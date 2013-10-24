@@ -178,7 +178,6 @@ char rfStringX_Init_cp(RF_StringX* str, uint32_t codepoint)
 
     //since this is an extended string let's be a bit more generous with the buffer
     str->bSize = 5*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER;
-    //TODO: Fix this ... mallocing everytime here is stupid
     RF_MALLOC(str->INH_String.bytes, str->bSize, false);
     str->bIndex = 0;
 

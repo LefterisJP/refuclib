@@ -4,6 +4,19 @@ import sys
 from pycparser import c_parser, c_ast, parse_file
 
 
+class TemplateParserError(Exception):
+    def __init__(self, msg, file_name=None, line=None):
+        self.file_name = file_name
+        self.msg = msg
+        self.line = line
+    def __str__(self):
+        if self.line  and self.file_name: 
+            return ("Template Parsing Error: \"{}\" "
+                    "in \"{}\" at line:\"{}\"".format(
+                        self.msg, self.file_name, self.line)
+            )
+        else:
+            return "Template Parsing Error: \"{}\"".format(self.msg)
 
 
 class Template_FuncCall:
@@ -16,7 +29,7 @@ class Template_FuncCall:
 
     def add_argument(self, string, t):
         if t is None:
-            raise Exception #TODO
+            raise TemplateParserError("Tried to add a None argument");
         self.args.append((string, t))
 
     def get_arg_type(self, arg):
@@ -45,10 +58,12 @@ def get_name(node):
     elif t is str:
         return node
     else:
-        raise Exception #TODO
+        raise TemplateParserError("Tried to get the name of an "
+                                  "unknown node type");
 
 class Analyzer:
-    def __init__(self, parents):
+    def __init__(self, parents, file_name):
+        self.file_name = file_name
         self.parents = parents
         self.index = len(parents) - 1
 
@@ -160,7 +175,10 @@ class Analyzer:
         elif type(node) is c_ast.Constant:
             return (node.value, node.type)
         else:
-            raise Exception #TODO (Unhandled type argument)
+            raise TemplateParserError(
+                "Have no handler for determining a node's argument",
+                self.file_name, node.coord.line
+            )
 
 class Visitor(c_ast.NodeVisitor):
 
@@ -178,9 +196,13 @@ class Visitor(c_ast.NodeVisitor):
     def handle_object_copy(self, node, parents):
         args = node.args.exprs
         if len(node.args.exprs) != 2:
-            raise Exception #TODO
+            raise TemplateParserError(
+                "@OBJECT_COPY can only take 2 arguments",
+                self.template_obj.filename, node.coord.line
+            )
+
         call = Template_FuncCall("@OBJECT_COPY", node.coord.line)
-        analyzer = Analyzer(parents)
+        analyzer = Analyzer(parents, self.template_obj.filename)
 
         for arg in node.args.exprs:
             (s, t) = analyzer.determine_argument(arg)
@@ -190,10 +212,13 @@ class Visitor(c_ast.NodeVisitor):
     def handle_object_compare(self, node, parents):
         args = node.args.exprs
         if len(node.args.exprs) != 2:
-            raise Exception #TODO
+            raise TemplateParserError(
+                "@OBJECT_COMPARE can only take 2 arguments",
+                self.template_obj.filename, node.coord.line
+            )
 
         call = Template_FuncCall("@OBJECT_COMPARE", node.coord.line)
-        analyzer = Analyzer(parents)
+        analyzer = Analyzer(parents, self.template_obj.filename)
         for arg in node.args.exprs:
             (s, t) = analyzer.determine_argument(arg)
             call.add_argument(s, t)
@@ -203,8 +228,12 @@ class Visitor(c_ast.NodeVisitor):
     def handle_object_destroy(self, node, parents):
         args = node.args.exprs
         if len(node.args.exprs) != 1:
-            raise Exception #TODO
-        analyzer = Analyzer(parents)
+            raise TemplateParserError(
+                "@OBJECT_DESTROY can only take 1 argument",
+                self.template_obj.filename, node.coord.line
+            )
+
+        analyzer = Analyzer(parents, self.template_obj.filename)
         (s, t) = analyzer.determine_argument(node.args.exprs[0])
         call = Template_FuncCall("@OBJECT_DESTROY", node.coord.line)
         call.add_argument(s, t)
@@ -214,8 +243,12 @@ class Visitor(c_ast.NodeVisitor):
     def handle_assign(self, node, parents):
         args = node.args.exprs
         if len(node.args.exprs) != 2:
-            raise Exception #TODO
-        analyzer = Analyzer(parents)
+            raise TemplateParserError(
+                "@ASSIGN can only take 2 arguments",
+                self.template_obj.filename, node.coord.line
+            )
+
+        analyzer = Analyzer(parents, self.template_obj.filename)
         call = Template_FuncCall("@ASSIGN", node.coord.line)
         for arg in node.args.exprs:
             (s, t) = analyzer.determine_argument(arg)
@@ -225,8 +258,12 @@ class Visitor(c_ast.NodeVisitor):
     def handle_shallow_ptr_arithmetic(self, node, parents):
         args = node.args.exprs
         if len(node.args.exprs) != 1:
-            raise Exception #TODO
-        analyzer = Analyzer(parents)
+            raise TemplateParserError(
+                "@SHALLOW_PTR_ARITHMETIC can only take 1 argument",
+                self.template_obj.filename, node.coord.line
+            )
+
+        analyzer = Analyzer(parents, self.template_obj.filename)
         (s, t) = analyzer.determine_argument(node.args.exprs[0])
         call = Template_FuncCall("@SHALLOW_PTR_ARITHMETIC", node.coord.line)
         call.add_argument(s, t)
