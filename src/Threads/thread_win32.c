@@ -35,7 +35,7 @@
     #include <stdio.h>//for FILE* used inside printf.h
     #include <String/string_decl.h> //for RF_String
     #include <String/common.h> //for RFS_() macro
-    #include <Utils/error.h>
+    #include <Utils/log.h>
 //for memory allocation
     #include <stdlib.h> //for malloc, calloc,realloc and exit()
     #include <Utils/memory.h> //for refu memory allocation

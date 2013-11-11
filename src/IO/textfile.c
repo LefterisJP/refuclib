@@ -42,17 +42,17 @@
 #include <String/filesx.h> //for rfStringX file functions
 #include <String/files.h> //for rfStringX file functions
 
-// for the endianess stuff
+//for the endianess stuff
     #include <Utils/endianess.h>
-// for error logging
-    #include <Utils/error.h>
-// for memory allocation macros
+//for error logging
+    #include <Utils/log.h>
+//for memory allocation macros
     #include <Utils/memory.h> //for refu memory allocation
-// for System functions
+//for System functions
     #include <System/rf_system.h>
-// for constant comparisons
+//for constant comparisons
     #include <Utils/constcmp.h> //for RF_HEXEQ_I() macro and others
-// for local scope macros
+//for local scope macros
     #include <Utils/localscope.h> //for the local scope macros
 /*------------- libc inclusion --------------*/
 #include <errno.h>

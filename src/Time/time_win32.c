@@ -39,21 +39,15 @@
 //*---------------------Outside module inclusion----------------------------------------
 #include "../System/info.ph" //to check if we have a high-res timer
 //for error logging
-    #include <stdio.h>//for FILE* used inside printf.h
-    #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
-    #include <String/string_decl.h> //for RF_String
-    #include <String/common.h> //for RFS_() macro
-    #include <Utils/error.h>
+    #include <Utils/log.h>
 //for memory allocation
-    #include <stdlib.h> //for malloc, calloc,realloc and exit()
-    #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
     #include <Utils/memory.h> //for refu memory allocation
 //*---------------------System specific inclusion---------------------------------------
 #include <windows.h> //for all the Winapi time structures and functions
 //*----------------------------End of Includes------------------------------------------
 
 
-/*-------------------------------------------------------Sleep functions-----------------------------------------------------------------------------------------*/
+//*---------------------Sleep Functions----------------------------
 
 // Suspends the calling thread for a number of seconds
 void rfSleep(uint32_t seconds)

@@ -26,7 +26,7 @@
 #define RF_LIBINIT_H
 
 #include <rf_options.h>
-#include <Utils/error.h>
+#include <Utils/log.h>
 
 #ifdef __cplusplus
 extern "C"

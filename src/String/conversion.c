@@ -35,26 +35,18 @@
 #include <String/common.h> //for RFS_()
 #include "common.ph" //for required string private macros and functions
 /*------------- Outside Module inclusion -------------*/
-#include <String/unicode.h>
-#include <Definitions/retcodes.h> //for error codes
-#include <Utils/constcmp.h> //for RF_HEXEQ_C() macro and others
+// for unicode functions
+    #include <String/unicode.h>
+//for error codes
+    #include <Definitions/retcodes.h> 
+//for RF_HEXEQ_C() macro and others
+    #include <Utils/constcmp.h> 
+//for error logging
+    #include <Utils/log.h> //for LOG_ERROR() macros
 //for local scope macros
-    #include <Definitions/threadspecific.h> //for the thread specific attribute
-    #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
-    #include <string.h> //for memset()
-    #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
     #include <Utils/localscope.h>
 //for memory allocation macros
-    #include <stdlib.h> //for malloc, calloc,realloc and exit()
-    #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
-    #include <stdio.h>//for FILE* used inside printf.h
-    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
     #include <Utils/memory.h> //for refu memory allocation
-//for error logging
-    #include <Threads/common.h> //for rfThread_GetID()
-    #include <String/string_decl.h> //for RF_String
-    #include <String/common.h> //for RFS_() macro
-    #include <Utils/error.h> //for LOG_ERROR() macros
 /*------------- libc inclusion --------------*/
 #include <errno.h> //for errno
 #include <math.h> //for HUGE_VAL

@@ -31,7 +31,7 @@
 //for io buffer initialization
     #include "../IO/buff.ph"//stdio buffer thread-specific initialization
 //for error logging
-    #include <Utils/error.h>
+    #include <Utils/log.h>
 //for memory allocation macros
     #include <Utils/memory.h> //for refu memory allocation
 //for local scope macros

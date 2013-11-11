@@ -43,7 +43,7 @@
 // for the endianess check
     #include <Utils/endianess.h>
 // for error logging
-    #include <Utils/error.h>
+    #include <Utils/log.h>
 // for the local scope macros
     #include <Utils/localmem_decl.h>
     #include <Utils/localscope.h>

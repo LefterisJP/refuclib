@@ -53,7 +53,7 @@
 #include <String/string_decl.h> //for RF_String
 #include <String/common.h> //for RFS_() macro
 #include <Threads/common.h> //for rfThread_GetID()
-#include <Utils/error.h>
+#include <Utils/log.h>
 
 /* ------------------------------------------------------------ Library initialization ------------------------------------------------------------ */
 #include <Utils/libinit.h>

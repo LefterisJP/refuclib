@@ -164,7 +164,7 @@ modules			= []
 #add all the modules one by one
 modules.append(
     Module("CORE",
-           ['refu.c', 'Utils/endianess.c', 'Utils/error.c',
+           ['refu.c', 'Utils/endianess.c', 'Utils/log.c',
             'Utils/localmem.c', 'Math/rf_math.c', 'Numeric/Float/dtoa.c',
             'Numeric/Integer/conversion.c'])
 )

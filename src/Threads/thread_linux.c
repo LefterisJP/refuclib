@@ -27,7 +27,7 @@
 #include <Threads/common.h>
 /*------------- Outside Module inclusion -------------*/
 // for error logging
-    #include <Utils/error.h>
+    #include <Utils/log.h>
 // for memory allocation
     #include <Utils/memory.h> //for refu memory allocation
 // for RF_BITFLAG_ON()

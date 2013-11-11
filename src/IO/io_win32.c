@@ -31,7 +31,7 @@
     #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
     #include <String/string_decl.h> //for RF_String
     #include <String/common.h> //for RFS_() macro
-    #include <Utils/error.h>
+    #include <Utils/log.h>
 //for error codes
 #include <Definitions/retcodes.h> //for error codes
 #include <String/string_decl.h> //since all we need is the struct members

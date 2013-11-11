@@ -36,20 +36,13 @@
 #include "common.ph"//include the string private functions and macros
 /*------------- Outside Module inclusion -------------*/
 //for the error logging macros
-    #include <stdio.h>//for FILE* used inside printf.h
-    #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
-    #include <Threads/common.h> //for rfThread_GetID()
-    #include <String/string_decl.h> //for RF_String
-    #include <String/common.h> //for RFS_() macro
-    #include <Utils/error.h>
-
-#include <Definitions/retcodes.h> //for the return codes
+    #include <Utils/log.h>
+//for the return codes
+    #include <Definitions/retcodes.h> 
 //for the local scope macros
-    #include <Definitions/threadspecific.h> //for the thread specific attribute
-    #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
-    #include <string.h> //for memset()
-    #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
     #include <Utils/localscope.h>
+/*------------- libc inclusion --------------*/
+#include <limits.h> // for INT_MAX e.t.c.
 /*------------- End of includes -------------*/
 
 //the specifiers that can appear in a format string

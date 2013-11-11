@@ -37,25 +37,19 @@
 #include <String/corex.h> //for rfStringX_Deinit()
 #include "common.ph" //for rfString_FindBytePos() and other private macros and functions
 //*---------------------Outside module inclusion----------------------------------------
-#include <String/unicode.h> //for rfUTF8_IsContinuationByte()
-
-#include <Utils/constcmp.h> //for RF_HEXEQ_C() macro and others
+//for bool and retcodes
+    #include <Definitions/retcodes.h>
+//for rfUTF8_IsContinuationByte()
+    #include <String/unicode.h>  
+//for RF_HEXEQ_C() macro and others
+    #include <Utils/constcmp.h> 
 //for the local scope macros
-    #include <Definitions/threadspecific.h> //for the thread specific attribute
-    #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
-    #include <string.h> //for memset()
-    #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
     #include <Utils/localscope.h>//for the local scope macros
 //for memory alllocation macros
-    #include <stdlib.h> //for malloc, calloc,realloc and exit()
-    #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
-    #include <stdio.h>//for FILE* used inside printf.h
-    #include <String/string_decl.h> //for RF_String
-    #include <String/common.h> //for RFS_() macro
-    #include <Utils/error.h> //for LOG_ERROR() macros
     #include <Utils/memory.h> //for refu memory allocation
 //*---------------------libc Headers inclusion------------------------------------------
 #include <stdarg.h> //for the va_ macros
+#include <limits.h> //for INT_MAX e.t.c.
 //*----------------------------End of Includes------------------------------------------
 
 

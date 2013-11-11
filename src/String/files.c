@@ -38,31 +38,19 @@
 #include <String/common.h> //for RFS_()
 /*------------- Outside Module inclusion -------------*/
 //for error logging
-#include <Threads/common.h> //for rfThread_GetID()
-#include <errno.h> //for error reporting that needs it
-#include <String/string_decl.h> //for RF_String
-#include <String/common.h> //for RFS_() macro
-#include <Utils/error.h>
+    #include <Utils/log.h>
 //for memory allocation macros
-#include <stdlib.h> //for malloc, calloc,realloc and exit()
-#include <Definitions/retcodes.h> //for error codes, logged in allocation failure
-#include <Utils/memory.h> //for refu memory allocation
-
+    #include <Utils/memory.h> //for refu memory allocation
 //for Endianess swapping functions
-#include <Utils/endianess.h>
-
+    #include <Utils/endianess.h>
 //Needed for IO/file.h
-#include <Definitions/inline.h> //for inline definitions
-#include <IO/common.h> //for stat_rft
-#include <IO/file.h> //for rfReadLine family  of functions
-
-#include "../IO/io.ph" //for IO_WRITE_CHECK() macro
+    #include <Definitions/inline.h> //for inline definitions
+    #include <IO/common.h> //for stat_rft
+    #include <IO/file.h> //for rfReadLine family  of functions
+//for IO_WRITE_CHECK() macro
+    #include "../IO/io.ph" 
 //for local scope macros
-#include <Definitions/threadspecific.h> //for the thread specific attribute
-#include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
-#include <string.h> //for memset()
-#include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
-#include <Utils/localscope.h>//for local scope macros
+    #include <Utils/localscope.h>//for local scope macros
 /*------------- End of includes -------------*/
  
 

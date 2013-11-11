@@ -39,6 +39,9 @@ $ENDIF
 #ifndef RF_LIST_H
 #define RF_LIST_H
 
+//for bool
+#include <Definitions/retcodes.h>
+
 #ifdef __cplusplus
 extern "C"
 {///opening bracket for calling from C++
@@ -57,7 +60,7 @@ i_DECLIMEX_ @DATA_STRUCT*  rfList_Create();
  ** @param l the list to initialize
  ** @return Returns true in succesfull initialization and false otherwise
  **/
-i_DECLIMEX_ char  rfList_Init(@DATA_STRUCT* l);
+i_DECLIMEX_ bool  rfList_Init(@DATA_STRUCT* l);
 
 /**
  ** @brief Copies src into dst
@@ -67,7 +70,7 @@ i_DECLIMEX_ char  rfList_Init(@DATA_STRUCT* l);
  ** @return Returns @c true in successful copying @c false otherwise
  **
  **/
-i_DECLIMEX_ char rfList_Copy_IN(@DATA_STRUCT* dst,
+i_DECLIMEX_ bool rfList_Copy_IN(@DATA_STRUCT* dst,
                                 @DATA_STRUCT* src);
 /**
  ** @brief Creates and returns an allocated copy of the given 
@@ -110,7 +113,7 @@ i_DECLIMEX_ void rfList_Deinit(@DATA_STRUCT* a);
  ** list and @c false otherwise
  **
  **/
-i_DECLIMEX_ char rfList_Add(@DATA_STRUCT* a, @TYPEPTR e);
+i_DECLIMEX_ bool rfList_Add(@DATA_STRUCT* a, @TYPEPTR e);
 
 /**
  ** @brief Deletes an element from a single linked list by calling
@@ -122,7 +125,7 @@ i_DECLIMEX_ char rfList_Add(@DATA_STRUCT* a, @TYPEPTR e);
  ** @return Returns @c true if the element is found and deleted from the
  ** list and @c false otherwise
  **/
-i_DECLIMEX_ char rfList_Delete(@DATA_STRUCT* a, @TYPEPTR e);
+i_DECLIMEX_ bool rfList_Delete(@DATA_STRUCT* a, @TYPEPTR e);
 
 
 
@@ -133,7 +136,7 @@ i_DECLIMEX_ char rfList_Delete(@DATA_STRUCT* a, @TYPEPTR e);
  ** @param e A pointer to the element to search for in the list
  ** @return Returns @c true if the element is found and false otherwise
  **/
-i_DECLIMEX_ char rfList_Has(@DATA_STRUCT* a, @TYPEPTR ret);
+i_DECLIMEX_ bool rfList_Has(@DATA_STRUCT* a, @TYPEPTR ret);
 
 /**
  ** This macro is used to iterate a list from each start node until

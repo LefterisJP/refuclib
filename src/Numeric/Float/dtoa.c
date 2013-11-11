@@ -241,15 +241,7 @@ typedef unsigned Long ULong;
 #endif
 
 //-EDIT- replaced stdlib.h with rf_memory.h since it was only needed for malloc() and free()
-#include <stdlib.h> //for malloc, calloc,realloc and exit()
-#include <Definitions/retcodes.h> //for error codes, logged in allocation failure
-#include <stdio.h>//for FILE* used inside printf.h
-#include <Definitions/imex.h> //for import export macro used inside <Utils/error.h>
-#include <Definitions/types.h> //for fixed size data types used inside <Utils/error.h>
-#include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
-#include <String/string_decl.h> //for RF_String
-#include <String/common.h> //for RFS_() macro
-#include <Utils/error.h> //for LOG_ERROR() macros
+#include <Utils/log.h> //for LOG_ERROR() macros
 #include <Utils/memory.h> //for refu memory allocation
 #include "string.h"
 

@@ -40,7 +40,7 @@
     #include <String/unicode.h> //for unicode functions such as rfUTF8_VerifySequence()
     #include <Utils/endianess.h> //for endianess detection
 // for error logging
-    #include <Utils/error.h>
+    #include <Utils/log.h>
 //for error codes
     #include <Definitions/retcodes.h> 
 //for the ioBuffer

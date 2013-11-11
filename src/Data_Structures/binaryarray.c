@@ -25,7 +25,7 @@
 #include <Data_Structures/binaryarray.h>
 /*------------- Outside Module inclusion -------------*/
 //for error logging
-    #include <Utils/error.h>
+    #include <Utils/log.h>
 //for memory allocation macros
     #include <Utils/memory.h> //for refu memory allocation
 /*------------- libc inclusion --------------*/

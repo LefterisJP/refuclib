@@ -38,13 +38,8 @@
     #include <String/stringx_decl.h> //for RF_StringX (ioBuffer type)
     #include "../IO/buff.ph"//stdio buffer thread-specific initialization
 //for error logging
-    #include <stdio.h>//for FILE* used inside printf.h
-    #include <String/string_decl.h> //for RF_String
-    #include <String/common.h> //for RFS_() macro
-    #include <Utils/error.h>
+    #include <Utils/log.h>
 //for memory allocation macros
-    #include <stdlib.h> //for malloc, calloc,realloc and exit()
-    #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
     #include <Utils/memory.h> //for refu memory allocation
 //for local scope macros
     #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack

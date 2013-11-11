@@ -18,7 +18,6 @@ vars_for_compile_time = [
 truevars_for_compile_time = [
     'DEFAULT_ARGUMENTS',
     'SAFE_MEMORY_ALLOCATION',
-    'VERBOSE_ERRNO',
     'DEBUG',
     'TEXTFILE_ADD_BOM'
 ]

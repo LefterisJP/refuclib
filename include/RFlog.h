@@ -21,10 +21,10 @@
 **      ==END OF REFU LICENSE==
 */
 
-#ifndef RF_ERROR_MODULE_HEADERS
-#define RF_ERROR_MODULE_HEADERS
+#ifndef RF_LOG_MODULE_HEADERS
+#define RF_LOG_MODULE_HEADERS
 
-#include <Utils/error.h>
+#include <Utils/log.h>
 
 
 #endif //include guards end

@@ -29,7 +29,7 @@
 // for return codes
     #include <Definitions/retcodes.h> 
 // for error logging
-    #include <Utils/error.h>
+    #include <Utils/log.h>
 // for memory allocation
     #include <Utils/memory.h> //for refu memory allocation
 /*------------- End of includes -------------*/

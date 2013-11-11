@@ -27,21 +27,15 @@
 #include <String/unicode.h>
 /*------------- Outside Module inclusion -------------*/
 //for error logging
-    #include <stdio.h>//for FILE* used inside printf.h
-    #include <Threads/common.h> //for rfThread_GetID()
-    #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
-    #include <String/string_decl.h> //for RF_String
-    #include <String/common.h> //for RFS_() macro
-    #include <Utils/error.h>
-
+    #include <Utils/log.h>
 //for memory allocation
-#include <stdlib.h> //for malloc, calloc,realloc and exit()
-#include <Definitions/retcodes.h> //for error codes, logged in allocation failure
-#include <Utils/memory.h> //for refu memory allocation
-
-#include <Utils/endianess.h> //endianess
-#include <Utils/constcmp.h> //for RF_HEXGE_UI() macro and others
-#include <Definitions/retcodes.h> //for return codes
+    #include <Utils/memory.h> //for refu memory allocation
+//endianess
+    #include <Utils/endianess.h> 
+//for RF_HEXGE_UI() macro and others
+    #include <Utils/constcmp.h> 
+//for return codes
+    #include <Definitions/retcodes.h>
 /*------------- libc inclusion --------------*/
 #include <string.h>//memcpy
 /*------------- End of includes -------------*/

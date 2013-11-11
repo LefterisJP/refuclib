@@ -22,12 +22,12 @@
 **
 **
 **
-** --Utils/error.h
-** Defines the error and info logging macros
+** --Utils/log.h
+** Defines the system logging functionality
 */
 
-#ifndef RF_UTILS_ERROR_H
-#define RF_UTILS_ERROR_H
+#ifndef RF_UTILS_LOG_H
+#define RF_UTILS_LOG_H
 
 
 #include <rf_options.h> //for the logging level defines
@@ -37,7 +37,6 @@
 #include <String/string_decl.h> //for RF_String
 #include <String/common.h> //for RFS_() macro
 #include <errno.h>  //only if using the stdlibrary functions that report errors with it
-#include <Utils/error.h>
 
 /**
 ** @Defgroup RF_ErrorLoggingGRP Error Logging

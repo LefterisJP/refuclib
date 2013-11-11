@@ -153,14 +153,6 @@ vars.Add(
                  'for this option are \'yes\' and \'no\'.'
                  ,'no' ))
 
-vars.Add(
-    BoolVariable('VERBOSE_ERRNO',
-                 'If \'yes\' then a lot of the code which detects errno'
-                 'being set actually logs a specific message depending on '
-                 'the situation and the errno value. If \'no\' then '
-                 'simply errno value is logged'
-                 ,'no' ))
-
 vars.Add('FGETS_READ_BYTESN', 'This option is the number of bytes that will '
          'be read each time by the library\'s version of fgets. Must be a '
          'positive integer number.', 512)

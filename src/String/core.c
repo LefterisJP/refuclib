@@ -41,23 +41,16 @@
 // for error code
     #include <Definitions/retcodes.h>
 // for error logging
-    #include <stdio.h>//for FILE* used inside printf.h
-    #include <Threads/common.h> //for rfThread_GetID()
-    #include <errno.h> //for error reporting that needs it
-    #include <String/string_decl.h> //for RF_String
-    #include <String/common.h> //for RFS_() macro
-    #include <Utils/error.h>
+    #include <Utils/log.h>
 //for the io buffer
     #include <Definitions/threadspecific.h> // for the thread specific keyword used in the ioBuffer
     #include "../IO/buff.ph" //for the ioBuffer StringX
 //for the local scope macros
-    #include <Utils/localmem_decl.h> //for RF_LocalMemoryStack
-    #include <string.h> //for memset()
-    #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
     #include <Utils/localscope.h>//for local scope macros
 //for memory allocation macros
-    #include <stdlib.h> //for malloc, calloc,realloc and exit()
     #include <Utils/memory.h> //for refu memory allocation
+/*------------- libc inclusion --------------*/
+#include <stdio.h> // for snprintf
 /*------------- End of includes -------------*/
 
 
@@ -251,12 +244,13 @@ RF_String* rfString_Create_i(int32_t i)
 char rfString_Init_i(RF_String* str, int32_t i)
 {
     //the size of the int32_t buffer
-    int32_t len;
+    int len;
     //put the int32_t into a buffer and turn it in a char*
     char buff[12];//max uint32_t is 4,294,967,295 in most environment so 12 chars will certainly fit it
-    if((len = sprintf(buff, "%d", i)) < 0)
+    len = snprintf(buff, 12, "%d", i);
+    if(len < 0 || len >= 12)
     {
-        RF_ERROR("String initialization from integer failed due to sprintf "
+        RF_ERROR("String initialization from integer failed due to snprintf() "
                  "failing with errno %d", errno);
         return false;
     }
@@ -283,11 +277,11 @@ RF_String* rfString_Create_f(float f)
 char rfString_Init_f(RF_String* str,float f)
 {
     char buff[50];//a buffer to hold the string float, TODO: check if size if ok
-    int32_t len;
-
-    if((len = sprintf(buff,"%f",f)) < 0)
+    int len;
+    len = snprintf(buff, 50, "%f", f);
+    if(len < 0 || len >= 50)
     {
-        RF_ERROR("String initialization from float failed due to sprintf "
+        RF_ERROR("String initialization from float failed due to snprintf() "
                  "failing with errno %d", errno);
         return false;
     }

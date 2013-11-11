@@ -27,7 +27,7 @@
 #include "localmem.ph" //for the private definitions of rfLMS functions
 /*------------- Outside Module inclusion -------------*/
 //for error logging
-    #include <Utils/error.h>
+    #include <Utils/log.h>
 //for memory allocation
     #include <Utils/memory.h> //for refu memory allocation
 /*------------- libc inclusion -------------*/

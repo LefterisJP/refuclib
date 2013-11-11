@@ -32,7 +32,7 @@
 
 #include <Data_Structures/list.h> //for rfListP_Init() and others
 //for error logging
-    #include <Utils/error.h>
+    #include <Utils/log.h>
 //for memory allocation macros
     #include <Utils/memory.h>//for RF_MALLOC()
 //for local memory functionality

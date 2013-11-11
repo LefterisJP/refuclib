@@ -46,17 +46,11 @@
 
 /*------------- Outside Module inclusion -------------*/
 //for error logging macros
-    #include <Definitions/defarg.h> //since ERROR macros use argument counting
-    #include <Threads/common.h> //for rfThread_GetID()
-    #include <errno.h> //for error reporting that needs it
-    #include <String/string_decl.h> //for RF_String
-    #include <String/common.h> //for RFS_() macro
-    #include <Utils/error.h>
+    #include <Utils/log.h>
 //for memory allocation macros
-#include <stdlib.h> //for malloc, calloc,realloc and exit()
-#include <Utils/memory.h> //for refu memory allocation
+    #include <Utils/memory.h> //for refu memory allocation
 //for the endianess macros
-#include <Utils/endianess.h> //for the endianess macros
+    #include <Utils/endianess.h> //for the endianess macros
 /*------------- Libc inclusion -------------*/
 #include <string.h> //for memcpy()
 /*------------- End of includes -------------*/

@@ -32,19 +32,10 @@
 #include <String/common.h> //for RFS_()
 #include <String/corex.h> //for rfStringX_Init_buff() and others
 //for error logging
-    #include <stdio.h>//for FILE* used inside printf.h
-    #include <String/string_decl.h> //for RF_String
-    #include <String/common.h> //for RFS_() macro
-    #include <Utils/error.h>
+    #include <Utils/log.h>
 //for memory allocation
-    #include <stdlib.h> //for malloc, calloc,realloc and exit()
-    #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
     #include <Utils/memory.h> //for refu memory allocation
 //for local scope macros
-    #include <Definitions/threadspecific.h> //for the thread specific attribute
-    #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
-    #include <string.h> //for memset()
-    #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
     #include <Utils/localscope.h>
 //*---------------------System Specific Headers inclusion-------------------------------
 #include <windows.h>

@@ -36,11 +36,7 @@
 #include <String/format.h> //for the String formatting function
 //*---------------------Outside module inclusion----------------------------------------
 //for error logging
-    #include <stdio.h>//for FILE* used inside printf.h
-    #include <Threads/common.h> //for rfThread_GetID()
-    #include <String/string_decl.h> //for RF_String
-    #include <String/common.h> //for RFS_() macro
-    #include <Utils/error.h>
+    #include <Utils/log.h>
 //for UTF8 macro
 #include <String/unicode.h> //for rfUTF8_VerifySequence()
 //for the ioBuffer

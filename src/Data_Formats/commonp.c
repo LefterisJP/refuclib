@@ -47,7 +47,7 @@
 
 #include <Utils/bits.h>//for RF_BITFLAG_ON()
 //For error logging
-    #include <Utils/error.h>
+    #include <Utils/log.h>
 
 #include <Definitions/retcodes.h> //for the return codes
 //*----------------------------End of Includes------------------------------------------

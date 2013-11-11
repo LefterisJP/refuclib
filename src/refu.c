@@ -37,10 +37,7 @@
 //for true/false
     #include <Definitions/retcodes.h> 
 //for error logging
-    #include <stdio.h>//for FILE* used inside printf.h
-    #include <String/string_decl.h> //for RF_String
-    #include <String/common.h> //for RFS_() macro
-    #include <Utils/error.h> //For RF_LastError
+    #include <Utils/log.h> //For RF_LastError
 //for ioBuffer initialization
     #include <String/string_decl.h> //for RF_String (ioBuffer type)
     #include <String/stringx_decl.h> //for RF_StringX (ioBuffer type)

@@ -41,7 +41,7 @@
 #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
 #include <String/string_decl.h> //for RF_String
 #include <String/common.h> //for RFS_() macro
-#include <Utils/error.h>
+#include <Utils/log.h>
 
 #include <Definitions/retcodes.h> //for the log error return codes
 

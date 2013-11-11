@@ -40,7 +40,7 @@
     #include <Threads/common.h> //for rfThread_GetID()
     #include <String/string_decl.h> //for RF_String
     #include <String/common.h> //for RFS_() macro
-    #include <Utils/error.h>
+    #include <Utils/log.h>
 /*------------- End of includes -------------*/
 
 

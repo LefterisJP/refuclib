@@ -24,7 +24,7 @@
 
 
 /*------------- Corrensponding Header inclusion -------------*/
-#include <Utils/error.h>
+#include <Utils/log.h>
 /*------------- Outside Module inclusion -------------*/
 //for bool
    #include <Definitions/retcodes.h>

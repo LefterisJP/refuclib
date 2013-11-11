@@ -33,17 +33,13 @@
 
 #include <rf_options.h> //check the memory allocation options
 #include <stdlib.h> //for malloc, calloc,realloc and exit()
-#include <Utils/error.h> //for RF_ERROR() macros family
-
+#include <Utils/log.h>
 
 //Here are some macro wrappers of malloc,calloc and realloc that depending
 //on the flag @c RF_OPTION_SAFE_MEMORY_ALLOCATION check their return
 //value or not
 
 //for realloc I check no matter what since it's a bit more complicated case than the other two
-
-
-
 
 /**
  ** Wrapper macro of the realloc() function that does check for memory

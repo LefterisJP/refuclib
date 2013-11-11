@@ -40,19 +40,10 @@ $INCLUDE @DECL_H
 $INCLUDE @H
 /*------------- Outside Module inclusion -------------*/
 //for error logging
-    #include <stdio.h>//for FILE* used inside printf.h
-    #include <String/string_decl.h> //for RF_String
-    #include <String/common.h> //for RFS_() macro
-    #include <Utils/error.h>
+    #include <Utils/log.h>
 //for memory allocation macros
-    #include <stdlib.h> //for malloc, calloc,realloc and exit()
-    #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
     #include <Utils/memory.h> //for refu memory allocation
-
 //for local scope
-    #include <Definitions/threadspecific.h> //for the thread specific attributes
-    #include <Utils/localmem_decl.h> //for RF_LocalMemoryStack
-    #include <stdint.h> //for UINT32_MAX used in RF_ENTER_LOCAL_SCOPE() macro
     #include <Utils/localscope.h>
 /*------------- libc includes -------------*/
 #include <string.h> //for memcpy and memcp
@@ -73,7 +64,7 @@ $INCLUDE @H
 }
 
 
-char rfList_Init(@DATA_STRUCT* l)
+bool rfList_Init(@DATA_STRUCT* l)
 {
     //allocate the first node
     RF_MALLOC(l->start, sizeof(@NODE), false);
@@ -85,7 +76,7 @@ char rfList_Init(@DATA_STRUCT* l)
 
 
 
-char rfList_Copy_IN(@DATA_STRUCT* dst,
+bool rfList_Copy_IN(@DATA_STRUCT* dst,
                     @DATA_STRUCT* src)
 {
     @NODE* n = src->start->next, *c, *pr = 0;
@@ -149,7 +140,7 @@ void rfList_Destroy(@DATA_STRUCT* a)
     free(a);
 }
 
-char rfList_Add(@DATA_STRUCT* a, @TYPEPTR e)
+bool rfList_Add(@DATA_STRUCT* a, @TYPEPTR e)
 {
     @NODE* n;
     char ret = true;
@@ -177,7 +168,7 @@ $ENDIF
     return ret;
 }
 
-char rfList_Delete(@DATA_STRUCT* a, @TYPEPTR e)
+bool rfList_Delete(@DATA_STRUCT* a, @TYPEPTR e)
 {
     @NODE* n = a->start->next;
     @NODE* pr = a->start;
@@ -217,7 +208,7 @@ $ENDIF
     return false;
 }
 
-char rfList_Has(@DATA_STRUCT* a, @TYPEPTR e)
+bool rfList_Has(@DATA_STRUCT* a, @TYPEPTR e)
 {
     @NODE* n = a->start->next;
 $IF @LMS

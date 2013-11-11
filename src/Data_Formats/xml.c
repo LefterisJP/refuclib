@@ -42,7 +42,7 @@
 #include <Data_Structures/list.h> //for rfListP_Get()
 
 //For error logging
-    #include <Utils/error.h>
+    #include <Utils/log.h>
 //For Memory allocation macros
     #include <Utils/memory.h>
 

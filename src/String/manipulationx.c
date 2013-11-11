@@ -43,18 +43,13 @@
     #include <Definitions/retcodes.h> //for return codes and true/false definition
     #include "../Numeric/Integer/rf_int.ph" //for the integer int and uint conversions
 //for the float conversions
-#include "../Numeric/Float/rf_float.ph" //for doubleToStr()
+    #include "../Numeric/Float/rf_float.ph" //for doubleToStr()
 //for error logging macros
-    #include <stdio.h>//for FILE* used inside printf.h
-    #include <Threads/common.h> //for rfThread_GetID()
-    #include <String/string_decl.h> //for RF_String
-    #include <String/common.h> //for RFS_() macro
-    #include <Utils/error.h>
+    #include <Utils/log.h>
 //for memory allocation macros
-    #include <stdlib.h> //for malloc, calloc,realloc and exit()
     #include <Utils/memory.h> //for refu memory allocation
-
-#include <Utils/constcmp.h> //for RF_HEXEQ_C() and other macros
+//for RF_HEXEQ_C() and other macros
+    #include <Utils/constcmp.h> 
 //for local scope macros
     #include <Definitions/threadspecific.h> //for the thread specific attribute
     #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack

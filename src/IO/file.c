@@ -27,15 +27,15 @@
 #include <IO/common.h> //for common I/O flags and definitions
 #include "io.ph"//for private I/O macros
 /*------------- Outside Module inclusion -------------*/
-// for error logging
-    #include <Utils/error.h>
-// for memory allocation macros
+//for error logging
+    #include <Utils/log.h>
+//for memory allocation macros
     #include <Utils/memory.h> //for refu memory allocation
-// for unicode related macro
+//for unicode related macro
     #include <String/unicode.h> //for rfUTF8_IsContinuationbyte
-// for constant compare macros
+//for constant compare macros
     #include <Utils/constcmp.h> //for RF_HEXLE_US() macro and others
-// for endianess functions
+//for endianess functions
     #include <Utils/endianess.h>
 /*------------- libc inclusion --------------*/
 #include <string.h>//for memcpy e.t.c.

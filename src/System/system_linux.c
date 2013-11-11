@@ -31,7 +31,7 @@
 #include <String/corex.h> //for rfStringX_Init_buff() and others
 #include <String/conversion.h> // for rfString_Cstr()
 //for error logging
-    #include <Utils/error.h>
+    #include <Utils/log.h>
 //for memory allocation
     #include <Utils/memory.h> //for refu memory allocation
 //for local scope macros
