@@ -39,8 +39,9 @@
 #include <String/unicode.h> //for unicode functions
 //for error logging macros
     #include <stdio.h>//for FILE* used inside printf.h
-    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
     #include <Threads/common.h> //for rfThread_GetID()
+    #include <String/string_decl.h> //for RF_String
+    #include <String/common.h> //for RFS_() macro
     #include <Utils/error.h>
 //for memory allocation macros
     #include <stdlib.h> //for malloc, calloc,realloc and exit()
@@ -65,7 +66,7 @@ char rfString_Append(RF_String* thisstr,const void* otherP)
 #if RF_OPTION_DEBUG
     if(other == NULL)
     {
-        RF_WARNING(0, "Provided a NULL pointer for the other string argument");
+        RF_ERROR("Provided a NULL pointer for the other string argument");
         ret = false;
         goto cleanup;
     }
@@ -94,13 +95,13 @@ char rfString_Append_i(RF_String* thisstr,const int32_t i)
     if((rc=snprintf(buff, thisstr->byteLength+15,
                     "%s%i", thisstr->bytes, i)) < 0)
     {
-        RF_ERROR(0,"During appending an int to a string snprintf failed");
+        RF_ERROR("During appending an int to a string snprintf failed");
         free(buff);
         return false;
     }
     if(rc > thisstr->byteLength + 15)
     {
-        RF_ERROR(0, "During appending an int to a string snprintf failed"
+        RF_ERROR("During appending an int to a string snprintf failed"
                  "because of insufficient buffer size");
         free(buff);
         return false;
@@ -123,13 +124,13 @@ char rfString_Append_f(RF_String* thisstr,const float f)
     if((rc=snprintf(buff, thisstr->byteLength + 64,
                     "%s%f",thisstr->bytes,f)) < 0)
     {
-        RF_ERROR(0,"During appending a float to a string snprintf failed");
+        RF_ERROR("During appending a float to a string snprintf failed");
         free(buff);
         return false;
     }
     if(rc > thisstr->byteLength + 64)
     {
-        RF_ERROR(0, "During appending a float to a string snprint failed "
+        RF_ERROR("During appending a float to a string snprint failed "
                  "due to insufficient buffer size");
         free(buff);
         return false;
@@ -154,7 +155,7 @@ char rfString_Prepend(RF_String* thisstr,const void* otherP)
 #if RF_OPTION_DEBUG
     if(other == NULL)
     {
-        RF_WARNING(0, "Provided a NULL pointer for the other string argument");
+        RF_ERROR("Provided a NULL pointer for the other string argument");
         ret = false;
         goto cleanup;
     }
@@ -199,7 +200,7 @@ char i_rfString_Remove(void* thisstrP, const void* rstrP, uint32_t number,
 #if RF_OPTION_DEBUG
     if(rstr == NULL)
     {
-        RF_WARNING(0, "Provided a NULL pointer for the To Remove string argument");
+        RF_ERROR("Provided a NULL pointer for the To Remove string argument");
         ret = false;
         goto cleanup;
     }
@@ -257,7 +258,7 @@ char rfString_KeepOnly(void* thisstrP,const void* keepstrP)
 #if RF_OPTION_DEBUG
     if(keepstr == NULL)
     {
-        RF_WARNING(0, "Provided a NULL pointer for the keep string argument");
+        RF_ERROR("Provided a NULL pointer for the keep string argument");
         ret = false;
         goto cleanup;
     }
@@ -288,7 +289,7 @@ char rfString_KeepOnly(void* thisstrP,const void* keepstrP)
         {
             if((charBLength = rfUTF8_FromCodepoint(charValue,&temp)) < 0)
             {
-                RF_ERROR(0,"Could not decode a codepoint into UTF-8");
+                RF_ERROR("Could not decode a codepoint into UTF-8");
                 ret = false;
                 goto cleanup2;
             }
@@ -504,8 +505,8 @@ char i_rfString_Replace(RF_String* thisstr, const void* sstrP,
 #if RF_OPTION_DEBUG
     if(sstr == NULL || rstr == NULL)
     {
-        RF_WARNING(0, "Provided a NULL pointer for either the search or "
-                   "for the replace string");
+        RF_ERROR("Provided a NULL pointer for either the search or "
+                 "for the replace string");
         ret = false;
         goto cleanup;
     }
@@ -628,7 +629,7 @@ char rfString_TrimStart(void* thisstrP,const void* subP)
 #if RF_OPTION_DEBUG
     if(sub == NULL)
     {
-        RF_WARNING(0, "Provided a NULL pointer for the substring argument");
+        RF_ERROR("Provided a NULL pointer for the substring argument");
         ret = false;
         goto cleanup;
     }
@@ -694,7 +695,7 @@ char rfString_TrimEnd(void* thisstrP, const void* subP)
 #if RF_OPTION_DEBUG
     if(sub == NULL)
     {
-        RF_WARNING(0, "Provided a NULL pointer for the substring argument");
+        RF_ERROR("Provided a NULL pointer for the substring argument");
         ret = false;
         goto cleanup;
     }

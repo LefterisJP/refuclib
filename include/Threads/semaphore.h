@@ -23,10 +23,13 @@
 **
 ** -Threads/semaphore.h
 ** This header declares the functions that operate on RF_Semaphore
-**
----------------------For internal library include make sure to have----------------------------
+*/
+#ifndef RF_SEMAPHORE_H
+#define RF_SEMAPHORE_H
+
 #include <Definitions/types.h> //for fixed size data types
 #include <Definitions/imex.h> //for the import export macro
+#include <Definitions/retcodes.h> //for bool
     #ifdef REFU_WIN32_VERSION
     #include <windows.h> //for HANDLE
     #else
@@ -34,10 +37,6 @@
     #endif
 #include <Threads/semaphore_decl.h> //for RF_Semaphore
 #include <Threads/semaphore.h>
----------------------For internal library include make sure to have----------------------------
-*/
-#ifndef RF_SEMAPHORE_H
-#define RF_SEMAPHORE_H
 
 #ifdef __cplusplus
 extern "C"
@@ -66,7 +65,7 @@ i_DECLIMEX_ RF_Semaphore* rfSemaphore_Create(uint32_t initialCount,
  ** @c SEM_VALUE_MAX
  ** @return Returns @c true for succes and @c false for failure
  **/
-i_DECLIMEX_ char rfSemaphore_Init(RF_Semaphore* s,
+i_DECLIMEX_ bool rfSemaphore_Init(RF_Semaphore* s,
                                   uint32_t initialCount,
                                   uint32_t maxCount);
 
@@ -76,7 +75,7 @@ i_DECLIMEX_ char rfSemaphore_Init(RF_Semaphore* s,
  **
  ** Refer to @ref rfSemaphoe_Deinit()
  **/
-i_DECLIMEX_ char rfSemaphore_Destroy(RF_Semaphore* s);
+i_DECLIMEX_ bool rfSemaphore_Destroy(RF_Semaphore* s);
 /**
  ** @memberof RF_Semaphore
  ** @brief Deinitializes a semaphore
@@ -88,7 +87,7 @@ i_DECLIMEX_ char rfSemaphore_Destroy(RF_Semaphore* s);
  ** logging otherwise
  **
  **/
-i_DECLIMEX_ char rfSemaphore_Deinit(RF_Semaphore* s);
+i_DECLIMEX_ bool rfSemaphore_Deinit(RF_Semaphore* s);
 
 /**
  ** @memberof RF_Semaphore
@@ -102,7 +101,7 @@ i_DECLIMEX_ char rfSemaphore_Deinit(RF_Semaphore* s);
  ** @return Returns @c true for succesfully decreasing the semaphore count
  ** and @c false otherwise 
  **/
-i_DECLIMEX_ char rfSemaphore_Wait(RF_Semaphore* s);
+i_DECLIMEX_ bool rfSemaphore_Wait(RF_Semaphore* s);
 
 /**
  ** @memberof RF_Semaphore
@@ -118,7 +117,7 @@ i_DECLIMEX_ char rfSemaphore_Wait(RF_Semaphore* s);
  ** @return Returns @c true for succesfully decreasing the semaphore count
  ** and @c false otherwise 
  **/
-i_DECLIMEX_ char rfSemaphore_TimedWait(RF_Semaphore* s, uint32_t ms, char* expire);
+i_DECLIMEX_ bool rfSemaphore_TimedWait(RF_Semaphore* s, uint32_t ms, char* expire);
 
 /**
  ** @memberof RF_Semaphore
@@ -133,7 +132,7 @@ i_DECLIMEX_ char rfSemaphore_TimedWait(RF_Semaphore* s, uint32_t ms, char* expir
  ** @return Returns @c true for succesfully decreasing the semaphore count
  ** and @c false otherwise 
  **/
-i_DECLIMEX_ char rfSemaphore_TryWait(RF_Semaphore* s, char* busy);
+i_DECLIMEX_ bool rfSemaphore_TryWait(RF_Semaphore* s, char* busy);
 
 /**
  ** @memberof RF_Semaphore
@@ -143,7 +142,7 @@ i_DECLIMEX_ char rfSemaphore_TryWait(RF_Semaphore* s, char* busy);
  ** @return Returns @c true for succesfull release of ownership and count increase
  ** and false otherwise
  **/
-i_DECLIMEX_  char rfSemaphore_Post(RF_Semaphore* s);
+i_DECLIMEX_ bool rfSemaphore_Post(RF_Semaphore* s);
 
 #ifdef __cplusplus
 }///closing bracket for calling from C++

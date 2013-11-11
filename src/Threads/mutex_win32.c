@@ -32,8 +32,9 @@
 #include <Definitions/retcodes.h> //for return codes
 //for error logging
     #include <stdio.h>//for FILE* used inside printf.h
-    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
     #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
+    #include <String/string_decl.h> //for RF_String
+    #include <String/common.h> //for RFS_() macro
     #include <Utils/error.h>
 //for memory allocation
     #include <stdlib.h> //for malloc, calloc,realloc and exit()

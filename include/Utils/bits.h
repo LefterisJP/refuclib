@@ -23,10 +23,6 @@
 **
 ** --Utils/bits.h
 ** This header declares macros that perform bit manipulation
-**
----------------------For internal library include make sure to have----------------------------
-
----------------------For internal library include make sure to have----------------------------
 */
 
 #ifndef RF_UTILS_BITS_H

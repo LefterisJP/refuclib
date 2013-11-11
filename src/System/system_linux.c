@@ -22,9 +22,6 @@
 **
 **/
 /*------------- Corrensponding Header inclusion -------------*/
-#include <Definitions/types.h> //for fixed size data types
-#include <Definitions/imex.h>  //for import export macro
-#include <Definitions/retcodes.h> //for boolean
 #include <System/rf_system.h>
 /*------------- Outside Module inclusion -------------*/
 #include <String/string_decl.h> //for RF_String
@@ -34,18 +31,10 @@
 #include <String/corex.h> //for rfStringX_Init_buff() and others
 #include <String/conversion.h> // for rfString_Cstr()
 //for error logging
-    #include <stdio.h>//for FILE* used inside printf.h
-    #include <Threads/common.h> //for rfThread_GetID()
-    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
     #include <Utils/error.h>
 //for memory allocation
-    #include <stdlib.h> //for malloc, calloc,realloc and exit()
     #include <Utils/memory.h> //for refu memory allocation
 //for local scope macros
-    #include <Definitions/threadspecific.h> //for the thread specific attribute
-    #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
-    #include <string.h> //for memset()
-    #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
     #include <Utils/localscope.h>
 //for IO/file function definitions
     #include <IO/common.h> //stat_rft definition
@@ -60,7 +49,6 @@
 /*------------- system includes -------------*/
 #include <unistd.h> //for syscall and tid
 #include <sys/syscall.h> //for syscall and tid
-#include <sys/types.h> //for syscall and tid
 /*------------- End of includes -------------*/
 
 
@@ -74,7 +62,7 @@ bool rfMakeDir(void* dirnameP,int mode)
 #if RF_OPTION_DEBUG
     if(dirname == NULL)
     {
-        RF_ERROR(0, "Provided a NULL string for the path argument in "
+        RF_ERROR("Provided a NULL string for the path argument in "
                  "the directory creation function");
         ret = false;
         goto cleanup;
@@ -84,7 +72,8 @@ bool rfMakeDir(void* dirnameP,int mode)
     //make the directory
     if(mkdir(dirname->bytes,mode)!=0)
     {
-        RF_ERROR_MKDIR("Creating a directory failed", "mkdir");
+        RF_ERROR("Creating a directory failed due to mkdir() "
+                 "errno %d", errno);
         ret = false;
     }
 
@@ -109,7 +98,7 @@ bool rfRemoveDir(void* dirnameP)
 #if RF_OPTION_DEBUF
     if(dirname == NULL)
     {
-        RF_ERROR(0, "Null string given for the dirname argument");
+        RF_ERROR("Null string given for the dirname argument");
         ret = false;
         goto cleanup1;
     }
@@ -118,14 +107,15 @@ bool rfRemoveDir(void* dirnameP)
 
     if(!rfStringX_Init_buff(&path, 1024, ""))
     {
-        RF_ERROR(0, "Failed to initialize a stringX buffer");
+        RF_ERROR("Failed to initialize a stringX buffer");
         ret = false;
         goto cleanup1;
     }
     //open the directory
     if((dir = opendir(dirname->bytes)) == NULL)
     {
-        RF_ERROR_OPENDIR("Failed to open the given directory", "opendir");
+        RF_ERROR("Failed to open the given directory due to "
+                 "opendir() errno %d", errno);
         ret = false;
         goto cleanup2;
     }
@@ -142,7 +132,7 @@ bool rfRemoveDir(void* dirnameP)
                    &path,
                    RFS_("%S"RF_DIRSEP"%s",dirname,entry->d_name)))
             {
-                RF_ERROR(0, "Failure at assigning the directory name to the "
+                RF_ERROR("Failure at assigning the directory name to the "
                          "path string");
                 ret = false;
                 goto cleanup2;
@@ -152,7 +142,7 @@ bool rfRemoveDir(void* dirnameP)
             {
                 if(!rfRemoveDir(&path))
                 {
-                    RF_ERROR(0, "Calling rfRemoveDir on directory \"%S\" failed",
+                    RF_ERROR("Calling rfRemoveDir on directory \"%S\" failed",
                              &path);
                     ret = false;
                     goto cleanup2;
@@ -163,7 +153,8 @@ bool rfRemoveDir(void* dirnameP)
             //if we get here this means it's a file that needs deletion
             if(unlink(path.INH_String.bytes)!=0)
             {
-                RF_ERROR_UNLINK("Failed to remove file \"%S\"", "unlink", &path);
+                RF_ERROR("Failed to remove file \"%S\" due to unlink() "
+                         "errno %d", &path, errno);
                 ret = false;
                 goto cleanup2;
             }//end of check of succesful file removal
@@ -172,14 +163,14 @@ bool rfRemoveDir(void* dirnameP)
     //check for readdir error
     if(errno != prErrno) //is this the best way to check?
     {
-        RF_ERROR_READDIR("Failure in reading the contents of a directory ",
-                         "readdir");
+        RF_ERROR("Failure in reading the contents of a directory "
+                 "due to readdir() errno %d", errno);
         ret = false;
         goto cleanup2;
     }
     if(closedir(dir) != 0)
     {
-        RF_ERROR(0, "Failure in closing a directory", "closedir");
+        RF_ERROR("Failure in closing a directory", "closedir");
         ret = false;
         goto cleanup2;
     }
@@ -188,7 +179,8 @@ bool rfRemoveDir(void* dirnameP)
     //finally delete the directory itself
     if(rmdir(dirname->bytes) != 0)
     {
-        RF_ERROR_RMDIR("Failed to remove directory \"%S\"", "rmdir", dirname);
+        RF_ERROR("Failed to remove directory \"%S\" due to rmdir() errno %d",
+                 dirname, errno);
         ret = false;
     }
 
@@ -213,7 +205,7 @@ bool rfDeleteFile(void* nameP)
 #if RF_OPTION_DEBUG
     if(name == NULL)
     {
-        RF_ERROR(0, "Provided a null filename string");
+        RF_ERROR("Provided a null filename string");
         ret = false;
         goto cleanup;
     }
@@ -222,7 +214,8 @@ bool rfDeleteFile(void* nameP)
     //if we get here this means it's a file that needs deletion
     if(unlink(name->bytes) != 0)
     {
-        RF_ERROR_UNLINK("Removing file \"%S\" failed", "unlink");
+        RF_ERROR("Removing file \"%S\" failed due to unlink() errno %d",
+                 name, errno);
         ret = false;
     }//end of check of succesful file removal
 
@@ -244,7 +237,7 @@ bool rfRenameFile(void* nameP, void* newNameP)
 #if RF_OPTION_DEBUG
     if(name == NULL || newName == NULL)
     {
-        RF_ERROR(0, "Provided a null string for either the name or the newName "
+        RF_ERROR("Provided a null string for either the name or the newName "
                  "argument");
         ret = false;
         goto cleanup;
@@ -253,8 +246,8 @@ bool rfRenameFile(void* nameP, void* newNameP)
 
     if(rename(name->bytes, newName->bytes)!= 0)
     {
-        RF_ERROR_RENAME("Renaming file \"%S\" to \"%S\" failed", "rename",
-                        name, newName);
+        RF_ERROR("Renaming file \"%S\" to \"%S\" failed due to rename() "
+                 "errno %d", name, newName, errno);
         ret = false;
     }//end of check for succesful renaming
 
@@ -273,7 +266,7 @@ bool rfFileExists(void* name)
     return (rfStat(file_name, &sb) == 0);
 }
 
-uintptr_t rfSystem_GetThreadID()
+threadid_t rfSystem_GetThreadID()
 {
     return syscall(SYS_gettid);
 }

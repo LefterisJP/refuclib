@@ -31,9 +31,10 @@
 //*---------------------Outside module inclusion----------------------------------------
 //for error logging
     #include <stdio.h>//for FILE* used inside printf.h
-    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
     #include <Threads/common.h> //for rfThread_GetID()
     #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
+    #include <String/string_decl.h> //for RF_String
+    #include <String/common.h> //for RFS_() macro
     #include <Utils/error.h>
 //for memory allocation
     #include <stdlib.h> //for malloc, calloc,realloc and exit()
@@ -71,8 +72,7 @@ char rfDate_Init(RF_Date* d,
 {
     if(wDay > 6)
     {
-        RF_ERROR(1,
-                 "During initializing a Date Object an illegal value of %d was "
+        RF_ERROR("During initializing a Date Object an illegal value of %d was "
                  "given the day of the week. Legal values are from 0 to 6"
                  , wDay);
         return false;
@@ -81,7 +81,7 @@ char rfDate_Init(RF_Date* d,
 
     if(mDay < 1 || mDay > 31)
     {
-        RF_ERROR(1,
+        RF_ERROR(
                  "During initializing a Date Object an illegal value of %d was "
                  "given for the day of the month. Legal values are from 1 to 31"
                  ,mDay);
@@ -91,7 +91,7 @@ char rfDate_Init(RF_Date* d,
 
     if(month < 1 || month > 12 )
     {
-        RF_ERROR(1,
+        RF_ERROR(
                  "During initializing a Date Object an illegal value of %d was "
                  "given for the month. Legal values are from 1 to 12"
                  ,month);
@@ -101,7 +101,7 @@ char rfDate_Init(RF_Date* d,
 
     if(year < 1601 || year > 30827)
     {
-        RF_ERROR(1,
+        RF_ERROR(
                  "During initializing a Date Object an illegal value of"
                  " %d was given for the year. Legal values are from 1601"
                  " to 30827 due to limitations of the Windows version of"
@@ -112,7 +112,7 @@ char rfDate_Init(RF_Date* d,
 
     if(hour > 23)
     {
-        RF_ERROR(1,
+        RF_ERROR(
                  "During initializing a Date Object an illegal value of %d was"
                  " given for the hour. Legal values are from 0 to 23",
                  hour);
@@ -122,7 +122,7 @@ char rfDate_Init(RF_Date* d,
 
     if(minutes > 59)
     {
-        RF_ERROR(1,
+        RF_ERROR(
                  "During initializing a Date Object an illegal value of %d was"
                  " given for the minutes. Legal values are from 0 to 59",
                  minutes);
@@ -132,7 +132,7 @@ char rfDate_Init(RF_Date* d,
 
     if(sec > 59)
     {
-        RF_ERROR(1,
+        RF_ERROR(
                  "During initializing a Date Object an illegal value of %d was"
                  " given for the seconds. Legal values are from 0 to 59",
                  sec);
@@ -302,7 +302,7 @@ void rfDate_AddDays(RF_Date* d, uint32_t g_days)
                 remMonthDays = 31-d->mDay;
             break;
             default:
-                RF_ERROR(0,
+                RF_ERROR(
                          "Unrecognized month value encountered. Should never "
                          "come here. The date object must be corrupt");
                 remMonthDays = 0;

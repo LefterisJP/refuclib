@@ -50,7 +50,8 @@
     #include <stdlib.h> //for malloc, calloc,realloc and exit()
     #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
     #include <stdio.h>//for FILE* used inside printf.h
-    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
+    #include <String/string_decl.h> //for RF_String
+    #include <String/common.h> //for RFS_() macro
     #include <Utils/error.h> //for LOG_ERROR() macros
     #include <Utils/memory.h> //for refu memory allocation
 //*---------------------libc Headers inclusion------------------------------------------

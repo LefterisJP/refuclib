@@ -22,20 +22,11 @@
 **
 **/
 /*------------- Corrensponding Header inclusion -------------*/
-#include <Definitions/imex.h> //for import export macro
-#include <Definitions/types.h>//for fixed size data types
-#include <Data_Structures/binaryarray_decl.h> //for RF_BinarryArray
 #include <Data_Structures/binaryarray.h>
 /*------------- Outside Module inclusion -------------*/
 //for error logging
-    #include <stdio.h>//for FILE* used inside printf.h
-    #include <Threads/common.h> //for rfThread_GetID()
-    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
-    #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
     #include <Utils/error.h>
 //for memory allocation macros
-    #include <stdlib.h> //for malloc, calloc,realloc and exit()
-    #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
     #include <Utils/memory.h> //for refu memory allocation
 /*------------- libc inclusion --------------*/
 #include <string.h> //for memcpy
@@ -54,16 +45,16 @@ RF_BinaryArray* rfBinaryArray_Create(uint32_t size)
     return ret;
 }
 // Initializes a binary array
-char rfBinaryArray_Init(RF_BinaryArray* arr,uint32_t size)
+bool rfBinaryArray_Init(RF_BinaryArray* arr,uint32_t size)
 {
-    //allocate enough bytes to encompass all of the values. Initializing everything to 0
+    //callocate enough bytes to encompass all of the values.
     RF_CALLOC(arr->data, size/8+1, 1, false);
     arr->size = size;
     return true;
 }
 
 //Copies RF_BinarryArray @c src into RF_BinaryArray @c dst
-char rfBinaryArray_Copy_IN(RF_BinaryArray* dst, RF_BinaryArray* src)
+bool rfBinaryArray_Copy_IN(RF_BinaryArray* dst, RF_BinaryArray* src)
 {
     dst->size = src->size;
     RF_CALLOC(dst->data, dst->size/8+1, 1, false);
@@ -96,13 +87,13 @@ void rfBinaryArray_Deinit(RF_BinaryArray* a)
 }
 
 // Gets a specific value of the array
-char rfBinaryArray_Get(RF_BinaryArray* a, uint32_t i, char* val)
+bool rfBinaryArray_Get(RF_BinaryArray* a, uint32_t i, char* val)
 {
     char b;
     //check for out of bounds index
     if(i >= a->size)
     {
-        RF_ERROR(0,
+        RF_ERROR(
                  "Attempted to retrieve a value from a BinaryArray with an "
                  "index out of bounds");
         return false;
@@ -117,7 +108,7 @@ char rfBinaryArray_Get(RF_BinaryArray* a, uint32_t i, char* val)
 }
 
 // Gets a specific value of the array, without checking for array index out of bounds. If the index IS out of bounds the value can not be trusted. For a safer function look at #rfBinaryArray_Get
-char rfBinaryArray_Get_NC(RF_BinaryArray* a, uint32_t i)
+bool rfBinaryArray_Get_NC(RF_BinaryArray* a, uint32_t i)
 {
     //the specific bit of the byte we wanna check for
     char b = 0x1 << (i%8);
@@ -126,12 +117,12 @@ char rfBinaryArray_Get_NC(RF_BinaryArray* a, uint32_t i)
 }
 
 // Sets a specific value of the binary array.
-char rfBinaryArray_Set(RF_BinaryArray* a, uint32_t i, char val)
+bool rfBinaryArray_Set(RF_BinaryArray* a, uint32_t i, char val)
 {
    //check for out of bounds index
    if(i >= a->size)
    {
-       RF_ERROR(0,
+       RF_ERROR(
                 "Attempted to set a value of a BinaryArray with an index out "
                 "of bounds");
        return false;
@@ -165,7 +156,7 @@ void rfBinaryArray_Set_NC(RF_BinaryArray* a, uint32_t i, char val)
 
 
 // Increases the size of a binary array
-char rfBinaryArray_Reallocate(RF_BinaryArray* a, uint32_t newSize)
+bool rfBinaryArray_Reallocate(RF_BinaryArray* a, uint32_t newSize)
 {
     //attempt to realloc
     RF_REALLOC(a->data, char, newSize/8 + 1, false);

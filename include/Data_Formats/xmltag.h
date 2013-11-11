@@ -23,8 +23,10 @@
 **
 ** --Data_Formats/xmltag.h
 ** This header declares the XMLTag functionality
-**
----------------------For internal library include make sure to have----------------------------
+*/
+#ifndef RF_XMLTAG_H
+#define RF_XMLTAG_H
+
 #include <Definitions/types.h> //for fixed size data types
 #include <Definitions/imex.h> //for import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
@@ -32,12 +34,6 @@
 #include <String/stringx_decl.h> //for RF_StringX used in RF_XMLTag
 #include <Data_Structures/list_decl.h> //for RF_ListP used in RF_XMLTag
 #include <Data_Formats/xmltag_decl.h>//for RF_XMLTag
-#include <Data_Formats/xmltag.h>
----------------------For internal library include make sure to have----------------------------
-*/
-#ifndef RF_XMLTAG_H
-#define RF_XMLTAG_H
-
 
 #ifdef __cplusplus
 extern "C"

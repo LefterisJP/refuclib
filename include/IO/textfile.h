@@ -24,8 +24,11 @@
 **
 ** --IO/textfile.h
 ** This header declares all the functions that operate on RF_TextFile
-**
----------------------For internal library include make sure to have----------------------------
+*/
+
+#ifndef RF_TEXTFILE_H
+#define RF_TEXTFILE_H
+
 #include <stdio.h> //for FILE*
 #include <Definitions/types.h> //for fixed size types needed in various places
 #include <String/string_decl.h>//for RF_String
@@ -34,12 +37,6 @@
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <IO/common.h> //for common I/O flags and definitions
-#include <IO/textfile.h>
----------------------For internal library include make sure to have----------------------------
-*/
-
-#ifndef RF_TEXTFILE_H
-#define RF_TEXTFILE_H
 
 #ifdef __cplusplus
 extern "C"

@@ -23,8 +23,11 @@
 **
 ** --Threads/mutex.h
 ** This header declares functions that operate on RF_Mutex
-**
----------------------For internal library include make sure to have----------------------------
+*/
+
+#ifndef RF_MUTEX_H
+#define RF_MUTEX_H
+
 #include <Definitions/types.h> //for fixed size data types
 #include <Definitions/imex.h> //for the import export macro
     #ifdef REFU_WIN32_VERSION
@@ -34,11 +37,6 @@
     #endif
 #include <Threads/mutex_decl.h> //for RF_Mutex
 #include <Threads/mutex.h>
----------------------For internal library include make sure to have----------------------------
-*/
-
-#ifndef RF_MUTEX_H
-#define RF_MUTEX_H
 
 #ifdef __cplusplus
 extern "C"

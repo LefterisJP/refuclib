@@ -19,30 +19,20 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **
 **      ==END OF REFU LICENSE==
-**
 */
-//*---------------------Corrensponding Header inclusion---------------------------------
-#include <Definitions/types.h> //fixed size data types
-#include <Definitions/imex.h> //for the import export macro
-#include <Definitions/threadspecific.h> //for the thread specific attribute
-#include <Utils/localmem_decl.h> //for RF_LocalMemoryStack
+
+/*------------- Corrensponding Header inclusion -------------*/
 #include <Utils/localmem.h>
-//*---------------------Module related inclusion----------------------------------------
+/*------------- Module related inclusion -------------*/
 #include "localmem.ph" //for the private definitions of rfLMS functions
-//*---------------------Outside module inclusion----------------------------------------
+/*------------- Outside Module inclusion -------------*/
 //for error logging
-    #include <stdio.h>//for FILE* used inside printf.h
-    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
-    #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
-    #include <Threads/common.h> //for rfThread_GetID()
     #include <Utils/error.h>
 //for memory allocation
-    #include <stdlib.h> //for malloc, calloc,realloc and exit()
-    #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
     #include <Utils/memory.h> //for refu memory allocation
-//*---------------------libc Headers inclusion------------------------------------------
+/*------------- libc inclusion -------------*/
 #include <string.h> //for memset() used in the Local scope macros
-//*----------------------------End of Includes------------------------------------------
+/*------------- End of includes -------------*/
 
 
 //define The main thread's local stack memory
@@ -53,7 +43,7 @@ i_THREAD__ RF_LocalMemoryStack* RF_LMS;
 
 
 // Initializes the local memory stack
-char rfLMS_Init(RF_LocalMemoryStack* lms, uint64_t size)
+bool rfLMS_Init(RF_LocalMemoryStack* lms, uint64_t size)
 {
     lms->stackPtr = 0;
     lms->macroEvalsI = 0;
@@ -71,7 +61,7 @@ void* rfLMS_Push(uint64_t size)
     uint32_t temp;
     if(RF_LMS->stackPtr+size > RF_OPTION_LOCALSTACK_MEMORY_SIZE)
     {
-         RF_ERROR(0, "Local Stack Memory pushing error. Attempted to "
+         RF_ERROR("Local Stack Memory pushing error. Attempted to "
          "allocate more memory than currently available");
         return NULL;
     }
@@ -82,11 +72,11 @@ void* rfLMS_Push(uint64_t size)
 
 
 //Frees some memory from the local memory stack
-char rfLMS_Pop(uint64_t size)
+bool rfLMS_Pop(uint64_t size)
 {
     if(size > RF_LMS->stackPtr)
     {
-         RF_ERROR(0, "Local Stack Memory popping error. Attempted to"
+         RF_ERROR("Local Stack Memory popping error. Attempted to"
                   " pop the memory to a point in the stack that's not "
                   "allocated yet");
         return false;
@@ -97,11 +87,11 @@ char rfLMS_Pop(uint64_t size)
 
 
 //Keeps the stack pointer before the specific macro evaluation
-char rfLMS_ArgsEval()
+bool rfLMS_ArgsEval()
 {
     if(RF_LMS->macroEvalsI+1 >= RF_MAX_FUNC_ARGS)
     {
-        RF_ERROR(0, "Local Stack Memory macro evaluation error. More "
+        RF_ERROR("Local Stack Memory macro evaluation error. More "
                  "macros than the specified maximum number of function "
                  "arguments \"%d\" have been evaluated", RF_MAX_FUNC_ARGS);
         return false;

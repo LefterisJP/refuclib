@@ -13,10 +13,8 @@ optionsList = ['_FILE_OFFSET_BITS',
                'RF_OPTION_THREADX_MSGQUEUE_SIZE',
                'RF_OPTION_FGETS_READ_BYTESN',
                'RF_OPTION_DEFAULT_ARGUMENTS',
-               'RF_OPTION_ERROR_LOGGING_LEVEL',
-               'RF_OPTION_WARNING_LOGGING_LEVEL',
-               'RF_OPTION_INFO_LOGGING_LEVEL',
                'RF_OPTION_LOCALSTACK_MEMORY_SIZE',
+               'RF_OPTION_LOG_LEVEL_DEFAULT',
                '_LARGEFILE64_SOURCE']
 
 

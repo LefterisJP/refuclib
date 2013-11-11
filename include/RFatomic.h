@@ -20,15 +20,39 @@
 **
 **      ==END OF REFU LICENSE==
 **
-**
+** This is simply a fontend for gcc's builtin functions for atomic operations.
+** http://gcc.gnu.org/onlinedocs/gcc-4.1.0/gcc/Atomic-Builtins.html
+** Should look more closely at C11 progress and the atomic type flag.
+** More details here: http://gcc.gnu.org/wiki/Atomic/C11
+** When complete it should also be used.
 */
-#ifndef RF_LOCALMEMORY_MODULE_HEADERS
-#define RF_LOCALMEMORY_MODULE_HEADERS
 
-//--Including local memory struct and its functions
-#include <Utils/localmem.h> //for the local memory functions
+/**
+ * An atomic int
+ */
+typedef struct atomic
+{
+    int val;
+}RF_Atomic;
 
-//--Including the Local scope macros
-#include <Utils/localscope.h>
+#define RF_ATOMIC_INIT(a_) {a_}
 
-#endif//include guards end
+static inline int rfAtomic_inc_fetch(RF_Atomic* a)
+{
+    return __sync_add_and_fetch(a->val, 1);
+}
+
+static inline void rfAtomic_inc(RFAtomic* a)
+{
+    __sync_add_and_fetch(a->val, 1);
+}
+
+static inline int rfAtomic_dec_fetch(RFAtomic* a)
+{
+    return __sync_sub_and_fetch(a->val, 1);
+}
+
+static inline void rfAtomic_dec(RFatomic* a)
+{
+    __sync_sub_and_fetch(a->val, 1);
+}

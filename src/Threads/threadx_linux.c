@@ -3,13 +3,13 @@
 **
 ** Copyright (c) 2011-2013, Karapetsas Eleftherios
 ** All rights reserved.
-** 
+**
 ** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 **  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 **  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in
 **     the documentation and/or other materials provided with the distribution.
 **  3. Neither the name of the Original Author of Refu nor the names of its contributors may be used to endorse or promote products derived from
-** 
+**
 ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
 ** INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 ** DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
@@ -23,39 +23,23 @@
 */
 
 /*------------- Corrensponding Header inclusion -------------*/
-#include <Definitions/types.h> //for fixed size data types
-#include <Definitions/imex.h> //for the import export macro
-#include <Definitions/defarg.h> //for enabling default arguments
-#include <pthread.h> //for pthread_t
-#include <Threads/thread_flags.h> //for common Thread flags
-#include <Threads/thread_decl.h> //for RF_Thread
-#include <Threads/mutex_decl.h> //for RF_Mutex used in RF_ThreadX
-#include <Threads/threadx_decl.h> //for RF_ThreadX
 #include <Threads/threadx.h>
 /*------------- Module related inclusion -------------*/
 #include <Threads/mutex.h>
 #include <Threads/common.h> //for rfThread_GetID()
 /*------------- Outside Module inclusion -------------*/
 //for io buffer initialization
-    #include <Definitions/threadspecific.h> // for the thread specific keyword used in the ioBuffer
-    #include <String/string_decl.h> //for RF_String (ioBuffer type)
-    #include <String/stringx_decl.h> //for RF_StringX (ioBuffer type)
     #include "../IO/buff.ph"//stdio buffer thread-specific initialization
 //for error logging
-    #include <stdio.h>//for FILE* used inside printf.h
-    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
     #include <Utils/error.h>
 //for memory allocation macros
-    #include <stdlib.h> //for malloc, calloc,realloc and exit()
-    #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
     #include <Utils/memory.h> //for refu memory allocation
 //for local scope macros
-    #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
-    #include <Utils/localmem.h> //for initializing the local memory stack of this thread
+    #include <Utils/localmem_decl.h>
+    #include <Utils/localmem.h>
 //for RF_BITFLAG_ON
     #include <Utils/bits.h>
 /*------------- libc inclusion -------------*/
-#include <errno.h>
 #include <string.h> //for memcpy() and memmove()
 /*------------- End of includes -------------*/
 
@@ -86,7 +70,7 @@ static void* RF_THREADX_FUNCTION(void* param)
     if(!rfLMS_Init(&lms,thread->INH_Thread.lmsSize))
     {
         //TODO: Add the thread's address in the msg
-        RF_ERROR(0,
+        RF_ERROR(
                  "Failure to initialize a thread because its local memory "
                  "stack could not be initialized");
         return (void*)RE_LOCALMEMSTACK_INIT;
@@ -152,7 +136,7 @@ char i_rfThreadX_Init(RF_ThreadX* t,
     //get the function given by the user
     if(ptr2onExecution == 0)
     {
-        RF_ERROR(0,
+        RF_ERROR(
                  "Passed a null pointer for the thread's execution. The thread"
                  " will be doing nothing, so it is meaningless");
         return false;

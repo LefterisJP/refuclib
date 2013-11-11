@@ -20,25 +20,19 @@
 **
 **      ==END OF REFU LICENSE==
 **
-**
-**
-**
 ** --Utils/localmem.h
 **
 ** Contains the local memory stack functions
-**
-**
----------------------For internal library include make sure to have----------------------------
-#include <Definitions/types.h> //fixed size data types
-#include <Definitions/imex.h> //for the import export macro
-#include <Definitions/threadspecific.h> //for the thread specific attribute
-#include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
-#include <Utils/localmem.h>
----------------------For internal library include make sure to have----------------------------
 */
 #ifndef RF_LOCAL_MEMORY_H
 #define RF_LOCAL_MEMORY_H
 
+
+#include <Definitions/retcodes.h> //for bool
+#include <Definitions/types.h> //fixed size data types
+#include <Definitions/imex.h> //for the import export macro
+#include <Definitions/threadspecific.h> //for the thread specific attribute
+#include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
 
 #ifdef __cplusplus
 extern "C"
@@ -59,7 +53,7 @@ extern "C"
  ** @return Returns @c true if initialized correctly and @c false otherwise
  **
  **/
-char rfLMS_Init(RF_LocalMemoryStack* lms, uint64_t size);
+bool rfLMS_Init(RF_LocalMemoryStack* lms, uint64_t size);
 
 /**
  ** @memberof RF_LocalMemoryStack
@@ -89,7 +83,7 @@ i_DECLIMEX_ void* rfLMS_Push(uint64_t size);
  ** attemped up to a point that has not yet been allocated
  **
  **/
-i_DECLIMEX_ char rfLMS_Pop(uint64_t t);
+i_DECLIMEX_ bool rfLMS_Pop(uint64_t t);
 
 /**
  ** @memberof RF_LocalMemoryStack
@@ -105,7 +99,7 @@ i_DECLIMEX_ char rfLMS_Pop(uint64_t t);
  ** @return Returns @c true for success and @c false if the maximum
  ** specified number of function arguments has been used
  **/
-i_DECLIMEX_ char rfLMS_ArgsEval();
+i_DECLIMEX_ bool rfLMS_ArgsEval();
 
 
 //functions to declare create old value data types on the local stack

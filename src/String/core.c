@@ -38,13 +38,14 @@
 #include "common.ph"//for private string iteration
 /*------------- Outside Module inclusion -------------*/
 #include <String/unicode.h> //for rfUTF8_VerifySequence()
-
-#include <Definitions/retcodes.h> //for error codes
-//for error logging
+// for error code
+    #include <Definitions/retcodes.h>
+// for error logging
     #include <stdio.h>//for FILE* used inside printf.h
-    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
     #include <Threads/common.h> //for rfThread_GetID()
     #include <errno.h> //for error reporting that needs it
+    #include <String/string_decl.h> //for RF_String
+    #include <String/common.h> //for RFS_() macro
     #include <Utils/error.h>
 //for the io buffer
     #include <Definitions/threadspecific.h> // for the thread specific keyword used in the ioBuffer
@@ -74,7 +75,7 @@ RF_String* i_rfString_Create(const char* s, ...)
     //read the var args
     if(rfStringX_Formatv(&ioBuffer,s,args) == false)
     {
-        RF_ERROR(0, "String creation failure due to failing at reading the "
+        RF_ERROR("String creation failure due to failing at reading the "
                  "formatted string");
         return NULL;
     }
@@ -119,7 +120,7 @@ char i_rfString_Init(RF_String* str, const char* s, ...)
     //read the var args
     if(rfStringX_Formatv(&ioBuffer,s,args) == false)
     {
-        RF_ERROR(0, "String creation failure due to failing at reading the "
+        RF_ERROR("String creation failure due to failing at reading the "
                  "formatted string");
         return false;
     }
@@ -140,7 +141,7 @@ char i_NVrfString_Init(RF_String* str, const char* s)
     uint32_t byteLength;
     if(!rfUTF8_VerifySequence(s,&byteLength))
     {
-        RF_ERROR(0, "Error at String Initialization due to invalid UTF-8 "
+        RF_ERROR("Error at String Initialization due to invalid UTF-8 "
                  "byte sequence");
         return false;
     }
@@ -223,7 +224,7 @@ char rfString_Init_cp(RF_String* str, uint32_t codepoint)
     }
     else
     {
-        RF_ERROR(0, "Attempted to encode an invalid unicode code point into"
+        RF_ERROR("Attempted to encode an invalid unicode code point into"
                  " a string");
         free(str->bytes);
         return false;
@@ -255,7 +256,8 @@ char rfString_Init_i(RF_String* str, int32_t i)
     char buff[12];//max uint32_t is 4,294,967,295 in most environment so 12 chars will certainly fit it
     if((len = sprintf(buff, "%d", i)) < 0)
     {
-        RF_ERROR_PRINTF("String initialization from integer failed", "sprintf");
+        RF_ERROR("String initialization from integer failed due to sprintf "
+                 "failing with errno %d", errno);
         return false;
     }
     str->byteLength = len;
@@ -285,7 +287,8 @@ char rfString_Init_f(RF_String* str,float f)
 
     if((len = sprintf(buff,"%f",f)) < 0)
     {
-        RF_ERROR_PRINTF("String initialization from float failed", "sprintf");
+        RF_ERROR("String initialization from float failed due to sprintf "
+                 "failing with errno %d", errno);
         return false;
     }
 
@@ -335,7 +338,7 @@ char rfString_Init_UTF16(RF_String* str, const uint16_t* s)
                        byteLength*2))
     {
         free(codepoints);
-        RF_ERROR(0, "String initialization failed due to invalide UTF-16 "
+        RF_ERROR("String initialization failed due to invalide UTF-16 "
                  "sequence");
         return false;
     }
@@ -344,7 +347,7 @@ char rfString_Init_UTF16(RF_String* str, const uint16_t* s)
     if(!rfUTF8_Encode(codepoints,characterLength,
                       &utf8ByteLength, utf8, characterLength*4))
     {
-        RF_ERROR(0, "String initialization failed during encoding in UTF8");
+        RF_ERROR("String initialization failed during encoding in UTF8");
         free(codepoints);
         free(utf8);
         return false;
@@ -380,7 +383,7 @@ char rfString_Init_UTF32(RF_String* str, const uint32_t* codeBuffer)
     RF_MALLOC(utf8, length*4, false);
     if(!rfUTF8_Encode(codeBuffer, length, &utf8ByteLength, utf8, length*4))
     {
-        RF_ERROR(0, "Could not properly encode a UTF32 buffer into UTF8");
+        RF_ERROR("Could not properly encode a UTF32 buffer into UTF8");
         free(utf8);
         return false;
     }
@@ -492,7 +495,7 @@ char rfString_Assign_char(RF_String* str,uint32_t codepoint)
     }
     else
     {
-        RF_ERROR(0, "Attempted to encode an invalid unicode code point into"
+        RF_ERROR("Attempted to encode an invalid unicode code point into"
                  " a string");
         return false;
     }

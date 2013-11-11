@@ -246,8 +246,9 @@ typedef unsigned Long ULong;
 #include <stdio.h>//for FILE* used inside printf.h
 #include <Definitions/imex.h> //for import export macro used inside <Utils/error.h>
 #include <Definitions/types.h> //for fixed size data types used inside <Utils/error.h>
-#include <IO/printf.h> //for rfFpintf() used in the error logging macros
 #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
+#include <String/string_decl.h> //for RF_String
+#include <String/common.h> //for RFS_() macro
 #include <Utils/error.h> //for LOG_ERROR() macros
 #include <Utils/memory.h> //for refu memory allocation
 #include "string.h"

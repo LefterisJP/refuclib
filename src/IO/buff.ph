@@ -27,14 +27,13 @@
 ** --IO/buff.ph
 ** Defines the I/O string buffer used internally in the library
 **
----------------------For internal library include make sure to have----------------------------
-#include <Definitions/threadspecific.h> // for the thread specific keyword used in the ioBuffer
-#include <Definitions/types.h> //for fixed size data types appearing in RF_String and RF_StringX
-#include <String/string_decl.h> //for RF_String (ioBuffer type)
-#include <String/stringx_decl.h> //for RF_StringX (ioBuffer type)
-#include "pathto/buff.ph"
----------------------For internal library include make sure to have----------------------------
 */
+
+#include <Definitions/threadspecific.h> 
+//for RF_String and RF_StringX
+#include <Definitions/types.h> 
+#include <String/string_decl.h>
+#include <String/stringx_decl.h>
 
 /**
  ** Initializes the stdio buffer that is needed by all Refu stdio functions

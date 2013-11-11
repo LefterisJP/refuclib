@@ -44,7 +44,8 @@ $INCLUDE @H
 /*------------- Outside Module inclusion -------------*/
 //for error logging
     #include <stdio.h>//for FILE* used inside printf.h
-    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
+    #include <String/string_decl.h> //for RF_String
+    #include <String/common.h> //for RFS_() macro
     #include <Threads/common.h> //for rfThread_GetID()
     #include <Utils/error.h>
 //for memory allocation macros
@@ -148,7 +149,7 @@ $ENDIF
         }
         else
         {
-            RF_ERROR(0,"Realloc failed in adding an object to an array of "
+            RF_ERROR("Realloc failed in adding an object to an array of "
                      "Objects during an attempt to increase buffer"
                      " capacity");
             ret = false;
@@ -176,8 +177,6 @@ $ENDIF
     //if the index goes over the buffer capacity
     if( i >= l->size)
     {
-        RF_WARNING(2, "Attempted to retrieve an element from an array with an"
-                 " index that is out of bounds");
         *code = false;
         return 0;
     }
@@ -199,9 +198,6 @@ $ENDIF
     //if the index points to a non-yet set element
     if(i >= l->size)
     {
-        RF_WARNING(2, "Attempted to set an element in an array with an index "
-                   "out of bounds. If you want to add objects to the list "
-                   "use the Add function.");
         ret = false;
         goto cleanup;
     }
@@ -220,7 +216,7 @@ bool rfDynamicArray_Remove(@DATA_STRUCT* l, uint32_t i)
     //if the index points to a non-yet set element
     if(i >= l->size)
     {
-        RF_ERROR(0,"Attempted to remove an element from an array with an"
+        RF_ERROR("Attempted to remove an element from an array with an"
                  " index out of bounds");
         return false;
     }
@@ -244,7 +240,7 @@ bool rfDynamicArray_Remove(@DATA_STRUCT* l, uint32_t i)
             l->data = testPtr;
         else
         {
-            RF_ERROR(0,"Realloc failed in removing an object from an array"
+            RF_ERROR("Realloc failed in removing an object from an array"
                      " during an attempt to shrink the buffer. Aborting "
                      "program");
            return false;

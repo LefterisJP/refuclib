@@ -20,22 +20,13 @@
 **
 **      ==END OF REFU LICENSE==
 **
-**
-**
-**
 ** --Utils/libinit.h
-**
-** The initialization function of the library.
-**
----------------------For internal library include make sure to have----------------------------
-#include <Definitions/imex.h> //import export macro
-#include <Definitions/types.h> //fixed size data types
-#include <Definition/defarg.h> //to enable default arguments
-#include <Utils/libinit.h>
----------------------For internal library include make sure to have----------------------------
 */
 #ifndef RF_LIBINIT_H
 #define RF_LIBINIT_H
+
+#include <rf_options.h>
+#include <Utils/error.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -66,6 +57,7 @@ extern "C"
  ** values for which the standard output stream or the standard error 
  ** stream are used respectively
  ** If no value is provided the default value is @c "refuErrorLog"
+ ** 
  ** @param lmsSize \rfoptional{RF_OPTION_LOCALSTACK_MEMORY_SIZE} The size
  ** of the main thread's local memory stack. This will be the size by 
  ** which the main thread's local memory stack will be initialized. 
@@ -74,28 +66,36 @@ extern "C"
  ** If no value is given the default value is to use the one provided at
  ** compile time by the Refu Builder and the
  ** preprocessor directive @c RF_OPTION_LOCALSTACK_MEMORY_SIZE.
+ ** 
+ ** @param level The level of the logging system. Possible values
+ ** are enumerated by @ref log_level_t
+ **
  ** @return Returns @c true in success and @c false otherwise
  **/
 #ifdef RF_IAMHERE_FOR_DOXYGEN
-i_DECLIMEX_  char rfInit(char* logstr, uint64_t size);
+i_DECLIMEX_  char rfInit(char* logstr, uint64_t size, log_level_t level);
 #else
 #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-    i_DECLIMEX_  char i_rfInit(char* logstr, uint64_t size);
+i_DECLIMEX_  char i_rfInit(char* logstr, uint64_t size, log_level_t level);
 #define rfInit(...) \
-    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_INIT, 2 ,__VA_ARGS__)
+    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_INIT, 3 ,__VA_ARGS__)
 
 #define i_NPSELECT_RF_INIT1(...)                                        \
     RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function "    \
-                     "rfStringInit() accepts from 0 to 2 arguments\"")
+                     "rfStringInit() accepts from 0 to 3 arguments\"")
 #define i_NPSELECT_RF_INIT0(...) \
     RF_SELECT_FUNC(i_SELECT_RF_INIT,__VA_ARGS__)
-#define i_SELECT_RF_INIT2(...)  i_rfInit(__VA_ARGS__) 
+#define i_SELECT_RF_INIT3(...)  i_rfInit(__VA_ARGS__) 
+#define i_SELECT_RF_INIT2(...)  i_rfInit(__VA_ARGS__, \
+                                         RF_OPTION_LOG_LEVEL_DEFAULT) 
 #define i_SELECT_RF_INIT1(...)  i_rfInit(__VA_ARGS__,  \
-                                         RF_OPTION_LOCALSTACK_MEMORY_SIZE)
+                                         RF_OPTION_LOCALSTACK_MEMORY_SIZE, \
+                                         RF_OPTION_LOG_LEVEL_DEFAULT) 
 #define i_SELECT_RF_INIT0(...)  i_rfInit("refuclib.log",    \
-                                         RF_OPTION_LOCALSTACK_MEMORY_SIZE)
+                                         RF_OPTION_LOCALSTACK_MEMORY_SIZE, \
+                                         RF_OPTION_LOG_LEVEL_DEFAULT) 
 #else
-    i_DECLIMEX_  char rfInit(char* logstr,uint64_t size);
+i_DECLIMEX_  char rfInit(char* logstr, uint64_t size, log_level_t level);
 #endif
 #endif
 //! @}

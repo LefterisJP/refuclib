@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <refu.h>
 #include <RFstring.h>
+#include <RFprintf.h>
 #include "../refu_tests.h"
 
 int main()

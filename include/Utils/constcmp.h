@@ -29,17 +29,13 @@
 ** and then compared.
 **
 ** For floating points, the minimum float or double representable by the
-** system, the epsilon, is used in the comparison. To achieve that, <float.h>
-** must be included
-**
----------------------For internal library include make sure to have----------------------------
-#include <float.h> //for EPSILON (only if you actually call the float or double macros)
----------------------For internal library include make sure to have----------------------------
+** system, the epsilon, is used in the comparison.
 */
 #ifndef RF_UTILS_CONSTCMP_H
 #define RF_UTILS_CONSTCMP_H
 
-/* - Safe Float and Double comparisons (need to include <float.h> too - */
+#include <float.h> //needed for EPSILON if calling the corresponding macros
+
 
 /**
  **  Returns true if float a > float b

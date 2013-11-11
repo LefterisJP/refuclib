@@ -24,18 +24,6 @@
 ** --IO/file.h
 ** This header defines functions that operate on FILE descriptors and
 ** also those that can open other processes
-**
----------------------For internal library include make sure to have----------------------------
-#include <stdio.h> //for FILE*
-#include <Definitions/types.h> //for fixed size types needed in various places
-#include <Definitions/imex.h> //for the import export macro
-#include <Definitions/inline.h> //for inline definitions
-#include <Definitions/retcodes.h> //for booleans
-#include <IO/common.h> //for stat_rft
-#include <String/string_decl.h> //for RF_String
-#include <String/conversion.h> // for rfString_Cstr
-#include <IO/file.h>
----------------------For internal library include make sure to have----------------------------
 */
 #ifndef REFU_IO_FILE_H
 #define REFU_IO_FILE_H
@@ -45,6 +33,14 @@
 #else
 #include <sys/stat.h>
 #endif
+#include <stdio.h> //for FILE*
+#include <Definitions/types.h> //for fixed size types needed in various places
+#include <Definitions/imex.h> //for the import export macro
+#include <Definitions/inline.h> //for inline definitions
+#include <Definitions/retcodes.h> //for booleans
+#include <IO/common.h> //for stat_rft
+#include <String/string_decl.h> //for RF_String
+#include <String/conversion.h> // for rfString_Cstr
 
 #ifdef __cplusplus
 extern "C"

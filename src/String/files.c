@@ -38,9 +38,10 @@
 #include <String/common.h> //for RFS_()
 /*------------- Outside Module inclusion -------------*/
 //for error logging
-#include <IO/printf.h> //for rfFpintf() used in the error logging macros
 #include <Threads/common.h> //for rfThread_GetID()
 #include <errno.h> //for error reporting that needs it
+#include <String/string_decl.h> //for RF_String
+#include <String/common.h> //for RFS_() macro
 #include <Utils/error.h>
 //for memory allocation macros
 #include <stdlib.h> //for malloc, calloc,realloc and exit()
@@ -89,7 +90,7 @@ char rfString_FInit(RF_String* str, FILE* f, char* eof, char eol,
             if(!rfFReadLine_UTF8(f, eol, &str->bytes,
                                  &str->byteLength, &bytes_read, eof))
             {
-                RF_ERROR(0, "Failed to initialize String from a UTF-8 file");
+                RF_ERROR("Failed to initialize String from a UTF-8 file");
                 return false;
             }
             break;
@@ -97,7 +98,7 @@ char rfString_FInit(RF_String* str, FILE* f, char* eof, char eol,
             if(!rfFReadLine_UTF16(f, eol, &str->bytes, &str->byteLength,
                                   eof, &bytes_read, endianess))
             {
-                RF_ERROR(0, "Failure to initialize a String from reading"
+                RF_ERROR("Failure to initialize a String from reading"
                          " a UTF-16 file");
                 return false;
             }
@@ -106,15 +107,15 @@ char rfString_FInit(RF_String* str, FILE* f, char* eof, char eol,
             if(!rfFReadLine_UTF32(f, eol, &str->bytes, &str->byteLength, eof,
                                   &bytes_read, endianess))
             {
-                RF_ERROR(0, "Failure to initialize a String from reading"
+                RF_ERROR("Failure to initialize a String from reading"
                          " a UTF-32 file");
                 return false;
             }
             break;
 #if RF_OPTION_DEBUG
         default:
-            RF_WARNING(0, "Provided an illegal encoding value to function "
-                       "rfString_Init_f()");
+            RF_ERROR("Provided an illegal encoding value to function "
+                     "rfString_Init_f()");
             return false;
             break;
 #endif
@@ -134,7 +135,7 @@ char rfString_FAssign(RF_String* str, FILE* f, char* eof, char eol,
         case RF_UTF8:
             if(!rfFReadLine_UTF8(f, eol, &utf8, &utf8ByteLength, &bytes_read, eof))
             {
-                RF_ERROR(0, "Failed to assign the contents of a UTF-8 file "
+                RF_ERROR("Failed to assign the contents of a UTF-8 file "
                          "to a String");
                 return false;
             }
@@ -143,7 +144,7 @@ char rfString_FAssign(RF_String* str, FILE* f, char* eof, char eol,
             if(!rfFReadLine_UTF16(f, eol, &utf8, &utf8ByteLength, eof,
                                   &bytes_read, endianess))
             {
-                RF_ERROR(0,"Failure to assign the contents of a "
+                RF_ERROR("Failure to assign the contents of a "
                          "UTF-16 file to a String");
                 return false;
             }
@@ -152,15 +153,15 @@ char rfString_FAssign(RF_String* str, FILE* f, char* eof, char eol,
             if(!rfFReadLine_UTF32(f, eol, &utf8, &utf8ByteLength, eof,
                                   &bytes_read, endianess))
             {
-                RF_ERROR(0, "Failure to assign to a String from reading "
+                RF_ERROR("Failure to assign to a String from reading "
                          "a UTF-32 file");
                 return false;
             }
             break;
 #if RF_OPTION_DEBUG
         default:
-            RF_WARNING(0, "Provided an illegal encoding value to function "
-                       "rfString_Assign_f()");
+            RF_ERROR("Provided an illegal encoding value to function "
+                     "rfString_Assign_f()");
             return false;
             break;
 #endif
@@ -194,7 +195,7 @@ char rfString_FAppend(RF_String* str, FILE* f, char* eof, char eol,
             if(!rfFReadLine_UTF8(f, eol, &utf8,
                                  &utf8ByteLength, &bytes_read, eof))
             {
-                RF_ERROR(0, "Failed to append to a String from reading "
+                RF_ERROR("Failed to append to a String from reading "
                          "a UTF-8 file");
                 return false;
             }
@@ -203,7 +204,7 @@ char rfString_FAppend(RF_String* str, FILE* f, char* eof, char eol,
             if(!rfFReadLine_UTF16(f, eol, &utf8, &utf8ByteLength, eof,
                                   &bytes_read, endianess))
             {
-                RF_ERROR(0,"Failure to append the contents of a "
+                RF_ERROR("Failure to append the contents of a "
                          "UTF-16 file to a String");
                 return false;
             }
@@ -212,15 +213,15 @@ char rfString_FAppend(RF_String* str, FILE* f, char* eof, char eol,
             if(!rfFReadLine_UTF32(f, eol, &utf8, &utf8ByteLength, eof,
                                   &bytes_read, endianess))
             {
-                RF_ERROR(0, "Failure to append to a String from reading "
+                RF_ERROR("Failure to append to a String from reading "
                          "a UTF-32 file");
                 return false;
             }
             break;
 #if RF_OPTION_DEBUG
         default:
-            RF_WARNING(0, "Provided an illegal encoding value to function "
-                       "rfString_Append_f()");
+            RF_ERROR("Provided an illegal encoding value to function "
+                     "rfString_Append_f()");
             return false;
             break;
 #endif
@@ -228,7 +229,7 @@ char rfString_FAppend(RF_String* str, FILE* f, char* eof, char eol,
     //append the utf8 to the given string
     if(!rfString_Append(str, RFS_(utf8)))
     {
-        RF_ERROR(0, "Failed to append a utf8 buffer to a string");
+        RF_ERROR("Failed to append a utf8 buffer to a string");
         ret = false;
     }
     //free the file's decoded utf8 buffer
@@ -263,7 +264,7 @@ char i_rfString_Fwrite(void* sP, FILE* f, int encoding, int endianess)
             if((utf16 = rfString_ToUTF16(s,&length)) == NULL)
             {
                 ret = false;
-                RF_ERROR(0, "Error in converting a string to UTF-16 LE");
+                RF_ERROR("Error in converting a string to UTF-16 LE");
                 goto cleanup1;
             }
             rfProcessByteOrderUSA(utf16, length, endianess);
@@ -279,7 +280,7 @@ char i_rfString_Fwrite(void* sP, FILE* f, int encoding, int endianess)
             if((utf32 = rfString_ToUTF32(s, &length)) == NULL)
             {
                 ret = false;
-                RF_ERROR(0, "Error in converting a string to LE UTF-32");
+                RF_ERROR("Error in converting a string to LE UTF-32");
                 goto cleanup1;
             }
             rfProcessByteOrderUIA(utf32, length, endianess);
@@ -292,13 +293,14 @@ char i_rfString_Fwrite(void* sP, FILE* f, int encoding, int endianess)
             goto cleanup1;//success
         break;
         default:
-            RF_ERROR(0, "Illegal encoding value given to the function");
+            RF_ERROR("Illegal encoding value given to the function");
             ret = false;
             goto cleanup1;
             break;
     }
-    //if we get here it means an error, and we log it with the macro
-    RF_ERROR_FGETC("Writting a string to a file failed", "fwrite");
+    //if we get here it means an error, and we log it
+    RF_ERROR("Writting a string to a file failed due to "
+             "fwrite errno %d", errno);
     ret = false;
 
 

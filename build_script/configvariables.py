@@ -9,9 +9,8 @@ vars_for_compile_time = [
     'LOCALSTACK_MEMORY_SIZE',
     'THREADX_MSGQUEUE_SIZE',
     'HASHMAP_LOAD_FACTOR',
-    'ERROR_LOGGING_LEVEL',
-    'WARNING_LOGGING_LEVEL',
-    'INFO_LOGGING_LEVEL',
+    'LOG_LEVEL_DEFAULT',
+    'LOG_BUFFER_SIZE',
 ]
 
 # These are variables from variables.py which are True/False
@@ -19,6 +18,7 @@ vars_for_compile_time = [
 truevars_for_compile_time = [
     'DEFAULT_ARGUMENTS',
     'SAFE_MEMORY_ALLOCATION',
+    'VERBOSE_ERRNO',
     'DEBUG',
     'TEXTFILE_ADD_BOM'
 ]

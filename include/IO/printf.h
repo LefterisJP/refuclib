@@ -23,17 +23,13 @@
 **
 ** -IO/printf.h
 ** Declares the Refu library's printf family of functions
-**
-------For internal library include make sure to have------(mirror: RFprintf.h)
-#include <Definitions/imex.h> //for import export macro
-#include <Definitions/types.h>
-#include <stdio.h> //for FILE*
-#include <IO/printf.h>
-------For internal library include make sure to have------
 */
 #ifndef RF_PRINTF_H
 #define RF_PRINTF_H
 
+#include <Definitions/imex.h> //for import export macro
+#include <Definitions/types.h>
+#include <stdio.h> //for FILE*
 
 #ifdef __cplusplus
 extern "C"

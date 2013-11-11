@@ -23,17 +23,13 @@
 **
 ** --Utils/endianess.h
 ** This header declares functions and macros that deal with endianess
-**
----------------------For internal library include make sure to have----------------------------
-#include <Definitions/imex.h> //import export macro
-#include <Definitions/types.h> //fixed size data types
-#include <Utils/endianess.h>
----------------------For internal library include make sure to have----------------------------
 */
 
 #ifndef RF_UTILS_ENDIANESS_H
 #define RF_UTILS_ENDIANESS_H
 
+#include <Definitions/imex.h> //import export macro
+#include <Definitions/types.h> //fixed size data types
 
 enum i_RF_ENDIANESS_TYPES 
     {

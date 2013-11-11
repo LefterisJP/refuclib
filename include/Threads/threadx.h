@@ -23,8 +23,16 @@
 **
 ** --Threads/threadx.h
 ** This header declares the functions and macros to be used with RF_ThreadX
-**
----------------------For internal library include make sure to have----------------------------
+*/
+
+
+#ifndef RF_THREADX_H
+#define RF_THREADX_H
+
+
+#include <rf_options.h>
+#ifdef RF_MODULE_THREADX //module check
+
 #include <Definitions/types.h> //for fixed size data types
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
@@ -40,15 +48,6 @@
     #endif
 #include <Threads/threadx_decl.h> //for RF_ThreadX
 #include <Threads/threadx.h>
----------------------For internal library include make sure to have----------------------------
-*/
-
-
-#ifndef RF_THREADX_H
-#define RF_THREADX_H
-
-#include <rf_options.h>
-#ifdef RF_MODULE_THREADX //module check
 
 #ifdef __cplusplus
 extern "C"

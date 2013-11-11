@@ -37,9 +37,10 @@
 /*------------- Outside Module inclusion -------------*/
 //for the error logging macros
     #include <stdio.h>//for FILE* used inside printf.h
-    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
     #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
     #include <Threads/common.h> //for rfThread_GetID()
+    #include <String/string_decl.h> //for RF_String
+    #include <String/common.h> //for RFS_() macro
     #include <Utils/error.h>
 
 #include <Definitions/retcodes.h> //for the return codes
@@ -141,7 +142,7 @@ static int Parse_FormatSpecifier(const char* s, Argument_Format* data)
             }
             else
             {
-                RF_ERROR(0, "During parsing a format string flag '-' was "
+                RF_ERROR("During parsing a format string flag '-' was "
                          "encountered at an unexpected location");
                 state = END_FORMAT;
                 i= -1;
@@ -154,7 +155,7 @@ static int Parse_FormatSpecifier(const char* s, Argument_Format* data)
             }
             else
             {
-                RF_ERROR(0,"During parsing a format string flag '+' was "
+                RF_ERROR("During parsing a format string flag '+' was "
                          "encountered at an unexpected location");
                 state = END_FORMAT;
                 i= -1;
@@ -168,7 +169,7 @@ static int Parse_FormatSpecifier(const char* s, Argument_Format* data)
             }
             else
             {
-                RF_ERROR(0, "During parsing a format string flag ' ' was "
+                RF_ERROR("During parsing a format string flag ' ' was "
                          "encountered at an unexpected location");
                 state = END_FORMAT;
                 i= -1;
@@ -181,7 +182,7 @@ static int Parse_FormatSpecifier(const char* s, Argument_Format* data)
             }
             else
             {
-                RF_ERROR(0,"During parsing a format string flag '#' was "
+                RF_ERROR("During parsing a format string flag '#' was "
                          "encountered at an unexpected location");
                 state = END_FORMAT;
                 i= -1;
@@ -194,7 +195,7 @@ static int Parse_FormatSpecifier(const char* s, Argument_Format* data)
             }
             else
             {
-                RF_ERROR(0,"During parsing a format string flag '0' was "
+                RF_ERROR("During parsing a format string flag '0' was "
                          "encountered at an unexpected location");
                 state = END_FORMAT;
                 i= -1;
@@ -210,7 +211,7 @@ static int Parse_FormatSpecifier(const char* s, Argument_Format* data)
             }
             else
             {
-                RF_ERROR(0, "During parsing a format string, width flag '*' was "
+                RF_ERROR("During parsing a format string, width flag '*' was "
                          "encountered at an unexpected location");
                 state = END_FORMAT;
                 i= -1;
@@ -242,7 +243,7 @@ static int Parse_FormatSpecifier(const char* s, Argument_Format* data)
                 }
                 else
                 {
-                    RF_ERROR(0, "During parsing a format string, after the "
+                    RF_ERROR("During parsing a format string, after the "
                              "precision character '.' a non-numeric non '*' "
                              "character was encountered");
                     state = END_FORMAT;
@@ -251,7 +252,7 @@ static int Parse_FormatSpecifier(const char* s, Argument_Format* data)
             }
             else
             {
-                RF_ERROR(0,"During parsing a format string, precision flag '.' "
+                RF_ERROR("During parsing a format string, precision flag '.' "
                          "was encountered at an unexpected location");
                 state = END_FORMAT;
                 i= -1;
@@ -283,7 +284,7 @@ static int Parse_FormatSpecifier(const char* s, Argument_Format* data)
             }
             else
             {
-                RF_ERROR(0,"During parsing a format string, a number was "
+                RF_ERROR("During parsing a format string, a number was "
                          "encountered at an unexpected location");
                 state = END_FORMAT;
                 i= -1;
@@ -304,7 +305,7 @@ static int Parse_FormatSpecifier(const char* s, Argument_Format* data)
             }
             else
             {
-                RF_ERROR(0, "During parsing a format string, length flag 'h' "
+                RF_ERROR("During parsing a format string, length flag 'h' "
                          "was encountered at an unexpected location");
                 state = END_FORMAT;
                 i= -1;
@@ -323,7 +324,7 @@ static int Parse_FormatSpecifier(const char* s, Argument_Format* data)
             }
             else
             {
-                RF_ERROR(0, "During parsing a format string, length flag 'l' was "
+                RF_ERROR("During parsing a format string, length flag 'l' was "
                          "encountered at an unexpected location");
                 state = END_FORMAT;
                 i= -1;
@@ -337,7 +338,7 @@ static int Parse_FormatSpecifier(const char* s, Argument_Format* data)
             }
             else
             {
-                RF_ERROR(0, "During parsing a format string, length flag 'j' "
+                RF_ERROR("During parsing a format string, length flag 'j' "
                          "was encountered at an unexpected location");
                 state = END_FORMAT;
                 i= -1;
@@ -351,7 +352,7 @@ static int Parse_FormatSpecifier(const char* s, Argument_Format* data)
             }
             else
             {
-                RF_ERROR(0, "During parsing a format string, length flag 'z' was "
+                RF_ERROR("During parsing a format string, length flag 'z' was "
                          "encountered at an unexpected location");
                 state = END_FORMAT;
                 i= -1;
@@ -365,7 +366,7 @@ static int Parse_FormatSpecifier(const char* s, Argument_Format* data)
             }
             else
             {
-                RF_ERROR(0, "During parsing a format string, length flag 't' "
+                RF_ERROR("During parsing a format string, length flag 't' "
                          "was encountered at an unexpected location");
                 state = END_FORMAT;
                 i= -1;
@@ -379,7 +380,7 @@ static int Parse_FormatSpecifier(const char* s, Argument_Format* data)
             }
             else
             {
-                RF_ERROR(0, "During parsing a format string, length flag 'L' "
+                RF_ERROR("During parsing a format string, length flag 'L' "
                          "was encountered at an unexpected location");
                 state = END_FORMAT;
                 i= -1;
@@ -457,7 +458,7 @@ static int Parse_FormatSpecifier(const char* s, Argument_Format* data)
         break;
         default:
             state = END_FORMAT;
-            RF_ERROR(0, "During parsing a format string illegal control "
+            RF_ERROR("During parsing a format string illegal control "
                      "character '%c' was encountered",
                      RE_FORMAT_ILLEGALCHAR,s[i]);
             i= -1;
@@ -507,7 +508,7 @@ char rfStringX_Formatv(RF_StringX *ret, const char* format, va_list args)
             if( (extraChars = Parse_FormatSpecifier(format+i+1,
                                                     &argData)) == 0)
             {
-                RF_ERROR(0, "Error at parsing an argument's format specifier");
+                RF_ERROR("Error at parsing an argument's format specifier");
                 rc = false;
                 goto cleanup1;
             }
@@ -544,7 +545,7 @@ char rfStringX_Formatv(RF_StringX *ret, const char* format, va_list args)
                                    argData.flags))
                             {
                                 rc = false;
-                                RF_ERROR(0,"Failure at appending an int to to a "
+                                RF_ERROR("Failure at appending an int to to a "
                                          "string during formatting");
                                 goto cleanup1;
                             }
@@ -558,7 +559,7 @@ char rfStringX_Formatv(RF_StringX *ret, const char* format, va_list args)
                                    argData.flags))
                             {
                                 rc = false;
-                                RF_ERROR(0,"Failure at appending an long int to "
+                                RF_ERROR("Failure at appending an long int to "
                                          "a string during formatting");
                                 goto cleanup1;
                             }
@@ -572,7 +573,7 @@ char rfStringX_Formatv(RF_StringX *ret, const char* format, va_list args)
                                    argData.flags))
                             {
                                 rc = false;
-                                RF_ERROR(0,"Failure at appending a long long "
+                                RF_ERROR("Failure at appending a long long "
                                          "int to a string during formatting");
                                 goto cleanup1;
                             }
@@ -596,7 +597,7 @@ char rfStringX_Formatv(RF_StringX *ret, const char* format, va_list args)
                                    argData.flags))
                             {
                                 rc = false;
-                                RF_ERROR(0,"Failure at appending an unsigned "
+                                RF_ERROR("Failure at appending an unsigned "
                                          "int to a string during formatting");
                                 goto cleanup1;
                             }
@@ -610,7 +611,7 @@ char rfStringX_Formatv(RF_StringX *ret, const char* format, va_list args)
                                    argData.flags))
                             {
                                 rc = false;
-                                RF_ERROR(0,"Failure at appending an unsigned "
+                                RF_ERROR("Failure at appending an unsigned "
                                          "long int to a string during formatting");
                                 goto cleanup1;
                             }
@@ -624,7 +625,7 @@ char rfStringX_Formatv(RF_StringX *ret, const char* format, va_list args)
                                    argData.flags))
                             {
                                 rc = false;
-                                RF_ERROR(0,"Failure at appending an unsigned long "
+                                RF_ERROR("Failure at appending an unsigned long "
                                          "long int to a string during formatting");
                                 goto cleanup1;
                             }
@@ -646,7 +647,7 @@ char rfStringX_Formatv(RF_StringX *ret, const char* format, va_list args)
                                    argData.flags))
                             {
                                 rc = false;
-                                RF_ERROR(0,"Failure at appending a hex "
+                                RF_ERROR("Failure at appending a hex "
                                          "int to a string during formatting");
                                 goto cleanup1;
                             }
@@ -660,7 +661,7 @@ char rfStringX_Formatv(RF_StringX *ret, const char* format, va_list args)
                                    argData.flags))
                             {
                                 rc = false;
-                                RF_ERROR(0,"Failure at appending a long hex "
+                                RF_ERROR("Failure at appending a long hex "
                                          "int to a string during formatting");
                                 goto cleanup1;
                             }
@@ -674,7 +675,7 @@ char rfStringX_Formatv(RF_StringX *ret, const char* format, va_list args)
                                    argData.flags))
                             {
                                 rc = false;
-                                RF_ERROR(0,"Failure at appending a long long "
+                                RF_ERROR("Failure at appending a long long "
                                          "hex int to a string during formatting");
                                 goto cleanup1;
                             }
@@ -691,7 +692,7 @@ char rfStringX_Formatv(RF_StringX *ret, const char* format, va_list args)
                                RFS_(va_arg(args,char*))))
                         {
                                 rc = false;
-                                RF_ERROR(0,"Failure at appending a c string "
+                                RF_ERROR("Failure at appending a c string "
                                          "to a string during formatting");
                             goto cleanup1;
                         }
@@ -704,7 +705,7 @@ char rfStringX_Formatv(RF_StringX *ret, const char* format, va_list args)
                                argData.precision))
                         {
                                 rc = false;
-                                RF_ERROR(0,"Failure at appending a c string "
+                                RF_ERROR("Failure at appending a c string "
                                          "to a string during formatting");
                             goto cleanup1;
                         }
@@ -719,7 +720,7 @@ char rfStringX_Formatv(RF_StringX *ret, const char* format, va_list args)
                                va_arg(args,RF_String*)))
                         {
                             rc = false;
-                            RF_ERROR(0,"Failure at appending an RF_String "
+                            RF_ERROR("Failure at appending an RF_String "
                                      "to a string during formatting");
                             goto cleanup1;
                         }
@@ -732,7 +733,7 @@ char rfStringX_Formatv(RF_StringX *ret, const char* format, va_list args)
                                argData.precision))
                         {
                             rc = false;
-                            RF_ERROR(0,"Failure at appending an RF_String "
+                            RF_ERROR("Failure at appending an RF_String "
                                      "to a string during formatting");
                             goto cleanup1;
                         }
@@ -744,7 +745,7 @@ char rfStringX_Formatv(RF_StringX *ret, const char* format, va_list args)
                     if(!rfStringX_Append_charutf8(ret,'%'))
                     {
                         rc = false;
-                        RF_ERROR(0,"Failure at appending '%' "
+                        RF_ERROR("Failure at appending '%' "
                                  "to a string during formatting");
                         goto cleanup1;
                     }
@@ -757,7 +758,7 @@ char rfStringX_Formatv(RF_StringX *ret, const char* format, va_list args)
                            va_arg(args,uint32_t)))
                     {
                         rc = false;
-                        RF_ERROR(0,"Failure at appending '%' "
+                        RF_ERROR("Failure at appending '%' "
                                  "to a string during formatting");
                         goto cleanup1;
                     }
@@ -778,7 +779,7 @@ char rfStringX_Formatv(RF_StringX *ret, const char* format, va_list args)
                            argData.flags))
                     {
                         rc = false;
-                        RF_ERROR(0,"Failure at appending a float"
+                        RF_ERROR("Failure at appending a float"
                                  "to a string during formatting");
                         goto cleanup1;
                     }
@@ -797,7 +798,7 @@ char rfStringX_Formatv(RF_StringX *ret, const char* format, va_list args)
                            argData.flags))
                     {
                         rc = false;
-                        RF_ERROR(0,"Failure at appending a scientific float"
+                        RF_ERROR("Failure at appending a scientific float"
                                  "to a string during formatting");
                         goto cleanup1;
                     }
@@ -812,7 +813,7 @@ char rfStringX_Formatv(RF_StringX *ret, const char* format, va_list args)
     if(!rfStringX_Append_bytes(ret,RFS_(format+lastI),i-lastI))
     {
         rc = false;
-        RF_ERROR(0, "Failure at appending the last bytes of the format string");
+        RF_ERROR("Failure at appending the last bytes of the format string");
         //no going to cleanup1 since it's the end, if that changes
         //add a goto here
     }

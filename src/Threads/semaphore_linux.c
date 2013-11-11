@@ -22,24 +22,13 @@
 **
 */
 /*------------- Corrensponding Header inclusion -------------*/
-#include <Definitions/types.h> //for fixed size data types
-#include <Definitions/imex.h> //for the import export macro
-#include <semaphore.h> //for pthread_semaphores
-#include <Threads/semaphore_decl.h> //for RF_Semaphore
 #include <Threads/semaphore.h>
 /*------------- Outside Module inclusion -------------*/
 //for error logging
-    #include <stdio.h>//for FILE* used inside printf.h
-    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
-    #include <Threads/common.h> //for rfThread_GetID()
-    #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
     #include <Utils/error.h>
 //for memory allocation
-#include <stdlib.h> //for malloc, calloc,realloc and exit()
-#include <Definitions/retcodes.h> //for error codes, logged in allocation failure
-#include <Utils/memory.h> //for refu memory allocation
+    #include <Utils/memory.h> //for refu memory allocation
 /*------------- libc inclusion -------------*/
-#include <errno.h>
 #include <time.h> //for CLOCK_REALTIME and clock_gettime()
 /*------------- End of includes -------------*/
 
@@ -48,7 +37,7 @@ RF_Semaphore* rfSemaphore_Create(uint32_t initialCount, uint32_t maxCount)
 {
     RF_Semaphore* ret;
     RF_MALLOC(ret, sizeof(RF_Semaphore), NULL);
-    if(rfSemaphore_Init(ret,initialCount,maxCount) != RF_SUCCESS)
+    if(!rfSemaphore_Init(ret,initialCount,maxCount))
     {
         free(ret);
         return NULL;
@@ -57,12 +46,13 @@ RF_Semaphore* rfSemaphore_Create(uint32_t initialCount, uint32_t maxCount)
     return ret;
 }
 // Initializes a semaphore object
-char rfSemaphore_Init(RF_Semaphore* s, uint32_t initialCount,
-                      uint32_t maxCount)
+bool rfSemaphore_Init(RF_Semaphore* s, uint32_t initialCount,
+                          uint32_t maxCount)
 {
     if(sem_init(&s->semaphoreObj,0,initialCount)!= 0)
     {
-        RF_ERROR_SEMINIT("Initializing a semaphore failed", "sem_init");
+        RF_ERROR("Initializing a semaphore failed due to sem_init() "
+                 "errno %d", errno);
         return false;
     }
     //success
@@ -70,7 +60,7 @@ char rfSemaphore_Init(RF_Semaphore* s, uint32_t initialCount,
 }
 
 // Destroys a semaphore object and frees its memory. 
-char rfSemaphore_Destroy(RF_Semaphore* s)
+bool rfSemaphore_Destroy(RF_Semaphore* s)
 {
     if(!rfSemaphore_Deinit(s))
     {
@@ -80,23 +70,25 @@ char rfSemaphore_Destroy(RF_Semaphore* s)
     return true;
 }
 // Deinitializes a semaphore
-char rfSemaphore_Deinit(RF_Semaphore* s)
+bool rfSemaphore_Deinit(RF_Semaphore* s)
 {
     if(sem_destroy(&s->semaphoreObj) != 0)
     {
-        RF_ERROR_SEMDESTROY("Failed to deinitialize a semaphore", "sem_destroy");
+        RF_ERROR("Failed to deinitialize a semaphore due to sem_destroy() "
+                 "errno %d", errno);
         return false;
     }
     return true;
 }
 
 // Waits for the semaphore. If succesfull decreases the count of the semaphore.
-char rfSemaphore_Wait(RF_Semaphore* s)
+bool rfSemaphore_Wait(RF_Semaphore* s)
 {
     int32_t error = sem_wait(&s->semaphoreObj);
     if(error != 0)
     {
-        RF_ERROR_SEMWAIT("Waiting on a semaphore failed", "sem_wait", error);
+        RF_ERROR("Waiting on a semaphore failed due to sem_wait() "
+                 "errno %d", error);
         return false;
     }
     //success
@@ -104,7 +96,7 @@ char rfSemaphore_Wait(RF_Semaphore* s)
 }
 
 // Same as the rfSemaphore_Wait function except that there is a timeout to waiting given as an argument
-char rfSemaphore_TimedWait(RF_Semaphore* s, uint32_t ms, char* expire)
+bool rfSemaphore_TimedWait(RF_Semaphore* s, uint32_t ms, char* expire)
 {
     struct timespec ts;
     time_t secs;
@@ -114,7 +106,7 @@ char rfSemaphore_TimedWait(RF_Semaphore* s, uint32_t ms, char* expire)
     //let's create the appropriate time structure
     if(clock_gettime(CLOCK_REALTIME, &ts) == -1)
     {
-        RF_ERROR(0,
+        RF_ERROR(
                  "Getting the system time failed. Can't perform a posix "
                  "semaphore timedwait.");
         return false;
@@ -138,7 +130,7 @@ char rfSemaphore_TimedWait(RF_Semaphore* s, uint32_t ms, char* expire)
                 *expire = true;
             break;
             case EINVAL:
-                RF_ERROR(0,
+                RF_ERROR(
                          "Failed to wait for a semaphore because the process or "
                          "thread would have blocked, and the abs_timeout "
                          "parameter specified a nanoseconds field value less "
@@ -146,20 +138,20 @@ char rfSemaphore_TimedWait(RF_Semaphore* s, uint32_t ms, char* expire)
                          "or due to invalid sem argument");
             break;
             case ENOSYS:
-                RF_ERROR(0,
+                RF_ERROR(
                          "Failed to wait for a semaphore because the function "
                          "sem_timewait() is not supported by this implementation");
             break;
             case EDEADLK:
-                RF_ERROR(0, "Failed to wait for a semaphore because a deadlock "
+                RF_ERROR("Failed to wait for a semaphore because a deadlock "
                          "condition has been detected.");
             break;
             case EINTR:
-                RF_ERROR(0, "Failed to wait for a semaphore because a signal "
+                RF_ERROR("Failed to wait for a semaphore because a signal "
                          "interrupted the sem_timedwait() function.");
             break;
             default:
-                RF_ERROR(0,
+                RF_ERROR(
                          "Generic Failure during waiting for a posix semaphore"
                          " with error code: %d", error);
             break;
@@ -171,33 +163,24 @@ char rfSemaphore_TimedWait(RF_Semaphore* s, uint32_t ms, char* expire)
 }
 
 // Tries to wait for the semaphore.
-char rfSemaphore_TryWait(RF_Semaphore* s, char* busy)
+bool rfSemaphore_TryWait(RF_Semaphore* s, char* busy)
 {
-    int32_t error = sem_trywait(&s->semaphoreObj);
+    int error = sem_trywait(&s->semaphoreObj);
     *busy = false;
-    if(error != 0)
+    if(!error) {return true;}
+    if(error == EAGAIN)
     {
-        switch(error)
-        {
-            //the semaphore is already locked by another thread
-            case EAGAIN:
-                *busy = true;
-            break;
-            i_RP_SEMWAIT_CASES("Waiting on a semaphore failed", "sem_trywait",
-                               error)
-            default:
-            RF_ERROR(0, "Waiting on a semaphore failed due to an unknown error "
-                     "code %d returned by sem_trywait()", error);
-            break;
-        }
+        *busy = true;
         return false;
     }
-    //success
-    return true;
+
+    RF_ERROR("Waiting on a semaphore failed due to sem_trywait() "
+             "errno %d", error);
+    return false;
 }
 
 // Releases ownerhship of a semaphore object, increasing its count by one
-char rfSemaphore_Post(RF_Semaphore* s)
+bool rfSemaphore_Post(RF_Semaphore* s)
 {
     //attempt to post, and if fail occurs error log
     if(sem_post(&s->semaphoreObj) != 0)
@@ -205,18 +188,18 @@ char rfSemaphore_Post(RF_Semaphore* s)
         switch(errno)
         {
             case EINVAL:
-                RF_ERROR(0,
+                RF_ERROR(
                          "Failure during posting to a posix semaphore due to "
                          "the argument not being a valid semaphore");
             break;
             case ENOSYS:
-                RF_ERROR(0,
+                RF_ERROR(
                          "Failure during posting to a posix semaphore because "
                          "the sem_post() function is not supported by this "
                          "implementation");
             break;
             default:
-                RF_ERROR(0,
+                RF_ERROR(
                          "Generic Failure during posting to a posix semaphore "
                          "with error code: %d", errno);
             break;

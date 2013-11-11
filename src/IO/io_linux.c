@@ -27,8 +27,9 @@
 #include <Definitions/imex.h> //for the import export macro
 /*------------- Outside Module inclusion -------------*/
 //for error logging
-    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
     #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
+    #include <String/string_decl.h> //for RF_String
+    #include <String/common.h> //for RFS_() macro
     #include <Utils/error.h>
 //for error codes
 #include <Definitions/retcodes.h> //for error codes
@@ -52,7 +53,7 @@ FILE* rfPopen(void* commandP, const char* mode)
 #if RF_OPTION_DEBUG
     if( strcmp(mode,"r") != 0 && strcmp(mode,"w") != 0)
     {
-        RF_ERROR(0, "Invalid mode argument provided to rfPopen()");
+        RF_ERROR("Invalid mode argument provided to rfPopen()");
         goto cleanup;
     }
 #endif

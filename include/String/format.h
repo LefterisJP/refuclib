@@ -46,6 +46,23 @@ extern "C"
 //! @{
 
 /**
+ ** libc printf format specifier for RF_String
+ */
+#define PRrfs "%.*s"
+
+/**
+ ** libc printf argument for RF_String with check
+ */
+#define RF_STRING_FORMAT(s_) \
+    (s_) ? (s_)->byteLength : 0, (s_) ? (s_)->bytes : ""
+
+/**
+ ** libc printf argument for RF_String w/o check
+ */
+#define RF_STRING_FORMATN(s_) \
+    (s_)->byteLength, (s_)->bytes
+
+/**
  ** @memberof RF_StringX
  ** @brief Formats an @ref RF_StringX according to the given format string
  **  and variable argument list

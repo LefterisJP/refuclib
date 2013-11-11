@@ -41,9 +41,10 @@
 #include "../System/info.ph" //to check if we have a high-res timer
 //for error logging
     #include <stdio.h>//for FILE* used inside printf.h
-    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
     #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
     #include <Threads/common.h> //for rfThread_GetID()
+    #include <String/string_decl.h> //for RF_String
+    #include <String/common.h> //for RFS_() macro
     #include <Utils/error.h>
 //for memory allocation
     #include <stdlib.h> //for malloc, calloc,realloc and exit()
@@ -77,7 +78,7 @@ char rfTimer_Init(RF_Timer* t,char resolution)
     //check if we can have high res timer
     if(rfSysInfo.hasHighResTimer == false)
     {
-        RF_ERROR(0,
+        RF_ERROR(
                  "Error initializing a timer, the system does not support a high "
                  "resolution timer");
         return false;
@@ -85,7 +86,7 @@ char rfTimer_Init(RF_Timer* t,char resolution)
     //query the timer
     if( clock_gettime( rfSysInfo.timerType, &t->lastQuery) == -1 ) /// Do We really need this if check here? In refu_init we do check that the timer type works
     {
-        RF_ERROR(0,
+        RF_ERROR(
                  "Error initializing a timer using POSIX, clock_gettime failed");
       return false;
     }
@@ -99,7 +100,7 @@ char rfTimer_Init(RF_Timer* t,char resolution)
             t->resolution = resolution;
         break;
         default:
-            RF_ERROR(0,
+            RF_ERROR(
                      "Attempted to initialize a timer with an illegal "
                      "resolution");
             return false;
@@ -146,7 +147,7 @@ double rfTimer_Query(RF_Timer* t,char resolution)
                 t->resolution = resolution;
             break;
             default:
-                RF_ERROR(0,
+                RF_ERROR(
                          "Attempted to query a timer with an illegal "
                          "resolution. The query will be performed with the "
                          "previously saved resolution");
@@ -157,7 +158,7 @@ double rfTimer_Query(RF_Timer* t,char resolution)
     //query the timer
     if( clock_gettime( rfSysInfo.timerType, &query) == -1 ) /// Do We really need this if check here? In refu_init we do check that the timer type works
     {
-        RF_ERROR(0,
+        RF_ERROR(
                  "Error querying a timer using POSIX, clock_gettime failed");
         return 0;
     }
@@ -219,7 +220,7 @@ char rfDate_Init_Now(RF_Date* d,char local)
     //error check
     if(date == NULL)
     {
-        RF_ERROR(0,
+        RF_ERROR(
             "There was an error in initializing a date Object in Linux. "
             "The system function returned NULL", RE_DATE_SYSTEM_ERROR);
         return false;
@@ -285,7 +286,7 @@ char rfDate_SetToSystem(RF_Date* d)
     time_t t = mktime(&tm);
     if(t == -1)
     {
-        RF_ERROR(0,
+        RF_ERROR(
                  "Setting the system time from an RF_Date in Linux failed "
                  "because mktime() returned -1");
         return false;
@@ -296,20 +297,20 @@ char rfDate_SetToSystem(RF_Date* d)
         switch(errno)
         {
             case EFAULT:
-                RF_ERROR(0,
+                RF_ERROR(
                     "Setting the system time from an RF_Date in Linux "
                     "failed in stime(). Error in getting information from"
                     " user space.", RE_DATE_SET_SYSTEMTIME);
             break;
             case EPERM:
-                RF_ERROR(0,
+                RF_ERROR(
                          "Setting the system time from an RF_Date in Linux "
                          "failed in stime().The calling process has "
                          "insufficient privilege. Under Linux the CAP_SYS_TIME"
                          " privilege is required.");
             break;
             default:
-                RF_ERROR(0,
+                RF_ERROR(
                          "Setting the system time from an RF_Date in Linux "
                          "failed in stime(). errno has unexpected value of %d",
                          errno);
@@ -351,7 +352,7 @@ char rfDate_SetToLocal(RF_Date* d)
     time_t t = mktime(&tm);
     if(t == -1)
     {
-        RF_ERROR(0,
+        RF_ERROR(
                  "Setting the Local System time from an RF_Date in Linux "
                  "failed because mktime() returned -1");
         return false;
@@ -371,20 +372,20 @@ char rfDate_SetToLocal(RF_Date* d)
         switch(errno)
         {
             case EFAULT:
-                RF_ERROR(0,
+                RF_ERROR(
                          "Setting the Local System time from an RF_Date in "
                          "Linux failed in stime(). Error in getting "
                          "information from user space.");
             break;
             case EPERM:
-                RF_ERROR(0,
+                RF_ERROR(
                          "Setting the Local System time from an RF_Date in "
                          "Linux failed in stime().The calling process has "
                          "insufficient privilege. Under Linux the CAP_SYS_TIME"
                          " privilege is required.");
             break;
             default:
-                RF_ERROR(0,
+                RF_ERROR(
                     "Setting the Local System time from an RF_Date in "
                     "Linux failed in stime(). errno has unexpected value "
                     "of %d", errno);

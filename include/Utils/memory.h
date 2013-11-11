@@ -27,23 +27,13 @@
 ** This file simply contains some macros that allow for easy tweaking of memory 
 ** allocation and freeing.In the future may contain specific memory allocation
 ** algorithm
-**
-------For internal library include make sure to have------(mirror: RFmemory.h)
-#include <stdlib.h> //for malloc, calloc,realloc and exit()
-#include <Definitions/retcodes.h> //for error codes, logged in allocation failure
-#include <stdio.h>//for FILE* used inside printf.h
-#include <Definitions/imex.h> //for import export macro used inside <Utils/error.h>
-#include <Definitions/types.h> //for fixed size data types used inside <Utils/error.h>
-#include <IO/printf.h> //for rfFpintf() used in the error logging macros
-#include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
-#include <Utils/error.h> //for RF_ERROR() macros family
-#include <Utils/memory.h> //for refu memory allocation
-------For internal library include make sure to have------
 */
 #ifndef RF_MEMORY_H
 #define RF_MEMORY_H
 
 #include <rf_options.h> //check the memory allocation options
+#include <stdlib.h> //for malloc, calloc,realloc and exit()
+#include <Utils/error.h> //for RF_ERROR() macros family
 
 
 //Here are some macro wrappers of malloc,calloc and realloc that depending
@@ -70,7 +60,7 @@
     do{ TYPE_* i_TEMPPTR_ = realloc( (REALLOC_RETURN_),(SIZE_));        \
         if(i_TEMPPTR_ == NULL)                                          \
         {                                                               \
-            RF_ERROR(0, "realloc() failure");                           \
+            RF_ERROR("realloc() failure");                           \
             return RETVAL_;                                             \
         }                                                               \
         REALLOC_RETURN_ = i_TEMPPTR_;                                   \
@@ -91,7 +81,7 @@
     do{ TYPE_* i_TEMPPTR_ = realloc( (REALLOC_RETURN_),(SIZE_));        \
         if(i_TEMPPTR_ == NULL)                                          \
         {                                                               \
-            RF_ERROR(0, "realloc() failure");                            \
+            RF_ERROR("realloc() failure");                            \
             STMT_;                                                      \
             goto GOTOFLAG_;                                             \
         }                                                               \
@@ -116,7 +106,7 @@
     do{ MALLOC_RETURN_ = malloc( (MALLOC_SIZE_) );                      \
         if(MALLOC_RETURN_ == NULL)                                      \
         {                                                               \
-            RF_ERROR(0, " malloc() failure");          \
+            RF_ERROR(" malloc() failure");          \
             return RETVAL_;                                    \
         } }while(0)
 
@@ -135,7 +125,7 @@
     do{ MALLOC_RETURN_ = malloc( (MALLOC_SIZE_) );                      \
         if(MALLOC_RETURN_ == NULL)                                      \
         {                                                               \
-            RF_ERROR(0, "malloc() failure");           \
+            RF_ERROR("malloc() failure");           \
             STMT_;                                                      \
             goto GOTOFLAG_;                                             \
         } }while(0)
@@ -155,7 +145,7 @@
     do{ CALLOC_RETURN_ = calloc( (CALLOC_NUM_), (CALLOC_SIZE_) );       \
         if(CALLOC_RETURN_ == NULL)                                      \
         {                                                               \
-            RF_ERROR(0, "calloc() failure");                           \
+            RF_ERROR("calloc() failure");                           \
             return RETVAL_;                                             \
         } }while(0)
 
@@ -176,7 +166,7 @@
     do{ CALLOC_RETURN_ = calloc( (CALLOC_NUM_), (CALLOC_SIZE_) );       \
         if(CALLOC_RETURN_ == NULL)                                      \
         {                                                               \
-        RF_ERROR(0, "calloc() failure");              \
+        RF_ERROR("calloc() failure");              \
             STMT_;
             goto GOTOFLAG__;                                             \
         } }while(0)

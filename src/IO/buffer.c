@@ -36,9 +36,10 @@
 #include <Definitions/retcodes.h>
 //error logging
     #include <stdio.h>//for FILE* used inside printf.h
-    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
     #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
     #include <Threads/common.h> //for rfThread_GetID()
+    #include <String/string_decl.h> //for RF_String
+    #include <String/common.h> //for RFS_() macro
     #include <Utils/error.h>
 /*------------- End of includes -------------*/
 
@@ -52,7 +53,7 @@ char rfInitStdio()
 {
     if(!rfStringX_Init_buff(&ioBuffer,STDIO_BUFF_SIZE,""))
     {
-        RF_ERROR(0, "Failed to initialize the refu stdio buffer");
+        RF_ERROR("Failed to initialize the refu stdio buffer");
         return false;
     }
     return true;

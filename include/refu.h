@@ -36,9 +36,6 @@
 /* ------------------------------------------------------------ Macro Flags and functions for System endianess ------------------------------------------------------------ */
 #include <Utils/endianess.h>
 
-/* ------------------------------------------------------------ Library initialization ------------------------------------------------------------ */
-#include <Utils/libinit.h>
-
 /* ------------------------------------------------ Enabling Default Arguments  ------------------------------------------------------- */
 #include <Definitions/defarg.h>
 
@@ -51,8 +48,13 @@
 /* --------------------------------------------- Function Return codes ------------------------------------------------------- */
 #include <Definitions/retcodes.h>
 /* --------------------------------------------- Error logging ------------------------------------------------------- */
-#include <stdio.h>//for FILE* used inside printf.h
-#include <IO/printf.h> //for rfFpintf() used in the error logging macros
+
+
+#include <String/string_decl.h> //for RF_String
+#include <String/common.h> //for RFS_() macro
 #include <Threads/common.h> //for rfThread_GetID()
 #include <Utils/error.h>
+
+/* ------------------------------------------------------------ Library initialization ------------------------------------------------------------ */
+#include <Utils/libinit.h>
 #endif//include guards end

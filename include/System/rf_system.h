@@ -23,23 +23,24 @@
 **
 ** --System/rf_system.h
 ** This header declares functions and macros that act on the respective system, such as file creation, deletion e.t.c.
-**
----------------------For internal library include make sure to have----------------------------
-#include <Definitions/types.h> //for fixed size data types
-#include <Definitions/imex.h>  //for import export macro
-#include <Definitions/retcodes.h> //for booleans
-#include <System/rf_system.h>
----------------------For internal library include make sure to have----------------------------
 */
 #ifndef RF_SYSTEM_H
 #define RF_SYSTEM_H
 
-
+#include <Definitions/types.h> //for fixed size data types
+#include <Definitions/imex.h>  //for import export macro
+#include <Definitions/retcodes.h> //for booleans
+#include <sys/types.h> //for syscall, tid and pid_t
 /**
 ** @defgroup RF_SystemGRP System
 ** @addtogroup RF_SystemGRP
 ** @{
 **/
+
+/**
+ * Identifier for a thread
+ */
+typedef pid_t threadid_t;
 
 //The directory separator depending on the user's system
 #ifdef REFU_WIN32_VERSION
@@ -219,7 +220,7 @@ i_DECLIMEX_ bool rfFileExists(void* name);
  ** currently supported.
  ** @return A unique id representing the calling thread
  **/
-i_DECLIMEX_ uintptr_t rfSystem_GetThreadID();
+i_DECLIMEX_ threadid_t rfSystem_GetThreadID();
 
 //! @}
 //end of system group

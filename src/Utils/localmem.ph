@@ -38,8 +38,9 @@
 #include <Utils/localmem_decl.h> //for local memory stack
 
 #include <stdio.h>//for FILE* used inside printf.h
-#include <IO/printf.h> //for rfFpintf() used in the error logging macros
 #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
+#include <String/string_decl.h> //for RF_String
+#include <String/common.h> //for RFS_() macro
 #include <Utils/error.h>
 
 #include <Definitions/retcodes.h> //for the log error return codes
@@ -65,7 +66,7 @@
     /* If the size of the stack plus the requested allocation goes beyond the stack size*/\
     if(RF_LMS->stackPtr+(i_size_) > RF_OPTION_LOCALSTACK_MEMORY_SIZE)\
     {\
-        RF_ERROR(0, "Local Stack Memory pushing error. Attempted to "   \
+        RF_ERROR("Local Stack Memory pushing error. Attempted to "   \
                  "allocate more memory than currently available in the " \
                  "local memory stack");                                                  \
         i_ptr_ = 0;                                                     \
@@ -89,7 +90,7 @@
         /*Check if the function had more local object macros evaluation than the max number of arguments*/ \
         if(RF_LMS->macroEvalsI+1 >= RF_MAX_FUNC_ARGS)                   \
         {                                                               \
-            RF_ERROR(0,"Local Stack Memory macro evaluation error. More" \
+            RF_ERROR("Local Stack Memory macro evaluation error. More" \
                      " macros than the specified maximum number of "    \
                      "function arguments \"%d\" have been evaluated",   \
                      RF_MAX_FUNC_ARGS);                                 \

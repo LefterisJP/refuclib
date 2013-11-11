@@ -23,9 +23,6 @@
 */
 
 /*------------- Corrensponding Header inclusion -------------*/
-#include <Definitions/imex.h> //for import export macro
-#include <Definitions/types.h>
-#include <stdio.h> //for FILE*
 #include <IO/printf.h>
 /*------------- Module related inclusion -------------*/
 #include <Definitions/threadspecific.h> //for the thread specific macro
@@ -41,16 +38,14 @@
 #include <String/files.h> //for rfString_Fwrite()
 #include <String/unicode.h> //for the unicode macros
 
-//for the endianess check
-    #include <Utils/endianess.h>
-//for error logging
-    #include <Threads/common.h> //for rfThread_GetID()
-    #include <Utils/error.h>
+// for bool
     #include <Definitions/retcodes.h>
-//for the local scope macros
-    #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
-    #include <string.h> //for memset()
-    #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
+// for the endianess check
+    #include <Utils/endianess.h>
+// for error logging
+    #include <Utils/error.h>
+// for the local scope macros
+    #include <Utils/localmem_decl.h>
     #include <Utils/localscope.h>
 /*------------- End of includes -------------*/
 
@@ -64,7 +59,7 @@ int rfPrintf(const char * format, ...)
     //clear out the stdio buffer
     if(!rfStringX_Assign(&ioBuffer, RFS_("")))
     {
-        RF_ERROR(0,"Failure to initialize the stdio buffer during printf");
+        RF_ERROR("Failure to initialize the stdio buffer during printf");
         RF_EXIT_LOCAL_SCOPE();
         return -1;
     }
@@ -72,7 +67,7 @@ int rfPrintf(const char * format, ...)
     va_start(args,format);
     if(rfStringX_Formatv(&ioBuffer,format,args) == false)
     {
-        RF_ERROR(0,"Failure to format a string during printf");
+        RF_ERROR("Failure to format a string during printf");
         va_end(args);
         RF_EXIT_LOCAL_SCOPE();
         return -1;
@@ -83,7 +78,7 @@ int rfPrintf(const char * format, ...)
     ret = ioBuffer.INH_String.byteLength;
     if(!rfString_Fwrite(&ioBuffer, stdout, RF_UTF8))
     {
-        RF_ERROR(0, "Failure to write the data to stdout during print");
+        RF_ERROR("Failure to write the data to stdout during print");
         RF_EXIT_LOCAL_SCOPE();
         return -1;
     }
@@ -99,7 +94,7 @@ int rfFPrintf(FILE* f,const char * format, ...)
     //clear out the stdio buffer
     if(!rfStringX_Assign(&ioBuffer, RFS_("")))
     {
-        RF_ERROR(0,"Failure to initialize the stdio buffer during fprintf");
+        RF_ERROR("Failure to initialize the stdio buffer during fprintf");
         RF_EXIT_LOCAL_SCOPE();
         return -1;
     }
@@ -107,7 +102,7 @@ int rfFPrintf(FILE* f,const char * format, ...)
     va_start(args,format);
     if(rfStringX_Formatv(&ioBuffer,format,args) == false)
     {
-        RF_ERROR(0,"Failure to format a string during fprintf");
+        RF_ERROR("Failure to format a string during fprintf");
         va_end(args);
         RF_EXIT_LOCAL_SCOPE();
         return -1;
@@ -118,7 +113,7 @@ int rfFPrintf(FILE* f,const char * format, ...)
     ret = ioBuffer.INH_String.byteLength;
     if(!rfString_Fwrite(&ioBuffer, f, RF_UTF8, rfEndianess()))
     {
-        RF_ERROR(0, "Failure to write the data to the the file during fprint");
+        RF_ERROR("Failure to write the data to the the file during fprint");
         RF_EXIT_LOCAL_SCOPE();
         return -1;
     }

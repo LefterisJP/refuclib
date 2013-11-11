@@ -23,13 +23,6 @@
 */
 
 //*---------------------Corrensponding Header inclusion---------------------------------
-#include <Definitions/types.h> //for fixed size data types
-#include <Definitions/imex.h> //for import export macro
-#include <Definitions/defarg.h> //for enabling default arguments
-#include <String/string_decl.h> //for RF_String used in RF_XMLTag
-#include <String/stringx_decl.h> //for RF_StringX used in RF_XMLTag
-#include <Data_Structures/list_decl.h> //for RF_ListP used in RF_XMLTag
-#include <Data_Formats/xmltag_decl.h>//for RF_XMLTag
 #include <Data_Formats/xmltag.h>
 //*---------------------Outside module inclusion----------------------------------------
 #include <String/core.h> //for rfString_Copy_IN() and others
@@ -39,20 +32,13 @@
 
 #include <Data_Structures/list.h> //for rfListP_Init() and others
 //for error logging
-    #include <stdio.h>//for FILE* used inside printf.h
-    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
     #include <Utils/error.h>
 //for memory allocation macros
-    #include <stdlib.h> //for malloc, calloc,realloc and exit()
-    #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
     #include <Utils/memory.h>//for RF_MALLOC()
 //for local memory functionality
-    #include <Definitions/threadspecific.h> //for the thread specific attribute
-    #include <string.h> //for size_t and memset() used in the Local scope macros
     #include <Utils/localmem_decl.h> //for local memory stack
     #include "../Utils/localmem.ph" //for the private local memory macros
 //for local memory scope macros
-    #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
     #include <Utils/localscope.h> //for the local scope macros
 //*---------------------libc Headers inclusion------------------------------------------
 #include <stdarg.h> //for va_list() macros

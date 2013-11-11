@@ -20,28 +20,21 @@
 **
 **      ==END OF REFU LICENSE==
 **
-**
-**
-**
 ** --Utils/localscope.h
 **
 ** Contains the local scope macros that should be used in any function
 ** the may get arguments that have been initialize in the local memory
 ** stack
-**
-**
----------------------For internal library include make sure to have----------------------------
+*/
+#ifndef RF_LOCALSCOPE_H
+#define RF_LOCALSCOPE_H
+
 #include <Definitions/types.h> //fixed size data types
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/threadspecific.h> //for the thread specific attribute
 #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
 #include <string.h> //for memset()
 #include <stdint.h> //for UINT32_MAX used in RF_ENTER_LOCAL_SCOPE() macro
-#include <Utils/localscope.h>
----------------------For internal library include make sure to have----------------------------
-*/
-#ifndef RF_LOCALSCOPE_H
-#define RF_LOCALSCOPE_H
 
 /**
  ** A small macro to find the smallest of the macro evaluation indices. 

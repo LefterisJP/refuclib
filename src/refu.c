@@ -23,10 +23,6 @@
 */
 
 /*------------- Corrensponding Header inclusion -------------*/
-#include <rf_options.h>
-#include <Definitions/imex.h> //import export macro
-#include <Definitions/types.h> //fixed size data types
-#include <Definitions/defarg.h> //to enable default arguments
 #include <Utils/libinit.h> //for the init function
 /*------------- Outside Module inclusion -------------*/
 //for detecting endianess
@@ -42,7 +38,8 @@
     #include <Definitions/retcodes.h> 
 //for error logging
     #include <stdio.h>//for FILE* used inside printf.h
-    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
+    #include <String/string_decl.h> //for RF_String
+    #include <String/common.h> //for RFS_() macro
     #include <Utils/error.h> //For RF_LastError
 //for ioBuffer initialization
     #include <String/string_decl.h> //for RF_String (ioBuffer type)
@@ -62,27 +59,28 @@
 
 //Initializes the Refu library
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-char rfInit(char* logstr,uint64_t lmsSize)
+char rfInit(char* logstr, uint64_t lmsSize, log_level_t level)
 #else
-char i_rfInit(char* logstr,uint64_t lmsSize)
+    char i_rfInit(char* logstr, uint64_t lmsSize, log_level_t level)
 #endif
 {
 
     //initialize the refu stdio
     rfInitStdio();
+    rfLog_Init(level);
     
-    //initialize regu log stream
-    if(strcmp(logstr,"stderr") == 0)
-        RF_Log_Stream = stderr;
-    else if(strcmp(logstr,"stdout")== 0)
-        RF_Log_Stream = stdout;
-    else//just open the given file
-    {
-        RF_Log_Stream = fopen(logstr,"w");
-        //Send the standard error also to the same file stream as the chosen rfStdErr
-        if(freopen(logstr,"w",stderr) ==0)
-            printf("Failed to reopen stderr stream to the given file name \"%s\"",logstr);
-    }
+    /* //initialize regu log stream */
+    /* if(strcmp(logstr,"stderr") == 0) */
+    /*     RF_Log_Stream = stderr; */
+    /* else if(strcmp(logstr,"stdout")== 0) */
+    /*     RF_Log_Stream = stdout; */
+    /* else//just open the given file */
+    /* { */
+    /*     RF_Log_Stream = fopen(logstr,"w"); */
+    /*     //Send the standard error also to the same file stream as the chosen rfStdErr */
+    /*     if(freopen(logstr,"w",stderr) ==0) */
+    /*         printf("Failed to reopen stderr stream to the given file name \"%s\"",logstr); */
+    /* } */
 
     //detect system endianess and save it in rfSysInfo
     i_DetectEndianess();
@@ -99,7 +97,7 @@ char i_rfInit(char* logstr,uint64_t lmsSize)
         {
             if(clock_getres(CLOCK_REALTIME,0) == -1)
             {
-                RF_ERROR(0,"No high resolution timer is supported. Even "
+                RF_ERROR("No high resolution timer is supported. Even "
                          "CLOCK_REALTIME initialization failed.");
                 rfSysInfo.hasHighResTimer = false;
             }
@@ -123,7 +121,7 @@ char i_rfInit(char* logstr,uint64_t lmsSize)
     //initialize the main thread's local stack memory
     if(rfLMS_Init(&RF_MainLMS,lmsSize) == false)
     {
-        RF_ERROR(0,
+        RF_ERROR(
                  "Could not initialize main thread's local memory stack");
 
         return false;

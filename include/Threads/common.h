@@ -25,14 +25,13 @@
 ** This declares some functions that deal with thread related globals
 ** or commong functionality such as the id of the curent thread.
 **  DOES NOT deal with anything having to do with RF_Thread types.
-**
----------------------For internal library include make sure to have----------------------------
-#include <Definitions/types.h> //for fixed size data types
-#include <Definitions/imex.h> //for the import export macro
----------------------For internal library include make sure to have----------------------------
 */
 #ifndef RF_THREAD_COMMON_H
 #define RF_THREAD_COMMON_H
+
+#include <Definitions/types.h> //for fixed size data types
+#include <Definitions/imex.h> //for the import export macro
+#include <System/rf_system.h> //for threadid_t
 
 #ifdef __cplusplus
 extern "C"
@@ -40,11 +39,12 @@ extern "C"
 #endif
 
 
+
 /**
  ** @brief Returns a unique identifier for the 
  ** current thread.
  **/
-i_DECLIMEX_ uintptr_t rfThread_GetID();
+i_DECLIMEX_ threadid_t rfThread_GetID();
 
 
 /**

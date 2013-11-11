@@ -44,8 +44,8 @@
                                     i_PROFF_, i_RET_)             do{   \
     if(rfFseek((i_TEXTFILE_)->f,i_PROFF_,SEEK_SET)!=0)                  \
     {                                                                   \
-        RF_ERROR_FSEEK("Resetting the file pointer to a given position failed", \
-                       "fseek");                                        \
+        RF_ERROR("Resetting the file pointer to a given position failed"\
+                 "due to fseek() with errno %d", errno);                \
         return i_RET_;                                                  \
     }                                                                   \
         (i_TEXTFILE_)->line = i_PRLINE_;                                \
@@ -60,8 +60,8 @@
                                     i_PROFF_, i_STMT_, i_FLAG_)  do{    \
     if(rfFseek((i_TEXTFILE_)->f,i_PROFF_,SEEK_SET)!=0)                  \
     {                                                                   \
-        RF_ERROR_FSEEK("Resetting the file pointer to a given position failed", \
-                       "fseek");                                        \
+        RF_ERROR("Resetting the file pointer to a given position failed" \
+                 "due to fseek() with errno %d", errno);                \
         i_STMT_;                                                        \
         goto i_FLAG_;                                                   \
     }                                                                   \
@@ -79,8 +79,8 @@
         foff_rft i_tomove_ = i_PROFF_ - rfFtell((i_TEXTFILE_)->f);      \
         if(rfFseek((i_TEXTFILE_)->f, i_tomove_, SEEK_CUR) != 0)         \
         {                                                               \
-            RF_ERROR_FSEEK("Resetting the file pointer to a given position failed", \
-                           "fseek");                                    \
+            RF_ERROR("Resetting the file pointer to a given position failed" \
+                     " due to fseek() with errno %d", errno);           \
             return i_RET_;                                              \
         }                                                               \
         (i_TEXTFILE_)->line = i_PRLINE_;                                \
@@ -97,8 +97,8 @@
         foff_rft i_tomove_ = i_PROFF_ - rfFtell((i_TEXTFILE_)->f);      \
         if(rfFseek((i_TEXTFILE_)->f, i_tomove_, SEEK_CUR) != 0)         \
         {                                                               \
-            RF_ERROR_FSEEK("Resetting the file pointer to a given position failed", \
-                           "fseek");                                    \
+            RF_ERROR("Resetting the file pointer to a given position failed "\
+                     "due to fseek() with errno %d", errno);            \
             i_STMT_;                                                    \
             goto i_FLAG_;                                               \
         }                                                               \
@@ -115,7 +115,8 @@
         foff_rft i_cPos_;                               \
         if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (foff_rft)-1) \
         {                                                       \
-            RF_ERROR_FTELL("Querying the current file position failed", "ftell"); \
+            RF_ERROR("Querying the current file position failed "       \
+                     "due to ftell() with errno %d", errno);            \
             return i_RET_;                                              \
         }                                                               \
         /*if the file mode is writing then reopen in reading mode*/     \
@@ -123,16 +124,17 @@
         {                                                               \
             if( ((i_TEXTFILE_)->f = freopen((i_TEXTFILE_)->name.bytes,"r"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0) \
             {                                                           \
-                RF_ERROR_FOPEN("Switching from writing to reading mode failed",\
-                               "freopen"); \
+                RF_ERROR("Switching from writing to reading mode failed" \
+                         "due to freopen() with errno %d", errno);      \
                 return  i_RET_;                \
             }                                   \
             (i_TEXTFILE_)->mode = RF_FILE_READ; \
             /*go to the saved file position*/           \
             if( rfFseek((i_TEXTFILE_)->f,i_cPos_,SEEK_SET)!=0)  \
             {                                                           \
-                RF_ERROR_FSEEK("Resetting the file pointer when switching from "\
-                               "write to read mode failed", "fseek");   \
+                RF_ERROR("Resetting the file pointer when switching from " \
+                         "write to read mode failed due to fseek() with " \
+                         "errno %d", errno);                            \
                 return i_RET_;                                          \
             }                                                           \
         }                                                               \
@@ -144,13 +146,14 @@
             {                                                           \
                 if(rfFseek(t->f,0,SEEK_SET) != 0)                       \
                 {                                                       \
-                    RF_ERROR_FSEEK("Rewinding to enable reading failed", \
-                                   "fseek");                            \
+                    RF_ERROR("Rewinding to enable reading failed "      \
+                             "due to fseek() with errno %d", errno);    \
                     return i_RET_;                                      \
                 }                                                       \
                 if(rfFseek(t->f,i_cPos_,SEEK_SET) != 0)                 \
                 {                                                       \
-                    RF_ERROR_FSEEK("Rewinding to enable reading failed", "fseek"); \
+                    RF_ERROR("Rewinding to enable reading failed due to " \
+                             "fseek() with errno %d", errno);           \
                     return i_RET_;                                      \
                 }                                                       \
             }                                                           \
@@ -168,7 +171,8 @@
         foff_rft i_cPos_;                               \
         if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (foff_rft)-1) \
         {                                                       \
-            RF_ERROR_FTELL("Querying the current file position failed", "ftell"); \
+            RF_ERROR("Querying the current file position failed "       \
+                     "due to ftell() with errno %d", errno);            \
             i_STMT_;                                                    \
             goto i_FLAG_;                                               \
         }                                                               \
@@ -177,8 +181,8 @@
         {                                                               \
             if( ((i_TEXTFILE_)->f = freopen((i_TEXTFILE_)->name.bytes,"r"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0) \
             {                                                           \
-                RF_ERROR_FOPEN("Switching from writing to reading mode failed",\
-                               "freopen"); \
+                RF_ERROR("Switching from writing to reading mode failed " \
+                               "due to freopen() with errno %d", errno); \
                 i_STMT_;                                                \
                 goto i_FLAG_;                                           \
             }                                   \
@@ -186,8 +190,9 @@
             /*go to the saved file position*/           \
             if( rfFseek((i_TEXTFILE_)->f,i_cPos_,SEEK_SET)!=0)  \
             {                                                           \
-                RF_ERROR_FSEEK("Resetting the file pointer when switching from "\
-                               "write to read mode failed", "fseek");   \
+                RF_ERROR("Resetting the file pointer when switching from " \
+                         "write to read mode failed due to fseek() "    \
+                         "with errno %d", errno);                       \
                 i_STMT_;                                                \
                 goto i_FLAG_;                                           \
             }                                                           \
@@ -200,14 +205,15 @@
             {                                                           \
                 if(rfFseek(t->f,0,SEEK_SET) != 0)                       \
                 {                                                       \
-                    RF_ERROR_FSEEK("Rewinding to enable reading failed", \
-                                   "fseek");                            \
+                    RF_ERROR("Rewinding to enable reading failed due to " \
+                             "fseek() with errno %d", errno);           \
                     i_STMT_;                                            \
                     goto i_FLAG_;                                       \
                 }                                                       \
                 if(rfFseek(t->f,i_cPos_,SEEK_SET) != 0)                 \
                 {                                                       \
-                    RF_ERROR_FSEEK("Rewinding to enable reading failed", "fseek"); \
+                    RF_ERROR("Rewinding to enable reading failed due to " \
+                             "fseek() with errno %d", errno);           \
                     i_STMT_;                                            \
                     goto i_FLAG_;                                       \
                 }                                                       \
@@ -218,12 +224,13 @@
  ** A macro to check if a textfile needs to changes its mode in order
  ** to perform a write operation. If there is an error it returns @c i_RET_
  **/
-#define RF_TEXTFILE_CANWRITE(i_TEXTFILE_, i_RET_){ \
-    /*Get current file position*/                       \
-    foff_rft i_cPos_;                                           \
-    if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (foff_rft)-1)     \
+#define RF_TEXTFILE_CANWRITE(i_TEXTFILE_, i_RET_){                      \
+    /*Get current file position*/                                       \
+    foff_rft i_cPos_;                                                   \
+    if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (foff_rft)-1)             \
     {                                                                   \
-        RF_ERROR_FTELL("Querying the current file position failed", "ftell"); \
+            RF_ERROR("Querying the current file position failed "       \
+                     "due to ftell() with errno %d", errno);            \
         return i_RET_;                                                  \
     }                                                                   \
     /*if the file mode is reading then reopen in writing mode*/         \
@@ -231,33 +238,36 @@
     {                                                                   \
         if( ((i_TEXTFILE_)->f = freopen((i_TEXTFILE_)->name.bytes,"a"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0) \
         {                                                               \
-            RF_ERROR_FOPEN("Switching from reading to writting mode failed", \
-                           "freopen");                                  \
+            RF_ERROR("Switching from reading to writting mode failed "  \
+                     "due to freopen() with errno %d", errno);          \
             return i_RET_;                                              \
         }                                                               \
         (i_TEXTFILE_)->mode = RF_FILE_WRITE;                            \
         /*go to the saved file position*/                               \
         if( rfFseek((i_TEXTFILE_)->f,i_cPos_,SEEK_SET)!=0)              \
         {                                                               \
-            RF_ERROR_FSEEK("Resetting the file pointer when switching from " \
-                           "read to write mode failed", "fseek");       \
+            RF_ERROR("Resetting the file pointer when switching from "  \
+                     "read to write mode failed due to fseek() with errno %d", \
+                     errno);                                            \
             return i_RET_;                                              \
         }                                                               \
     }                                                                   \
 /*else if the file is read/write mode and  the previous file operation was\ 
   a read we gotta rewind*/                                              \
-   else if((i_TEXTFILE_)->mode == RF_FILE_READWRITE)             \
-   {                                                             \
-       if((i_TEXTFILE_)->previousOp == RF_FILE_READ)             \
-       {                                                         \
-           if(rfFseek(t->f,0,SEEK_SET) != 0)                     \
-           {                                                        \
-               RF_ERROR_FSEEK("Rewinding to enable writing failed", "fseek"); \
+   else if((i_TEXTFILE_)->mode == RF_FILE_READWRITE)                    \
+   {                                                                    \
+       if((i_TEXTFILE_)->previousOp == RF_FILE_READ)                    \
+       {                                                                \
+           if(rfFseek(t->f,0,SEEK_SET) != 0)                            \
+           {                                                            \
+               RF_ERROR("Rewinding to enable writing failed due to "    \
+                        "fseek() with errno %d", errno);                \
                return i_RET_;                                           \
-           }                                    \
-           if(rfFseek(t->f,i_cPos_,SEEK_SET) != 0)  \
-           {                                                        \
-               RF_ERROR_FSEEK("Rewinding to enable writing failed", "fseek"); \
+           }                                                            \
+           if(rfFseek(t->f,i_cPos_,SEEK_SET) != 0)                      \
+           {                                                            \
+               RF_ERROR("Rewinding to enable writing failed due to fseek() " \
+                        "with errno %d");                               \
                return i_RET_;                                           \
            }                                                            \
        }                                                                \
@@ -273,7 +283,8 @@
          foff_rft i_cPos_;                                          \
          if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (foff_rft)-1)        \
          {                                                              \
-             RF_ERROR_FTELL("Querying the current file position failed", "ftell"); \
+            RF_ERROR("Querying the current file position failed "       \
+                     "due to ftell() with errno %d", errno);            \
              i_STMT_;                                                   \
              goto i_FLAG_;                                              \
          }                                                              \
@@ -282,8 +293,8 @@
          {                                                              \
              if( ((i_TEXTFILE_)->f = freopen((i_TEXTFILE_)->name.bytes,"a"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0) \
              {                                                          \
-                 RF_ERROR_FOPEN("Switching from reading to writting mode failed", \
-                                "freopen");                             \
+                 RF_ERROR("Switching from reading to writting mode failed" \
+                          "due to freopen() with errno %d", errno);     \
                  i_STMT_;                                               \
                  goto i_FLAG_;                                          \
              }                                                          \
@@ -291,8 +302,9 @@
              /*go to the saved file position*/                          \
              if( rfFseek((i_TEXTFILE_)->f,i_cPos_,SEEK_SET)!=0)         \
              {                                                          \
-                 RF_ERROR_FSEEK("Resetting the file pointer when switching from " \
-                                "read to write mode failed", "fseek");  \
+                 RF_ERROR("Resetting the file pointer when switching from " \
+                          "read to write mode failed due to fseek() with " \
+                          "errno %d", errno);                           \
                  i_STMT_;                                               \
                  goto i_FLAG_;                                          \
              }                                                          \
@@ -305,13 +317,15 @@
              {                                                          \
                  if(rfFseek(t->f,0,SEEK_SET) != 0)                      \
                  {                                                      \
-                     RF_ERROR_FSEEK("Rewinding to enable writing failed", "fseek"); \
+                     RF_ERROR("Rewinding to enable writing failed due to " \
+                              "fseek() with errno %d", errno);          \
                      i_STMT_;                                           \
                      goto i_FLAG_;                                      \
                  }                                                      \
                  if(rfFseek(t->f,i_cPos_,SEEK_SET) != 0)                \
                  {                                                      \
-                     RF_ERROR_FSEEK("Rewinding to enable writing failed", "fseek"); \
+                     RF_ERROR("Rewinding to enable writing failed due to " \
+                              "fseek() with errno %d", errno);          \
                      i_STMT_;                                           \
                      goto i_FLAG_;                                      \
                  }                                                      \

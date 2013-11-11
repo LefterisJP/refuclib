@@ -47,6 +47,13 @@ extern "C"
 //! @name Creating an RF_String
 //! @{
 
+
+/**
+ ** @memberof RF_String
+ ** Statically initialize a string
+ */
+#define RF_STRING_STATIC_INIT(s_) {s_, sizeof(s_) - 1}
+
 /**
  ** @memberof RF_String
  ** @opassign

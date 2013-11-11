@@ -23,8 +23,11 @@
 **
 ** --Data_Formats/xml.h
 ** This header declares the XML file functionality
-**
----------------------For internal library include make sure to have----------------------------
+*/
+
+#ifndef RF_XML_H
+#define RF_XML_H
+
 #include <Definitions/types.h> //for fixed size data types
 #include <Definitions/imex.h> //for import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
@@ -36,12 +39,6 @@
 #include <stdio.h> //for FILE* used in RF_TextFile
 #include <IO/textfile_decl.h> //for RF_TextFile used in RF_XML
 #include <Data_Formats/xml_decl.h>//for RF_XML
-#include <Data_Formats/xml.h>
----------------------For internal library include make sure to have----------------------------
-*/
-
-#ifndef RF_XML_H
-#define RF_XML_H
 
 #ifdef __cplusplus
 extern "C"

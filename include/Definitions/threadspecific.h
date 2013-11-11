@@ -22,8 +22,9 @@
 **
 **
 ** --Definitions/threadspecific.h
-** This header contains the definition of the thread specific attribute with which to declare
-** certain data inside the library that should be specific to each thread
+** This header contains the definition of the thread specific attribute with
+** which to declare certain data inside the library that should be local
+** to a thread
 */
 #ifndef RF_THREADSPECIFIC_H
 #define RF_THREADSPECIFIC_H

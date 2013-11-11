@@ -24,17 +24,6 @@
 ** --Data_Structures/hashmap.h
 ** This header declares functions that operate on RF_Hashmap, a simple
 ** separate chaining with linked list hash map implementation
-**
----------------------For internal library include make sure to have----------------------------
-#include <Definitions/imex.h> //for import export macro
-#include <Definitions/types.h> //for fixed size data types
-#include <Definitions/defarg.h> //for enabling default arguments
-#include <Preprocessor/rf_tokens.h>//for the defined library tokens
-#include <String/string_decl.h> //for RF_String
-#include <Definitions/retcodes.h> //for error codes, bool
-#include <Data_Structures/hashmap_decl.h> //for the struct declarations
-#include <Data_Structures/hashmap.h>
----------------------For internal library include make sure to have----------------------------
 */
 
 $IF 0

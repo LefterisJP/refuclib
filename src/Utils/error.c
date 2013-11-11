@@ -23,18 +23,170 @@
 */
 
 
-//*---------------------Corrensponding Header inclusion---------------------------------
-#include <stdio.h>//for FILE* used inside printf.h
-#include <Definitions/imex.h> //for import export macro
-#include <Definitions/types.h>
-#include <IO/printf.h> //for rfFpintf() used in the error logging macros
-#include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
+/*------------- Corrensponding Header inclusion -------------*/
 #include <Utils/error.h>
-//*----------------------------End of Includes------------------------------------------
+/*------------- Outside Module inclusion -------------*/
+//for bool
+   #include <Definitions/retcodes.h>
+//for the local scope macros
+    #include <Utils/localscope.h>
+//for static RF_String init
+    #include <String/core.h>
+//for getting thread id
+    #include <Threads/common.h>
+/*------------- libc inclusion -------------*/
+#include <stdio.h> //for printf
+#include <string.h> //for memcpy
+#include <stdlib.h> //for malloc
+#include <sys/time.h> //for timestamps
+#include <time.h> //for strftime()
+/*------------- End of includes -------------*/
+
+typedef struct error_context
+{
+    char* buffer;
+    uint64_t index;
+    uint64_t buff_size;
+    log_level_t level;
+}error_context;
+static error_context _ctx;
+
+static const RF_String severity_level_string[] = {
+    RF_STRING_STATIC_INIT(" [Emergency] "),
+    RF_STRING_STATIC_INIT(" [Alert] "),
+    RF_STRING_STATIC_INIT(" [Critical] "),
+    RF_STRING_STATIC_INIT(" [Error] "),
+    RF_STRING_STATIC_INIT(" [Warning] "),
+    RF_STRING_STATIC_INIT(" [Debug] "),
+    RF_STRING_STATIC_INIT(" [Notice] "),
+    RF_STRING_STATIC_INIT(" [Info] "),
+    RF_STRING_STATIC_INIT(" [Debug] ")
+};
+
+/* Remaining buffer size */
+#define REM (_ctx.buff_size - _ctx.index - 1)
+
+/* The buffer position we write at */
+#define BPOS (_ctx.buffer + _ctx.index)
+
+void rfLog_Init(log_level_t level)
+{
+    _ctx.buff_size = RF_OPTION_LOG_BUFFER_SIZE;
+    _ctx.buffer = malloc(RF_OPTION_LOG_BUFFER_SIZE);
+    _ctx.index = 0;
+    _ctx.level = level;
+}
+
+/* TODO: handle no memory case a bit better */
+#define INCREASE_BUFFER() \
+    do{                                             \
+        char* tmp;                                  \
+        _ctx.buff_size *= 2;                        \
+        tmp = realloc(_ctx.buffer, _ctx.buff_size); \
+        if(!tmp)                                    \
+        {                                           \
+            printf("No memory");                    \
+            exit(1);                                \
+        }                                           \
+        _ctx.buffer = tmp;                          \
+    }while(0)
+
+#define CHECK_BUFFER(add_size)                  \
+    do{                                         \
+        if (_ctx.index + add_size >= REM)       \
+        {                                       \
+            INCREASE_BUFFER();                  \
+        }                                       \
+    }while(0);
 
 
-//definitions
-FILE* RF_Log_Stream;
+static inline bool add_location(const char* file,
+                                const char* func,
+                                int line)
+{
+    int file_len, func_len, ret, max;
+    
+    file_len = strlen(file);
+    func_len = strlen(func);
+    
+    /* the maximum amount of bytes for location. +100 is for the rest and '/0' */
+    max = file_len + func_len + 100;
+    CHECK_BUFFER(max);
+    ret = snprintf(BPOS, max,
+                   "[%.*s:%.*s (%d)]",
+                   file_len, file, func_len, func, line
+    );
+
+    if(ret < 0 || ret >= max) {return false;}
+    
+    _ctx.index += ret;
+    return true;
+}
+static bool format_log_message(log_level_t level,
+                               const char* file,
+                               const char* func,
+                               int line, RF_String* msg)
+{
+    struct timeval tv;
+    struct tm *now_tm;
+    size_t s;
+    int ret;
+    gettimeofday(&tv, NULL);
+    now_tm = localtime(&tv.tv_sec);
+
+    s = strftime(BPOS, REM, "%Y-%m-%d %H:%M:%S", now_tm);
+    if(!s)
+    {
+        INCREASE_BUFFER();
+        s = strftime(BPOS, REM, "%Y-%m-%d %H:%M:%S", now_tm);
+        if(!s)
+        {
+            RF_ERROR("Can't add timestamp to log");
+            return false;
+        }
+    }
+    _ctx.index += s;
+
+    /* Log type */
+    CHECK_BUFFER(severity_level_string[level].byteLength);
+    memcpy(BPOS, severity_level_string[level].bytes,
+           severity_level_string[level].byteLength);
+
+    /* Thread ID */
+    CHECK_BUFFER(100);
+    ret = snprintf(BPOS, 100, "(Thread %d)", rfThread_GetID());
+    if(ret < 0 || ret >= 100) {return false;}
+    _ctx.index += ret;
+
+    /* Location */
+    if(!add_location(file, func, line)) {return false;}
+
+    /* Message */
+    CHECK_BUFFER(msg->byteLength + 1);
+    memcpy(BPOS, msg->bytes, msg->byteLength + 1);
+           
+    return true;
+}
 
 
+void rfLog_Add(log_level_t level, const char* file,
+               const char* func,
+               int line, RF_String* msg)
+{
+    RF_ENTER_LOCAL_SCOPE();
+    if(_ctx.level < level)
+    {
+        RF_EXIT_LOCAL_SCOPE();
+        return;
+    }
 
+
+    /* TODO: add a lock here to protect for multithreading */
+
+    if(!format_log_message(level, file, func, line, msg))
+    {
+        //TODO: how to handle this?
+    }
+    RF_EXIT_LOCAL_SCOPE();
+    return;
+}

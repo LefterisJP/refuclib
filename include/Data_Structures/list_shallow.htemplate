@@ -24,15 +24,6 @@
 ** --Data_Structures/list.h
 ** This header declares functions that operate on RF_List, a single
 ** linked list data structure
-**
----------------------For internal library include make sure to have----------------------------
-#include <Definitions/imex.h> //for import export macro
-#include <Definitions/types.h> //for fixed size data types
-#include <Definitions/defarg.h> //for enabling default arguments
-#include <Preprocessor/rf_tokens.h>//for the defined library tokens
-#include <Data_Structures/linkedlist_decl.h>
-#include <Data_Structures/linkedlist.h>
----------------------For internal library include make sure to have----------------------------
 */
 
 $IF 0

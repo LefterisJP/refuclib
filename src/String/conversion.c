@@ -52,6 +52,8 @@
     #include <Utils/memory.h> //for refu memory allocation
 //for error logging
     #include <Threads/common.h> //for rfThread_GetID()
+    #include <String/string_decl.h> //for RF_String
+    #include <String/common.h> //for RFS_() macro
     #include <Utils/error.h> //for LOG_ERROR() macros
 /*------------- libc inclusion --------------*/
 #include <errno.h> //for errno
@@ -69,7 +71,7 @@ uint16_t* rfString_ToUTF16(const void* sP, uint32_t* length)
     if(!rfUTF8_Decode(s->bytes, s->byteLength, &charsN,
                       codepoints, s->byteLength*4))
     {
-        RF_ERROR(0,"Error during decoding a UTF-8 byte stream");
+        RF_ERROR("Error during decoding a UTF-8 byte stream");
         free(codepoints);
         return NULL;
     }
@@ -78,7 +80,7 @@ uint16_t* rfString_ToUTF16(const void* sP, uint32_t* length)
     RF_MALLOC(utf16, s->byteLength*4, NULL);  
     if(!rfUTF16_Encode(codepoints, charsN, length, utf16, s->byteLength*4))
     {
-        RF_ERROR(0, "Error at encoding a buffer in UTF-16");
+        RF_ERROR("Error at encoding a buffer in UTF-16");
         free(utf16);
         free(codepoints);
         utf16 = NULL;
@@ -96,7 +98,7 @@ uint32_t* rfString_ToUTF32(const void* sP,uint32_t* length)
     //get the unicode codepoints
     if(!rfUTF8_Decode(s->bytes, s->byteLength, length, cp, s->byteLength*4))
     {
-        RF_ERROR(0, "Error during decoding a UTF-8 byte stream");
+        RF_ERROR("Error during decoding a UTF-8 byte stream");
         cp = NULL;
     }
     return cp;

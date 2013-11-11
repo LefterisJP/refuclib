@@ -112,19 +112,24 @@ vars.Add(
 
 
 vars.Add(
-    'ERROR_LOGGING_LEVEL', 'This option specified the error logging level'
-    'that the log macros will be using. If greater than the level of the'
-    ' macro then it will kick in', 2)
+    EnumVariable('LOG_LEVEL_DEFAULT',
+                 'This option specifies the default logging level'
+                 'that the log system will be using.', 'LOG_ERROR',
+                 allowed_values=(
+                     'LOG_EMERGENCY',
+                     'LOG_ALERT',
+                     'LOG_CRITICAL',
+                     'LOG_ERROR',
+                     'LOG_WARNING',
+                     'LOG_NOTICE',
+                     'LOG_INFO',
+                     'LOG_DEBUG',
+                 )
+             )
+)
 
-vars.Add(
-    'WARNING_LOGGING_LEVEL', 'This option specified the warning logging level'
-    'that the log macros will be using. If greater than the level of the'
-    ' macro then it will kick in', 2)
-
-vars.Add(
-    'INFO_LOGGING_LEVEL', 'This option specified the Info logging level'
-    'that the log macros will be using. If greater than the level of the'
-    ' macro then it will kick in', 2)
+vars.Add('LOG_BUFFER_SIZE', 'The initial size to allocate for the Logging '
+         'system buffer', 4096)
 
                  
 vars.Add('DEBUG', "This option determines if this will be a Debug Build (0"
@@ -146,6 +151,14 @@ vars.Add(
                  'failure log an error and exit the process.If \'no\' then '
                  'malloc and calloc are called normally.Accepted values '
                  'for this option are \'yes\' and \'no\'.'
+                 ,'no' ))
+
+vars.Add(
+    BoolVariable('VERBOSE_ERRNO',
+                 'If \'yes\' then a lot of the code which detects errno'
+                 'being set actually logs a specific message depending on '
+                 'the situation and the errno value. If \'no\' then '
+                 'simply errno value is logged'
                  ,'no' ))
 
 vars.Add('FGETS_READ_BYTESN', 'This option is the number of bytes that will '

@@ -62,7 +62,7 @@ typedef struct RF_ILHead
  * Because RF_ILNodes have redundant information, consistency checking between
  * the back and forward links can be done.  This is useful as a debugging check.
  * If @abortstr is non-NULL, that will be printed in a diagnostic if the list
-vvv * is inconsistent, and the function will abort.
+ * is inconsistent, and the function will abort.
  *
  * Returns the list head if the list is consistent, NULL if not (it
  * can never return NULL if @abortstr is set).

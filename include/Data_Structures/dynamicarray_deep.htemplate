@@ -23,16 +23,6 @@
 **
 ** --Data_Structures/dynamicarray.h
 ** This header declares functions to operate on a Dynamic Array
-**
----------------------For internal library include make sure to have----------------------------
-#include <Definitions/imex.h> //for import export macro
-#include <Definitions/types.h> //for fixed size data types
-#include <Definitions/retcodes.h> //for error codes, bool
-#include <Definitions/defarg.h> //for enabling default arguments
-#include <Preprocessor/rf_tokens.h>//for the defined library tokens
-#include <Data_Structures/dynamicarray_decl.h>
-#include <Data_Structures/dynamicarray.h>
----------------------For internal library include make sure to have----------------------------
 */
 
 $IF 0

@@ -26,17 +26,6 @@
 */
 
 //*---------------------Corrensponding Header inclusion---------------------------------
-#include <Definitions/types.h> //for fixed size data types
-#include <Definitions/imex.h> //for import export macro
-#include <Definitions/defarg.h> //for enabling default arguments
-#include <String/string_decl.h> //for RF_String used in RF_XMLTag
-#include <String/stringx_decl.h> //for RF_StringX used in RF_XMLTag
-#include <Data_Structures/list_decl.h> //for RF_ListP used in RF_XMLTag
-#include <Data_Formats/xmltag_decl.h>//for RF_XMLTag
-#include <IO/common.h> //for foff_rft used in RF_XML
-#include <stdio.h> //for FILE* used in RF_TextFile
-#include <IO/textfile_decl.h> //for RF_TextFile used in RF_XML
-#include <Data_Formats/xml_decl.h>//for RF_XML
 #include "common.ph"
 //*---------------------Module related inclusion----------------------------------------
 #include <Data_Formats/xmltag.h> //for XMLTag functions such as rfXMLTag_GetChild()
@@ -58,7 +47,6 @@
 
 #include <Utils/bits.h>//for RF_BITFLAG_ON()
 //For error logging
-    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
     #include <Utils/error.h>
 
 #include <Definitions/retcodes.h> //for the return codes

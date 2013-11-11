@@ -19,22 +19,11 @@
 ** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **
 **      ==END OF REFU LICENSE==
-**
-** Just a convenient header to include all needed headers for error/warning/info
-** logging
 */
 
 #ifndef RF_ERROR_MODULE_HEADERS
 #define RF_ERROR_MODULE_HEADERS
 
-#include <rf_options.h> //for the logging level defines
-#include <stdio.h>//for FILE* used inside printf.h
-#include <Definitions/imex.h> //for import export macro
-#include <Definitions/types.h>
-#include <IO/printf.h> //for rfFpintf() used in the error logging macros
-#include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
-#include <Threads/common.h> //for rfThread_GetID()
-#include <errno.h>  //only if using the stdlibrary functions that report errors with it
 #include <Utils/error.h>
 
 

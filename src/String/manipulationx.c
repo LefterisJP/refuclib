@@ -46,8 +46,9 @@
 #include "../Numeric/Float/rf_float.ph" //for doubleToStr()
 //for error logging macros
     #include <stdio.h>//for FILE* used inside printf.h
-    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
     #include <Threads/common.h> //for rfThread_GetID()
+    #include <String/string_decl.h> //for RF_String
+    #include <String/common.h> //for RFS_() macro
     #include <Utils/error.h>
 //for memory allocation macros
     #include <stdlib.h> //for malloc, calloc,realloc and exit()
@@ -73,7 +74,7 @@ char rfStringX_Append(RF_StringX* thisstr, const void* otherP)
 #if RF_OPTION_DEBUG
     if(other == NULL)
     {
-        RF_WARNING(0, "Provided a NULL pointer for the other string argument");
+        RF_ERROR("Provided a NULL pointer for the other string argument");
         ret = false;
         goto cleanup;
     }
@@ -108,7 +109,7 @@ char rfStringX_Append_i(RF_StringX* thisstr, const void* otherP, int chars)
 #if RF_OPTION_DEBUG
     if(other == NULL)
     {
-        RF_WARNING(0, "Provided a NULL pointer for the other string argument");
+        RF_ERROR("Provided a NULL pointer for the other string argument");
         ret = false;
         goto cleanup;
     }
@@ -149,7 +150,7 @@ char rfStringX_Append_char(RF_StringX* thisstr, uint32_t unichar)
     int length;
     if((length = rfUTF8_Encode_single(unichar,utf8)) <= 0)
     {
-        RF_ERROR(0,"Encoding the given unicode codepoint to UTF8 failed");
+        RF_ERROR("Encoding the given unicode codepoint to UTF8 failed");
         return false;
     }
 
@@ -733,7 +734,7 @@ char rfStringX_Prepend(RF_StringX* thisstr, const void* otherP)
 #if RF_OPTION_DEBUG
     if(other == NULL)
     {
-        RF_WARNING(0, "Provided a NULL pointer for the other string argument");
+        RF_ERROR("Provided a NULL pointer for the other string argument");
         ret = false;
         goto cleanup;
     }
@@ -774,7 +775,7 @@ char rfStringX_Insert(RF_StringX* thisstr, uint32_t pos,
 #if RF_OPTION_DEBUG
     if(other == NULL)
     {
-        RF_WARNING(0, "Provided a NULL pointer for the other string argument");
+        RF_ERROR("Provided a NULL pointer for the other string argument");
         ret = false;
         goto cleanup;
     }
@@ -829,7 +830,7 @@ char rfStringX_Append_bytes(RF_StringX* thisstr, const void* otherP,
 #if RF_OPTION_DEBUG
     if(other == NULL)
     {
-        RF_WARNING(0, "Provided a NULL pointer for the other string argument");
+        RF_ERROR("Provided a NULL pointer for the other string argument");
         ret = false;
         goto cleanup;
     }
@@ -855,7 +856,7 @@ char rfStringX_Append_cstr(RF_StringX* thisstr, const char* cstr)
 #if RF_OPTION_DEBUG
     if(cstr == NULL)
     {
-        RF_WARNING(0, "Provided a NULL pointer for the c string argument");
+        RF_ERROR("Provided a NULL pointer for the c string argument");
         return false;
     }
 #endif
@@ -895,8 +896,8 @@ char i_rfStringX_Replace(RF_StringX* thisstr, const void* sstrP,
 #if RF_OPTION_DEBUG
     if(sstr == NULL || rstr == NULL )
     {
-        RF_WARNING(0, "Provided a NULL pointer for either the search or "
-                   "the replace string argument");
+        RF_ERROR("Provided a NULL pointer for either the search or "
+                 "the replace string argument");
         ret = false;
         goto cleanup;
     }
@@ -1054,8 +1055,8 @@ char i_rfStringX_ReplaceBetween(RF_StringX* thisstr, const void* leftP,
 #if RF_OPTION_DEBUG
     if(left == NULL || right == NULL || rstr = NULL)
     {
-        RF_WARNING(0, "Provided a NULL pointer for either the left or the right "
-                   "or the replace string argument");
+        RF_ERROR("Provided a NULL pointer for either the left or the right "
+                 "or the replace string argument");
         ret = false;
         goto cleanup1;
     }

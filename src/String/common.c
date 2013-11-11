@@ -37,8 +37,9 @@
 //*---------------------Outside module inclusion----------------------------------------
 //for error logging
     #include <stdio.h>//for FILE* used inside printf.h
-    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
     #include <Threads/common.h> //for rfThread_GetID()
+    #include <String/string_decl.h> //for RF_String
+    #include <String/common.h> //for RFS_() macro
     #include <Utils/error.h>
 //for UTF8 macro
 #include <String/unicode.h> //for rfUTF8_VerifySequence()
@@ -66,7 +67,7 @@ RF_String* i_rfString_CreateLocal1(const char* s,...)
     va_start(args,s);
     if(rfStringX_Formatv(&ioBuffer,s,args) == false)
     {
-        RF_ERROR(0,"Local string creation failure due to failing at reading the"
+        RF_ERROR("Local string creation failure due to failing at reading the"
                  " formatted string");
         return NULL;
     }
@@ -92,7 +93,7 @@ RF_String* i_NVrfString_CreateLocal(const char* s)
     //check for validity of the given sequence and get the character length
     if(!rfUTF8_VerifySequence(s,&byteLength))
     {
-        RF_ERROR(0,
+        RF_ERROR(
                  "Error at String Allocation due to invalid UTF-8 byte sequence");
         return NULL;
     }

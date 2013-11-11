@@ -28,9 +28,10 @@
 /*------------- Outside Module inclusion -------------*/
 //for error logging
     #include <stdio.h>//for FILE* used inside printf.h
-    #include <IO/printf.h> //for rfFpintf() used in the error logging macros
     #include <Threads/common.h> //for rfThread_GetID()
     #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
+    #include <String/string_decl.h> //for RF_String
+    #include <String/common.h> //for RFS_() macro
     #include <Utils/error.h>
 
 //for memory allocation
@@ -57,7 +58,7 @@ char rfUTF8_Encode(const uint32_t* codepoints, uint32_t charsN,
         /* check for the buffSize not fitting */
         if(*byteLength >= buffSize)
         {
-            RF_ERROR(0,"During encoding codepoints into utf8, the provided utf8 "
+            RF_ERROR("During encoding codepoints into utf8, the provided utf8 "
                      "buffer size of %u was not big enough for the given "
                      "codepoints", buffSize);
             return false;
@@ -108,7 +109,7 @@ char rfUTF8_Encode(const uint32_t* codepoints, uint32_t charsN,
         }
         else
         {
-            RF_ERROR(0,"Attempted to encode an invalid unicode code point "
+            RF_ERROR("Attempted to encode an invalid unicode code point "
                      "into a string");
             return false;
         }
@@ -167,7 +168,7 @@ int rfUTF8_Encode_single(const uint32_t codepoint, char* utf8)
     }
     else
     {
-        RF_ERROR(0,"Attempted to encode an invalid unicode code point into"
+        RF_ERROR("Attempted to encode an invalid unicode code point into"
                  " a string");
         utf8[0] = '\0';
         return -1;
@@ -189,7 +190,7 @@ char rfUTF8_Decode(const char* utf8, uint32_t utf8Length,
         /* buffer size check */
         if(i >= buff_size)
         {
-            RF_ERROR(0, "The provided buffer size for the unicode codepoints "
+            RF_ERROR("The provided buffer size for the unicode codepoints "
                      "of %u is not big enough to fit them", buff_size);
             return false;
         }
@@ -262,7 +263,7 @@ char rfUTF8_VerifySequence(const char* bytes, uint32_t * i)
             //also remember bytes 0xC0 and 0xC1 are invalid and could possibly be found in a starting byte of this type so check for them here
             if( RF_HEXEQ_C(bytes[*i],0xC0) || RF_HEXEQ_C(bytes[*i],0xC1))
             {
-                RF_ERROR(0,"While decoding a UTF-8 byte sequence, "
+                RF_ERROR("While decoding a UTF-8 byte sequence, "
                          "an invalid byte was encountered");
                 return false;
             }
@@ -270,7 +271,7 @@ char rfUTF8_VerifySequence(const char* bytes, uint32_t * i)
             //if the next byte is NOT a continuation byte
             if( !rfUTF8_IsContinuationByte(bytes[*i+1]))
             {
-                RF_ERROR(0, "While decoding a UTF-8 byte sequence, "
+                RF_ERROR("While decoding a UTF-8 byte sequence, "
                          "and expecting a continuation byte, one "
                          "was not found");
                 return false;
@@ -284,7 +285,7 @@ char rfUTF8_VerifySequence(const char* bytes, uint32_t * i)
             if(!rfUTF8_IsContinuationByte(bytes[*i+1]) ||
                !rfUTF8_IsContinuationByte(bytes[*i+2]) )
             {
-                RF_ERROR(0,"While decoding a UTF-8 byte sequence, "
+                RF_ERROR("While decoding a UTF-8 byte sequence, "
                          "and expecting a continuation byte, one "
                          "was not found");
                 return false;
@@ -297,7 +298,7 @@ char rfUTF8_VerifySequence(const char* bytes, uint32_t * i)
             //in this type of starting byte a number of invalid bytes can be encountered. We have to check for them.
             if(RF_HEXGE_C(bytes[*i],0xF5)) //invalid byte value are from 0xF5 to 0xFF
             {
-                RF_ERROR(0,"While decoding a UTF-8 byte sequence, "
+                RF_ERROR("While decoding a UTF-8 byte sequence, "
                          "an invalid byte was encountered");
                 return false;
             }
@@ -307,7 +308,7 @@ char rfUTF8_VerifySequence(const char* bytes, uint32_t * i)
                !rfUTF8_IsContinuationByte(bytes[*i+2]) ||
                !rfUTF8_IsContinuationByte(bytes[*i+3]))
             {
-                RF_ERROR(0,"While decoding a UTF-8 byte sequence, "
+                RF_ERROR("While decoding a UTF-8 byte sequence, "
                          "and expecting a continuation byte, one "
                          "was not found");
                 return false;
@@ -316,7 +317,7 @@ char rfUTF8_VerifySequence(const char* bytes, uint32_t * i)
         }
         else//we were expecting one of the 4 different start bytes and we did not find it, there is an error
         {
-            RF_ERROR(0,"While decoding a UTF-8 byte sequence, the "
+            RF_ERROR("While decoding a UTF-8 byte sequence, the "
                      "first byte of a character was not valid "
                      "UTF-8");
             return false;
@@ -342,7 +343,7 @@ char rfUTF16_Decode(const char* buff, uint32_t* charactersN,
         /* buffer size check */
         if(byteLength >= buff_size)
         {
-            RF_ERROR(0, "The provided buffer size \"%u\" "
+            RF_ERROR("The provided buffer size \"%u\" "
                      "is not enough to fit the decoded codepoints", buff_size);            
             return false;
         }
@@ -354,7 +355,7 @@ char rfUTF16_Decode(const char* buff, uint32_t* charactersN,
             //determine if it's a valid first pair(between 0xD800 and 0xDBFF)
             if(RF_HEXG_US(v1,0xDBFF))
             {
-                RF_ERROR(0,"Invalid 16-bit integer found in the "
+                RF_ERROR("Invalid 16-bit integer found in the "
                          "given sequence. Can't decode.");
                 return false;
             }
@@ -365,12 +366,12 @@ char rfUTF16_Decode(const char* buff, uint32_t* charactersN,
             {
                 if(v2 != 0)
                 {
-                    RF_ERROR(0,"Invalid surrogate pair found in the"
+                    RF_ERROR("Invalid surrogate pair found in the"
                              " given sequence. Can't decode.");
                 }
                 else
                 {
-                    RF_ERROR(0, "A surrogate pair was expected and "
+                    RF_ERROR("A surrogate pair was expected and "
                              "it was not found. Can't decode");
                 }
                 return false;
@@ -410,14 +411,14 @@ char rfUTF16_Encode(const uint32_t* codepoints, uint32_t charsN,
         /* buffer size check */
         if((*length)*2 >= buff_size)
         {
-            RF_ERROR(0, "The provided buffer size of \"%u\" given to hold the "
+            RF_ERROR("The provided buffer size of \"%u\" given to hold the "
                      "encoded UTF-16 bytes is not enough",buff_size);
             return false;
         }
 
         if(RF_HEXG_UI(codepoints[i],0x10FFFF))
         {
-            RF_ERROR(0, "While encoding unicode codepoints into a UTF-16 "
+            RF_ERROR("While encoding unicode codepoints into a UTF-16 "
                      "buffer a codepoint greater than 0x10FFFF was "
                      "encountered");
             return false;
@@ -488,7 +489,7 @@ int rfUTF8_FromCodepoint(uint32_t codepoint, uint32_t* utf8Int)
     }
     else
     {
-        RF_ERROR(0,"Attempted to encode an invalid unicode code point into"
+        RF_ERROR("Attempted to encode an invalid unicode code point into"
                  " a string");
         byteLength = -1;
     }
