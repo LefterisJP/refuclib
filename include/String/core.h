@@ -36,17 +36,26 @@
 #ifndef RF_STRING_CORE_H
 #define RF_STRING_CORE_H
 
+
+//for string decl
+    #include <String/stringx_decl.h>
+//for exact sized types
+    #include <Definitions/types.h>
+//for bool
+    #include <Definitions/retcodes.h>
+// for rfUTF8_IsContinutationByte
+    #include <String/unicode.h>
+//for size_t
+    #include <string.h>
+
 #ifdef __cplusplus
 extern "C"
 {///opening bracket for calling from C++
 #endif
 
 
-/*-------------------------------------------------------------------------Methods to create an RF_String-------------------------------------------------------------------------------*/
-
 //! @name Creating an RF_String
 //! @{
-
 
 /**
  ** @memberof RF_String
@@ -59,17 +68,21 @@ extern "C"
  ** @opassign
  ** @brief Allocates and returns a string with the given characters
  **
- ** Given characters have to be in UTF-8. A check for valid sequence of bytes is performed. @notinherited{StringX}
+ ** Given characters have to be in UTF-8. A check for valid sequence
+ ** of bytes is performed. @notinherited{StringX}
  ** @lmsFunction
- ** @param s The sequence of bytes for the characters in UTF-8 (the default). Can also follow a printf-like format which will be formatted with
- ** the variables that follow it. A check to see if it is a valid UTF-8 sequence is performed
- ** @param ... \rfoptional{nothing}  Depending on the string literal, the function may expect a sequence of additional arguments,
- ** each containing one value to be inserted instead of each %-tag specified in the @c slit parameter, if any. There should be
+ ** @param s The sequence of bytes for the characters in UTF-8 (the default).
+ ** Can also follow a printf-like format which will be formatted with
+ ** the variables that follow it. A check to see if it is a valid
+ ** UTF-8 sequence is performed
+ ** @param ... \rfoptional{nothing}  Depending on the string literal,
+ ** the function may expect a sequence of additional arguments,
+ ** each containing one value to be inserted instead of each %-tag
+ ** specified in the @c slit parameter, if any. There should be
  ** the same number of these arguments as the number of %-tags that expect a value.
  ** @return Returns the initialized RF_string or null in case of failure to initialize, due to invalid utf-8 sequence
  ** @see rfString_Init()
  ** @see rfStringX_Create()
- **
  **/
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ RF_String* rfString_Create(const char* s,...);
@@ -89,24 +102,16 @@ i_DECLIMEX_ RF_String* i_NVrfString_Create(const char* s);
  ** @brief Initializes a string with the given characters.
  **
  ** @notinherited{StringX}
- ** Given characters have to be in UTF-8. A check for valide sequence of bytes is performed.
  ** @lmsFunction
- ** @param str The string to initialize
- ** @param s The sequence of bytes for the characters in UTF-8 (the default).Can also follow a printf-like format which will be formatted with
- ** the variables that follow it. A check to see if it is a valid UTF-8 sequence is performed
- ** @param ... \rfoptional{nothing}  Depending on the string literal, the function may expect a sequence of additional arguments,
- ** each containing one value to be inserted instead of each %-tag specified in the @c slit parameter, if any. There should be
- ** the same number of these arguments as the number of %-tags that expect a value.
- ** @return Returns true in case of correct initialization and false , due to invalid utf-8 sequence
  ** @see rfString_Create()
  ** @see rfStringX_Init()
  **
  **/
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-i_DECLIMEX_ char rfString_Init(RF_String* str,const char* s,...);
+i_DECLIMEX_ bool rfString_Init(RF_String* str,const char* s,...);
 #else
-i_DECLIMEX_ char i_rfString_Init(RF_String* str,const char* s,...);
-i_DECLIMEX_ char i_NVrfString_Init(RF_String* str,const char* s);
+i_DECLIMEX_ bool i_rfString_Init(RF_String* str,const char* s,...);
+i_DECLIMEX_ bool i_NVrfString_Init(RF_String* str,const char* s);
 #define rfString_Init(...)  RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_INIT,2,__VA_ARGS__)
 #define i_SELECT_RF_STRING_INIT1(...) i_NVrfString_Init(__VA_ARGS__)
 #define i_SELECT_RF_STRING_INIT0(...) i_rfString_Init(__VA_ARGS__)
@@ -115,44 +120,44 @@ i_DECLIMEX_ char i_NVrfString_Init(RF_String* str,const char* s);
 /**
  ** @memberof RF_String
  ** @cppnotctor
- ** @brief Allocates a String by turning a unicode code point in a String (encoded in UTF-8).
+ ** @brief Allocates a String by turning a unicode code point
+ ** in a String (encoded in UTF-8).
  **
  ** @notinherited{StringX}
  ** @param code The unicode code point to encode
- ** @return A String with the code point encoded in it or a null pointer in case of an illegal code point value
+ ** @return A String with the code point encoded in it or a null
+ ** pointer in case of an illegal code point value
  ** @see rfString_Init_cp()
  ** @see rfStringX_Create_cp()
- **
  **/
 i_DECLIMEX_ RF_String* rfString_Create_cp(uint32_t code);
 /**
  ** @memberof RF_String
- ** @brief Initializes a string by turning a unicode code point in a String (encoded in UTF-8).
+ ** @brief Initializes a string by turning a unicode code point 
+ **        in a String (encoded in UTF-8).
  **
  ** @notinherited{StringX}
- ** @param str The string to initialize
- ** @param code The unicode code point to encode
- ** @return Returns true in case of correct initialization and false , due to illegal code point value
  ** @see rfString_Create_cp()
  ** @see rfStringX_Init_cp()
- **
  **/
-i_DECLIMEX_ char rfString_Init_cp(RF_String* str,uint32_t code);
+i_DECLIMEX_ bool rfString_Init_cp(RF_String* str,uint32_t code);
 
 
 
 /**
  ** @memberof RF_String
  ** @cppnotctor
- ** @brief Allocates and returns a string with the given characters with no checking.
+ ** @brief Allocates and returns a string with the given characters
+ **        without any checking.
  **
  ** @notinherited{StringX}
  ** @warning NO VALID-UTF8 check is performed.
- ** @param s The sequence of bytes for the characters in UTF-8 (the default).Can also follow a printf-like format which will be formatted with
+ ** @param s The sequence of bytes for the characters in UTF-8
+ ** (the default).Can also follow a printf-like format which will be formatted with
  ** the variables that follow it. No check for valid bytestream is performed
- ** @return Returns the initialized RF_string or null in case of failure to initialize
+ ** @return Returns the initialized RF_string or null in case
+ ** of failure to initialize
  ** @see rfString_Init_unsafe()
- **
  **/
 RF_String* rfString_Create_unsafe(const char* s);
 
@@ -163,16 +168,20 @@ RF_String* rfString_Create_unsafe(const char* s);
  ** @brief Initializes a string with the given characters with no checking
  **
  ** @notinherited{StringX}
- ** @warning NO VALID-UTF8 check is performed.
- ** @param str The string to initialize
- ** @param s The sequence of bytes for the characters in UTF-8 (the default).Can also follow a printf-like format which will be formatted with
- ** the variables that follow it. No check for valid bytestream is performed
- ** @return Returns @c true for success and @c false otherwise
  ** @see rfString_Create_unsafe()
- **
  **/
-i_DECLIMEX_ char rfString_Init_unsafe(RF_String* str,const char* s);
+i_DECLIMEX_ bool rfString_Init_unsafe(RF_String* str,const char* s);
 
+/**
+ ** @memberof RF_String
+ ** @brief Initializes a string from a non-null terminated char* buffer
+ ** and for the given bytelength
+ ** 
+ ** @notinherited{StringX}
+ ** @see rfString_init_unsafe()
+ **/
+i_DECLIMEX_ bool rfString_Init_unsafe_nnt(RF_String* str, const char* s,
+                                          size_t length);
 
 /**
  ** @memberof RF_String
@@ -183,7 +192,6 @@ i_DECLIMEX_ char rfString_Init_unsafe(RF_String* str,const char* s);
  ** @param i The integer to turn into a string
  ** @return Returns the initialized RF_string
  ** @see rfString_Init_i()
- **
  **/
 i_DECLIMEX_ RF_String* rfString_Create_i(int32_t i);
 /**
@@ -191,13 +199,9 @@ i_DECLIMEX_ RF_String* rfString_Create_i(int32_t i);
  ** @brief Initializes a string with the given integer.
  **
  ** @notinherited{StringX}
- ** @param str The string to initialize
- ** @param i The integer to turn into a string
- ** @return Returns true in case of correct initialization and false otherwise
  ** @see rfString_Create_i()
- **
  **/
-i_DECLIMEX_ char rfString_Init_i(RF_String* str,int32_t i);
+i_DECLIMEX_ bool rfString_Init_i(RF_String* str,int32_t i);
 /**
  ** @memberof RF_String
  ** @opassign
@@ -207,7 +211,6 @@ i_DECLIMEX_ char rfString_Init_i(RF_String* str,int32_t i);
  ** @param f The float to turn into a string
  ** @return Returns the initialized RF_string
  ** @see rfString_Init_f()
- **
  **/
 i_DECLIMEX_ RF_String* rfString_Create_f(float f);
 /**
@@ -215,13 +218,9 @@ i_DECLIMEX_ RF_String* rfString_Create_f(float f);
  ** @brief Initializes a string with the given float.
  **
  ** @notinherited{StringX}
- ** @param str The string to initialize
- ** @param f The float to turn into a string
- ** @return Returns true in case of correct initialization and false otherwise
  ** @see rfString_Create_f()
- **
  **/
-i_DECLIMEX_ char rfString_Init_f(RF_String* str,float f);
+i_DECLIMEX_ bool rfString_Init_f(RF_String* str,float f);
 
 /**
  ** @memberof RF_String
@@ -230,28 +229,26 @@ i_DECLIMEX_ char rfString_Init_f(RF_String* str,float f);
  ** @notinherited{StringX}
  ** @param s A buffer of 2 bytes word representing the
  **  utf-16 byte sequence.
- ** Needs to be null terminated
+ ** @param len The bytelength of @c s
  ** @return Returns the initialized RF_string or null in case of failure to
  ** initialize, due to invalid utf-16 sequence or illegal endianess value
  ** @see rfString_Init_UTF16()
  ** @see rfString_Create_fUTF16()
  ** @see rfString_Init_UTF16()
  **/
-i_DECLIMEX_ RF_String* rfString_Create_UTF16(const uint16_t* s);
+i_DECLIMEX_ RF_String* rfString_Create_UTF16(const uint16_t* s,
+                                             unsigned int len);
 /**
  ** @memberof RF_String
  ** @brief Initializes a string with the given UTF-16 byte sequence.
  **
  ** @notinherited{StringX}
- ** @param str The string to initialize
- ** @param s A buffer of 2 bytes word representing the
- **  utf-16 byte sequence.
- ** @return Returns true for succesfull initialization and false otherwise 
  ** @see rfString_Create_UTF16()
  ** @see rfString_Create_fUTF16()
  ** @see rfString_Init_UTF16()
  **/
-i_DECLIMEX_ char rfString_Init_UTF16(RF_String* str, const uint16_t* s);
+i_DECLIMEX_ bool rfString_Init_UTF16(RF_String* str, const uint16_t* s,
+                                     unsigned int len);
 
 /**
  ** @memberof RF_String
@@ -261,34 +258,31 @@ i_DECLIMEX_ char rfString_Init_UTF16(RF_String* str, const uint16_t* s);
  ** @notinherited{StringX}
  ** Given characters have to be in UTF-32 and in the endianess of the system.
  ** No endianess swapping occurs in the function
- ** @param s A buffer of 4-byte words representing the utf-32 byte sequence. Needs to be null terminated.
- ** @return Returns the initialized RF_string or null in case of failure to initialize
+ ** @param s A buffer of 4-byte words representing the utf-32
+ ** byte sequence.
+ ** @param len The length of s in codepoints (unicode characters)
+ ** @return Returns the initialized RF_string or null in case of
+ ** failure to initialize
  ** @see rfString_Init_UTF32()
  ** @see rfString_Create_fUTF32()
  ** @see rfString_Init_UTF32()
- **
  **/
-i_DECLIMEX_ RF_String* rfString_Create_UTF32(const uint32_t* s);
+i_DECLIMEX_ RF_String* rfString_Create_UTF32(const uint32_t* s,
+                                             unsigned int len);
 /**
  ** @memberof RF_String
  ** @brief Initializes a string with the given UTF-32 byte sequence.
  **
  ** @notinherited{StringX}
- ** Given characters have to be in UTF-32 and in the endianess of the system.
- ** No endianess swapping occurs in the function
- ** @param str The string to initialize
- ** @param s A buffer of 4-byte words representing the utf-32 byte sequence. Needs to be null terminated.
- ** @return Returns true for successful initialization and false otherwise
  ** @see rfString_Create_UTF32()
  ** @see rfString_Create_fUTF32()
  ** @see rfString_Init_UTF32()
- **
  **/
-i_DECLIMEX_ char rfString_Init_UTF32(RF_String* str,const uint32_t* s);
+i_DECLIMEX_ bool rfString_Init_UTF32(RF_String* str, const uint32_t* s,
+                                     unsigned int len);
 
 //! @}
 
-/*-------------------------------------------------------------------------Methods to assign to an RF_String-------------------------------------------------------------------------------*/
 //! @name Assigning to a String
 //! @{
 
@@ -298,15 +292,17 @@ i_DECLIMEX_ char rfString_Init_UTF32(RF_String* str,const uint32_t* s);
  **
  ** @notinherited{StringX}
  ** @lmsFunction
- ** Both strings should already be initialized and hold a value. It is an error to give null parameters.
- ** @param dest The destination string, which should get assigned
- ** @param source The source string, whose values to copy. @inhtype{String,StringX} @tmpSTR
- ** @return Returns @c true for success and @c false otherwise
+ ** Both strings should already be initialized and hold a value.
+ ** It is an error to give null parameters.
+ ** @param dest   The destination string, which should get assigned
+ ** @param source The source string, whose values to copy.
+ **               @inhtype{String,StringX} @tmpSTR
+ **
+ ** @return       Returns @c true for success and @c false otherwise
  ** @see rfString_Assign_char()
  ** @see rfStringX_Assign()
- **
  **/
-i_DECLIMEX_ char rfString_Assign(RF_String* dest,const void* source);
+i_DECLIMEX_ bool rfString_Assign(RF_String* dest, const void* source);
 
 
 /**
@@ -316,12 +312,12 @@ i_DECLIMEX_ char rfString_Assign(RF_String* dest,const void* source);
  ** @notinherited{StringX}
  ** @param thisstr The string to assign to
  ** @param character The unicode character codepoint to assign to the String
- ** @return Returns @c true for succesfull assignment and @c false if the given @c character was not a valid unicode codepoint
+ ** @return Returns @c true for succesfull assignment and @c false
+ **         if the given @c character was not a valid unicode codepoint
  ** @see rfString_Assign()
  ** @see rfStringX_Assign_char()
- **
  **/
-i_DECLIMEX_ char rfString_Assign_char(RF_String* thisstr,uint32_t character);
+i_DECLIMEX_ bool rfString_Assign_char(RF_String* thisstr,uint32_t character);
 
 /**
  ** @memberof RF_String
@@ -331,47 +327,39 @@ i_DECLIMEX_ char rfString_Assign_char(RF_String* thisstr,uint32_t character);
  ** A safer and easier alternative is to assigg an empty string and
  * check for it with @ref rfString_IsEmpty()
  **/
-#define rfString_Null(i_STRING) do{               \
-        (i_STRING)->byteLength = 0;               \
-        (i_STRING)->bytes = NULL;                 \
+#define rfString_Null(i_STRING) do{                      \
+        rfString_ByteLength(i_STRING) = 0;               \
+        rfString_Data(i_STRING) = NULL;                  \
 }while(0)
 
 //! @}
 
-
-/*------------------------------------------------------------------------ RF_String Copying functions-------------------------------------------------------------------------------*/
 //! @name String Copying Functions
 //! @{
 
 /**
  ** @memberof RF_String
- ** @cppignore
  ** @brief Creates and returns an allocated copy of the given string
  **
  ** @isinherited{StringX}
- ** @note The Returned Substring needs to be freed by the user. BEWARE when assigning to a string using this function since if any previous string exists there IS NOT getting freed. You have to free it explicitly
  ** @param src The string to copy from. @inhtype{String,StringX}
- ** @return Returns a string copied from the previous one or null if the original string was null
+ ** @return Returns a string copied from the previous one or null
+ ** if the original string was null
  ** @see rfString_Copy_IN()
  ** @see rfString_Copy_chars()
- **
  **/
 i_DECLIMEX_ RF_String* rfString_Copy_OUT(const void* src);
 /**
  ** @memberof RF_String
- ** @cppignore
  ** @brief Copies all the contents of a string to another
  **
  ** @isinherited{StringX}
- ** @param dst The string to copy in.
- ** @param src The string to copy from. @inhtype{String,StringX}
- ** If the value is bigger than the maximum number of characters then still all characters are copied.
  ** @return Returns @c true for succesfull copying @c false otherwise
  ** @see rfString_Copy_OUT()
  ** @see rfString_Copy_chars()
  **
  **/
-i_DECLIMEX_ char rfString_Copy_IN(RF_String* dst,const void* src);
+i_DECLIMEX_ bool rfString_Copy_IN(RF_String* dst, const void* src);
 /**
  ** @memberof RF_String
  ** @brief Copies a certain number of characters from a string
@@ -381,19 +369,18 @@ i_DECLIMEX_ char rfString_Copy_IN(RF_String* dst,const void* src);
  ** @param dst The string to copy in
  ** @param src The string to copy from. @inhtype{String,StringX}
  ** @param n The number of characters to copy from the @c src string
- ** If the value is bigger than the maximum number of characters then still all characters are copied.
+ ** If the value is bigger than the maximum number of characters 
+ ** then still all characters are copied.
  ** @return Returns @c true for success and @c false otherwise
  ** @see rfString_Copy_IN()
  ** @see rfString_Copy_OUT()
  **
  **/
-i_DECLIMEX_ char rfString_Copy_chars(RF_String* dst, const void* src,
+i_DECLIMEX_ bool rfString_Copy_chars(RF_String* dst, const void* src,
                                      uint32_t n);
 
 //! @}
 
-
-/*-------------------------------------------------------------------------Methods to get rid of an RF_String-------------------------------------------------------------------------------*/
 //! @name Getting rid of an RF_String
 //! @{
 
@@ -403,11 +390,9 @@ i_DECLIMEX_ char rfString_Copy_chars(RF_String* dst, const void* src,
  ** @brief Deletes a string object and also frees its pointer.
  **
  ** @notinherited{StringX}
- ** It is an error to give a NULL(0x0) string for deleting. Will most probably lead to a segmentation fault
  ** Use it for strings made with _Create
  ** @param s The string for deletion
  ** @see rfString_Deinit()
- **
  **/
 i_DECLIMEX_ void rfString_Destroy(RF_String* s);
 /**
@@ -416,9 +401,6 @@ i_DECLIMEX_ void rfString_Destroy(RF_String* s);
  ** @brief Deletes a string object only, not its memory.
  **
  ** @notinherited{StringX}
- ** It is an error to give a NULL(0x0) string for deleting. Will most probably lead to a segmentation fault
- ** Use it for strings made with _Init
- ** @param s The string for deletion
  ** @see rfString_Destroy()
  **
  **/
@@ -426,30 +408,30 @@ i_DECLIMEX_ void rfString_Deinit(RF_String* s);
 
 
 //! @}
-/*------------------------------------------------------------------------ RF_String Equality check -------------------------------------------------------------------------------*/
+
 //! @name Equality check
 //! @{
 
 /**
  ** @memberof RF_String
  ** @opcmpeq
- ** @brief Compares two Strings and returns true if they are equal and false otherwise
+ ** @brief Compares two Strings and returns true
+ **        if they are equal and false otherwise
  **
  ** @isinherited{StringX}
  ** @lmsFunction
  ** @param s1 The first string to compare @inhtype{String,StringX} @tmpSTR
  ** @param s2 The second string to compare @inhtype{String,StringX} @tmpSTR
  ** @return True in case the strings are equal and false otherwise
- **
  **/
-i_DECLIMEX_ char rfString_Equal(const void* s1,const void* s2);
+i_DECLIMEX_ bool rfString_Equal(const void* s1, const void* s2);
 
 /**
  ** @memberof RF_String
  ** @brief Checks that a string is null
  **/
-#define rfString_IsNull(i_STRING)                               \
-    ((i_STRING)->byteLength == 0 && (i_STRING)->bytes == NULL)
+#define rfString_IsNull(i_STRING)                                       \
+    (rfString_ByteLength(i_STRING) == 0 && rfString_Data(i_STRING) == NULL)
 
 
 /**
@@ -463,67 +445,88 @@ i_DECLIMEX_ char rfString_Equal(const void* s1,const void* s2);
 //! @}
 
 
-/*------------------------------------------------------------------------ RF_String iteration functions-------------------------------------------------------------------------------*/
 //! @name String Iteration
 //! @{
 
 
-// **The following 2 functions are exposed here only because they are used in the iteration macros** //
+/*
+  The following 2 functions are exposed here only 
+  because they are used in the iteration macros
+*/
+
 /**
  ** @internal
  ** @memberof RF_String
- ** @cppignore
- ** @brief Retrieves the unicode code point of the parameter bytepos of the string.
+ ** @brief Retrieves the unicode code point of the parameter
+ ** bytepos of the string.
  **
  ** @isinherited{StringX}
- ** This is an internal function, there is no need to use it. The reason it is exposed here is that it is utilized in the iteration macros.
+ ** This is an internal function, there is no need to use it. The reason
+ ** it is exposed here is that it is utilized in the iteration macros.
  ** @warning DO NOT use this function unless you know what you are doing
- ** @param thisstr The string whose byte position code point we need. @inhtype{String,StringX}
- ** @param bytepos The byte position of the string from where to get the code point.
- ** @warning If this is out of bounds then nothing can detect it and at best it will cause a SEG FAULT.
- **                 Moreover no check to see if this is not a continutation byte is made. All the checks must have been made before calling the function.
+ ** @param thisstr The string whose byte position code point we need.
+ **                @inhtype{String,StringX}
+ ** @param bytepos The byte position of the string from
+ **                 where to get the code point.
+ ** @warning If this is out of bounds then nothing can detect it and
+ **          at best it will cause a SEG FAULT. Moreover no check to see
+ **          if this is not a continutation byte is made. All the checks
+ **          must have been made before calling the function.
  ** @return Returns the code point of the byte position as an uint32_t
  ** @endinternal
- **
  **/
-i_DECLIMEX_ uint32_t rfString_BytePosToCodePoint(const void* thisstr,uint32_t bytepos);
+i_DECLIMEX_ uint32_t rfString_BytePosToCodePoint(const void* thisstr,
+                                                 uint32_t bytepos);
 /**
  ** @internal
  ** @memberof RF_String
- ** @cppignore
  ** @brief Retrieves character position of a byte position
  **
  ** @isinherited{StringX}
- ** This is an internal function, there is no need to use it. It attempts to retrieve character position from a byte position. If the byte
- ** position is a continutation byte and does not constitute the start of a character then depending on the option the function will find
- ** either the next character or the previous character position from this byte position
+ ** This is an internal function, there is no need to use it. It attempts
+ ** to retrieve character position from a byte position. If the byte
+ ** position is a continutation byte and does not constitute the start
+ ** of a character then depending on the option the function will find
+ ** either the next character or the previous character position from
+ ** this byte position
  **
  ** @warning DO NOT use this function unless you know what you are doing
- ** @param thisstr The string whose byte position code point we need. @inhtype{String,StringX}
- ** @param bytepos The byte position of the string from where to get the character position
- ** @param before A boolean flag denoting the behaviour in case this byte position is a continutation byte. If @c before is true then
- ** the function will retrieve the first character position before the byte. If it is false, it will retrieve the first character position
- ** after the continuation byte.
+ ** @param thisstr The string whose byte position code point we need.
+ **                @inhtype{String,StringX}
+ ** @param bytepos The byte position of the string from where to get
+ **                the character position
+ ** @param before A boolean flag denoting the behaviour in case this byte
+ **               position is a continutation byte. If @c before is true then
+ **               the function will retrieve the first character position
+ **               before the byte. If it is false, it will retrieve the
+ **               first character position after the continuation byte.
  ** @endinternal
- **
  **/
-i_DECLIMEX_ uint32_t rfString_BytePosToCharPos(const void* thisstr,uint32_t bytepos,char before);
+i_DECLIMEX_ uint32_t rfString_BytePosToCharPos(const void* thisstr,
+                                               uint32_t bytepos,
+                                               bool before);
 
 
 // Checks if a given byte is a continuation byte
 #define rfUTF8_IsContinuationByte2(b__)  ( b__ >= 0x80 && b__<= 0xBF )
 
-// Two macros to accomplish iteration of an RF_String from any given character going forwards. This macro should be used with its end pair.
-// We take advantage of the fact that an RF_String is always guaranteed to contain a valid UTF-8 sequence and thus no checks are performed.
+/*
+  Two macros to accomplish iteration of an RF_String from any given
+  character going forwards. This macro should be used with its end pair.
+  We take advantage of the fact that an RF_String is always guaranteed
+  to contain a valid UTF-8 sequence and thus no checks are performed.
+*/
+
 /**
 ** @memberof RF_String
 ** @cppignore
 ** @brief Starts an RF_String forward iteration scope.
 **
 ** @isinherited{StringX}
-** Use this macro to iterate every character inside an RF_String or RF_StringX\n
-** Must be used with its pair macro #rfString_Iterate_End.\n
-** As an example consider this code that iterates every character of a string from the start to finish
+** Use this macro to iterate every character inside an RF_String or RF_StringX
+** Must be used with its pair macro #rfString_Iterate_End.
+** As an example consider this code that iterates every character
+** of a string from the start to finish
 ** @code
 ** uint32_t i = 0;
 ** uint32_t charValue;
@@ -534,30 +537,42 @@ i_DECLIMEX_ uint32_t rfString_BytePosToCharPos(const void* thisstr,uint32_t byte
 ** rfString_Iterate_End(i)
 ** @endcode
 ** @param[in] string_ The string to iterate. Must be a pointer to string
-** @param[in,out] startCharacterPos_ Here give an uint32_t which will be the character position from which to start the iteration. In each iteration this will hold the character index. If the given position is out of bounds then the iteration does not happen
-** @param[in,out] characterUnicodeValue_ Here pass an uint32_t which in each iteration will hold the unicode code point of the character at position startCharacterPos_
+** @param[in,out] startCharacterPos_ Here give an uint32_t which will
+**                be the character position from which to start the iteration.
+**                In each iteration this will hold the character index.
+**                If the given position is out of bounds then the
+**                iteration does not happen
+** @param[in,out] characterUnicodeValue_ Here pass an uint32_t which in
+**                each iteration will hold the unicode code point of the
+**                character at position startCharacterPos_
 ** @see rfString_Iterate_End()
 ** @see rfString_IterateB_Start()
 **/
-#define rfString_Iterate_Start(string_,startCharacterPos_,characterUnicodeValue_)     {\
-            /* b index sec is the byte index and j the character index*/\
-            uint32_t byteIndex_ = 0;uint32_t j_=0;\
-            /*iterate until we find the character position requested and its equivalent byte position*/\
-            while(j_!=startCharacterPos_)\
-            {\
-                if( rfUTF8_IsContinuationByte( ((RF_String*)(string_))->bytes[byteIndex_]) ==false)\
-                {\
-                    j_++;\
-                }\
-                byteIndex_++;\
-            }\
-            /*now start the requested iteration*/\
-            while( ((RF_String*)(string_))->bytes[byteIndex_]!='\0')\
-            {\
-                /*if it's a character*/\
-                if( rfUTF8_IsContinuationByte( ((RF_String*)(string_))->bytes[byteIndex_]) ==false)\
-                {/*Give the character value to the user*/\
-                    characterUnicodeValue_ = rfString_BytePosToCodePoint( (string_),byteIndex_);
+#define rfString_Iterate_Start(string_, startCharacterPos_,             \
+                               characterUnicodeValue_)                  \
+    {                                                                   \
+    /* b index sec is the byte index and j the character index*/        \
+    uint32_t byteIndex_ = 0;uint32_t j_=0;                              \
+    /*                                                                  \
+      iterate until we find the character position requested and        \
+      its equivalent byte position                                      \
+    */                                                                  \
+    while(j_ != startCharacterPos_)                                     \
+    {                                                                   \
+        if(!rfUTF8_IsContinuationByte(rfString_Data(string_)[byteIndex_])) \
+        {                                                               \
+            j_++;                                                       \
+        }                                                               \
+        byteIndex_++;                                                   \
+    }                                                                   \
+    /*now start the requested iteration*/                               \
+    while(byteIndex_ < rfString_ByteLength(string_))                    \
+    {                                                                   \
+    /*if it's a character*/                                             \
+        if(!rfUTF8_IsContinuationByte(rfString_Data(string_)[byteIndex_])) \
+        {/*Give the character value to the user*/                       \
+            characterUnicodeValue_ = rfString_BytePosToCodePoint((string_), \
+                                                                 byteIndex_);
 
 /**
  ** @memberof RF_String
@@ -572,8 +587,12 @@ i_DECLIMEX_ uint32_t rfString_BytePosToCharPos(const void* thisstr,uint32_t byte
  **/
 #define rfString_Iterate_End(startCharacterPos_)  startCharacterPos_++;}byteIndex_++;}}
 
-//Two macros to accomplish iteration of an RF_String from any given character going backwards. This macro should be used with its end pair.
-// We take advantage of the fact that an RF_String is always guaranteed to contain a valid UTF-8 sequence and thus no checks are performed.
+/*
+  Two macros to accomplish iteration of an RF_String from any given
+  character going backwards. This macro should be used with its end pair.
+  We take advantage of the fact that an RF_String is always guaranteed to contain
+  a valid UTF-8 sequence and thus no checks are performed.
+*/
 
 /**
 ** @memberof RF_String
@@ -581,10 +600,11 @@ i_DECLIMEX_ uint32_t rfString_BytePosToCharPos(const void* thisstr,uint32_t byte
 ** @brief Starts an RF_String backward iteration scope.
 **
 ** @isinherited{StringX}
-** Use this macro to iterate every character inside an RF_String or RF_StringX going backwards\n
-** Must be used with its pair macro #rfString_IterateB_End.\n
-**
-** As an example consider this code that iterates every character of a string from the start to finish
+** Use this macro to iterate every character inside an RF_String or
+** RF_StringX going backwards
+** Must be used with its pair macro #rfString_IterateB_End.
+** As an example consider this code that iterates every character of a
+** string from the start to finish
 ** @code
 ** uint32_t charValue;
 ** RF_String foo;rfString_Init(&foo,"I am a String");
@@ -595,32 +615,50 @@ i_DECLIMEX_ uint32_t rfString_BytePosToCharPos(const void* thisstr,uint32_t byte
 ** rfString_IterateB_End(i)
 ** @endcode
 ** @param[in] string_ The string to iterate. Must be a pointer to string
-** @param[in,out] characterPos_ Here give an uint32_t which will be the character position from which to start the iteration. In each iteration this will hold the character index. If the given position is out of bounds then the iteration does not happen
-** @param[in,out] characterUnicodeValue_ Here pass an uint32_t which in each iteration will hold the unicode code point of the character at position characterPos_
+** @param[in,out] characterPos_ Here give an uint32_t which will be the
+**                character position from which to start the iteration. 
+**                In each iteration this will hold the character index.
+**                If the given position is out of bounds then the iteration
+**                does not happen
+** @param[in,out] characterUnicodeValue_ Here pass an uint32_t which in
+**                each iteration will hold the unicode code point of the
+**                character at position characterPos_
 ** @see rfString_IterateB_End()
 ** @see rfString_Iterate_Start()
 **/
-#define rfString_IterateB_Start(string_,characterPos_,characterUnicodeValue_)     {\
-            /* b index is the byte index and j the character index*/\
-            uint32_t b_index_ = 0;uint32_t j_=0;\
-            /* c index sec is another signed copy of the character index (and is int64_t so that it can cater for any situation). Reason is cause going backwards we gotta have -1 too */\
-            int64_t c_index_ = characterPos_;\
-            /*iterate until we find the character position requested and its equivalent byte position*/\
-            while(j_!=characterPos_)\
-            {\
-                if( rfUTF8_IsContinuationByte( ((RF_String*)(string_))->bytes[b_index_]) ==false)\
-                {\
-                    j_++;\
-                }\
-                b_index_++;\
-            }\
-            /*now start the requested iteration - notice that the end condition is to reach the first character position*/\
-            while(c_index_!=-1)\
-            {\
-                /*if it's a character*/\
-                if( rfUTF8_IsContinuationByte( ((RF_String*)(string_))->bytes[b_index_]) ==false)\
-                {/*Give the character value to the user*/\
-                    characterUnicodeValue_ = rfString_BytePosToCodePoint( (string_),b_index_);
+#define rfString_IterateB_Start(string_,characterPos_,\
+                                characterUnicodeValue_)     {           \
+    /* b index is the byte index and j the character index*/            \
+    uint32_t b_index_ = 0;uint32_t j_=0;                                \
+    /*                                                                  \
+       c index sec is another signed copy of the character index        \
+       (and is int64_t so that it can cater for any situation). Reason  \
+       is cause going backwards we gotta have -1 too                    \
+    */                                                                  \
+    int64_t c_index_ = characterPos_;                                   \
+    /*                                                                  \
+      iterate until we find the character position requested and        \
+      its equivalent byte position                                      \
+    */                                                                  \
+    while(j_ != characterPos_)                                          \
+    {                                                                   \
+        if(!rfUTF8_IsContinuationByte(rfString_Data(string_)[b_index_])) \
+        {                                                               \
+            j_++;                                                       \
+        }                                                               \
+        b_index_++;                                                     \
+    }                                                                   \
+    /*                                                                  \
+      now start the requested iteration - notice that the               \
+      end condition is to reach the first character position            \
+    */                                                                  \
+    while(c_index_ != -1)                                               \
+    {                                                                   \
+        /*if it's a character*/                                         \
+        if(!rfUTF8_IsContinuationByte(rfString_Data(string_)[b_index_])) \
+        {/*Give the character value to the user*/                       \
+            characterUnicodeValue_ = rfString_BytePosToCodePoint((string_), \
+                                                                 b_index_);
 
 /**
  ** @memberof RF_String
@@ -629,7 +667,8 @@ i_DECLIMEX_ uint32_t rfString_BytePosToCharPos(const void* thisstr,uint32_t byte
  **
  ** @isinherited{StringX}
  ** Look at #rfString_IterateB_Start for an example usage
- ** @param[in,out] characterPos_ Here give the uint32_t given to #rfString_IterateB_Start
+ ** @param[in,out] characterPos_ Here give the uint32_t given
+ ** to #rfString_IterateB_Start
  ** @see rfString_IteraB_Start()
  **
  **/

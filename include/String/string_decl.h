@@ -32,13 +32,19 @@
 ** @endinternal
 ** @brief A unicode String with UTF-8 internal representation
 **
-** The Refu String is a Unicode String that has two versions. One is this and for the other check @ref RF_StringX to see what operations can be performed on extended Strings.
-** Functions to convert to and from all UTF encoding exists but the internal representation is always at UTF-8. Once a
-** a String has been created it is always assumed that the stream of bytes inside it is valid UTF-8 since every function
-** performs a UTF-8 check unless otherwise specified.
+** The Refu String is a Unicode String that has two versions. One is this and for
+** the other check @ref RF_StringX to see what operations can be performed
+** on extended Strings.
+** Functions to convert to and from all UTF encoding exists but the internal
+** representation is always at UTF-8. Once a String has been created it is 
+** always assumed that the stream of bytes inside it is valid UTF-8 since
+** every function performs a UTF-8 check unless otherwise specified.
 **
-** All the functions which have @isinherited{StringX} on their description can be used with extended strings safely, since no specific
-** version of the function exists, or needs to exist to manipulate Extended Strings. To make the documentation even clearer the functions that should not
+** All the functions which have @isinherited{StringX} on their
+** description can be used with extended strings safely, since no specific
+** version of the function exists, or needs to exist to manipulate 
+** Extended Strings. To make the documentation even clearer the 
+** functions that should not
 ** be used with the extended string are marked with @notinherited{StringX}
 **
 ** @see RF_StringX
@@ -52,10 +58,9 @@
 typedef struct RF_String
 {
     //! The string's data
-    char* bytes;
-    //! The string's length in bytes (not including the null termination). The string keeps its length in bytes
-    //! to avoid multiple calls to strlen()
-    uint32_t byteLength;
+    char* data;
+    //! String's length in bytes
+    uint32_t length;
 }RF_String;
 
 #endif//include guards end

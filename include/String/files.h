@@ -23,66 +23,25 @@
 **
 ** --String/files.h
 ** This header includes FILE descriptor functionality for RF_String
-**
----------------------For internal library include make sure to have----------------------------
-#include <stdio.h> //for FILE*
-#include <IO/common.h> //for RF_EOL macros
-#include <Definitions/imex.h> //for the import export macro
-#include <Definitions/types.h> //for fixed size types needed in various places
-#include <String/unicode.h> //for the unicode macros RF_UTF8 and friends
-#include <String/string_decl.h>//for RF_String
-#include <Definitions/defarg.h> //for enabling default arguments
-#include <String/files.h>
----------------------For internal library include make sure to have----------------------------
-*/
+**/
 #ifndef RF_STRING_FILES_H
 #define RF_STRING_FILES_H
 
+// for string decl
+    #include <String/stringx_decl.h>
+// for exact sized types
+    #include <Definitions/types.h>
+// for bool
+    #include <Definitions/retcodes.h>
 
 #ifdef __cplusplus
 extern "C"
 {///opening bracket for calling from C++
 #endif
 
-/*--- RF_String File Descriptor I/O functions ---*/
 //! @name String File Descriptor I/O functions
 //! @{
 
-/**
- ** @memberof RF_String
- ** @brief Allocates and returns a string from file parsing
- **
- ** @notinherited{StringX}
- ** Read the file stream @c f until either a newline character or the EOF is 
- ** reached and saves it as an RF_String
- ** If for some reason (like EOF reached) no string can be read then null is returned
- ** @param f A valid and open file pointer in read mode from which to read the
- ** string. 
- ** @param[out] eof Pass a pointer to a char to receive a true or false
- ** value in case the end of file was reached with this initialization
- ** @param[in] eol The End Of Line type that this file uses. Can be one of:
- ** + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as 
- ** the end of line signal
- ** + @c RF_EOL_CR: For Macintosh-style line endings, taking @c '\r' as the 
- ** end of line signal
- ** + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as
- ** the end of line signal
- ** @param encoding The encoding of the file.
- ** + @c RF_UTF8: For Unicode UTF-8 encoding
- ** + @c RF_UTF16: For Unicode UTF-16 encoding
- ** + @c RF_UTF32: For Unicode UTF-32 encoding
- ** @param endianess A flag that determines in what endianess the file is 
- ** encoded in. Possible values here are @c RF_LITTLE_ENDIAN and
- ** @c RF_BIG_ENDIAN and apply only if the file is either UTF-16 or UTF-32
- ** @return The initialized string or null pointer in case of failure
- **  to read the file, or unexpected data (non-UTF8 encoded string)
- ** @see rfString_FInit()
- ** @see rfString_FAssign()
- ** @see rfString_FAppend()
- **
- **/
-i_DECLIMEX_ RF_String* rfString_FCreate(FILE* f, char* eof, char eol,
-                                        int encoding, int endianess);
 /**
  ** @memberof RF_String
  ** @brief Initializes a string from file parsing
@@ -110,11 +69,26 @@ i_DECLIMEX_ RF_String* rfString_FCreate(FILE* f, char* eof, char eol,
  ** @param endianess A flag that determines in what endianess the file is 
  ** encoded in. Possible values here are @c RF_LITTLE_ENDIAN and
  ** @c RF_BIG_ENDIAN and apply only if the file is either UTF-16 or UTF-32
+ ** @param buff_size Give a pointer to an unsigned int here to get the size
+ ** of the buffer allocated for the string. You can give NULL if you are not
+ ** interested in its value
  ** @return Returns @c true for success and @c false otherwise
  **/
-i_DECLIMEX_ char rfString_FInit(RF_String* str, FILE* f, char* eof, char eol,
-                                int encoding, int endianess);
+i_DECLIMEX_ bool rfString_FInit(RF_String* str, FILE* f, char* eof, char eol,
+                                int encoding, int endianess,
+                                unsigned int* buff_size);
 
+/**
+ ** @memberof RF_String
+ ** @brief Allocates and returns a string from file parsing
+ ** @notinherited{StringX}
+ ** @see rfString_FInit()
+ ** @see rfString_FAssign()
+ ** @see rfString_FAppend()
+ **/
+i_DECLIMEX_ RF_String* rfString_FCreate(FILE* f, char* eof, char eol,
+                                        int encoding, int endianess,
+                                        unsigned int* buff_size);
 /**
  ** @memberof RF_String
  ** @brief Assigns to a string from file parsing
@@ -147,7 +121,7 @@ i_DECLIMEX_ char rfString_FInit(RF_String* str, FILE* f, char* eof, char eol,
  ** @see rfString_FAppend()
  **
  **/
-i_DECLIMEX_ char rfString_FAssign(RF_String* str, FILE* f, char* eof,
+i_DECLIMEX_ bool rfString_FAssign(RF_String* str, FILE* f, char* eof,
                                   char eol, int encoding, int endianess);
 /**
  ** @memberof RF_String
@@ -179,7 +153,7 @@ i_DECLIMEX_ char rfString_FAssign(RF_String* str, FILE* f, char* eof,
  ** @see rfString_FAssign()
  **
  **/
-i_DECLIMEX_ char rfString_FAppend(RF_String* str, FILE* f, char* eof, char eol,
+i_DECLIMEX_ bool rfString_FAppend(RF_String* str, FILE* f, char* eof, char eol,
                                    int encoding, int endianess);
 
 /**
@@ -203,9 +177,9 @@ i_DECLIMEX_ char rfString_FAppend(RF_String* str, FILE* f, char* eof, char eol,
  ** @return Returns @c true for success and @c false otherwise
  **/
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-i_DECLIMEX_ char rfString_Fwrite(void* s, FILE* f, int encoding, int endianess);
+i_DECLIMEX_ bool rfString_Fwrite(void* s, FILE* f, int encoding, int endianess);
 #else
-i_DECLIMEX_ char i_rfString_Fwrite(void* s, FILE* f, int encoding, int endianess);
+i_DECLIMEX_ bool i_rfString_Fwrite(void* s, FILE* f, int encoding, int endianess);
 #define rfString_Fwrite(...) \
     RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_FWRITE, 4, __VA_ARGS__)
 #define i_NPSELECT_RF_STRING_FWRITE1(...) \

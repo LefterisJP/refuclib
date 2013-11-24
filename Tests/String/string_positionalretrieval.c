@@ -1,5 +1,4 @@
 ﻿#include <RFstring.h>
-#include <RFprintf.h>
 #include <refu.h>
 
 #include "../refu_tests.h"
@@ -64,7 +63,7 @@ int main()
                RFS_(" Letters"),
                &ret,
                RF_CASE_IGNORE));
-    EXPECTGE(rfPrintf("%S\n",&ret), 0);
+    EXPECTGE(printf(RF_STR_PF_FMT"\n", RF_STR_PF_ARG(&ret)), 0);
     rfString_Deinit(&ret);
 
     //expect true from both and <meta name="application-name
@@ -73,7 +72,7 @@ int main()
                &s3,
                "<meta name=\"application-name\" content=\"BBC News\" />"));
     EXPECT(true,rfString_Beforev(&s3,&ret,0,2,RFS_("/>"),RFS_("\" ")));
-    EXPECTGE(rfPrintf("%S\n",&ret), 0);
+    EXPECTGE(printf(RF_STR_PF_FMT"\n", RF_STR_PF_ARG(&ret)), 0);
     //expect false
     EXPECT(false,
            rfString_Beforev(&s3, &ret, 0, 4, RFS_("56"),

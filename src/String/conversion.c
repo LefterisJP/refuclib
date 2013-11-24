@@ -34,6 +34,7 @@
 #include <String/retrieval.h> //for rfString_Count
 #include <String/common.h> //for RFS_()
 #include "common.ph" //for required string private macros and functions
+#include "defines.ph" //for some defines
 /*------------- Outside Module inclusion -------------*/
 // for unicode functions
     #include <String/unicode.h>
@@ -47,21 +48,24 @@
     #include <Utils/localscope.h>
 //for memory allocation macros
     #include <Utils/memory.h> //for refu memory allocation
+//for rfMax
+    #include <Utils/math.h>
+//for the internal thread specific buffer
+    #include "../Internal/internal_mod.ph"
 /*------------- libc inclusion --------------*/
 #include <errno.h> //for errno
 #include <math.h> //for HUGE_VAL
 /*------------- End of includes -------------*/
 
-//Returns the strings contents as a UTF-16 buffer
-uint16_t* rfString_ToUTF16(const void* sP, uint32_t* length)
+
+uint16_t* rfString_ToUTF16(const void* s, uint32_t* length)
 {
     uint32_t* codepoints,charsN;
     uint16_t* utf16;
-    const RF_String* s = (const RF_String*) sP;
-    RF_MALLOC(codepoints, s->byteLength*4, NULL);
+    RF_MALLOC(codepoints, rfString_ByteLength(s) * 4, NULL);
     //get the unicode codepoints
-    if(!rfUTF8_Decode(s->bytes, s->byteLength, &charsN,
-                      codepoints, s->byteLength*4))
+    if(!rfUTF8_Decode(rfString_Data(s), rfString_ByteLength(s), &charsN,
+                      codepoints, rfString_ByteLength(s) * 4))
     {
         RF_ERROR("Error during decoding a UTF-8 byte stream");
         free(codepoints);
@@ -69,8 +73,9 @@ uint16_t* rfString_ToUTF16(const void* sP, uint32_t* length)
     }
     //encode them in UTF-16, no check here since it comes from an RF_String
     // which is always guaranteed to have valid UTF-8 and as such valid codepoints
-    RF_MALLOC(utf16, s->byteLength*4, NULL);  
-    if(!rfUTF16_Encode(codepoints, charsN, length, utf16, s->byteLength*4))
+    RF_MALLOC(utf16, rfString_ByteLength(s) * 4, NULL);  
+    if(!rfUTF16_Encode(codepoints, charsN, length,
+                       utf16, rfString_ByteLength(s) * 4))
     {
         RF_ERROR("Error at encoding a buffer in UTF-16");
         free(utf16);
@@ -81,14 +86,13 @@ uint16_t* rfString_ToUTF16(const void* sP, uint32_t* length)
     return utf16;
 }
 
-//Returns the strings contents as a UTF-32 buffer
-uint32_t* rfString_ToUTF32(const void* sP,uint32_t* length)
+uint32_t* rfString_ToUTF32(const void* s, uint32_t* length)
 {
-    const RF_String* s = (const RF_String*) sP;
     uint32_t* cp;
-    RF_MALLOC(cp, s->byteLength*4, NULL);
+    RF_MALLOC(cp, rfString_ByteLength(s) * 4, NULL);
     //get the unicode codepoints
-    if(!rfUTF8_Decode(s->bytes, s->byteLength, length, cp, s->byteLength*4))
+    if(!rfUTF8_Decode(rfString_Data(s), rfString_ByteLength(s), length,
+                      cp, rfString_ByteLength(s) * 4))
     {
         RF_ERROR("Error during decoding a UTF-8 byte stream");
         cp = NULL;
@@ -96,100 +100,92 @@ uint32_t* rfString_ToUTF32(const void* sP,uint32_t* length)
     return cp;
 }
 
-// Returns the cstring representation of the string
 char* rfString_Cstr(const void* str)
 {
-    const RF_String* s = (const RF_String*)str;
-    return s->bytes;
+    char* ret;
+    RF_MALLOC(ret, rfString_ByteLength(str) + 1, NULL);
+    memcpy(ret, rfString_Data(str), rfString_ByteLength(str));
+    ret[rfString_ByteLength(str)] = '\0';
+    return ret;
 }
 
-
-//Returns the integer value of the string if and only if it contains only numbers. If it contains anything else the function fails.
-char rfString_ToInt(const void* str,int32_t* v)
+bool rfString_ToInt(const void* str, int32_t* v)
 {
-    const RF_String* thisstr = (const RF_String*)str;
-    char* end;
-    //get the integer
-    *v = strtol ( thisstr->bytes, &end,10);
+    char buff[MAX_UINT32_STRING_CHAR_SIZE + 1];
+    int index;
 
-///This is the non-strict case. Takes the number out of the string no matter what else it has inside
-/*    //if we did get something
-    if(strlen(end) < this->length())
-        return true;
-*/
-///This is the strict case, and the one we will go with. The non-strict case might be moved to its own function, if ever in the future
-    if(end[0] == '\0')
-        return true;
+    index = rfMax(MAX_UINT32_STRING_CHAR_SIZE, rfString_ByteLength(str));
+    memcpy(buff, rfString_Data(str), index);
+    buff[index] = '\0';
 
-    //else false
-    return false;
-}
-
-//Returns the float value of a String
-int rfString_ToDouble(const void* thisstrP,double* f)
-{
-    const RF_String* str = (const RF_String*)thisstrP;
-    *f = strtod(str->bytes,NULL);
-    //check the result
-    if(*f == 0.0)
+    errno = 0;
+    *v = strtol (buff, NULL, 10);
+    
+    if(!*v || errno)
     {
-        //if it's zero and the string equals to zero then we are okay
-        if(rfString_Equal(str,RFS_("0")) || rfString_Equal(str,RFS_("0.0")))
-            return RF_SUCCESS;
-        //underflow error
-        if(errno == ERANGE)
-            return RE_STRING_TOFLOAT_UNDERFLOW;
-        //in any other case it's a conversion error
-        return RE_STRING_TOFLOAT;
+        RF_ERROR("Failed to convert %s to int with strtol()"
+                 " errno: %d", buff, errno);
+        return false;
     }
-    //if the result is a HUGE_VAL and errno is set,the number is not representable by a double
-    if(*f == HUGE_VAL && errno == ERANGE)
-        return RE_STRING_TOFLOAT_RANGE;
-
-    //any other case success
-    return RF_SUCCESS;
+    return true;
 }
 
-//Turns any uppercase characters of the string into lower case
-void rfString_ToLower(void* thisstr)
+bool rfString_ToDouble(const void* str, double* f)
+{
+    char buff[MAX_DOUBLE_STRING_CHAR_SIZE + 1];
+    int index;
+
+    index = rfMax(MAX_DOUBLE_STRING_CHAR_SIZE, rfString_ByteLength(str));
+    memcpy(buff, rfString_Data(str), index);
+    buff[index] = '\0';
+
+    errno = 0;
+    *f = strtod(buff, NULL);
+    //check the result
+    if(DBLCMP_EQ(*f, 0.0f) || errno)
+    {
+        RF_ERROR("Failed to convert %s to double with strtod()"
+                 " errno: %d", buff, errno);
+        return false;        
+    }
+    return true;
+}
+
+void rfString_ToLower(void* s)
 {
     uint32_t charI,byteI;
-    RF_String* s = (RF_String*)thisstr;
-    RF_STRING_ITERATE_START(s,charI,byteI)
+    RF_STRING_ITERATE_START(s, charI, byteI)
         //if the character is lowercase
-        if(s->bytes[byteI] >= 65 && s->bytes[byteI]<=90)
+        if(rfString_Data(s)[byteI] >= 65 && rfString_Data(s)[byteI] <= 90)
         {
             //turn it into uppercase
-            s->bytes[byteI] += 32;
+            rfString_Data(s)[byteI] += 32;
         }
-    RF_STRING_ITERATE_END(charI,byteI)
+    RF_STRING_ITERATE_END(charI, byteI)
 }
 
-//Turns any lowercase characters of the string into upper case
-void rfString_ToUpper(void* thisstr)
+void rfString_ToUpper(void* s)
 {
-    uint32_t charI,byteI;
-    RF_String* s = (RF_String*)thisstr;
-    RF_STRING_ITERATE_START(s,charI,byteI)
+    uint32_t charI, byteI;
+    RF_STRING_ITERATE_START(s, charI, byteI)
         //if the character is lowercase
-        if(s->bytes[byteI] >= 97 && s->bytes[byteI]<=122)
+        if(rfString_Data(s)[byteI] >= 97 && rfString_Data(s)[byteI] <= 122)
         {
             //turn it into uppercase
-            s->bytes[byteI] -= 32;
+            rfString_Data(s)[byteI] -= 32;
         }
-    RF_STRING_ITERATE_END(charI,byteI)
+    RF_STRING_ITERATE_END(charI, byteI)
 }
 
-// Tokenizes the given string. Separates it into @c tokensN depending on how many substrings can be created from the @c sep separatior and stores them
-// into the Array of RF_String* that should be passed to the function
-char rfString_Tokenize(const void* str,const void* sepP,uint32_t* tokensN,RF_String** tokens)
+bool rfString_Tokenize(const void* str, const void* sep,
+                       uint32_t* tokensN, RF_String** tokens)
 {
-    const RF_String* thisstr = (const RF_String*)str;
-    const RF_String* sep = (const RF_String*)sepP;
-    uint32_t i;
+    uint32_t i, sepLen;
+    char *s;
+    char *e;
     RF_ENTER_LOCAL_SCOPE();
     //first find the occurences of the separator, and then the number of tokens
-    *tokensN = rfString_Count(thisstr,sep,0)+1;
+    *tokensN = rfString_Count(str, sep, 0) + 1;
     //error checking
     if(*tokensN == 1)
     {
@@ -197,33 +193,44 @@ char rfString_Tokenize(const void* str,const void* sepP,uint32_t* tokensN,RF_Str
         return false;
     }
     //allocate the tokens
-    RF_MALLOC(*tokens,sizeof(RF_String) *(*tokensN), false);
+    RF_MALLOC(*tokens, sizeof(RF_String) * (*tokensN), false);
     //find the length of the separator
-    uint32_t sepLen = sep->byteLength;
-    char* s,*e;
-    s = thisstr->bytes;
-    for(i = 0; i < (*tokensN)-1; i ++)
+    sepLen = rfString_ByteLength(sep);
+
+    s = rfString_Data(str);
+    e = rfString_Data(str) + rfString_ByteLength(str);
+    for(i = 0; i < (*tokensN) - 1; i ++)
     {
         //find each substring
-        e = strstr(s,sep->bytes);
-        (*tokens)[i].byteLength = e-s;
-        RF_MALLOC((*tokens)[i].bytes,(*tokens)[i].byteLength+1, false);
+        e = strstr_nnt(s, e - s,
+                       rfString_Data(sep), rfString_ByteLength(sep));
+        rfString_ByteLength(&(*tokens)[i]) = e - s;
+        RF_MALLOC(rfString_Data(&(*tokens)[i]),
+                  rfString_ByteLength(&(*tokens)[i]),
+                  false
+        );
         //put in the data
-        strncpy((*tokens)[i].bytes,s,(*tokens)[i].byteLength);
-        //null terminate
-        (*tokens)[i].bytes[(*tokens)[i].byteLength] = '\0';
-
+        memcpy(rfString_Data(&(*tokens)[i]),
+               s,
+               rfString_ByteLength(&(*tokens)[i])
+        );
         //prepare for next sub-string
-        s = e+sepLen;
+        s = e + sepLen;
 
     }
     ///make sure that if it's the last substring we change strategy
-    (*tokens)[i].byteLength = strlen(s);
-    RF_MALLOC((*tokens)[i].bytes,(*tokens)[i].byteLength+1, false);
+    rfString_ByteLength(&(*tokens)[i]) = (
+        rfString_ByteLength(str) - (s - rfString_Data(str))
+    );
+    RF_MALLOC(rfString_Data(&(*tokens)[i]),
+              rfString_ByteLength(&(*tokens)[i]),
+              false
+    );
     //put in the data
-    strncpy((*tokens)[i].bytes,s,(*tokens)[i].byteLength);
-    //null terminate
-    (*tokens)[i].bytes[(*tokens)[i].byteLength] = '\0';
+    memcpy(rfString_Data(&(*tokens)[i]),
+           s,
+           rfString_ByteLength(&(*tokens)[i])
+    );
 
     //success
     RF_EXIT_LOCAL_SCOPE();

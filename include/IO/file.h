@@ -40,7 +40,10 @@
 #include <Definitions/retcodes.h> //for booleans
 #include <IO/common.h> //for stat_rft
 #include <String/string_decl.h> //for RF_String
-#include <String/conversion.h> // for rfString_Cstr
+#include <stdlib.h> //for free
+
+//for rfString_Cstr with buffer
+#include "../../src/String/conversion.ph"
 
 #ifdef __cplusplus
 extern "C"
@@ -66,7 +69,16 @@ extern "C"
 #else
 i_INLINE_DECL int rfStat(RF_String* f, stat_rft* buffer)
 {
-    return stat(rfString_Cstr(f), (struct stat*)buffer);
+    unsigned int index;
+    int ret;
+    char * cs;
+    if(!(cs = rfString_Cstr_ibuff_push(f, &index)))
+    {
+        return -1;
+    }
+    ret = stat(cs, (struct stat*)buffer);
+    rfString_Cstr_ibuff_pop(index);
+    return ret;
 }
 #endif
 

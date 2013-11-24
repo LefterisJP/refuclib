@@ -25,7 +25,6 @@
 #include <IO/file.h>
 /*------------- Module related inclusion -------------*/
 #include <IO/common.h> //for common I/O flags and definitions
-#include "io.ph"//for private I/O macros
 /*------------- Outside Module inclusion -------------*/
 //for error logging
     #include <Utils/log.h>
@@ -108,10 +107,12 @@ bool rfFReadLine_UTF16(FILE* f, char eol, char** utf8,
                          uint32_t* byteLength, char* eof,
                          uint32_t* bytes_read, int endianess)
 {
-    char buff[RF_OPTION_FGETS_READ_BYTESN+5], ret = true;
+    char buff[RF_OPTION_FGETS_READ_BYTESN+5];
+
     uint32_t *codepoints, charsN, bytesN;
     uint32_t buffSize=RF_OPTION_FGETS_READ_BYTESN+5;
-    char* tempBuff = 0,buffAllocated=false;
+    char* tempBuff = 0;
+    bool ret = true, buffAllocated = false;
     *bytes_read = 0;
 
     if(!rfFgets_UTF16(buff, RF_OPTION_FGETS_READ_BYTESN, f, eof,
@@ -159,15 +160,13 @@ bool rfFReadLine_UTF16(FILE* f, char eol, char** utf8,
             }
         }while(bytesN >= RF_OPTION_FGETS_READ_BYTESN && (*eof)==false);//end of reading loop
     }//end of size not fitting the initial buffer case
-    if(bytesN >0)//determine the amount of bytes read
-    {
-        (*bytes_read) += bytesN;
-    }
+
     //allocate the codepoints
-    RF_MALLOC_JMP(codepoints, (*bytes_read + 5)*2, ret = false,
+    RF_MALLOC_JMP(codepoints, ((*bytes_read) + 5) * 2, ret = false,
                   cleanup2);
     //decode it into codepoints
-    if(!rfUTF16_Decode(tempBuff, &charsN, codepoints, (*bytes_read+5)*2))
+    if(!rfUTF16_Decode(tempBuff, *bytes_read, &charsN,
+                       codepoints, (*bytes_read+5)*2))
     {
 
         RF_ERROR("Failed to Decode UTF-16 from a File Descriptor");
@@ -189,7 +188,7 @@ bool rfFReadLine_UTF16(FILE* f, char eol, char** utf8,
   cleanup1:
     free(codepoints);
   cleanup2:
-    if(buffAllocated==true)
+    if(buffAllocated)
     {
         free(tempBuff);
     }
@@ -254,10 +253,7 @@ bool rfFReadLine_UTF32(FILE* f, char eol, char** utf8,
             }
         }while(bytesN >= RF_OPTION_FGETS_READ_BYTESN && (*eof)==false);//end of reading loop
     }//end of size not fitting the initial buffer case
-    if(bytesN >0)//determine the amount of bytes read
-    {
-        (*bytes_read) += bytesN;
-    }
+
     //utf-32 is actually codepoints
     codepoints = (uint32_t*)tempBuff;
     //now encode these codepoints into UTF8
@@ -449,8 +445,7 @@ bool rfFgets_UTF16(char* buff, uint32_t num, FILE* f,
             break;
         }//end of EOL dependent newline check
     }while(c !=(uint32_t) EOF && !eolReached);
-    //null terminate the buffer for UTF16
-    buff[*bytes_read] =  buff[(*bytes_read) + 1] = '\0';
+
     //finally check yet again for end of file right after the new line
     bytesN = rfFgetc_UTF16(f, &c, false, endianess, eofReached);
     if(bytesN < 0 && !(*eofReached))

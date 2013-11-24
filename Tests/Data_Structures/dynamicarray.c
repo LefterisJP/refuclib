@@ -1,6 +1,5 @@
 #include <RFstring.h>
 #include <RFdynamicarray.h>
-#include <RFprintf.h>
 #include <refu.h>
 
 #include "../refu_tests.h"

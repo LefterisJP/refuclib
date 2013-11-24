@@ -36,6 +36,7 @@
 #include <String/retrieval.h> //for rfString_Between and others
 #include <String/traversalx.h> //for rfStringX_MoveAfter() and other functions
 #include "common.ph" //for private string functions and macros
+#include "manipulation.ph" //for manipulation only stuff
 /*------------- Outside Module inclusion -------------*/
 #include <String/unicode.h> //for unicode functions
 //for the integer int and uint conversions
@@ -51,97 +52,61 @@
 //for RF_HEXEQ_C() and other macros
     #include <Utils/constcmp.h> 
 //for local scope macros
-    #include <Definitions/threadspecific.h> //for the thread specific attribute
-    #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
-    #include <string.h> //for memset()
-    #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
     #include <Utils/localscope.h>//for local scope macros
+//for sanity macros
+    #include <Utils/sanity.h>
 /*------------- End of includes -------------*/
 
-
-// Appends the parameter String to this extended string.
-char rfStringX_Append(RF_StringX* thisstr, const void* otherP)
+bool rfStringX_Append(RF_StringX* thisstr, const void* other)
 {
-    char ret = true;
-    const RF_String* other = (const RF_String*)otherP;
+    bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
+    i_NULLPTR_CHECK_1(other, "append", ret = false;goto cleanup);
 
-#if RF_OPTION_DEBUG
-    if(other == NULL)
-    {
-        RF_ERROR("Provided a NULL pointer for the other string argument");
-        ret = false;
-        goto cleanup;
-    }
-#endif
+    ret = rfStringXGEN_Append(thisstr, rfString_Data(other),
+                              rfString_ByteLength(other));
 
-    //calculate the new byte length
-    thisstr->INH_String.byteLength += other->byteLength;
-    //if it does not fit inside the remaining size, reallocate the buffer
-    RF_STRINGX_REALLOC_JMP(thisstr,
-                           thisstr->INH_String.byteLength+thisstr->bIndex+1,
-                           ret = false,
-                           cleanup);
-    //add the string to this one
-    strncat(thisstr->INH_String.bytes, other->bytes, other->byteLength);
-
+#ifdef RF_OPTION_DEBUG
   cleanup:
+#endif
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
-
-//Appends a number of characters from the parameter String to this extended string.
-char rfStringX_Append_i(RF_StringX* thisstr, const void* otherP, int chars)
+bool rfStringX_Append_chars(RF_StringX* thisstr, const void* other, int chars)
 {
-    const RF_String* other = (const RF_String*)otherP;
     uint32_t i;
     uint32_t length = 0;
     unsigned end = 0;
-    char ret = true;
+    bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-
-#if RF_OPTION_DEBUG
-    if(other == NULL)
-    {
-        RF_ERROR("Provided a NULL pointer for the other string argument");
-        ret = false;
-        goto cleanup;
-    }
-#endif
+    i_NULLPTR_CHECK_1(other, "append", ret = false; goto cleanup);
 
     //find out the bytelength of the requested char position
-    RF_STRING_ITERATE_START(other,length,i);
+    RF_STRING_ITERATE_START(other, length, i);
         if(length == chars)
         {
             end = i;
             break;
         }
-    RF_STRING_ITERATE_END(length,i)
-
-    //if the end is not found (requested out of bounds character) then just take all of the string
-    if(end == 0)
+    RF_STRING_ITERATE_END(length, i)
+    //if the end is not found
+    if(!end)
     {
-        end = other->byteLength;
+        end = rfString_ByteLength(other);
     }
-    //calculate the new bytelength
-    thisstr->INH_String.byteLength += end;
-    //if it does not fit inside the remaining size, reallocate the buffer
-    RF_STRINGX_REALLOC_JMP(thisstr,
-                           thisstr->INH_String.byteLength+thisstr->bIndex+1,
-                           ret = false, cleanup);
-    //add the part of the other string to this one
-    strncat(thisstr->INH_String.bytes, other->bytes, end);
+    ret = rfStringXGEN_Append(thisstr, rfString_Data(other), end);
 
+#ifdef RF_OPTION_DEBUG
   cleanup:
+#endif
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
-//Appends a single unicode character to this string
-char rfStringX_Append_char(RF_StringX* thisstr, uint32_t unichar)
+bool rfStringX_Append_char(RF_StringX* thisstr, uint32_t unichar)
 {
-    char utf8[5];
+    char utf8[MAX_UTF8C_BYTES];
     int length;
     if((length = rfUTF8_Encode_single(unichar,utf8)) <= 0)
     {
@@ -149,645 +114,56 @@ char rfStringX_Append_char(RF_StringX* thisstr, uint32_t unichar)
         return false;
     }
 
-    //calculate the new bytelength
-    thisstr->INH_String.byteLength += length;
-    //if it does not fit inside the remaining size, reallocate the buffer
-    RF_STRINGX_REALLOC(thisstr,
-                       thisstr->INH_String.byteLength+thisstr->bIndex+1,
-                       false);
-    //add it
-    strcat(thisstr->INH_String.bytes,utf8);
-    return true;
+    return rfStringXGEN_Append(thisstr, utf8, length);
 }
 
-//Appends a single utf8 character to this string
-char rfStringX_Append_charutf8(RF_StringX* thisstr,uint32_t utf8char)
+bool rfStringX_Prepend(RF_StringX* thisstr, const void* other)
 {
-    int i,j;
-    uint32_t length = 0;
-    char c = utf8char&0xFF,utf8[5];
-
-    //if it may not fit inside the remaining size, reallocate the buffer
-    RF_STRINGX_REALLOC(thisstr,
-                       thisstr->INH_String.byteLength+thisstr->bIndex+5,
-                       false);
-    //add the bytes of the utf8
-    while(c != 0 && length<4)
-    {
-        utf8[length] = c;
-        length++;
-        utf8char = utf8char>>8;
-        c = utf8char&0xFF;
-    }
-    for(i=length-1,j=0; i>=0; i--,j++)
-    {
-        thisstr->INH_String.bytes[thisstr->INH_String.byteLength+j] = utf8[i];
-    }
-    //determine the new bytelength
-    thisstr->INH_String.byteLength += length;
-    //and null terminate it
-    thisstr->INH_String.bytes[thisstr->INH_String.byteLength]='\0';
-    return true;
-}
-
-/* max number of bytes used for an int */
-#define INTNUMBUFF 64
-//Appends an int to the extended string
-char rfStringX_Append_int(RF_StringX* thisstr, int64_t num, int width,
-                          int precision, char flags)
-{
-    char buff[INTNUMBUFF];
-    int len=0;
-    char hasSign=0;
-
-    if(flags & RF_FORMATFLAG_SIGN && num > 0)//force a '+' for positive
-    {
-        buff[0] ='+';
-        len=1;
-        hasSign=1;
-    }
-    else if(flags & RF_FORMATFLAG_NOSIGN && num > 0)
-    {//If the first character of a signed conversion is not a sign or if a signed conversion results in no characters, a <space> shall be prefixed to the result
-        buff[0] = ' ';
-        len=1;
-        hasSign=1;
-    }
-
-
-    //turn the string into a number
-    len+=intToStr(num,buff+hasSign);
-
-    //if we need less digits
-    if(len-hasSign > precision)
-    {
-        len=precision + hasSign;
-    }
-    //if we need more space
-    if(width> len)
-    {
-        char pad = ' ';
-        int diff = width-len;
-        if(flags & RF_FORMATFLAG_PADZEROES)
-        {
-            pad = '0';
-        }
-        if(flags & RF_FORMATFLAG_LJUSTIFY)
-        {
-            memset(buff+len,pad,diff);
-        }
-        else//right justify
-        {
-            //move the buffer to the right to make room for the padding
-            memmove(buff+diff,buff,len);
-            memset(buff,pad,diff);
-        }
-        len = width;
-    }
-    //null terminate the buffer
-    buff[len] = '\0';
-
-    //calculate the new bytelength
-    thisstr->INH_String.byteLength += len;
-    //if it does not fit inside the remaining size, reallocate the buffer
-    RF_STRINGX_REALLOC(thisstr,
-                       thisstr->INH_String.byteLength+thisstr->bIndex+1,
-                       false);
-    //add the int to the string
-    strncat(thisstr->INH_String.bytes,buff,len);
-    return true;
-}
-
-//Appends an unsigned int to the extended string
-char rfStringX_Append_uint(RF_StringX* thisstr, uint64_t num, int width,
-                           int precision, char flags)
-{
-    char buff[INTNUMBUFF];
-    char hasSign=0;
-    int len =0;
-    /* - finding it useless for unsigned ints, will leave it commented and think about it
-    if(flags & RF_FORMATFLAG_SIGN)//force a '+'
-    {
-        buff[0] ='+';
-        i=1;
-        hasSign=1;
-    }*/
-    if(flags & RF_FORMATFLAG_NOSIGN)
-    {
-        buff[0] = ' ';
-        hasSign=1;
-        len=1;
-    }
-
-    //turn the string into a number
-    len+=uintToStr(num,buff+hasSign);
-
-    //if we need less digits
-    if(len - hasSign > precision)
-    {
-        len=precision;
-        if(hasSign)
-        {
-            len +=1;
-        }
-    }
-    //if we need more space
-    if(width> len)
-    {
-        int diff=width-len;
-        char pad = ' ';
-        if(flags & RF_FORMATFLAG_PADZEROES)
-        {
-            pad = '0';
-        }
-        if(flags & RF_FORMATFLAG_LJUSTIFY)
-        {
-            memset(buff+len,pad,diff);
-        }
-        else//right justify
-        {
-            //move the buffer to the right to make room for the padding
-            memmove(buff+diff,buff,len);
-            memset(buff,pad,diff);
-        }
-        len = width;
-    }
-    //null terminate the buffer
-    buff[len] = '\0';
-
-    //calculate the new bytelength
-    thisstr->INH_String.byteLength += len;
-    //if it does not fit inside the remaining size, reallocate the buffer
-    RF_STRINGX_REALLOC(thisstr,
-                       thisstr->INH_String.byteLength+thisstr->bIndex+1,
-                       false);
-    //add the int to the string
-    strncat(thisstr->INH_String.bytes,buff,len);
-    return true;
-}
-
-//Appends an unsigned int as a Hexadecimal value to the extended string following some specific parameters
-char rfStringX_Append_hex(RF_StringX* thisstr, uint64_t num, int width,
-                          int precision, char flags)
-{
-    char buff[INTNUMBUFF];
-    int len = 0;
-    if(flags&RF_FORMATFLAG_SHARP)
-    {
-        len+=2;
-        buff[0] = '0';
-        buff[1] = 'x';
-    }
-    if(flags&RF_FORMATFLAG_UPPER)
-    {
-        len+=uintToUHexStr(num,buff+len);
-    }
-    else
-    {
-        len+=uintToLHexStr(num,buff+len);
-    }
-    //if we need less digits
-    if(len>precision)
-    {
-        len=precision;
-    }
-    //if we need more space
-    if(width> len)
-    {
-        int diff=width-len;
-        char pad = ' ';
-        if(flags & RF_FORMATFLAG_PADZEROES)
-        {
-            pad = '0';
-        }
-        if(flags & RF_FORMATFLAG_LJUSTIFY)
-        {
-            memset(buff+len, pad, diff);
-        }
-        else//right justify
-        {
-            //move the buffer to the right to make room for the padding
-            memmove(buff+diff,buff,len);
-            memset(buff,pad,diff);
-        }
-        len = width;
-    }
-    //null terminate the buffer
-    buff[len] = '\0';
-    //calculate the new bytelength
-    thisstr->INH_String.byteLength += len;
-    //if it does not fit inside the remaining size, reallocate the buffer
-    RF_STRINGX_REALLOC(thisstr,
-                       thisstr->INH_String.byteLength+thisstr->bIndex+1,
-                       false);
-    //add the int to the string
-    strncat(thisstr->INH_String.bytes,buff,len);
-    return true;
-}
-
-// Appends a float or double value to the extended string following some specific parameters
-char rfStringX_Append_double(RF_StringX* thisstr, double f, int width,
-                             int precision, char flags)
-{
-    char* result,*end,*str,hasSign;
-    int decpt,sign,len,start;
-    result=doubleToStr(f,3,precision,&decpt,&sign,&end);
-    len = end-result+1;
-    str = thisstr->INH_String.bytes+thisstr->INH_String.byteLength;
-    start = thisstr->INH_String.byteLength;
-    //negative check
-    hasSign=0;
-    if(sign!=0)
-    {
-        len+=1;
-        *str++ = '-';
-        hasSign=1;
-    }
-    if(decpt < 0)//if decpt is less than zero then we gotta play it differently
-    {
-        int udec = -1*decpt;
-        len+= udec+2;//+2 is for "0."
-        RF_STRINGX_REALLOC(
-            thisstr,
-            thisstr->INH_String.byteLength+thisstr->bIndex+3+len+width,
-            false);//3 = 2 (for both sign and decpt==0) +1 (null termination character) +width (may be an overkill but maybe it's better than an extra comparison)
-        str = thisstr->INH_String.bytes+thisstr->INH_String.byteLength+hasSign;
-        *str++='0';
-        *str++='.';
-
-        memset(str,'0',udec);
-        str = str+ udec;
-        while(*result !='\0')
-        {
-            *str++=*result++;
-        }
-        *str='\0';
-        thisstr->INH_String.byteLength+=len;
-
-    }
-    //if there are no characters after the radix
-    else if(len == decpt+1)
-    {
-        RF_STRINGX_REALLOC(
-            thisstr,
-            thisstr->INH_String.byteLength+thisstr->bIndex+3+len+width,
-            false);//3 = 2 (for both sign and decpt==0) +1 (null termination character) +width (may be an overkill but maybe it's better than an extra comparison)
-        str = thisstr->INH_String.bytes+thisstr->INH_String.byteLength+hasSign;
-        do
-        {
-            *str++ = *result++;
-        }while(*result!='\0');
-        *str='\0';
-        len=decpt;
-        thisstr->INH_String.byteLength+=len;
-        if(flags & RF_FORMATFLAG_SHARP)
-        {
-            *str++ = '.';
-            *str++ = '0';
-            *str++ = '\0';
-            len+=2;
-            thisstr->INH_String.byteLength+=2;
-        }
-    }
-    //else check all the bad number cases
-    else if(decpt == 9999)
-    {
-        RF_STRINGX_REALLOC(
-            thisstr,
-            thisstr->INH_String.byteLength+thisstr->bIndex+4+width,
-            false);
-        str = thisstr->INH_String.bytes+thisstr->INH_String.byteLength;
-        len = 3;
-        thisstr->INH_String.byteLength+=3;
-        if(strcmp(result,"Infinity")==0)
-        {
-            if(flags & RF_FORMATFLAG_UPPER)
-            {
-                *str++ = 'I';
-                *str++ = 'N';
-                *str++ = 'F';
-                *str++ = '\0';
-            }
-            else
-            {
-                *str++ = 'i';
-                *str++ = 'n';
-                *str++ = 'f';
-                *str++ = '\0';
-            }
-        }
-        else if(strcmp(result,"NaN")==0)
-        {
-            if(flags & RF_FORMATFLAG_UPPER)
-            {
-                *str++ = 'N';
-                *str++ = 'A';
-                *str++ = 'N';
-                *str++ = '\0';
-            }
-            else
-            {
-                *str++ = 'n';
-                *str++ = 'a';
-                *str++ = 'n';
-                *str++ = '\0';
-            }
-        }
-    }
-    else//normal case
-    {
-        RF_STRINGX_REALLOC(
-            thisstr,
-            thisstr->INH_String.byteLength+thisstr->bIndex+3+len+width,
-            false);//3 = 2 (for both sign and decpt==0) +1 (null termination character) +width (may be an overkill but maybe it's better than an extra comparison)
-        str = thisstr->INH_String.bytes+thisstr->INH_String.byteLength+hasSign;
-        if(!decpt)//if decimal point is at zero we got 1 more digit in the length
-        {
-            len+=1;
-            *str++='0';
-        }
-
-        memcpy(str, result, decpt);
-        str = str+decpt;
-        *str++ = '.';
-        result = result+decpt;
-        do
-        {
-             *(str++) = *(result++);
-        }while(*result != '\0');
-        *str = '\0';
-
-        //take care of byteLength
-        thisstr->INH_String.byteLength+=len;
-    }//end of all cases
-
-    //check to see if more width should be given
-    if(width > len)
-    {
-        int diff = width-len;
-        char pad = ' ';
-        if(flags & RF_FORMATFLAG_PADZEROES)
-        {
-            pad = '0';
-        }
-        if(flags & RF_FORMATFLAG_LJUSTIFY)//left justify
-        {
-            memset(thisstr->INH_String.bytes+thisstr->INH_String.byteLength,
-                   pad,
-                   diff);
-        }
-        else//right justify
-        {
-            memmove(thisstr->INH_String.bytes+start+diff,
-                    thisstr->INH_String.bytes+start,len);
-            memset(thisstr->INH_String.bytes+start, pad, diff);
-        }
-        thisstr->INH_String.byteLength+=diff;
-        thisstr->INH_String.bytes[thisstr->INH_String.byteLength] ='\0';
-    }
-    //success
-    return true;
-}
-
-//Appends a float or double value to the extended string in scientific notation following some specific parameters
-char rfStringX_Append_double_scientific(RF_StringX* thisstr, double f,
-                                        int width, int precision,
-                                        char flags)
-{
-    char* result,*str,*end,hasSign=0;
-    int decpt,sign,len,start;
-    result=doubleToStr(f, 3, 999, &decpt, &sign, &end);//for scientific notation calling doubleToStr() with 999 precision because there might be cases where
-    len=0;      //in normal notation the given precision would be enough but since the radix moves in scientific we would be left with less data than we need
-    start = thisstr->INH_String.byteLength;
-    str = thisstr->INH_String.bytes+thisstr->INH_String.byteLength;
-    //negative check
-    if(sign!=0)
-    {
-        len+=1;
-        hasSign=1;
-        *str++ = '-';
-    }
-    //if there are no characters after the radix and the flag does not specifically request the radix in all cases
-    if(decpt == end-result && (!(flags &RF_FORMATFLAG_SHARP)))
-    {
-        RF_STRINGX_REALLOC(
-            thisstr,
-            thisstr->INH_String.byteLength+thisstr->bIndex+3+len+width,
-            false);//3 = 2 (for both sign and decpt==0) +1 (null termination character) +width (may be an overkill but maybe it's better than an extra comparison)
-        str = thisstr->INH_String.bytes+thisstr->INH_String.byteLength+hasSign;
-        do
-        {
-            len++;
-            *str++ = *result++;
-        }while(*result!='\0');
-        *str='\0';
-        thisstr->INH_String.byteLength+=len;
-    }
-    //else check all the bad number cases
-    else if(decpt == 9999)
-    {
-        RF_STRINGX_REALLOC(
-            thisstr,
-            thisstr->INH_String.byteLength+thisstr->bIndex+4+width,
-            false);
-        str = thisstr->INH_String.bytes+thisstr->INH_String.byteLength;
-        len = 3;
-        thisstr->INH_String.byteLength+=3;
-        if(strcmp(result,"Infinity")==0)
-        {
-            if(flags & RF_FORMATFLAG_UPPER)
-            {
-                *str++ = 'I';
-                *str++ = 'N';
-                *str++ = 'F';
-                *str++ = '\0';
-            }
-            else
-            {
-                *str++ = 'i';
-                *str++ = 'n';
-                *str++ = 'f';
-                *str++ = '\0';
-            }
-        }
-        else if(strcmp(result,"NaN")==0)
-        {
-            if(flags & RF_FORMATFLAG_UPPER)
-            {
-                *str++ = 'N';
-                *str++ = 'A';
-                *str++ = 'N';
-                *str++ = '\0';
-            }
-            else
-            {
-                *str++ = 'n';
-                *str++ = 'a';
-                *str++ = 'n';
-                *str++ = '\0';
-            }
-        }
-    }
-    else//normal case
-    {
-        char buff[4];
-        int i = 0;
-        int pCount = 0;//will hold the counter of precision for the digits after the radix
-        RF_STRINGX_REALLOC(
-            thisstr,
-            thisstr->INH_String.byteLength+thisstr->bIndex+precision+width+6,
-            false);//+6 is for the digits needed for scientific notation
-        str = thisstr->INH_String.bytes+thisstr->INH_String.byteLength+hasSign;
-        if(!decpt)//if decimal point is at zero we got 1 more digit in the length
-        {
-            len+=1;
-            *str++='0';
-        }
-        else//take the first digit of the result
-        {
-            *str++=*result++;
-        }
-        *str++='.';//output the decimal point
-        do
-        {
-            *str++=*result++;
-            pCount++;
-        }while(*result != '\0' && pCount < precision);
-        len+=pCount+4;//+1 is for the 'E' or 'e' below,+1 for the operator '+' or '-', +1 for the first digit at the start of the else and +1 for the radix right after that
-        if(flags & RF_FORMATFLAG_UPPER)
-        {
-            *str++='E';
-        }
-        else
-        {
-            *str++='e';
-        }
-        if(decpt >=0)
-        {
-            *str++='+';
-            uintToStr(decpt-1,buff);
-            do
-            {
-                *str++ = buff[i];
-                i++;
-                len++;
-            }while(buff[i] != '\0');
-
-        }
-        else
-        {
-            *str++='-';
-            uintToStr(-1*(-1+decpt),buff);
-            do
-            {
-                *str++ = buff[i];
-                i++;
-                len++;
-            }while(buff[i] != '\0');
-        }
-        *str='\0';
-        //take care of byteLength
-        thisstr->INH_String.byteLength+=len;
-    }//end of all cases
-
-    //check to see if more width should be given
-    if(width > len)
-    {
-        int diff = width-len;
-        char pad = ' ';
-        if(flags & RF_FORMATFLAG_PADZEROES)
-        {
-            pad = '0';
-        }
-        if(flags & RF_FORMATFLAG_LJUSTIFY)//left justify
-        {
-            memset(thisstr->INH_String.bytes+thisstr->INH_String.byteLength,pad,diff);
-        }
-        else//right justify
-        {
-            memmove(thisstr->INH_String.bytes+start+diff,
-                    thisstr->INH_String.bytes+start,len);
-            memset(thisstr->INH_String.bytes+start, pad, diff);
-        }
-        thisstr->INH_String.byteLength+=diff;
-        thisstr->INH_String.bytes[thisstr->INH_String.byteLength] ='\0';
-    }
-    //success
-    return true;
-}
-
-
-// Prepends the parameter String to this extended string
-char rfStringX_Prepend(RF_StringX* thisstr, const void* otherP)
-{
-    char ret = true;
-    const RF_String* other = (const RF_String*)otherP;
-    int32_t i;//is not unsigned since it goes to -1 in the loop
-    //keep the previous byte length
-    uint32_t size = thisstr->INH_String.byteLength;
-
+    bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-#if RF_OPTION_DEBUG
-    if(other == NULL)
-    {
-        RF_ERROR("Provided a NULL pointer for the other string argument");
-        ret = false;
-        goto cleanup;
-    }
-#endif 
+    i_NULLPTR_CHECK_1(other, "prepend", ret=false;goto cleanup);
 
-
-    //get the new byte length
-    thisstr->INH_String.byteLength += other->byteLength;
     //if the new string does not fit inside the buffer reallocate it
     RF_STRINGX_REALLOC_JMP(
         thisstr,
-        thisstr->INH_String.byteLength+thisstr->bIndex+1,
+        rfString_ByteLength(thisstr) + rfString_ByteLength(other),
         ret = false,
         cleanup
-        );
-    //move the pre-existing string to the end of the buffer, by dislocating each byte by cstrlen
-    for(i = size; i >= 0; i --)
-    {
-        thisstr->INH_String.bytes[i+other->byteLength] = thisstr->INH_String.bytes[i];
-    }
-    //and now add the new string to the start
-    memcpy(thisstr->INH_String.bytes,other->bytes,other->byteLength);
+    );
 
+    if(!rfStringGEN_Prepend(thisstr,
+                            rfString_Data(other),
+                            rfString_ByteLength(thisstr),
+                            rfString_ByteLength(other)))
+    {
+        ret = false;
+    }
   cleanup:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
-// Inserts a string to this extended string at the parameter position.
-char rfStringX_Insert(RF_StringX* thisstr, uint32_t pos,
-                      const void* otherP)
+bool rfStringX_Insert(RF_StringX* thisstr, uint32_t pos,
+                      const void* other)
 {
-    const RF_String* other = (const RF_String*)otherP;
-    uint32_t length,bytePos,size,i;
-    char found = false, ret = true;
+    uint32_t length, bytePos, size, i;
+    bool found = false, ret = false;
     RF_ENTER_LOCAL_SCOPE();
+    i_NULLPTR_CHECK_1(other, "insert", goto cleanup);
 
-#if RF_OPTION_DEBUG
-    if(other == NULL)
-    {
-        RF_ERROR("Provided a NULL pointer for the other string argument");
-        ret = false;
-        goto cleanup;
-    }
-#endif
 
     //keep the original byte length here
-    size = thisstr->INH_String.byteLength;
+    size = rfString_ByteLength(thisstr);
     //get the new byte length
-    thisstr->INH_String.byteLength += other->byteLength;
+    rfString_ByteLength(thisstr) += rfString_ByteLength(other);
     //check if the new string fits in the buffer and if not reallocate it
     RF_STRINGX_REALLOC_JMP(
         thisstr,
-        thisstr->INH_String.byteLength+thisstr->bIndex+1,
-        ret = false,
+        rfString_ByteLength(thisstr),
+        ;,
         cleanup);
     //iterate this string to find the byte position of the character position
-    RF_STRING_ITERATE_START(thisstr,length,i)
+    RF_STRING_ITERATE_START(thisstr, length, i)
         if(length == pos)
         {
             //found the position. Is saved in bytePos
@@ -795,17 +171,19 @@ char rfStringX_Insert(RF_StringX* thisstr, uint32_t pos,
             found = true;
             break;
         }
-    RF_STRING_ITERATE_END(length,i);
+    RF_STRING_ITERATE_END(length, i);
     //if the position is found in the string then insert
-    if(found != false)
+    if(found)
     {
+        ret = true;
         //move the string's contents to make room for the extra string insertion
-        memmove(thisstr->INH_String.bytes+other->byteLength+bytePos,
-                thisstr->INH_String.bytes+bytePos,size-bytePos+1);
-        //+1 is for the null termination character
+        memmove(
+            rfString_Data(thisstr) + rfString_ByteLength(other) + bytePos,
+            rfString_Data(thisstr) + bytePos, size - bytePos);
         //now insert the new string
-        memcpy(thisstr->INH_String.bytes+bytePos,
-               other->bytes,other->byteLength);
+        memcpy(rfString_Data(thisstr) + bytePos,
+               rfString_Data(other),
+               rfString_ByteLength(other));
     }
 
   cleanup:
@@ -813,331 +191,198 @@ char rfStringX_Insert(RF_StringX* thisstr, uint32_t pos,
     return ret;
 }
 
-/*-- RF_StringX unsafe appending  functions--*/
-// Appends some bytes of the parameter String to this extended string.
-char rfStringX_Append_bytes(RF_StringX* thisstr, const void* otherP,
+/*--- RF_StringX unsafe appending functions---*/
+
+bool rfStringX_Append_bytes(RF_StringX* thisstr, const void* other,
                             const int32_t bytes)
 {
-    const RF_String* other = (const RF_String*)otherP;
-    char ret = true;
+    bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
+    i_NULLPTR_CHECK_1(other, "append_bytes", ret=false;goto cleanup);
 
-#if RF_OPTION_DEBUG
-    if(other == NULL)
-    {
-        RF_ERROR("Provided a NULL pointer for the other string argument");
-        ret = false;
-        goto cleanup;
-    }
-#endif
-    //calculate the new bytelength
-    thisstr->INH_String.byteLength += bytes;
     //if it does not fit inside the remaining size, reallocate the buffer
     RF_STRINGX_REALLOC_JMP(
         thisstr,
-        thisstr->INH_String.byteLength+thisstr->bIndex+1,
+        rfString_ByteLength(thisstr) + bytes,
         ret = false,
         cleanup);
-    //add the part of the other string to this one
-    strncat(thisstr->INH_String.bytes, other->bytes, bytes);
+    ret = rfStringXGEN_Append(thisstr, rfString_Data(other), bytes);
 
   cleanup:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
-//Appends a cstring to this string
-char rfStringX_Append_cstr(RF_StringX* thisstr, const char* cstr)
+
+bool rfStringX_Append_cstr(RF_StringX* thisstr, const char* cstr)
 {
-#if RF_OPTION_DEBUG
-    if(cstr == NULL)
-    {
-        RF_ERROR("Provided a NULL pointer for the c string argument");
-        return false;
-    }
-#endif
-    //calculate the new bytelength
-    thisstr->INH_String.byteLength += strlen(cstr);
+    size_t len = strlen(cstr);
+    i_NULLPTR_CHECK_1(other, "append_cstr", ret=false;goto cleanup);
     //if it does not fit inside the remaining size, reallocate the buffer
     RF_STRINGX_REALLOC(
         thisstr,
-        thisstr->INH_String.byteLength+thisstr->bIndex+1,
+        rfString_ByteLength(thisstr) + len,
         false);
-    //add the part of the other string to this one
-    strcat(thisstr->INH_String.bytes,cstr);
-    return true;
+    
+    return rfStringXGEN_Append(thisstr, cstr, len);
 }
 
 /*--- RF_StringX replacing functions---*/
-// Replaces all of the specified sstr substring from the extended String with string rstr
+
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-char rfStringX_Replace(RF_StringX* thisstr, const void* sstrP,
-                       const void* rstrP, uint32_t num,
+bool rfStringX_Replace(RF_StringX* thisstr, const void* sstr,
+                       const void* rstr, uint32_t num,
                        const char options)
 #else
-char i_rfStringX_Replace(RF_StringX* thisstr, const void* sstrP,
-                         const void* rstrP, uint32_t num,
+bool i_rfStringX_Replace(RF_StringX* thisstr, const void* sstr,
+                         const void* rstr, uint32_t num,
                          const char options)
 #endif
 {
-    const RF_String* sstr = (const RF_String*)sstrP;
-    const RF_String* rstr = (const RF_String*)rstrP;
-    //will keep the number of found instances of the substring
-    uint32_t foundN = 0;
-    uint32_t diff,i,j,start, bSize;
-    int32_t* bytePositions;
-    char ret = true;
+    //will keep the number of given instances to find
+    uint32_t number = num;
+    bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
+    i_NULLPTR_CHECK_2(sstr, rstr, ret=false;goto cleanup);
 
-#if RF_OPTION_DEBUG
-    if(sstr == NULL || rstr == NULL )
-    {
-        RF_ERROR("Provided a NULL pointer for either the search or "
-                 "the replace string argument");
-        ret = false;
-        goto cleanup;
-    }
-#endif
-
-    //if the substring string is not even found return false
-    if(rfString_FindBytePos(thisstr,sstr,options) == RF_FAILURE)
+    if(!replace_intro(thisstr, &number, sstr, options))
     {
         ret = false;
         goto cleanup;
     }
-    //create a buffer that will keep the byte positions
-    bSize = 50;
-    RF_MALLOC_JMP(bytePositions, bSize*sizeof(int32_t),
-                  ret = false, cleanup1);
-    //if the given num is 0 just make sure we replace all
-    if(num == 0)
-    {
-        num = UINT_MAX;//max number of occurences
-    }
-    //find how many occurences exist but also remember the previous position of the internal pointer
-    start = thisstr->bIndex;
-    while((bytePositions[foundN] = rfString_FindBytePos(
-               thisstr, sstr, options))  != RF_FAILURE)
-    {
-        int32_t move = bytePositions[foundN] + sstr->byteLength;
-        bytePositions[foundN] = bytePositions[foundN]+thisstr->bIndex-start;
-        thisstr->bIndex += move;
-        thisstr->INH_String.bytes += move;
-        thisstr->INH_String.byteLength -= move;
-        foundN++;
-        //if buffer is in danger of overflow realloc it
-        if(foundN > bSize)
-        {
-            bSize *=2;
-            RF_REALLOC_JMP(bytePositions, int32_t, bSize,
-                           ret = false, cleanup);
-        }
-        //if we found the required number of occurences break;
-        if(foundN >= num)
-        {
-            break;
-        }
-    }
-    //move the internal pointer back since we are done searching
-    thisstr->INH_String.bytes -= thisstr->bIndex-start;
-    thisstr->INH_String.byteLength += thisstr->bIndex-start;
-    thisstr->bIndex = start;
-    //make sure that the number of occurences to replace do not exceed the actual number of occurences
-    if(num > foundN)
-    {
-        num = foundN;
-    }
+
     //act depending on the size difference of rstr and sstr
-    if(rstr->byteLength > sstr->byteLength) //replace string is bigger than the removed one
+    if(rfString_ByteLength(rstr)> rfString_ByteLength(sstr))
     {
-        int32_t reqSize;
-        diff = rstr->byteLength - sstr->byteLength;
-        //calculate the required bytelength
-        reqSize = thisstr->INH_String.byteLength + num*diff;
-        //reallocate the string to fit the new bigger size if needed
-        RF_STRINGX_REALLOC_JMP(thisstr,
-                               reqSize+thisstr->bIndex+1,
-                               ret = false,
-                               cleanup);
-        //now replace all the substrings one by one
-        for(i = 0; i < num; i ++)
-        {
-            //make space in the string for the replacement
-            memmove(
-                thisstr->INH_String.bytes+bytePositions[i]+sstr->byteLength+diff,
-                thisstr->INH_String.bytes+bytePositions[i]+sstr->byteLength,
-                thisstr->INH_String.byteLength+1-(bytePositions[i]+sstr->byteLength));
-            //copy in the replacement
-            memcpy(
-                thisstr->INH_String.bytes+bytePositions[i],
-                rstr->bytes,
-                rstr->byteLength);
-            //also increase the bytelength (since now we moved the whole string by one replacement)
-            thisstr->INH_String.byteLength += diff;
-            //also increase all the subsequent found byte positions since there is a change of string size
-            for(j = i+1; j < num; j ++)
-            {
-                bytePositions[j] = bytePositions[j]+diff;
-            }
-        }
+        //reallocate the string if needed
+        RF_STRINGX_REALLOC_JMP(
+            thisstr,
+            rfString_ByteLength(thisstr) + number * (
+                rfString_ByteLength(rstr) - rfString_ByteLength(sstr)
+            ),
+            ret = false, cleanup
+        );
+        replace_greater(thisstr, number, sstr, rstr);
     }
-    else if(rstr->byteLength < sstr->byteLength) //replace string is smaller than the removed one
+    else if(rfString_ByteLength(rstr) < rfString_ByteLength(sstr))
     {
-        //get the differenc in byte length of removed substring and replace string
-        diff = sstr->byteLength-rstr->byteLength;
-
-        //now replace all the substrings one by one
-        for(i =0; i < num; i ++)
-        {
-            //copy in the replacement
-            memcpy(
-                thisstr->INH_String.bytes+bytePositions[i],
-                rstr->bytes,
-                rstr->byteLength);
-            //move all of the contents of the string to fit the replacement
-            memmove(
-                thisstr->INH_String.bytes+bytePositions[i]+rstr->byteLength,
-                thisstr->INH_String.bytes+bytePositions[i]+sstr->byteLength,
-                thisstr->INH_String.byteLength+1-(bytePositions[i]+sstr->byteLength));
-            //reduce bytelength
-            thisstr->INH_String.byteLength-=diff;
-            //also decrease all the subsequent found byte positions since there is a change of string size
-            for(j = i+1; j < num; j ++)
-            {
-                bytePositions[j] = bytePositions[j]-diff;
-            }
-        }
-        //just note that reallocating downwards is not necessary
+        replace_lesser(thisstr, number, sstr, rstr);
     }
     else //replace and remove strings are equal
     {
-        for(i = 0; i < num; i ++)
-        {
-            strncpy(
-                thisstr->INH_String.bytes+bytePositions[i],
-                rstr->bytes,
-                rstr->byteLength);
-        }
+        replace_equal(thisstr, number, rstr);
     }
 
-#ifdef RF_OPTION_SAFE_MEMORY_ALLOCATION //only used for malloc fail
-  cleanup1:
-#endif
-    free(bytePositions);
   cleanup:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
-//Replaces what exists between the ith left and right substrings of this extended String.Utilizes the internal string pointer.
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-char rfStringX_ReplaceBetween(RF_StringX* thisstr, const void* leftP,
-                              const void* rightP, const void* rstrP,
+bool rfStringX_ReplaceBetween(RF_StringX* thisstr, const void* left,
+                              const void* right, const void* rstr,
                               char options, uint32_t i)
 #else
-char i_rfStringX_ReplaceBetween(RF_StringX* thisstr, const void* leftP,
-                                const void* rightP, const void* rstrP,
+bool i_rfStringX_ReplaceBetween(RF_StringX* thisstr, const void* left,
+                                const void* right, const void* rstr,
                                 char options, uint32_t i)
 #endif
 {
-    const RF_String* left = (const RF_String*)leftP;
-    const RF_String* right = (const RF_String*)rightP;
-    const RF_String* rstr = (const RF_String*)rstrP;
     uint32_t j,move,start = thisstr->bIndex;
-    char found = false,ret=false;
+    bool found = false,ret=false;
     RF_String ss;
     RF_ENTER_LOCAL_SCOPE();
 
-#if RF_OPTION_DEBUG
-    if(left == NULL || right == NULL || rstr = NULL)
-    {
-        RF_ERROR("Provided a NULL pointer for either the left or the right "
-                 "or the replace string argument");
-        ret = false;
-        goto cleanup1;
-    }
-#endif
-
+    i_NULLPTR_CHECK_3(left, right, rstr, ret=false; goto cleanup);
 
     if(i==0)//if we want all occurences replaced
     {
         //while we have occurences of the pair
-        while(rfString_Between(thisstr,left,right,&ss,options) != false)
+        while(!rfString_Between(thisstr, left, right, &ss, options))
         {
             found = true;
-            //move the internal pointer right after the left part of the pair and replace what was found there
-            //no of the functions below fail since the while condition is true
-            rfStringX_MoveAfter(thisstr,left,0,options);
-            if(rfStringX_Replace(thisstr,&ss,rstr,1,options))
+            /*
+             * move the internal pointer right after the left part of the pair
+             * and replace what was found there. No of the functions
+             * below fail since the while condition is true
+             */
+            rfStringX_MoveAfter(thisstr, left, 0, options);
+            if(rfStringX_Replace(thisstr, &ss, rstr, 1, options))
             {
                 goto cleanup1;
             }
             //also move after the right
-            move = rstr->byteLength+right->byteLength;
+            move = rfString_ByteLength(rstr) + rfString_ByteLength(right);
             thisstr->bIndex += move;
-            thisstr->INH_String.bytes += move;
-            thisstr->INH_String.byteLength -= move;
+            rfString_Data(thisstr) += move;
+            rfString_ByteLength(thisstr) -= move;
             //free temp string before next iteration
             rfString_Deinit(&ss);
         }
 
-        if(found)//if we replaced at least 1 occurence success and get the internal pointer back
+        if(found)//if we replaced at least 1 occurence
         {
-            move = thisstr->bIndex-start;
-            thisstr->INH_String.bytes -= move;
+            move = thisstr->bIndex - start;
+            rfString_Data(thisstr) -= move;
             thisstr->bIndex = start;
-            thisstr->INH_String.byteLength += move;
+            rfString_ByteLength(thisstr) += move;
             //success
-            ret=true;
+            ret = true;
         }
         goto cleanup1;
     }
 
     ///if we check for a specific instance
-    for(j = 1; j < i;j++)
+    for(j = 1; j < i; j++)
     {
         //move after the pair of the 'j' inbetween substrings
-        if(rfStringX_MoveAfterPair(thisstr,left,right,0,options) ==false)
+        if(!rfStringX_MoveAfterPair(thisstr, left, right, 0, options))
         {
-            //and if the occurence does not existget the string back to where it should be
-            move = thisstr->bIndex-start;
-            thisstr->INH_String.bytes -= move;
+            //and if the occurence does not exist
+            move = thisstr->bIndex - start;
+            rfString_Data(thisstr) -= move;
             thisstr->bIndex = start;
             //and increase its bytelength
-            thisstr->INH_String.byteLength += move;
+            rfString_ByteLength(thisstr) += move;
             goto cleanup1;//falure
         }
     }
     //move after the pair of the inbetween substrings we actually want
-    if(rfString_Between(thisstr,left,right,&ss,options) == false)
+    if(!rfString_Between(thisstr, left, right, &ss, options))
     {
-        //and if the occurence does not existget the string back to where it should be
+        //and if the occurence does not exist
         move = thisstr->bIndex-start;
-        thisstr->INH_String.bytes -= move;
+        rfString_Data(thisstr) -= move;
         thisstr->bIndex = start;
         //and increase its bytelength
-        thisstr->INH_String.byteLength += move;
+        rfString_ByteLength(thisstr) += move;
         goto cleanup1;//falure
     }
     ///success
     //move after the left part of the pair
-    rfStringX_MoveAfter(thisstr,left,0,options);
+    rfStringX_MoveAfter(thisstr, left, 0, options);
     //and then replace the occurence
-    if(!rfStringX_Replace(thisstr,&ss,rstr,1,options))
+    if(!rfStringX_Replace(thisstr, &ss, rstr, 1, options))
     {
         //failure
         goto cleanup1;
     }
     //now we are done and should go back
     rfString_Deinit(&ss);
-    move = thisstr->bIndex-start;
-    thisstr->INH_String.bytes -= move;
+    move = thisstr->bIndex - start;
+    rfString_Data(thisstr) -= move;
     thisstr->bIndex = start;
-    thisstr->INH_String.byteLength += move;
+    rfString_ByteLength(thisstr) += move;
 
     //if we get here success
-    ret=true;
+    ret = true;
 cleanup1:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
-
 }
+
+
+
+
+i_INLINE_INS bool rfStringXGEN_Append(RF_StringX* s,
+                                      const char* other,
+                                      unsigned int bytes_to_copy);

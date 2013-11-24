@@ -1,5 +1,4 @@
 ﻿#include <RFstring.h>
-#include <RFprintf.h>
 #include <RFsystem.h>
 #include <refu.h>
 
@@ -17,12 +16,12 @@ static void test_file_encoding(const char* filename, int encoding,
     EXPECTNOT(0, inF=fopen(filename, "rb"));
     //expect to see succesfull initialization
     EXPECTGE(rfString_FInit(&s1, inF, &eof, RF_EOL_LF,
-                            encoding, endianess),
+                            encoding, endianess, NULL),
              0);
 	
     //expect to see the first line of the file (as mentioned in the first comment let's just get rid of the bom here)
     EXPECT(true,rfString_PruneStart(&s1,1));
-    EXPECTGE(rfPrintf("%S",&s1), 0);//ending newline is included since we don't use RF_TextFile, RF_SUCCESS)
+    EXPECTGE(printf(RF_STR_PF_FMT, RF_STR_PF_ARG(&s1)), 0);//ending newline is included since we don't use RF_TextFile, RF_SUCCESS)
     //assign the next line to the same string
     EXPECTGE(rfString_FAssign(&s1, inF, &eof, RF_EOL_LF,
                               encoding, endianess),
@@ -44,7 +43,7 @@ static void test_file_encoding(const char* filename, int encoding,
 
   //read from that same file and compare
     EXPECTGE(rfString_FInit(&s2, f, &eof, RF_EOL_LF,
-                            encoding, endianess),
+                            encoding, endianess, NULL),
              0);
     EXPECT(true,rfString_Equal(&s1,&s2));
 	
@@ -53,10 +52,10 @@ static void test_file_encoding(const char* filename, int encoding,
     EXPECT(0, fseek(inF, 0, SEEK_SET));
 	
     EXPECTGE(rfStringX_FInit(&sx1, inF, &eof, RF_EOL_LF,
-                            encoding, endianess),
+                             encoding, endianess),
              0);
     EXPECT(true,rfString_PruneStart(&sx1,1));
-    EXPECTGE(rfPrintf("%S", &sx1), 0);//ending newline is included since we don't use RF_TextFile, RF_SUCCESS)
+    EXPECTGE(printf(RF_STR_PF_FMT, RF_STR_PF_ARG(&sx1)), 0);//ending newline is included since we don't use RF_TextFile, RF_SUCCESS)
     EXPECTGE(rfStringX_FAssign(&sx1, inF, &eof, RF_EOL_LF,
                                encoding, endianess),
              0);

@@ -1,5 +1,4 @@
 ﻿#include <RFstring.h>
-#include <RFprintf.h>
 #include <refu.h>
 
 #include "../refu_tests.h"
@@ -18,7 +17,7 @@ int main()
                "If remove\r\ndoes not work correctly here\r\nthe test will"
                " surely\r\nfail!\r\n"));
     EXPECT(true,rfString_Remove(&s1,RFS_("\r")));
-    EXPECTGE(rfPrintf("%S\n",&s1), 0);
+    EXPECTGE(printf(RF_STR_PF_FMT"\n", RF_STR_PF_ARG(&s1)), 0);
 
     //expect true for all confirming that by removing we got left only with what we should be
     EXPECT(true,
@@ -74,7 +73,7 @@ int main()
                "   \t\t\t  This is a nice string but has lots of tabs, "
                "spaces and newlines on either end \n\n\n"));
     EXPECT(true,rfString_Trim(&s5,RFS_(" \n\t")));
-    EXPECTGE(rfPrintf("%S\n",&s5), 0);
+    EXPECTGE(printf(RF_STR_PF_FMT"\n", RF_STR_PF_ARG(&s5)), 0);
 
     //Trim all the hiragana and full width stop from the end of the string and check the string afterwards
     EXPECT(true,rfString_Init(&s6,"警視庁への取材でわかった。"));
@@ -91,7 +90,7 @@ int main()
                &s7,
                "  \t\t  3)This is the 3rd bullet point of something"));
     EXPECT(true,rfString_TrimStart(&s7,RFS_(" \t123456789)")));
-    EXPECTGE(rfPrintf("%S\n",&s7), 0);
+    EXPECTGE(printf(RF_STR_PF_FMT"\n", RF_STR_PF_ARG(&s7)), 0);
 
 	return 0;
 }

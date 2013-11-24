@@ -1,6 +1,5 @@
 #include <RFstring.h>
 #include <RFintrusive_list.h>
-#include <RFprintf.h>
 #include <refu.h>
 
 #include <stdlib.h>

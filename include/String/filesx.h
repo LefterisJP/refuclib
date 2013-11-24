@@ -23,65 +23,23 @@
 **
 ** --String/filesx.h
 ** This header includes FILE descriptor functionality for RF_StringX
-**
----------------------For internal library include make sure to have----------------------------
-#include <stdio.h> //for FILE*
-#include <IO/common.h> //for RF_EOL macros
-#include <Definitions/imex.h> //for the import export macro
-#include <Definitions/types.h> //for fixed size types needed in various places
-#include <String/unicode.h> //for the unicode macros RF_UTF8 and friends
-#include <String/string_decl.h>//for RF_String
-#include <String/stringx_decl.h>//for RF_StringX
-#include <String/filesx.h>
----------------------For internal library include make sure to have----------------------------
-*/
+**/
 #ifndef RF_STRING_FILESX_H
 #define RF_STRING_FILESX_H
 
+// for string decl
+    #include <String/stringx_decl.h>
+// for bool
+    #include <Definitions/retcodes.h>
 
 #ifdef __cplusplus
 extern "C"
 {///opening bracket for calling from C++
 #endif
 
-/*--- File I/O RF_StringX Functions ---*/
 //! @name RF_StringX File I/O
 //! @{
 
-/**
- ** @memberof RF_StringX
- ** @brief Allocates and returns a stringX from file parsing
- **
- ** Read the file stream @c f until either a newline character or the EOF is 
- ** reached and saves it as an RF_StringX
- ** If for some reason (like EOF reached) no string can be read then null is returned
- ** @param f A valid and open file pointer in read mode from which to read the
- ** string. 
- ** @param[out] eof Pass a pointer to a char to receive a true or false
- ** value in case the end of file was reached with this initialization
- ** @param[in] eol The End Of Line type that this file uses. Can be one of:
- ** + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as 
- ** the end of line signal
- ** + @c RF_EOL_CR: For Macintosh-style line endings, taking @c '\r' as the 
- ** end of line signal
- ** + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as
- ** the end of line signal
- ** @param encoding The encoding of the file.
- ** + @c RF_UTF8: For Unicode UTF-8 encoding
- ** + @c RF_UTF16: For Unicode UTF-16 encoding
- ** + @c RF_UTF32: For Unicode UTF-32 encoding
- ** @param endianess A flag that determines in what endianess the file is 
- ** encoded in. Possible values here are @c RF_LITTLE_ENDIAN and
- ** @c RF_BIG_ENDIAN and apply only if the file is either UTF-16 or UTF-32
- ** @return The initialized string or null pointer in case of failure
- **  to read the file, or unexpected data (non-UTF8 encoded string)
- ** @see rfStringX_FInit()
- ** @see rfStringX_FAssign()
- ** @see rfStringX_FAppend()
- **
- **/
-i_DECLIMEX_ RF_StringX* rfStringX_FCreate(FILE* f, char* eof, char eol,
-                                          int encoding, int endianess);
 /**
  ** @memberof RF_StringX
  ** @brief Initializes a stringX from file parsing
@@ -110,8 +68,20 @@ i_DECLIMEX_ RF_StringX* rfStringX_FCreate(FILE* f, char* eof, char eol,
  ** @c RF_BIG_ENDIAN and apply only if the file is either UTF-16 or UTF-32
  ** @return Returns @c true for success and @c false otherwise
  **/
-i_DECLIMEX_ char rfStringX_FInit(RF_StringX* str, FILE* f, char* eof, char eol,
+i_DECLIMEX_ bool rfStringX_FInit(RF_StringX* str, FILE* f, char* eof, char eol,
                                  int encoding, int endianess);
+
+/**
+ ** @memberof RF_StringX
+ ** @brief Allocates and returns a stringX from file parsing
+ ** @return The initialized string or null pointer in case of failure
+ **  to read the file, or unexpected data (non-UTF8 encoded string)
+ ** @see rfStringX_FInit()
+ ** @see rfStringX_FAssign()
+ ** @see rfStringX_FAppend()
+ **/
+i_DECLIMEX_ RF_StringX* rfStringX_FCreate(FILE* f, char* eof, char eol,
+                                          int encoding, int endianess);
 
 /**
  ** @memberof RF_StringX
@@ -142,9 +112,8 @@ i_DECLIMEX_ char rfStringX_FInit(RF_StringX* str, FILE* f, char* eof, char eol,
  ** @see rfStringX_FInit()
  ** @see rfStringX_FCreate()
  ** @see rfStringX_FAppend()
- **
  **/
-i_DECLIMEX_ char rfStringX_FAssign(RF_StringX* str, FILE* f, char* eof,
+i_DECLIMEX_ bool rfStringX_FAssign(RF_StringX* str, FILE* f, char* eof,
                                    char eol, int encoding, int endianess);
 /**
  ** @memberof RF_StringX
@@ -173,9 +142,8 @@ i_DECLIMEX_ char rfStringX_FAssign(RF_StringX* str, FILE* f, char* eof,
  ** @see rfStringX_FInit()
  ** @see rfStringX_FCreate()
  ** @see rfStringX_FAssign()
- **
  **/
-i_DECLIMEX_ char rfStringX_FAppend(RF_StringX* str, FILE* f, char* eof, char eol,
+i_DECLIMEX_ bool rfStringX_FAppend(RF_StringX* str, FILE* f, char* eof, char eol,
                                    int encoding, int endianess);
 
 //! @}

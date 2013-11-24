@@ -53,8 +53,7 @@
 #include <String/traversalx.h>
 #include <String/filesx.h>
 
-#include <stdarg.h> //needed for the va_list argument in rfStringX_Formatv()
-#include <String/format.h>
+#include <stdarg.h> //needed for the va_list argument
 
 #else //end of the strings module include
     #error Attempted to include Refu String manipulation with the String module flag off. Rebuild the library with that option added if you need to include them

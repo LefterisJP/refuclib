@@ -3,13 +3,13 @@
 **
 ** Copyright (c) 2011-2013, Karapetsas Eleftherios
 ** All rights reserved.
-** 
+**
 ** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 **  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 **  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in
 **     the documentation and/or other materials provided with the distribution.
 **  3. Neither the name of the Original Author of Refu nor the names of its contributors may be used to endorse or promote products derived from
-** 
+**
 ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
 ** INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 ** DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
@@ -29,18 +29,21 @@
 //for error logging
     #include <Utils/log.h>
 //for error codes
-#include <Definitions/retcodes.h> //for error codes
-#include <String/string_decl.h> //since all we need is the struct members
+    #include <Definitions/retcodes.h>
+//for the buffered Cstr() conversion
+    #include "../String/conversion.ph"
+   
 //for local scope macros
     #include <Utils/localscope.h> //for the local scope macros
 /*------------- End of includes -------------*/
 
 
 //Opens another process as a pipe
-FILE* rfPopen(void* commandP, const char* mode)
+FILE* rfPopen(void* command, const char* mode)
 {
     FILE* ret = NULL;
-    RF_String* command = (RF_String*)commandP;
+    unsigned int index;
+    char *cs;
     RF_ENTER_LOCAL_SCOPE();
 
 #if RF_OPTION_DEBUG
@@ -50,12 +53,17 @@ FILE* rfPopen(void* commandP, const char* mode)
         goto cleanup;
     }
 #endif
+    if(!(cs = rfString_Cstr_ibuff_push(command, &index)))
+    {
+        goto cleanup;
+    }
 
-    ret = popen(command->bytes,mode);
+    ret = popen(cs, mode);
 
-#if RF_OPTION_DEBUG
-  cleanup:
-#endif
+    rfString_Cstr_ibuff_pop(index);
+
+
+cleanup:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }

@@ -1,5 +1,4 @@
 ﻿#include <RFstring.h>
-#include <RFprintf.h>
 #include <refu.h>
 
 #include "../refu_tests.h"
@@ -18,12 +17,12 @@ int main()
                "President Barack Obama or choose Mitt Romney with polls "
                "predicting a tight race."));
     EXPECTNOT(0, s2=rfString_Copy_OUT(&s1));
-    EXPECTGE(rfPrintf("%S\n",s2), 0);
+    EXPECTGE(printf(RF_STR_PF_FMT"\n", RF_STR_PF_ARG(s2)), 0);
     EXPECT(true,rfString_PruneEnd(s2,14));
     EXPECT(rfString_Copy_IN(&s3,s2), true);
-    EXPECTGE(rfPrintf("%S\n",&s3), 0);
+    EXPECTGE(printf(RF_STR_PF_FMT"\n", RF_STR_PF_ARG(&s3)), 0);
     EXPECT(rfString_Copy_chars(&s4,&s3,21), true);
-    EXPECTGE(rfPrintf("%S\n",&s4), 0);
+    EXPECTGE(printf(RF_STR_PF_FMT"\n", RF_STR_PF_ARG(&s4)), 0);
     EXPECT(true,
            rfString_Init(
                &s5,
@@ -32,7 +31,7 @@ int main()
  
 	//testing RF_StringX copying functions from String
     EXPECT(rfStringX_FromString_IN(&sx1,&s1), true);
-    EXPECTGE(rfPrintf("%S\n",&sx1), 0);
+    EXPECTGE(printf(RF_STR_PF_FMT"\n", RF_STR_PF_ARG(&sx1)), 0);
     EXPECTNOT(0, sx2=rfStringX_FromString_OUT(&s5));
     EXPECT(true,
            rfString_Equal(

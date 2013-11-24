@@ -1,5 +1,4 @@
 ﻿#include <RFstring.h>
-#include <RFprintf.h>
 #include <refu.h>
 
 #include "../refu_tests.h"
@@ -23,7 +22,7 @@ int main()
     EXPECT(true,rfString_Replace(&s1,RFS_("$FLAGS"),RFS_("-Wall -O2"),0,0));
     EXPECT(true,rfString_Replace(&s1,RFS_("$FILE"),RFS_("tocompile"),0,0));
     EXPECT(true,rfString_Replace(&s1,RFS_("$OBJDIRNAME"),RFS_("obj"),0,0));
-    EXPECTGE(rfPrintf("%S\n",&s1), 0);
+    EXPECTGE(printf(RF_STR_PF_FMT"\n", RF_STR_PF_ARG(&s1)), 0);
 
     //expect the same string with some kanji replaced by their English equivalent
     EXPECT(true,

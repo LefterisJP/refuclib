@@ -58,8 +58,7 @@ $INCLUDE @H
 $IFNOT @STRING
     #include <String/core.h> //for rfString_Equal
 $ENDIF
-    #include <String/conversion.h> //for rfString_Cstr()
-    #include <String/retrieval.h> //for rfString_Length()
+    #include <String/retrieval.h> //for rfString_Data and ByteLength
 /*------------- libc includes -------------*/
 #include <stdint.h> //used by hsieh's hash
 /*------------- End of includes -------------*/
@@ -178,7 +177,7 @@ static char i_InsertValue(@NODE** slots, RF_String* key,
     @NODE* s, *pr;
 
     *exists = false;
-    i = HsiehHash(rfString_Cstr(key), rfString_Length(key));
+    i = HsiehHash(rfString_Data(key), rfString_ByteLength(key));
     i = i % size;
     s = slots[i];
 
@@ -320,7 +319,7 @@ i_DECLIMEX_ @TYPEPTR rfHashmap_Get(@DATA_STRUCT* m, RF_String* key,
     @TYPEPTR ret = 0;
     *found = false;
     RF_ENTER_LOCAL_SCOPE();
-    i = HsiehHash(rfString_Cstr(key), rfString_Length(key));
+    i = HsiehHash(rfString_Data(key), rfString_ByteLength(key));
     i = i % m->size;
     s = m->slots[i];
 

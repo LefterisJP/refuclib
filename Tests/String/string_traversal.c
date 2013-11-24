@@ -1,5 +1,4 @@
 ﻿#include <RFstring.h>
-#include <RFprintf.h>
 #include <refu.h>
 
 #include "../refu_tests.h"

@@ -64,7 +64,9 @@ int32_t rfMakeDir(void* dirnameP,int mode)
                 error = RE_DIRECTORY_EXISTS;
             break;
             case ENOENT:
-                LOG_ERROR("Failed to create directory \"%S\" because the given path was not found",RE_DIRECTORY_INVALID,dirname)
+                RF_ERROR("Failed to create directory \""RF_STR_PF_FMT"\""
+                         " because the given path was not found",
+                         RF_STR_PF_ARG(dirname));
                 error = RE_DIRECTORY_INVALID;
             break;
         }
@@ -88,28 +90,11 @@ int32_t rfRemoveDir(void* dirnameP)
     rfStringX_Init_buff(&path,1024,"");
     //open the directory
     dir = opendir(dirname->bytes);
-    if(dir == NULL)
+    if(!dir)
     {
-        switch(errno)
-        {
-            case EACCES:
-                LOG_ERROR("Failed to access directory \"%S\" because of insufficient permissions",RE_PERMISSION,dirname)
-            break;
-            case ENAMETOOLONG:
-                LOG_ERROR("Can't access directory \"%S\" because its name is too long for the filesystem",RE_DIRECTORY_NAMELENGTH,dirname)
-            break;
-            case ENOENT:
-            case ENOTDIR:
-                LOG_ERROR("Failed to access directory \"%S\" because the given path was not found or is not a directory",RE_DIRECTORY_INVALID,dirname)
-            break;
-            case ENFILE:
-            case EMFILE:
-                LOG_ERROR("Failed to access directory \"%S\" because too many files are currently open in the system",RE_DIRECTORY_TOOMANY_FILES,dirname)
-            break;
-            default:
-                LOG_ERROR("Failed to access directory \"%S\" because of opendir() failure",RE_DIRECTORY_OPEN,dirname)
-            break;
-        }
+        RF_ERROR("Failed to access directory "RF_STR_PF_FMT" due to opendir() "
+                 "errno %d", RF_STR_PF_ARG(dirname), errno);
+        ret = errno;
         ret = RF_LastError;
         goto cleanup1;
     }
@@ -123,7 +108,8 @@ int32_t rfRemoveDir(void* dirnameP)
             //create the full entry name
             if(!rfStringX_Assign(
                    &path,
-                   RFS_("%S"RF_DIRSEP"%s",dirname,entry->d_name)))
+                   RFS_(RF_STR_PF_FMT RF_DIRSEP "%s",
+                        RF_STR_PF_ARG(dirname), entry->d_name)))
             {
                 ret = RE_STRING_ASSIGN;
                 goto cleanup1;
@@ -141,8 +127,13 @@ int32_t rfRemoveDir(void* dirnameP)
             if(DeleteFile(path.INH_String.bytes)==0)
             {
                 RF_WIN32_GETSYSERROR(strBuff)
-                LOG_ERROR("Recursive directory deletion of directory \"%S\" failed because of inability to delete file \"%S\". Windows error (%lu) was given:\n%s",
-                          RE_FILE_DELETE,dirname,&path,i_ERROR_CODE,strBuff)
+                RF_ERROR("Recursive directory deletion of directory "
+                         "\""RF_STR_PF_FMT"\" failed because of inability to "
+                         "delete file \""RF_STR_PF_FMT"\". "
+                         "Windows error (%lu) was given:\n%s",
+                         RF_STR_PF_ARG(dirname),RF_STR_PF_ARG(&path),
+                         i_ERROR_CODE,
+                         strBuff)
                 LocalFree(strBuff);
                 ret = RE_FILE_DELETE;
                 goto cleanup1;
@@ -156,18 +147,6 @@ int32_t rfRemoveDir(void* dirnameP)
     //check if we finished iterating succesfully
     if(errno != prErrno)
     {
-        switch(errno)
-        {
-            case EBADF:
-                LOG_ERROR("During iteration of directory \"%S\" the directory value was invalid",RE_DIRECTORY_INVALID,dirname)
-            break;
-            case ENOENT:
-                LOG_ERROR("During iteration of directory \"%S\" the current position of the directory stream was invalid",RE_DIRECTORY_STREAMPOS,dirname)
-            break;
-            default:
-                LOG_ERROR("During iteration of directory \"%S\" reading the directory failed",RE_DIRECTORY_READ,dirname)
-            break;
-        }
         ret = RF_LastError;
         goto cleanup1;
     }
@@ -175,8 +154,13 @@ int32_t rfRemoveDir(void* dirnameP)
     if(RemoveDirectory(dirname->bytes)==0)
     {
         RF_WIN32_GETSYSERROR(strBuff)
-        LOG_ERROR("Recursive directory deletion of directory \"%S\" failed because of inability to delete the directory itself. Windows error (%lu) was given:\n%s",
-                  RE_DIRECTORY_DELETE,dirname,i_ERROR_CODE,strBuff);
+                RF_ERROR("Recursive directory deletion of directory "
+                         "\""RF_STR_PF_FMT"\" failed because of inability to "
+                         "delete file \""RF_STR_PF_FMT"\". "
+                         "Windows error (%lu) was given:\n%s",
+                         RF_STR_PF_ARG(dirname),RF_STR_PF_ARG(&path),
+                         i_ERROR_CODE,
+                         strBuff);
         LocalFree(strBuff);
         ret = RE_DIRECTORY_DELETE;//no need to jump with goto here since it's right after
     }
@@ -196,7 +180,9 @@ int32_t rfDeleteFile(void* nameP)
     if(DeleteFile(name->bytes)==0)
     {
         RF_WIN32_GETSYSERROR(strBuff)
-        LOG_ERROR("Failed to delete file \"%S\" because of Windows error(%lu):\n%s",RE_FILE_DELETE,name,i_ERROR_CODE,strBuff)
+        RF_ERROR("Failed to delete file \""RF_STR_PF_FMT"\" because of "
+                  "Windows error(%lu):\n%s",
+                  RF_STR_PF_ARG(name), i_ERROR_CODE, strBuff)
         LocalFree(strBuff);
         ret = RE_FILE_DELETE;
     }
@@ -215,7 +201,10 @@ int32_t rfRenameFile(void* nameP,void* newNameP)
     if(MoveFile(name->bytes,newName->bytes) ==0)
     {
         RF_WIN32_GETSYSERROR(strBuff)
-        LOG_ERROR("Failed to rename file \"%S\" to \"%S\" because of Windows error(%lu):\n:%s",RE_FILE_RENAME,name,newName,i_ERROR_CODE,strBuff)
+        RF_ERROR("Failed to rename file \""RF_STR_PF_FMT"\" to "
+                 "\""RF_STR_PF_FMT"\" because of Windows error(%lu):\n:%s",
+                 RF_STR_PF_ARG(name) ,RF_STR_PF_ARG(newName), i_ERROR_CODE,
+                 strBuff);
         LocalFree(strBuff);
         ret = RE_FILE_RENAME;
     }

@@ -41,26 +41,28 @@
  ** Just to avoid copying pasting
  **
  **/
-#define RF_ENTER_LOCAL_SCOPE() \
-uint32_t i_stackPtrBefore_;                 \
-do{                                                           \
-    uint32_t i_index_;                                        \
-    /*If we had any macro evaluations in the function call*/  \
-    if(RF_LMS->macroEvalsI > 0)                               \
-    {\
-        /*find the smallest pointer of the macro evaluations. This is where the stack pointer was before the function call*/\
-        i_stackPtrBefore_ = UINT32_MAX;\
-        for(i_index_=0; i_index_< RF_LMS->macroEvalsI; i_index_ ++)\
-        {\
-            if(RF_LMS->macroEvals[i_index_] < i_stackPtrBefore_)\
-                i_stackPtrBefore_ = RF_LMS->macroEvals[i_index_];\
-        }\
-        /*now reset the macro evaluations to be ready for the next function call*/\
-        RF_LMS->macroEvalsI = 0;\
-        memset(RF_LMS->macroEvals,0,4*RF_MAX_FUNC_ARGS);\
-    }\
-    else\
-        i_stackPtrBefore_= RF_LMS->stackPtr;\
+#define RF_ENTER_LOCAL_SCOPE()                                          \
+    uint32_t i_stackPtrBefore_;                                         \
+    do{                                                                 \
+        uint32_t i_index_;                                              \
+        /*If we had any macro evaluations in the function call*/        \
+        if(RF_LMS->macroEvalsI > 0)                                     \
+        {                                                               \
+            /*find the smallest pointer of the macro evaluations. This  \
+             *is where the stack pointer was before the function call*/ \
+            i_stackPtrBefore_ = UINT32_MAX;                             \
+            for(i_index_=0; i_index_< RF_LMS->macroEvalsI; i_index_ ++) \
+            {                                                           \
+                if(RF_LMS->macroEvals[i_index_] < i_stackPtrBefore_)    \
+                    i_stackPtrBefore_ = RF_LMS->macroEvals[i_index_];   \
+            }                                                           \
+            /*now reset the macro evaluations to be ready for the next  \
+             * function call*/                                          \
+            RF_LMS->macroEvalsI = 0;                                    \
+            memset(RF_LMS->macroEvals,0,4*RF_MAX_FUNC_ARGS);            \
+        }                                                               \
+        else                                                            \
+            i_stackPtrBefore_= RF_LMS->stackPtr;                        \
     }while(0)
 
 /**

@@ -30,8 +30,10 @@ class TestError(Exception):
     
     def __str__(self):
         if self.line_num is not None:
-            return "\t**TEST-FAIL**: {} failed at line {}".format(
-                self.test_name, self.line_num)
+            return ("\t**TEST-FAIL**: {} failed at expected "
+                    "stdout line {}".format(
+                        self.test_name, self.line_num)
+                )
         else:
             return "\t**TEST-FAIL**: {} failed ".format(
                 self.test_name)

@@ -23,50 +23,24 @@
 **
 ** --String/conversion.h
 ** This header includes functions for String conversion
-**
----------------------For internal library include make sure to have----------------------------
-#include <Definitions/types.h> //for fixed size types needed in various places
-#include <String/string_decl.h>//for RF_String
-#include <Definitions/imex.h> //for the import export macro
-#include <Definitions/defarg.h> //for enabling default arguments
-#include <String/conversion.h>
----------------------For internal library include make sure to have----------------------------
 */
 #ifndef RF_STRING_CONVERSION_H
 #define RF_STRING_CONVERSION_H
+
+// for string decl
+    #include <String/stringx_decl.h>
+// for exact sized types
+    #include <Definitions/types.h>
+// for bool
+    #include <Definitions/retcodes.h>
 
 #ifdef __cplusplus
 extern "C"
 {///opening bracket for calling from C++
 #endif
 
-
-/*------------------------------------------------------------------------ RF_String unicode conversion-------------------------------------------------------------------------------*/
 //! @name Unicode Conversion Functions
 //! @{
-
-/**
- ** @memberof RF_String
- ** @brief Returns the strings contents as a UTF-8 buffer
- **
- ** @isinherited{StringX}
- ** This is just a macro wrapper of @ref rfString_Cstr() and exists here
- ** just so that users can guess function names for all unicode encodings.
- **
- **  Note that just like in @ref rfString_Cstr() this is just a pointer to
- ** the String's internal UTF8 buffer and as such should be read only. If there
- ** is a need to do anything other than that copy the buffer.
- ** @param s The string in question
- ** @return Returns a pointer to the String's internal UTF-8 uffer
- ** @see rfString_ToUTF16()
- ** @see rfString_ToUTF32()
- **
- **/
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ const char* rfString_ToUTF8(RF_String* s);
-#else
-#define rfString_ToUTF8(i_STRING_)  rfString_Cstr(i_STRING_)
-#endif
 
 /**
  ** @memberof RF_String
@@ -77,15 +51,15 @@ i_DECLIMEX_ const char* rfString_ToUTF8(RF_String* s);
  ** UTF-8 contents are encoded as UTF-16. The endianess of the buffer
  ** is that of the system. The returned buffer needs to be freed by the user
  ** later.
- ** @param[in] s The string in question. @inhtype{String,StringX}
- ** @param[out] length Give a reference to a uint32_t in this argument to receive the length of
- ** the returned UTF-16 buffer in 16-bit words
+ ** @param[in]  s      The string in question. @inhtype{String,StringX}
+ ** @param[out] length Give a reference to a uint32_t in 
+ **             this argument to receive the length of
+ **             the returned UTF-16 buffer in 16-bit words
  ** @return Returns an allocated UTF-16 buffer. Needs to be freed by the user later.
  ** @see rfString_ToUTF8()
  ** @see rfString_ToUTF32()
- **
  **/
-i_DECLIMEX_ uint16_t* rfString_ToUTF16(const void* s,uint32_t* length);
+i_DECLIMEX_ uint16_t* rfString_ToUTF16(const void* s, uint32_t* length);
 
 /**
  ** @memberof RF_String
@@ -96,32 +70,39 @@ i_DECLIMEX_ uint16_t* rfString_ToUTF16(const void* s,uint32_t* length);
  ** UTF-8 contents are encoded as UTF-32. The endianess of the buffer
  ** is that of the system. The returned buffer needs to be freed by the user
  ** later.
- ** @param[in] s The string in question. @inhtype{String,StringX}
- ** @param[out] length Give a reference to a uint32_t in this argument to receive the length
- ** of the returned UTF-32 buffer in codepoints. (32-bit) words
+ ** @param[in]  s      The string in question. @inhtype{String,StringX}
+ ** @param[out] length Give a reference to a uint32_t in this
+ **                    argument to receive the length
+ **                   of the returned UTF-32 buffer in codepoints. (32-bit) words
  ** @return Returns an allocated UTF-16 buffer. Needs to be freed by the user later.
  ** @see rfString_ToUTF8()
  ** @see rfString_ToUTF16()
- **
  **/
 i_DECLIMEX_ uint32_t* rfString_ToUTF32(const void* s,uint32_t*length);
 
 //! @}
-
-/*------------------------------------------------------------------------ RF_String Conversion functions-------------------------------------------------------------------------------*/
 
 //! @name String Conversion Functions
 //! @{
 
 /**
  ** @memberof RF_String
- ** @brief Returns the cstring representation of the string
+ ** @brief Creates a Cstring representation of the string
  **
  ** @isinherited{StringX}
- ** Remember that this is just a pointer to the string data. It can't be modified. memcpy it if you need a copy of it.
- ** @param s The string whose cstring repesentation to get. @inhtype{String,StringX}
- ** @return Returns the a pointer to the array of bytes held inside the string in the UTF-8 encoding
+ ** Since RF_String is not null terminated this function shall allocate
+ ** a c string where it will be stored.
  **
+ ** @internal
+ ** You can also use the internal @ref rfString_Cstr_ibuff_push()
+ ** which combined with popping allows you to avoid mallocs
+ ** @endinternal
+ **
+ ** @warning Make sure to free the returned string after using
+ **
+ ** @param s       The string whose cstring repesentation to get.
+ **                @inhtype{String,StringX}
+ ** @return        Returns the pointer to the allocated c string
  **/
 i_DECLIMEX_ char* rfString_Cstr(const void* s);
 
@@ -130,32 +111,31 @@ i_DECLIMEX_ char* rfString_Cstr(const void* s);
  ** @brief Returns the integer value of a String
  **
  ** @isinherited{StringX}
- ** The parameter string must contains only numbers. If it contains anything else the function fails.
- ** @param thisstr The string whose integer value to return. @inhtype{String,StringX}
+ ** The parameter string must start with a number.
+ ** @param thisstr The string whose integer value to return.
+ **                @inhtype{String,StringX}
  ** @param[out] v A refence to an integer that will return the float value
- ** @return Returns true in case of succesfull conversion or false if no integer was represented by the string
+ ** @return Returns true in case of succesfull conversion or false if no
+ **         integer was represented by the string
  ** @see rfString_ToDouble()
- **
  **/
-i_DECLIMEX_ char rfString_ToInt(const void* thisstr,int32_t* v);
+i_DECLIMEX_ bool rfString_ToInt(const void* thisstr, int32_t* v);
 
 /**
  ** @memberof RF_String
  ** @brief Returns the double value of a String
  **
  ** @isinherited{StringX}
- ** The parameter string must contain only a number. If it contains anything else the function fails.
- ** @param thisstr The string whose floating point value to return. @inhtype{String,StringX}
- ** @param[out] f A refence to a double that will return the floating point number value
- ** @return Returns RF_SUCCESS in case of succesfull conversion or error if there was failure. Possible errors are:
- ** + @c RE_STRING_TOFLOAT: There was a conversion error. The string probably does not represent a float
- ** + @c RE_STRING_TOFLOAT_RANGE: The represented floating point number is of a range bigger than what can be
- ** represented by the system
- ** + @c RE_STRING_TOFLOAT_UNDERFLOW: Representing the string's floating point number in a double would cause underflow
+ ** The parameter string must start with a floating point number
+ ** @param thisstr The string whose floating point value to return.
+ **                @inhtype{String,StringX}
+ ** @param[out] f A refence to a double that will return the
+ **               floating point number value
+ ** @return Returns @c true if the conversion was succesfull and @c false
+ **        otherwise
  ** @see rfString_ToInt()
- **
  **/
-i_DECLIMEX_ int rfString_ToDouble(const void* thisstr,double* f);
+i_DECLIMEX_ bool rfString_ToDouble(const void* thisstr, double* f);
 
 /**
  ** @memberof RF_String
@@ -163,10 +143,11 @@ i_DECLIMEX_ int rfString_ToDouble(const void* thisstr,double* f);
  **
  ** @isinherited{StringX}
  ** This function as of now only works with letter of the English alphabet.
- ** All the characters of the string that are uppercase shall be turned into lowercase
- ** @param thisstr The string for which to perform the uppercase to lowercase conversion
+ ** All the characters of the string that are uppercase shall
+ ** be turned into lowercase
+ ** @param thisstr The string for which to perform the uppercase
+ **                to lowercase conversion
  ** @see rfString_ToUpper()
- **
  **/
 i_DECLIMEX_ void rfString_ToLower(void* thisstr);
 
@@ -176,10 +157,11 @@ i_DECLIMEX_ void rfString_ToLower(void* thisstr);
  **
  ** @isinherited{StringX}
  ** This function as of now only works with letter of the English alphabet.
- ** All the characters of the string that are lowercase shall be turned into uppercase
- ** @param thisstr The string for which to perform the lowercase to uppercase conversion
+ ** All the characters of the string that are lowercase shall be turned
+ ** into uppercase
+ ** @param thisstr The string for which to perform the lowercase to
+ **                uppercase conversion
  ** @see rfString_ToLower()
- **
  **/
 i_DECLIMEX_ void rfString_ToUpper(void* thisstr);
 
@@ -188,36 +170,26 @@ i_DECLIMEX_ void rfString_ToUpper(void* thisstr);
  ** @brief Tokenizes the given string
  **
  ** @isinherited{StringX}
- ** Separates it into @c tokensN depending on how many substrings can be created from the @c sep separatior and stores them
- ** into the Array of RF_String* that should be passed to the function. The array gets initialized inside the function and
- ** <b>has to be freed explicitly</b> later by thg user. Also each String inside the array has to be Deinitialized too.
+ ** Separates it into @c tokensN depending on how many substrings
+ ** can be created from the @c sep separatior and stores them
+ ** into the Array of RF_String* that should be passed to the
+ ** function. The array gets initialized inside the function and
+ ** <b>has to be freed explicitly</b> later by thg user.
+ ** Also each String inside the array has to be Deinitialized too.
  ** Here is an example usage:
  ** @snippet Strings/tokenize.cpp Tokenize_C
  ** @lmsFunction
- ** @param[in] thisstr The string to tokenize. @inhtype{String,StringX}
- ** @param[in] sep A substring that will be used as a separator @inhtype{String,StringX}
- ** @param[out] tokensN The number of tokens that got created
- ** @param[out] tokens Pass a pointer to an array of RF_Strings. @keepptr
- ** @return Returns true in success and false in case the the separating character has not been found
- ** @internal @cppcode
- ** char String::Tokenize(char* sep,uint32_t* tokensN, String*** tokens)
- ** {
- **     RF_String* t;
- **     uint32_t i;
- **     if(rfString_Tokenize(this->i_StringCHandle,sep,tokensN,&t)==false)
- **         return false;
- **
- **     *tokens = (String**) malloc(sizeof(String*)* (*tokensN));
- **     for(i=0;i<(*tokensN);i++)
- **     {
- **        (*tokens)[i] = new String((RF_String*)&t[i]);
- **     }
- **     return true;
- ** }
- ** @endcpp @endinternal
- **
+ ** @param[in] thisstr    The string to tokenize.
+ **                       @inhtype{String,StringX}
+ ** @param[in] sep        A substring that will be used as a separator
+ **                       @inhtype{String,StringX}
+ ** @param[out] tokensN   The number of tokens that got created
+ ** @param[out] tokens    Pass a pointer to an array of RF_Strings. @keepptr
+ ** @return Returns @c true in success and @c false in case the the
+ ** separating character has not been found
  **/
-i_DECLIMEX_ char rfString_Tokenize(const void* thisstr,const void* sep,uint32_t* tokensN,RF_String** tokens);
+i_DECLIMEX_ bool rfString_Tokenize(const void* thisstr, const void* sep,
+                                   uint32_t* tokensN, RF_String** tokens);
 
 //! @}
 

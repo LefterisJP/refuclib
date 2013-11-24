@@ -22,62 +22,66 @@
 **
 **
 ** --String/common.h
-** This header includes common String functionality common for all strings
+** This header includes String functionality common for all strings
 **
----------------------For internal library include make sure to have----------------------------
-#include <Definitions/types.h> //for fixed size types needed in various places
-#include <String/string_decl.h>//for RF_String
-#include <Definitions/imex.h> //for the import export macro
-#include <Definitions/defarg.h> //for enabling default arguments
-#include <String/common.h>
----------------------For internal library include make sure to have----------------------------
-*/
+**/
 #ifndef RF_STRING_COMMON_H
 #define RF_STRING_COMMON_H
 
+// for string decl
+    #include <String/stringx_decl.h>
+// for string accessors
+    #include <String/retrieval.h>
 
 #ifdef __cplusplus
 extern "C"
 {///opening bracket for calling from C++
 #endif
 
-
-
+#define RF_STR_PF_FMT "%.*s"
+#if RF_OPTION_DEBUG
+#define RF_STR_PF_ARG(i_str_)                    \
+    (i_str_) ? rfString_ByteLength(i_str_) : 0, \
+    (i_str_) ? rfString_Data(i_str) : ""
+#else
+#define RF_STR_PF_ARG(i_str_) \
+    rfString_ByteLength(i_str_), rfString_Data(i_str_) 
+#endif
 /**
  ** @memberof RF_String
  ** @brief Create a termporary String from a String literal
  **
- ** A macro to be used only inside a function call that accepts an @ref RF_String or any
- ** inherited data type such as @ref RF_StringX. It creates a Temporary RF_String*
+ ** A macro to be used only inside a function call that accepts an
+ ** @ref RF_String or any inherited data type
+ ** such as @ref RF_StringX. It creates a Temporary RF_String*
  ** that will be used by the function. This macro accepts from 1 to N arguments.
  **
- ** The first argument shall either be a String literal or a printf styled string literal
- ** given in UTF-8 encoding. Other encodings are easy to support but are not currently
- ** supported since the current limitation is for UTF-8 encoded source code.
+ ** The first argument shall either be a String literal or a printf styled
+ ** string literal given in UTF-8 encoding. Other encodings are easy to support
+ ** but are not currently supported since the current
+ ** limitation is for UTF-8 encoded source code.
  **
- ** Optionally the first argument can be followed by a sequence of additional arguments that would
- ** specify how to format the string @c s. If additional arguments follow then the @c s shall be
- ** formatted using the Refu String formatting rules, more details about which can be found at
- ** @ref rfStringX_Formatv()
+ ** Optionally the first argument can be followed by a sequence of additional
+ ** arguments that would specify how to format
+ ** the string @c s.
  ** @warning
- ** + If no extra arguments are given then the given string @c s is not interpreted as a formatted
+ ** + If no extra arguments are given then the given string @c s is
+ ** not interpreted as a formatted
  ** string and is instead printed as is.
  ** @warning
- ** + This macro can not be called recursively with extra arguments and doing so is undefined behaviour.
- ** Moreover there is no reason to do so as the example below tries to so.
- ** <br /><b>Illegal and undefined behaviour</b>
- ** @code rfString_Append(&s,RFS_("Never call the %S",RFS_("%s macro recursively with extra arguments such as this %d","RFS macro",1024))); @endcode
- ** The equivalent legal (and more simple way to do the above is:
- ** @code rfString_Append(&s,RFS_("Never call the %s macro recursively with extra arguments such as this %d","RFS macro",1024)); @endcode
- **
- ** @param s The formatted string that will constitute the RF_String. Must be in the same encoding as that of the source file.
+ ** + This macro can not be called recursively with extra arguments and doing 
+ ** so is undefined behaviour.
+ ** @param s The formatted string that will constitute the RF_String. Must
+ ** be in the same encoding as that of the source file.
  ** Default is UTF-8.
- ** @param ... \rfoptional{nothing}  Depending on the string literal, the function may expect a sequence of additional arguments,
- ** each containing one value to be inserted instead of each %-tag specified in the @c slit parameter, if any. There should be
+ ** @param ... \rfoptional{nothing}  Depending on the string literal,
+ ** the function may expect a sequence of additional arguments,
+ ** each containing one value to be inserted instead of each %-tag
+ ** specified in the @c slit parameter, if any. There should be
  ** the same number of these arguments as the number of %-tags that expect a value.
- ** @return Returns true in case of correct initialization and false , due to invalid byte sequence for the given encoding
+ ** @return Returns true in case of correct initialization and false
+ ** due to invalid byte sequence for the given encoding
  ** @isinherited{StringX}
- **
  **/
 #ifdef RF_IAMHERE_FOR_DOXYGEN
 RF_String* RFS_(const char* s,...);

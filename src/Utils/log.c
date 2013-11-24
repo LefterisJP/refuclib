@@ -32,6 +32,8 @@
     #include <Utils/localscope.h>
 //for static RF_String init
     #include <String/core.h>
+//for string accessors
+    #include <String/retrieval.h>
 //for getting thread id
     #include <Threads/common.h>
 /*------------- libc inclusion -------------*/
@@ -148,9 +150,9 @@ static bool format_log_message(log_level_t level,
     _ctx.index += s;
 
     /* Log type */
-    CHECK_BUFFER(severity_level_string[level].byteLength);
-    memcpy(BPOS, severity_level_string[level].bytes,
-           severity_level_string[level].byteLength);
+    CHECK_BUFFER(rfString_ByteLength(&severity_level_string[level]));
+    memcpy(BPOS, rfString_Data(&severity_level_string[level]),
+           rfString_ByteLength(&severity_level_string[level]));
 
     /* Thread ID */
     CHECK_BUFFER(100);
@@ -162,8 +164,8 @@ static bool format_log_message(log_level_t level,
     if(!add_location(file, func, line)) {return false;}
 
     /* Message */
-    CHECK_BUFFER(msg->byteLength + 1);
-    memcpy(BPOS, msg->bytes, msg->byteLength + 1);
+    CHECK_BUFFER(rfString_ByteLength(msg) + 1);
+    memcpy(BPOS, rfString_Data(msg), rfString_ByteLength(msg));
            
     return true;
 }

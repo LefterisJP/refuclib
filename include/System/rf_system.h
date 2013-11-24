@@ -27,10 +27,18 @@
 #ifndef RF_SYSTEM_H
 #define RF_SYSTEM_H
 
-#include <Definitions/types.h> //for fixed size data types
-#include <Definitions/imex.h>  //for import export macro
-#include <Definitions/retcodes.h> //for booleans
-#include <sys/types.h> //for syscall, tid and pid_t
+//for fixed size data types
+    #include <Definitions/types.h> 
+//for import export macro
+    #include <Definitions/imex.h>  
+//for bool
+    #include <Definitions/retcodes.h> 
+//for syscall, tid and pid_t
+   #include <sys/types.h> 
+//for FILE* and friends
+   #include <stdio.h>   
+
+
 /**
 ** @defgroup RF_SystemGRP System
 ** @addtogroup RF_SystemGRP
@@ -221,6 +229,16 @@ i_DECLIMEX_ bool rfFileExists(void* name);
  ** @return A unique id representing the calling thread
  **/
 i_DECLIMEX_ threadid_t rfSystem_GetThreadID();
+
+/**
+ ** @brief A wrapper for fopen with RF_String
+ */
+i_DECLIMEX_ FILE* rfFopen(void* name, const char* mode);
+
+/**
+ ** @brief A wrapper for freopen with RF_String
+ */
+i_DECLIMEX_ FILE* rfFreopen(void* name, const char* mode, FILE* f);
 
 //! @}
 //end of system group

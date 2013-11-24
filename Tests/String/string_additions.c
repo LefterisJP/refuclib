@@ -1,5 +1,4 @@
 ﻿#include <RFstring.h>
-#include <RFprintf.h>
 #include <refu.h>
 
 #include "../refu_tests.h"
@@ -16,7 +15,7 @@ int main()
     EXPECT(rfString_Append(&s1,&s2), true);
 
     //expect the addition of the above sentence in stdout
-    EXPECTGE(rfPrintf("%S\n",&s1), 0);
+    EXPECTGE(printf(RF_STR_PF_FMT"\n", RF_STR_PF_ARG(&s1)), 0);
 
     //expect the additions of the sentences below in stdout
     EXPECT(true,rfString_Init(&s3,"A very interesting"));
@@ -24,17 +23,19 @@ int main()
                &s3,
                RFS_(" %s is %s and its value is %.4f","number",
                     "the golden mean",1.6180339)), true);
-    EXPECTGE(rfPrintf("%S\n",&s3), 0);
+    EXPECTGE(printf(RF_STR_PF_FMT"\n", RF_STR_PF_ARG(&s3)), 0);
 
     //expect true if the additions of these are correct
     EXPECT(true,rfString_Init(&s4,"東京"));
     EXPECT(rfString_Prepend(&s4,RFS_("日本の首都は")), true);
     EXPECT(rfString_Append(&s4,RFS_("だと思います。")), true);
     EXPECT(rfString_Append(&s4,RFS_("ちなみに今日は%d日です。",26)), true);
-    EXPECT_MSG(true,rfString_Equal(
+    EXPECT_MSG(true,
+               rfString_Equal(
                    &s4,
                    RFS_("日本の首都は東京だと思います。ちなみに今日は26日"
-                        "です。")),"The Japanese strings did not get added"
+                        "です。")),
+               "The Japanese strings did not get added"
                " correctly");
 
     ///RF_STringX testing
@@ -48,7 +49,7 @@ int main()
                        "Barack Obama has won a second term as US president "
                        "after winning the crucial battleground of Ohio, "
                        "taking him past the 270 margin."));
-    rfStringX_MoveForward(&sx1,8);
+    rfStringX_MoveForward(&sx1, 8);
     EXPECT(rfStringX_Append(
                &sx1,
                RFS_("研究室に行ってきます。")),
@@ -92,10 +93,7 @@ int main()
     EXPECT(rfStringX_Append_char(&sx3, (uint32_t)'r'), true);
     EXPECT(rfString_Equal(
                &sx3, RFS_("Testing appending a char")), true);
-#pragma GCC diagnostic ignored "-Wmultichar"
-    EXPECT(rfStringX_Append_charutf8(&sx3, (uint32_t)'研'), true);
-    EXPECT(rfString_Equal(
-               &sx3, RFS_("Testing appending a char研")), true);
+
 
 
 	return 0;

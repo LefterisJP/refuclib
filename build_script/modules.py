@@ -165,15 +165,17 @@ modules			= []
 modules.append(
     Module("CORE",
            ['refu.c', 'Utils/endianess.c', 'Utils/log.c',
-            'Utils/localmem.c', 'Math/rf_math.c', 'Numeric/Float/dtoa.c',
+            'Utils/localmem.c', 'Utils/math.c', 'Numeric/Float/dtoa.c',
+            'Internal/internal_mod.c', 'Utils/buffer.c',
             'Numeric/Integer/conversion.c'])
 )
 
 modules.append(
     Module("STRING",
            ['String/common.c', 'String/commonp.c', 'String/conversion.c',
+            'String/conversionp.c', 
             'String/core.c', 'String/corex.c', 'String/files.c',
-            'String/filesx.c', 'String/format.c', 'String/manipulation.c',
+            'String/filesx.c', 'String/mod.c', 'String/manipulation.c',
             'String/manipulationx.c', 'String/retrieval.c',
             'String/traversalx.c', 'String/unicode.c'],
            macro = "RF_MODULE_STRINGS",
@@ -182,7 +184,7 @@ modules.append(
 
 modules.append(
     Module("IO",
-           ['IO/buffer.c', 'IO/file.c', 'IO/printf.c'],
+           ['IO/buffer.c', 'IO/file.c'],
            macro = "RF_MODULE_IO",
            win32_sources = ['IO/io_win32.c'],
            linux_sources = ['IO/io_linux.c'])

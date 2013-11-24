@@ -1,5 +1,5 @@
 ﻿#include <RFstring.h>
-#include <RFprintf.h>
+#include <stdlib.h>
 #include <refu.h>
 
 
@@ -23,7 +23,9 @@ int main()
 {
     RF_String s1,s2;
     RF_StringX sx1;
-    EXPECT(rfInit(), true);
+    uint32_t cp;
+    char *cs;
+    EXPECT_TRUE(rfInit());
 
     //expect 131 : This string's length
     EXPECT(true,
@@ -43,35 +45,39 @@ int main()
                          "する。党指導部の世代交代が進むとみられる５年に１"
                          "度の党大会前後の一連の政治的な行事が本格的に始ま"
                          "った。"));
-    EXPECT_MSG(123,rfString_Length(&s2),"String had unexpected length");
+    EXPECT_MSG(123, rfString_Length(&s2), "String had unexpected length");
 	
     //expect 1
-    EXPECT(true, checkEqual(utf8CString,rfString_Cstr(&s2)));
+    cs = rfString_Cstr(&s2);
+    EXPECT_TRUE(checkEqual(utf8CString, cs));
+    free(cs);
     //expect 84: (decimal value of 'T'
-    EXPECT(84,rfString_GetChar(&s1,0));
+    EXPECT_TRUE(rfString_GetChar(&s1, 0, &cp));
+    EXPECT_TRUE(cp == 84);
     //expect 29987: (decimal value of '産')
-    EXPECT(29987,rfString_GetChar(&s2,12));
+    EXPECT_TRUE(rfString_GetChar(&s2, 12, &cp));
+    EXPECT_TRUE(cp == 29987);
     //expect 20581: (decimal value of the character at position 18 '健')
     //this is an internal function and will only work for non-continuation byte positions
-    EXPECT(20581,rfString_BytePosToCodePoint(&s2,18));
+    EXPECT(20581, rfString_BytePosToCodePoint(&s2,18));
     //expect 9: (character position of byte position 27 '中')
     //also an internal function
-    EXPECT(9,rfString_BytePosToCharPos(&s2,27,false));
+    EXPECT(9, rfString_BytePosToCharPos(&s2,27,false));
     //expect 9: (character position of byte position 29 and if it is a continuation byte take the previous char which is '中')
-    EXPECT(9,rfString_BytePosToCharPos(&s2,29,true));
+    EXPECT(9, rfString_BytePosToCharPos(&s2,29,true));
     //expect 10: (character position of byte position 28 and if it is a continuation byte take the next char which is '国')
-    EXPECT(10,rfString_BytePosToCharPos(&s2,28,false));
+    EXPECT(10, rfString_BytePosToCharPos(&s2,28,false));
 
     //testing null strings
     rfStringX_Null(&sx1);
-    EXPECT(rfStringX_IsNull(&sx1), true);
+    EXPECT_TRUE(rfStringX_IsNull(&sx1));
     rfString_Null(&s2);
-    EXPECT(rfString_IsNull(&s2), true);
+    EXPECT_TRUE(rfString_IsNull(&s2));
 
     //testing empty string
-    EXPECT(rfString_Init(&s2, ""), true);
-    EXPECT(rfString_IsEmpty(&s2), true);
-    EXPECT(rfStringX_Init(&sx1, ""), true);
-    EXPECT(rfString_IsEmpty(&sx1), true);
+    EXPECT_TRUE(rfString_Init(&s2, ""));
+    EXPECT_TRUE(rfString_IsEmpty(&s2));
+    EXPECT_TRUE(rfStringX_Init(&sx1, ""));
+    EXPECT_TRUE(rfString_IsEmpty(&sx1));
 	return 0;
 }

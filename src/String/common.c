@@ -20,25 +20,23 @@
 **
 **      ==END OF REFU LICENSE==
 **
-*/
+**/
 
 
-
-//*---------------------Corrensponding Header inclusion---------------------------------
+/*------------- Corrensponding Header inclusion -------------*/
 #include <Definitions/types.h> //for fixed size types needed in various places
 #include <String/string_decl.h>//for RF_String
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
-#include <String/common.h>
-//*---------------------Module related inclusion----------------------------------------
+/*------------- Module related inclusion -------------*/
 #include <String/stringx_decl.h> //for RF_StringX
-#include <stdarg.h> //needed for the va_list argument in rfStringX_Formatv() and also in the functions below
-#include <String/format.h> //for the String formatting function
-//*---------------------Outside module inclusion----------------------------------------
+#include <stdarg.h> //needed for the va_list
+#include "common.ph" //for fill_fmt_buffer()
+/*------------- Outside Module inclusion -------------*/
 //for error logging
     #include <Utils/log.h>
 //for UTF8 macro
-#include <String/unicode.h> //for rfUTF8_VerifySequence()
+   #include <String/unicode.h> //for rfUTF8_VerifyCstr()
 //for the ioBuffer
     #include <Definitions/threadspecific.h> // for the thread specific keyword used in the ioBuffer
     #include "../IO/buff.ph" //for the ioBuffer StringX
@@ -47,21 +45,24 @@
     #include <Utils/localmem_decl.h> //for local memory stack
     #include <Definitions/retcodes.h> //for return codes
     #include "../Utils/localmem.ph" //for the private local memory macros
-//*---------------------libc Headers inclusion------------------------------------------
+//for the internal buffer
+    #include "../Internal/internal_mod.ph"
+/*------------- libc inclusion --------------*/
 #include <stdlib.h> //for exit()
-//*----------------------------End of Includes------------------------------------------
+/*------------- End of includes -------------*/
 
-//Allocates and returns a string with the given characters a refu string with the given characters. Given characters have to be in UTF-8. A check for valid sequence of bytes is performed.
 RF_String* i_rfString_CreateLocal1(const char* s,...)
 {
     RF_String* ret;
     va_list args;
+    unsigned int size, bIndex;
+    char *buffPtr;
     //remember the stack pointer before this macro evaluation
     i_rfLMS_ArgsEval(return NULL);
 
     //read the var args
-    va_start(args,s);
-    if(rfStringX_Formatv(&ioBuffer,s,args) == false)
+    va_start(args, s);
+    if(!fill_fmt_buffer(s, &size, &buffPtr, &bIndex, args))
     {
         RF_ERROR("Local string creation failure due to failing at reading the"
                  " formatted string");
@@ -70,14 +71,17 @@ RF_String* i_rfString_CreateLocal1(const char* s,...)
     va_end(args);
 
     //allocate the string in the local memory stack
-    i_rfLMS_Push(ret,sizeof(RF_String), return NULL);
+    i_rfLMS_Push(ret, sizeof(RF_String), ret = NULL; goto cleanup_buffer);
     //get length
-    ret->byteLength = ioBuffer.INH_String.byteLength;
+    rfString_ByteLength(ret) = size;
     //now that we know the length we can allocate the buffer and copy the bytes
-    i_rfLMS_Push(ret->bytes,ret->byteLength+1, return NULL);
+    i_rfLMS_Push(rfString_Data(ret), ret->length,
+                 ret = NULL; goto cleanup_buffer);
+    memcpy(rfString_Data(ret), buffPtr, rfString_ByteLength(ret));
 
-    memcpy(ret->bytes,ioBuffer.INH_String.bytes,ret->byteLength+1);
-
+cleanup_buffer:
+    //pop back the buffer
+    rfBuffer_SetIndex(TSBUFFA, bIndex);
     return ret;
 }
 RF_String* i_NVrfString_CreateLocal(const char* s)
@@ -87,19 +91,19 @@ RF_String* i_NVrfString_CreateLocal(const char* s)
     //remember the stack pointer before this macro evaluation
     i_rfLMS_ArgsEval(return NULL);
     //check for validity of the given sequence and get the character length
-    if(!rfUTF8_VerifySequence(s,&byteLength))
+    if(!rfUTF8_VerifyCstr(s, &byteLength))
     {
-        RF_ERROR(
-                 "Error at String Allocation due to invalid UTF-8 byte sequence");
+        RF_ERROR("Error at String Allocation due to invalid "
+                 "UTF-8 byte sequence");
         return NULL;
     }
 
     //allocate the string in the local memory stack
-    i_rfLMS_Push(ret,sizeof(RF_String), return NULL);
+    i_rfLMS_Push(ret, sizeof(RF_String), return NULL);
     //get length
-    ret->byteLength = byteLength;
-    i_rfLMS_Push(ret->bytes, ret->byteLength+1, return NULL);
-    memcpy(ret->bytes,s,ret->byteLength+1);
+    rfString_ByteLength(ret) = byteLength;
+    i_rfLMS_Push(rfString_Data(ret), byteLength, return NULL);
+    memcpy(rfString_Data(ret), s, byteLength);
 
     return ret;
 }

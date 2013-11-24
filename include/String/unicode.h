@@ -34,6 +34,8 @@
 #ifndef RF_UNICODE_H
 #define RF_UNICODE_H
 
+#include <Utils/constcmp.h> //for RF_HEXEQ_C
+#include <Definitions/retcodes.h> //for bool
 enum i_RF_ENCODING_TYPES 
     {
         RF_UTF8=1,
@@ -41,8 +43,15 @@ enum i_RF_ENCODING_TYPES
         RF_UTF32
     };
 
-// Checks if a given  byte (must be char and not unsigned char) is a continuation byte (needs <Utils/constcmp.h> for the RF_HEXEQ_C() macro
-#define rfUTF8_IsContinuationByte(b__)  ( RF_HEXEQ_C( (  (~( (b__) ^ 0x80))>>6),0x3 ))
+/* maximum bytes of a UTF8 char */
+#define MAX_UTF8C_BYTES  5
+
+
+/**
+ **  Checks if a given  byte (must be char and not unsigned char) 
+ **/
+#define rfUTF8_IsContinuationByte(b__)  \
+    ( RF_HEXEQ_C( (  (~( (b__) ^ 0x80))>>6),0x3 ))
 
 #ifdef __cplusplus
 extern "C"
@@ -74,16 +83,15 @@ extern "C"
  ** @param[in] charsN The number of codepoints inside the buffer,
  **  that is how many characters are in there
  ** @param[out] utf8Length Pass a pointer to @c uint32_t to receive inside
- **  it the bytelength of the allcoated utf8 buffer without the null termination
- ** counted
+ **  it the bytelength of the allocated utf8 buffer
  ** @param[in/out] utf8 Here the caller has to provide a byte buffer of size 
  ** great enough to hold the encoded utf8. To be safe provide a buffer of 
- ** charsN*4 
+ ** size charsN*4. Does not get null terminated.
  ** @param buffSize The size of the buffer given at @c utf8 in bytes
  ** @return Returns @c true for success and @c false otherwise
  **
  **/
-i_DECLIMEX_ char rfUTF8_Encode(const uint32_t* codepoints, 
+i_DECLIMEX_ bool rfUTF8_Encode(const uint32_t* codepoints, 
                                uint32_t charsN, uint32_t* utf8Length,
                                char* utf8, uint32_t buffSize);
 
@@ -94,8 +102,8 @@ i_DECLIMEX_ char rfUTF8_Encode(const uint32_t* codepoints,
  ** and return the UTF-8 encoded byte buffer in @c utf8.
  **
  ** @param[in] codepoint The codepoint to encode. Must be given as a @c uint32_t
- ** @param[out] utf8 Pass a buffer of at least 5 bytes here to receive the null
- ** terminated utf8 bytes
+ ** @param[out] utf8 Pass a buffer of at least 5 bytes here to receive
+ **             the utf8 bytes. Does not get null terminated.
  ** @return Returns the number of bytes used for the utf8 conversion for
  ** success or @c -1 for error at encoding with additional error logging
  **
@@ -106,20 +114,22 @@ i_DECLIMEX_ int rfUTF8_Encode_single(const uint32_t codepoint, char* utf8);
  ** @brief Takes a utf8 buffer and decodes it into unicode codepoints
  **
  ** Note that the returned decoded codepoints buffer needs to be freed by
- ** the user explicitly after done with its use. The returned buffer is null terminated
- ** @param[in] utf8 The utf8 buffer
- ** @param[in] utf8BLength The bytes length of the UTF8 buffer
- ** @param[out] charsN Pass a reference to an @c uint32_t here to receive the number of
- ** unicode characters contained in the @c utf8 and the returned codepoints buffer
+ ** the user explicitly after done with its use.
+ ** @param[in] utf8            The utf8 buffer
+ ** @param[in] utf8BLength     The bytes length of the UTF8 buffer
+ ** @param[out] charsN         Pass a reference to an @c uint32_t here to receive
+ **                            the number of unicode characters contained in
+ **                            the @c utf8 and the returned codepoints buffer
  ** @param[in/out] code_points Pass a buffer of @c uint32_t to receive the code
- ** points of the decoded utf8 buffer here. The buffer has to be allocated and
- ** be of at least 4 times the length of the utf8 buffer to be safe that it fits
- ** the decoded codepoints
+ **                            points of the decoded utf8 buffer here.
+ **                            The buffer has to be allocated and
+ **                            be of at least 4 times the length of the utf8
+ **                            buffer to be safe that it fits
+ **                            the decoded codepoints
  ** @param buff_size The size of the buffer given at @c code_points.
  ** @return Returns @c true for success and @c false otherwise
- **
  **/
-i_DECLIMEX_ char rfUTF8_Decode(const char* utf8, uint32_t utf8BLength,
+i_DECLIMEX_ bool rfUTF8_Decode(const char* utf8, uint32_t utf8BLength,
                                uint32_t* charsN, uint32_t* code_points,
                                uint32_t buff_size);
 
@@ -129,88 +139,62 @@ i_DECLIMEX_ char rfUTF8_Decode(const char* utf8, uint32_t utf8BLength,
  **
  ** Takes in a UTF-16 endoded byte stream  inside @c buff.
  ** Pass an int32_t in @c characterLength to receive the character length and 
- ** an @c uint32_t buffer at
- ** @c codepoints with enough allocated size to fit any amount of characters
- **  that the UTF-16 stream could produce.
- ** @param[in] buff The UTF-16 byte stream
+ ** an @c uint32_t buffer at @c codepoints with enough allocated size to fit 
+ ** any amount of characters that the UTF-16 stream could produce.
+ ** @param[in] buff             The UTF-16 byte stream
+ ** @param[in] in_buff_length   The length of the input UTF-16 stream
+ **                             in bytes
  ** @param[out] characterLength Give a @c uint32_t here to receive the
- **  character length of the decoded codepoints
- ** @param[in/out] codepoints Provide an already allocated uint32_t buffer to
- **  hold the decoded unicode codepoints. The buffer must have enough length
- ** to hold any decoded codepoints that will come out of the UTF-16. The 
- ** maximum size you can provide to be safe is 2 times the size of the UTF-16 
- ** buffer length in bytes
- ** @param[in] buff_size The size of the buffer at @c codepoints given in 
- ** bytes
+ **                             character length of the decoded codepoints
+ ** @param[in/out] codepoints   Provide an already allocated uint32_t buffer to
+ **                             hold the decoded unicode codepoints. The buffer
+ **                             must have enough length
+ **                             to hold any decoded codepoints that will come
+ **                             out of the UTF-16. The maximum size you can
+ **                             provide to be safe is 2 times the size of
+ **                             the UTF-16 buffer length in bytes
+ ** @param[in] buff_size        The size of the buffer at @c codepoints 
+ **                             given in bytes
  ** @return Returns @c true for success and @c false otherwise
  **/
-i_DECLIMEX_ char rfUTF16_Decode(const char* buff, uint32_t* length,
-                                uint32_t* codepoints, uint32_t buff_size);
+i_DECLIMEX_ bool rfUTF16_Decode(const char* buff, uint32_t in_buff_length,
+                                uint32_t* length, uint32_t* codepoints,
+                                uint32_t buff_size);
 
 /**
  ** @brief Encodes a buffer of unicode codepoints into UTF-16.
  **
- ** @param[in] codepoints Provides a buffer of unicode codepoints for encoding
- ** @param[in] charsN Provide the number of characters in the codepoints buffer
- ** (excluding the null termination character)
- ** @param[out] utf16Length Give a reference to a uint32_t to receive the
- ** length in 16-bit words of the utf-16 buffer that the function
- ** will return
- ** @param[out] utf16 Provide a buffer of big enough size here inside which to
- ** receive the encoded UTF16 byte stream
- ** @param buff_size Provide the size of the buffer given at @c utf16. The size
- ** of the buffer must be big enough to fit the encoded UTF-16. To be safe give
- ** a buffer the same size in bytes as that of the codepoints
+ ** @param[in] codepoints     Provides a buffer of unicode
+ **                           codepoints for encoding
+ ** @param[in] charsN         Provide the number of characters in the codepoints
+ **                           buffer (excluding the null termination character)
+ ** @param[out] utf16Length   Give a reference to a uint32_t to receive the
+ **                           length in 16-bit words of the utf-16 buffer
+ **                           that the function will return
+ ** @param[out] utf16         Provide a buffer of big enough size here inside
+ **                           which to receive the encoded UTF16 byte stream
+ ** @param buff_size          Provide the size of the buffer given at @c utf16.
+ **                           The size of the buffer must be big enough to fit
+ **                           the encoded UTF-16. To be safe give a buffer the 
+ **                           same size in bytes as that of the codepoints
  ** @return Returns @c true for success and @c false otherwise
- **
  **/
-i_DECLIMEX_ char rfUTF16_Encode(const uint32_t* codepoints,
+i_DECLIMEX_ bool rfUTF16_Encode(const uint32_t* codepoints,
                                 uint32_t charsN, uint32_t* utf16Length,
                                 uint16_t* utf16, uint32_t buff_size);
 
 /**
- ** Parses a utf-8 byte sequence returning the byte length and verifying
- **  its validity
- ** @param[in] bytes A sequence of bytes encoded in the UTF-8 encoding
- ** @param[out] byteLength Pass a reference to an uint32_t to obtain the number
- ** of bytes that make up the sequence not including the '\0' byte
- ** @return Returns  @c true for proper utf8 byte sequence and @c false otherwise
+ ** Parses a utf-8 byte sequence represented as a null terminated c-string
+ ** and returns the byte length verifying its validity
+ ** @param[in] bytes        A sequence of bytes encoded in the UTF-8 encoding
+ ** @param[out] byteLength  Pass a reference to an uint32_t to obtain the number
+ **                         of bytes that make up the sequence
+ ** @return                 Returns @c true for proper utf8 byte sequence
+ **                         and @c false otherwise
  **/
-i_DECLIMEX_ char rfUTF8_VerifySequence(const char* bytes,
-                                       uint32_t* byteLength);
+i_DECLIMEX_ bool rfUTF8_VerifyCstr(const char* bytes,
+                                   uint32_t* byteLength);
 
-/**
- ** @brief Finds the length of a UTF-32 buffer
- **
- ** Finds the length (in code points) of a UTF-32 buffer which is already in
- ** correct endianess and  is an @c uint32_t buffer
- ** @param[in] buffer The utf32 buffer. Must be null terminated and
- ** contain @c uint32_t
- ** @param[out] bLength Pass a uint32_t here to get the length of
- ** the buffer. It returns the length of the string in characters
- ** NOT INLUDING the null terminating character
- **
- **/
-#ifdef RF_IAMHERE_FOR_DOXYGEN
-void rfUTF32_Length(uint32_t* buffer,uint32_t bLength);
-#else
-#define rfUTF32_Length(i_BUFFER_, i_BLENGTH_)  \
-    do{                                                 \
-        i_BLENGTH_=0;                                       \
-        while(i_BUFFER_[i_BLENGTH_] != 0){ i_BLENGTH_++;}}while(0)
-#endif
-/**
- ** @brief Turns a unicode code point into utf8
- **
- ** A function that takes in a single unicode codepoint, turns it into UTF-8
- ** and returns the utf8 bytelength of the codepoint
- ** @param[in] codepoint The unicode codepoint
- ** @param[out] utf8 The returned utf8 byte sequence inside a @c uint32_t
- ** @return Returns the bytelength of the utf8 or negative
- ** number if there was failure
- **
- **/
-i_DECLIMEX_ int rfUTF8_FromCodepoint(uint32_t codepoint, uint32_t* utf8);
 
 //! @}
 //end of unicode doxygen group

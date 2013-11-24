@@ -1,6 +1,5 @@
 ﻿#include <RFtextfile.h>
 #include <RFstring.h>
-#include <RFprintf.h>
 #include <refu.h>
 
 #include "../refu_tests.h"
@@ -41,7 +40,7 @@ void writeTest(int endianess, int encoding, RF_StringX* buff)
            rfTextFile_Insert(&outF,1,
                              RFS_("We are inserting a line before the first"
                                   " line of the file, replacing the "
-                                  "previous first"),false));
+                                  "previous first"), false));
     EXPECT(true,
            rfTextFile_Insert(
                &outF,3,

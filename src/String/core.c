@@ -3,13 +3,13 @@
 **
 ** Copyright (c) 2011-2013, Karapetsas Eleftherios
 ** All rights reserved.
-** 
+**
 ** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 **  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 **  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in
 **     the documentation and/or other materials provided with the distribution.
 **  3. Neither the name of the Original Author of Refu nor the names of its contributors may be used to endorse or promote products derived from
-** 
+**
 ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
 ** INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 ** DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
@@ -23,7 +23,6 @@
 */
 
 
-
 /*------------- Corrensponding Header inclusion -------------*/
 #include <Definitions/types.h> //for fixed size types needed in various places
 #include <String/string_decl.h>//for RF_String
@@ -33,28 +32,32 @@
 #include <String/core.h>
 /*------------- Module related inclusion -------------*/
 #include <String/stringx_decl.h> //for RF_StringX
-#include <stdarg.h> //needed for the va_list argument in rfStringX_Formatv() and also in the functions below
-#include <String/format.h> //for the String formatting function
-#include "common.ph"//for private string iteration
+#include <stdarg.h> //needed for the va_list
+//for private string iteration
+    #include "common.ph"
+//for some defines
+#include "defines.ph"
 /*------------- Outside Module inclusion -------------*/
-#include <String/unicode.h> //for rfUTF8_VerifySequence()
-// for error code
+//for unicode functions
+    #include <String/unicode.h>
+//for error code
     #include <Definitions/retcodes.h>
-// for error logging
+//for error logging
     #include <Utils/log.h>
 //for the io buffer
-    #include <Definitions/threadspecific.h> // for the thread specific keyword used in the ioBuffer
+    #include <Definitions/threadspecific.h>
     #include "../IO/buff.ph" //for the ioBuffer StringX
 //for the local scope macros
     #include <Utils/localscope.h>//for local scope macros
 //for memory allocation macros
     #include <Utils/memory.h> //for refu memory allocation
+//for the internal buffer
+    #include "../Internal/internal_mod.ph"
 /*------------- libc inclusion --------------*/
 #include <stdio.h> // for snprintf
 /*------------- End of includes -------------*/
 
 
-//Allocates and returns a string with the given characters a refu string with the given characters. Given characters have to be in UTF-8. A check for valide sequence of bytes is performed.
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
 RF_String* rfString_Create(const char* s, ...)
 #else
@@ -62,25 +65,36 @@ RF_String* i_rfString_Create(const char* s, ...)
 #endif
 {
     RF_String* ret;
-    va_list args;//note that no local scope macros are needed here since the
+    va_list args;
+    char *buff_ptr;
+    unsigned int size, buff_index;
+    RF_ENTER_LOCAL_SCOPE();
 
     va_start(args,s);
     //read the var args
-    if(rfStringX_Formatv(&ioBuffer,s,args) == false)
+    if(!fill_fmt_buffer(s, &size, &buff_ptr, &buff_index, args))
     {
         RF_ERROR("String creation failure due to failing at reading the "
                  "formatted string");
-        return NULL;
+        ret = NULL;
+        goto cleanup_lscope;
     }
     va_end(args);
+    RF_MALLOC_JMP(ret, sizeof(RF_String), ret = NULL, cleanup_buffer);
 
-    RF_MALLOC(ret, sizeof(RF_String), NULL);
     //get length
-    ret->byteLength = ioBuffer.INH_String.byteLength;
+    rfString_ByteLength(ret) = size;
     //now that we know the length we can allocate the buffer and copy the bytes
-    RF_MALLOC(ret->bytes, ret->byteLength+1, NULL);
-    memcpy(ret->bytes, ioBuffer.INH_String.bytes, ret->byteLength+1);
+    RF_MALLOC_JMP(rfString_Data(ret), rfString_ByteLength(ret),
+                  ret = NULL, cleanup_buffer);
+    memcpy(rfString_Data(ret), buff_ptr, rfString_ByteLength(ret));
 
+#ifdef RF_OPTION_DEBUG
+cleanup_buffer:
+#endif
+    rfBuffer_SetIndex(TSBUFFA, buff_index);
+cleanup_lscope:
+    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 #ifdef RF_OPTION_DEFAULT_ARGUMENTS
@@ -88,7 +102,7 @@ RF_String* i_NVrfString_Create(const char* s)
 {
     RF_String* ret;
     RF_MALLOC(ret, sizeof(RF_String), NULL);
-    if(i_NVrfString_Init(ret, s) == false)
+    if(!i_NVrfString_Init(ret, s))
     {
         free(ret);
         return NULL;
@@ -98,41 +112,49 @@ RF_String* i_NVrfString_Create(const char* s)
 #endif
 
 
-// Initializes a string with the given characters. Given characters have to be
-// in UTF-8. A check for valid sequence of bytes is performed.
-// <b>Can't be used with RF_StringX</b>
 #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-char rfString_Init(RF_String* str, const char* s, ...)
+bool rfString_Init(RF_String* str, const char* s, ...)
 #else
-char i_rfString_Init(RF_String* str, const char* s, ...)
+bool i_rfString_Init(RF_String* str, const char* s, ...)
 #endif
 {
-    va_list args;//note that no local scope macros are needed here since the 
-                 //arguments get evaluated in rfStringX_Formatv()
-    va_start(args,s);
+    va_list args;
+    unsigned int size, buff_index;
+    bool ret = true;
+    char *buff_ptr;
+    RF_ENTER_LOCAL_SCOPE();
+    va_start(args, s);
     //read the var args
-    if(rfStringX_Formatv(&ioBuffer,s,args) == false)
+    if(!fill_fmt_buffer(s, &size, &buff_ptr, &buff_index, args))
     {
         RF_ERROR("String creation failure due to failing at reading the "
                  "formatted string");
-        return false;
+        ret = false;
+        goto cleanup_lscope;
     }
     va_end(args);
 
     //get length
-    str->byteLength = ioBuffer.INH_String.byteLength;
+    rfString_ByteLength(str) = size;
     //now that we know the length we can allocate the buffer and copy the bytes
-    RF_MALLOC(str->bytes, str->byteLength+1, false);
-    memcpy(str->bytes, ioBuffer.INH_String.bytes, str->byteLength+1);
+    RF_MALLOC_JMP(rfString_Data(str), rfString_ByteLength(str),
+                  ret = false, cleanup_buffer);
+    memcpy(rfString_Data(str), buff_ptr, rfString_ByteLength(str));
 
-    return true;
+#ifdef RF_OPTION_DEBUG
+cleanup_buffer:
+#endif
+    rfBuffer_SetIndex(TSBUFFA, buff_index);
+cleanup_lscope:
+    RF_EXIT_LOCAL_SCOPE();
+    return ret;
 }
 #ifdef RF_OPTION_DEFAULT_ARGUMENTS
-char i_NVrfString_Init(RF_String* str, const char* s)
+bool i_NVrfString_Init(RF_String* str, const char* s)
 {
     //check for validity of the given sequence and get the character length
     uint32_t byteLength;
-    if(!rfUTF8_VerifySequence(s,&byteLength))
+    if(!rfUTF8_VerifyCstr(s, &byteLength))
     {
         RF_ERROR("Error at String Initialization due to invalid UTF-8 "
                  "byte sequence");
@@ -140,10 +162,10 @@ char i_NVrfString_Init(RF_String* str, const char* s)
     }
 
     //get length
-    str->byteLength = byteLength;
+    rfString_ByteLength(str) = byteLength;
     //now that we know the length we can allocate the buffer and copy the bytes
-    RF_MALLOC(str->bytes, str->byteLength+1, false);
-    memcpy(str->bytes, s, str->byteLength+1);
+    RF_MALLOC(rfString_Data(str), rfString_ByteLength(str), false);
+    memcpy(rfString_Data(str), s, rfString_ByteLength(str));
 
     return true;
 }
@@ -154,7 +176,7 @@ RF_String* rfString_Create_cp(uint32_t codepoint)
 {
     RF_String* ret;
     RF_MALLOC(ret, sizeof(RF_String), NULL);
-    if(rfString_Init_cp(ret,codepoint) == true)
+    if(rfString_Init_cp(ret, codepoint))
     {
         return ret;
     }
@@ -163,105 +185,53 @@ RF_String* rfString_Create_cp(uint32_t codepoint)
     return NULL;
 }
 
-//Initializes a string by turning a unicode code point in a String (encoded in UTF-8).
-char rfString_Init_cp(RF_String* str, uint32_t codepoint)
+//Turns a unicode code point in a String (encoded in UTF-8).
+bool rfString_Init_cp(RF_String* str, uint32_t codepoint)
 {
-    //alloc enough for a character
-    RF_MALLOC(str->bytes, 5, false);
-
-    //if we only need a byte to encode it
-    if(RF_HEXLE_UI(codepoint,0x007f))
+    //alloc enough for a utf8 character
+    RF_MALLOC(rfString_Data(str), MAX_UTF8C_BYTES, false);
+    rfString_ByteLength(str) = rfUTF8_Encode_single(codepoint, rfString_Data(str));
+    if(!rfString_ByteLength(str))
     {
-        str->bytes[0] = codepoint;
-        str->bytes[1] = '\0';
-        str->byteLength = 1;
-    }
-    //if we need 2 bytes to encode it
-    else if( RF_HEXGE_UI(codepoint,0x0080) && 
-             RF_HEXLE_UI(codepoint,0x07ff))
-    {
-        //get the first bits of the first byte and encode them to the first byte
-        str->bytes[1] = (codepoint & 0x3F)|(0x02<<6);
-        //get the 5 following bits and encode them in the second byte
-        str->bytes[0] = ((codepoint & 0x7C0) >> 6)  | (0x6<<5);
-        str->bytes[2] = '\0';
-        str->byteLength = 2;
-    }
-    //if we need 3 bytes to encode it
-    else if( RF_HEXGE_UI(codepoint,0x0800) &&
-             RF_HEXLE_UI(codepoint,0x0ffff))
-    {
-        //get the first bits of the first byte and encode them to the first byte
-        str->bytes[2] = (codepoint & 0x3F)|(0x02<<6);
-        //get the 6 following bits and encode them in the second byte
-        str->bytes[1] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
-        //get the 4 following bits and encode them in the third byte
-        str->bytes[0] = (((codepoint & 0xF000))>>12) | (0xE<<4);
-        str->bytes[3] = '\0';
-        str->byteLength = 3;
-    }
-    //if we need 4 bytes to encode it
-    else if( RF_HEXGE_UI(codepoint,0x10000) &&
-             RF_HEXLE_UI(codepoint,0x10ffff))
-    {
-        //get the first bits of the first byte and encode them to the first byte
-        str->bytes[3] = (codepoint & 0x3F)|(0x02<<6);
-        //get the 6 following bits and encode them in the second byte
-        str->bytes[2] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
-        //get the 6 following bits and encode them in the third byte
-        str->bytes[1] = (((codepoint & 0x3F000))>>12) | (0x02<<6);
-        //get the 3 following bits and encode them in the fourth byte
-        str->bytes[0] = (((codepoint & 0x1C0000))>>18) | (0x1E<<3);
-        str->bytes[4] = '\0';
-        str->byteLength = 4;
-    }
-    else
-    {
-        RF_ERROR("Attempted to encode an invalid unicode code point into"
-                 " a string");
-        free(str->bytes);
+        free(rfString_Data(str));
         return false;
     }
-
     return true;
 }
 
-
-// Allocates and returns a string with the given integer
 RF_String* rfString_Create_i(int32_t i)
 {
     //initialize the string and return it
     RF_String* ret;
     RF_MALLOC(ret, sizeof(RF_String), NULL);
-    if(rfString_Init_i(ret, i) == false)
+    if(!rfString_Init_i(ret, i))
     {
         free(ret);
         return NULL;
     }
     return ret;
 }
-// Initializes a string with the given integer.
-char rfString_Init_i(RF_String* str, int32_t i)
+
+bool rfString_Init_i(RF_String* str, int32_t i)
 {
     //the size of the int32_t buffer
     int len;
     //put the int32_t into a buffer and turn it in a char*
-    char buff[12];//max uint32_t is 4,294,967,295 in most environment so 12 chars will certainly fit it
-    len = snprintf(buff, 12, "%d", i);
-    if(len < 0 || len >= 12)
+    char buff[MAX_UINT32_STRING_CHAR_SIZE];
+    len = snprintf(buff, MAX_UINT32_STRING_CHAR_SIZE, "%d", i);
+    if(len < 0 || len >= MAX_UINT32_STRING_CHAR_SIZE)
     {
         RF_ERROR("String initialization from integer failed due to snprintf() "
                  "failing with errno %d", errno);
         return false;
     }
-    str->byteLength = len;
-    RF_MALLOC(str->bytes, len+1, false);
-    strcpy(str->bytes, buff);
+    rfString_ByteLength(str) = len;
+    RF_MALLOC(rfString_Data(str), len, false);
+    memcpy(rfString_Data(str), buff, len);
 
     return true;
 }
 
-// Allocates and returns a string with the given float
 RF_String* rfString_Create_f(float f)
 {
     RF_String* ret;
@@ -273,35 +243,32 @@ RF_String* rfString_Create_f(float f)
     }
     return ret;
 }
-// Initializes a string with the given float
-char rfString_Init_f(RF_String* str,float f)
+
+bool rfString_Init_f(RF_String* str,float f)
 {
-    char buff[50];//a buffer to hold the string float, TODO: check if size if ok
+    char buff[MAX_DOUBLE_STRING_CHAR_SIZE];
     int len;
-    len = snprintf(buff, 50, "%f", f);
-    if(len < 0 || len >= 50)
+    len = snprintf(buff, MAX_DOUBLE_STRING_CHAR_SIZE, "%f", f);
+    if(len < 0 || len >= MAX_DOUBLE_STRING_CHAR_SIZE)
     {
         RF_ERROR("String initialization from float failed due to snprintf() "
                  "failing with errno %d", errno);
         return false;
     }
 
-    str->byteLength = len;
-    RF_MALLOC(str->bytes, len+1, false);
-    strcpy(str->bytes, buff);
+    rfString_ByteLength(str) = len;
+    RF_MALLOC(rfString_Data(str), len, false);
+    memcpy(rfString_Data(str), buff, len);
 
     //success
     return true;
 }
 
-//Allocates and returns a string with the given UTF-16 byte sequence. Given
-// characters have to be in UTF-16. A check for valid sequence of bytes is
-// performed.<b>Can't be used with RF_StringX</b>
-RF_String* rfString_Create_UTF16(const uint16_t* s)
+RF_String* rfString_Create_UTF16(const uint16_t* s, unsigned int len)
 {
     RF_String* ret;
     RF_MALLOC(ret, sizeof(RF_String), NULL);
-    if(rfString_Init_UTF16(ret, s) == false)
+    if(!rfString_Init_UTF16(ret, s, len))
     {
         free(ret);
         return NULL;
@@ -309,27 +276,19 @@ RF_String* rfString_Create_UTF16(const uint16_t* s)
     return ret;
 }
 
-//Initializes a string with the given UTF-16 byte sequence. Given characters
-// have to be in UTF-16. A check for valid sequence of bytes is performed.
-// <b>Can't be used with RF_StringX</b>
-char rfString_Init_UTF16(RF_String* str, const uint16_t* s)
+bool rfString_Init_UTF16(RF_String* str, const uint16_t* s, unsigned int len)
 {
     //decode the utf-16 and get the code points
     uint32_t* codepoints;
-    uint32_t byteLength, characterLength, utf8ByteLength;
+    uint32_t characterLength, utf8ByteLength;
     char* utf8;
 
-    byteLength = 0;
-    while(s[byteLength/2]!= 0)
-    {
-        byteLength += 2;
-    }
-    byteLength+=3;//for the last utf-16 null termination character
-    RF_MALLOC(codepoints, byteLength*2, false); //allocate the codepoints
-    //parse the given byte stream normally since it has to be in the 
+
+    RF_MALLOC(codepoints, len * 2, false); //allocate the codepoints
+    //parse the given byte stream normally since it has to be in the
     //endianess of the system
-    if(!rfUTF16_Decode((const char*)s, &characterLength, codepoints,
-                       byteLength*2))
+    if(!rfUTF16_Decode((const char*)s, len, &characterLength, codepoints,
+                       len * 2))
     {
         free(codepoints);
         RF_ERROR("String initialization failed due to invalide UTF-16 "
@@ -337,9 +296,9 @@ char rfString_Init_UTF16(RF_String* str, const uint16_t* s)
         return false;
     }
     //now encode these codepoints into UTF8
-    RF_MALLOC(utf8, characterLength*4, false);
-    if(!rfUTF8_Encode(codepoints,characterLength,
-                      &utf8ByteLength, utf8, characterLength*4))
+    RF_MALLOC(utf8, characterLength * 4, false);
+    if(!rfUTF8_Encode(codepoints, characterLength,
+                      &utf8ByteLength, utf8, characterLength * 4))
     {
         RF_ERROR("String initialization failed during encoding in UTF8");
         free(codepoints);
@@ -348,202 +307,143 @@ char rfString_Init_UTF16(RF_String* str, const uint16_t* s)
     }
     //success
     free(codepoints);
-    str->bytes = utf8;
-    str->byteLength = utf8ByteLength;
+    rfString_Data(str) = utf8;
+    rfString_ByteLength(str) = utf8ByteLength;
     return true;
 }
 
-//Allocates and returns a string with the given UTF-32 byte sequence. Given characters have to be in UTF-32.
-RF_String* rfString_Create_UTF32(const uint32_t* s)
+RF_String* rfString_Create_UTF32(const uint32_t* s, unsigned int len)
 {
     RF_String* ret;
     RF_MALLOC(ret, sizeof(RF_String), NULL);
-    if(rfString_Init_UTF32(ret, s) == false)
+    if(rfString_Init_UTF32(ret, s, len) == false)
     {
         free(ret);
         return NULL;
     }
     return ret;
 }
-//Initializes a string with the given UTF-32 byte sequence. Given characters have to be in UTF-32.
-char rfString_Init_UTF32(RF_String* str, const uint32_t* codeBuffer)
+
+bool rfString_Init_UTF32(RF_String* str, const uint32_t* codeBuffer,
+                         unsigned int length)
 {
     //find the length of the utf32 buffer in characters
-    uint32_t length,utf8ByteLength;
-    char* utf8;
-    rfUTF32_Length(codeBuffer,length);
+    uint32_t utf8ByteLength;
+    char *utf8;
 
     //turn the codepoints into a utf-8 encoded buffer
-    RF_MALLOC(utf8, length*4, false);
-    if(!rfUTF8_Encode(codeBuffer, length, &utf8ByteLength, utf8, length*4))
+    RF_MALLOC(utf8, length * 4, false);
+    if(!rfUTF8_Encode(codeBuffer, length, &utf8ByteLength, utf8, length * 4))
     {
         RF_ERROR("Could not properly encode a UTF32 buffer into UTF8");
         free(utf8);
         return false;
     }
-    str->bytes = utf8;
-    str->byteLength = utf8ByteLength;
+    rfString_Data(str) = utf8;
+    rfString_ByteLength(str) = utf8ByteLength;
     return true;
 }
 
-// Allocates and returns a string with the given characters. NO VALID-UTF8 check is performed
+
 RF_String* rfString_Create_unsafe(const char* s)
 {
     RF_String* ret;
-    RF_MALLOC(ret,sizeof(RF_String), NULL);
-    //get length
-    ret->byteLength = strlen(s);
-    //now that we know the length we can allocate the buffer and copy the bytes
-    RF_MALLOC(ret->bytes, ret->byteLength+1, NULL);
-    memcpy(ret->bytes, s, ret->byteLength+1);
+    RF_MALLOC(ret, sizeof(RF_String), NULL);
+    if(!rfString_Init_unsafe(ret, s))
+    {
+        free(ret);
+        return NULL;
+    }
     return ret;
 }
 
-
-// Initializes a string with the given characters. NO VALID-UTF8 check is performed
-char rfString_Init_unsafe(RF_String* str, const char* s)
+bool rfString_Init_unsafe(RF_String* str, const char* s)
 {
-    //get its length
-    str->byteLength = strlen(s);
-    //now that we know the length we can allocate the buffer and copy the bytes
-    RF_MALLOC(str->bytes, str->byteLength+1, false);
-    memcpy(str->bytes, s, str->byteLength+1);
+    return rfString_Init_unsafe_nnt(str, s, strlen(s));
+}
+
+
+bool rfString_Init_unsafe_nnt(RF_String* str, const char* s, size_t length)
+{
+    RF_MALLOC(rfString_Data(str), length, false);
+    memcpy(rfString_Data(str), s, length);
+    rfString_ByteLength(str) = length;
     return true;
 }
 
 
-// Assigns the value of the source string to the destination.Both strings should already be initialized and hold a value. It is an error to give null parameters.
-char rfString_Assign(RF_String* dest,const void* sourceP)
+/* --- Assigning to a String --- */
+
+
+bool rfString_Assign(RF_String* dst, const void* src)
 {
-    const RF_String* source = (const RF_String*)sourceP;
-    char ret = true;
+    bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    //only if the new string value won't fit in the buffer reallocate the buffer (let's avoid unecessary reallocs)
-    if(source->byteLength > dest->byteLength)
+    //only if new string value won't fit in the buffer reallocate
+    if(rfString_ByteLength(src) > rfString_ByteLength(dst))
     {
-        RF_REALLOC_JMP(dest->bytes, char, source->byteLength+1,
-                       ret=false, cleanup);
+        RF_REALLOC_JMP(rfString_Data(dst), char, rfString_ByteLength(src),
+                       ret = false, cleanup);
     }
     //now copy the value
-    memcpy(dest->bytes,source->bytes, source->byteLength+1);
+    memcpy(rfString_Data(dst), rfString_Data(src), rfString_ByteLength(src));
     //and fix the lengths
-    dest->byteLength = source->byteLength;
+    rfString_ByteLength(dst) = rfString_ByteLength(src);
   cleanup:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
 //Assigns the value of a unicode character to the string
-char rfString_Assign_char(RF_String* str,uint32_t codepoint)
+bool rfString_Assign_char(RF_String* str,uint32_t codepoint)
 {
     //realloc if needed
-    if(str->byteLength <5)
+    if(str->length <5)
     {
-        RF_REALLOC(str->bytes, char, 5, false);
+        RF_REALLOC(rfString_Data(str), char, 5, false);
     }
-    //if we only need a byte to encode it
-    if(RF_HEXLE_UI(codepoint, 0x007f))
+    rfString_ByteLength(str) = rfUTF8_Encode_single(codepoint,
+                                                    rfString_Data(str));
+    if(!rfString_ByteLength(str))
     {
-        str->bytes[0] = codepoint;
-        str->bytes[1] = '\0';
-        str->byteLength = 1;
-    }
-    //if we need 2 bytes to encode it
-    else if( RF_HEXGE_UI(codepoint, 0x0080) &&
-             RF_HEXLE_UI(codepoint, 0x07ff))
-    {
-        //get the first bits of the first byte and encode them to the first byte
-        str->bytes[1] = (codepoint & 0x3F)|(0x02<<6);
-        //get the 5 following bits and encode them in the second byte
-        str->bytes[0] = ((codepoint & 0x7C0) >> 6)  | (0x6<<5);
-        str->bytes[2] = '\0';
-        str->byteLength = 2;
-    }
-    //if we need 3 bytes to encode it
-    else if( RF_HEXGE_UI(codepoint, 0x0800) &&
-             RF_HEXLE_UI(codepoint, 0x0ffff))
-    {
-        //get the first bits of the first byte and encode them to the first byte
-        str->bytes[2] = (codepoint & 0x3F)|(0x02<<6);
-        //get the 6 following bits and encode them in the second byte
-        str->bytes[1] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
-        //get the 4 following bits and encode them in the third byte
-        str->bytes[0] = (((codepoint & 0xF000))>>12) | (0xE<<4);
-        str->bytes[3] = '\0';
-        str->byteLength = 3;
-    }
-    //if we need 4 bytes to encode it
-    else if( RF_HEXGE_UI(codepoint,0x10000) &&
-             RF_HEXLE_UI(codepoint,0x10ffff))
-    {
-        //get the first bits of the first byte and encode them to the first byte
-        str->bytes[3] = (codepoint & 0x3F)|(0x02<<6);
-        //get the 6 following bits and encode them in the second byte
-        str->bytes[2] = ((codepoint & 0xFC0) >> 6)  | (0x02<<6);
-        //get the 6 following bits and encode them in the third byte
-        str->bytes[1] = (((codepoint & 0x3F000))>>12) | (0x02<<6);
-        //get the 3 following bits and encode them in the fourth byte
-        str->bytes[0] = (((codepoint & 0x1C0000))>>18) | (0x1E<<3);
-        str->bytes[4] = '\0';
-        str->byteLength = 4;
-    }
-    else
-    {
-        RF_ERROR("Attempted to encode an invalid unicode code point into"
-                 " a string");
         return false;
     }
-
     return true;
 }
 
+
 /*--- RF_String copying functions ---*/
 
-
-
-
-//Creates and returns an allocated copy of the given string
-RF_String* rfString_Copy_OUT(const void* srcP)
+RF_String* rfString_Copy_OUT(const void* src)
 {
-    const RF_String* src = (const RF_String*)srcP;
     RF_String* ret;
     //create the new string
     RF_MALLOC(ret, sizeof(RF_String), NULL);
-    if(rfString_Copy_IN(ret, src) == false)
+    if(!rfString_Copy_IN(ret, src))
     {
         free(ret);
         return NULL;
     }
     return ret;
 }
-// Copies all the contents of a string to another
-char rfString_Copy_IN(RF_String* dst, const void* srcP)
-{
-    const RF_String* src = (const RF_String*)srcP;
-    //get the length
-    dst->byteLength = src->byteLength;
-    //copy the bytes
-    RF_MALLOC(dst->bytes, src->byteLength+1, false);
-    memcpy(dst->bytes, src->bytes, dst->byteLength+1);
-    return true;
 
+bool rfString_Copy_IN(RF_String* dst, const void* src)
+{
+    return rfString_Init_unsafe_nnt(dst,
+                                    rfString_Data(src),
+                                    rfString_ByteLength(src));
 }
 //Copies a certain number of characters from a string
-char rfString_Copy_chars(RF_String* dst, const void* srcP, uint32_t charsN)
+bool rfString_Copy_chars(RF_String* dst, const void* src, uint32_t charsN)
 {
     uint32_t i = 0,bytePos;
-    const RF_String* src = (const RF_String*)srcP;
 
     //find the byte position until which we need to copy
-    RF_STRING_ITERATE_START(src,i,bytePos)
-        if(i == charsN)
-            break;
-    RF_STRING_ITERATE_END(i,bytePos)
-    dst->byteLength = bytePos;
-    RF_MALLOC(dst->bytes, dst->byteLength+1 ,false);
-    memcpy(dst->bytes,src->bytes,dst->byteLength+1);
-    dst->bytes[dst->byteLength] = '\0';//null terminate it
-    return true;
+    RF_STRING_ITERATE_START(src, i, bytePos)
+        if(i == charsN) { break;}
+    RF_STRING_ITERATE_END(i, bytePos)
+
+    return rfString_Init_unsafe_nnt(dst, rfString_Data(src), bytePos);
 }
 
 
@@ -552,113 +452,118 @@ char rfString_Copy_chars(RF_String* dst, const void* srcP, uint32_t charsN)
 // Deletes a string object and also frees its pointer.
 void rfString_Destroy(RF_String* s)
 {
-    free(s->bytes);
-    free(s);
+    if(s != 0)
+    {
+        free(rfString_Data(s));
+        free(s);
+    }
 }
 // Deletes a string object only, not its memory.
 void rfString_Deinit(RF_String* s)
 {
-    free(s->bytes);
+    if(s != 0)
+    {
+        free(rfString_Data(s));
+    }
 }
 
 /*--- Equality check ---*/
 
-// Compares two Strings and returns true if they are equal and false otherwise
-char rfString_Equal(const void* s1P,const void* s2P)
+bool rfString_Equal(const void* s1, const void* s2)
 {
-    const RF_String* s1 = (const RF_String*)s1P;
-    const RF_String* s2 = (const RF_String*)s2P;
-    char ret = false;
+    bool ret;
     RF_ENTER_LOCAL_SCOPE();
-    if( strcmp(s1->bytes,s2->bytes)==0)
-    {
-        ret = true;
-    }
+    ret = strcmp_nnt(rfString_Data(s1), rfString_ByteLength(s1),
+                     rfString_Data(s2), rfString_ByteLength(s2));
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
 /*--- 2 functions used in the iteration macros ---*/
 
-//Retrieves the unicode code point of the parameter bytepos of the string. 
-//If the byte position is not the start of a character 0 is returned. This is 
-//an internal function, there is no need to use it. <i>Can be used with StringX</i>
+
 uint32_t rfString_BytePosToCodePoint(const void* str, uint32_t i)
 {
     uint32_t codePoint=0;
-    const RF_String* thisstr = (const RF_String*)str;
-    ///Here I am not checking if byte position 'i' is withing bounds and especially if it is a start of a character
-    /// This is assumed to have been checked or to be known beforehand by the programmer. That's one of the reasons
-    /// why this is an internal function and should not be used unless you know what you are doing
+    /*
+      Here I am not checking if byte position 'i' is withing bounds
+      and especially if it is a start of a character. This is assumed
+      to have been checked or to be known beforehand by the programmer.
+      That's one of the reasons why this is an internal function and
+      should not be used unless you know what you are doing
+    */
     //if the lead bit of the byte is 0 then range is : U+0000 to U+0007F (1 byte)
-    if( ((thisstr->bytes[i] & 0x80)>>7) == 0 )
+    if( ((rfString_Data(str)[i] & 0x80)>>7) == 0 )
     {
         //and the code point is this whole byte only
-        codePoint = thisstr->bytes[i];
+        codePoint = rfString_Data(str)[i];
     }
     //if the leading bits are in the form of 0b110xxxxx then range is: U+0080 to U+07FF (2 bytes)
-    else if ( RF_HEXEQ_C( ( (~(thisstr->bytes[i] ^  0xC0))>>5),0x7) )
+    else if ( RF_HEXEQ_C( ( (~(rfString_Data(str)[i] ^  0xC0))>>5),0x7) )
     {
         codePoint =0;
         //from the second byte take the first 6 bits
-        codePoint = (thisstr->bytes[i+1] & 0x3F) ;
+        codePoint = (rfString_Data(str)[i+1] & 0x3F) ;
         //from the first byte take the first 5 bits and put them in the start
-        codePoint |= ((thisstr->bytes[i] & 0x1F) << 6);
+        codePoint |= ((rfString_Data(str)[i] & 0x1F) << 6);
     }
     //if the leading bits are in the form of 0b1110xxxx then range is U+0800 to U+FFFF  (3 bytes)
-    else if( RF_HEXEQ_C( ( (~(thisstr->bytes[i] ^ 0xE0))>>4),0xF) )
+    else if( RF_HEXEQ_C( ( (~(rfString_Data(str)[i] ^ 0xE0))>>4),0xF) )
     {
         codePoint = 0;
         //from the third byte take the first 6 bits
-        codePoint = (thisstr->bytes[i+2] & 0x3F) ;
+        codePoint = (rfString_Data(str)[i+2] & 0x3F) ;
         //from the second byte take the first 6 bits and put them to the left of the previous 6 bits
-        codePoint |= ((thisstr->bytes[i+1] & 0x3F) << 6);
+        codePoint |= ((rfString_Data(str)[i+1] & 0x3F) << 6);
         //from the first byte take the first 4 bits and put them to the left of the previous 6 bits
-        codePoint |= ((thisstr->bytes[i] & 0xF) << 12);
+        codePoint |= ((rfString_Data(str)[i] & 0xF) << 12);
     }
     //if the leading bits are in the form of 0b11110xxx then range is U+010000 to U+10FFFF (4 bytes)
-    else if( RF_HEXEQ_C( ( (~(thisstr->bytes[i] ^ 0xF0))>>3), 0x1F))
+    else if( RF_HEXEQ_C( ( (~(rfString_Data(str)[i] ^ 0xF0))>>3), 0x1F))
     {
         codePoint = 0;
         //from the fourth byte take the first 6 bits
-        codePoint = (thisstr->bytes[i+3] & 0x3F) ;
+        codePoint = (rfString_Data(str)[i+3] & 0x3F) ;
         //from the third byte take the first 6 bits and put them to the left of the previous 6 bits
-        codePoint |= ((thisstr->bytes[i+2] & 0x3F) << 6);
+        codePoint |= ((rfString_Data(str)[i+2] & 0x3F) << 6);
         //from the second byte take the first 6 bits and put them to the left of the previous 6 bits
-        codePoint |= ((thisstr->bytes[i+1] & 0x3F) << 12);
+        codePoint |= ((rfString_Data(str)[i+1] & 0x3F) << 12);
         //from the first byte take the first 3 bits and put them to the left of the previous 6 bits
-        codePoint |= ((thisstr->bytes[i] & 0x7) << 18);
+        codePoint |= ((rfString_Data(str)[i] & 0x7) << 18);
     }
 
     return codePoint;
 }
 //Retrieves character position of a byte position
-uint32_t rfString_BytePosToCharPos(const void* thisstrP,uint32_t bytepos,
-                                   char before)
+uint32_t rfString_BytePosToCharPos(const void* str, uint32_t bytepos,
+                                   bool before)
 {
-    ///here there is no check if this is actually a byte pos inside the string's
-    ///byte buffer. The programmer should have made sure it is before hand. This is why it is
-    /// an internal function and should only be used if you know what you are doing
-    const RF_String* thisstr = (const RF_String*)thisstrP;
+    /*
+      here there is no check if this is actually a byte pos inside the string's
+      byte buffer. The programmer should have made sure it is before hand.
+      This is why it is an internal function and should only be used if
+      you know what you are doing
+    */
     uint32_t charPos = 0;
     uint32_t byteI = 0;
     //iterate the string's bytes until you get to the required byte
     //if it is not a continuation byte, return the position
-    if(rfUTF8_IsContinuationByte(thisstr->bytes[bytepos])==false)
+    if(!rfUTF8_IsContinuationByte(rfString_Data(str)[bytepos]))
     {
-        RF_STRING_ITERATE_START(thisstr,charPos,byteI)
-            if(byteI == bytepos)
-                return charPos;
-        RF_STRING_ITERATE_END(charPos,byteI)
+        RF_STRING_ITERATE_START(str, charPos, byteI)
+            if(byteI == bytepos) {return charPos;}
+        RF_STRING_ITERATE_END(charPos, byteI)
     }
-    //else  iterate the string's bytes until you get anything bigger than the required byte
-    RF_STRING_ITERATE_START(thisstr,charPos,byteI)
+    //else iterate the string's bytes until you get sth bigger than the required byte
+    RF_STRING_ITERATE_START(str, charPos, byteI)
         if(byteI > bytepos)
             break;
-    RF_STRING_ITERATE_END(charPos,byteI)
+    RF_STRING_ITERATE_END(charPos, byteI)
     //if we need the previous one return it
-    if(before == true)
-        return charPos-1;
+    if(before)
+    {
+        return charPos - 1;
+    }
     //else return this
     return charPos;
 }

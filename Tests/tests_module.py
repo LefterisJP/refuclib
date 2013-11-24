@@ -266,10 +266,6 @@ tests_list = [
          [os.path.join("String", "string_filedescriptors.c")],
          "String"),
 
-    Test("string_format",
-         [os.path.join("String", "string_format.c")],
-         "String"),
-
     Test("string_init",
          [os.path.join("String", "string_init.c")],
          "String"),

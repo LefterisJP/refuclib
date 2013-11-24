@@ -1,5 +1,4 @@
 ﻿#include <RFstring.h>
-#include <RFprintf.h>
 #include <refu.h>
 #include <stdlib.h>
 
@@ -46,8 +45,8 @@ int main()
     rfString_ToLower(&s1);
     EXPECT(true,rfString_Init(&s2,"abcdefghijklmnopqrstuvwxyz"));
     rfString_ToUpper(&s2);
-    EXPECTGE(rfPrintf("%S\n",&s1), 0);
-    EXPECTGE(rfPrintf("%S\n",&s2), 0);
+    EXPECTGE(printf(RF_STR_PF_FMT"\n", RF_STR_PF_ARG(&s1)), 0);
+    EXPECTGE(printf(RF_STR_PF_FMT"\n", RF_STR_PF_ARG(&s2)), 0);
 
 
     //first create the string to test. Japanese(Adachiku) + MusicalSymbol(G clef)
@@ -60,15 +59,15 @@ int main()
 
     //expect 0(false) and 1(true) and 15042
     EXPECT(rfString_Init(&s5,"15042"), true);
-    EXPECT(false,rfString_ToInt(&s3,&num));
+    EXPECT(false, rfString_ToInt(&s3,&num));
     EXPECT(true,rfString_ToInt(&s5,&num));
-    EXPECTGE(rfPrintf("%d\n",num), 0);
+    EXPECTGE(printf("%d\n",num), 0);
 
     //expect RE_STRING_TOFLOAT and RF_SUCCESS and 3.141592
     EXPECT(true,rfString_Init(&s6,"3.141592"));
-    EXPECT(RE_STRING_TOFLOAT,rfString_ToDouble(&s3,&dbl));
-    EXPECT(RF_SUCCESS,rfString_ToDouble(&s6,&dbl));
-    EXPECTGE(rfPrintf("%f\n",dbl), 0);
+    EXPECT(false ,rfString_ToDouble(&s3,&dbl));
+    EXPECT(true, rfString_ToDouble(&s6,&dbl));
+    EXPECTGE(printf("%f\n",dbl), 0);
 
     //expect the sentence separated in words
     EXPECT(true,
@@ -80,7 +79,7 @@ int main()
     EXPECT(true,rfString_Tokenize(&s7,RFS_(" "),&wordsN,&words));
     for(i=0;i<wordsN;i++)
     {
-        EXPECTGE(rfPrintf("%S\n",&words[i]), 0);
+        EXPECTGE(printf(RF_STR_PF_FMT"\n", RF_STR_PF_ARG(&words[i])), 0);
     }
     //free stuff
     for(i = 0; i < wordsN; i++)

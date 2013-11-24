@@ -44,6 +44,10 @@
     #include "IO/buff.ph"//for rfInitStdio()
 //for threads initialization
     #include <Threads/common.h>
+//for internal initialization
+    #include "Internal/internal_mod.ph"
+/*------------- Modules init/deinit -------------*/
+    #include "String/mod.ph"
 /*------------- System Specific includes -------------*/
 #ifdef REFU_WIN32_VERSION
     #include <windows.h> //for QueryPerformanceFrequency() and other related flags
@@ -65,7 +69,10 @@ char rfInit(char* logstr, uint64_t lmsSize, log_level_t level)
     //initialize the refu stdio
     rfInitStdio();
     rfLog_Init(level);
-    
+    module_string_init();
+    module_internal_init();
+
+
     /* //initialize regu log stream */
     /* if(strcmp(logstr,"stderr") == 0) */
     /*     RF_Log_Stream = stderr; */

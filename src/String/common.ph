@@ -27,103 +27,146 @@
 ** This is the private header file of the C RF_String
 ** containing functions and macros that don't need to be exposed
 ** to the user
-**
----------------------For internal library include make sure to have----------------------------
-#include <Definitions/types.h> //for fixed size types needed in various places
-#include "common.ph"
----------------------For internal library include make sure to have----------------------------
-*/
+**/
 #ifndef RF_STRING_COMMON_PH
 #define RF_STRING_COMMON_PH
 
+//for bool
+    #include <Definitions/retcodes.h>
+//for inline
+    #include <Definitions/inline.h> 
+//for the internal buffer
+    #include "../Internal/internal_mod.ph" 
+//for String accessors
+    #include <String/retrieval.h>
+//for vsnprintf
+    #include <stdio.h>
+//for memcpy
+    #include <string.h>
 
 #ifdef __cplusplus
 extern "C"
 {///opening bracket for calling from C++
 #endif
 
-    /********************* ==Internal Use Only== String Iteration (For API use iteration refer to rfString_Iterate() group of macros *************************************/
-
 /**
- ** Two macros to accomplish iteration of an RF_String starting from the beginning of the String. This macro should be used with its end pair.
- ** We take advantage of the fact that an RF_String is always guaranteed to contain a valid UTF-8 sequence and thus no checks are performed.
+ ** Two macros to accomplish iteration of an RF_String starting from
+ ** the beginning of the String. This macro should be used with its end pair.
+ ** We take advantage of the fact that an RF_String is always guaranteed
+ ** to contain a valid UTF-8 sequence and thus no checks are performed.
  ** @param i_string_ The string to iterate
  ** @param i_char_ A variable to hold the current character position of the iteration
  ** @param i_index_ A variable to hold the current byte position of the iteration
  **
  **/
-#define RF_STRING_ITERATE_START(i_string_,i_char_,i_index_)     \
-            i_index_ = 0;i_char_=0;\
-            while( ((RF_String*)(i_string_))->bytes[(i_index_)] != '\0'){\
-                if( rfUTF8_IsContinuationByte( ((RF_String*)(i_string_))->bytes[(i_index_)]) ==false){
+#define RF_STRING_ITERATE_START(i_string_, i_char_, i_index_)         \
+    i_index_ = 0;i_char_ = 0;                                         \
+    while( i_index_ < rfString_ByteLength(i_string_)){                \
+    if(!rfUTF8_IsContinuationByte(                                    \
+       rfString_Data(i_string_)[(i_index_)])){
 
-#define RF_STRING_ITERATE_END(i_char_,i_index_)  (i_char_)++;}(i_index_)++;}
+#define RF_STRING_ITERATE_END(i_char_, i_index_)  (i_char_)++;}(i_index_)++;}
 
 /**
- ** Two macros to accomplish iteration of an RF_String starting from the end of the String. This macro should be used with its end pair.
- ** We take advantage of the fact that an RF_String is always guaranteed to contain a valid UTF-8 sequence and thus no checks are performed
+ ** Two macros to accomplish iteration of an RF_String starting from the end
+ ** of the String. This macro should be used with its end pair.
+ ** We take advantage of the fact that an RF_String is always guaranteed
+ ** to contain a valid UTF-8 sequence and thus no checks are performed
  ** @param i_string_ The string to iterate
- ** @param i_char_ An unsigned variable to hold the current character position of the iteration.
- ** @param i_index_ An uint32_t variable to hold the current byte position of the iteration
+ ** @param i_char_ An unsigned variable to hold the current character
+ **        position of the iteration.
+ ** @param i_index_ An uint32_t variable to hold the current byte
+ **        position of the iteration
  **
  **/
-#define RF_STRING_ITERATEB_START(i_string_,i_char_,i_index_)     \
-            i_index_ = ((RF_String*)(i_string_))->byteLength-1;(i_char_)=1;\
-            do{\
-               if( rfUTF8_IsContinuationByte(((RF_String*)(i_string_))->bytes[(i_index_)]) ==false){
+#define RF_STRING_ITERATEB_START(i_string_, i_char_, i_index_)     \
+    i_index_ = rfString_ByteLength(i_string_) - 1;(i_char_)=1;     \
+    do{                                                            \
+    if(!rfUTF8_IsContinuationByte(                                 \
+           rfString_Data(i_string_)[(i_index_)])){
 
-#define RF_STRING_ITERATEB_END(i_char_,i_index_)  (i_char_)++;}(i_index_)--;}while((i_index_) != 0);
+#define RF_STRING_ITERATEB_END(i_char_, i_index_)       \
+    (i_char_)++;}(i_index_)--;}while((i_index_) != 0);
 
 
 /**
  ** A macro to easily reallocate a StringX's buffer using RF_REALOC
+ ** @param STR_         The StringX whose buffer to reallocate
+ ** @param REQSIZE_     The new required size the buffer should have
+ ** @param RETVALUE_    What to return in realloc failure
  **
+ ** @note No need to take the bIndex into account when giving the REQSIZE_
+ ** the macro takes care of it.
  **/
 #define RF_STRINGX_REALLOC(STR_, REQSIZE_, RETVALUE_)                   \
     do{                                                                 \
         /*If the buffer size is not enough for the required size*/      \
-        if(REQSIZE_ >= STR_->bSize)                                     \
+        if(REQSIZE_ + (STR_)->bIndex >= (STR_)->bSize)                  \
         {                                                               \
             /*create the new size*/                                     \
-            STR_->bSize = REQSIZE_*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER; \
+            (STR_)->bSize = (REQSIZE_ + (STR_)->bIndex) * RF_OPTION_STRINGX_CAPACITY_MULTIPLIER; \
             /*Reallocate the buffer depending on whether its internal pointer has a value or not*/ \
             if(STR_->bIndex == 0)                                       \
             {                                                           \
-                RF_REALLOC(STR_->INH_String.bytes, char,                \
-                           STR_->bSize, RETVALUE_);                     \
+                RF_REALLOC(rfString_Data(STR_), char,                   \
+                           (STR_)->bSize, RETVALUE_);                     \
             }                                                           \
             else                                                        \
             {                                                           \
-                STR_->INH_String.bytes-=STR_->bIndex;                   \
-                RF_REALLOC(STR_->INH_String.bytes,char,                 \
-                           STR_->bSize, RETVALUE_);                     \
-                STR_->INH_String.bytes+=STR_->bIndex;                   \
-                }                                                       \
+                rfString_Data(STR_) -= (STR_)->bIndex;                  \
+                RF_REALLOC(rfString_Data(STR_), char,                   \
+                           (STR_)->bSize, RETVALUE_);                     \
+                rfString_Data(STR_) += (STR_)->bIndex;                    \
+            }                                                           \
         }}while(0)
 
 /**
  ** A macro to easily reallocate a StringX's buffer using RF_REALLOC_JMP
+ ** @param STR_         The StringX whose buffer to reallocate
+ ** @param REQSIZE_     The new required size the buffer should have
+ ** @param STMT_    What to return in realloc failure
+ ** @param GOTOFLAG_ Where to jump to in realloc failure
  **
+ ** @note No need to take the bIndex into account when giving the REQSIZE_
+ ** the macro takes care of it.
  **/
 #define RF_STRINGX_REALLOC_JMP(STR_, REQSIZE_, STMT_, GOTOFLAG_)        \
     do{                                                                 \
         /*If the buffer size is not enough for the required size*/      \
-        if(REQSIZE_ >= STR_->bSize)                                     \
+        if(REQSIZE_ + (STR_)->bIndex >= (STR_)->bSize)                  \
         {                                                               \
             /*create the new size*/                                     \
-            STR_->bSize = REQSIZE_*RF_OPTION_STRINGX_CAPACITY_MULTIPLIER; \
+            (STR_)->bSize = (REQSIZE_+ (STR_)->bIndex) * RF_OPTION_STRINGX_CAPACITY_MULTIPLIER; \
             /*Reallocate the buffer depending on whether its internal pointer has a value or not*/ \
-            if(STR_->bIndex == 0)                                       \
-                RF_REALLOC_JMP(STR_->INH_String.bytes, char,            \
-                               STR_->bSize, STMT_, GOTOFLAG_);          \
+            if((STR_)->bIndex == 0)                                       \
+                RF_REALLOC_JMP(rfString_Data(STR_), char,               \
+                               (STR_)->bSize, STMT_, GOTOFLAG_);          \
                 else                                                    \
                 {                                                       \
-                    STR_->INH_String.bytes-=STR_->bIndex;               \
-                    RF_REALLOC_JMP(STR_->INH_String.bytes, char,        \
-                                   STR_->bSize, STMT_, GOTOFLAG_);      \
-                    STR_->INH_String.bytes+=STR_->bIndex;               \
+                    rfString_Data(STR_) -= (STR_)->bIndex;              \
+                    RF_REALLOC_JMP(rfString_Data(STR_), char,           \
+                                   (STR_)->bSize, STMT_, GOTOFLAG_);      \
+                    rfString_Data(STR_) += (STR_)->bIndex;                \
                 }                                                       \
         }}while(0)
+
+
+/**
+ ** @internal
+ ** Searches a string for a substring
+ ** when both are not null terminated
+ ** @endinternal
+ **/
+char* strstr_nnt(const char* s1, unsigned int s1_len,
+                 const char* s2, unsigned int s2_len);
+
+/**
+ ** @internal
+ ** Compares two non null terminated strings
+ ** @endinternal
+**/
+bool strcmp_nnt(char* s1, unsigned int s1_len,
+                char* s2, unsigned int s2_len);
 
 /**
  ** @internal
@@ -131,22 +174,87 @@ extern "C"
  ** @brief Internal version of rfString_Find, used for byte position.
  **
  ** @isinherited{StringX}
- ** Finds the existence of String sstr inside this string with the given options. You have the
- ** option to either match case or perform a case-insensitive search. In addition you can search
- ** for the exact string and not it just being a part of another string. This is an internal version
- ** used by other functions to obtain the byte position instead of the character position.
+ ** Finds the existence of String sstr inside this string with the given
+ ** options. You have the
+ ** option to either match case or perform a case-insensitive search.
+ ** In addition you can search for the exact string and not it just being a
+ ** part of another string. This is an internal version
+ ** used by other functions to obtain the byte position instead of the
+ ** character position.
  ** @param thisstr This string we want to search in @inhtype{String,StringX}
  ** @param sstr The substring string we want to search for @inhtype{String,StringX}
- ** @param options Bitflag options denoting some options for the search. Give 0 for the defaults. Can have values:
- ** + @c RF_CASE_IGNORE: If you want the found substring to ignore the case and returns success for any occurence of the string in any case.
- **     Default search option is to @b match the case. For now this works only for characters of the english language.
- ** + @c RF_MATCH_WORD: If you want the found substring to be exact. For example an exact search for @e "HELLO" in the string
- **     @e "HELLOWORLD" would return a failure. Default search is to return any found substring.
- ** @return Returns the byte position of the found substring or RF_FAILURE for not found
+ ** @param options Bitflag options denoting some options for the search.
+ ** Give 0 for the defaults. Can have values:
+ ** + @c RF_CASE_IGNORE: If you want the found substring to
+ **      ignore the case and returns success for any occurence of the 
+ **      string in any case.
+ **      Default search option is to @b match the case.
+ **      For now this works only for characters of the english language.
+ ** + @c RF_MATCH_WORD: If you want the found substring to be exact.
+ **      For example an exact search for @e "HELLO" in the string
+ **      @e "HELLOWORLD" would return a failure. Default search is
+ **      to return any found substring.
+ ** @return Returns the byte position of the found substring or 
+ ** RF_FAILURE for not found
  ** @endinternal
  **
  **/
-int32_t rfString_FindBytePos(const void* thisstr,const void* sstr,char options);
+int rfString_FindBytePos(const void* thisstr, const void* sstr,
+                         const char options);
+
+
+/**
+ * Reads the formatted string and the va_args and fills in
+ * the a buffer returning the string's size in bytes
+ **
+ ** @param fmt[in]         The formatted string
+ ** @param size[out]       The string's byte size
+ ** @param buffPtr[out]    The pointer to the beginning of the String
+ **                        in the internal buffer
+ ** @param bIndex[out]     The index to return the buffer to after we
+ **                        are done with it
+ ** @return                Returns @c true in success and @c false in failure
+ */
+i_INLINE_DECL bool fill_fmt_buffer(const char *fmt,
+                                   unsigned int *size,
+                                   char **buffPtr,
+                                   unsigned int *bIndex,
+                                   va_list args)
+{
+    int ret;
+    size_t n = rfBuffer_Size(TSBUFFA);
+    *bIndex = rfBuffer_Index(TSBUFFA);
+    *buffPtr = rfBuffer_Ptr(TSBUFFA);
+    ret = vsnprintf(rfBuffer_Ptr(TSBUFFA), n, fmt, args);
+    if(ret < 0)
+    {
+        return false;
+    }
+    if(ret >= n)
+    {
+        ret = vsnprintf(rfBuffer_Ptr(TSBUFFA), n + ret, fmt, args);
+        if(ret < 0 || ret >= n)
+        {
+            return false;
+        }
+    }
+    TSBUFFA->index += ret;
+    *size = ret;
+    return true;
+}
+
+
+i_INLINE_DECL void rfStringGEN_Append(void *thisstr, const char* other,
+                                      unsigned int bytes_to_copy)
+{
+    //add the string to this one
+    memcpy(
+        rfString_Data(thisstr) + rfString_ByteLength(thisstr),
+        other,
+        bytes_to_copy
+   );
+   rfString_ByteLength(thisstr) += bytes_to_copy;
+}
 
 #ifdef __cplusplus
 }///closing bracket for calling from C++
