@@ -20,3 +20,5 @@ indent-preproc-define
 --add-brackets
 # max column length
 --max-code-length=80
+# indentation for continued statements like func decls
+--max-instatement-indent=80

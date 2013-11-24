@@ -40,7 +40,7 @@ def sanity_check():
         print ("colordiff can't be found in the path. Will use diff")
         diff_exe = "diff"
     return True
-       
+
 
 def call_astyle(file_name):
     """
@@ -57,7 +57,7 @@ def call_astyle(file_name):
             "--options={}/astyle_options".format(dirname),
             file_name]
         )
-    except:
+    except OSerror as e:
         if e.errno == os.errno.ENOENT:
             print("astyle could not be found in the path")
         else:
@@ -74,7 +74,11 @@ def check_style(file_name):
     """Checks style violations and provides a diff"""
     if not call_astyle(file_name):
         return False
-    
+
+    if not os.path.isfile("{}.orig".format(file_name)):
+        print("Woohoo! Go you! No style violations!")
+        return True
+
     try:
         subprocess.call(
             [diff_exe,
@@ -86,13 +90,13 @@ def check_style(file_name):
     except:
         print("There was a problem invoking the diff command")
         return False
-    
+
     os.rename("{}.orig".format(file_name), file_name)
     return True
-    
-    
-    
-    
+
+
+
+
 def reformat_style(file_name, keep_original=False):
     """Reformats the file using astyle"""
     if not call_astyle(file_name):
@@ -114,5 +118,5 @@ if __name__ == '__main__':
 
     if args.reformat_style:
         reformat_style(os.path.abspath(args.file_name))
-        
+
 

@@ -28,10 +28,10 @@
 #define RF_LOCAL_MEMORY_H
 
 
-#include <Definitions/retcodes.h> //for bool
-#include <Definitions/types.h> //fixed size data types
-#include <Definitions/imex.h> //for the import export macro
-#include <Definitions/threadspecific.h> //for the thread specific attribute
+#include <Definitions/retcodes.h> /* for bool */
+#include <Definitions/types.h> /* fixed size data types */
+#include <Definitions/imex.h> 
+#include <Definitions/threadspecific.h> 
 #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
 
 #ifdef __cplusplus

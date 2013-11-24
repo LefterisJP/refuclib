@@ -27,6 +27,7 @@
 #include <rf_options.h>
 #ifdef RF_MODULE_STRINGS//check if the strings are included as a module
 
+#include <Utils/endianess.h> /* for endianess typedefs */
 #include <Definitions/types.h> //fixed size data types
 #include <Definitions/imex.h> //including the import export macro
 #include <Definitions/defarg.h>//enabling defargs
@@ -46,7 +47,7 @@
 #include <IO/common.h> //for RF_EOL macros used in String/files.h and String/filesx.h
 #include <String/files.h>
 
-//*---------------------------------------RF_StringX headers---------------------------------------
+/*---------RF_StringX headers--------*/
 #include <String/stringx_decl.h>
 #include <String/corex.h>
 #include <String/manipulationx.h>
