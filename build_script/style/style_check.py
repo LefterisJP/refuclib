@@ -4,8 +4,24 @@ import subprocess
 import argparse
 import sys
 
-dirname = os.path.dirname(os.path.realpath(__file__))
-diff_exe = "colordiff"
+_dirname = os.path.dirname(os.path.realpath(__file__))
+_diff_exe = "colordiff"
+
+def gen_diff_call(file_name):
+    if _diff_exe == "colordiff":
+        return [_diff_exe,
+                "--show-c-function",
+                "-u",
+                "{}.orig".format(file_name),
+                file_name
+            ]
+    else:
+        return [_diff_exe,
+                "-u",
+                "{}.orig".format(file_name),
+                file_name
+            ]        
+    
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Astyle wrapper script')
@@ -32,13 +48,14 @@ def is_on_path(program):
     return False
 
 def sanity_check():
+    global _diff_exe
     """Makes sure we have the programs needed"""
     if not is_on_path("astyle"):
         print ("astyle can not be found in the path. Quitting ...")
         return False
     if not is_on_path("colordiff"):
         print ("colordiff can't be found in the path. Will use diff")
-        diff_exe = "diff"
+        _diff_exe = "diff"
     return True
 
 
@@ -54,7 +71,7 @@ def call_astyle(file_name):
     try:
         rc = subprocess.call([
             "astyle",
-            "--options={}/astyle_options".format(dirname),
+            "--options={}/astyle_options".format(_dirname),
             file_name]
         )
     except OSerror as e:
@@ -79,14 +96,9 @@ def check_style(file_name):
         print("Woohoo! Go you! No style violations!")
         return True
 
+    l = gen_diff_call(file_name)
     try:
-        subprocess.call(
-            [diff_exe,
-             "--show-c-function",
-             "-u",
-             "{}.orig".format(file_name),
-             file_name
-         ])
+        subprocess.call(l)
     except:
         print("There was a problem invoking the diff command")
         return False
