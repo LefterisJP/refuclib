@@ -155,11 +155,7 @@ cleanup:
 }
 
 //Writes a string to a file in the given encoding
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 bool rfString_Fwrite(void* s, FILE* f, int encoding, int endianess)
-#else
-bool i_rfString_Fwrite(void* s, FILE* f, int encoding, int endianess)
-#endif
 {
     uint32_t *utf32,length;
     uint16_t* utf16;

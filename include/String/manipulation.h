@@ -145,35 +145,9 @@ i_DECLIMEX_ bool rfString_Prepend(RF_String* thisstr, const void* other);
  ** @see rfString_Trim()
  **
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ bool rfString_Remove(void* thisstr, const void* rstr,
                                  uint32_t number,const char options);
-#else
-i_DECLIMEX_ bool i_rfString_Remove(void* thisstr, const void* rstr, 
-                                   uint32_t number,const char options);
-#define rfString_Remove(...) \
-    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_REMOVE,4,__VA_ARGS__)
-#define i_NPSELECT_RF_STRING_REMOVE1(...)                               \
-    RF_COMPILE_ERROR("message \"Illegal Arguments "                     \
-                     "Number: Function rfString_Remove() accepts "      \
-                     "from 2 to 4 arguments\"")
-#define i_NPSELECT_RF_STRING_REMOVE0(...) \
-    RF_SELECT_FUNC(i_SELECT_RF_STRING_REMOVE,__VA_ARGS__)
-#define i_SELECT_RF_STRING_REMOVE4(i_THISSTR_,i_REPSTR_,i_NUMBER_,i_OPTIONS_) \
-    i_rfString_Remove(i_THISSTR_,i_REPSTR_,i_NUMBER_,i_OPTIONS_)
-#define i_SELECT_RF_STRING_REMOVE3(i_THISSTR_,i_REPSTR_,i_NUMBER_) \
-    i_rfString_Remove(i_THISSTR_,i_REPSTR_,i_NUMBER_,0)
-#define i_SELECT_RF_STRING_REMOVE2(i_THISSTR_,i_REPSTR_) \
-    i_rfString_Remove(i_THISSTR_,i_REPSTR_,0,0)
-#define i_SELECT_RF_STRING_REMOVE1(...)                             \
-    RF_COMPILE_ERROR("message \"Illegal Arguments "                 \
-                     "Number: Function rfString_Remove() accepts "  \
-                     "from 2 to 4 arguments\"")
-#define i_SELECT_RF_STRING_REMOVE0(...)                             \
-    RF_COMPILE_ERROR("message \"Illegal Arguments "                 \
-                     "Number: Function rfString_Remove() accepts "  \
-                     "from 2 to 4 arguments\"")
-#endif
+
 
 /**
  ** @memberof RF_String
@@ -350,12 +324,12 @@ i_DECLIMEX_ bool rfString_Trim(void* thisstr, const void* sub);
  **                         current string. @inhtype{String,StringX} @tmpSTR
  ** @param rstr             The string with which to replace it.
  **                         @inhtype{String,StringX} @tmpSTR
- ** @param number           \rfoptional{0}. The number of occurences to
+ ** @param number           The number of occurences to
  **                         replace. Give @e 0 for all the occurences.
  **                         If the given number is bigger than the actual
  **                         number of occurences, still all occurences
  **                         get replaced.
- ** @param options          \rfoptional{0}. Bitflag options denoting some
+ ** @param options          Bitflag options denoting some
  **                         options for the string to replace. Give 0 for the
  **                         defaults. Can have values:
  **                         + @c RF_CASE_IGNORE: If you want to replace any
@@ -372,39 +346,9 @@ i_DECLIMEX_ bool rfString_Trim(void* thisstr, const void* sub);
  **                           the substring was not even found inside the string
  ** @see rfStringX_Replace()
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ bool rfString_Replace(RF_String* thisstr, const void* sstr, 
                                   const void* rstr, const uint32_t number,
                                   const char options);
-#else
-i_DECLIMEX_ bool i_rfString_Replace(RF_String* thisstr, const void* sstr,
-                                    const void* rstr, const uint32_t number, 
-                                    const char options);
-#define rfString_Replace(...)                                           \
-    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_REPLACE,5,__VA_ARGS__)
-#define i_NPSELECT_RF_STRING_REPLACE1(...)                              \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Replace() accepts from 3 to 5 arguments\"")
-#define i_NPSELECT_RF_STRING_REPLACE0(...)                  \
-    RF_SELECT_FUNC(i_SELECT_RF_STRING_REPLACE,__VA_ARGS__)
-#define i_SELECT_RF_STRING_REPLACE5(i_THISSTR_,i_SEARCHSTR_,            \
-                                    i_REPSTR_,i_NUMBER_,i_OPTIONS_)     \
-    i_rfString_Replace(i_THISSTR_,i_SEARCHSTR_,i_REPSTR_,i_NUMBER_,i_OPTIONS_)
-#define i_SELECT_RF_STRING_REPLACE4(i_THISSTR_,i_SEARCHSTR_,i_REPSTR_,i_NUMBER_) \
-    i_rfString_Replace(i_THISSTR_,i_SEARCHSTR_,i_REPSTR_,i_NUMBER_,0)
-#define i_SELECT_RF_STRING_REPLACE3(i_THISSTR_,i_SEARCHSTR_,i_REPSTR_) \
-    i_rfString_Replace(i_THISSTR_,i_SEARCHSTR_,i_REPSTR_,0,0)
-#define i_SELECT_RF_STRING_REPLACE2(...) \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Replace() accepts from 3 to 5 arguments\"")
-#define i_SELECT_RF_STRING_REPLACE1(...)                                \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Replace() accepts from 3 to 5 arguments\"")
-#define i_SELECT_RF_STRING_REPLACE0(...)                                \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Replace() accepts from 3 to 5 arguments\"")
-#endif
-
 //! @}
 
 

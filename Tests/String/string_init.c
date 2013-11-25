@@ -12,7 +12,7 @@ int main()
     unsigned int utf16b_len = 3 * sizeof(uint16_t);
     const uint32_t utf32Buffer[] = {0x6771,0x4EAC};
     unsigned int utf32b_len = 2;
-    EXPECT(rfInit(), true);
+    DEFAULT_LIB_INIT();
     //initialize RF_Strings
     EXPECT_TRUE(rfString_Init(&s1, "This is the test of String initialization"));
     EXPECT_TRUE(

@@ -7,7 +7,7 @@ int main()
     RF_StringX sx1,sx2,sx3,resx1;
     RF_String res1,res2,res3;
 	
-    EXPECT(rfInit(), true);
+    DEFAULT_LIB_INIT();
 	
     EXPECT(true,
            rfStringX_Init(

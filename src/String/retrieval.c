@@ -120,11 +120,7 @@ bool rfString_Substr(const void* s, uint32_t startPos,
 }
 
 
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 int32_t rfString_Find(const void* tstr, const void* sstr, const char options)
-#else
-int32_t i_rfString_Find(const void* tstr ,const void* sstr, const char options)
-#endif
 {
     int32_t ret;
     RF_ENTER_LOCAL_SCOPE();
@@ -142,15 +138,9 @@ int32_t i_rfString_Find(const void* tstr ,const void* sstr, const char options)
 }
 
 
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 int32_t rfString_Find_i(const void* thisstr, const void* sstr,
                         uint32_t startPos, uint32_t length,
                         const char options)
-#else
-int32_t i_rfString_Find_i(const void* thisstr, const void* sstr,
-                          uint32_t startPos, uint32_t length,
-                          const char options)
-#endif
 {
     RF_String sub;
     int32_t ret = RF_FAILURE;//the return value
@@ -173,13 +163,8 @@ cleanup1:
     return ret;
 }
 
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 unsigned int rfString_Count(const void* tstr, const void* sstr,
                             const char options)
-#else
-unsigned int i_rfString_Count(const void* tstr, const void* sstr,
-                              const char options)
-#endif
 {
     int move, index;
     unsigned int n;
@@ -244,14 +229,8 @@ cleanup:
 }
 
 
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 bool rfString_Between(const void* tstr, const void* lstr,
                       const void* rstr, void* result, const char options)
-#else
-bool i_rfString_Between(const void* tstr, const void* lstr,
-                        const void* rstr, void* result,
-                        const char options)
-#endif
 {
     int start, end;
     RF_String temp;
@@ -360,13 +339,8 @@ bool rfString_Beforev(const void* thisstr, void* result, const char options,
     return ret;
 }
 
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 bool rfString_Before(const void* thisstr, const void* sstr,
                      void* result, const char options)
-#else
-bool i_rfString_Before(const void* thisstr, const void* sstr,
-                       void* result, const char options)
-#endif
 {
     int32_t rv;
     bool ret = true;
@@ -402,14 +376,8 @@ bool i_rfString_Before(const void* thisstr, const void* sstr,
     return ret;
 }
 
-
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 bool rfString_After(const void* thisstr, const void* after,
                     void* result, const char options)
-#else
-bool i_rfString_After(const void* thisstr, const void* after,
-                      void* result, const char options)
-#endif
 {
     int32_t bytePos;
     bool ret = true;

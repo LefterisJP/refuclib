@@ -88,7 +88,7 @@ static void test_file_encoding(const char* filename, int encoding,
 
 int main()
 {
-    EXPECT(rfInit(), true);
+    DEFAULT_LIB_INIT();
 
     //this is not the normal way to open a unicode file but since
     //the unicode file descriptor functions need to be tested here separately from the TextFile module

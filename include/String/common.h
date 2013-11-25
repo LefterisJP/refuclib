@@ -1,30 +1,32 @@
-/**
-**      ==START OF REFU LICENSE==
-**
-** Copyright (c) 2011-2013, Karapetsas Eleftherios
-** All rights reserved.
-** 
-** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-**  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-**  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the distribution.
-**  3. Neither the name of the Original Author of Refu nor the names of its contributors may be used to endorse or promote products derived from
-** 
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
-** INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-** DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-** SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-** WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-**
-**      ==END OF REFU LICENSE==
-**
-**
-** --String/common.h
-** This header includes String functionality common for all strings
-**
-**/
+/*
+ *    == START OF REFU LICENSE ==
+ *
+ * Copyright (c) 2011-2013, Karapetsas Eleftherios
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *  1. Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. Neither the name of the Original Author of Refu nor the names of its
+ *     contributors may be used to endorse or promote products derived from
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ *    == END OF REFU LICENSE ==
+*/
 #ifndef RF_STRING_COMMON_H
 #define RF_STRING_COMMON_H
 
@@ -34,8 +36,7 @@
     #include <String/retrieval.h>
 
 #ifdef __cplusplus
-extern "C"
-{///opening bracket for calling from C++
+extern "C" {
 #endif
 
 #define RF_STR_PF_FMT "%.*s"
@@ -71,12 +72,13 @@ extern "C"
  ** @warning
  ** + This macro can not be called recursively with extra arguments and doing 
  ** so is undefined behaviour.
- ** @param s The formatted string that will constitute the RF_String. Must
- ** be in the same encoding as that of the source file.
- ** Default is UTF-8.
- ** @param ... \rfoptional{nothing}  Depending on the string literal,
- ** the function may expect a sequence of additional arguments,
- ** each containing one value to be inserted instead of each %-tag
+ ** @param s                The formatted string that will constitute the
+ **                         RF_String. Must be in the same encoding as that of
+ **                         the source file. Default is UTF-8.
+ ** @param ...              \rfoptional{nothing}  Depending on the string 
+ **                         literal, the function may expect a sequence of
+ **                         additional arguments, each containing one value to
+ **                         be inserted instead of each %-tag
  ** specified in the @c slit parameter, if any. There should be
  ** the same number of these arguments as the number of %-tags that expect a value.
  ** @return Returns true in case of correct initialization and false
@@ -84,7 +86,7 @@ extern "C"
  ** @isinherited{StringX}
  **/
 #ifdef RF_IAMHERE_FOR_DOXYGEN
-RF_String* RFS_(const char* s,...);
+RF_String* RFS_(const char *s, ...);
 #else
 #define RFS_(...) i_rfString_CreateLocal(__VA_ARGS__)
 #endif

@@ -4,13 +4,13 @@
 **
 ** Copyright (c) 2011-2013, Karapetsas Eleftherios
 ** All rights reserved.
-** 
+**
 ** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 **  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 **  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in
 **     the documentation and/or other materials provided with the distribution.
 **  3. Neither the name of the Original Author of Refu nor the names of its contributors may be used to endorse or promote products derived from
-** 
+**
 ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
 ** INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 ** DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
@@ -37,7 +37,7 @@
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <IO/common.h> //for common I/O flags and definitions
-
+#include <Definitions/retcodes.h> //for bool
 #ifdef __cplusplus
 extern "C"
 {///opening bracket for calling from C++
@@ -68,7 +68,7 @@ enum i_RF_TEXTFILE_OPEN_TYPES
  ** @memberof RF_TextFile
  ** @brief Initializes a new text file
  **
- ** This function initializes a new textfile object. You have the option to 
+ ** This function initializes a new textfile object. You have the option to
  ** either open an already existing TextFile by using
  ** either @c RF_FILE_READ , @c RF_FILE_WRITE or @c RF_FILE_READWRITE for the
  ** @c mode argument. In that case the file shall also
@@ -81,95 +81,76 @@ enum i_RF_TEXTFILE_OPEN_TYPES
  ** Note that if a specific endianess for UTF-16 or UTF-32 is not given then
  ** the file will be created in the system's endianess.
  ** @lmsFunction
- ** @param t The textfile to initialize
- ** @param name The name of the file. @inhtype{String,StringX} @tmpSTR
- ** @param mode The mode with which to access the file. Should be one of the
- **  following values:
- ** + @c RF_FILE_READ: Opens an already existing file for writting.
- ** + @c RF_FILE_WRITE: Opens an already existing file for writting. If the
- **      file does not exist
- ** it is created. If it exists its contents <b>are not</b> erased.
- ** + @c RF_FILE_NEW: Opens a file for writing. If the file already exists
- **      its contents are erased.
- ** + @c RF_FILE_READWRITE: Opens a file for both reading and writting. 
- **      The file must exist.
- ** + @c RF_FILE_READWRITE_NEW: Opens a new file both both reading and writting.
- **      If the file already exists its contents are erased.
+ ** @param t                      The textfile to initialize
+ ** @param name                   The name of the file.
+ **                               @inhtype{String,StringX} @tmpSTR
+ ** @param mode                   The mode with which to access the file.
+ **                               Should be one of the following values:
+ **                                   + @c RF_FILE_READ: Opens an already
+ **                                     existing file for writting.
+ **                                   + @c RF_FILE_WRITE: Opens an already
+ **                                     existing file for writting. If the
+ **                                     file does not exist it is created. If
+ **                                     it exists its contents <b>are not</b>
+ **                                     erased.
+ **                                   + @c RF_FILE_NEW: Opens a file for writing.
+ **                                     If the file already exists its contents
+ **                                     are erased.
+ **                                   + @c RF_FILE_READWRITE: Opens a file for
+ **                                        both reading and writting. The file
+ **                                        must exist.
+ **                                   + @c RF_FILE_READWRITE_NEW: Opens a new file
+ **                                        both both reading and writting. If the
+ **                                        file already exists its contents are
+ **                                        erased.
  **
- ** This parameter serves as but a hint of what operation should follow the
- ** initialization. The reason is that each
- ** of the functions that operate on an @ref RF_TextFile check the current mode
- ** and if it is not the legal mode for that operation the file is reopened 
- ** with the proper mode, or has its file pointer rewinded and then put back if
- ** it is in read/write mode.
- ** You should note though, that there is a considerable overhead in reopening
- ** the file in a different mode so you should make sure to pack the reading
- **  and writing operations in different places, or just use a different @ref
- **  RF_TextFile handler for writing and a different one for reading.
- ** @param endianess \rfoptional{@c RF_ENDIANESS_UNKNOWN} 
- ** The endianess of the file. Is useful only if the encoding
- ** of the file is in UTF-32 or UTF-16. The legal values for this field are
- ** @c RF_LITTLE_ENDIAN or @c RF_BIG_ENDIAN or @c RF_ENDIANESS_UNKNOWN.
- ** In the latter case the file is scanned in an attempt to determine its
- ** endianess 
- ** @param encoding \rfoptional{@c RF_UTF8} The encoding of the file. 
- ** Default is @c RF_UTF8. Can be one of:
- ** + @c RF_UTF8: For Unicode UTF-8 encoding
- ** + @c RF_UTF16: For Unicode UTF-16 encoding 
- ** + @c RF_UTF32: For Unicode UTF-32 encoding 
+ **                               This parameter serves as but a hint of what
+ **                               operation should follow the initialization. 
+ **                               The reason is that each of the functions that
+ **                               operate on an @ref RF_TextFile check the 
+ **                               current mode and if it is not the legal mode
+ **                               for that operation the file is reopened with
+ **                               the proper mode, or has its file pointer
+ **                               rewinded and then put back if it is in
+ **                               read/write mode.
+ ** @param endianess              The endianess of the file. Is useful only if
+ **                               the encoding of the file is in UTF-32 or UTF-16.
+ **                               The legal values for this field are 
+ **                               @c RF_LITTLE_ENDIAN or @c RF_BIG_ENDIAN or
+ **                               @c RF_ENDIANESS_UNKNOWN. In the latter case
+ **                               the file is scanned in an attempt to determine
+ **                               its endianess
+ ** @param encoding               The encoding of the file. Can be one of:
+ **                                   + @c RF_UTF8: For Unicode UTF-8 encoding
+ **                                   + @c RF_UTF16: For Unicode UTF-16 encoding
+ **                                   + @c RF_UTF32: For Unicode UTF-32 encoding
  **
- ** @param eol \rfoptional{@c RF_EOL_AUTO} The End Of Line type that this
- **  textfile uses. The value of @c RF_EOL_AUTO should
- ** not be given if this is a newly created file. If that is done an 
- ** invalid argument error is logged and the file is
- ** initialized with @c RF_EOL_LF. In addition if the auto-detection fails for
- **  some reason the default @c RF_EOL_LF will be used
- ** and appropriate error logging will be performed. The default value
- **  @c RF_EOL_DEFAULT is equal to Unix-style encoding of @c RF_EOL_LF.
- **  Possible values are:
- ** + @c RF_EOL_AUTO: For the function to attempt and auto detect the line
- **  endings used by the file
- ** + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as the end
- **  of line signal
- ** + @c RE_EOL_CR: For Macintosh-style line endings, taking @c '\r' as the
- **  end of line signal
- ** + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n"
- **  as the end of line signal
+ ** @param eol                    The End Of Line type that this textfile uses.
+ **                               The value of @c RF_EOL_AUTO should not be given
+ **                               if this is a newly created file. If that is done
+ **                               an invalid argument error is logged and the file
+ **                               is initialized with @c RF_EOL_LF. In addition
+ **                               if the auto-detection fails for some reason
+ **                               the default @c RF_EOL_LF will be used and
+ **                               appropriate error logging will be performed.
+ **                               The default value is @c RF_EOL_LF.
+ **                               Possible values are:
+ **                                   + @c RF_EOL_AUTO: For the function to
+ **                                     attempt and auto detect the line
+ **                                     endings used by the file
+ **                                   + @c RF_EOL_LF: For Unix-style line endings,
+ **                                     taking @c '\n' as the end of line signal
+ **                                   + @c RE_EOL_CR: For Macintosh-style line
+ **                                     endings, taking @c '\r' as the end of
+ **                                     line signal
+ **                                   + @c RF_EOL_CRLF: For Windows-style line
+ **                                        endings, taking @c "\r\n"
+ **                                        as the end of line signal
  **
- ** @return Returns @c true in success and @c false otherwise
+ ** @return                       Returns @c true in success
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ char rfTextFile_Init(RF_TextFile* t, const void* name, char mode,
                                  int endianess, int encoding, char eol);
-#else
-i_DECLIMEX_ char i_rfTextFile_Init(RF_TextFile* t, const void* name, char mode,
-                                   int endianess, int encoding, char eol);
-#define rfTextFile_Init(...)  \
-    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_TEXTFILE_INIT, 6, __VA_ARGS__)
-#define i_NPSELECT_RF_TEXTFILE_INIT1(...) \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "\
-                     "rfTextFile_Init() accepts from 3 to 6 arguments\"")
-#define i_NPSELECT_RF_TEXTFILE_INIT0(...) \
-    RF_SELECT_FUNC(i_SELECT_RF_TEXTFILE_INIT,__VA_ARGS__)
-#define i_SELECT_RF_TEXTFILE_INIT6(i_TEXTFILE_, i_NAME_, i_MODE_, i_ENDIANESS_,\
-                                   i_ENCODING_,i_EOL_)                  \
-    i_rfTextFile_Init(i_TEXTFILE_, i_NAME_, i_MODE_, i_ENDIANESS_, i_ENCODING_, i_EOL_)
-#define i_SELECT_RF_TEXTFILE_INIT5(i_TEXTFILE_, i_NAME_, i_MODE_, i_ENDIANESS_, i_ENCODING_) \
-    i_rfTextFile_Init(i_TEXTFILE_, i_NAME_, i_MODE_, i_ENDIANESS_, i_ENCODING_, RF_EOL_AUTO)
-#define i_SELECT_RF_TEXTFILE_INIT4(i_TEXTFILE_, i_NAME_, i_MODE_, i_ENDIANESS_)        \
-    i_rfTextFile_Init(i_TEXTFILE_, i_NAME_, i_MODE_, i_ENDIANESS_, RF_UTF8, RF_EOL_AUTO)
-#define i_SELECT_RF_TEXTFILE_INIT3(i_TEXTFILE_, i_NAME_, i_MODE_)        \
-    i_rfTextFile_Init(i_TEXTFILE_, i_NAME_, i_MODE_, RF_ENDIANESS_UNKNOWN, RF_UTF8, RF_EOL_AUTO)
-#define i_SELECT_RF_TEXTFILE_INIT2(...) \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "\
-                     "rfTextFile_Init() accepts from 3 to 6 arguments\"")
-#define i_SELECT_RF_TEXTFILE_INIT1(...) \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "\
-                     "rfTextFile_Init() accepts from 3 to 6 arguments\"")
-#define i_SELECT_RF_TEXTFILE_INIT0(...) \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "\
-                     "rfTextFile_Init() accepts from 3 to 6 arguments\"")
-#endif
 
 /**
  ** @memberof RF_TextFile
@@ -180,34 +161,11 @@ i_DECLIMEX_ char i_rfTextFile_Init(RF_TextFile* t, const void* name, char mode,
  ** Behaves exactly like @ref rfTextFile_Init() so refer to it for the explanation
  ** of the arguments
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
+
 i_DECLIMEX_ RF_TextFile* rfTextFile_Create(const void* name, char mode,
-                                           int endianess, int encoding, char eol);
-#else
-i_DECLIMEX_ RF_TextFile* i_rfTextFile_Create(const void* name, char mode,
-                                             int endianess, int encoding,char eol);
-#define rfTextFile_Create(...)  \
-    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_TEXTFILE_CREATE,5,__VA_ARGS__)
-#define i_NPSELECT_RF_TEXTFILE_CREATE1(...) \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "\
-                     "rfTextFile_Create() accepts from 2 to 5 arguments\"")
-#define i_NPSELECT_RF_TEXTFILE_CREATE0(...) \
-    RF_SELECT_FUNC(i_SELECT_RF_TEXTFILE_CREATE,__VA_ARGS__)
-#define i_SELECT_RF_TEXTFILE_CREATE5(i_NAME_,i_MODE_,i_ENDIANESS_,i_ENCODING_,i_EOL_) \
-    i_rfTextFile_Create(i_NAME_,i_MODE_,i_ENDIANESS_,i_ENCODING_,i_EOL_)
-#define i_SELECT_RF_TEXTFILE_CREATE4(i_NAME_,i_MODE_,i_ENDIANESS_,i_ENCODING_) \
-    i_rfTextFile_Create(i_NAME_,i_MODE_,i_ENDIANESS_,i_ENCODING_,RF_EOL_AUTO)
-#define i_SELECT_RF_TEXTFILE_CREATE3(i_NAME_,i_MODE_,i_ENDIANESS_)        \
-    i_rfTextFile_Create(i_NAME_,i_MODE_,i_ENDIANESS_,RF_UTF8,RF_EOL_AUTO)
-#define i_SELECT_RF_TEXTFILE_CREATE2(i_NAME_,i_MODE_)        \
-    i_rfTextFile_Create(i_NAME_,i_MODE_,RF_ENDIANESS_UNKNOWN,RF_UTF8,RF_EOL_AUTO)
-#define i_SELECT_RF_TEXTFILE_CREATE1(...) \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "\
-                     "rfTextFile_Create() accepts from 2 to 5 arguments\"")
-#define i_SELECT_RF_TEXTFILE_CREATE0(...) \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "\
-                     "rfTextFile_Create() accepts from 2 to 5 arguments\"")
-#endif
+                                           int endianess, int encoding,
+                                           char eol);
+
 
 //! @}
 //! @name Copying functions
@@ -291,7 +249,7 @@ i_DECLIMEX_ char rfTextFile_SetMode(RF_TextFile* t, char mode);
  ** the current line
  **
  ** Moves the file pointer at the beginning of the line at @c linesN forward if
- ** @c linesN is a positive number or at the beginning of the line located 
+ ** @c linesN is a positive number or at the beginning of the line located
  ** @c linesN behind the current line if the number is negative.
  ** If the @c linesN number is negative and its absolute value is equal to or
  ** greater to the current line then nothing happens and @c RF_FAILURE is returned.
@@ -336,7 +294,7 @@ i_DECLIMEX_ int32_t rfTextFile_MoveLines(RF_TextFile* t, int64_t linesN);
  ** remain at the same position
 
  ** @param[in] t The Text File to operate on
- ** @param[in] charsN The number of characters to move. Can be either 
+ ** @param[in] charsN The number of characters to move. Can be either
  ** negative or positive
  ** @return Returns the number of characters moved in either direction
  **  or a negative number for failure
@@ -370,7 +328,7 @@ i_DECLIMEX_ int32_t rfTextFile_MoveChars_f(RF_TextFile* t, uint64_t charsN);
  ** @param[in] charsN The number of characters to move backward
  ** @return Returns the number of characters the file pointer was moved or a negative
  ** number for error. If file's beginning is reached then the returned number
- ** of characters will be less than the requested number of characters and 
+ ** of characters will be less than the requested number of characters and
  ** the textfile's EOF flag will be set
  **/
 i_DECLIMEX_ int32_t rfTextFile_MoveChars_b(RF_TextFile* t, uint64_t charsN);
@@ -380,7 +338,7 @@ i_DECLIMEX_ int32_t rfTextFile_MoveChars_b(RF_TextFile* t, uint64_t charsN);
  ** @brief Moves the file pointer at the start of the given line
  **
  ** Moves the file pointer at the beginning of the line at @c lineN and it is
- ** as if the line has not been read. The outcome of the next @ref 
+ ** as if the line has not been read. The outcome of the next @ref
  ** rfTextFile_ReadLine() will provide the contents of that line. Line Indexing
  ** starts from @c 1.
  **
@@ -422,7 +380,7 @@ i_DECLIMEX_ int32_t rfTextFile_GoToLine(RF_TextFile* t, uint64_t lineN);
  ** @param[in] t The Text File to operate on
  ** @param[in] offset The offset to move the internal file pointer to. Can be
  ** either negative or positive and it depends on the position given at @c origin
- ** @param[in] origin Just like fseek this denotes from where should the 
+ ** @param[in] origin Just like fseek this denotes from where should the
  ** offset moving be performed.
  ** + @c SEEK_SET: From the beginning of the file
  ** + @c SEEK_CUR: From the current file position
@@ -459,42 +417,34 @@ i_DECLIMEX_ int32_t rfTextFile_GoToOffset(RF_TextFile* t, foff_rft offset,
  **  line of the file, then and only then should you call @ref rfStringX_Deinit() or
  ** @ref rfStringX_Destroy() on the @c line string.
  **
- ** If the library has been compiled with @c DEFAULT_ARGUMENTS off then there is
- ** a second function called @c rfTextFile_ReadLine2() that can be called when
- **  you are sure you want all the characters of the text file.
- ** This function exists also if the compile option @c DEFAULT_ARGUMENTS is on,
- **  but can be called if the last argument @c characters of
- **  @c rfTextFile_ReadLine() is omitted.
- ** @param[in] TextFile A pointer to the text file
- ** @param[in,out] line Give an already initialized @ref RF_StringX buffer that
- **  will act as the line buffer of the file.
- **  The reason this parameter is a StringX is due to the need for text processing.
- ** @param[in] characters \rfoptional{0} Give the number of characters that you
- **  would like to read from the line into the String. If @c 0 is given the
- **  whole line is read into the string.
- ** @note No matter the choice of characters here the file pointer will still
- **  move to the start of the next line.
- ** @return Returns @c RF_SUCCESS for success, @c RE_FILE_EOF for the end of file
- ** encountered while reading and a negative number for error
+ ** @param[in] TextFile               A pointer to the text file
+ ** @param[in,out] line               Give an already initialized @ref RF_StringX
+ **                                   buffer that will act as the line buffer
+ **                                   of the file. The reason this parameter is
+ **                                   a StringX is due to the need for text
+ **                                   processing.
+ ** @return                           Returns @c RF_SUCCESS for success,
+ **                                   @c RE_FILE_EOF for the end of file
+ **                                   encountered while reading and a negative
+ **                                   number for error
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
-i_DECLIMEX_ int32_t rfTextFile_ReadLine(RF_TextFile* t, RF_StringX* line,
-                                        uint32_t characters);
-i_DECLIMEX_ int32_t rfTextFile_ReadLine2(RF_TextFile* t, RF_StringX* line);
-#else
-//in the default arguments case. breaking down the function into two different ones since that would simplify the 2 args call
-i_DECLIMEX_ int32_t i_rfTextFile_ReadLine3(RF_TextFile* t,
-                                           RF_StringX* line,
-                                           uint32_t characters);
-i_DECLIMEX_ int32_t rfTextFile_ReadLine2(RF_TextFile* t, RF_StringX* line);
-#define rfTextFile_ReadLine(...)  RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_TEXTFILE_READLINE,3,__VA_ARGS__)
-#define i_NPSELECT_RF_TEXTFILE_READLINE1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_ReadLine() accepts from 2 to 3 arguments\"")
-#define i_NPSELECT_RF_TEXTFILE_READLINE0(...) RF_SELECT_FUNC(i_SELECT_RF_TEXTFILE_READLINE,__VA_ARGS__)
-#define i_SELECT_RF_TEXTFILE_READLINE3(...) i_rfTextFile_ReadLine3(__VA_ARGS__)
-#define i_SELECT_RF_TEXTFILE_READLINE2(...) rfTextFile_ReadLine2(__VA_ARGS__)
-#define i_SELECT_RF_TEXTFILE_READLINE1(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_ReadLine() accepts from 2 to 3 arguments\"")
-#define i_SELECT_RF_TEXTFILE_READLINE0(...) RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_ReadLine() accepts from 2 to 3 arguments\"")
-#endif
+i_DECLIMEX_ int rfTextFile_ReadLine(RF_TextFile* t, RF_StringX* line);
+
+/**
+ ** @memberof RF_TextFile
+ ** @brief Reads a specific number of characters from the next line
+ **        @see rfTextFile_ReadLine() for more details
+ **
+ ** @param[in] characters           Give the number of characters that you
+ **                                 would like to read from the line into the
+ **                                 String. If @c 0 is given the
+ **                                 whole line is read into the string.
+ **                                 @note No matter the choice of characters
+ **                                 here the file pointer will still
+ **                                 move to the start of the next line.
+ **/
+i_DECLIMEX_ int rfTextFile_ReadLine_chars(RF_TextFile* t, RF_StringX* line,
+                                          uint32_t characters);
 
 
 /**
@@ -529,7 +479,7 @@ i_DECLIMEX_ char rfTextFile_GetOffset(RF_TextFile* t, foff_rft* offset);
  **
  ** An important thing to note about the usage of this function is that when a
  ** line is found the internal file pointer and the current line are not
- ** changed. This just retrieves the lines without moving the file pointer or 
+ ** changed. This just retrieves the lines without moving the file pointer or
  ** changing the line.
  ** @param[in] t The textfile to get the line from
  ** @param[in] lineN The number of line to retrieve. Indexing starts from @c 1
@@ -571,7 +521,7 @@ i_DECLIMEX_ int32_t rfTextFile_GetLine_begin(RF_TextFile* t,
  **  Do not give 0 here. If 0 is given then @c RE_INPUT error is returned
  ** @param[out] line Here give an @ref RF_StringX that will receive the read
  ** line. The string must <b>already be initialized</b> before being passed to
- **  the function. It is recommended to initialize a string with @ref 
+ **  the function. It is recommended to initialize a string with @ref
  ** rfStringX_Init_txtbuff() macro
  ** @return Returns @c RF_SUCCESS if everything went all right. If there was a
  ** failure it returns a negative number. Can also return @c RE_FILE_EOF if the
@@ -603,7 +553,7 @@ i_DECLIMEX_ int32_t rfTextFile_GetLine(RF_TextFile* t, uint64_t lineN,
  ** @param t The textfile to write to
  ** @param string The string to add to the end of the textfile
  **                @inhtype{String,StringX} @tmpSTR
- ** @return Returns @c true for succesfull writting and @c false if an 
+ ** @return Returns @c true for succesfull writting and @c false if an
  ** error happened
  **/
 i_DECLIMEX_ char rfTextFile_Write(RF_TextFile* t, void* string);
@@ -619,7 +569,7 @@ i_DECLIMEX_ char rfTextFile_Write(RF_TextFile* t, void* string);
  ** This function inserts a line, so it will append a newline character at the end
  ** of the @c string before inserting. The given string may contain many new
  ** lines inside and hence replace one line with multiple one. The given
- ** string's newlines must be only represented by the '\n' character. The 
+ ** string's newlines must be only represented by the '\n' character. The
  ** function shall handle the file line endings separately by editing
  ** the string before inputting it into the file if so needed.
  ** The given string must not end with newline, it is automatically appended
@@ -629,37 +579,31 @@ i_DECLIMEX_ char rfTextFile_Write(RF_TextFile* t, void* string);
  ** returns error
  **
  ** @lmsFunction
- ** @param t The TextFile to operate on
- ** @param lineN Give the line number before of after which the @c string
- ** will be placed. Line indexing starts from @c 1 and up until the last line
- ** of the file. If a bigger line than the file's last line is given then an
- ** error will occur since the requested line will not be found.
- ** Do not give 0 here. If 0 is given the function shall return error
- ** @param string   @inhtype{String,StringX} @tmpSTR 
- ** The string to insert to the textfile either after or before @c lineN
- ** A newline character will be appended by this function inside the string
- ** to make it a line but you can also contain other newline characters inside,
- ** in essence entering multiple lines to the file.
- ** @param after \rfoptional{false} A boolean denoting where we want to place
- ** the new line. If @c true then
- ** the new line is placed after the line at @c lineN and if false beforee
- ** @return Returns @c true for success @c false for error
+ ** @param t                      The TextFile to operate on
+ ** @param lineN                  Give the line number before of after which
+ **                               the @c string will be placed. Line indexing
+ **                               starts from @c 1 and up until the last line
+ **                               of the file. If a bigger line than the file's
+ **                               last line is given then an error will occur
+ **                               since the requested line will not be found.
+ **                               Do not give 0 here. If 0 is given the
+ **                               function shall return error
+ ** @param string                 @inhtype{String,StringX} @tmpSTR
+ **                               The string to insert to the textfile either
+ **                               after or before @c lineN. A newline character
+ **                               will be appended by this function inside the
+ **                               string to make it a line but you can also
+ **                               include other newline characters inside,
+ **                               in essence entering multiple lines to the file
+ ** @param after                  A boolean denoting where we want to place
+ **                               the new line. If @c true then the new line is
+ **                               placed after the line at @c lineN and if false
+ **                               before
+ ** @return                       Returns @c true for success @c false for error
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
-i_DECLIMEX_ char rfTextFile_Insert(RF_TextFile* t, uint64_t lineN,
-                                   void* string, char after);
-#else
-i_DECLIMEX_ char i_rfTextFile_Insert(RF_TextFile* t, uint64_t lineN,
-                                     void* string, char after);
-#define rfTextFile_Insert(...)  RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_TEXTFILE_INSERT,4,__VA_ARGS__)
-#define i_NPSELECT_RF_TEXTFILE_INSERT1(...)  RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Insert() accepts from 3 to 4 arguments\"")
-#define i_NPSELECT_RF_TEXTFILE_INSERT0(...)  RF_SELECT_FUNC(i_SELECT_RF_TEXTFILE_INSERT,__VA_ARGS__)
-#define i_SELECT_RF_TEXTFILE_INSERT4(i_TEXTFILE_,i_LINEN_,i_STR_,i_AFTER_)    i_rfTextFile_Insert(i_TEXTFILE_,i_LINEN_,i_STR_,i_AFTER_)
-#define i_SELECT_RF_TEXTFILE_INSERT3(i_TEXTFILE_,i_LINEN_,i_STR_)             i_rfTextFile_Insert(i_TEXTFILE_,i_LINEN_,i_STR_,true)
-#define i_SELECT_RF_TEXTFILE_INSERT2(...)   RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Insert() accepts from 3 to 4 arguments\"")
-#define i_SELECT_RF_TEXTFILE_INSERT1(...)   RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Insert() accepts from 3 to 4 arguments\"")
-#define i_SELECT_RF_TEXTFILE_INSERT0(...)   RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function rfTextFile_Insert() accepts from 3 to 4 arguments\"")
-#endif
+i_DECLIMEX_ bool rfTextFile_Insert(RF_TextFile* t, uint64_t lineN,
+                                   void* string, bool after);
+
 
 /**
  ** @memberof RF_TextFile
@@ -692,7 +636,7 @@ i_DECLIMEX_ char rfTextFile_Remove(RF_TextFile* t, uint64_t lineN);
  ** file if so needed.  The given string must not end with newline, it is
  ** automatically appended by the function.
  **
- ** If the End Of File is encountered before the line is found then the 
+ ** If the End Of File is encountered before the line is found then the
  ** function returns error
  **
  ** @lmsFunction

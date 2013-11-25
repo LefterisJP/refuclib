@@ -64,7 +64,7 @@ static void test_generic_map(RF_Hashmap* m)
 int main()
 {
     RF_Hashmap m;
-    EXPECT(rfInit(), true);
+    DEFAULT_LIB_INIT();
 
     
     // test non library object hashmap

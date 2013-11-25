@@ -51,43 +51,20 @@ extern "C" {
  ** This function needs to be called in the very beginning of any program
  ** using the library.
  **
- ** @param errstr           \rfoptional{"refuclib.log"} The filename of the
- **                          error log to create and append the library's log to
- ** @param lmsSize          \rfoptional{RF_OPTION_LOCALSTACK_MEMORY_SIZE}
- **                         The size of the main thread's local memory stack.
+ ** @param errstr           A c string literal with the filename of the log
+ **                         to create. If NULL then the value is "refuclib.log"
+ ** @param lmsSize          The size of the main thread's local memory stack.
  **                         This will be the size by which the main thread's
  **                         local memory stack will be initialized. It allows
  **                         the usage of macros for temporary object creation.
+ **                         If 0 then the compile time constant
+ **                         RF_OPTION_LOCALSTACK_MEMORY_SIZE is used.
  ** @param level            The level of the logging system. Possible values
  **                         are enumerated by @ref log_level_t
  ** @return                 Returns @c true in success
  **/
-#ifdef RF_IAMHERE_FOR_DOXYGEN
 i_DECLIMEX_  bool rfInit(char *logstr, uint64_t size, log_level_t level);
-#else
-#ifdef RF_OPTION_DEFAULT_ARGUMENTS
-i_DECLIMEX_  bool i_rfInit(char *logstr, uint64_t size, log_level_t level);
-#define rfInit(...) \
-    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_INIT, 3 ,__VA_ARGS__)
 
-#define i_NPSELECT_RF_INIT1(...)                                        \
-    RF_COMPILE_ERROR("message \"Ileggal Arguments Number: Function "    \
-                     "rfStringInit() accepts from 0 to 3 arguments\"")
-#define i_NPSELECT_RF_INIT0(...) \
-    RF_SELECT_FUNC(i_SELECT_RF_INIT,__VA_ARGS__)
-#define i_SELECT_RF_INIT3(...)  i_rfInit(__VA_ARGS__)
-#define i_SELECT_RF_INIT2(...)  i_rfInit(__VA_ARGS__, \
-                                         RF_OPTION_LOG_LEVEL_DEFAULT)
-#define i_SELECT_RF_INIT1(...)  i_rfInit(__VA_ARGS__,  \
-                                         RF_OPTION_LOCALSTACK_MEMORY_SIZE, \
-                                         RF_OPTION_LOG_LEVEL_DEFAULT)
-#define i_SELECT_RF_INIT0(...)  i_rfInit("refuclib.log",    \
-                                         RF_OPTION_LOCALSTACK_MEMORY_SIZE, \
-                                         RF_OPTION_LOG_LEVEL_DEFAULT)
-#else
-i_DECLIMEX_  bool rfInit(char *logstr, uint64_t size, log_level_t level);
-#endif
-#endif
 //! @}
 //closing RF_GeneralGRP doxygen group
 

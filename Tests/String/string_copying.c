@@ -6,8 +6,7 @@ int main()
 {
     RF_String s1,*s2,s3,s4,s5;
     RF_StringX sx1,*sx2,sx3,sx4,*sx5,sx6;
-	
-    EXPECT(rfInit(), true);
+    DEFAULT_LIB_INIT();
 	
     //testing RF_String copying functions
     EXPECT(true,

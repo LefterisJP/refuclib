@@ -8,7 +8,7 @@ int main()
     RF_StringX sx1;
 
 
-    EXPECT(rfInit(), true);
+    DEFAULT_LIB_INIT();
 
 
     //expect the fully formed compile command "gcc -c -I../../includes -Wall -O2 tocompile.c -o ./obj/tocompile.o"
@@ -78,7 +78,8 @@ int main()
            rfString_Replace(
                &s3,
                RFS_("with Swiss bank accounts"),
-               RFS_("με λογαριασμους σε Ελβετικες τραπεζες"),0,0));
+               RFS_("με λογαριασμους σε Ελβετικες τραπεζες"),
+               0,0));
     EXPECT(true,
            rfString_Equal(
                &s3,
@@ -90,13 +91,13 @@ int main()
 
 	//Stringx replacing
     EXPECT(true,rfStringX_Init(&sx1,"News from all over the world."));
-    EXPECTNOT(RF_FAILURE,rfStringX_MoveAfter(&sx1,RFS_("News ")));
+    EXPECTNOT(RF_FAILURE,rfStringX_MoveAfter(&sx1,RFS_("News "), 0, 0));
     EXPECT(true,
            rfStringX_Replace(
                &sx1,
                RFS_("."),
                RFS_(" || 投稿動画を参考に捜査…タクシー運転手殴った疑いで"
-                    "逮捕 ||"),0,0));
+                    "逮捕 ||"), 0, 0));
 	EXPECT(true,
          rfString_Equal(
              &sx1,
@@ -110,7 +111,7 @@ int main()
              RFS_(" "),
              RFS_("Φοβερη ειδηση που μολις βγηκε απο το το γραφειο ειδησεων. Η Μαρικα παντρευεται. Ναι δεν κανουμε πλακα, η Μαρικα σοβαρα "
                   "παντρευεται με τον Τοτο. Μιλαμε για νεα βιβλικων "
-                  "διαστασεων φιλε μου ||"),0,1));
+                  "διαστασεων φιλε μου ||"), 0, 1));
 	EXPECT(true,
          rfString_Equal(
              &sx1,

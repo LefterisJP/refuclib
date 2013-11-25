@@ -164,42 +164,22 @@ i_DECLIMEX_ bool rfString_FAppend(RF_String* str, FILE* f, char* eof, char eol,
  ** This function shall output the string @c s into the file descriptor @c f in
  **  the given @c encoding .
  ** @lmsFunction
- ** @param s The string to write to the file @inhtype{String,StringX} @tmpSTR
- ** @param f A valid and open file pointer into which to write the string.
- ** @param encoding \rfoptional{@c RF_UTF8} The encoding of the file.
- **  Default is @c RF_UTF8. Can be one of:
- ** + @c RF_UTF8: For Unicode UTF-8 encoding
- ** + @c RF_UTF16: For Unicode UTF-16 encoding
- ** + @c RF_UTF32: For Unicode UTF-32 encoding
- ** @param endianess \rfoptional{@c rfEndianess()} The endianess that we want
- ** the written file to have.
- ** Can be one of @c RF_LITTLE_ENDIAN or @c RF_BIG_ENDIAN
- ** @return Returns @c true for success and @c false otherwise
+ ** @param s           The string to write to the file @inhtype{String,StringX}
+ **                    @tmpSTR
+ ** @param f           A valid and open file pointer into which to write the
+ **                    string.
+ ** @param encoding    The encoding of the file.
+ **                    Default is @c RF_UTF8. Can be one of:
+ **                        + @c RF_UTF8: For Unicode UTF-8 encoding
+ **                        + @c RF_UTF16: For Unicode UTF-16 encoding
+ **                        + @c RF_UTF32: For Unicode UTF-32 encoding
+ ** @param endianess   The endianess that we want
+ **                    the written file to have.
+ **                    Can be one of @c RF_LITTLE_ENDIAN or @c RF_BIG_ENDIAN
+ ** @return            Returns @c true for success and @c false otherwise
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ bool rfString_Fwrite(void* s, FILE* f, int encoding, int endianess);
-#else
-i_DECLIMEX_ bool i_rfString_Fwrite(void* s, FILE* f, int encoding, int endianess);
-#define rfString_Fwrite(...) \
-    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_FWRITE, 4, __VA_ARGS__)
-#define i_NPSELECT_RF_STRING_FWRITE1(...) \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function " \
-                     "rfString_Fwrite() accepts from 2 to 4 arguments\"")
-#define i_NPSELECT_RF_STRING_FWRITE0(...) \
-    RF_SELECT_FUNC(i_SELECT_RF_STRING_FWRITE,__VA_ARGS__)
-#define i_SELECT_RF_STRING_FWRITE4(i_STR_, i_FILE_, i_ENCODING_, i_ENDIANESS_) \
-    i_rfString_Fwrite(i_STR_, i_FILE_, i_ENCODING_, i_ENDIANESS_)
-#define i_SELECT_RF_STRING_FWRITE3(i_STR_, i_FILE_, i_ENCODING_)  \
-    i_rfString_Fwrite(i_STR_, i_FILE_, i_ENCODING_, rfEndianess())
-#define i_SELECT_RF_STRING_FWRITE2(i_STR_, i_FILE_)  \
-    i_rfString_Fwrite(i_STR_, i_FILE_, RF_UTF8, rfEndianess())
-#define i_SELECT_RF_STRING_FWRITE1(...) \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "\
-                     "rfString_Fwrite() accepts from 2 to 4 arguments\"")
-#define i_SELECT_RF_STRING_FWRITE0(...) \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "\
-                     "rfString_Fwrite() accepts from 2 to 4 arguments\"")
-#endif
+
 
 //! @}
 

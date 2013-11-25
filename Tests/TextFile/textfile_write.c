@@ -44,7 +44,7 @@ void writeTest(int endianess, int encoding, RF_StringX* buff)
     EXPECT(true,
            rfTextFile_Insert(
                &outF,3,
-               RFS_("We are inserting a line after the third line"),true));
+               RFS_("We are inserting a line after the third line"), true));
     rfTextFile_Deinit(&outF);
 	
     //checking if the file was correctly written
@@ -65,7 +65,7 @@ int main()
 {
     RF_StringX buffer;
 	
-    EXPECT(rfInit(), true);
+    DEFAULT_LIB_INIT();
 	//initialize the lines we are gonna use for checking
     EXPECT(true,
            rfString_Init(

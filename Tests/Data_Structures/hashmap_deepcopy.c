@@ -67,7 +67,7 @@ int main()
     int i;
     RF_String str, *strp;
     bool exists;
-    EXPECT(rfInit(), true);
+    DEFAULT_LIB_INIT();
 
     m3 = rfHashmap_String_Create(10);
     EXPECTNOT(m3, NULL);

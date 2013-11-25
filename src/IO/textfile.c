@@ -594,13 +594,9 @@ static char determine_endianess(RF_TextFile* t, int encoding,
 }
 
 //Initializes a new text file
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
+
 char rfTextFile_Init(RF_TextFile* t, const void* nameP, char mode,
                      int endianess, int encoding, char eol)
-#else
-char i_rfTextFile_Init(RF_TextFile* t, const void* nameP, char mode,
-                     int endianess, int encoding, char eol)
-#endif
 {
     RF_String* name = (RF_String*) nameP;
     char ret = true;
@@ -742,19 +738,13 @@ cleanup1:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
-//Create a new text file
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 RF_TextFile* rfTextFile_Create(const void* name, char mode,
                                int endianess, int encoding, char eol)
-#else
-RF_TextFile* i_rfTextFile_Create(const void* name, char mode,
-                                 int endianess, int encoding, char eol)
-#endif
 {
     RF_TextFile* ret;
     RF_ENTER_LOCAL_SCOPE();
     RF_MALLOC_JMP(ret, sizeof(RF_TextFile), ret = NULL, cleanup);
-    if(!rfTextFile_Init(ret, name, mode, endianess, encoding,eol))
+    if(!rfTextFile_Init(ret, name, mode, endianess, encoding, eol))
     {
         free(ret);
         ret = NULL;
@@ -923,14 +913,8 @@ char rfTextFile_SetMode(RF_TextFile* t, char mode)
 }
 
 
-//Reads the next line of the text file
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
-int32_t rfTextFile_ReadLine(RF_TextFile* t, RF_StringX* line,
-                            uint32_t characters)
-#else
-int32_t i_rfTextFile_ReadLine3(RF_TextFile* t, RF_StringX* line,
-                               uint32_t characters)
-#endif
+int rfTextFile_ReadLine_chars(RF_TextFile* t, RF_StringX* line,
+                        uint32_t characters)
 {
     foff_rft startOff;
     char eof = false;
@@ -983,8 +967,8 @@ int32_t i_rfTextFile_ReadLine3(RF_TextFile* t, RF_StringX* line,
     t->eof = eof;
     return RF_SUCCESS;
 }
-//in the default arguments case, have a different function for the 2 argument readline
-int32_t rfTextFile_ReadLine2(RF_TextFile* t, RF_StringX* line)
+
+int rfTextFile_ReadLine(RF_TextFile* t, RF_StringX* line)
 {
     char eof = false;
     foff_rft startOff;
@@ -1079,7 +1063,7 @@ int32_t rfTextFile_GetLine_begin(RF_TextFile* t, uint64_t lineN,
         return -1;
     }
     //read all the lines until you get to the one we need
-    while((error = rfTextFile_ReadLine2(t,&buffer)) == RF_SUCCESS)
+    while((error = rfTextFile_ReadLine(t,&buffer)) == RF_SUCCESS)
     {
         //if this is the line we need, assign it to the given string
         if(i==lineN)
@@ -1157,7 +1141,7 @@ int32_t rfTextFile_GetLine(RF_TextFile* t, uint64_t lineN,
         return -1;
     }
     //and now get it
-    if(rfTextFile_ReadLine2(t,line) != RF_SUCCESS)
+    if(rfTextFile_ReadLine(t,line) != RF_SUCCESS)
     {
         RF_ERROR("Error at getting the requested line for Textfile "
                  "\""RF_STR_PF_FMT"\"", RF_STR_PF_ARG(&t->name));
@@ -1199,7 +1183,7 @@ int32_t rfTextFile_MoveLines(RF_TextFile* t, int64_t linesN)
             return -1;
         }
         //in the positive case the operation is easy, just read the lines until we get to the required one
-        while((error = rfTextFile_ReadLine2(t,&buffer)) == RF_SUCCESS)
+        while((error = rfTextFile_ReadLine(t,&buffer)) == RF_SUCCESS)
         {
             if(t->line == targetLine)
             {
@@ -1261,7 +1245,7 @@ int32_t rfTextFile_MoveLines(RF_TextFile* t, int64_t linesN)
         }
         for(i=1; i<targetLine; i ++)
         {
-            if((error = rfTextFile_ReadLine2(t,&buffer)) != RF_SUCCESS)
+            if((error = rfTextFile_ReadLine(t,&buffer)) != RF_SUCCESS)
             {
                 //there was an error at line reading
                 TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, -1);
@@ -1679,16 +1663,11 @@ cleanup1:
 
 
 //Inserts a line into a specific part of the Text File
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
-char rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* string,
-                       char after)
-#else
-char i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* string,
-                         char after)
-#endif
+bool rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* string,
+                       bool after)
 {
     RF_String tempFileName;
-    char lineFound,allocatedS, ret = true;
+    bool lineFound,allocatedS, ret = true;
     foff_rft tOff=0;
     FILE* newFile;
     uint32_t linesCount;
@@ -1829,7 +1808,7 @@ char i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* string,
     //cleanup3 - for the string buffer deinitialization
     
     //read every line of this file from the beginning
-    while((error = rfTextFile_ReadLine2(t, &buffer)) == RF_SUCCESS)
+    while((error = rfTextFile_ReadLine(t, &buffer)) == RF_SUCCESS)
     {
         //write the given line to the other file according to eol
         ret = write_to_file_eol(newFile, t, &buffer.INH_String);
@@ -1844,7 +1823,7 @@ char i_rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* string,
         }
         //also if this is the place to put the line, do it
         if(t->line - 1 == lineN)
-        //-1 is since right after the ReadLine2 function
+        //-1 is since right after the ReadLine function
         // the current line changes
         {
             lineFound = true;
@@ -2031,10 +2010,10 @@ char rfTextFile_Remove(RF_TextFile* t, uint64_t lineN)
         goto cleanup2;
     }
     //read every line of this file from the beginning
-    while((error =rfTextFile_ReadLine2(t,&buffer)) == RF_SUCCESS)
+    while((error =rfTextFile_ReadLine(t,&buffer)) == RF_SUCCESS)
     {
         //only if this line is not the one to remove write the line to the temporary file
-        if(t->line-1 != lineN)//-1 is since right after the ReadLine2 function the current line changes
+        if(t->line-1 != lineN)//-1 is since right after the ReadLine function the current line changes
         {
             //write the given line to the other file according to eol
             ret = write_to_file_eol(newFile, t, &buffer.INH_String);
@@ -2250,10 +2229,10 @@ char rfTextFile_Replace(RF_TextFile* t, uint64_t lineN, void* stringP)
         goto cleanup2;
     }
     //read every line of this file from the beginning;
-    while((error =rfTextFile_ReadLine2(t,&buffer)) == RF_SUCCESS)
+    while((error =rfTextFile_ReadLine(t,&buffer)) == RF_SUCCESS)
     {
         //write the read line to the other file if this is not the line to replace
-        if(t->line-1 != lineN)//-1 is since right after the ReadLine2 function the current line changes
+        if(t->line-1 != lineN)//-1 is since right after the ReadLine function the current line changes
         {
             //write the given line to the other file according to eol
             ret = write_to_file_eol(newFile, t, &buffer.INH_String);

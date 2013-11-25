@@ -94,14 +94,8 @@ static inline bool move_internal_ptr(RF_StringX* s, int32_t move,
     return true;
 }
 
-//Moves the internal pointer right after the substring
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 int32_t rfStringX_MoveAfter(RF_StringX* thisstr, const void* sub,
                             void* result, const char options)
-#else
-int32_t i_rfStringX_MoveAfter(RF_StringX* thisstr, const void* sub,
-                              void* result, const char options)
-#endif
 {
     int32_t move;
     RF_ENTER_LOCAL_SCOPE();
@@ -226,15 +220,9 @@ bool rfStringX_MoveAfterv(RF_StringX* thisstr, void* result,
     return ret;
 }
 
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 bool rfStringX_MoveAfterPair(RF_StringX* thisstr, const void* left,
                              const void* right, void* result,
                              char options, uint32_t occurence)
-#else
-bool i_rfStringX_MoveAfterPair(RF_StringX* thisstr, const void* left,
-                               const void* right, void* result,
-                               char options, uint32_t occurence)
-#endif
 {
     uint32_t i,move,start = thisstr->bIndex;
     bool found = false;

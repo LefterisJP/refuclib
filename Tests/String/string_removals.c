@@ -5,9 +5,7 @@
 int main()
 {
     RF_String s1,s2,s3,s4,s5,s6,s7;
-
-
-    EXPECT(rfInit(), true);
+    DEFAULT_LIB_INIT();
 
 
     //expect true and then the string without the \r
@@ -16,7 +14,7 @@ int main()
                &s1,
                "If remove\r\ndoes not work correctly here\r\nthe test will"
                " surely\r\nfail!\r\n"));
-    EXPECT(true,rfString_Remove(&s1,RFS_("\r")));
+    EXPECT(true,rfString_Remove(&s1,RFS_("\r"), 0, 0));
     EXPECTGE(printf(RF_STR_PF_FMT"\n", RF_STR_PF_ARG(&s1)), 0);
 
     //expect true for all confirming that by removing we got left only with what we should be
@@ -31,11 +29,12 @@ int main()
                &s2,
                RFS_("歌舞伎俳優の中村橋吾さん（３３）が都内の路上で見知ら"
                     "ぬ男に突然顔を殴られる被害に遭っていたことが、警視庁"
-                    "への取材でわかった。")));
+                    "への取材でわかった。"),
+               0, 0));
     EXPECT(true,
            rfString_Equal(&s2,RFS_("同庁は暴行事件として調べている。")));
     //expect false, can't remove that from the string since it is already removed
-    EXPECT(false,rfString_Remove(&s2,RFS_("歌舞伎")));
+    EXPECT(false,rfString_Remove(&s2,RFS_("歌舞伎"), 0, 0 ));
 
     //expect true: keep only the hiragana(it's not the list of all the hiragana, must have forgotten something),the numbers and the full stop from this sentence
     EXPECT(true,

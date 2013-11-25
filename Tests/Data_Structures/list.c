@@ -70,7 +70,7 @@ int main()
     RF_List_test_object t1;
     RF_String s;
     int i;
-    rfInit();
+    DEFAULT_LIB_INIT();
 
     //simple test of adding 10 ints to a linked list and then iterating
     //through them

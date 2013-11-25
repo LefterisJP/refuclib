@@ -149,13 +149,8 @@ bool rfString_Prepend(RF_String* thisstr, const void* other)
     return ret;
 }
 
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 bool rfString_Remove(void* thisstr, const void* rstr, uint32_t number,
                      const char options)
-#else
-bool i_rfString_Remove(void* thisstr, const void* rstr, uint32_t number,
-                       const char options)
-#endif
 {
     uint32_t i,count,occurences=0;
     int32_t bytePos;
@@ -534,15 +529,9 @@ bool rfString_Trim(void* thisstrP, const void* subP)
 }
 
 
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 bool rfString_Replace(RF_String* thisstr, const void* sstr,
                       const void* rstr, const uint32_t num,
                       const char options)
-#else
-bool i_rfString_Replace(RF_String* thisstr, const void* sstr,
-                        const void* rstr, const uint32_t num,
-                        const char options)
-#endif
 {
     //will keep the number of given instances to find
     uint32_t number = num;

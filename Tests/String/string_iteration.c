@@ -6,7 +6,7 @@ int main()
 {
     RF_String s1,s2;
     uint32_t i=0,c;
-    EXPECT(rfInit(), true);
+    DEFAULT_LIB_INIT();
 	
 	//testing normal string iteration
     EXPECT(true,

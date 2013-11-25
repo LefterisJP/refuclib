@@ -15,7 +15,7 @@ int main()
     RF_String s, *sp;
     int i, ret;
     bool code;
-    EXPECT(rfInit(), true);
+    DEFAULT_LIB_INIT();
 
     //Create a dynamic array of 5 ints capacity and add 10 ints to it
     EXPECT(rfDynamicArray_I_Init(&a1, 5), true);

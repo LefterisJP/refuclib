@@ -25,7 +25,7 @@ int main()
     RF_StringX sx1;
     uint32_t cp;
     char *cs;
-    EXPECT_TRUE(rfInit());
+    DEFAULT_LIB_INIT();
 
     //expect 131 : This string's length
     EXPECT(true,

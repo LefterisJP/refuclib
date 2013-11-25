@@ -58,14 +58,14 @@ extern "C"
  ** @param thisstr     The extended string to work on
  ** @param sub         The substring after which to move inside the current
  **                    String. @inhtype{String,StringX} @tmpSTR
- ** @param result      \rfoptional{0} Pass a pointer to a @c String type to be
+ ** @param result      Pass a pointer to a @c String type to be
  **                    initialized with the substring between the start of
  **                    @c thisstr and the end of the moving. If the passed
  **                    pointer is of RF_StringX type also pass the 
  **                    @c RF_STRINGX_ARGUMENT bitflag argument in the 
  **                    @c options argument
  **                    If 0 nothing is returned @inhtype{String,StringX}
- ** @param options     \rfoptional{0} @see rfString_Remove() for details of the
+ ** @param options     @see rfString_Remove() for details of the
  **                    possible options. An additional option that can be given:
  **                    + @c RF_STRINGX_ARGUMENT: Pass this bitflag option if the
  **                    pointer you gave for initialization at @c result is
@@ -78,33 +78,8 @@ extern "C"
  ** @see rfStringX_MoveBack()
  ** @see rfStringX_Reset()
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ int32_t rfStringX_MoveAfter(RF_StringX* thisstr, const void* sub,
                                         void* result, const char options);
-#else
-i_DECLIMEX_ int32_t i_rfStringX_MoveAfter(RF_StringX* thisstr, const void* sub,
-                                          void* result, const char options);
-#define rfStringX_MoveAfter(...) \
-    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRINGX_MOVEAFTER,4,__VA_ARGS__)
-#define i_NPSELECT_RF_STRINGX_MOVEAFTER1(...)                           \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfStringX_MoveAfter() accepts from 2 to 4 arguments\"")
-#define i_NPSELECT_RF_STRINGX_MOVEAFTER0(...) \
-    RF_SELECT_FUNC(i_SELECT_RF_STRINGX_MOVEAFTER,__VA_ARGS__)
-#define i_SELECT_RF_STRINGX_MOVEAFTER4(i_THISSTR_, i_SUBSTR_,         \
-                                       i_RESULT_, i_OPTIONS_)         \
-    i_rfStringX_MoveAfter(i_THISSTR_,i_SUBSTR_,i_RESULT_,i_OPTIONS_)
-#define i_SELECT_RF_STRINGX_MOVEAFTER3(i_THISSTR_, i_SUBSTR_, i_RESULT_) \
-     i_rfStringX_MoveAfter(i_THISSTR_,i_SUBSTR_,i_RESULT_,0)
-#define i_SELECT_RF_STRINGX_MOVEAFTER2(i_THISSTR_,i_SUBSTR_) \
-     i_rfStringX_MoveAfter(i_THISSTR_,i_SUBSTR_,0,0)
-#define i_SELECT_RF_STRINGX_MOVEAFTER1(...)                             \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfStringX_MoveAfter() accepts from 2 to 4 arguments\"")
-#define i_SELECT_RF_STRINGX_MOVEAFTER0(...)                             \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfStringX_MoveAfter() accepts from 2 to 4 arguments\"")
-#endif
 
 /**
  ** @memberof RF_StringX
@@ -196,7 +171,7 @@ i_DECLIMEX_ bool rfStringX_MoveAfterv(RF_StringX* thisstr, void* result,
  **                      @inhtype{String,StringX} @tmpSTR
  ** @param result        For details @see rfStringX_MoveAfter()
  ** @param options       For details @see rfStringX_MoveAfter()
- ** @param occurence     \rfoptional{0} If this is not 0 then the function
+ ** @param occurence     If this is not 0 then the function
  **                      will search for the number of occurence given in this
  **                      parameter. If it is 0 it will search for the first
  **                      occurence. If it is not found then the function shall
@@ -209,44 +184,9 @@ i_DECLIMEX_ bool rfStringX_MoveAfterv(RF_StringX* thisstr, void* result,
  ** @see rfStringX_MoveBack()
  ** @see rfStringX_Reset()
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ bool rfStringX_MoveAfterPair(RF_StringX* thisstr, const void* left,
                                          const void* right, void* result, 
                                          char options, uint32_t occurence);
-#else
-i_DECLIMEX_ bool i_rfStringX_MoveAfterPair(RF_StringX* thisstr, const void* left,
-                                           const void* right, void* result, 
-                                           char options, uint32_t occurence);
-#define rfStringX_MoveAfterPair(...) \
-    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRINGX_MOVEAFTERPAIR,6,__VA_ARGS__)
-#define i_NPSELECT_RF_STRINGX_MOVEAFTERPAIR1(...)                       \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfStringX_MoveAfterPair() accepts from 3 to 6 arguments\"")
-#define i_NPSELECT_RF_STRINGX_MOVEAFTERPAIR0(...) \
-    RF_SELECT_FUNC(i_SELECT_RF_STRINGX_MOVEAFTERPAIR,__VA_ARGS__)
-#define i_SELECT_RF_STRINGX_MOVEAFTERPAIR6(i_THISSTR_, i_LEFTSTR_, i_RIGHTSTR_, \
-                                           i_RESULT_,i_OPTIONS_,i_OCCURENCE_) \
-    i_rfStringX_MoveAfterPair(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_RESULT_, \
-                              i_OPTIONS_,i_OCCURENCE_)
-#define i_SELECT_RF_STRINGX_MOVEAFTERPAIR5(i_THISSTR_, i_LEFTSTR_, i_RIGHTSTR_, \
-                                           i_RESULT_, i_OPTIONS_)       \
-    i_rfStringX_MoveAfterPair(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,        \
-                              i_RESULT_,i_OPTIONS_,0)
-#define i_SELECT_RF_STRINGX_MOVEAFTERPAIR4(i_THISSTR_, i_LEFTSTR_, i_RIGHTSTR_, \
-                                           i_RESULT_)                   \
-    i_rfStringX_MoveAfterPair(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_RESULT_,0,0)
-#define i_SELECT_RF_STRINGX_MOVEAFTERPAIR3(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_) \
-    i_rfStringX_MoveAfterPair(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,0,0,0)
-#define i_SELECT_RF_STRINGX_MOVEAFTERPAIR2(...)                         \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfStringX_MoveAfterPair() accepts from 3 to 6 arguments\"")
-#define i_SELECT_RF_STRINGX_MOVEAFTERPAIR1(...)                         \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfStringX_MoveAfterPair() accepts from 3 to 6 arguments\"")
-#define i_SELECT_RF_STRINGX_MOVEAFTERPAIR0(...)                         \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfStringX_MoveAfterPair() accepts from 3 to 6 arguments\"")
-#endif
 
 //! @}
 

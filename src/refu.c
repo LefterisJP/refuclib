@@ -51,14 +51,8 @@
 #include <string.h> //for strcmp
 /*------------- End of includes -------------*/
 
-
-
 //Initializes the Refu library
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 bool rfInit(char *logstr, uint64_t lmsSize, log_level_t level)
-#else
-bool i_rfInit(char *logstr, uint64_t lmsSize, log_level_t level)
-#endif
 {
 
     //initialize the refu stdio
@@ -109,10 +103,11 @@ bool i_rfInit(char *logstr, uint64_t lmsSize, log_level_t level)
     //! @todo
 #endif
     //initialize the main thread's local stack memory
+    if (lmsSize == 0) {
+        lmsSize = RF_OPTION_LOCALSTACK_MEMORY_SIZE;
+    }
     if (!rfLMS_Init(&RF_MainLMS, lmsSize)) {
-        RF_ERROR(
-            "Could not initialize main thread's local memory stack");
-
+        RF_ERROR("Could not initialize main thread's local memory stack");
         return false;
     }
 

@@ -111,15 +111,9 @@ RF_Thread* i_rfThread_Create(uint32_t flags,
     return ret;
 }
 //Initialises a thread
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
-char rfThread_Init(RF_Thread* t, uint32_t flags,
+bool rfThread_Init(RF_Thread* t, uint32_t flags,
                    void* (*ptr2onExecution)(void*), void* data,
                    uint64_t lmsSize )
-#else
-char i_rfThread_Init(RF_Thread* t, uint32_t flags,
-                     void* (*ptr2onExecution)(void*), void* data,
-                     uint64_t lmsSize )
-#endif
 {
     pthread_attr_t attributes;
     //get the data and the lms size

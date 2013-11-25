@@ -7,7 +7,7 @@ int main()
 	  RF_String s1,s2,s3,s4;
 	  RF_StringX sx1,sx2, sx3;
 
-	  EXPECT(rfInit(), true);
+    DEFAULT_LIB_INIT();
 
     EXPECT(true, rfString_Init(&s1,"The meaning of life"));
     EXPECT(rfString_Append(&s1, RFS_(" is doing what you love")), true);

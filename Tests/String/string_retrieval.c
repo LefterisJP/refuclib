@@ -7,7 +7,7 @@ int main()
     RF_String s1,s2,s3,s4,s5,s6,s7;
     RF_String ret;
 
-    EXPECT(rfInit(), true);
+    DEFAULT_LIB_INIT();
 
 	
     EXPECT(true,
@@ -61,13 +61,13 @@ int main()
                          RF_CASE_IGNORE|RF_MATCH_WORD));
     EXPECT(RF_FAILURE,rfString_Find_i(&s4,RFS_("New York"),2,30,0));
     EXPECT(55,rfString_Find_i(&s5,RFS_("不適切な事例"),34,120,0));
-    EXPECT(true,rfString_BeginsWith(&s6,RFS_("Στον πυρετό")));
-    EXPECT(true,rfString_EndsWith(&s6,RFS_("Αθήνα")));
-    EXPECT(false,rfString_EndsWith(&s6,RFS_("Δεν ειμαι στο τελος")));
-    EXPECT(false,rfString_BeginsWith(&s6,RFS_("Στο πυρετό")));;
-    EXPECT(2,rfString_Count(&s7,RFS_("ニューヨーク")));
-    EXPECT(5,rfString_Count(&s7,RFS_("州")));
-    EXPECT(false,rfString_Count(&s7,RFS_("東京")));
+    EXPECT(true,rfString_BeginsWith(&s6, RFS_("Στον πυρετό"), 0));
+    EXPECT(true,rfString_EndsWith(&s6,RFS_("Αθήνα"), 0));
+    EXPECT(false,rfString_EndsWith(&s6,RFS_("Δεν ειμαι στο τελος"), 0));
+    EXPECT(false,rfString_BeginsWith(&s6, RFS_("Στο πυρετό"), 0));;
+    EXPECT(2, rfString_Count(&s7, RFS_("ニューヨーク"), 0));
+    EXPECT(5, rfString_Count(&s7,RFS_("州"), 0));
+    EXPECT(false,rfString_Count(&s7, RFS_("東京"), 0));
 	
 	//expect the strings to be equal
 	EXPECT(true,

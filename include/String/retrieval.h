@@ -3,13 +3,13 @@
 **
 ** Copyright (c) 2011-2013, Karapetsas Eleftherios
 ** All rights reserved.
-** 
+**
 ** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 **  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 **  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in
 **     the documentation and/or other materials provided with the distribution.
 **  3. Neither the name of the Original Author of Refu nor the names of its contributors may be used to endorse or promote products derived from
-** 
+**
 ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
 ** INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 ** DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
@@ -146,31 +146,8 @@ i_DECLIMEX_ bool rfString_Substr(const void* thisstr, uint32_t startPos,
  **                         substring or RF_FAILURE for not found
  ** @see rfString_Find_i()
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
-i_DECLIMEX_ int32_t rfString_Find(const void* thisstr, const void* sstr, 
-                               const char options);
-#else
-i_DECLIMEX_ int32_t i_rfString_Find(const void* thisstr,const void* sstr,
-                                    const char options);
-#define rfString_Find(...) \
-    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_FIND,3,__VA_ARGS__)
-#define i_NPSELECT_RF_STRING_FIND1(...)                                 \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Find() accepts from 2 to 3 arguments\"")
-#define i_NPSELECT_RF_STRING_FIND0(...) \
-    RF_SELECT_FUNC(i_SELECT_RF_STRING_FIND,__VA_ARGS__)
-#define i_SELECT_RF_STRING_FIND3(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) \
-    i_rfString_Find(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_)
-#define i_SELECT_RF_STRING_FIND2(i_THISSTR_,i_SEARCHSTR_) \
-    i_rfString_Find(i_THISSTR_,i_SEARCHSTR_,0)
-#define i_SELECT_RF_STRING_FIND1(...)                                   \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Find() accepts from 2 to 3 arguments\"")
-#define i_SELECT_RF_STRING_FIND0(...)                                   \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Find() accepts from 2 to 3 arguments\"")
-#endif
-
+i_DECLIMEX_ int32_t rfString_Find(const void* thisstr, const void* sstr,
+                                  const char options);
 
 /**
  ** @memberof RF_String
@@ -180,40 +157,9 @@ i_DECLIMEX_ int32_t i_rfString_Find(const void* thisstr,const void* sstr,
  ** @lmsFunction
  ** @see rfString_Find()
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ int32_t rfString_Find_i(const void* thisstr, const void* sstr,
                                     uint32_t startPos, uint32_t length,
                                     const char options);
-#else
-i_DECLIMEX_ int32_t i_rfString_Find_i(const void* thisstr, const void* sstr,
-                                      uint32_t startPos, uint32_t length,
-                                      const char options);
-#define rfString_Find_i(...) \
-    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_FIND_I,5,__VA_ARGS__)
-#define i_NPSELECT_RF_STRING_FIND_I1(...)                               \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Find_i() accepts from 4 to 5 arguments\"")
-#define i_NPSELECT_RF_STRING_FIND_I0(...) \
-    RF_SELECT_FUNC(i_SELECT_RF_STRING_FIND_I,__VA_ARGS__)
-#define i_SELECT_RF_STRING_FIND_I5(i_THISSTR_, i_SEARCHSTR_, i_STARTPOS_,\
-                                   i_LENGTH_,i_OPTIONS_) \
-    i_rfString_Find_i(i_THISSTR_,i_SEARCHSTR_,i_STARTPOS_,i_LENGTH_,i_OPTIONS_)
-#define i_SELECT_RF_STRING_FIND_I4(i_THISSTR_, i_SEARCHSTR_, i_STARTPOS_,\
-                                   i_LENGTH_)            \
-    i_rfString_Find_i(i_THISSTR_,i_SEARCHSTR_,i_STARTPOS_,i_LENGTH_,0)
-#define i_SELECT_RF_STRING_FIND_I3(...)                                 \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Find_i() accepts from 4 to 5 arguments\"")
-#define i_SELECT_RF_STRING_FIND_I2(...)                                 \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Find_i() accepts from 4 to 5 arguments\"")
-#define i_SELECT_RF_STRING_FIND_I1(...)                                 \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Find_i() accepts from 4 to 5 arguments\"")
-#define i_SELECT_RF_STRING_FIND_I0(...)                                 \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Find_i() accepts from 4 to 5 arguments\"")
-#endif
 
 
 /**
@@ -235,34 +181,9 @@ i_DECLIMEX_ int32_t i_rfString_Find_i(const void* thisstr, const void* sstr,
  **                      and false if not
  ** @see rfString_EndsWith()
  **/
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ bool rfString_BeginsWith(const void* thisstr, const void* sstr,
-                                     const char options);
-#else
-    #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfString_BeginsWith(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) \
+#define rfString_BeginsWith(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_)     \
     (rfString_Find((i_THISSTR_),(i_SEARCHSTR_),(i_OPTIONS_)) == 0)
-    #else
-        #define rfString_BeginsWith(...) \
-        RF_SELECT_FUNC_IF_NARGGT2(i_NPSELECT_RF_STRING_BEGINSWITH,3,__VA_ARGS__)
-        #define i_NPSELECT_RF_STRING_BEGINSWITH1(...)                     \
-        RF_COMPILE_ERROR("message \"Illeggal Arguments Number: Function " \
-        "rfString_BeginsWith() accepts from 2 to 3 arguments\"")
-        #define i_NPSELECT_RF_STRING_BEGINSWITH0(...) \
-        RF_SELECT_FUNC2(i_SELECT_RF_STRING_BEGINSWITH,__VA_ARGS__)
-        #define i_SELECT_RF_STRING_BEGINSWITH3(i_THISSTR_, i_SEARCHSTR_,\
-                                               i_OPTIONS_) \
-        (rfString_Find(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) == 0)
-        #define i_SELECT_RF_STRING_BEGINSWITH2(i_THISSTR_, i_SEARCHSTR_) \
-        (rfString_Find(i_THISSTR_,i_SEARCHSTR_) == 0)
-        #define i_SELECT_RF_STRING_BEGINSWITH1(...)                       \
-        RF_COMPILE_ERROR("message \"Illeggal Arguments Number: Function " \
-        "rfString_BeginsWith() accepts from 2 to 3 arguments\"")
-        #define i_SELECT_RF_STRING_BEGINSWITH0(...)                       \
-        RF_COMPILE_ERROR("message \"Illeggal Arguments Number: Function " \
-        "rfString_BeginsWith() accepts from 2 to 3 arguments\"")
-    #endif
-#endif
+
 
 /**
  ** @memberof RF_String
@@ -284,33 +205,11 @@ i_DECLIMEX_ bool rfString_BeginsWith(const void* thisstr, const void* sstr,
  ** @see rfString_BeginsWith()
  **
  **/
-#if defined(RF_IAMHERE_FOR_DOXYGEN)
-i_DECLIMEX_ bool rfString_EndsWith(const void* thisstr, const void* sstr,
-                                   const char options);
-#else
-    #ifndef RF_OPTION_DEFAULT_ARGUMENTS
-        #define rfString_EndsWith(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) \
-            (rfString_Find(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) == (rfString_Length(i_THISSTR_)-rfString_Length(i_SEARCHSTR_)) )
-    #else
-        #define rfString_EndsWith(...) \
-        RF_SELECT_FUNC_IF_NARGGT2(i_NPSELECT_RF_STRING_ENDSWITH,3,__VA_ARGS__)
-        #define i_NPSELECT_RF_STRING_ENDSWITH1(...) \
-         RF_COMPILE_ERROR("message \"Illeggal Arguments Number: Function "\
-         "rfString_EndsWith() accepts from 2 to 3 arguments\"")
-        #define i_NPSELECT_RF_STRING_ENDSWITH0(...) \
-        RF_SELECT_FUNC2(i_SELECT_RF_STRING_ENDSWITH,__VA_ARGS__)
-        #define i_SELECT_RF_STRING_ENDSWITH3(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) \
-            (rfString_Find(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) == (rfString_Length(i_THISSTR_)-rfString_Length(i_SEARCHSTR_)) )
-        #define i_SELECT_RF_STRING_ENDSWITH2(i_THISSTR_,i_SEARCHSTR_) \
-            (rfString_Find(i_THISSTR_,i_SEARCHSTR_) == (rfString_Length(i_THISSTR_)-rfString_Length(i_SEARCHSTR_)) )
-        #define i_SELECT_RF_STRING_ENDSWITH1(...) \
-         RF_COMPILE_ERROR("message \"Illeggal Arguments Number: Function "\
-         "rfString_EndsWith() accepts from 2 to 3 arguments\"")
-        #define i_SELECT_RF_STRING_ENDSWITH0(...) \
-         RF_COMPILE_ERROR("message \"Illeggal Arguments Number: Function "\
-         "rfString_EndsWith() accepts from 2 to 3 arguments\"")
-    #endif
-#endif
+#define rfString_EndsWith(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_)           \
+    (                                                                   \
+        rfString_Find(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_)               \
+        == (rfString_Length(i_THISSTR_)-rfString_Length(i_SEARCHSTR_)) )
+
 
 /**
  ** @memberof RF_String
@@ -326,30 +225,8 @@ i_DECLIMEX_ bool rfString_EndsWith(const void* thisstr, const void* sstr,
  ** @return              Returns the number of times cstr exists inside the
  **                      string (0 is returned in case it's not found at all
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ unsigned int rfString_Count(const void* thisstr, const void* sstr,
                                         const char options);
-#else
-i_DECLIMEX_ unsigned int i_rfString_Count(const void* thisstr, const void* sstr,
-                                          const char options);
-#define rfString_Count(...) \
-    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_COUNT,3,__VA_ARGS__)
-#define i_NPSELECT_RF_STRING_COUNT1(...)                                \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Count() accepts from 2 to 3 arguments\"")
-#define i_NPSELECT_RF_STRING_COUNT0(...) \
-    RF_SELECT_FUNC(i_SELECT_RF_STRING_COUNT,__VA_ARGS__)
-#define i_SELECT_RF_STRING_COUNT3(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_) \
-    i_rfString_Count(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_)
-#define i_SELECT_RF_STRING_COUNT2(i_THISSTR_,i_SEARCHSTR_)  \
-    i_rfString_Count(i_THISSTR_,i_SEARCHSTR_,0)
-#define i_SELECT_RF_STRING_COUNT1(...)                                  \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Count() accepts from 2 to 3 arguments\"")
-#define i_SELECT_RF_STRING_COUNT0(...)                                  \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Count() accepts from 2 to 3 arguments\"")
-#endif
 
 //! @}
 
@@ -403,41 +280,9 @@ i_DECLIMEX_ bool rfString_ScanfAfter(const void* thisstr, const void* afterstr,
  ** @see rfString_After()
  ** @see rfStringX_MoveAfterPair()
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ bool rfString_Between(const void* thisstr, const void* lstr,
-                                  const void* rstr, void* result, 
+                                  const void* rstr, void* result,
                                   const char options);
-#else
-i_DECLIMEX_ bool i_rfString_Between(const void* thisstr, const void* lstr,
-                                    const void* rstr, void* result, 
-                                    const char options);
-#define rfString_Between(...) \
-    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_BETWEEN,5,__VA_ARGS__)
-#define i_NPSELECT_RF_STRING_BETWEEN1(...)                              \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Between() accepts from 4 to 5 arguments\"")
-#define i_NPSELECT_RF_STRING_BETWEEN0(...)  \
-    RF_SELECT_FUNC(i_SELECT_RF_STRING_BETWEEN,__VA_ARGS__)
-#define i_SELECT_RF_STRING_BETWEEN5(i_THISSTR_, i_LEFTSTR_, i_RIGHTSTR_, \
-                                    i_RESULT_,i_OPTIONS_)               \
-    i_rfString_Between(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_RESULT_,i_OPTIONS_)
-#define i_SELECT_RF_STRING_BETWEEN4(i_THISSTR_, i_LEFTSTR_, i_RIGHTSTR_, \
-                                    i_RESULT_)                          \
-    i_rfString_Between(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_RESULT_,0)
-#define i_SELECT_RF_STRING_BETWEEN3(...)                                \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Between() accepts from 4 to 5 arguments\"")
-#define i_SELECT_RF_STRING_BETWEEN2(...)                                \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Between() accepts from 4 to 5 arguments\"")
-#define i_SELECT_RF_STRING_BETWEEN1(...)                                \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Between() accepts from 4 to 5 arguments\"")
-#define i_SELECT_RF_STRING_BETWEEN0(...)                                \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Between() accepts from 4 to 5 arguments\"")
-
-#endif
 
 
 /**
@@ -446,7 +291,7 @@ i_DECLIMEX_ bool i_rfString_Between(const void* thisstr, const void* lstr,
  ** start until any of the given Strings are found
  **
  ** @isinherited{StringX}
- ** The parameters that have to be given as variable argument 
+ ** The parameters that have to be given as variable argument
  ** <b>must</b> be of type RF_String* or RF_StringX* or even
  ** string initialized with the temporary string macro
  ** @lmsFunction
@@ -481,41 +326,15 @@ i_DECLIMEX_ bool rfString_Beforev(const void* thisstr, void* result,
  **                           string @inhtype{String,StringX} @tmpSTR
  ** @param[out] result        For details @see rfString_Between()
  ** @param options            For details @see rfStringX_MoveAfter()
- ** @return                   Returns @c true if the substring was initialized 
+ ** @return                   Returns @c true if the substring was initialized
  **                           and false if none of the parameters were found or
  **                           an invalid UTF-8 sequence was given.
  **                           In the latter case an error is also logged.
  ** @see rfString_Beforev()
  ** @see rfString_After()
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ bool rfString_Before(const void* thisstr, const void* sstr,
                                  void* result, const char options);
-#else
-i_DECLIMEX_ bool i_rfString_Before(const void* thisstr, const void* sstr,
-                                   void* result, const char options);
-#define rfString_Before(...) \
-    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_BEFORE,4,__VA_ARGS__)
-#define i_NPSELECT_RF_STRING_BEFORE1(...)                               \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Before() accepts from 3 to 4 arguments\"")
-#define i_NPSELECT_RF_STRING_BEFORE0(...)  \
-    RF_SELECT_FUNC(i_SELECT_RF_STRING_BEFORE,__VA_ARGS__)
-#define i_SELECT_RF_STRING_BEFORE4(i_THISSTR_, i_SEARCHSTR_, i_RESULT_,\
-                                   i_OPTIONS_) \
-    i_rfString_Before(i_THISSTR_,i_SEARCHSTR_,i_RESULT_,i_OPTIONS_)
-#define i_SELECT_RF_STRING_BEFORE3(i_THISSTR_, i_SEARCHSTR_, i_RESULT_) \
-    i_rfString_Before(i_THISSTR_,i_SEARCHSTR_,i_RESULT_,0)
-#define i_SELECT_RF_STRING_BEFORE2(...)                                 \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Before() accepts from 3 to 4 arguments\"")
-#define i_SELECT_RF_STRING_BEFORE1(...)                                 \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Before() accepts from 3 to 4 arguments\"")
-#define i_SELECT_RF_STRING_BEFORE0(...)                                 \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_Before() accepts from 3 to 4 arguments\"")
-#endif
 
 /**
  ** @memberof RF_String
@@ -539,40 +358,15 @@ i_DECLIMEX_ bool i_rfString_Before(const void* thisstr, const void* sstr,
  ** @see rfString_Before()
  ** @see rfStringX_MoveAfter()
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ bool rfString_After(const void* thisstr, const void* after,
                                 void* result, const char options);
-#else
-i_DECLIMEX_ bool i_rfString_After(const void* thisstr, const void* after,
-                                  void* result, const char options);
-#define rfString_After(...) \
-    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRING_AFTER,4,__VA_ARGS__)
-#define i_NPSELECT_RF_STRING_AFTER1(...)                                \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_After() accepts from 3 to 4 arguments\"")
-#define i_NPSELECT_RF_STRING_AFTER0(...) \
-    RF_SELECT_FUNC(i_SELECT_RF_STRING_AFTER,__VA_ARGS__)
-#define i_SELECT_RF_STRING_AFTER4(i_THISSTR_,i_AFTERSTR_,i_OUTSTR_,i_OPTIONS_)\
-    i_rfString_After(i_THISSTR_,i_AFTERSTR_,i_OUTSTR_,i_OPTIONS_)
-#define i_SELECT_RF_STRING_AFTER3(i_THISSTR_,i_AFTERSTR_,i_OUTSTR_) \
-    i_rfString_After(i_THISSTR_,i_AFTERSTR_,i_OUTSTR_,0)
-#define i_SELECT_RF_STRING_AFTER2(...)                                  \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_After() accepts from 3 to 4 arguments\"")
-#define i_SELECT_RF_STRING_AFTER1(...)                                  \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_After() accepts from 3 to 4 arguments\"")
-#define i_SELECT_RF_STRING_AFTER0(...)                                  \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfString_After() accepts from 3 to 4 arguments\"")
-#endif
 
 /**
  ** @memberof RF_String
  ** @brief Initialize a string after the first of the given substrings found
  **
  ** @isinherited{StringX}
- ** Initializes the given String with the substring located after 
+ ** Initializes the given String with the substring located after
  ** (and not including) the after substring inside the parameter string.
  ** If the substring is not located the function returns false.
  ** The parameters that have to be given as variable argument <b>must</b> be

@@ -173,39 +173,10 @@ i_DECLIMEX_ bool rfStringX_Append_cstr(RF_StringX* thisstr,
  ** @brief Replaces all occurences of a String
  ** @see rfString_Replace()
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ bool rfStringX_Replace(RF_StringX* thisstr, const void* sstr,
                                    const void* rstr, uint32_t number,
                                    char options);
-#else
-i_DECLIMEX_ bool i_rfStringX_Replace(RF_StringX* thisstr, const void* sstr,
-                                     const void* rstr, uint32_t number,
-                                     const char options);
-#define rfStringX_Replace(...) \
-    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRINGX_REPLACE,5,__VA_ARGS__)
-#define i_NPSELECT_RF_STRINGX_REPLACE1(...)                             \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfStringX_Replace() accepts from 3 to 5 arguments\"")
-#define i_NPSELECT_RF_STRINGX_REPLACE0(...) \
-    RF_SELECT_FUNC(i_SELECT_RF_STRINGX_REPLACE,__VA_ARGS__)
-#define i_SELECT_RF_STRINGX_REPLACE5(i_THISSTR_, i_SEARCHSTR_, i_REPSTR_,\
-                                     i_NUMBER_,i_OPTIONS_)              \
-   i_rfStringX_Replace(i_THISSTR_,i_SEARCHSTR_,i_REPSTR_,i_NUMBER_,i_OPTIONS_)
-#define i_SELECT_RF_STRINGX_REPLACE4(i_THISSTR_,i_SEARCHSTR_,           \
-                                     i_REPSTR_,i_NUMBER_)               \
-    i_rfStringX_Replace(i_THISSTR_, i_SEARCHSTR_, i_REPSTR_, i_NUMBER_, 0)
-#define i_SELECT_RF_STRINGX_REPLACE3(i_THISSTR_, i_SEARCHSTR_, i_REPSTR_) \
-    i_rfStringX_Replace(i_THISSTR_,i_SEARCHSTR_,i_REPSTR_,0,0)
-#define i_SELECT_RF_STRINGX_REPLACE2(...)                               \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfStringX_Replace() accepts from 3 to 5 arguments\"")
-    #define i_SELECT_RF_STRINGX_REPLACE1(...)                           \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "    \
-                     "rfStringX_Replace() accepts from 3 to 5 arguments\"")
-    #define i_SELECT_RF_STRINGX_REPLACE0(...)                           \
-        RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function " \
-                        "rfStringX_Replace() accepts from 3 to 5 arguments\"")
-#endif
+
 
 /**
  ** @memberof RF_StringX
@@ -228,53 +199,12 @@ i_DECLIMEX_ bool i_rfStringX_Replace(RF_StringX* thisstr, const void* sstr,
  **                    for error
  ** @see rfStringX_Replace()
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ bool rfStringX_ReplaceBetween(RF_StringX* thisstr,
                                           const void* left,
                                           const void* right,
                                           const void* rstr,
                                           char options,uint32_t i);
-#else
-i_DECLIMEX_ bool i_rfStringX_ReplaceBetween(RF_StringX* thisstr,
-                                            const void* left,
-                                            const void* right,
-                                            const void* rstr,
-                                            char options,uint32_t i);
-#define rfStringX_ReplaceBetween(...) \
-    RF_SELECT_FUNC_IF_NARGGT(i_NPSELECT_RF_STRINGX_REPLACEBETWEEN,6,__VA_ARGS__)
-#define i_NPSELECT_RF_STRINGX_REPLACEBETWEEN1(...)  \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "  \
-                     "rfStringX_ReplaceBetween() accepts "            \
-                     "from 4 to 6 arguments\"")
-#define i_NPSELECT_RF_STRINGX_REPLACEBETWEEN0(...) \
-    RF_SELECT_FUNC(i_SELECT_RF_STRINGX_REPLACEBETWEEN,__VA_ARGS__)
-#define i_SELECT_RF_STRINGX_REPLACEBETWEEN6(i_THISSTR_, i_LEFTSTR_,     \
-                                            i_RIGHTSTR_, i_REPSTR_,i_OPTIONS_, \
-                                            i_OCCURENCE_)               \
-    i_rfStringX_ReplaceBetween(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_REPSTR_,i_OPTIONS_,i_OCCURENCE_)
-#define i_SELECT_RF_STRINGX_REPLACEBETWEEN5(i_THISSTR_, i_LEFTSTR_,     \
-                                            i_RIGHTSTR_,i_REPSTR_,i_OPTIONS_) \
-    i_rfStringX_Between(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_REPSTR_,i_OPTIONS_,0)
-#define i_SELECT_RF_STRINGX_REPLACEBETWEEN4(i_THISSTR_, i_LEFTSTR_,     \
-                                            i_RIGHTSTR_,i_REPSTR_)      \
-    i_rfStringX_ReplaceBetween(i_THISSTR_,i_LEFTSTR_,i_RIGHTSTR_,i_REPSTR_,0,0)
-#define i_SELECT_RF_STRINGX_REPLACEBETWEEN3(...)                      \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "  \
-                     "rfStringX_ReplaceBetween() accepts "            \
-                     "from 4 to 6 arguments\"")
-#define i_SELECT_RF_STRINGX_REPLACEBETWEEN2(...)                      \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "  \
-                     "rfStringX_ReplaceBetween() accepts "            \
-                     "from 4 to 6 arguments\"")
-#define i_SELECT_RF_STRINGX_REPLACEBETWEEN1(...)                      \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "  \
-                     "rfStringX_ReplaceBetween() accepts "            \
-                     "from 4 to 6 arguments\"")
-#define i_SELECT_RF_STRINGX_REPLACEBETWEEN0(...)                      \
-    RF_COMPILE_ERROR("message \"Illegal Arguments Number: Function "  \
-                     "rfStringX_ReplaceBetween() accepts "            \
-                     "from 4 to 6 arguments\"")
-#endif
+
 
 //! @}
 

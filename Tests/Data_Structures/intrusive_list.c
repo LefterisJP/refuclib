@@ -117,7 +117,8 @@ static void test_List_Append_Prepend(RF_ILHead* l1, RF_ILHead* l2,
 int main()
 {
     RF_ILHead list1, list2, list3;
-    rfInit();
+    DEFAULT_LIB_INIT();
+
     rfIList_HeadInit(&list1);
 
     test_AddTail(&list1, arr1, sizeof(arr1)/sizeof(int));

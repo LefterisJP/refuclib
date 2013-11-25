@@ -77,12 +77,8 @@ static DWORD WINAPI RF_THREAD_FUNCTION(LPVOID  t)
     return ret;
 }
 
-//Allocates and returns a thread
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
-RF_Thread* rfThread_Create(uint32_t flags,void* (*ptr2onExecution)(void*),void* data ,uint64_t lmsSize)
-#else
-RF_Thread* i_rfThread_Create(uint32_t flags,void* (*ptr2onExecution)(void*),void* data ,uint64_t lmsSize)
-#endif
+RF_Thread* rfThread_Create(uint32_t flags, void* (*ptr2onExecution)(void*),
+                           void* data , uint64_t lmsSize)
 {
     RF_Thread* ret;
     RF_MALLOC(ret,sizeof(RF_Thread));
@@ -96,11 +92,8 @@ RF_Thread* i_rfThread_Create(uint32_t flags,void* (*ptr2onExecution)(void*),void
     return ret;
 }
 //Initialises a thread
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
-char rfThread_Init(RF_Thread* t,uint32_t flags,void* (*ptr2onExecution)(void*),void* data,uint64_t lmsSize )
-#else
-char i_rfThread_Init(RF_Thread* t,uint32_t flags,void* (*ptr2onExecution)(void*),void* data,uint64_t lmsSize )
-#endif
+bool rfThread_Init(RF_Thread* t, uint32_t flags, void* (*ptr2onExecution)(void*),
+                   void* data, uint64_t lmsSize )
 {
     //get the data
     t->data = data;

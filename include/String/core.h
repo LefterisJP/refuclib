@@ -21,17 +21,6 @@
 **      ==END OF REFU LICENSE==
 **
 **
-** --String/core.h
-** This header includes core RF_String functionality (initialization, deinitialization, copying e.t.c.)
-**
----------------------For internal library include make sure to have----------------------------
-#include <Definitions/types.h> //for fixed size types needed in various places
-#include <String/string_decl.h>//for RF_String
-#include <Definitions/imex.h> //for the import export macro
-#include <Definitions/defarg.h> //for enabling default arguments
-#include <Utils/constcmp.h> //for RF_HEXEQ_C() used in rfUTF8_IsContinuationByte() which itself is used in the iteration macros
-#include <String/core.h>
----------------------For internal library include make sure to have----------------------------
 */
 #ifndef RF_STRING_CORE_H
 #define RF_STRING_CORE_H

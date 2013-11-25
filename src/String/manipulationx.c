@@ -228,15 +228,9 @@ bool rfStringX_Append_cstr(RF_StringX* thisstr, const char* cstr)
 
 /*--- RF_StringX replacing functions---*/
 
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 bool rfStringX_Replace(RF_StringX* thisstr, const void* sstr,
                        const void* rstr, uint32_t num,
                        const char options)
-#else
-bool i_rfStringX_Replace(RF_StringX* thisstr, const void* sstr,
-                         const void* rstr, uint32_t num,
-                         const char options)
-#endif
 {
     //will keep the number of given instances to find
     uint32_t number = num;
@@ -277,15 +271,9 @@ bool i_rfStringX_Replace(RF_StringX* thisstr, const void* sstr,
     return ret;
 }
 
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 bool rfStringX_ReplaceBetween(RF_StringX* thisstr, const void* left,
                               const void* right, const void* rstr,
                               char options, uint32_t i)
-#else
-bool i_rfStringX_ReplaceBetween(RF_StringX* thisstr, const void* left,
-                                const void* right, const void* rstr,
-                                char options, uint32_t i)
-#endif
 {
     uint32_t j,move,start = thisstr->bIndex;
     bool found = false,ret=false;
@@ -335,7 +323,7 @@ bool i_rfStringX_ReplaceBetween(RF_StringX* thisstr, const void* left,
     for(j = 1; j < i; j++)
     {
         //move after the pair of the 'j' inbetween substrings
-        if(!rfStringX_MoveAfterPair(thisstr, left, right, 0, options))
+        if(!rfStringX_MoveAfterPair(thisstr, left, right, 0, options, 0))
         {
             //and if the occurence does not exist
             move = thisstr->bIndex - start;

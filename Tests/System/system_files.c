@@ -7,7 +7,7 @@
 int main()
 {
     FILE* f;
-    EXPECT(rfInit(), true);
+    DEFAULT_LIB_INIT();
 
     EXPECTNOT(f = fopen("afile.txt", "w"), NULL);
     fputc('!', f);

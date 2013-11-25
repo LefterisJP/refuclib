@@ -14,7 +14,8 @@ int main()
     RF_Hashmap_I m1, m2;
     int i;
     bool exists, found;
-    EXPECT(rfInit(), true);
+    DEFAULT_LIB_INIT();
+
     // test a hashmap with some unicode keys
     EXPECT(true, rfHashmap_I_Init(&m1, 20));
     EXPECT(true, rfHashmap_I_Insert(&m1, RFS_("ενα"), 1, &exists));

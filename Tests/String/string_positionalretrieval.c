@@ -8,9 +8,7 @@ int main()
     RF_String ret,ret2;
     RF_StringX retx1;
     int year;
-
-
-    EXPECT(rfInit(), true);
+    DEFAULT_LIB_INIT();
 
     EXPECT(true,
            rfString_Init(

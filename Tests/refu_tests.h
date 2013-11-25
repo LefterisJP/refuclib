@@ -67,3 +67,8 @@
 
 #define EXPECTGE_MSG(value1_, value2_, message_)      \
         COMPARISON_MSG(value1_, value2_, <, message_)
+
+
+
+#define DEFAULT_LIB_INIT() \
+        EXPECT_TRUE(rfInit(0, 0, LOG_DEBUG))

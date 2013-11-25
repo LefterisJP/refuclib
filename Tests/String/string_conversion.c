@@ -38,7 +38,7 @@ int main()
     int num;
     double dbl;
 
-    EXPECT(rfInit(), true);
+    DEFAULT_LIB_INIT();
 
     //testing to lowercase and to uppercase
     EXPECT(true,rfString_Init(&s1,"ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
