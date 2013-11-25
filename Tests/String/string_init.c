@@ -16,7 +16,7 @@ int main()
     //initialize RF_Strings
     EXPECT_TRUE(rfString_Init(&s1, "This is the test of String initialization"));
     EXPECT_TRUE(
-        rfString_Init(&s2,
+        rfString_Initv(&s2,
                       "%s %d %.3f %u",
                       "Printf style initialization",
                       1337, 3.141592, 912341)

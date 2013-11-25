@@ -128,11 +128,7 @@ i_DECLIMEX_ void rfStringX_Reset(RF_StringX* thisstr);
  ** internal pointer right after the first occuring substring. Optionally and
  ** if the value given at @c result is not 0 the string between the start and
  ** the end of the moving is returned. The parameters accepted can be of any
- ** string type, even temporary strings initialized with the temporary string macro
- ** @rfNoDefArgsWarn1
- ** @warning if the library has been compiled with @c DEFAULT_ARGUMENTS off
- ** then arguments @c options and @c parN are actually pointers  to @c char
- ** and @c unsigned char respectively
+ ** string type, even temporary strings initialized with the RFS_() macro
  ** @lmsFunction
  ** @param thisstr      The extended string to work on
  ** @param result       For details @see rfStringX_MoveAfter()

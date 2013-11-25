@@ -87,17 +87,10 @@ void* RF_THREAD_FUNCTION(void* param)
 }
 
 //Allocates and returns a thread
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 RF_Thread* rfThread_Create(uint32_t flags,
                                void* (*ptr2onExecution)(void*),
                                void* data,
                                uint64_t lmsSize )
-#else
-RF_Thread* i_rfThread_Create(uint32_t flags,
-                                 void* (*ptr2onExecution)(void*),
-                                 void* data,
-                                 uint64_t lmsSize )
-#endif
 {
     RF_Thread* ret;
     RF_MALLOC(ret, sizeof(RF_Thread), NULL);

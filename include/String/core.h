@@ -54,16 +54,13 @@ extern "C"
 
 /**
  ** @memberof RF_String
- ** @opassign
  ** @brief Allocates and returns a string with the given characters
  **
  ** Given characters have to be in UTF-8. A check for valid sequence
  ** of bytes is performed. @notinherited{StringX}
  ** @lmsFunction
- ** @param s The sequence of bytes for the characters in UTF-8 (the default).
- ** Can also follow a printf-like format which will be formatted with
- ** the variables that follow it. A check to see if it is a valid
- ** UTF-8 sequence is performed
+ ** @param s                      The sequence of bytes for the characters
+ **                               in UTF-8 (the default).
  ** @param ... \rfoptional{nothing}  Depending on the string literal,
  ** the function may expect a sequence of additional arguments,
  ** each containing one value to be inserted instead of each %-tag
@@ -73,15 +70,25 @@ extern "C"
  ** @see rfString_Init()
  ** @see rfStringX_Create()
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
-i_DECLIMEX_ RF_String* rfString_Create(const char* s,...);
-#else
-i_DECLIMEX_ RF_String* i_rfString_Create(const char* s,...);
-i_DECLIMEX_ RF_String* i_NVrfString_Create(const char* s);
-#define rfString_Create(...)  RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATE,1,__VA_ARGS__)
-#define i_SELECT_RF_STRING_CREATE1(...) i_NVrfString_Create(__VA_ARGS__)
-#define i_SELECT_RF_STRING_CREATE0(...) i_rfString_Create(__VA_ARGS__)
-#endif
+i_DECLIMEX_ RF_String* rfString_Create(const char* s);
+/**
+ ** @memberof RF_String
+ ** @brief Allocates and returns a string with the given characters (vararg)
+ **
+ ** Given characters have to be in UTF-8. A check for valid sequence
+ ** of bytes is performed. @notinherited{StringX}
+ ** @lmsFunction
+ ** @param s                      The sequence of bytes for the characters
+ **                               in UTF-8 (the default).
+ ** @param ...                    Depending on the string literal, the function
+ **                               may expect additional arguments in a printf-like
+ **                               fashion
+ ** @return                       Returns the initialized RF_string or null in
+ **                               case of failure
+ ** @see rfString_Init()
+ **/
+i_DECLIMEX_ RF_String* rfString_Createv(const char* s, ...);
+
 
 
 
@@ -93,18 +100,19 @@ i_DECLIMEX_ RF_String* i_NVrfString_Create(const char* s);
  ** @notinherited{StringX}
  ** @lmsFunction
  ** @see rfString_Create()
- ** @see rfStringX_Init()
  **
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
-i_DECLIMEX_ bool rfString_Init(RF_String* str,const char* s,...);
-#else
-i_DECLIMEX_ bool i_rfString_Init(RF_String* str,const char* s,...);
-i_DECLIMEX_ bool i_NVrfString_Init(RF_String* str,const char* s);
-#define rfString_Init(...)  RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_INIT,2,__VA_ARGS__)
-#define i_SELECT_RF_STRING_INIT1(...) i_NVrfString_Init(__VA_ARGS__)
-#define i_SELECT_RF_STRING_INIT0(...) i_rfString_Init(__VA_ARGS__)
-#endif
+i_DECLIMEX_ bool rfString_Init(RF_String* str,const char* s);
+/**
+ ** @memberof RF_String
+ ** @brief Initializes a string with the given characters. (varargs)
+ **
+ ** @notinherited{StringX}
+ ** @lmsFunction
+ ** @see rfString_Createv()
+ **
+ **/
+i_DECLIMEX_ bool rfString_Initv(RF_String* str, const char* s, ...);
 
 /**
  ** @memberof RF_String

@@ -49,29 +49,15 @@ extern "C"
 /**
  ** @memberof RF_StringX
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
-i_DECLIMEX_ RF_StringX* rfStringX_Create(const char* lit,...);
-#else
-i_DECLIMEX_ RF_StringX* i_rfStringX_Create(const char* lit,...);
-i_DECLIMEX_ RF_StringX* i_NVrfStringX_Create(const char* lit);
-#define rfStringX_Create(...)  RP_SELECT_FUNC_IF_NARGIS(  \
-        i_SELECT_RF_STRINGX_CREATE,1,__VA_ARGS__)
-#define i_SELECT_RF_STRINGX_CREATE1(...) i_NVrfStringX_Create(__VA_ARGS__)
-#define i_SELECT_RF_STRINGX_CREATE0(...) i_rfStringX_Create(__VA_ARGS__)
-#endif
+i_DECLIMEX_ RF_StringX* rfStringX_Create(const char* lit);
+i_DECLIMEX_ RF_StringX* rfStringX_Createv(const char* lit,...);
 /**
  ** @memberof RF_StringX
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
-i_DECLIMEX_ bool rfStringX_Init(RF_StringX* str,const char* lit,...);
-#else
-i_DECLIMEX_ bool i_rfStringX_Init(RF_StringX* str,const char* lit,...);
-i_DECLIMEX_ bool i_NVrfStringX_Init(RF_StringX* str,const char* lit);
-#define rfStringX_Init(...)  RP_SELECT_FUNC_IF_NARGIS(  \
-        i_SELECT_RF_STRINGX_INIT,2,__VA_ARGS__)
-#define i_SELECT_RF_STRINGX_INIT1(...) i_NVrfStringX_Init(__VA_ARGS__)
-#define i_SELECT_RF_STRINGX_INIT0(...) i_rfStringX_Init(__VA_ARGS__)
-#endif
+i_DECLIMEX_ bool rfStringX_Init(RF_StringX* str,const char* lit);
+i_DECLIMEX_ bool rfStringX_Initv(RF_StringX* str,const char* lit,...);
+
+
 /**
  ** @memberof RF_StringX
  **/
@@ -151,92 +137,46 @@ i_DECLIMEX_ bool rfStringX_Init_UTF32(RF_StringX* str, const uint32_t* s,
  ** of the string are bigger than the buffer Size then an error is logged
  ** but the String is initialized correctly.
  ** @lmsFunction
- ** @param buffSize A positive value of bytes for the size of the buffer to allocate
- ** @param lit The string literal with which to initialize.A check to see
- ** if it is a valid UTF-8 sequence is performed
- ** Can also follow a printf-like format which will be formatted with
- ** the variables that follow it.
- ** @param ... \rfoptional{nothing}  Depending on the string literal,
- ** the function may expect a sequence of additional arguments,
- ** each containing one value to be inserted instead of each %-tag specified
- * in the @c lit parameter, if any. There should be
- ** the same number of these arguments as the number of %-tags that expect a value.
- ** @return The newly initialized string
+ ** @param buffSize               A positive value of bytes for the size of the
+ **                               buffer to allocate
+ ** @param lit                    The string literal with which to initialize.
+ **                               A check to see if it is
+ **                               a valid UTF-8 sequence is performed
+ ** @return                       The newly initialized string
  ** @see rfStringX_Init_buff()
- ** @see rfStringX_Create()
- ** @see rfStringX_Create_cp()
- ** @see rfStringX_Create_i()
- ** @see rfStringX_Create_f()
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ RF_StringX* rfStringX_Create_buff(uint32_t buffSize,
-                                              const char* lit, ...);
-#else
-i_DECLIMEX_ RF_StringX* i_rfStringX_Create_buff(uint32_t buffSize,
-                                                const char* lit,
-                                                ...);
-i_DECLIMEX_ RF_StringX* i_NVrfStringX_Create_buff(uint32_t buffSize,
-                                                  const char* lit);
-#define rfStringX_Create_buff(...)  \
-    RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRINGX_CREATE_BUFF,2,__VA_ARGS__)
-#define i_SELECT_RF_STRINGX_CREATE_BUFF1(...) \
-    i_NVrfStringX_Create_buff(__VA_ARGS__)
-#define i_SELECT_RF_STRINGX_CREATE_BUFF0(...) \
-    i_rfStringX_Create_buff(__VA_ARGS__)
-#endif
+                                              const char* lit);
+
+/**
+ ** @memberof RF_StringX
+ ** @brief Creates an RF_StingX with a specified buffer size (varargs)
+ **/
+i_DECLIMEX_ RF_StringX* rfStringX_Create_buffv(uint32_t buffSize,
+                                              const char* lit,
+                                               ...);
 
 
 /**
  ** @memberof RF_StringX
  ** @brief Initializes an RF_StingX with a specified buffer size
  ** @lmsFunction
- ** @return true for success and false for failure
- ** @see rfStringX_Create_buff()
- ** @see rfStringX_Init()
- ** @see rfStringX_Init_cp()
- ** @see rfStringX_Init_i()
- ** @see rfStringX_Init_f()
+ ** @see rfStringX_Create_buff() for details
  **/
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
 i_DECLIMEX_ bool rfStringX_Init_buff(RF_StringX* str,
                                      uint32_t buffSize,
-                                     const char* lit, ...);
-#else
-i_DECLIMEX_ bool i_rfStringX_Init_buff(RF_StringX* str,
-                                       uint32_t buffSize,
-                                       const char* lit, ...);
-i_DECLIMEX_ bool i_NVrfStringX_Init_buff(RF_StringX* str,
-                                         uint32_t buffSize,
-                                         const char* lit);
-#define rfStringX_Init_buff(...)  \
-    RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRINGX_INIT_BUFF,3,__VA_ARGS__)
-#define i_SELECT_RF_STRINGX_INIT_BUFF1(...) \
-    i_NVrfStringX_Init_buff(__VA_ARGS__)
-#define i_SELECT_RF_STRINGX_INIT_BUFF0(...) \
-    i_rfStringX_Init_buff(__VA_ARGS__)
-#endif
+                                     const char* lit);
+
 /**
  ** @memberof RF_StringX
- ** @brief Initializes an RF_StingX buffer for textfile reading
- **
- ** This is simply a wrapper macro for @ref rfStringX_Init_buff that 
- ** initializes an @ref RF_StringX as a file reading buffer using the
- ** compile time option @c RF_OPTION_FGETS_READ_BYTESN. It is intended
- ** to be used with @ref RF_TextFile reading as can be seen 
- ** in this code snippet:
- ** @snippet IO/textfile1.c READ_LINES
- **
- ** @warning This macro is not available if the library has not been 
- ** compiled with default arguments on since then variadic macros do not
- ** exist. In that case replace it with the full call of
- ** @code rfStringX_Init_buff(&str,RF_OPTION_FGETS_READ_BYTESN+1,"")
- ** @endcode
+ ** @brief Initializes an RF_StingX with a specified buffer size
+ ** @lmsFunction
+ ** @see rfStringX_Init_buffv() for details
  **/
-#ifdef RF_OPTION_DEFAULT_ARGUMENTS
-#define rfStringX_Init_txtbuff(i_STRINGX_, ...) \
-    rfStringX_Init_buff((i_STRINGX_),RF_OPTION_FGETS_READ_BYTESN+1,__VA_ARGS__)
-#endif
-
+i_DECLIMEX_ bool rfStringX_Init_buffv(RF_StringX* str,
+                                     uint32_t buffSize,
+                                     const char* lit,
+                                      ...);
 
 //! @}
 

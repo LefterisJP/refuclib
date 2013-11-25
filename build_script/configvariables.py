@@ -16,7 +16,6 @@ vars_for_compile_time = [
 # These are variables from variables.py which are True/False
 # and will be added to the build as preprocessor defines (or not)
 truevars_for_compile_time = [
-    'DEFAULT_ARGUMENTS',
     'SAFE_MEMORY_ALLOCATION',
     'DEBUG',
     'TEXTFILE_ADD_BOM'

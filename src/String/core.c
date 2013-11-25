@@ -58,11 +58,8 @@
 /*------------- End of includes -------------*/
 
 
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
-RF_String* rfString_Create(const char* s, ...)
-#else
-RF_String* i_rfString_Create(const char* s, ...)
-#endif
+
+RF_String* rfString_Createv(const char* s, ...)
 {
     RF_String* ret;
     va_list args;
@@ -97,26 +94,23 @@ cleanup_lscope:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
-#ifdef RF_OPTION_DEFAULT_ARGUMENTS
-RF_String* i_NVrfString_Create(const char* s)
+
+RF_String* rfString_Create(const char* s)
 {
     RF_String* ret;
     RF_MALLOC(ret, sizeof(RF_String), NULL);
-    if(!i_NVrfString_Init(ret, s))
+    if(!rfString_Init(ret, s))
     {
         free(ret);
         return NULL;
     }
     return ret;
 }
-#endif
 
 
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
-bool rfString_Init(RF_String* str, const char* s, ...)
-#else
-bool i_rfString_Init(RF_String* str, const char* s, ...)
-#endif
+
+
+bool rfString_Initv(RF_String* str, const char* s, ...)
 {
     va_list args;
     unsigned int size, buff_index;
@@ -149,8 +143,7 @@ cleanup_lscope:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
-#ifdef RF_OPTION_DEFAULT_ARGUMENTS
-bool i_NVrfString_Init(RF_String* str, const char* s)
+bool rfString_Init(RF_String* str, const char* s)
 {
     //check for validity of the given sequence and get the character length
     uint32_t byteLength;
@@ -169,7 +162,7 @@ bool i_NVrfString_Init(RF_String* str, const char* s)
 
     return true;
 }
-#endif
+
 
 //Allocates a String by turning a unicode code point in a String (encoded in UTF-8).
 RF_String* rfString_Create_cp(uint32_t codepoint)

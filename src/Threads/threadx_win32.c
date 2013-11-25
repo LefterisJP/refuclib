@@ -88,11 +88,8 @@ static DWORD WINAPI RF_THREADX_FUNCTION(LPVOID  t)
 }
 
 // Allocates and returns a ThreadX
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
-RF_ThreadX* rfThreadX_Create(uint32_t flags,void* (*ptr2onExecution)(RF_ThreadX*),void* data,uint64_t lmsSize,uint32_t maxMsgQueue)
-#else
-RF_ThreadX* i_rfThreadX_Create(uint32_t flags,void* (*ptr2onExecution)(RF_ThreadX*),void* data,uint64_t lmsSize,uint32_t maxMsgQueue)
-#endif
+RF_ThreadX* rfThreadX_Create(uint32_t flags, void* (*ptr2onExecution)(RF_ThreadX*),
+                             void* data,uint64_t lmsSize,uint32_t maxMsgQueue)
 {
     RF_ThreadX* ret;
     RF_MALLOC(ret,sizeof(RF_ThreadX));
@@ -104,11 +101,10 @@ RF_ThreadX* i_rfThreadX_Create(uint32_t flags,void* (*ptr2onExecution)(RF_Thread
     return ret;
 }
 // Initializes a ThreadX
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
-char rfThreadX_Init(RF_ThreadX* t,uint32_t flags,void* (*ptr2onExecution)(RF_ThreadX*),void* data ,uint64_t lmsSize,uint32_t maxMsgQueue)
-#else
-char i_rfThreadX_Init(RF_ThreadX* t,uint32_t flags,void* (*ptr2onExecution)(RF_ThreadX*),void* data ,uint64_t lmsSize,uint32_t maxMsgQueue)
-#endif
+
+bool rfThreadX_Init(RF_ThreadX* t, uint32_t flags,
+                    void* (*ptr2onExecution)(RF_ThreadX*), void* data ,
+                    uint64_t lmsSize,uint32_t maxMsgQueue)
 {
     //get the data and the lms size
     t->INH_Thread.data = data;

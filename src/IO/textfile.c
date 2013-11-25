@@ -1747,7 +1747,7 @@ bool rfTextFile_Insert(RF_TextFile* t,uint64_t lineN,void* string,
     t->previousOp = RF_FILE_READ;
     //now open another temporary file
     ///cleanup2 - is for temporary file Deletion
-    if(!rfString_Init(&tempFileName, RF_STR_PF_FMT"_temp",
+    if(!rfString_Initv(&tempFileName, RF_STR_PF_FMT"_temp",
                       RF_STR_PF_ARG(&t->name)))
     {
         RF_ERROR("Failure at string initialization for the temporary file");
@@ -1976,7 +1976,7 @@ char rfTextFile_Remove(RF_TextFile* t, uint64_t lineN)
     RF_TEXTFILE_CANREAD_JMP(t, ret = false, cleanup1);
     t->previousOp = RF_FILE_READ;
     //now open another temporary file
-    if(!rfString_Init(&tempFileName, RF_STR_PF_FMT"_temp",
+    if(!rfString_Initv(&tempFileName, RF_STR_PF_FMT"_temp",
                       RF_STR_PF_ARG(&t->name)))
     {
         RF_ERROR("Failed to initialize the string for the name of the "
@@ -2197,7 +2197,7 @@ char rfTextFile_Replace(RF_TextFile* t, uint64_t lineN, void* stringP)
     RF_TEXTFILE_CANREAD_JMP(t, ret = false, cleanup1);
     t->previousOp = RF_FILE_READ;
     //now open another temporary file
-    if(!rfString_Init(&tempFileName, RF_STR_PF_FMT"_temp",
+    if(!rfString_Initv(&tempFileName, RF_STR_PF_FMT"_temp",
                       RF_STR_PF_ARG(&t->name)))
     {///cleanup2 - For the removal and deallocation of the temporary file
         RF_ERROR("Failed to initialize a temporary file name");

@@ -486,8 +486,7 @@ i_DECLIMEX_ char rfTextFile_GetOffset(RF_TextFile* t, foff_rft* offset);
  ** for the first line. Do not give 0 here. If 0 is given then error is returned
  ** @param[out] line Here give an @ref RF_StringX that will receive the read
  ** line. The string must <b>already be initialized</b> before being passed to
- ** the function. It is recommended to initialize a string with the
- ** @ref rfStringX_Init_txtbuff() macro
+ ** the function.
  ** @return Returns @c RF_SUCCESS if everything went all right. If there was a
  ** failure it returns a negative number. Can also return @c RE_FILE_EOF if the
  ** line does not exist
@@ -521,8 +520,7 @@ i_DECLIMEX_ int32_t rfTextFile_GetLine_begin(RF_TextFile* t,
  **  Do not give 0 here. If 0 is given then @c RE_INPUT error is returned
  ** @param[out] line Here give an @ref RF_StringX that will receive the read
  ** line. The string must <b>already be initialized</b> before being passed to
- **  the function. It is recommended to initialize a string with @ref
- ** rfStringX_Init_txtbuff() macro
+ **  the function.
  ** @return Returns @c RF_SUCCESS if everything went all right. If there was a
  ** failure it returns a negative number. Can also return @c RE_FILE_EOF if the
  ** line does not exist

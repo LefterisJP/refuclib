@@ -60,11 +60,7 @@
 /* === Init functions === */
 
 /* --- Functions that already exist for RF_String - START --- */
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
-RF_StringX* rfStringX_Create(const char* lit, ...)
-#else
-RF_StringX* i_rfStringX_Create(const char* lit, ...)
-#endif
+RF_StringX* rfStringX_Createv(const char* lit, ...)
 {
     RF_StringX* ret;
     va_list args;
@@ -98,27 +94,20 @@ cleanup_lscope:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
-#ifdef RF_OPTION_DEFAULT_ARGUMENTS
-RF_StringX* i_NVrfStringX_Create(const char* lit)
+
+RF_StringX* rfStringX_Create(const char* lit)
 {
     RF_StringX* ret;
     RF_MALLOC(ret, sizeof(RF_StringX), NULL);
-    if(!i_NVrfStringX_Init(ret, lit))
+    if(!rfStringX_Init(ret, lit))
     {
         free(ret);
         return NULL;
     }
     return ret;
 }
-#endif
 
-
-
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
-bool rfStringX_Init(RF_StringX* str, const char* lit, ...)
-#else
-bool i_rfStringX_Init(RF_StringX* str, const char* lit, ...)
-#endif
+bool rfStringX_Initv(RF_StringX* str, const char* lit, ...)
 {
     bool ret = true;
     va_list args;
@@ -150,8 +139,8 @@ cleanup_lscope:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
-#ifdef RF_OPTION_DEFAULT_ARGUMENTS
-bool i_NVrfStringX_Init(RF_StringX* str, const char* lit)
+
+bool rfStringX_Init(RF_StringX* str, const char* lit)
 {
     //check the string literal for valid utf-8 byte sequence
     uint32_t byteLength;
@@ -164,7 +153,6 @@ bool i_NVrfStringX_Init(RF_StringX* str, const char* lit)
 
     return rfStringX_Init_unsafe_nnt(str, lit, byteLength);
 }
-#endif
 
 RF_StringX* rfStringX_Create_cp(uint32_t codepoint)
 {
@@ -319,11 +307,7 @@ bool rfStringX_Init_unsafe_bnnt(RF_StringX* str, const char* s,
 
 /* --- Functions that already exist for RF_String - END --- */
 
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
-RF_StringX* rfStringX_Create_buff(uint32_t buffSize, const char* lit, ...)
-#else
-RF_StringX* i_rfStringX_Create_buff(uint32_t buffSize, const char* lit, ...)
-#endif
+RF_StringX* rfStringX_Create_buffv(uint32_t buffSize, const char* lit, ...)
 {
     RF_StringX* ret;
     va_list args;
@@ -362,27 +346,21 @@ cleanup_lscope:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
-#ifdef RF_OPTION_DEFAULT_ARGUMENTS
-RF_StringX* i_NVrfStringX_Create_buff(uint32_t buffSize,const char* lit)
+RF_StringX* rfStringX_Create_buff(uint32_t buffSize,const char* lit)
 {
     RF_StringX* ret;
     RF_MALLOC(ret, sizeof(RF_StringX), NULL);
-    if(!i_NVrfStringX_Init_buff(ret, buffSize, lit))
+    if(!rfStringX_Init_buff(ret, buffSize, lit))
     {
         free(ret);
         return NULL;
     }
     return ret;
 }
-#endif
 
-#ifndef RF_OPTION_DEFAULT_ARGUMENTS
-bool rfStringX_Init_buff(RF_StringX* str, uint32_t buffSize,
+
+bool rfStringX_Init_buffv(RF_StringX* str, uint32_t buffSize,
                          const char* lit, ...)
-#else
-bool i_rfStringX_Init_buff(RF_StringX* str, uint32_t buffSize,
-                           const char* lit, ...)
-#endif
 {
     bool ret = true;
     va_list args;
@@ -413,8 +391,8 @@ cleanup_lscope:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
-#ifdef RF_OPTION_DEFAULT_ARGUMENTS
-bool i_NVrfStringX_Init_buff(RF_StringX* str, uint32_t buffSize,
+
+bool rfStringX_Init_buff(RF_StringX* str, uint32_t buffSize,
                              const char* lit)
 {
     //check the string literal for valid utf-8 byte sequence
@@ -432,7 +410,6 @@ bool i_NVrfStringX_Init_buff(RF_StringX* str, uint32_t buffSize,
     }
     return rfStringX_Init_unsafe_bnnt(str, lit, byteLength, buffSize);
 }
-#endif
 
 
 /*---- Methods to copy/assign an RF_StringX ----*/
