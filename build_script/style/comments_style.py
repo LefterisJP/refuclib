@@ -14,7 +14,7 @@ cr = re.compile("(?P<comment_opening>\\/\\*+\n)"
 # matches (and will remove) the rfoptional doxygen tag that is no longer used
 optional_re = re.compile("\\\\rfoptional\\{.*?\\}")
 
-param_re = re.compile("( *\\*+ )(?P<param_name>(@param\\[?.*?\\]? (\w|\\.)+?)|(@return))\s(?P<param_desc>.*?)(?=( *\\*+ @param)|( *\\*+ @return)|( *\\*+ @see)|( *\\*+\\/))", flags=re.DOTALL)
+param_re = re.compile("( *\\*+ )(?P<param_name>(@param\\[?.*?\\]? (\w|\\.)+?)|(@return))\s(?P<param_desc>.*?)(?=( *\\*+ @param)|( *\\*+ @return)|( *\\*+ @see)|( *\\*+\\/)|$)", flags=re.DOTALL)
 
 # should match newline plus the start of next line of comment
 stars_re = re.compile("(((\n)|(\r\n)|(\n\r)|(\r))|^)( *\\*+)(?!\\/)")
@@ -71,10 +71,13 @@ def process_comment(comment):
         comment = comment[m.end():]
         m = param_re.search(comment)
 
-    # the added newline after the last parameter should go away
-    # TODO: find a better way to do this
-    ret = ret[:-1]
+    # add the remaining comment if any or remove the last newline added if not
+    if comment:
+        ret += comment
+    else:
+        ret = ret[:-1]
 
+    # finish up with the outro
     ret += cm_outro
     return ret
 
