@@ -4,6 +4,9 @@ import subprocess
 import argparse
 import sys
 
+
+from comments_style import reformat_file_comments
+
 _dirname = os.path.dirname(os.path.realpath(__file__))
 _diff_exe = "colordiff"
 
@@ -25,10 +28,12 @@ def gen_diff_call(file_name):
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Astyle wrapper script')
-    parser.add_argument('-c', '--check-style', action="store_true",
+    parser.add_argument('-s', '--check-style', action="store_true",
                         help='checks for style violations')
     parser.add_argument('-r', '--reformat-style', action="store_true",
                         help='Reformats style')
+    parser.add_argument('-c', '--check-comments', action="store_true",
+                        help='checks the style of comments above functions')
     parser.add_argument(dest="file_name",
                         help="The name of the file to work on")
     args = parser.parse_args()
@@ -109,7 +114,7 @@ def check_style(file_name):
 
 
 
-def reformat_style(file_name, keep_original=False):
+def reformat_with_astyle(file_name, keep_original=False):
     """Reformats the file using astyle"""
     if not call_astyle(file_name):
         return False
@@ -118,6 +123,11 @@ def reformat_style(file_name, keep_original=False):
         os.remove("{}.orig".format(file_name))
 
 
+
+
+        
+
+    
 
 
 if __name__ == '__main__':
@@ -131,4 +141,6 @@ if __name__ == '__main__':
     if args.reformat_style:
         reformat_style(os.path.abspath(args.file_name))
 
-
+    if args.check_comments:
+        reformat_file_comments(os.path.abspath(args.file_name))
+        
