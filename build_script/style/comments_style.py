@@ -14,7 +14,7 @@ cr = re.compile("(?P<comment_opening>\\/\\*+\n)"
 # matches (and will remove) the rfoptional doxygen tag that is no longer used
 optional_re = re.compile("\\\\rfoptional\\{.*?\\}")
 
-param_re = re.compile("( *\\*+ )(?P<param_name>(@param\\[?.*?\\]? (\w|\\.)+?)|(@return))\s(?P<param_desc>.*?)(?=(\\*\\* @param)|(\\*\\* @return)|(\\*\\* @see)|(\\*+\\/))", flags=re.DOTALL)
+param_re = re.compile("( *\\*+ )(?P<param_name>(@param\\[?.*?\\]? (\w|\\.)+?)|(@return))\s(?P<param_desc>.*?)(?=( *\\*+ @param)|( *\\*+ @return)|( *\\*+ @see)|( *\\*+\\/))", flags=re.DOTALL)
 
 # should match newline plus the start of next line of comment
 stars_re = re.compile("(((\n)|(\r\n)|(\n\r)|(\r))|^)( *\\*+)(?!\\/)")
@@ -74,7 +74,7 @@ def process_comment(comment):
     # the added newline after the last parameter should go away
     # TODO: find a better way to do this
     ret = ret[:-1]
-    
+
     ret += cm_outro
     return ret
 
@@ -97,7 +97,7 @@ def reformat_file_comments(file_name, replace_file=False):
         match = cr.search(s)
 
     formatted_string += s
-    
+
     if not replace_file:
         original_l = original_string.splitlines(True)
         formatted_l = formatted_string.splitlines(True)
@@ -106,15 +106,16 @@ def reformat_file_comments(file_name, replace_file=False):
         return
 
     # else we replace the file
+    print("Reformatting comments for \"{}\"".format(file_name))
     outF = open(file_name, "w")
     outF.write(formatted_string)
     outF.close()
-    
-    
 
 
 
-    
+
+
+
 
 
 

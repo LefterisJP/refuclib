@@ -23,8 +23,8 @@ def gen_diff_call(file_name):
                 "-u",
                 "{}.orig".format(file_name),
                 file_name
-            ]        
-    
+            ]
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Astyle wrapper script')
@@ -33,11 +33,15 @@ def parse_arguments():
     parser.add_argument('-f', '--format-style', action="store_true",
                         help='Reformats style')
     parser.add_argument('-c', '--check-comments', action='store_true',
-                        help='checks the style of comments above functions')
+                        help='checks the style of comments above functions'
+                        ' and provides a diff of how they would be reformatted'
+                        ' if the -C flag was passed')
+    parser.add_argument('-C', '--format-comments', action='store_true',
+                        help='reformats the style of comments above functions')
     parser.add_argument('-r', '--recursive', action='store_true',
                         help='Expects one or more target directories and '
                         'applies actions recursively to all source files under'
-                        'them')    
+                        'them')
     parser.add_argument(dest='targets', nargs='+',
                         help='One or more targets to apply style actions on')
     args = parser.parse_args()
@@ -134,7 +138,7 @@ def reformat_with_astyle(file_name, keep_original=False):
 
 
 
-        
+
 def apply_checks(args, file_name):
     """applies all style actions to a single file"""
     if args.check_style:
@@ -143,9 +147,9 @@ def apply_checks(args, file_name):
     if args.format_style:
         reformat_with_astyle(file_name)
 
-    if args.check_comments:
-        reformat_file_comments(file_name)
-    
+    if args.check_comments or args.format_comments:
+        reformat_file_comments(file_name, args.format_comments)
+
 
 
 if __name__ == '__main__':
@@ -172,4 +176,4 @@ if __name__ == '__main__':
 
         for f in matches:
             apply_checks(args, f)
-        
+
