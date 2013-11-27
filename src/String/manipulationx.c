@@ -43,8 +43,6 @@
     #include <Definitions/inline.h> //for the inline declaration
     #include <Definitions/retcodes.h> //for return codes and true/false definition
     #include "../Numeric/Integer/rf_int.ph" //for the integer int and uint conversions
-//for the float conversions
-    #include "../Numeric/Float/rf_float.ph" //for doubleToStr()
 //for error logging macros
     #include <Utils/log.h>
 //for memory allocation macros
