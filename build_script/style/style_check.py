@@ -3,7 +3,7 @@ import os
 import subprocess
 import argparse
 import sys
-
+import fnmatch
 
 from comments_style import reformat_file_comments
 
@@ -30,12 +30,16 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='Astyle wrapper script')
     parser.add_argument('-s', '--check-style', action="store_true",
                         help='checks for style violations')
-    parser.add_argument('-r', '--reformat-style', action="store_true",
+    parser.add_argument('-f', '--format-style', action="store_true",
                         help='Reformats style')
-    parser.add_argument('-c', '--check-comments', action="store_true",
+    parser.add_argument('-c', '--check-comments', action='store_true',
                         help='checks the style of comments above functions')
-    parser.add_argument(dest="file_name",
-                        help="The name of the file to work on")
+    parser.add_argument('-r', '--recursive', action='store_true',
+                        help='Expects one or more target directories and '
+                        'applies actions recursively to all source files under'
+                        'them')    
+    parser.add_argument(dest='targets', nargs='+',
+                        help='One or more targets to apply style actions on')
     args = parser.parse_args()
     return args
 
@@ -116,17 +120,31 @@ def check_style(file_name):
 
 def reformat_with_astyle(file_name, keep_original=False):
     """Reformats the file using astyle"""
+    print("Reformatting style of \"{}\"".format(file_name))
+
     if not call_astyle(file_name):
         return False
 
     if not keep_original:
-        os.remove("{}.orig".format(file_name))
+        try:
+            os.remove("{}.orig".format(file_name))
+        except: # file does not get created if there was nothing to reformat
+            pass
 
 
 
 
         
+def apply_checks(args, file_name):
+    """applies all style actions to a single file"""
+    if args.check_style:
+        check_style()
 
+    if args.format_style:
+        reformat_with_astyle(file_name)
+
+    if args.check_comments:
+        reformat_file_comments(file_name)
     
 
 
@@ -135,12 +153,23 @@ if __name__ == '__main__':
         sys.exit(1)
 
     args = parse_arguments()
-    if args.check_style:
-        check_style(os.path.abspath(args.file_name))
 
-    if args.reformat_style:
-        reformat_style(os.path.abspath(args.file_name))
+    if not args.recursive:
+        for target in args.targets:
+            apply_checks(args, os.path.abspath(target))
+    else:
+        matches = []
+        for target in args.targets:
+            target = os.path.abspath(target)
+            if not os.path.isdir(target):
+                print("Provided target \"{}\" is not a directory."
+                      " Skipping".format(target))
+                continue
+            for root, dirnames, filenames in os.walk(target):
+                for filename in filenames:
+                    if filename.endswith(('.c', '.h', '.ph')):
+                        matches.append(os.path.join(root, filename))
 
-    if args.check_comments:
-        reformat_file_comments(os.path.abspath(args.file_name))
+        for f in matches:
+            apply_checks(args, f)
         
