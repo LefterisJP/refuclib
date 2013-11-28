@@ -34,7 +34,6 @@
 #include "System/info.ph" /* detecting endianess */
 #include <Utils/localmem.h> /* local memory stack */
 #include <Utils/log.h> /* logging system */
-#include <Threads/common.h> /* threads initialization */
 #include "Internal/internal_mod.ph" /* internal data initialization */
 /*------------- Modules init/deinit -------------*/
 #include "String/mod.ph"
@@ -103,12 +102,6 @@ bool rfInit(char *logstr, uint64_t lmsSize, log_level_t level)
         return false;
     }
 
-    //initialize the threading system
-    if (!rfThreads_Init()) {
-        return false;
-    }
-
-    //finish
     return true;
 }
 

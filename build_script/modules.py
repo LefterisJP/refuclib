@@ -276,23 +276,6 @@ modules.append(
            macro			= "RF_MODULE_TIME_DATE")
 )
 
-modules.append(
-    Module("XML",
-           #['Data_Formats/xml.c', 'Data_Formats/xmltag.c', 'Data_Formats/commonp.c'],
-           macro			= "RF_MODULE_DF_XML",
-           dependencies	= ['TEXTFILE', 'String', 'List'])
-)
-
-modules.append(
-    Module("THREADS",
-           win32_sources = ['Threads/thread_win32.c',
-                            'Threads/mutex_win32.c',
-                            'Threads/semaphore_win32.c'],
-           linux_sources = ['Threads/thread_linux.c',
-                            'Threads/mutex_linux.c',
-                            'Threads/semaphore_linux.c'],
-           macro = "RF_MODULE_THREAD")
-)
 
 modules.append(
     Module("SYSTEM",

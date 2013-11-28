@@ -34,8 +34,6 @@
     #include <String/core.h>
 //for string accessors
     #include <String/retrieval.h>
-//for getting thread id
-    #include <Threads/common.h>
 /*------------- libc inclusion -------------*/
 #include <stdio.h> //for printf
 #include <string.h> //for memcpy
@@ -43,6 +41,13 @@
 #include <sys/time.h> //for timestamps
 #include <time.h> //for strftime()
 /*------------- End of includes -------------*/
+
+
+/* temporary just to compile. Move and implement separately */
+int rf_thread_get_id()
+{
+    return 0;
+}
 
 typedef struct error_context
 {
@@ -156,7 +161,7 @@ static bool format_log_message(log_level_t level,
 
     /* Thread ID */
     CHECK_BUFFER(100);
-    ret = snprintf(BPOS, 100, "(Thread %d)", rfThread_GetID());
+    ret = snprintf(BPOS, 100, "(Thread %d)", rf_thread_get_id());
     if(ret < 0 || ret >= 100) {return false;}
     _ctx.index += ret;
 
