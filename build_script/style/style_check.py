@@ -5,7 +5,7 @@ import argparse
 import sys
 import fnmatch
 
-from comments_style import reformat_file_comments
+from comments_style import CommentFormatter
 
 _dirname = os.path.dirname(os.path.realpath(__file__))
 _diff_exe = "colordiff"
@@ -42,6 +42,11 @@ def parse_arguments():
                         help='Expects one or more target directories and '
                         'applies actions recursively to all source files under'
                         'them')
+
+    parser.add_argument('--comment-column-padding', type=int,
+                        default=34, help='The number of spaces to put as '
+                        'padding right of parameters when reformatting '
+                        'the comments')
     parser.add_argument(dest='targets', nargs='+',
                         help='One or more targets to apply style actions on')
     args = parser.parse_args()
@@ -139,7 +144,7 @@ def reformat_with_astyle(file_name, keep_original=False):
 
 
 
-def apply_checks(args, file_name):
+def apply_checks(args, file_name, comments):
     """applies all style actions to a single file"""
     if args.check_style:
         check_style()
@@ -148,7 +153,7 @@ def apply_checks(args, file_name):
         reformat_with_astyle(file_name)
 
     if args.check_comments or args.format_comments:
-        reformat_file_comments(file_name, args.format_comments)
+        comments.reformat_file_comments(file_name, args.format_comments)
 
 
 
@@ -157,10 +162,10 @@ if __name__ == '__main__':
         sys.exit(1)
 
     args = parse_arguments()
-
+    comments = CommentFormatter(args.comment_column_padding)
     if not args.recursive:
         for target in args.targets:
-            apply_checks(args, os.path.abspath(target))
+            apply_checks(args, os.path.abspath(target), comments)
     else:
         matches = []
         for target in args.targets:
@@ -175,5 +180,5 @@ if __name__ == '__main__':
                         matches.append(os.path.join(root, filename))
 
         for f in matches:
-            apply_checks(args, f)
+            apply_checks(args, f, comments)
 
