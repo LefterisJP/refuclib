@@ -43,9 +43,6 @@
     #include <Utils/log.h>
 //for UTF8 macro
    #include <String/unicode.h> //for rfUTF8_VerifyCstr()
-//for the ioBuffer
-    #include <Definitions/threadspecific.h> // for the thread specific keyword used in the ioBuffer
-    #include "../IO/buff.ph" //for the ioBuffer StringX
 //for local scope macros
     #include <string.h> //for size_t and memset() used in the Local scope macros
     #include <Utils/localmem_decl.h> //for local memory stack

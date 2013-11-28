@@ -43,8 +43,6 @@
     #include <Utils/log.h>
 //for error codes
     #include <Definitions/retcodes.h> 
-//for the ioBuffer
-    #include "../IO/buff.ph"
 //for RF_HEXLE_UI() macro and others
     #include <Utils/constcmp.h> 
 //for the local scope macros

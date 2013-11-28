@@ -28,14 +28,11 @@
 #include <Threads/mutex.h>
 #include <Threads/common.h> //for rfThread_GetID()
 /*------------- Outside Module inclusion -------------*/
-//for io buffer initialization
-    #include "../IO/buff.ph"//stdio buffer thread-specific initialization
 //for error logging
     #include <Utils/log.h>
 //for memory allocation macros
     #include <Utils/memory.h> //for refu memory allocation
 //for local scope macros
-    #include <Utils/localmem_decl.h>
     #include <Utils/localmem.h>
 //for RF_BITFLAG_ON
     #include <Utils/bits.h>
@@ -77,8 +74,7 @@ static void* RF_THREADX_FUNCTION(void* param)
     }
     //save the address of this thread as id
     i_thread_id = (uintptr_t)&t;
-    //initialize the stdio for this thread
-    rfInitStdio();
+
     //run the thread function
     ret = thread->INH_Thread.ptr2onExecution(thread);
     //free the local memory stack and return

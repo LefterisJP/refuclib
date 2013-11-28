@@ -44,9 +44,6 @@
     #include <Definitions/retcodes.h>
 //for error logging
     #include <Utils/log.h>
-//for the io buffer
-    #include <Definitions/threadspecific.h>
-    #include "../IO/buff.ph" //for the ioBuffer StringX
 //for the local scope macros
     #include <Utils/localscope.h>//for local scope macros
 //for memory allocation macros

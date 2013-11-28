@@ -184,7 +184,7 @@ modules.append(
 
 modules.append(
     Module("IO",
-           ['IO/buffer.c', 'IO/file.c'],
+           ['IO/file.c'],
            macro = "RF_MODULE_IO",
            win32_sources = ['IO/io_win32.c'],
            linux_sources = ['IO/io_linux.c'])

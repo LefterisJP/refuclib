@@ -35,13 +35,9 @@
 // for return codes
     #include <Definitions/retcodes.h> 
 // for initializing the io buffer for this thread
-    #include <Definitions/threadspecific.h> // for the thread specific keyword used in the ioBuffer
-    #include <String/string_decl.h> //for RF_String (ioBuffer type)
-    #include <String/stringx_decl.h> //for RF_StringX (ioBuffer type)
-    #include "../IO/buff.ph"//stdio buffer thread-specific initialization
+
 //for local memory initialization
-    #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
-    #include <Utils/localmem.h> //for LMS_Initialization
+    #include <Utils/localmem.h>
 //for getting the id of a thread via system call
 #include <System/rf_system.h> 
 /*------------- End of includes -------------*/
@@ -77,8 +73,6 @@ void* RF_THREAD_FUNCTION(void* param)
     }
     i_thread_id = rfSystem_GetThreadID();
 
-    //initialize the stdio for this thread
-    rfInitStdio();
     //run the function
     ret = t->ptr2onExecution(t->data);
     //free the Local memory stack and return

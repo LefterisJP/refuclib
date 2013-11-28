@@ -34,11 +34,6 @@
 #include "System/info.ph" /* detecting endianess */
 #include <Utils/localmem.h> /* local memory stack */
 #include <Utils/log.h> /* logging system */
-/* for ioBuffer initialization */
-#include <String/string_decl.h> //for RF_String (ioBuffer type)
-#include <String/stringx_decl.h> //for RF_StringX (ioBuffer type)
-#include "IO/buff.ph"//for rfInitStdio()
-
 #include <Threads/common.h> /* threads initialization */
 #include "Internal/internal_mod.ph" /* internal data initialization */
 /*------------- Modules init/deinit -------------*/
@@ -54,9 +49,6 @@
 //Initializes the Refu library
 bool rfInit(char *logstr, uint64_t lmsSize, log_level_t level)
 {
-
-    //initialize the refu stdio
-    rfInitStdio();
     rfLog_Init(level);
     module_string_init();
     module_internal_init();
