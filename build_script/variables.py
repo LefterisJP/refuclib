@@ -90,7 +90,7 @@ vars.Add(
                      'HASHMAP',
                      'TIME', 'DATE',
                      'XML',
-                     'THREADS', 'THREADS_SIMPLE', 'THREADS_X',
+                     'PARALLEL',
                      'SYSTEM']
              ))
 
@@ -169,6 +169,13 @@ vars.Add('LOCALSTACK_MEMORY_SIZE',
          'to provide a big enough value so that no overflow happens for your'
          ' program. The default value is used if '
          'no specific value is provided at rfInit()', 1048576)
+
+vars.Add('MAX_WORKER_THREADS',
+         'The maximum number of worker threads we can have', 32)
+
+vars.Add('WORKER_SLEEP_MICROSECONDS',
+         'The amount of time in microseconds for worker threads to sleep while '
+         'waiting for jobs to appears on their queues', 1000)
 
 vars.Add(
     BoolVariable('TEXTFILE_ADD_BOM', 'This control whether to add a '

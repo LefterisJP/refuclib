@@ -11,6 +11,8 @@ vars_for_compile_time = [
     'HASHMAP_LOAD_FACTOR',
     'LOG_LEVEL_DEFAULT',
     'LOG_BUFFER_SIZE',
+    'WORKER_SLEEP_MICROSECONDS',
+    'MAX_WORKER_THREADS'
 ]
 
 # These are variables from variables.py which are True/False

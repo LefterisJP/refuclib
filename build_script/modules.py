@@ -183,6 +183,17 @@ modules.append(
 )
 
 modules.append(
+    Module("Parallel",
+           [],
+           win32_sources = [''],
+           linux_sources = ['Parallel/worker_pool_linux.c',
+                            'Parallel/threading_linux.c'],
+           macro = "RF_MODULE_PARALLEL",
+           dependencies = ["INTRUSIVE_LIST"]
+       )
+)
+
+modules.append(
     Module("IO",
            ['IO/file.c'],
            macro = "RF_MODULE_IO",

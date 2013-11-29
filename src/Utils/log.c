@@ -27,13 +27,15 @@
 #include <Utils/log.h>
 /*------------- Outside Module inclusion -------------*/
 //for bool
-   #include <Definitions/retcodes.h>
+#include <Definitions/retcodes.h>
 //for the local scope macros
-    #include <Utils/localscope.h>
+#include <Utils/localscope.h>
 //for static RF_String init
-    #include <String/core.h>
+#include <String/core.h>
 //for string accessors
-    #include <String/retrieval.h>
+#include <String/retrieval.h>
+//for thread id
+#include <Parallel/threading.h>
 /*------------- libc inclusion -------------*/
 #include <stdio.h> //for printf
 #include <string.h> //for memcpy
@@ -42,12 +44,6 @@
 #include <time.h> //for strftime()
 /*------------- End of includes -------------*/
 
-
-/* temporary just to compile. Move and implement separately */
-int rf_thread_get_id()
-{
-    return 0;
-}
 
 typedef struct error_context
 {
@@ -161,7 +157,7 @@ static bool format_log_message(log_level_t level,
 
     /* Thread ID */
     CHECK_BUFFER(100);
-    ret = snprintf(BPOS, 100, "(Thread %d)", rf_thread_get_id());
+    ret = snprintf(BPOS, 100, "(Thread %d)", rf_ThreadGetId());
     if(ret < 0 || ret >= 100) {return false;}
     _ctx.index += ret;
 
