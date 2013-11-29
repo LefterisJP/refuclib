@@ -38,7 +38,7 @@ compilers['gcc'] = Compiler(
               'Linux': []},
     cflags={'all': {}, 'Windows': {}, 'Linux': {'_GNU_SOURCE': None}},
     lflags={'all': [], 'Windows': [], 'Linux': []},
-    libs={'all': [], 'Windows': [], 'Linux': ['rt', 'pthread']},
+    libs={'all': [], 'Windows': [], 'Linux': ['rt', 'pthread', 'm']},
     toolsValues={'Windows': ['mingw'], 'Linux': ['gcc']},
     debug_flags={'all': ["-g"], 'Windows': [], 'Linux': []}
 )

@@ -87,7 +87,7 @@
  **  Returns true if float a == float b
  **
  **/
-#define DBLCMP_EQ(a__,b__)   fabs(a__-b__)<DBL_EPSILON
+#define DBLCMP_EQ(a__,b__)   fabs((a__) -(b__)) < DBL_EPSILON
 
 
 /* --------------------------------------------- Safe Hex Literal comparisons ------------------------------------------------------- */

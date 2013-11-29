@@ -39,14 +39,13 @@ struct WorkerPool;
 typedef struct WorkerPool RF_WorkerPool;
 
 
-i_DECLIMEX_ bool rfWorkerPool_Init(RF_WorkerPool *p, int initial_workers_num);
+i_DECLIMEX_ RF_WorkerPool *rfWorkerPool_Create(int initial_workers_num);
 
-i_DECLIMEX_ void rfWorkerPool_Deinit(RF_WorkerPool *p);
+i_DECLIMEX_ void rfWorkerPool_Destroy(RF_WorkerPool *p);
 
 i_DECLIMEX_ bool rfWorkerPool_AddTask(RF_WorkerPool *p,
                                       ptr2task task_ptr,
                                       void* data);
-
 
 
 #endif

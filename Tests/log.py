@@ -37,7 +37,8 @@ def  check_library_log(log_file, root, test_name):
        a Test Error
     """
     refu_error_logf = os.path.join(root, "refuclib.log")
-    if(os.path.getsize(refu_error_logf) > 0):
+    if(os.path.isfile(refu_error_logf) and 
+       os.path.getsize(refu_error_logf) > 0):
         report(log_file, "--Start of Library Log--")
         l = open(refu_error_logf)
         for line in l:

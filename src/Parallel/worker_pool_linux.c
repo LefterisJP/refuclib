@@ -94,12 +94,10 @@ static void *WorkerLoop(void *t)
 static bool rfWorkerThread_Init(RF_WorkerThread *thread)
 {
     pthread_attr_t attributes;
-    int ret;
 
     pthread_attr_init(&attributes);
     pthread_attr_setdetachstate(&attributes, PTHREAD_CREATE_JOINABLE);
-    ret = pthread_create(&thread->t, &attributes, WorkerLoop, thread);
-    if (!ret) {
+    if (pthread_create(&thread->t, &attributes, WorkerLoop, thread) != 0) {
         RF_ERROR("pthread create failed with %d", errno);
         pthread_attr_destroy(&attributes);
         return false;
@@ -130,9 +128,9 @@ typedef struct WorkerPool {
     //! The list of workers
     RF_ILHead workers_list;
     //! The number of worker thread
-    unsigned int workers_num;
+    int workers_num;
     //! The load of each worker in tasks (always incrementing)
-    unsigned int load[RF_OPTION_MAX_WORKER_THREADS];
+    int load[RF_OPTION_MAX_WORKER_THREADS];
 } RF_WorkerPool;
 
 /**
@@ -140,7 +138,7 @@ typedef struct WorkerPool {
  **/
 static int rfWorkerPool_DecideWorker(RF_WorkerPool *p)
 {
-    unsigned int i;
+    int i;
     int max_index, max_load;
     max_index = max_load = -1;
     for (i = 0; i < p->workers_num; i++) {
@@ -155,7 +153,7 @@ static int rfWorkerPool_DecideWorker(RF_WorkerPool *p)
 bool rfWorkerPool_Init(RF_WorkerPool *p, int initial_workers_num)
 {
     RF_WorkerThread *worker;
-    unsigned i;
+    int i;
 
     if (initial_workers_num > RF_OPTION_MAX_WORKER_THREADS) {
         RF_ERROR("Provided \"%d\" initial worker number exceeds the "
@@ -164,7 +162,10 @@ bool rfWorkerPool_Init(RF_WorkerPool *p, int initial_workers_num)
     }
 
     p->workers_num = initial_workers_num;
-    memset(p->load, 0, sizeof(unsigned int) * RF_OPTION_MAX_WORKER_THREADS);
+    /* memset(p->load, 0, sizeof(p->load) - 1); */
+    for (i = 0; i < RF_OPTION_MAX_WORKER_THREADS; i ++) {
+        p->load[i] = 0;
+    }
 
     rfIList_HeadInit(&p->workers_list);
     for (i = 0; i < initial_workers_num; i ++) {
@@ -179,7 +180,19 @@ bool rfWorkerPool_Init(RF_WorkerPool *p, int initial_workers_num)
     return true;
 }
 
-void rfWorkerPool_Deinit(RF_WorkerPool *p)
+RF_WorkerPool *rfWorkerPool_Create(int initial_workers_num)
+{
+    RF_WorkerPool *ret;
+    RF_MALLOC(ret, sizeof(*ret), NULL);
+    
+    if (!rfWorkerPool_Init(ret, initial_workers_num)) {
+        free(ret);
+        return NULL;
+    }
+    return ret;
+}
+
+void rfWorkerPool_Destroy(RF_WorkerPool *p)
 {
     RF_WorkerThread *worker;
     RF_WorkerThread *tmp;
@@ -198,7 +211,9 @@ void rfWorkerPool_Deinit(RF_WorkerPool *p)
     rfIList_ForEach_safe(&p->workers_list, worker, tmp, ln) {
         free(worker);
     }
+    free(p);
 }
+
 
 i_DECLIMEX_ bool rfWorkerPool_AddTask(RF_WorkerPool *p,
                                       ptr2task task_ptr,
@@ -221,6 +236,7 @@ i_DECLIMEX_ bool rfWorkerPool_AddTask(RF_WorkerPool *p,
             p->load[worker_index] ++;
             return true;
         }
+        i++;
     }
 
     RF_ERROR("Could not assign task to worker. Should never happen");

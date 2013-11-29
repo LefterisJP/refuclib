@@ -144,6 +144,7 @@ class Test:
                              cwd=self.root, stdout=subprocess.PIPE)
 
         expected_stdout_lineN = 1
+        expected_stdout = None
         line = None
         for line in p.stdout:
             #read each line
@@ -156,21 +157,21 @@ class Test:
             #if not then let's check the expected stdout line if we got one
             if expected_output:
                 expected_stdout = f.readline()
-                if line != expected_stdout:
-                    # if it's an EXPECT() macro error, report it
-                    if "*ERROR*:" in line:
-                        report(logFile, "FAILED!\n\t {}".format(line))
-                        if fail_fast:
-                            raise TestError(self.name, expected_stdout_lineN)
-                    # else it's an expected std output error
-                    else:
-                        report(logFile, "\n\t\tTest failed at expected "
-                               "output line \"[{}]\"\n".format(
-                                   str(expected_stdout_lineN)))
-                        report(logFile, "\n\t\tExpected:\n\t\t\t{}\n\t\t"
-                               "Found:\n\t\t\t{}\n".format(
-                                   str(expected_stdout), str(line)))
-                    raise TestError(self.name, expected_stdout_lineN)
+            if not expected_output or line != expected_stdout:
+                # if it's an EXPECT() macro error, report it
+                if "*ERROR*:" in line:
+                    report(logFile, "FAILED!\n\t {}".format(line))
+                    if fail_fast:
+                        raise TestError(self.name, expected_stdout_lineN)
+                # else it's an expected std output error
+                else:
+                    report(logFile, "\n\t\tTest failed at expected "
+                           "output line \"[{}]\"\n".format(
+                               str(expected_stdout_lineN)))
+                    report(logFile, "\n\t\tExpected:\n\t\t\t{}\n\t\t"
+                           "Found:\n\t\t\t{}\n".format(
+                               str(expected_stdout), str(line)))
+                raise TestError(self.name, expected_stdout_lineN)
                 expected_stdout_lineN += 1
         #wait till the test subprocess ends
         ret = p.poll()
@@ -308,5 +309,9 @@ tests_list = [
 
     Test("textfile_write",
          [os.path.join("TextFile", "textfile_write.c")],
-         "TextFile")
+         "TextFile"),
+
+    Test("worker_pool",
+         [os.path.join("Parallel", "test_worker_pool.c")],
+         "Parallel")
 ]

@@ -2,7 +2,7 @@
 ** Just a simple header file to conveniently define anything that
 ** would be commonly needed in all tests
 **/
-
+#include <stdio.h>
 
 // prevent stdout buffering for test reports.
 // Must-have when debugging a test that crushes
