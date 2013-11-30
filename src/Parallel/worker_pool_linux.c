@@ -215,7 +215,7 @@ void rfWorkerPool_Destroy(RF_WorkerPool *p)
 }
 
 
-i_DECLIMEX_ bool rfWorkerPool_AddTask(RF_WorkerPool *p,
+bool rfWorkerPool_AddTask(RF_WorkerPool *p,
                                       ptr2task task_ptr,
                                       void* data)
 {

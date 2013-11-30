@@ -60,10 +60,10 @@ extern "C" {
  **                         If 0 then the compile time constant
  **                         RF_OPTION_LOCALSTACK_MEMORY_SIZE is used.
  ** @param level            The level of the logging system. Possible values
- **                         are enumerated by @ref log_level_t
+ **                         are enumerated by @ref RF_LogLevel
  ** @return                 Returns @c true in success
  **/
-i_DECLIMEX_  bool rfInit(char *logstr, uint64_t size, log_level_t level);
+i_DECLIMEX_  bool rfInit(char *logstr, uint64_t size, RF_LogLevel level);
 
 //! @}
 //closing RF_GeneralGRP doxygen group

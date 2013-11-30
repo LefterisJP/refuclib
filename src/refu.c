@@ -46,9 +46,9 @@
 /*------------- End of includes -------------*/
 
 //Initializes the Refu library
-bool rfInit(char *logstr, uint64_t lmsSize, log_level_t level)
+bool rfInit(char *logstr, uint64_t lmsSize, RF_LogLevel level)
 {
-    rfLog_Init(level);
+    rf_LogModule_Init(level, logstr);
     module_string_init();
     module_internal_init();
 
