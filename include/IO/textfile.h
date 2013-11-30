@@ -38,6 +38,7 @@
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <IO/common.h> //for common I/O flags and definitions
 #include <Definitions/retcodes.h> //for bool
+#include <String/unicode.h> //for unicode definitions
 #ifdef __cplusplus
 extern "C"
 {///opening bracket for calling from C++

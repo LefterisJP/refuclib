@@ -313,7 +313,7 @@ tests_list = [
 
     Test("worker_pool",
          [os.path.join("Parallel", "test_worker_pool.c")],
-         "Parallel")
+         "Parallel"),
 
     Test("test_log_simple",
          [os.path.join("Log", "test_log_simple.c")],

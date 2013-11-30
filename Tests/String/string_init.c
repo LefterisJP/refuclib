@@ -28,7 +28,7 @@ int main()
     EXPECT_TRUE(rfStringX_Init(&sx4,"Initializing a StringX"));
     EXPECT_TRUE(rfStringX_Init_f(&sx5, 3.141592));
     EXPECT_TRUE(rfStringX_Init_i(&sx6, 4096));
-    EXPECTNOT(0, sx9=rfStringX_Create_cp(0x2708));
+    EXPECT_NOT(0, sx9=rfStringX_Create_cp(0x2708));
 
     //simply print the strings to see if they initialized correctly
     EXPECTGE(printf(RF_STR_PF_FMT"\n", RF_STR_PF_ARG(&s1)), 0);
@@ -39,8 +39,8 @@ int main()
     EXPECTGE(printf(RF_STR_PF_FMT"\n", RF_STR_PF_ARG(&sx5)), 0);
     EXPECTGE(printf(RF_STR_PF_FMT"\n", RF_STR_PF_ARG(&sx6)), 0);
     //testing conversions from String to StringX (this atm can never be zero but since it's a test anyway ...)
-    EXPECTNOT(0,sx1 = rfStringX_FromString_OUT(&s1));
-    EXPECTNOT(0,
+    EXPECT_NOT(0,sx1 = rfStringX_FromString_OUT(&s1));
+    EXPECT_NOT(0,
               sx2 = rfStringX_Create_buff(4096,"This is a StringX initialiation with a buffer"));
     EXPECT(rfStringX_FromString_IN(&sx3,&s2), true);
     //simply print the stringXs to see if the conversion happened correctly
@@ -73,7 +73,7 @@ int main()
 	
     //checking if the initialization of a string from trans-BMP utf-16 works (G-clef music symbol)+東
     EXPECT_TRUE(rfString_Init_UTF16(&s7, utf16Buffer, utf16b_len));
-    EXPECTNOT(0, sp1 = rfString_Create_cp(0x1D11E));
+    EXPECT_NOT(0, sp1 = rfString_Create_cp(0x1D11E));
     EXPECT_TRUE(
         rfString_Equal(&s7, RFS_(RF_STR_PF_FMT"東", RF_STR_PF_ARG(sp1)))
     );

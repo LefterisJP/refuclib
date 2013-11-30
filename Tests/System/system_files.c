@@ -9,7 +9,7 @@ int main()
     FILE* f;
     DEFAULT_LIB_INIT();
 
-    EXPECTNOT(f = fopen("afile.txt", "w"), NULL);
+    EXPECT_NOT(f = fopen("afile.txt", "w"), NULL);
     fputc('!', f);
     fclose(f);
 

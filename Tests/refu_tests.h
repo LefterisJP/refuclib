@@ -53,7 +53,7 @@
 #define EXPECT_MSG(value1_, value2_, message_)          \
         COMPARISON_MSG(value1_, value2_, !=, message_)
 
-#define EXPECTNOT(value1_, value2_)             \
+#define EXPECT_NOT(value1_, value2_)             \
     COMPARISON(value1_, value2_, ==)		
 
 #define EXPECT_TRUE(value_)                     \
@@ -70,5 +70,8 @@
 
 
 
-#define DEFAULT_LIB_INIT() \
-        EXPECT_TRUE(rfInit(0, 0, LOG_DEBUG))
+#define DEFAULT_LIB_INIT()                                    \
+        EXPECT_TRUE(rfInit("refulib.log",                     \
+                           RF_OPTION_LOCALSTACK_MEMORY_SIZE,  \
+                           LOG_DEBUG)                         \
+        )

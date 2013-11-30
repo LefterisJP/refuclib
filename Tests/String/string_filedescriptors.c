@@ -13,7 +13,7 @@ static void test_file_encoding(const char* filename, int encoding,
     char eof;
 
     //things like BOM in the start of the file
-    EXPECTNOT(0, inF=fopen(filename, "rb"));
+    EXPECT_NOT(0, inF=fopen(filename, "rb"));
     //expect to see succesfull initialization
     EXPECTGE(rfString_FInit(&s1, inF, &eof, RF_EOL_LF,
                             encoding, endianess, NULL),
@@ -37,7 +37,7 @@ static void test_file_encoding(const char* filename, int encoding,
 	//remove the appended newlines since we want to read it one-off from the other file
     EXPECT(true, rfString_Remove(&s1,RFS_("\n"),0,0));
   //open an output file and write the string there
-    EXPECTNOT(0, f = fopen("outputfile","w+b"));
+    EXPECT_NOT(0, f = fopen("outputfile","w+b"));
     EXPECT(true,rfString_Fwrite(&s1, f, encoding, endianess));
     EXPECT(0,fseek(f,0,SEEK_SET));
 
@@ -70,7 +70,7 @@ static void test_file_encoding(const char* filename, int encoding,
 	  //remove the appended newlines since we want to read it one-off from the other file
     EXPECT(true,rfString_Remove(&sx1, RFS_("\n"), 0, 0));
     //open an output file and write the string there
-    EXPECTNOT(0,(f = fopen("outputfile","w+b")));
+    EXPECT_NOT(0,(f = fopen("outputfile","w+b")));
     EXPECT(true,rfString_Fwrite(&sx1, f, encoding, endianess));
     EXPECT(0, fseek(f,0,SEEK_SET));
 

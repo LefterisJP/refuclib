@@ -574,7 +574,8 @@ static char determine_endianess(RF_TextFile* t, int encoding,
         case RF_UTF8:
             if(!check_BOM_UTF8(t, endianess))
             {
-                return false;
+                //no BOM, just take the system's endianess
+                t->endianess = rfEndianess();
             }
         break;
         default:
@@ -999,7 +1000,7 @@ int rfTextFile_ReadLine(RF_TextFile* t, RF_StringX* line)
                  "Reading line [%llu] of a text file failed", t->line);
         if(rfFseek(t->f,startOff,SEEK_SET) != 0)
         {
-            RF_ERROR("After a failed readline operation rewindind "
+            RF_ERROR("After a failed readline operation rewinding "
                      "the file pointer to its value before the function"
                      "'s execution failed due to fseek() errno %d",
                      errno);
@@ -1010,7 +1011,8 @@ int rfTextFile_ReadLine(RF_TextFile* t, RF_StringX* line)
     t->line++;
     t->eof = eof;
     //also if the end of line was found make sure it's not included in the returned string
-    if(rfString_Data(line)[rfString_ByteLength(line) - 1] == '\n')
+    if(rfString_ByteLength(line) > 0 && 
+       rfString_Data(line)[rfString_ByteLength(line) - 1] == '\n')
     {
         rfString_ByteLength(line)--;
     }

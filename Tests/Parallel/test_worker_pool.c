@@ -50,7 +50,7 @@ int main()
 
     srand((unsigned int)time(NULL));
     pool = rfWorkerPool_Create(THREADS_NUMBER);
-    EXPECTNOT(pool, NULL);
+    EXPECT_NOT(pool, NULL);
 
     /* add tasks to the pool */
     for (i =0; i < THREADS_NUMBER; i++) {

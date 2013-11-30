@@ -70,7 +70,7 @@ int main()
     DEFAULT_LIB_INIT();
 
     m3 = rfHashmap_String_Create(10);
-    EXPECTNOT(m3, NULL);
+    EXPECT_NOT(m3, NULL);
     for(i = 0; i < m3_size; i ++)
     {
         EXPECT(true, rfHashmap_String_Insert(
@@ -94,7 +94,7 @@ int main()
     {
         /* test the Get_OUT function */
         strp = rfHashmap_String_Get_OUT(m3, RFS_("%s", m3_keys[i]));
-        EXPECTNOT(strp, NULL);
+        EXPECT_NOT(strp, NULL);
         EXPECT(true, rfString_Equal(strp, RFS_("%s", m3_values[i])));
     }
     //also in this hashmap test the iteration function

@@ -98,7 +98,7 @@ int main()
         EXPECT(rfDynamicArray_String_Get_IN(&a2, i, &s), true);
         EXPECT(rfString_Equal(&s, RFS_("String %d", i + 50 )), true);
     }
-    EXPECTNOT(rfDynamicArray_String_Get_IN(&a2, 51, &s), true);
+    EXPECT_NOT(rfDynamicArray_String_Get_IN(&a2, 51, &s), true);
 
     return 0;
 }

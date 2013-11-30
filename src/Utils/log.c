@@ -104,7 +104,7 @@ static bool rfLog_Init(RF_Log *log, RF_LogLevel level, char *log_file_name)
         assert(0);
         return false;
     }
-    log->file = fopen(log_file_name, "ab+");
+    log->file = fopen(log_file_name, "wb+");
     if (!log->file) {
         assert(0);
         return false;
@@ -121,6 +121,7 @@ static bool rfLog_Flush(RF_Log *log)
     if (rc != OCCUPIED(log)) {
         ret = false;
     }
+    fflush(log->file);
     log->index = log->buffer;
     pthread_mutex_unlock(&log->lock);
     return ret;
@@ -173,7 +174,7 @@ static inline bool rfLog_AddLocation(
     max = file_len + func_len + 100;
     CHECK_BUFFER(log, max);
     ret = snprintf(log->index, max,
-                   "[%.*s:%.*s (%d)]",
+                   "[%.*s:%.*s():%d] ",
                    file_len, file, func_len, func, line
     );
 
@@ -217,10 +218,11 @@ static bool format_log_message(RF_Log *log,
         rfString_Data(&severity_level_string[level]),
         rfString_ByteLength(&severity_level_string[level])
     );
+    log->index += rfString_ByteLength(&severity_level_string[level]);
 
     /* Thread ID */
     CHECK_BUFFER(log, 100);
-    ret = snprintf(log->index, 100, "(Thread %d)", rf_ThreadGetId());
+    ret = snprintf(log->index, 100, "(Thread %#010x)", rf_ThreadGetId());
     if(ret < 0 || ret >= 100) {
         return false;
     }
@@ -234,6 +236,9 @@ static bool format_log_message(RF_Log *log,
     /* Message */
     CHECK_BUFFER(log, rfString_ByteLength(msg) + 1);
     memcpy(log->index, rfString_Data(msg), rfString_ByteLength(msg));
+    log->index += rfString_ByteLength(msg);
+    *log->index = '\n';
+    log->index++;
            
     return true;
 }

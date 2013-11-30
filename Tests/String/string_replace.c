@@ -91,7 +91,7 @@ int main()
 
 	//Stringx replacing
     EXPECT(true,rfStringX_Init(&sx1,"News from all over the world."));
-    EXPECTNOT(RF_FAILURE,rfStringX_MoveAfter(&sx1,RFS_("News "), 0, 0));
+    EXPECT_NOT(RF_FAILURE,rfStringX_MoveAfter(&sx1,RFS_("News "), 0, 0));
     EXPECT(true,
            rfStringX_Replace(
                &sx1,

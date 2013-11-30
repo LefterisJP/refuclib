@@ -12,7 +12,7 @@ int main()
     EXPECT(true,
            rfStringX_Init(
                &sx1,"中国共産党総書記に習近平氏　新指導部の７人発表"));
-    EXPECTNOT(RF_FAILURE,rfStringX_MoveAfter(&sx1,RFS_("に"),&res1,0));
+    EXPECT_NOT(RF_FAILURE,rfStringX_MoveAfter(&sx1,RFS_("に"),&res1,0));
     EXPECT(true,rfString_Equal(&sx1,RFS_("習近平氏　新指導部の７人発表")));
     EXPECT(true,rfString_Equal(&res1,RFS_("中国共産党総書記")));
 	
@@ -50,7 +50,7 @@ int main()
            rfString_Equal(
                &sx1,
                RFS_("中国共産党総書記に習近平氏　新指導部の７人発表")));
-    EXPECTNOT(RF_FAILURE,
+    EXPECT_NOT(RF_FAILURE,
               rfStringX_MoveAfter(&sx1,RFS_("　"),
                                   &resx1,
                                   RF_STRINGX_ARGUMENT));

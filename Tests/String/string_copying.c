@@ -15,7 +15,7 @@ int main()
                "Millions of Americans are voting on whether to re-elect "
                "President Barack Obama or choose Mitt Romney with polls "
                "predicting a tight race."));
-    EXPECTNOT(0, s2=rfString_Copy_OUT(&s1));
+    EXPECT_NOT(0, s2=rfString_Copy_OUT(&s1));
     EXPECTGE(printf(RF_STR_PF_FMT"\n", RF_STR_PF_ARG(s2)), 0);
     EXPECT(true,rfString_PruneEnd(s2,14));
     EXPECT(rfString_Copy_IN(&s3,s2), true);
@@ -31,7 +31,7 @@ int main()
 	//testing RF_StringX copying functions from String
     EXPECT(rfStringX_FromString_IN(&sx1,&s1), true);
     EXPECTGE(printf(RF_STR_PF_FMT"\n", RF_STR_PF_ARG(&sx1)), 0);
-    EXPECTNOT(0, sx2=rfStringX_FromString_OUT(&s5));
+    EXPECT_NOT(0, sx2=rfStringX_FromString_OUT(&s5));
     EXPECT(true,
            rfString_Equal(
                sx2,
@@ -47,7 +47,7 @@ int main()
                "ッチ２０１２」の出場２９選手を、発表した"));
     rfStringX_MoveForward(&sx3,10);
     EXPECT(rfStringX_Copy_IN(&sx4,&sx3), true);
-    EXPECTNOT(0, sx5=rfStringX_Copy_OUT(&sx3));
+    EXPECT_NOT(0, sx5=rfStringX_Copy_OUT(&sx3));
     EXPECT(true,
            rfString_Equal(
                &sx4,
