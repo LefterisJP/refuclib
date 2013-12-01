@@ -32,7 +32,7 @@
 #include <Time/sleep.h>
 
 #else
-    #error Attempted to include RF_Date while not having compiled the library with the appropriate module activated
+    #error Attempted to include RFdate while not having compiled the library with the appropriate module activated
 #endif
 
 #endif //include guards end

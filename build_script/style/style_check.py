@@ -208,7 +208,8 @@ if __name__ == '__main__':
                 continue
             for root, dirnames, filenames in os.walk(target):
                 for filename in filenames:
-                    if filename.endswith(('.c', '.h', '.ph')):
+                    if filename.endswith(('.c', '.h', '.ph', '.ctemplate',
+                                          '.htemplate')):
                         matches.append(os.path.join(root, filename))
 
         for f in matches:

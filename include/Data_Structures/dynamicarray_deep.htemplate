@@ -48,7 +48,7 @@ extern "C"
  **
  ** @return The allocated array
  **/
-i_DECLIMEX_ @DATA_STRUCT*  rfDynamicArray_Create(uint32_t numElements);
+i_DECLIMEX_ @DATA_STRUCT*  rf_dynamic_array_create(uint32_t numElements);
  
 
 /**
@@ -57,7 +57,7 @@ i_DECLIMEX_ @DATA_STRUCT*  rfDynamicArray_Create(uint32_t numElements);
  ** @param array The array to initialize
  ** @return true in case of succesfull initialization and false otherwise
  **/
-i_DECLIMEX_ bool rfDynamicArray_Init(@DATA_STRUCT* array,
+i_DECLIMEX_ bool rf_dynamic_array_init(@DATA_STRUCT* array,
                                       uint32_t numElements);
 
 /**
@@ -67,7 +67,7 @@ i_DECLIMEX_ bool rfDynamicArray_Init(@DATA_STRUCT* array,
  ** @param src The array to copy from
  ** @return Returns @c true in succesfull copying and false otherwise
  **/
-i_DECLIMEX_ bool rfDynamicArray_Copy_IN(@DATA_STRUCT* dst,
+i_DECLIMEX_ bool rf_dynamic_array_copy_in(@DATA_STRUCT* dst,
                                         @DATA_STRUCT* src);
 /**
  ** @brief Creates and returns an allocated copy of the given 
@@ -77,7 +77,7 @@ i_DECLIMEX_ bool rfDynamicArray_Copy_IN(@DATA_STRUCT* dst,
  ** @return An allocated @DATA_STRUCT copy of the given array
  **
  **/
-i_DECLIMEX_ @DATA_STRUCT* rfDynamicArray_Copy_OUT(@DATA_STRUCT* src);
+i_DECLIMEX_ @DATA_STRUCT* rf_dynamic_array_copy_out(@DATA_STRUCT* src);
 
 /**
  ** @brief Destroys an array of objects releasing their memory and calling
@@ -86,7 +86,7 @@ i_DECLIMEX_ @DATA_STRUCT* rfDynamicArray_Copy_OUT(@DATA_STRUCT* src);
  ** @param l The array to destroy
  **
  **/
-i_DECLIMEX_ void rfDynamicArray_Destroy(@DATA_STRUCT* l);
+i_DECLIMEX_ void rf_dynamic_array_destroy(@DATA_STRUCT* l);
 
 /**
  ** @brief Deinitializes a array of objects releasing their memory and 
@@ -95,7 +95,7 @@ i_DECLIMEX_ void rfDynamicArray_Destroy(@DATA_STRUCT* l);
  ** @param l The array to deinitialize
  **
  **/
-i_DECLIMEX_ void rfDynamicArray_Deinit(@DATA_STRUCT* l);
+i_DECLIMEX_ void rf_dynamic_array_deinit(@DATA_STRUCT* l);
 
 /**
  ** @brief Adds a new object to the array
@@ -107,7 +107,7 @@ i_DECLIMEX_ void rfDynamicArray_Deinit(@DATA_STRUCT* l);
  **
  ** @return Returns @c true for success and @c false otherwise
  **/
-i_DECLIMEX_ bool rfDynamicArray_Add(@DATA_STRUCT* l, @TYPEPTR object);
+i_DECLIMEX_ bool rf_dynamic_array_add(@DATA_STRUCT* l, @TYPEPTR object);
 
 
 /**
@@ -123,7 +123,7 @@ i_DECLIMEX_ bool rfDynamicArray_Add(@DATA_STRUCT* l, @TYPEPTR object);
  ** @c false if the index is out of bounds
  **
  **/
-i_DECLIMEX_ bool rfDynamicArray_Get_IN(
+i_DECLIMEX_ bool rf_dynamic_array_get_in(
     @DATA_STRUCT* l,
     uint32_t i,
     @TYPEPTR ret
@@ -139,7 +139,7 @@ i_DECLIMEX_ bool rfDynamicArray_Get_IN(
  ** @return the value of the array at @c i. 
  ** If there is a failure this will return @c NULL
  **/
-i_DECLIMEX_ @TYPEPTR rfDynamicArray_Get_OUT(
+i_DECLIMEX_ @TYPEPTR rf_dynamic_array_get_out(
     @DATA_STRUCT* l,
     uint32_t i,
     bool* ret_code
@@ -157,7 +157,7 @@ i_DECLIMEX_ @TYPEPTR rfDynamicArray_Get_OUT(
  ** @return True if the element got set succesfully and false if this 
  ** is a yet unset index
  **/
-i_DECLIMEX_ bool rfDynamicArray_Set(
+i_DECLIMEX_ bool rf_dynamic_array_set(
     @DATA_STRUCT* l,
     uint32_t i,
     @TYPEPTR e
@@ -174,7 +174,7 @@ i_DECLIMEX_ bool rfDynamicArray_Set(
  ** @return Returns true if the object at @c i was succesfully removed
  ** and @c false if there is no element at @c i or there was another error
  **/
-i_DECLIMEX_ bool rfDynamicArray_Remove(@DATA_STRUCT* l, uint32_t i);
+i_DECLIMEX_ bool rf_dynamic_array_remove(@DATA_STRUCT* l, uint32_t i);
 
 #ifdef __cplusplus
 }///closing bracket for calling from C++

@@ -30,13 +30,13 @@
 #include <Definitions/types.h> //for the fixed size data types
 #include <Definitions/imex.h> //for the import export macro
     #ifdef REFU_LINUX_VERSION
-    #include <time.h> //for clockid_t used in RF_Timer
+    #include <time.h> //for clockid_t used in RFtimer
     #endif
-#include <Time/timer_decl.h> //for RF_Timer
+#include <Time/timer_decl.h> //for RFtimer
 #include <Time/timer.h>
 
 #else
-    #error Attempted to include RF_Timer while not having compiled the library with the appropriate module activated
+    #error Attempted to include RFtimer while not having compiled the library with the appropriate module activated
 #endif
 
 #endif //include guards end

@@ -33,7 +33,7 @@
 ** @brief A unicode String with UTF-8 internal representation
 **
 ** The Refu String is a Unicode String that has two versions. One is this and for
-** the other check @ref RF_StringX to see what operations can be performed
+** the other check @ref RFstringx to see what operations can be performed
 ** on extended Strings.
 ** Functions to convert to and from all UTF encoding exists but the internal
 ** representation is always at UTF-8. Once a String has been created it is 
@@ -47,20 +47,20 @@
 ** functions that should not
 ** be used with the extended string are marked with @notinherited{StringX}
 **
-** @see RF_StringX
+** @see RFstringx
 ** @internal
 ** @cppcode
 ** //default constructor
-** String(){this->i_StringCHandle = rfString_Create("");}
+** String(){this->i_StringCHandle = rf_string_create("");}
 ** @endcpp
 ** @endinternal
 */
-typedef struct RF_String
+typedef struct RFstring
 {
     //! The string's data
     char* data;
     //! String's length in bytes
     uint32_t length;
-}RF_String;
+}RFstring;
 
 #endif//include guards end

@@ -22,7 +22,7 @@
 **
 **
 ** --String/manipulation.h
-** This header declares the functions that manipulate RF_String
+** This header declares the functions that manipulate RFstring
 **/
 #ifndef RF_STRING_MANIPULATION_H
 #define RF_STRING_MANIPULATION_H
@@ -43,7 +43,7 @@ extern "C"
 //! @{
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Appends a string to this one
  **
  ** @notinherited{StringX}
@@ -52,15 +52,15 @@ extern "C"
  ** @param other     The string to add to this string.
  **                  @inhtype{String,StringX} @tmpSTR
  ** @return          Returns @c true for success and @c false otherwise
- ** @see rfString_Append_int()
- ** @see rfString_Append_double()
- ** @see rfString_Prepend()
+ ** @see rf_string_append_int()
+ ** @see rf_string_append_double()
+ ** @see rf_string_prepend()
  **/
-i_DECLIMEX_ bool rfString_Append(RF_String* thisstr, const void* other);
+i_DECLIMEX_ bool rf_string_append(RFstring* thisstr, const void* other);
 
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @opadd
  ** @brief Appends an integer to the string
  **
@@ -68,13 +68,13 @@ i_DECLIMEX_ bool rfString_Append(RF_String* thisstr, const void* other);
  ** @param thisstr     The string to append to
  ** @param i           The integer to add
  ** @return             Returns @c true for success and @c false otherwise
- ** @see rfString_Append()
- ** @see rfString_Append_double()
+ ** @see rf_string_append()
+ ** @see rf_string_append_double()
  **/
-i_DECLIMEX_ bool rfString_Append_int(RF_String* thisstr, const int32_t i);
+i_DECLIMEX_ bool rf_string_append_int(RFstring* thisstr, const int32_t i);
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @opadd
  ** @brief Appends a float to the string
  **
@@ -82,13 +82,13 @@ i_DECLIMEX_ bool rfString_Append_int(RF_String* thisstr, const int32_t i);
  ** @param thisstr       The string to append to
  ** @param d             The double
  ** @return              Returns @c true for success and @c false otherwise
- ** @see rfString_Append()
- ** @see rfString_Append_int()
+ ** @see rf_string_append()
+ ** @see rf_string_append_int()
  **/
-i_DECLIMEX_ bool rfString_Append_double(RF_String* thisstr, const double d);
+i_DECLIMEX_ bool rf_string_append_double(RFstring* thisstr, const double d);
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Prepends the parameter String to this string
  **
  ** @notinherited{StringX}
@@ -97,9 +97,9 @@ i_DECLIMEX_ bool rfString_Append_double(RF_String* thisstr, const double d);
  ** @param other     The string to prepend to this string.
  **                  @inhtype{String,StringX} @tmpSTR
  ** @return          Returns @c true for success and @c false otherwise
- ** @see rfString_Append()
+ ** @see rf_string_append()
  **/
-i_DECLIMEX_ bool rfString_Prepend(RF_String* thisstr, const void* other);
+i_DECLIMEX_ bool rf_string_prepend(RFstring* thisstr, const void* other);
 
 
 //! @}
@@ -108,7 +108,7 @@ i_DECLIMEX_ bool rfString_Prepend(RF_String* thisstr, const void* other);
 //! @{
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Removes occurences of a substring
  **
  ** @isinherited{StringX}
@@ -141,16 +141,16 @@ i_DECLIMEX_ bool rfString_Prepend(RF_String* thisstr, const void* other);
  **                        found substring.
  ** @return                Returns true in case of success, and false if
  **                        the substring was not even found inside the string
- ** @see rfString_Append()
- ** @see rfString_Trim()
+ ** @see rf_string_append()
+ ** @see rf_string_trim()
  **
  **/
-i_DECLIMEX_ bool rfString_Remove(void* thisstr, const void* rstr,
+i_DECLIMEX_ bool rf_string_remove(void* thisstr, const void* rstr,
                                  uint32_t number,const char options);
 
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Removes all of the characters of the string except those specified
  **
  ** This string is scanned for the existence of each characters inside the
@@ -163,11 +163,11 @@ i_DECLIMEX_ bool rfString_Remove(void* thisstr, const void* rstr,
  **                    in @c thisstr @inhtype{String,StringX} @tmpSTR
  ** @return            Returns @c true in success and @c false otherwise
  **/
-i_DECLIMEX_ bool rfString_KeepOnly(void* thisstr, const void* keepstr);
+i_DECLIMEX_ bool rf_string_keep_only(void* thisstr, const void* keepstr);
 
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Removes the first n characters from the start of the string.
  **
  ** @isinherited{StringX}
@@ -177,14 +177,14 @@ i_DECLIMEX_ bool rfString_KeepOnly(void* thisstr, const void* keepstr);
  ** @return           True if n characters got removed and false if there are not 
  **                   enough characters to remove. (in which case the
  **                   string becomes empty) or in error
- ** @see rfString_PruneEnd()
- ** @see rfString_PruneMiddleB()
- ** @see rfString_PruneMiddleF()
+ ** @see rf_string_prune_end()
+ ** @see rf_string_prune_middle_b()
+ ** @see rf_string_prune_middle_f()
  **/
-i_DECLIMEX_ bool rfString_PruneStart(void* thisstr, uint32_t n);
+i_DECLIMEX_ bool rf_string_prune_start(void* thisstr, uint32_t n);
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Removes the last n characters from the end of the string
  **
  ** @isinherited{StringX}
@@ -194,14 +194,14 @@ i_DECLIMEX_ bool rfString_PruneStart(void* thisstr, uint32_t n);
  ** @return              True if n characters got removed and false if there
  **                      are not enough characters to remove.
  **                     (in which case the string becomes empty) or in error
- ** @see rfString_PruneStart()
- ** @see rfString_PruneMiddleB()
- ** @see rfString_PruneMiddleF()
+ ** @see rf_string_prune_start()
+ ** @see rf_string_prune_middle_b()
+ ** @see rf_string_prune_middle_f()
  **/
-i_DECLIMEX_ bool rfString_PruneEnd(void* thisstr, uint32_t n);
+i_DECLIMEX_ bool rf_string_prune_end(void* thisstr, uint32_t n);
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Removes characters from one point of the string
  ** to another going backwards
  **
@@ -216,13 +216,13 @@ i_DECLIMEX_ bool rfString_PruneEnd(void* thisstr, uint32_t n);
  **                    and back.Must be a positive integer.
  ** @return            Returns true in case of succesfull removal and
  **                    false in any other case.
- ** @see rfString_PruneMiddleF()
- ** @see rfString_PruneStart()
- ** @see rfString_PruneEnd()
+ ** @see rf_string_prune_middle_f()
+ ** @see rf_string_prune_start()
+ ** @see rf_string_prune_end()
  **/
-i_DECLIMEX_ bool rfString_PruneMiddleB(void* thisstr, uint32_t p, uint32_t n);
+i_DECLIMEX_ bool rf_string_prune_middle_b(void* thisstr, uint32_t p, uint32_t n);
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Removes characters from one point of the string
  ** to another going forward
  **
@@ -237,14 +237,14 @@ i_DECLIMEX_ bool rfString_PruneMiddleB(void* thisstr, uint32_t p, uint32_t n);
  **                    position and on. Must be a positive integer.
  ** @return            Returns true in case of succesfull removal and
  **                    false in any other case.
- ** @see rfString_PruneMiddleB()
- ** @see rfString_PruneStart()
- ** @see rfString_PruneEnd()
+ ** @see rf_string_prune_middle_b()
+ ** @see rf_string_prune_start()
+ ** @see rf_string_prune_end()
  **/
-i_DECLIMEX_ bool rfString_PruneMiddleF(void* thisstr, uint32_t p, uint32_t n);
+i_DECLIMEX_ bool rf_string_prune_middle_f(void* thisstr, uint32_t p, uint32_t n);
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Removes all characters of a substring only from
  ** the start of the String
  **
@@ -259,13 +259,13 @@ i_DECLIMEX_ bool rfString_PruneMiddleF(void* thisstr, uint32_t p, uint32_t n);
  ** @return           Returns true for success and false if none
  **                   of @c sub characters were found inside the given
  **                   String or in error
- ** @see rfString_Trim()
- ** @see rfString_TrimEnd()
+ ** @see rf_string_trim()
+ ** @see rf_string_trim_end()
  **/
-i_DECLIMEX_ bool rfString_TrimStart(void* thisstr, const void* sub);
+i_DECLIMEX_ bool rf_string_trim_start(void* thisstr, const void* sub);
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Removes all characters of a substring starting
  ** from the end of the String
  **
@@ -279,13 +279,13 @@ i_DECLIMEX_ bool rfString_TrimStart(void* thisstr, const void* sub);
  **                    @inhtype{String,StringX} @tmpSTR
  ** @return            Returns true for success and false if none of @c sub
  **                    characters were found inside the given String or in error
- ** @see rfString_Trim()
- ** @see rfString_TrimStart()
+ ** @see rf_string_trim()
+ ** @see rf_string_trim_start()
  **/
-i_DECLIMEX_ bool rfString_TrimEnd(void* thisstr, const void* sub);
+i_DECLIMEX_ bool rf_string_trim_end(void* thisstr, const void* sub);
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Removes all characters of a substring from both ends
  ** of the given String
  **
@@ -301,10 +301,10 @@ i_DECLIMEX_ bool rfString_TrimEnd(void* thisstr, const void* sub);
  **                    @inhtype{String,StringX} @tmpSTR
  ** @return            Returns true for success and false if none
  **                    of @c sub characters were found inside the given String or in error
- ** @see rfString_TrimStart()
- ** @see rfString_TrimEnd()
+ ** @see rf_string_trim_start()
+ ** @see rf_string_trim_end()
  **/
-i_DECLIMEX_ bool rfString_Trim(void* thisstr, const void* sub);
+i_DECLIMEX_ bool rf_string_trim(void* thisstr, const void* sub);
 
 //! @}
 
@@ -312,7 +312,7 @@ i_DECLIMEX_ bool rfString_Trim(void* thisstr, const void* sub);
 //! @{
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Replace all occurences of a String
  **
  ** @notinherited{StringX}
@@ -344,9 +344,9 @@ i_DECLIMEX_ bool rfString_Trim(void* thisstr, const void* sub);
  **                           with this flag off.
  ** @return                   Returns true in case of success, and false if
  **                           the substring was not even found inside the string
- ** @see rfStringX_Replace()
+ ** @see rf_stringx_replace()
  **/
-i_DECLIMEX_ bool rfString_Replace(RF_String* thisstr, const void* sstr, 
+i_DECLIMEX_ bool rf_string_replace(RFstring* thisstr, const void* sstr, 
                                   const void* rstr, const uint32_t number,
                                   const char options);
 //! @}

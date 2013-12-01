@@ -22,12 +22,12 @@
 **
 **
 ** --Time/date.h
-** This header includes macros and functions that operate on RF_Date
+** This header includes macros and functions that operate on RFdate
 **
 ---------------------For internal library include make sure to have----------------------------
 #include <Definitions/imex.h>//for import export macro
 #include <Definitions/types.h> //for fixed size types
-#include <Time/date_decl.h> //for RF_Date
+#include <Time/date_decl.h> //for RFdate
 #include <Time/date.h>
 ---------------------For internal library include make sure to have----------------------------
 */
@@ -42,7 +42,7 @@ extern "C"
 
 
 
-///Days of the week for the RF_Date
+///Days of the week for the RFdate
 #define RF_SUNDAY       0
 #define RF_MONDAY       1
 #define RF_TUESDAY      2
@@ -51,7 +51,7 @@ extern "C"
 #define RF_FRIDAY       5
 #define RF_SATURDAY     6
 
-///Months for the RF_Date
+///Months for the RFdate
 #define RF_JANUARY      1
 #define RF_FEBRUARY     2
 #define RF_MARCH        3
@@ -70,7 +70,7 @@ extern "C"
 
 
 /**
- ** @memberof RF_Date
+ ** @memberof RFdate
  ** @brief Initializes a Date object with the current date
  **
  ** @param d The date to initialize
@@ -78,20 +78,20 @@ extern "C"
  ** @return Returns true for success and false for failure
  **
  **/
-i_DECLIMEX_ char rfDate_Init_Now(RF_Date* d, char local);
+i_DECLIMEX_ char rf_date_init_now(RFdate* d, char local);
 
 /**
- ** @memberof RF_Date
+ ** @memberof RFdate
  ** @brief Allocates and returns a Date object with the current date
  **
  ** @param local A boolean flag denoting if the date should be in local system time. If not it is considered to be in UTC (Coordinated Universal Time)
  ** @return The allocated date
  **
  **/
-i_DECLIMEX_ RF_Date* rfDate_Create_Now(char local);
+i_DECLIMEX_ RFdate* rf_date_create_now(char local);
 
 /**
- ** @memberof RF_Date
+ ** @memberof RFdate
  ** @brief Initializes a Date object with a specific date
  **
  ** @param d The date to initialize
@@ -105,7 +105,7 @@ i_DECLIMEX_ RF_Date* rfDate_Create_Now(char local);
  ** @return Returns true for success and false for failure
  **
  **/
-i_DECLIMEX_ char rfDate_Init(RF_Date* d,
+i_DECLIMEX_ char rf_date_init(RFdate* d,
                              unsigned char wDay,
                              unsigned char mDay,
                              unsigned char month,
@@ -115,7 +115,7 @@ i_DECLIMEX_ char rfDate_Init(RF_Date* d,
                              unsigned char sec);
 
 /**
- ** @memberof RF_Date
+ ** @memberof RFdate
  ** @brief Create a Date object with a specific date
  **
  ** @param wDay The day of the week. Legal values are @c RF_SUNDAY, @c RF_MONDAY, @c RF_TUESDAY, @c RF_WEDNESDAY, @c RF_THURSDAY, @c RF_FRIDAY and @c RF_SATURDAY
@@ -125,11 +125,11 @@ i_DECLIMEX_ char rfDate_Init(RF_Date* d,
  ** @param hour The hour of the day. Legal values are from 0 to 23
  ** @param min The minutes of the hour. Legal values are from 0 to 59
  ** @param sec The seconds after the minutes. Legal values are from 0 to 59
- ** @return Returns an initialized @ref RF_Date for success and 
+ ** @return Returns an initialized @ref RFdate for success and 
  ** @c NULL for failure
  **
  **/
-i_DECLIMEX_ RF_Date* rfDate_Create(unsigned char wDay,
+i_DECLIMEX_ RFdate* rf_date_create(unsigned char wDay,
                                    unsigned char mDay,
                                    unsigned char month,
                                    uint16_t year,
@@ -141,131 +141,131 @@ i_DECLIMEX_ RF_Date* rfDate_Create(unsigned char wDay,
 //closing the doxygen group of date creation
 
 /**
- ** @memberof RF_Date
- ** @brief Destroys a Date made with rfDate_Create
+ ** @memberof RFdate
+ ** @brief Destroys a Date made with rf_date_create
  **
  ** @param d The date to destroy
  **
  **/
-i_DECLIMEX_ void rfDate_Destroy(RF_Date* d);
+i_DECLIMEX_ void rf_date_destroy(RFdate* d);
 
 /*-------------------------------------------------------------------------Methods to manipulate a Date-------------------------------------------------------------------------------*/
 //! @name Manipulating a Date
 //! @{
 
 /**
- ** @memberof RF_Date
+ ** @memberof RFdate
  ** @brief Adds a number of years to the Date
  **
  ** @param d The date to work with
  ** @param years The number of years to add
  **
  **/
-i_DECLIMEX_ void rfDate_AddYears(RF_Date* d, uint32_t years);
+i_DECLIMEX_ void rf_date_add_years(RFdate* d, uint32_t years);
 /**
- ** @memberof RF_Date
+ ** @memberof RFdate
  ** @brief Removes a number of years from the Date
  **
  ** @param d The date to work with
  ** @param years The number of years to remove
  **
  **/
-i_DECLIMEX_ void rfDate_SubYears(RF_Date* d, uint32_t years);
+i_DECLIMEX_ void rf_date_sub_years(RFdate* d, uint32_t years);
 
 /**
- ** @memberof RF_Date
+ ** @memberof RFdate
  ** @brief Adds a number of months to the Date
  **
  ** @param d The date to work with
  ** @param months The number of months to add
  **
  **/
-i_DECLIMEX_ void rfDate_AddMonths(RF_Date* d, uint32_t months);
+i_DECLIMEX_ void rf_date_add_months(RFdate* d, uint32_t months);
 /**
- ** @memberof RF_Date
+ ** @memberof RFdate
  ** @brief Removes a number of months from the Date
  **
  ** @param d The date to work with
  ** @param months The number of months to remove
  **
  **/
-i_DECLIMEX_ void rfDate_SubMonths(RF_Date* d, uint32_t months);
+i_DECLIMEX_ void rf_date_sub_months(RFdate* d, uint32_t months);
 
 /**
- ** @memberof RF_Date
+ ** @memberof RFdate
  ** @brief Adds a number of days to the Date
  **
  ** @param d The date to work with
  ** @param days The number of days to add
  **
  **/
-i_DECLIMEX_ void rfDate_AddDays(RF_Date* d, uint32_t days);
+i_DECLIMEX_ void rf_date_add_days(RFdate* d, uint32_t days);
 /**
- ** @memberof RF_Date
+ ** @memberof RFdate
  ** @brief Removes a number of days from the Date
  **
  ** @param d The date to work with
  ** @param days The number of days to remove
  **
  **/
-i_DECLIMEX_ void rfDate_SubDays(RF_Date* d, uint32_t days);
+i_DECLIMEX_ void rf_date_sub_days(RFdate* d, uint32_t days);
 
 /**
- ** @memberof RF_Date
+ ** @memberof RFdate
  ** @brief Adds a number of hours to the Date
  **
  ** @param d The date to work with
  ** @param hours The number of hours to add
  **
  **/
-i_DECLIMEX_ void rfDate_AddHours(RF_Date* d, uint32_t hours);
+i_DECLIMEX_ void rf_date_add_hours(RFdate* d, uint32_t hours);
 /**
- ** @memberof RF_Date
+ ** @memberof RFdate
  ** @brief Removes a number of hours from the Date
  **
  ** @param d The date to work with
  ** @param hours The number of hours to remove
  **
  **/
-i_DECLIMEX_ void rfDate_SubHours(RF_Date* d, uint32_t hours);
+i_DECLIMEX_ void rf_date_sub_hours(RFdate* d, uint32_t hours);
 
 /**
- ** @memberof RF_Date
+ ** @memberof RFdate
  ** @brief Adds a number of minutes to the Date
  **
  ** @param d The date to work with
  ** @param minutes The number of minutes to add
  **
  **/
-i_DECLIMEX_ void rfDate_AddMinutes(RF_Date* d, uint32_t minutes);
+i_DECLIMEX_ void rf_date_add_minutes(RFdate* d, uint32_t minutes);
 /**
- ** @memberof RF_Date
+ ** @memberof RFdate
  ** @brief Removes a number of minutes from the Date
  **
  ** @param d The date to work with
  ** @param minutes The number of minutes to remove
  **
  **/
-i_DECLIMEX_ void rfDate_SubMinutes(RF_Date* d, uint32_t minutes);
+i_DECLIMEX_ void rf_date_sub_minutes(RFdate* d, uint32_t minutes);
 
 /**
- ** @memberof RF_Date
+ ** @memberof RFdate
  ** @brief Adds a number of seconds to the Date
  **
  ** @param d The date to work with
  ** @param seconds The number of seconds to add
  **
  **/
-i_DECLIMEX_ void rfDate_AddSeconds(RF_Date* d, uint32_t seconds);
+i_DECLIMEX_ void rf_date_add_seconds(RFdate* d, uint32_t seconds);
 /**
- ** @memberof RF_Date
+ ** @memberof RFdate
  ** @brief Removes a number of seconds from the Date
  **
  ** @param d The date to work with
  ** @param seconds The number of seconds to remove
  **
  **/
-i_DECLIMEX_ void rfDate_SubSeconds(RF_Date* d, uint32_t seconds);
+i_DECLIMEX_ void rf_date_sub_seconds(RFdate* d, uint32_t seconds);
 //! @}
 //closing the Date Manipulation doxygen group
 
@@ -279,7 +279,7 @@ i_DECLIMEX_ void rfDate_SubSeconds(RF_Date* d, uint32_t seconds);
 //! @{
 
 /**
- ** @memberof RF_Date
+ ** @memberof RFdate
  ** @brief Sets this date as the current system date and time
  **
  ** This function set the system's date and time which is always considered to be
@@ -291,10 +291,10 @@ i_DECLIMEX_ void rfDate_SubSeconds(RF_Date* d, uint32_t seconds);
  ** @return Returns @c true for succesfull setting or @c false otherwise with appropriate error logging
  **
  **/
-i_DECLIMEX_ char rfDate_SetToSystem(RF_Date* d);
+i_DECLIMEX_ char rf_date_set_to_system(RFdate* d);
 
 /**
- ** @memberof RF_Date
+ ** @memberof RFdate
  ** @brief Sets this date as the current local date and time
  **
  ** This function sets the system's local date and time depending on the timezone that
@@ -307,7 +307,7 @@ i_DECLIMEX_ char rfDate_SetToSystem(RF_Date* d);
  ** @return Returns @c true for succesfull setting or @c false otherwise with appropriate error logging
  **
  **/
-i_DECLIMEX_ char rfDate_SetToLocal(RF_Date* d);
+i_DECLIMEX_ char rf_date_set_to_local(RFdate* d);
 
 //! @}
 //closing the System Methods doxygen group
@@ -320,7 +320,7 @@ i_DECLIMEX_ char rfDate_SetToLocal(RF_Date* d);
 //! @{
 
 /**
- ** @memberof RF_Date
+ ** @memberof RFdate
  ** @brief Returns the difference between two dates
  **
  ** This function calculates the difference of the other date @c oDate minus this date @c tDate and the result is returned inside @c res.
@@ -361,18 +361,18 @@ i_DECLIMEX_ char rfDate_SetToLocal(RF_Date* d);
  **  If an error happens then @c RF_FAILURE is returned.
  **
  **/
-i_DECLIMEX_ char rfDate_Diff(RF_Date* tDate,RF_Date* oDate,RF_Date* res);
+i_DECLIMEX_ char rf_date_diff(RFdate* tDate,RFdate* oDate,RFdate* res);
 /*
 needs thinking
 **
- ** @memberof RF_Date
+ ** @memberof RFdate
  ** @brief Turns a time interval into seconds
  **
  ** @param interval Accepts a time interval RF_Date.
  ** @return Returns true for success and false for failure. Failure can occur mainly if the interval is too long to be represented by an uint64_t in the particular
  ** system that the function is ran at. In that case the result will contain the value of ULLONG_MAX from limits.h and the return will be false. An error will additionally be logged.
  **
-char rfDate_I_ToSeconds(const RF_Date* interval,uint64_t* result);
+char rf_date_i_to_seconds(const RFdate* interval,uint64_t* result);
 */
 //! @}
 //closing the time intervals doxygen group

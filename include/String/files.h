@@ -22,7 +22,7 @@
 **
 **
 ** --String/files.h
-** This header includes FILE descriptor functionality for RF_String
+** This header includes FILE descriptor functionality for RFstring
 **/
 #ifndef RF_STRING_FILES_H
 #define RF_STRING_FILES_H
@@ -43,12 +43,12 @@ extern "C"
 //! @{
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Initializes a string from file parsing
  **
  ** @notinherited{StringX}
  ** Read the file stream @c f until either a newline character or the EOF is 
- ** reached and saves it as an RF_String
+ ** reached and saves it as an RFstring
  ** If for some reason (like EOF reached) no string can be read then null is returned
  ** @param str The String to initialize
  ** @param f A valid and open file pointer in read mode from which to read the
@@ -74,28 +74,28 @@ extern "C"
  ** interested in its value
  ** @return Returns @c true for success and @c false otherwise
  **/
-i_DECLIMEX_ bool rfString_FInit(RF_String* str, FILE* f, char* eof, char eol,
+i_DECLIMEX_ bool rf_string_f_init(RFstring* str, FILE* f, char* eof, char eol,
                                 int encoding, int endianess,
                                 unsigned int* buff_size);
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Allocates and returns a string from file parsing
  ** @notinherited{StringX}
- ** @see rfString_FInit()
- ** @see rfString_FAssign()
- ** @see rfString_FAppend()
+ ** @see rf_string_f_init()
+ ** @see rf_string_f_assign()
+ ** @see rf_string_f_append()
  **/
-i_DECLIMEX_ RF_String* rfString_FCreate(FILE* f, char* eof, char eol,
+i_DECLIMEX_ RFstring* rf_string_f_create(FILE* f, char* eof, char eol,
                                         int encoding, int endianess,
                                         unsigned int* buff_size);
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Assigns to a string from file parsing
  **
  ** @notinherited{StringX}
  ** Read the file stream @c f until either a newline character or the EOF is
- ** reached and assigns it to an RF_String
+ ** reached and assigns it to an RFstring
  ** @param str The string to assign to
  ** @param f A valid and open file pointer in read mode from which to read the
  ** string. 
@@ -116,15 +116,15 @@ i_DECLIMEX_ RF_String* rfString_FCreate(FILE* f, char* eof, char eol,
  ** encoded in. Possible values here are @c RF_LITTLE_ENDIAN and
  ** @c RF_BIG_ENDIAN and apply only if the file is either UTF-16 or UTF-32
  ** @return Returns @c true for success and @c false otherwise
- ** @see rfString_FInit()
- ** @see rfString_FCreate()
- ** @see rfString_FAppend()
+ ** @see rf_string_f_init()
+ ** @see rf_string_f_create()
+ ** @see rf_string_f_append()
  **
  **/
-i_DECLIMEX_ bool rfString_FAssign(RF_String* str, FILE* f, char* eof,
+i_DECLIMEX_ bool rf_string_f_assign(RFstring* str, FILE* f, char* eof,
                                   char eol, int encoding, int endianess);
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Appends to a string from file parsing
  **
  ** @notinherited{StringX}
@@ -148,16 +148,16 @@ i_DECLIMEX_ bool rfString_FAssign(RF_String* str, FILE* f, char* eof,
  ** encoded in. Possible values here are @c RF_LITTLE_ENDIAN and
  ** @c RF_BIG_ENDIAN and apply only if the file is either UTF-16 or UTF-32
  ** @return Returns @c true for success and @c false otherwise
- ** @see rfString_FInit()
- ** @see rfString_FCreate()
- ** @see rfString_FAssign()
+ ** @see rf_string_f_init()
+ ** @see rf_string_f_create()
+ ** @see rf_string_f_assign()
  **
  **/
-i_DECLIMEX_ bool rfString_FAppend(RF_String* str, FILE* f, char* eof, char eol,
+i_DECLIMEX_ bool rf_string_f_append(RFstring* str, FILE* f, char* eof, char eol,
                                    int encoding, int endianess);
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Writes a string to a file depending on the given encoding
  **
  ** @isinherited{StringX}
@@ -178,7 +178,7 @@ i_DECLIMEX_ bool rfString_FAppend(RF_String* str, FILE* f, char* eof, char eol,
  **                    Can be one of @c RF_LITTLE_ENDIAN or @c RF_BIG_ENDIAN
  ** @return            Returns @c true for success and @c false otherwise
  **/
-i_DECLIMEX_ bool rfString_Fwrite(void* s, FILE* f, int encoding, int endianess);
+i_DECLIMEX_ bool rf_string_fwrite(void* s, FILE* f, int encoding, int endianess);
 
 
 //! @}

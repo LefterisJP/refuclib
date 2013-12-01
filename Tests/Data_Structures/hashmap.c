@@ -12,22 +12,22 @@ typedef struct an_object
 {
     int num;
     float f;
-    RF_String s;
+    RFstring s;
 }an_object;
 
-static an_object* an_object_create(int n, float f, RF_String* s)
+static an_object* an_object_create(int n, float f, RFstring* s)
 {
     an_object* ret;
     RF_MALLOC(ret, sizeof(*ret), NULL);
     ret->num = n;
     ret->f = f;
-    rfString_Copy_IN(&ret->s, s);
+    rf_string_copy_in(&ret->s, s);
     return ret;
 }
 
 static void an_object_destroy(an_object* a)
 {
-    rfString_Deinit(&a->s);
+    rf_string_deinit(&a->s);
     free(a);
 }
 
@@ -37,7 +37,7 @@ bool iterate_destroy(void* value, void* data)
     return true;
 }
 
-static void test_generic_map(RF_Hashmap* m)
+static void test_generic_map(RFhashmap* m)
 {
     int i;
     an_object* obj;
@@ -46,33 +46,33 @@ static void test_generic_map(RF_Hashmap* m)
     for(i = 0; i < 20; i ++)
     {
         obj = an_object_create(i, (float)i, RFS_("%d", i));
-        EXPECT(true, rfHashmap_Insert(m, RFS_("%d",i), obj, &exists));
+        EXPECT(true, rf_hashmap_insert(m, RFS_("%d",i), obj, &exists));
         EXPECT(false, exists);
     }
 
     //test it
     for(i = 0; i < 20; i++)
     {
-        EXPECT_NOT((obj = rfHashmap_Get(m, RFS_("%d",i), &exists)), NULL);
+        EXPECT_NOT((obj = rf_hashmap_get(m, RFS_("%d",i), &exists)), NULL);
         EXPECT(obj->num == i, true);
         EXPECT(obj->f == (float)i, true);
-        EXPECT(rfString_Equal(&obj->s, RFS_("%d", i)), true );
+        EXPECT(rf_string_equal(&obj->s, RFS_("%d", i)), true );
     }
 
 }
 
 int main()
 {
-    RF_Hashmap m;
+    RFhashmap m;
     DEFAULT_LIB_INIT();
 
     
     // test non library object hashmap
-    EXPECT(rfHashmap_Init(&m, 20), true);
+    EXPECT(rf_hashmap_init(&m, 20), true);
     test_generic_map(&m);
     //free all object using hashmap iterate
-    EXPECT(rfHashmap_Iterate(&m, iterate_destroy, NULL), true);
-    rfHashmap_Deinit(&m);
+    EXPECT(rf_hashmap_iterate(&m, iterate_destroy, NULL), true);
+    rf_hashmap_deinit(&m);
 
     return 0;
 }

@@ -22,7 +22,7 @@
 **
 **
 ** --String/filesx.h
-** This header includes FILE descriptor functionality for RF_StringX
+** This header includes FILE descriptor functionality for RFstringx
 **/
 #ifndef RF_STRING_FILESX_H
 #define RF_STRING_FILESX_H
@@ -37,15 +37,15 @@ extern "C"
 {///opening bracket for calling from C++
 #endif
 
-//! @name RF_StringX File I/O
+//! @name RFstringx File I/O
 //! @{
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Initializes a stringX from file parsing
  **
  ** Read the file stream @c f until either a newline character or the EOF is 
- ** reached and saves it as an RF_StringX
+ ** reached and saves it as an RFstringx
  ** If for some reason (like EOF reached) no string can be read then null is returned
  ** @param str The StringX to initialize
  ** @param f A valid and open file pointer in read mode from which to read the
@@ -68,27 +68,27 @@ extern "C"
  ** @c RF_BIG_ENDIAN and apply only if the file is either UTF-16 or UTF-32
  ** @return Returns @c true for success and @c false otherwise
  **/
-i_DECLIMEX_ bool rfStringX_FInit(RF_StringX* str, FILE* f, char* eof, char eol,
+i_DECLIMEX_ bool rf_stringx_f_init(RFstringx* str, FILE* f, char* eof, char eol,
                                  int encoding, int endianess);
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Allocates and returns a stringX from file parsing
  ** @return The initialized string or null pointer in case of failure
  **  to read the file, or unexpected data (non-UTF8 encoded string)
- ** @see rfStringX_FInit()
- ** @see rfStringX_FAssign()
- ** @see rfStringX_FAppend()
+ ** @see rf_stringx_f_init()
+ ** @see rf_stringx_f_assign()
+ ** @see rf_stringx_f_append()
  **/
-i_DECLIMEX_ RF_StringX* rfStringX_FCreate(FILE* f, char* eof, char eol,
+i_DECLIMEX_ RFstringx* rf_stringx_f_create(FILE* f, char* eof, char eol,
                                           int encoding, int endianess);
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Assigns to a stringX from file parsing
  **
  ** Read the file stream @c f until either a newline character or the EOF is
- ** reached and assigns it to an RF_StringX
+ ** reached and assigns it to an RFstringx
  ** @param str The stringX to assign to
  ** @param f A valid and open file pointer in read mode from which to read the
  ** string. 
@@ -109,14 +109,14 @@ i_DECLIMEX_ RF_StringX* rfStringX_FCreate(FILE* f, char* eof, char eol,
  ** encoded in. Possible values here are @c RF_LITTLE_ENDIAN and
  ** @c RF_BIG_ENDIAN and apply only if the file is either UTF-16 or UTF-32
  ** @return Returns @c true for success and @c false otherwise
- ** @see rfStringX_FInit()
- ** @see rfStringX_FCreate()
- ** @see rfStringX_FAppend()
+ ** @see rf_stringx_f_init()
+ ** @see rf_stringx_f_create()
+ ** @see rf_stringx_f_append()
  **/
-i_DECLIMEX_ bool rfStringX_FAssign(RF_StringX* str, FILE* f, char* eof,
+i_DECLIMEX_ bool rf_stringx_f_assign(RFstringx* str, FILE* f, char* eof,
                                    char eol, int encoding, int endianess);
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Appends to a stringX from file parsing
  **
  ** @param str The stringX to append to
@@ -139,11 +139,11 @@ i_DECLIMEX_ bool rfStringX_FAssign(RF_StringX* str, FILE* f, char* eof,
  ** encoded in. Possible values here are @c RF_LITTLE_ENDIAN and
  ** @c RF_BIG_ENDIAN and apply only if the file is either UTF-16 or UTF-32
  ** @return Returns @c true for success and @c false otherwise
- ** @see rfStringX_FInit()
- ** @see rfStringX_FCreate()
- ** @see rfStringX_FAssign()
+ ** @see rf_stringx_f_init()
+ ** @see rf_stringx_f_create()
+ ** @see rf_stringx_f_assign()
  **/
-i_DECLIMEX_ bool rfStringX_FAppend(RF_StringX* str, FILE* f, char* eof, char eol,
+i_DECLIMEX_ bool rf_stringx_f_append(RFstringx* str, FILE* f, char* eof, char eol,
                                    int encoding, int endianess);
 
 //! @}

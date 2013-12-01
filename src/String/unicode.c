@@ -41,7 +41,7 @@
 /*------------- End of includes -------------*/
 
 //Takes a buffer of unicode character and turns them into a UTF-8 encoded string
-bool rfUTF8_Encode(const uint32_t* codepoints, uint32_t charsN,
+bool rf_utf8_encode(const uint32_t* codepoints, uint32_t charsN,
                    uint32_t* byteLength, char* utf8, uint32_t buffSize)
 {
     uint32_t charN;
@@ -113,7 +113,7 @@ bool rfUTF8_Encode(const uint32_t* codepoints, uint32_t charsN,
     return true;
 }
 //takes a unicode codepoint and turns them into a UTF-8 byte
-int rfUTF8_Encode_single(const uint32_t codepoint, char* utf8)
+int rf_utf8_encode_single(const uint32_t codepoint, char* utf8)
 {
     int i = 0;
     /*If the code point requires only 1 byte*/
@@ -169,7 +169,7 @@ int rfUTF8_Encode_single(const uint32_t codepoint, char* utf8)
 }
 
 //Takes a utf8 buffer and decodes it into unicode codepoints
-bool rfUTF8_Decode(const char* utf8, uint32_t utf8Length,
+bool rf_utf8_decode(const char* utf8, uint32_t utf8Length,
                    uint32_t* charsN, uint32_t* codePoints,
                    uint32_t buff_size)
 {
@@ -233,7 +233,7 @@ bool rfUTF8_Decode(const char* utf8, uint32_t utf8Length,
     return true;
 }
 
-bool rfUTF16_Decode(const char* buff, uint32_t in_buff_length, 
+bool rf_utf16_decode(const char* buff, uint32_t in_buff_length, 
                     uint32_t* charactersN, uint32_t* codepoints,
                     uint32_t buff_size)
 {
@@ -305,7 +305,7 @@ bool rfUTF16_Decode(const char* buff, uint32_t in_buff_length,
 }
 
 //Encodes a buffer of unicode codepoints into UTF-16
-bool rfUTF16_Encode(const uint32_t* codepoints, uint32_t charsN,
+bool rf_utf16_encode(const uint32_t* codepoints, uint32_t charsN,
                     uint32_t* length, uint16_t* utf16, uint32_t buff_size)
 {
     uint32_t i,U;
@@ -344,7 +344,7 @@ bool rfUTF16_Encode(const uint32_t* codepoints, uint32_t charsN,
     return true;
 }
 
-bool rfUTF8_VerifyCstr(const char* bytes, uint32_t * i)
+bool rf_utf8_verify_cstr(const char* bytes, uint32_t * i)
 {
     //i is the byte index
     *i=0;
@@ -367,7 +367,7 @@ bool rfUTF8_VerifyCstr(const char* bytes, uint32_t * i)
             }
 
             //if the next byte is NOT a continuation byte
-            if( !rfUTF8_IsContinuationByte(bytes[*i+1]))
+            if( !rf_utf8_is_continuation_byte(bytes[*i+1]))
             {
                 RF_ERROR("While decoding a UTF-8 byte sequence, "
                          "and expecting a continuation byte, one "
@@ -380,8 +380,8 @@ bool rfUTF8_VerifyCstr(const char* bytes, uint32_t * i)
         else if( RF_HEXEQ_C( ( (~(bytes[*i] ^ 0xE0))>>4),0xF))
         {
             //if the string has invalid continuation bytes quit. They are in separate if checks to avoid checking outside of array bounds
-            if(!rfUTF8_IsContinuationByte(bytes[*i+1]) ||
-               !rfUTF8_IsContinuationByte(bytes[*i+2]) )
+            if(!rf_utf8_is_continuation_byte(bytes[*i+1]) ||
+               !rf_utf8_is_continuation_byte(bytes[*i+2]) )
             {
                 RF_ERROR("While decoding a UTF-8 byte sequence, "
                          "and expecting a continuation byte, one "
@@ -402,9 +402,9 @@ bool rfUTF8_VerifyCstr(const char* bytes, uint32_t * i)
             }
 
             //if the string has invalid continuation bytes quit. They are in separate if checks to avoid checking outside of array bounds
-            if(!rfUTF8_IsContinuationByte(bytes[*i+1]) ||
-               !rfUTF8_IsContinuationByte(bytes[*i+2]) ||
-               !rfUTF8_IsContinuationByte(bytes[*i+3]))
+            if(!rf_utf8_is_continuation_byte(bytes[*i+1]) ||
+               !rf_utf8_is_continuation_byte(bytes[*i+2]) ||
+               !rf_utf8_is_continuation_byte(bytes[*i+3]))
             {
                 RF_ERROR("While decoding a UTF-8 byte sequence, "
                          "and expecting a continuation byte, one "

@@ -29,7 +29,7 @@
 #include <Definitions/types.h> //for fixed size data types
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <Preprocessor/rf_tokens.h>//for the defined library tokens
-#include <String/string_decl.h> //for RF_String
+#include <String/string_decl.h> //for RFstring
 #include <Data_Structures/hashmap_decl.h>
 #include <Data_Structures/hasmap.h>
 ---------------------For internal library include make sure to have----------------------------
@@ -49,7 +49,7 @@ $ENDIF
 
 typedef struct @NODE
 {
-    RF_String key;
+    RFstring key;
     @TYPE  value;
     struct @NODE* next;
 }@NODE;

@@ -29,16 +29,16 @@
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/types.h> //for fixed size types needed in various places
 #include <String/unicode.h> //for the unicode macros RF_UTF8 and friends
-#include <String/string_decl.h>//for RF_String
-#include <String/stringx_decl.h>//for RF_StringX
+#include <String/string_decl.h>//for RFstring
+#include <String/stringx_decl.h>//for RFstringx
 #include <String/filesx.h>
 /*------------- Module related inclusion -------------*/
 #include <String/common.h> // for RFS_()
-#include <String/manipulationx.h> //for rfStringX_Append and others
-#include <String/traversalx.h> //for rfStringX_Reset and others
+#include <String/manipulationx.h> //for rf_stringx_append and others
+#include <String/traversalx.h> //for rf_stringx_reset and others
 #include "files.ph" //for some macros
 
-//for rfString_FInit
+//for rf_string_f_init
 #include <String/files.h>
 
 //Needed for IO/file.h
@@ -47,7 +47,7 @@
 #include <Definitions/retcodes.h> //for error codes, logged in allocation failure
 #include <IO/file.h> //for rfReadLine family  of functions
 
-//for rfStringXGet_Append()
+//for rf_stringxget_append()
 #include "manipulation.ph"
 
 /*------------- Outside Module inclusion -------------*/
@@ -64,13 +64,13 @@
 
 
 
-// Allocates and returns an RF_StringX from a file descriptor
-RF_StringX* rfStringX_FCreate(FILE* f, char* eof, char eol,
+// Allocates and returns an RFstringx from a file descriptor
+RFstringx* rf_stringx_f_create(FILE* f, char* eof, char eol,
                               int encoding, int endianess)
 {
-    RF_StringX* ret;
-    RF_MALLOC(ret, sizeof(RF_StringX), NULL);
-    if(!rfStringX_FInit(ret, f, eof, eol, encoding, endianess))
+    RFstringx* ret;
+    RF_MALLOC(ret, sizeof(*ret), NULL);
+    if(!rf_stringx_f_init(ret, f, eof, eol, encoding, endianess))
     {
         free(ret);
         ret = NULL;
@@ -78,11 +78,11 @@ RF_StringX* rfStringX_FCreate(FILE* f, char* eof, char eol,
     return ret;
 }
 
-// Initializes RF_String from a file descriptor
-bool rfStringX_FInit(RF_StringX* str, FILE* f, char* eof, char eol,
+// Initializes RFstring from a file descriptor
+bool rf_stringx_f_init(RFstringx* str, FILE* f, char* eof, char eol,
                      int encoding, int endianess)
 {
-    if(!rfString_FInit(&str->INH_String, f, eof, eol,
+    if(!rf_string_f_init(&str->INH_String, f, eof, eol,
                        encoding, endianess, &str->bSize))
     {
         return false;
@@ -93,21 +93,21 @@ bool rfStringX_FInit(RF_StringX* str, FILE* f, char* eof, char eol,
 }
 
 //Assigns to a StringX from file parsing
-bool rfStringX_FAssign(RF_StringX* str, FILE* f, char* eof, char eol,
+bool rf_stringx_f_assign(RFstringx* str, FILE* f, char* eof, char eol,
                        int encoding, int endianess)
 {
     UTF_FILE_READLINE(f, eol, eof, "assign")
     //success
     //assign it to the string
-    rfStringX_Reset(str);
+    rf_stringx_reset(str);
     if(str->bSize <= utf8ByteLength)
     {
         str->bSize = (utf8ByteLength)*2;
-        RF_REALLOC_JMP(rfString_Data(str), char, str->bSize,
+        RF_REALLOC_JMP(rf_string_data(str), char, str->bSize,
                                      ret = false, cleanup);
     }
-    memcpy(rfString_Data(str), utf8, utf8ByteLength);
-    rfString_ByteLength(str) = utf8ByteLength;
+    memcpy(rf_string_data(str), utf8, utf8ByteLength);
+    rf_string_length_bytes(str) = utf8ByteLength;
 
   cleanup:
     //free the file's utf8 buffer
@@ -116,12 +116,12 @@ bool rfStringX_FAssign(RF_StringX* str, FILE* f, char* eof, char eol,
 }
 
 //Appends to a String from UTF-8 file parsing
-bool rfStringX_FAppend(RF_StringX* str, FILE* f, char* eof, char eol,
+bool rf_stringx_f_append(RFstringx* str, FILE* f, char* eof, char eol,
                       int encoding, int endianess)
 {
     UTF_FILE_READLINE(f, eol, eof, "append")
     //append the utf8 to the given string
-    if(!rfStringXGEN_Append(str, utf8, utf8ByteLength))
+    if(!rf_stringxgen_append(str, utf8, utf8ByteLength))
     {
         RF_ERROR("Failed to append a utf8 buffer to a stringX");
         ret = false;

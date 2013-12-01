@@ -45,7 +45,7 @@ extern "C"
 //! @{
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Finds the length of the string in characters.
  ** @isinherited{StringX}
  **
@@ -53,11 +53,11 @@ extern "C"
  **               @inhtype{String,StringX}
  ** @return       Returns the length of the string in characters
  **/
-i_DECLIMEX_ uint32_t rfString_Length(const void * s);
+i_DECLIMEX_ uint32_t rf_string_length(const void * s);
 
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Gets the bytelength of the string
  ** @warning IS a macro. Only safe past a typecheck
  ** @isinherited{StringX}
@@ -65,10 +65,10 @@ i_DECLIMEX_ uint32_t rfString_Length(const void * s);
  ** @param            s_ A string pointer
  ** @return           The length of the string in bytes
  */
-#define rfString_ByteLength(s_) ((RF_String*)(s_))->length
+#define rf_string_length_bytes(s_) ((RFstring*)(s_))->length
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Gets a pointer to the data of a string
  ** @warning IS a macro. Only safe past a typecheck
  ** @isinherited{StringX}
@@ -76,10 +76,10 @@ i_DECLIMEX_ uint32_t rfString_Length(const void * s);
  ** @param s_      A string pointer
  ** @return        A pointer to the string's data
  */
-#define rfString_Data(s_) ((RF_String*)(s_))->data
+#define rf_string_data(s_) ((RFstring*)(s_))->data
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Retrieves the unicode code point of the parameter character.
  **
  ** @isinherited{StringX}
@@ -91,7 +91,7 @@ i_DECLIMEX_ uint32_t rfString_Length(const void * s);
  ** @param cp           Will return the unicode codepoint if succesfull
  ** @return             returns @c true for success and @c false for failure
  **/
-i_DECLIMEX_ bool rfString_GetChar(const void* thisstr,
+i_DECLIMEX_ bool rf_string_get_char(const void* thisstr,
                                   uint32_t c,
                                   uint32_t* cp);
 //! @}
@@ -100,7 +100,7 @@ i_DECLIMEX_ bool rfString_GetChar(const void* thisstr,
 //! @{
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Returns a substring of this string
  **
  ** @isinherited{StringX}
@@ -115,19 +115,19 @@ i_DECLIMEX_ bool rfString_GetChar(const void* thisstr,
  **                       If they exceed the end of the string then,
  **                       a substring only until the end of the string
  **                       shall be returned.
- ** @param ret            Pass a reference to an RF_String here to receive
+ ** @param ret            Pass a reference to an RFstring here to receive
  **                       the resulting substring.
  ** @return               Returns @c true if a substring exists and
  **                       @c false otherwise
- ** @see rfString_Between()
- ** @see rfString_After()
- ** @see rfString_Before()
+ ** @see rf_string_between()
+ ** @see rf_string_after()
+ ** @see rf_string_before()
  **/
-i_DECLIMEX_ bool rfString_Substr(const void* thisstr, uint32_t startPos,
-                                 uint32_t charsN, RF_String* ret);
+i_DECLIMEX_ bool rf_string_substr(const void* thisstr, uint32_t startPos,
+                                 uint32_t charsN, RFstring* ret);
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Finds if a substring exists inside another string.
  **
  ** @isinherited{StringX}
@@ -141,29 +141,29 @@ i_DECLIMEX_ bool rfString_Substr(const void* thisstr, uint32_t startPos,
  **                         @inhtype{String,StringX}
  ** @param sstr             The substring string we want to search for
  **                         @inhtype{String,StringX} @tmpSTR
- ** @param options          @see rfString_Remove() for details on this option
+ ** @param options          @see rf_string_remove() for details on this option
  ** @return                 Returns the character position of the found
  **                         substring or RF_FAILURE for not found
- ** @see rfString_Find_i()
+ ** @see rf_string_find_i()
  **/
-i_DECLIMEX_ int32_t rfString_Find(const void* thisstr, const void* sstr,
+i_DECLIMEX_ int32_t rf_string_find(const void* thisstr, const void* sstr,
                                   const char options);
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Finds if a substring exists inside a specific part of another string.
  **
  ** @isinherited{StringX}
  ** @lmsFunction
- ** @see rfString_Find()
+ ** @see rf_string_find()
  **/
-i_DECLIMEX_ int32_t rfString_Find_i(const void* thisstr, const void* sstr,
+i_DECLIMEX_ int32_t rf_string_find_i(const void* thisstr, const void* sstr,
                                     uint32_t startPos, uint32_t length,
                                     const char options);
 
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Finds if a String begins with a particular substring
  **
  ** @isinherited{StringX}
@@ -176,17 +176,17 @@ i_DECLIMEX_ int32_t rfString_Find_i(const void* thisstr, const void* sstr,
  **                      @inhtype{String,StringX}
  ** @param sstr          The substring to check for in the beginning
  **                      @inhtype{String,StringX} @tmpSTR
- ** @param options       For details @see rfString_Remove()
+ ** @param options       For details @see rf_string_remove()
  ** @return              Returns true if the string does begin with @c sstr
  **                      and false if not
- ** @see rfString_EndsWith()
+ ** @see rf_string_ends_with()
  **/
-#define rfString_BeginsWith(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_)     \
-    (rfString_Find((i_THISSTR_),(i_SEARCHSTR_),(i_OPTIONS_)) == 0)
+#define rf_string_begins_with(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_)     \
+    (rf_string_find((i_THISSTR_),(i_SEARCHSTR_),(i_OPTIONS_)) == 0)
 
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Finds if a String ends with a particular substring
  **
  ** @isinherited{StringX}
@@ -199,20 +199,20 @@ i_DECLIMEX_ int32_t rfString_Find_i(const void* thisstr, const void* sstr,
  **                       @inhtype{String,StringX}
  ** @param sstr           The substring to check for in the end of the
  **                       string @inhtype{String,StringX} @tmpSTR
- ** @param options        For details @see rfString_Remove()
+ ** @param options        For details @see rf_string_remove()
  ** @return               Returns true if the string does end with
  **                       @c sstr and false if not
- ** @see rfString_BeginsWith()
+ ** @see rf_string_begins_with()
  **
  **/
-#define rfString_EndsWith(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_)           \
+#define rf_string_ends_with(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_)           \
     (                                                                   \
-        rfString_Find(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_)               \
-        == (rfString_Length(i_THISSTR_)-rfString_Length(i_SEARCHSTR_)) )
+        rf_string_find(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_)               \
+        == (rf_string_length(i_THISSTR_)-rf_string_length(i_SEARCHSTR_)) )
 
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Counts how many times a substring occurs inside the string.
  **
  ** @isinherited{StringX}
@@ -221,11 +221,11 @@ i_DECLIMEX_ int32_t rfString_Find_i(const void* thisstr, const void* sstr,
  **                      @inhtype{String,StringX}
  ** @param sstr          The substring for which to search.
  **                      @inhtype{String,StringX} @tmpSTR
- ** @param options       For details @see rfString_Remove()
+ ** @param options       For details @see rf_string_remove()
  ** @return              Returns the number of times cstr exists inside the
  **                      string (0 is returned in case it's not found at all
  **/
-i_DECLIMEX_ unsigned int rfString_Count(const void* thisstr, const void* sstr,
+i_DECLIMEX_ unsigned int rf_string_count(const void* thisstr, const void* sstr,
                                         const char options);
 
 //! @}
@@ -234,7 +234,7 @@ i_DECLIMEX_ unsigned int rfString_Count(const void* thisstr, const void* sstr,
 //! @{
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Applies a limited version of sscanf after the specified substring
  **
  ** @isinherited{StringX}
@@ -249,11 +249,11 @@ i_DECLIMEX_ unsigned int rfString_Count(const void* thisstr, const void* sstr,
  **                          otherwise, substring not being found in the string
  **                          or sscanf unable to read into the variable
  **/
-i_DECLIMEX_ bool rfString_ScanfAfter(const void* thisstr, const void* afterstr,
+i_DECLIMEX_ bool rf_string_scanf_after(const void* thisstr, const void* afterstr,
                                      const char* format, void* var);
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Initializes the first substring, between two given strings
  **
  ** @isinherited{StringX}
@@ -268,36 +268,36 @@ i_DECLIMEX_ bool rfString_ScanfAfter(const void* thisstr, const void* afterstr,
  **                            substring. @inhtype{String,StringX} @tmpSTR
  ** @param[out] result         Pass a pointer to a String type to receive
  **                            the string between @c lstr and @c rstr.
- **                            If the passed pointer is of RF_StringX type
+ **                            If the passed pointer is of RFstringx type
  **                            also pass the @c RF_STRINGX_ARGUMENT bitflag
  **                            argument in the @c options argument.
  **                            This should NOT ever be null.
  **                            @inhtype{String,StringX}
- ** @param options             For details @see rfStringX_MoveAfter()
+ ** @param options             For details @see rf_stringx_move_after()
  ** @return                    Returns @c true if the substring is found and
  **                            initialized and @c false otherwise
- ** @see rfString_Before()
- ** @see rfString_After()
- ** @see rfStringX_MoveAfterPair()
+ ** @see rf_string_before()
+ ** @see rf_string_after()
+ ** @see rf_stringx_move_after_pair()
  **/
-i_DECLIMEX_ bool rfString_Between(const void* thisstr, const void* lstr,
+i_DECLIMEX_ bool rf_string_between(const void* thisstr, const void* lstr,
                                   const void* rstr, void* result,
                                   const char options);
 
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Initializes the given string as the substring from the
  ** start until any of the given Strings are found
  **
  ** @isinherited{StringX}
  ** The parameters that have to be given as variable argument
- ** <b>must</b> be of type RF_String* or RF_StringX* or even
+ ** <b>must</b> be of type RFstring* or RFstringx* or even
  ** string initialized with the temporary string macro
  ** @lmsFunction
  ** @param thisstr            The string to operate in. @inhtype{String,StringX}
- ** @param[out] result        For details @see rfString_Between()
- ** @param options            For details @see rfStringX_MoveAfter()
+ ** @param[out] result        For details @see rf_string_between()
+ ** @param options            For details @see rf_stringx_move_after()
  ** @param parN               The number of strings to search for
  ** @param ...                The strings to search for.
  **                           @inhtype{String,StringX} @tmpSTR
@@ -305,16 +305,16 @@ i_DECLIMEX_ bool rfString_Between(const void* thisstr, const void* lstr,
  **                           false if none of the parameters were found or an
  **                           invalid UTF-8 sequence was given. In the latter case
  **                           an error is also logged.
- ** @see rfString_Before()
- ** @see rfString_Afterv()
+ ** @see rf_string_before()
+ ** @see rf_string_afterv()
  **/
-i_DECLIMEX_ bool rfString_Beforev(const void* thisstr, void* result,
+i_DECLIMEX_ bool rf_string_beforev(const void* thisstr, void* result,
                                   const char options, const unsigned char parN,
                                   ...);
 
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Initializes the given string as the substring from the start
  ** until the given string is found
  **
@@ -324,20 +324,20 @@ i_DECLIMEX_ bool rfString_Beforev(const void* thisstr, void* result,
  **                           @inhtype{String,StringX}
  ** @param sstr               The substring that we want to find inside the
  **                           string @inhtype{String,StringX} @tmpSTR
- ** @param[out] result        For details @see rfString_Between()
- ** @param options            For details @see rfStringX_MoveAfter()
+ ** @param[out] result        For details @see rf_string_between()
+ ** @param options            For details @see rf_stringx_move_after()
  ** @return                   Returns @c true if the substring was initialized
  **                           and false if none of the parameters were found or
  **                           an invalid UTF-8 sequence was given.
  **                           In the latter case an error is also logged.
- ** @see rfString_Beforev()
- ** @see rfString_After()
+ ** @see rf_string_beforev()
+ ** @see rf_string_after()
  **/
-i_DECLIMEX_ bool rfString_Before(const void* thisstr, const void* sstr,
+i_DECLIMEX_ bool rf_string_before(const void* thisstr, const void* sstr,
                                  void* result, const char options);
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Initialize a string after a given substring
  **
  ** @isinherited{StringX}
@@ -350,19 +350,19 @@ i_DECLIMEX_ bool rfString_Before(const void* thisstr, const void* sstr,
  **                             will be formed. @inhtype{String,StringX}
  ** @param[in] after            The substring to search for inside the parameter
  **                             string. @inhtype{String,StringX} @tmpSTR
- ** @param[out] result          For details @see rfString_Between()
- ** @param options              For details @see rfStringX_MoveAfter()
+ ** @param[out] result          For details @see rf_string_between()
+ ** @param options              For details @see rf_stringx_move_after()
  ** @return                     Returns true for success and false if the
  **                             substring is not found in the parameter string.
- ** @see rfString_Afterv()
- ** @see rfString_Before()
- ** @see rfStringX_MoveAfter()
+ ** @see rf_string_afterv()
+ ** @see rf_string_before()
+ ** @see rf_stringx_move_after()
  **/
-i_DECLIMEX_ bool rfString_After(const void* thisstr, const void* after,
+i_DECLIMEX_ bool rf_string_after(const void* thisstr, const void* after,
                                 void* result, const char options);
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Initialize a string after the first of the given substrings found
  **
  ** @isinherited{StringX}
@@ -370,23 +370,23 @@ i_DECLIMEX_ bool rfString_After(const void* thisstr, const void* after,
  ** (and not including) the after substring inside the parameter string.
  ** If the substring is not located the function returns false.
  ** The parameters that have to be given as variable argument <b>must</b> be
- ** of type RF_String* or RF_StringX* or even string initializers
+ ** of type RFstring* or RFstringx* or even string initializers
  ** with the temporary string macro
  ** @lmsFunction
  ** @param[in] thisstr            The parameter string from which the substring
  **                               will be formed. @inhtype{String,StringX}
- ** @param[out] result            For details @see rfString_Between()
- ** @param options                For details @see rfStringX_MoveAfter()
+ ** @param[out] result            For details @see rf_string_between()
+ ** @param options                For details @see rf_stringx_move_after()
  ** @param parN                   The number of substrings to search for.
  ** @param ...                    The substrings to search for.
  **                               @inhtype{String,StringX} @tmpSTR
  ** @return                       Returns @c true for success and @c false if
  **                               the substring is not found in the parameter
  **                               string or in error
- ** @see rfString_After()
- ** @see rfString_Beforev()
+ ** @see rf_string_after()
+ ** @see rf_string_beforev()
  **/
-i_DECLIMEX_ bool rfString_Afterv(const void* thisstr, void* result,
+i_DECLIMEX_ bool rf_string_afterv(const void* thisstr, void* result,
                                  const char options, const unsigned char parN,
                                  ...);
 

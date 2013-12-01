@@ -37,7 +37,7 @@
  **/
 #define RF_MATCH_WORD 0x2
 /**
- ** Denotes that some specific argument is of RF_StringX type
+ ** Denotes that some specific argument is of RFstringx type
  **/
 #define RF_STRINGX_ARGUMENT 0x4
 

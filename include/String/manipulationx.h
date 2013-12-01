@@ -22,7 +22,7 @@
 **
 **
 ** --String/manipulationx.h
-** This header declares the functions that manipulate RF_StringX
+** This header declares the functions that manipulate RFstringx
 **/
 #ifndef RF_STRING_MANIPULATIONX_H
 #define RF_STRING_MANIPULATIONX_H
@@ -40,11 +40,11 @@ extern "C"
 #endif
 
 
-//! @name RF_StringX Appending
+//! @name RFstringx Appending
 //! @{
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Appends the parameter String to this extended string.
  **
  ** @lmsFunction
@@ -52,12 +52,12 @@ extern "C"
  ** @param other       The string to add to this string.
  **                    @inhtype{String,StringX} @tmpSTR
  ** @return            Returns @c true in success and @c false otherwise
- ** @see rfStringX_Prepend()
+ ** @see rf_stringx_prepend()
  **/
-i_DECLIMEX_ bool rfStringX_Append(RF_StringX* thisstr, const void* other);
+i_DECLIMEX_ bool rf_stringx_append(RFstringx* thisstr, const void* other);
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Appends a number of characters from the parameter String
  ** to this extended string.
  **
@@ -69,26 +69,26 @@ i_DECLIMEX_ bool rfStringX_Append(RF_StringX* thisstr, const void* other);
  **                     @inhtype{String,StringX} @tmpSTR
  ** @param chars        The number of chars of @c other to append to @c thisstr
  ** @return             Returns @c true in success and @c false otherwise
- ** @see rfStringX_Prepend()
+ ** @see rf_stringx_prepend()
  **/
-i_DECLIMEX_ bool rfStringX_Append_chars(RF_StringX* thisstr,
+i_DECLIMEX_ bool rf_stringx_append_chars(RFstringx* thisstr,
                                         const void* other,
                                         int chars);
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Appends a single unicode character to this string
  **
  ** @param thisstr      The extended string to append to
  ** @param unichar      The character to append to this string.
  **                     It should be a unicode codepoint (UTF-32)
  ** @return             Returns @c true in success and @c false otherwise
- ** @see rfStringX_Prepend()
+ ** @see rf_stringx_prepend()
  **/
-i_DECLIMEX_ bool rfStringX_Append_char(RF_StringX* thisstr, uint32_t unichar);
+i_DECLIMEX_ bool rf_stringx_append_char(RFstringx* thisstr, uint32_t unichar);
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Prepends the parameter String to this extended string
  **
  ** @lmsFunction
@@ -96,14 +96,14 @@ i_DECLIMEX_ bool rfStringX_Append_char(RF_StringX* thisstr, uint32_t unichar);
  ** @param other          The string to prepend to this string.
  **                       @inhtype{String,StringX} @tmpSTR
  ** @return               Returns @c true in success and @c false otherwise
- ** @see rfStringX_Append()
+ ** @see rf_stringx_append()
  **/
-i_DECLIMEX_ bool rfStringX_Prepend(RF_StringX* thisstr, const void* other);
+i_DECLIMEX_ bool rf_stringx_prepend(RFstringx* thisstr, const void* other);
 
 
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Inserts a string to this extended string at the
  ** parameter character position
  **
@@ -117,10 +117,10 @@ i_DECLIMEX_ bool rfStringX_Prepend(RF_StringX* thisstr, const void* other);
  **                    is over the string's size nothing happens.
  ** @param other       The string to add. @inhtype{String,StringX} @tmpSTR
  ** @return            Returns @c true in success and @c false otherwise
- ** @see rfStringX_Append()
- ** @see rfStringX_Prepend()
+ ** @see rf_stringx_append()
+ ** @see rf_stringx_prepend()
  **/
-i_DECLIMEX_ bool rfStringX_Insert(RF_StringX* thisstr, uint32_t pos,
+i_DECLIMEX_ bool rf_stringx_insert(RFstringx* thisstr, uint32_t pos,
                                   const void* other);
 
 //! @}
@@ -129,7 +129,7 @@ i_DECLIMEX_ bool rfStringX_Insert(RF_StringX* thisstr, uint32_t pos,
 //! @{
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Appends some bytes of the parameter String to this extended string.
  **
  ** @warning This is a dangerous function. No check is performed in the
@@ -142,44 +142,44 @@ i_DECLIMEX_ bool rfStringX_Insert(RF_StringX* thisstr, uint32_t pos,
  **                     @inhtype{String,StringX} @tmpSTR
  ** @param bytes        The number of bytes of @c other to append to @c thisstr
  ** @return             Returns @c true in success and @c false otherwise
- ** @see rfStringX_Append()
+ ** @see rf_stringx_append()
  **/
-i_DECLIMEX_ bool rfStringX_Append_bytes(RF_StringX* thisstr,
+i_DECLIMEX_ bool rf_stringx_append_bytes(RFstringx* thisstr,
                                         const void* other,
                                         const int32_t bytes);
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Appends a cstring to this string
  **
  ** @warning This is a dangerous function. No check is performed in the
  ** function to see if the given @c cstr is a valid UTF8 buffer.
  ** For a safe way to add a UTF8 string use
- ** @ref rfStringX_Append() and enclose the @c cstr with @ref RFS_()
+ ** @ref rf_stringx_append() and enclose the @c cstr with @ref RFS_()
  ** @param thisstr      The extended string to append to
  ** @param cstr         The cstring to add to this functions
  ** @return             Returns @c true in success and @c false otherwise
- ** @see rfStringX_Append()
+ ** @see rf_stringx_append()
  **/
-i_DECLIMEX_ bool rfStringX_Append_cstr(RF_StringX* thisstr,
+i_DECLIMEX_ bool rf_stringx_append_cstr(RFstringx* thisstr,
                                        const char* cstr);
 
 //! @}
 
-//! @name RF_StringX Replacing
+//! @name RFstringx Replacing
 //! @{
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Replaces all occurences of a String
- ** @see rfString_Replace()
+ ** @see rf_string_replace()
  **/
-i_DECLIMEX_ bool rfStringX_Replace(RF_StringX* thisstr, const void* sstr,
+i_DECLIMEX_ bool rf_stringx_replace(RFstringx* thisstr, const void* sstr,
                                    const void* rstr, uint32_t number,
                                    char options);
 
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Replaces Strings between substrings for a given number of occurences
  **
  ** Replaces what exists between the ith left and right substrings of this
@@ -190,16 +190,16 @@ i_DECLIMEX_ bool rfStringX_Replace(RF_StringX* thisstr, const void* sstr,
  **                    @inhtype{String,StringX} @tmpSTR
  ** @param rstr        The string to act as replacement.
  **                    @inhtype{String,StringX} @tmpSTR
- ** @param options     @see rfString_Replace()
+ ** @param options     @see rf_string_replace()
  ** @param i           \rfoptional{0}. The specific between occurence to 
  **                    replace. Should range between 1 and infinity. If 0 all
  **                    occurences will be replaced
  ** @return            Returns true if the replacing happened and false if
  **                    either the left or the right strings were not found or
  **                    for error
- ** @see rfStringX_Replace()
+ ** @see rf_stringx_replace()
  **/
-i_DECLIMEX_ bool rfStringX_ReplaceBetween(RF_StringX* thisstr,
+i_DECLIMEX_ bool rf_stringx_replace_between(RFstringx* thisstr,
                                           const void* left,
                                           const void* right,
                                           const void* rstr,

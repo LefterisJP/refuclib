@@ -36,7 +36,7 @@
 #include <String/unicode.h>
 #include <String/flags.h> //for some needed flags
 
-#include <Utils/constcmp.h> //for RF_HEXEQ_C() used in rfUTF8_IsContinuationByte() which itself is used in the iteration macros
+#include <Utils/constcmp.h> //for RF_HEXEQ_C() used in rf_utf8_is_continuation_byte() which itself is used in the iteration macros
 #include <String/core.h>
 
 #include <String/retrieval.h>
@@ -47,7 +47,7 @@
 #include <IO/common.h> //for RF_EOL macros used in String/files.h and String/filesx.h
 #include <String/files.h>
 
-/*---------RF_StringX headers--------*/
+/*---------RFstringx headers--------*/
 #include <String/stringx_decl.h>
 #include <String/corex.h>
 #include <String/manipulationx.h>

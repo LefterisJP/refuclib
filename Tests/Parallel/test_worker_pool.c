@@ -41,7 +41,7 @@ static void calculatePi(void* data)
 
 int main()
 {
-    RF_WorkerPool *pool;
+    RFworker_pool *pool;
     int i;
     double pi;
     circle_count = 0;
@@ -49,15 +49,15 @@ int main()
     DEFAULT_LIB_INIT();
 
     srand((unsigned int)time(NULL));
-    pool = rfWorkerPool_Create(THREADS_NUMBER);
+    pool = rf_workerpool_create(THREADS_NUMBER);
     EXPECT_NOT(pool, NULL);
 
     /* add tasks to the pool */
     for (i =0; i < THREADS_NUMBER; i++) {
-        rfWorkerPool_AddTask(pool, calculatePi, NULL);        
+        rf_workerpool_add_task(pool, calculatePi, NULL);        
     }
     /* destroy the pool and wait till all is done */
-    rfWorkerPool_Destroy(pool);
+    rf_workerpool_destroy(pool);
 
     /* use the results of the calculation to approximate pi */
     pi = 4.0f * ((float)circle_count / (float)POINTS_NUMBER);

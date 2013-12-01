@@ -3,12 +3,12 @@
 
 //for bool
     #include <Definitions/retcodes.h>
-//for RF_Buffer
+//for RFbuffer
     #include <Utils/buffer.h>
 //for thread specific attribute
     #include <Definitions/threadspecific.h>
 
-extern i_THREAD__ RF_Buffer _tsbuffa;
+extern i_THREAD__ RFbuffer _tsbuffa;
 #define TSBUFFA (&_tsbuffa)
 
 bool module_internal_init_ts();

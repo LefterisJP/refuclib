@@ -51,19 +51,19 @@ $INCLUDE @H
 //for local memory scope macros (where needed)
 $IF @LMS
     #include <Definitions/threadspecific.h> //for the thread specific attribute
-    #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
+    #include <Utils/localmem_decl.h> // for RFlocal_memory_stack
     #include <stdint.h> //for UINT32_MAX used in RF_ENTER_LOCAL_SCOPE() macro
     #include <Utils/localscope.h>
 $ENDIF
 /*------------- End of includes -------------*/
 
 //Allocates and returns an array of objects
-@DATA_STRUCT* rfDynamicArray_Create(uint32_t numElements)
+@DATA_STRUCT* rf_dynamic_array_create(uint32_t numElements)
 {
     @DATA_STRUCT* ret;
     //allocate the new array
     RF_MALLOC(ret, sizeof(@DATA_STRUCT), NULL);
-    if(! rfDynamicArray_Init(ret, numElements))
+    if(! rf_dynamic_array_init(ret, numElements))
     {
         free(ret);
         return NULL;
@@ -71,7 +71,7 @@ $ENDIF
     return ret;
 }
 //Initialises an array of objects
-bool rfDynamicArray_Init(@DATA_STRUCT* array, uint32_t numElements)
+bool rf_dynamic_array_init(@DATA_STRUCT* array, uint32_t numElements)
 {
     //allocate the data buffer
     array->bufferCapacity = @OBJECT_SIZE * numElements;
@@ -81,7 +81,7 @@ bool rfDynamicArray_Init(@DATA_STRUCT* array, uint32_t numElements)
     return true;
 }
 
-bool rfDynamicArray_Copy_IN(@DATA_STRUCT* dst, @DATA_STRUCT* src)
+bool rf_dynamic_array_copy_in(@DATA_STRUCT* dst, @DATA_STRUCT* src)
 {
     uint32_t i;
     dst->bufferCapacity = src->bufferCapacity;
@@ -96,11 +96,11 @@ bool rfDynamicArray_Copy_IN(@DATA_STRUCT* dst, @DATA_STRUCT* src)
     return true;
 }
 
-@DATA_STRUCT* rfDynamicArray_Copy_OUT(@DATA_STRUCT* src)
+@DATA_STRUCT* rf_dynamic_array_copy_out(@DATA_STRUCT* src)
 {
     @DATA_STRUCT* dst;
     RF_MALLOC(dst, sizeof(@DATA_STRUCT), NULL);
-    if(! rfDynamicArray_Copy_IN(dst, src))
+    if(! rf_dynamic_array_copy_in(dst, src))
     {
         free(dst);
         return NULL;
@@ -109,21 +109,21 @@ bool rfDynamicArray_Copy_IN(@DATA_STRUCT* dst, @DATA_STRUCT* src)
     return dst;
 }
 
-void rfDynamicArray_Destroy(@DATA_STRUCT* l)
+void rf_dynamic_array_destroy(@DATA_STRUCT* l)
 {
     //finally just free the  whole data buffer and the list object
     free(l->data);
     free(l);
 }
 
-void rfDynamicArray_Deinit(@DATA_STRUCT* l)
+void rf_dynamic_array_deinit(@DATA_STRUCT* l)
 {
     //finally just free the  whole data buffer
     free(l->data);
 }
 
 // Adds a new object at the end of the array
-bool rfDynamicArray_Add(@DATA_STRUCT* l, @TYPEPTR object)
+bool rf_dynamic_array_add(@DATA_STRUCT* l, @TYPEPTR object)
 {
     bool ret = true;
 $IF @LMS
@@ -162,7 +162,7 @@ $ENDIF
 }
 
 // Returns an object from the array
-@TYPEPTR rfDynamicArray_Get(
+@TYPEPTR rf_dynamic_array_get(
     @DATA_STRUCT* l,
     uint32_t i,
     bool* code)
@@ -178,7 +178,7 @@ $ENDIF
     return @SHALLOW_PTR_ARITHMETIC(l->data + i);
 }
 
-bool rfDynamicArray_Set(
+bool rf_dynamic_array_set(
     @DATA_STRUCT* l,
     uint32_t i,
     @TYPEPTR e)
@@ -204,7 +204,7 @@ $ENDIF
     return ret;
 }
 
-bool rfDynamicArray_Remove(@DATA_STRUCT* l, uint32_t i)
+bool rf_dynamic_array_remove(@DATA_STRUCT* l, uint32_t i)
 {
     //if the index points to a non-yet set element
     if(i >= l->size)

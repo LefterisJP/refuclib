@@ -44,7 +44,7 @@
 /*------------- End of includes -------------*/
 
 
-/* ====== RF_WorkerTask -- Start ====== */
+/* ====== RFworker_task -- Start ====== */
 
 typedef struct WorkerTask {
     //! Function pointer to the job to be done
@@ -53,11 +53,11 @@ typedef struct WorkerTask {
     void *task_data;
     //! Node to attach the task to the work queue
     RF_ILNode ln;
-} RF_WorkerTask;
+} RFworker_task;
 
-/* ====== RF_WorkerTask -- End ====== */
+/* ====== RFworker_task -- End ====== */
 
-/* ====== RF_WorkerThread -- Start ====== */
+/* ====== RFworker_thread -- Start ====== */
 
 typedef struct WorkerThread {
     //! Posix thread
@@ -68,22 +68,22 @@ typedef struct WorkerThread {
     bool must_terminate;
     //! Node to attach the worker to the pool
     RF_ILNode ln;
-} RF_WorkerThread;
+} RFworker_thread;
 
 static void *WorkerLoop(void *t)
 {
-    RF_WorkerThread *worker = t;
-    RF_WorkerTask *task;
+    RFworker_thread *worker = t;
+    RFworker_task *task;
     /* do all thread specific initialization here*/
 
     while(!worker->must_terminate) {
         usleep(RF_OPTION_WORKER_SLEEP_MICROSECONDS);
-        task = rfIList_Pop(&worker->work_queue, RF_WorkerTask, ln);
+        task = rf_ilist_pop(&worker->work_queue, RFworker_task, ln);
         while(task) {
             /* execute and free the task */
             task->task_ptr(task->task_data);
             free(task);
-            task = rfIList_Pop(&worker->work_queue, RF_WorkerTask, ln);
+            task = rf_ilist_pop(&worker->work_queue, RFworker_task, ln);
         }
     }
 
@@ -91,7 +91,7 @@ static void *WorkerLoop(void *t)
     return 0;
 }
 
-static bool rfWorkerThread_Init(RF_WorkerThread *thread)
+static bool rf_workerthread_init(RFworker_thread *thread)
 {
     pthread_attr_t attributes;
 
@@ -104,24 +104,24 @@ static bool rfWorkerThread_Init(RF_WorkerThread *thread)
     }
     pthread_attr_destroy(&attributes);
 
-    rfIList_HeadInit(&thread->work_queue);
+    rf_ilist_head_init(&thread->work_queue);
     thread->must_terminate = false;
     return true;
 }
 
-static RF_WorkerThread *rfWorkerThread_Create()
+static RFworker_thread *rf_workerthread_create()
 {
-    RF_WorkerThread *ret;
+    RFworker_thread *ret;
     RF_MALLOC(ret, sizeof(*ret), NULL);
     
-    if (!rfWorkerThread_Init(ret)) {
+    if (!rf_workerthread_init(ret)) {
         free(ret);
         return NULL;
     }
     return ret;
 }
 
-/* ====== RF_WorkerThread -- End ====== */
+/* ====== RFworker_thread -- End ====== */
 
 
 typedef struct WorkerPool {
@@ -131,12 +131,12 @@ typedef struct WorkerPool {
     int workers_num;
     //! The load of each worker in tasks (always incrementing)
     int load[RF_OPTION_MAX_WORKER_THREADS];
-} RF_WorkerPool;
+} RFworker_pool;
 
 /**
  ** Stupid load balancing algorithm for now
  **/
-static int rfWorkerPool_DecideWorker(RF_WorkerPool *p)
+static int rf_workerpool_decide_worker(RFworker_pool *p)
 {
     int i;
     int max_index, max_load;
@@ -150,9 +150,9 @@ static int rfWorkerPool_DecideWorker(RF_WorkerPool *p)
     return max_index;
 }
 
-bool rfWorkerPool_Init(RF_WorkerPool *p, int initial_workers_num)
+bool rf_workerpool_init(RFworker_pool *p, int initial_workers_num)
 {
-    RF_WorkerThread *worker;
+    RFworker_thread *worker;
     int i;
 
     if (initial_workers_num > RF_OPTION_MAX_WORKER_THREADS) {
@@ -167,72 +167,72 @@ bool rfWorkerPool_Init(RF_WorkerPool *p, int initial_workers_num)
         p->load[i] = 0;
     }
 
-    rfIList_HeadInit(&p->workers_list);
+    rf_ilist_head_init(&p->workers_list);
     for (i = 0; i < initial_workers_num; i ++) {
-        worker = rfWorkerThread_Create();
+        worker = rf_workerthread_create();
         if (!worker) {
             RF_ERROR("Failed to initialize a worker");
             return false;
         }
-        rfIList_Add(&p->workers_list, &worker->ln);
+        rf_ilist_add(&p->workers_list, &worker->ln);
     }
     
     return true;
 }
 
-RF_WorkerPool *rfWorkerPool_Create(int initial_workers_num)
+RFworker_pool *rf_workerpool_create(int initial_workers_num)
 {
-    RF_WorkerPool *ret;
+    RFworker_pool *ret;
     RF_MALLOC(ret, sizeof(*ret), NULL);
     
-    if (!rfWorkerPool_Init(ret, initial_workers_num)) {
+    if (!rf_workerpool_init(ret, initial_workers_num)) {
         free(ret);
         return NULL;
     }
     return ret;
 }
 
-void rfWorkerPool_Destroy(RF_WorkerPool *p)
+void rf_workerpool_destroy(RFworker_pool *p)
 {
-    RF_WorkerThread *worker;
-    RF_WorkerThread *tmp;
+    RFworker_thread *worker;
+    RFworker_thread *tmp;
 
     /* signal all threads they must terminate */
-    rfIList_ForEach(&p->workers_list, worker, ln) {
+    rf_ilist_for_each(&p->workers_list, worker, ln) {
         worker->must_terminate = true;
     }
 
     /* wait till they do */
-    rfIList_ForEach(&p->workers_list, worker, ln) {
+    rf_ilist_for_each(&p->workers_list, worker, ln) {
         pthread_join(worker->t, NULL);
     }
 
     /* and now we can free */
-    rfIList_ForEach_safe(&p->workers_list, worker, tmp, ln) {
+    rf_ilist_for_each_safe(&p->workers_list, worker, tmp, ln) {
         free(worker);
     }
     free(p);
 }
 
 
-bool rfWorkerPool_AddTask(RF_WorkerPool *p,
+bool rf_workerpool_add_task(RFworker_pool *p,
                                       ptr2task task_ptr,
                                       void* data)
 {
-    RF_WorkerTask *task;
-    RF_WorkerThread *worker;
+    RFworker_task *task;
+    RFworker_thread *worker;
     int worker_index, i;
 
     RF_MALLOC(task, sizeof(*task), false);
     task->task_ptr = task_ptr;
     task->task_data = data;
 
-    worker_index = rfWorkerPool_DecideWorker(p);
+    worker_index = rf_workerpool_decide_worker(p);
 
     i = 0;
-    rfIList_ForEach(&p->workers_list, worker, ln) {
+    rf_ilist_for_each(&p->workers_list, worker, ln) {
         if (i == worker_index) {
-            rfIList_AddTail(&worker->work_queue, &task->ln);
+            rf_ilist_add_tail(&worker->work_queue, &task->ln);
             p->load[worker_index] ++;
             return true;
         }

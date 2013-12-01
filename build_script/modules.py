@@ -225,10 +225,10 @@ modules.append(
                "shallow": "Data_Structures/list_shallow.ctemplate",
                "deep": "Data_Structures/list_deep.ctemplate"
            },
-           template_data_struct = "RF_List",
-           template_node = "RF_L_Node",
+           template_data_struct = "RFlist",
+           template_node = "RFlnode",
            gen_name_sub = [                        
-               "rfList",
+               "rf_list",
                "RF_LIST",
            ]
        )
@@ -244,9 +244,9 @@ modules.append(
                "deep": "Data_Structures/dynamicarray_deep.ctemplate",
                "shallow": "Data_Structures/dynamicarray_shallow.ctemplate"
            },
-           template_data_struct = "RF_DynamicArray",
+           template_data_struct = "RFdynamic_array",
            gen_name_sub = [
-               "rfDynamicArray",
+               "rf_dynamic_array",
                "RF_DYNAMICARRAY"
            ]
        )
@@ -259,10 +259,10 @@ modules.append(
            has_template = "HASHMAP",
            template_files = {"shallow": "Data_Structures/hashmap_shallow.ctemplate",
                              "deep": "Data_Structures/hashmap_deep.ctemplate"},
-           template_data_struct = "RF_Hashmap",
-           template_node = "RF_Hashslot",
+           template_data_struct = "RFhashmap",
+           template_node = "RFhashslot",
            gen_name_sub = [
-               "rfHashmap",
+               "rf_hashmap",
                "RF_HASHMAP",
            ]
        )

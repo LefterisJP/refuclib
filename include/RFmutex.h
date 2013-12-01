@@ -35,10 +35,10 @@
 #else
     #error Unsupported Operating System
 #endif
-#include <Threads/mutex_decl.h> //for RF_Mutex
+#include <Threads/mutex_decl.h> //for RFmutex
 #include <Threads/mutex.h>
 #else
-    #error Attempted to include RF_Mutex while not having compiled the library with the Thread module activated
+    #error Attempted to include RFmutex while not having compiled the library with the Thread module activated
 #endif
 
 

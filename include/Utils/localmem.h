@@ -32,7 +32,7 @@
 #include <Definitions/types.h> /* fixed size data types */
 #include <Definitions/imex.h> 
 #include <Definitions/threadspecific.h> 
-#include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
+#include <Utils/localmem_decl.h> // for RFlocal_memory_stack
 
 #ifdef __cplusplus
 extern "C"
@@ -40,23 +40,23 @@ extern "C"
 #endif
 
 /**
- ** @memberof RF_LocalMemoryStack
+ ** @memberof RFlocal_memory_stack
  ** @brief Initializes the local memory stack
  **
  ** This function simply initializes a local memory stack and should not 
  ** be used by the user directly. It is used in 2 occasions inside the
  ** library. Once inside the library's
- ** initialization function @ref rfInit() and at every new @ref RF_Thread
+ ** initialization function @ref rfInit() and at every new @ref RFthread
  **  initialization since this stack is thread specific.
  ** @param lms The Local Memory stack to initialize
  ** @param size The size that the local memory stack will have
  ** @return Returns @c true if initialized correctly and @c false otherwise
  **
  **/
-bool rfLMS_Init(RF_LocalMemoryStack* lms, uint64_t size);
+bool rf_lms_init(RFlocal_memory_stack* lms, uint64_t size);
 
 /**
- ** @memberof RF_LocalMemoryStack
+ ** @memberof RFlocal_memory_stack
  ** @brief Pushes the local memory stack
  **
  ** This function simply pushes the local memory stack for @c size bytes so
@@ -69,10 +69,10 @@ bool rfLMS_Init(RF_LocalMemoryStack* lms, uint64_t size);
  **  for no more local memory available
  **
  **/
-i_DECLIMEX_ void* rfLMS_Push(uint64_t size);
+i_DECLIMEX_ void* rf_lms_push(uint64_t size);
 
 /**
- ** @memberof RF_LocalMemoryStack
+ ** @memberof RFlocal_memory_stack
  ** @brief Pops the local stack memory back to a certain value
  **
  ** This function puts the local stack pointer back to a specific value
@@ -83,10 +83,10 @@ i_DECLIMEX_ void* rfLMS_Push(uint64_t size);
  ** attemped up to a point that has not yet been allocated
  **
  **/
-i_DECLIMEX_ bool rfLMS_Pop(uint64_t t);
+i_DECLIMEX_ bool rf_lms_pop(uint64_t t);
 
 /**
- ** @memberof RF_LocalMemoryStack
+ ** @memberof RFlocal_memory_stack
  ** @brief Keeps the stack pointer before the specific macro evaluation
  **
  ** This function remembers the stack pointer right before a given
@@ -99,8 +99,11 @@ i_DECLIMEX_ bool rfLMS_Pop(uint64_t t);
  ** @return Returns @c true for success and @c false if the maximum
  ** specified number of function arguments has been used
  **/
-i_DECLIMEX_ bool rfLMS_ArgsEval();
+i_DECLIMEX_ bool rf_lms_args_eval();
 
+
+
+i_DECLIMEX_ bool rf_module_lms_init(uint64_t size);
 
 //functions to declare create old value data types on the local stack
 //and pass them as parameters to functions which can accept them

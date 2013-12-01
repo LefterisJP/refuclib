@@ -40,7 +40,7 @@
  **Globals for Systeminformation
  **
  **/
-typedef struct RF_SystemInfo
+typedef struct RFsystem_info
 {
     //! A byte holding the system's endianess. Is @c 0 (@c RF_LITTLE_ENDIAN) for little endian and @c 1 (@c RF_BIG_ENDIAN) for big endian
     char endianess;
@@ -55,11 +55,11 @@ typedef struct RF_SystemInfo
 #else
     //! @todo
 #endif
-}RF_SystemInfo;
+}RFsystem_info;
 
 
 //system info global declaration
-extern RF_SystemInfo rfSysInfo;
+extern RFsystem_info rfSysInfo;
 
 
 /**

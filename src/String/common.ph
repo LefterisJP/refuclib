@@ -24,7 +24,7 @@
 **
 **
 ** -- String/common.ph
-** This is the private header file of the C RF_String
+** This is the private header file of the C RFstring
 ** containing functions and macros that don't need to be exposed
 ** to the user
 **/
@@ -50,9 +50,9 @@ extern "C"
 #endif
 
 /**
- ** Two macros to accomplish iteration of an RF_String starting from
+ ** Two macros to accomplish iteration of an RFstring starting from
  ** the beginning of the String. This macro should be used with its end pair.
- ** We take advantage of the fact that an RF_String is always guaranteed
+ ** We take advantage of the fact that an RFstring is always guaranteed
  ** to contain a valid UTF-8 sequence and thus no checks are performed.
  ** @param i_string_ The string to iterate
  ** @param i_char_ A variable to hold the current character position of the iteration
@@ -61,16 +61,16 @@ extern "C"
  **/
 #define RF_STRING_ITERATE_START(i_string_, i_char_, i_index_)         \
     i_index_ = 0;i_char_ = 0;                                         \
-    while( i_index_ < rfString_ByteLength(i_string_)){                \
-    if(!rfUTF8_IsContinuationByte(                                    \
-       rfString_Data(i_string_)[(i_index_)])){
+    while( i_index_ < rf_string_length_bytes(i_string_)){                \
+    if(!rf_utf8_is_continuation_byte(                                    \
+       rf_string_data(i_string_)[(i_index_)])){
 
 #define RF_STRING_ITERATE_END(i_char_, i_index_)  (i_char_)++;}(i_index_)++;}
 
 /**
- ** Two macros to accomplish iteration of an RF_String starting from the end
+ ** Two macros to accomplish iteration of an RFstring starting from the end
  ** of the String. This macro should be used with its end pair.
- ** We take advantage of the fact that an RF_String is always guaranteed
+ ** We take advantage of the fact that an RFstring is always guaranteed
  ** to contain a valid UTF-8 sequence and thus no checks are performed
  ** @param i_string_ The string to iterate
  ** @param i_char_ An unsigned variable to hold the current character
@@ -80,10 +80,10 @@ extern "C"
  **
  **/
 #define RF_STRING_ITERATEB_START(i_string_, i_char_, i_index_)     \
-    i_index_ = rfString_ByteLength(i_string_) - 1;(i_char_)=1;     \
+    i_index_ = rf_string_length_bytes(i_string_) - 1;(i_char_)=1;     \
     do{                                                            \
-    if(!rfUTF8_IsContinuationByte(                                 \
-           rfString_Data(i_string_)[(i_index_)])){
+    if(!rf_utf8_is_continuation_byte(                                 \
+           rf_string_data(i_string_)[(i_index_)])){
 
 #define RF_STRING_ITERATEB_END(i_char_, i_index_)       \
     (i_char_)++;}(i_index_)--;}while((i_index_) != 0);
@@ -108,15 +108,15 @@ extern "C"
             /*Reallocate the buffer depending on whether its internal pointer has a value or not*/ \
             if(STR_->bIndex == 0)                                       \
             {                                                           \
-                RF_REALLOC(rfString_Data(STR_), char,                   \
+                RF_REALLOC(rf_string_data(STR_), char,                   \
                            (STR_)->bSize, RETVALUE_);                     \
             }                                                           \
             else                                                        \
             {                                                           \
-                rfString_Data(STR_) -= (STR_)->bIndex;                  \
-                RF_REALLOC(rfString_Data(STR_), char,                   \
+                rf_string_data(STR_) -= (STR_)->bIndex;                  \
+                RF_REALLOC(rf_string_data(STR_), char,                   \
                            (STR_)->bSize, RETVALUE_);                     \
-                rfString_Data(STR_) += (STR_)->bIndex;                    \
+                rf_string_data(STR_) += (STR_)->bIndex;                    \
             }                                                           \
         }}while(0)
 
@@ -139,14 +139,14 @@ extern "C"
             (STR_)->bSize = (REQSIZE_+ (STR_)->bIndex) * RF_OPTION_STRINGX_CAPACITY_MULTIPLIER; \
             /*Reallocate the buffer depending on whether its internal pointer has a value or not*/ \
             if((STR_)->bIndex == 0)                                       \
-                RF_REALLOC_JMP(rfString_Data(STR_), char,               \
+                RF_REALLOC_JMP(rf_string_data(STR_), char,               \
                                (STR_)->bSize, STMT_, GOTOFLAG_);          \
                 else                                                    \
                 {                                                       \
-                    rfString_Data(STR_) -= (STR_)->bIndex;              \
-                    RF_REALLOC_JMP(rfString_Data(STR_), char,           \
+                    rf_string_data(STR_) -= (STR_)->bIndex;              \
+                    RF_REALLOC_JMP(rf_string_data(STR_), char,           \
                                    (STR_)->bSize, STMT_, GOTOFLAG_);      \
-                    rfString_Data(STR_) += (STR_)->bIndex;                \
+                    rf_string_data(STR_) += (STR_)->bIndex;                \
                 }                                                       \
         }}while(0)
 
@@ -170,8 +170,8 @@ bool strcmp_nnt(char* s1, unsigned int s1_len,
 
 /**
  ** @internal
- ** @memberof RF_String
- ** @brief Internal version of rfString_Find, used for byte position.
+ ** @memberof RFstring
+ ** @brief Internal version of rf_string_find, used for byte position.
  **
  ** @isinherited{StringX}
  ** Finds the existence of String sstr inside this string with the given
@@ -199,7 +199,7 @@ bool strcmp_nnt(char* s1, unsigned int s1_len,
  ** @endinternal
  **
  **/
-int rfString_FindBytePos(const void* thisstr, const void* sstr,
+int rf_string_find_byte_pos(const void* thisstr, const void* sstr,
                          const char options);
 
 
@@ -222,17 +222,17 @@ i_INLINE_DECL bool fill_fmt_buffer(const char *fmt,
                                    va_list args)
 {
     int ret;
-    size_t n = rfBuffer_Size(TSBUFFA);
-    *bIndex = rfBuffer_Index(TSBUFFA);
-    *buffPtr = rfBuffer_Ptr(TSBUFFA);
-    ret = vsnprintf(rfBuffer_Ptr(TSBUFFA), n, fmt, args);
+    size_t n = rf_buffer_size(TSBUFFA);
+    *bIndex = rf_buffer_index(TSBUFFA);
+    *buffPtr = rf_buffer_ptr(TSBUFFA);
+    ret = vsnprintf(rf_buffer_ptr(TSBUFFA), n, fmt, args);
     if(ret < 0)
     {
         return false;
     }
     if(ret >= n)
     {
-        ret = vsnprintf(rfBuffer_Ptr(TSBUFFA), n + ret, fmt, args);
+        ret = vsnprintf(rf_buffer_ptr(TSBUFFA), n + ret, fmt, args);
         if(ret < 0 || ret >= n)
         {
             return false;
@@ -244,16 +244,16 @@ i_INLINE_DECL bool fill_fmt_buffer(const char *fmt,
 }
 
 
-i_INLINE_DECL void rfStringGEN_Append(void *thisstr, const char* other,
+i_INLINE_DECL void rf_stringgen_append(void *thisstr, const char* other,
                                       unsigned int bytes_to_copy)
 {
     //add the string to this one
     memcpy(
-        rfString_Data(thisstr) + rfString_ByteLength(thisstr),
+        rf_string_data(thisstr) + rf_string_length_bytes(thisstr),
         other,
         bytes_to_copy
    );
-   rfString_ByteLength(thisstr) += bytes_to_copy;
+   rf_string_length_bytes(thisstr) += bytes_to_copy;
 }
 
 #ifdef __cplusplus

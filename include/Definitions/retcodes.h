@@ -113,7 +113,7 @@ enum {
         RE_TIMER_HIGHRES_UNSUPPORTED,//Error initializing a timer, the system does not support high resolution performance counter
         RE_TIMER_POSIX,//Error occured while using a posix timer function.
         RE_TIMER_QPC,//Error occured while using Windows Performance Counter function
-        RE_DATE_ILLEGAL_PARAM,//Illegal RF_Date parameters given
+        RE_DATE_ILLEGAL_PARAM,//Illegal RFdate parameters given
         RE_DATE_SYSTEM_ERROR,//Error during initialization of a Date in Linux. The system call returned an error
         RE_DATE_SET_SYSTEMTIME,//Error during setting the sytem time
         RE_DATE_ILLEGAL_MONTH, //Occurs when an illegal month value is encountered

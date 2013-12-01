@@ -33,26 +33,26 @@
 typedef struct atomic
 {
     int val;
-}RF_Atomic;
+}RFatomic;
 
 #define RF_ATOMIC_INIT(a_) {a_}
 
-static inline int rfAtomic_inc_fetch(RF_Atomic* a)
+static inline int rf_atomic_inc_fetch(RFatomic* a)
 {
     return __sync_add_and_fetch(a->val, 1);
 }
 
-static inline void rfAtomic_inc(RFAtomic* a)
+static inline void rf_atomic_inc(RFAtomic* a)
 {
     __sync_add_and_fetch(a->val, 1);
 }
 
-static inline int rfAtomic_dec_fetch(RFAtomic* a)
+static inline int rf_atomic_dec_fetch(RFAtomic* a)
 {
     return __sync_sub_and_fetch(a->val, 1);
 }
 
-static inline void rfAtomic_dec(RFatomic* a)
+static inline void rf_atomic_dec(RFatomic* a)
 {
     __sync_sub_and_fetch(a->val, 1);
 }

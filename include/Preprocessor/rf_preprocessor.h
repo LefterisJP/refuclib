@@ -22,8 +22,8 @@
 **
 */
 
-/** @defgroup RF_Preprocessor_DefaultArgsGRP Default Arguments Related Macros
-** @addtogroup RF_Preprocessor_DefaultArgsGRP
+/** @defgroup RFpreprocessor_default_args_g_r_p Default Arguments Related Macros
+** @addtogroup RFpreprocessor_default_args_g_r_p
 ** @{
 ** @def RF_DECLARE_DFUNCXX(retType,funcN,defArgsN,...)
 ** @brief Declares a function with default arguments
@@ -48,4 +48,4 @@
 ** @param ... Here give in order: 1)the type of each variable 2)the default arguments value. For example arg1Type,arg2Type,arg3Types,defValue1,defValue2
 **/
 #define RF_DEFINE_DFUNCXX(retType,funcN,...) //just so doxygen can parse it...temporary until I find another way
-//! @} //end of the RF_Preprocessor_DefaultArgsGRP group
+//! @} //end of the RFpreprocessor_default_args_g_r_p group

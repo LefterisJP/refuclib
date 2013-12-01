@@ -32,23 +32,23 @@
 //so that they can be determined for any type of object
 #define i_RF_GETTYPE_FUNCSTART(i_REFU_TYPE) \
     i_RP_PASTE3(i_TYPE_,i_REFU_TYPE,_FUNCSTART_)
-#define i_TYPE_RF_StringX_FUNCSTART_   rfStringX
-#define i_TYPE_RF_String_FUNCSTART_   rfString
-#define i_TYPE_RF_LinkedList_FUNCSTART_ rfLinkedList
-#define i_TYPE_RF_ListV_FUNCSTART_   rfListV
-#define i_TYPE_RF_ListP_FUNCSTART_   rfListP
-#define i_TYPE_RF_ArrayP_FUNCSTART_   rfArrayP
-#define i_TYPE_RF_ArrayV_FUNCSTART_   rfArrayV
-#define i_TYPE_RF_BinaryArray_FUNCSTART_   rfBinaryArray
+#define i_TYPE_RFstringx_f_u_n_c_s_t_a_r_t   rfStringX
+#define i_TYPE_RFstring_f_u_n_c_s_t_a_r_t   rfString
+#define i_TYPE_RFlinked_list_f_u_n_c_s_t_a_r_t rfLinkedList
+#define i_TYPE_RFlist_v_f_u_n_c_s_t_a_r_t   rfListV
+#define i_TYPE_RFlist_p_f_u_n_c_s_t_a_r_t   rfListP
+#define i_TYPE_RFarray_p_f_u_n_c_s_t_a_r_t   rfArrayP
+#define i_TYPE_RFarray_v_f_u_n_c_s_t_a_r_t   rfArrayV
+#define i_TYPE_RFbinary_array_f_u_n_c_s_t_a_r_t   rfBinaryArray
 #define i_TYPE_RF_XMLTag_FUNCSTART_   rfXMLTag
 #define i_TYPE_RF_XML_FUNCSTART_   rfXML
-#define i_TYPE_RF_Thread_FUNCSTART_   rfThread
-#define i_TYPE_RF_ThreadX_FUNCSTART_   rfThreadX
-#define i_TYPE_RF_Mutex_FUNCSTART_   rfMutex
-#define i_TYPE_RF_Semaphore_FUNCSTART_   rfSemaphore
-#define i_TYPE_RF_Date_FUNCSTART_   rfDate
-#define i_TYPE_RF_Timer_FUNCSTART_   rfTimer
-#define i_TYPE_RF_TextFile_FUNCSTART_   rfTextFile
+#define i_TYPE_RFthread_f_u_n_c_s_t_a_r_t   rfThread
+#define i_TYPE_RFthread_x_f_u_n_c_s_t_a_r_t   rfThreadX
+#define i_TYPE_RFmutex_f_u_n_c_s_t_a_r_t   rfMutex
+#define i_TYPE_RFsemaphore_f_u_n_c_s_t_a_r_t   rfSemaphore
+#define i_TYPE_RFdate_f_u_n_c_s_t_a_r_t   rfDate
+#define i_TYPE_RFtimer_f_u_n_c_s_t_a_r_t   rfTimer
+#define i_TYPE_RFtextfile_f_u_n_c_s_t_a_r_t   rfTextFile
 
 //===The macros here determine the tokens for the destruction/definit and copy functions of the refu object types===//
 

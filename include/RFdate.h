@@ -29,11 +29,11 @@
 
 #include <Definitions/types.h> //for the fixed size data types
 #include <Definitions/imex.h> //for the import export macro
-#include <Time/date_decl.h> //for RF_Date
+#include <Time/date_decl.h> //for RFdate
 #include <Time/date.h>
 
 #else
-    #error Attempted to include RF_Date while not having compiled the library with the appropriate module activated
+    #error Attempted to include RFdate while not having compiled the library with the appropriate module activated
 #endif
 
 #endif //include guards end

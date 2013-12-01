@@ -26,12 +26,12 @@
 #include <Definitions/imex.h> //import export macro
 #include <Definitions/types.h> //for the fixed size data types
 #ifdef RF_MODULE_TIME_TIMER//module check
-    #include <time.h> //for clockid_t used in RF_Timer
-    #include <Time/timer_decl.h> //for RF_Timer
+    #include <time.h> //for clockid_t used in RFtimer
+    #include <Time/timer_decl.h> //for RFtimer
     #include <Time/timer.h>
 #endif
 #ifdef RF_MODULE_TIME_DATE
-    #include <Time/date_decl.h> //for RF_Date
+    #include <Time/date_decl.h> //for RFdate
     #include <Time/date.h>
 #endif
 /*------------- Module related inclusion -------------*/
@@ -60,7 +60,7 @@ void rfSleep(uint32_t seconds)
     sleep(seconds);
 }
 //Suspends the calling thread for a number of milliseconds
-void rfSleep_ms(uint32_t milliseconds)
+void rf_sleep_ms(uint32_t milliseconds)
 {
     usleep(milliseconds*1000);
 }
@@ -68,7 +68,7 @@ void rfSleep_ms(uint32_t milliseconds)
 /*--- Timer functions ---*/
 #ifdef RF_MODULE_TIME_TIMER
 //initializes a timer
-char rfTimer_Init(RF_Timer* t,char resolution)
+char rf_timer_init(RFtimer* t,char resolution)
 {
     //check if we can have high res timer
     if(rfSysInfo.hasHighResTimer == false)
@@ -106,11 +106,11 @@ char rfTimer_Init(RF_Timer* t,char resolution)
 }
 
 // Allocates and returns a timer object
-RF_Timer* rfTimer_Create(char resolution)
+RFtimer* rf_timer_create(char resolution)
 {
-    RF_Timer* ret;
-    RF_MALLOC(ret, sizeof(RF_Timer), NULL);
-    if(rfTimer_Init(ret, resolution) == false)
+    RFtimer* ret;
+    RF_MALLOC(ret, sizeof(*ret), NULL);
+    if(rf_timer_init(ret, resolution) == false)
     {
         free(ret);
         return NULL;
@@ -119,13 +119,13 @@ RF_Timer* rfTimer_Create(char resolution)
 }
 
 // Destroys a timer
-void rfTimer_Destroy(RF_Timer* t)
+void rf_timer_destroy(RFtimer* t)
 {
     free(t);
 }
 
 // Queries a timer
-double rfTimer_Query(RF_Timer* t,char resolution)
+double rf_timer_query(RFtimer* t,char resolution)
 {
     double result=0;
     struct timespec query;
@@ -196,10 +196,10 @@ double rfTimer_Query(RF_Timer* t,char resolution)
 
 
 #ifdef RF_MODULE_TIME_DATE
-/*--- RF_Dates Functions ---*/
+/*--- RFdates Functions ---*/
 
 // Initializes a Date
-char rfDate_Init_Now(RF_Date* d,char local)
+char rf_date_init_now(RFdate* d,char local)
 {
     struct tm* date;
     //get the time
@@ -244,11 +244,11 @@ char rfDate_Init_Now(RF_Date* d,char local)
 }
 
 //Creates a date
-RF_Date* rfDate_Create_Now(char local)
+RFdate* rf_date_create_now(char local)
 {
-    RF_Date* ret;
-    RF_MALLOC(ret, sizeof(RF_Date), NULL);
-    if(rfDate_Init_Now(ret, local) == false)
+    RFdate* ret;
+    RF_MALLOC(ret, sizeof(*ret), NULL);
+    if(rf_date_init_now(ret, local) == false)
     {
         free(ret);
         return NULL;
@@ -257,7 +257,7 @@ RF_Date* rfDate_Create_Now(char local)
 }
 
 // Sets this date as the current system date and time
-char rfDate_SetToSystem(RF_Date* d)
+char rf_date_set_to_system(RFdate* d)
 {
     struct tm tm;
     tm.tm_sec = d->seconds;
@@ -282,7 +282,7 @@ char rfDate_SetToSystem(RF_Date* d)
     if(t == -1)
     {
         RF_ERROR(
-                 "Setting the system time from an RF_Date in Linux failed "
+                 "Setting the system time from an RFdate in Linux failed "
                  "because mktime() returned -1");
         return false;
     }
@@ -293,20 +293,20 @@ char rfDate_SetToSystem(RF_Date* d)
         {
             case EFAULT:
                 RF_ERROR(
-                    "Setting the system time from an RF_Date in Linux "
+                    "Setting the system time from an RFdate in Linux "
                     "failed in stime(). Error in getting information from"
                     " user space.", RE_DATE_SET_SYSTEMTIME);
             break;
             case EPERM:
                 RF_ERROR(
-                         "Setting the system time from an RF_Date in Linux "
+                         "Setting the system time from an RFdate in Linux "
                          "failed in stime().The calling process has "
                          "insufficient privilege. Under Linux the CAP_SYS_TIME"
                          " privilege is required.");
             break;
             default:
                 RF_ERROR(
-                         "Setting the system time from an RF_Date in Linux "
+                         "Setting the system time from an RFdate in Linux "
                          "failed in stime(). errno has unexpected value of %d",
                          errno);
             break;
@@ -318,7 +318,7 @@ char rfDate_SetToSystem(RF_Date* d)
 }
 
 // Sets this date as the current local date and time
-char rfDate_SetToLocal(RF_Date* d)
+char rf_date_set_to_local(RFdate* d)
 {
     struct tm tm;
     char *tz;
@@ -348,7 +348,7 @@ char rfDate_SetToLocal(RF_Date* d)
     if(t == -1)
     {
         RF_ERROR(
-                 "Setting the Local System time from an RF_Date in Linux "
+                 "Setting the Local System time from an RFdate in Linux "
                  "failed because mktime() returned -1");
         return false;
     }
@@ -368,20 +368,20 @@ char rfDate_SetToLocal(RF_Date* d)
         {
             case EFAULT:
                 RF_ERROR(
-                         "Setting the Local System time from an RF_Date in "
+                         "Setting the Local System time from an RFdate in "
                          "Linux failed in stime(). Error in getting "
                          "information from user space.");
             break;
             case EPERM:
                 RF_ERROR(
-                         "Setting the Local System time from an RF_Date in "
+                         "Setting the Local System time from an RFdate in "
                          "Linux failed in stime().The calling process has "
                          "insufficient privilege. Under Linux the CAP_SYS_TIME"
                          " privilege is required.");
             break;
             default:
                 RF_ERROR(
-                    "Setting the Local System time from an RF_Date in "
+                    "Setting the Local System time from an RFdate in "
                     "Linux failed in stime(). errno has unexpected value "
                     "of %d", errno);
             break;

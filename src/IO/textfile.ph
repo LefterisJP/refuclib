@@ -32,11 +32,11 @@
 
 #include <Definitions/types.h> //for fixed size types needed in various places
 #include <stdio.h> //for FILE*
-#include <String/string_decl.h> // for RF_String (used in RF_TextFile
-#include <IO/textfile_decl.h> //for RF_TextFile
+#include <String/string_decl.h> // for RFstring (used in RFtext_file
+#include <IO/textfile_decl.h> //for RFtext_file
 #include "textfile.ph"
 
-/// ================ Macros for usage only inside RF_TextFile functions ================= ///
+/// ================ Macros for usage only inside RFtext_file functions ================= ///
 
 /**
  ** A macro to resume the text file pointer back to a saved position starting

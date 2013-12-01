@@ -31,7 +31,7 @@
 //for memory allocation macros
     #include <Utils/memory.h> //for refu memory allocation
 //for unicode related macro
-    #include <String/unicode.h> //for rfUTF8_IsContinuationbyte
+    #include <String/unicode.h> //for rf_utf8_is_continuationbyte
 //for constant compare macros
     #include <Utils/constcmp.h> //for RF_HEXLE_US() macro and others
 //for endianess functions
@@ -42,7 +42,7 @@
 
 // Reads a UTF-8 file descriptor until end of line or EOF is found and
 // returns a UTF-8 byte buffer
-bool rfFReadLine_UTF8(FILE* f, char eol, char** utf8,
+bool rf_freadline_utf8(FILE* f, char eol, char** utf8,
                       uint32_t* byteLength,
                       uint32_t* bufferSize, char* eof)
 {
@@ -53,7 +53,7 @@ bool rfFReadLine_UTF8(FILE* f, char eol, char** utf8,
     RF_MALLOC(*utf8, *bufferSize, RE_MALLOC_FAILURE);
     *byteLength = 0;
     //read the start
-    if(!rfFgets_UTF8(*utf8, RF_OPTION_FGETS_READ_BYTESN, f,
+    if(!rf_fgets_utf8(*utf8, RF_OPTION_FGETS_READ_BYTESN, f,
                      eof, eol, &bytesN))
     {
         free(*utf8);
@@ -82,7 +82,7 @@ bool rfFReadLine_UTF8(FILE* f, char eol, char** utf8,
                             false);
             }
             bIndex += bytesN;
-            if(!rfFgets_UTF8((*utf8)+bIndex,
+            if(!rf_fgets_utf8((*utf8)+bIndex,
                              RF_OPTION_FGETS_READ_BYTESN,
                              f, eof, eol, &bytesN))
             {
@@ -103,7 +103,7 @@ bool rfFReadLine_UTF8(FILE* f, char eol, char** utf8,
     return true;
 }
 //Reads a Little Endian UTF-16 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
-bool rfFReadLine_UTF16(FILE* f, char eol, char** utf8,
+bool rf_freadline_utf16(FILE* f, char eol, char** utf8,
                          uint32_t* byteLength, char* eof,
                          uint32_t* bytes_read, int endianess)
 {
@@ -115,7 +115,7 @@ bool rfFReadLine_UTF16(FILE* f, char eol, char** utf8,
     bool ret = true, buffAllocated = false;
     *bytes_read = 0;
 
-    if(!rfFgets_UTF16(buff, RF_OPTION_FGETS_READ_BYTESN, f, eof,
+    if(!rf_fgets_utf16(buff, RF_OPTION_FGETS_READ_BYTESN, f, eof,
                        eol, &bytesN, endianess))
     {
         RF_ERROR("There was an error while readine a line from a UTF16 file "
@@ -136,7 +136,7 @@ bool rfFReadLine_UTF16(FILE* f, char eol, char** utf8,
         //keep reading until we have read all until newline or EOF
         do
         {
-            if(!rfFgets_UTF16(tempBuff + (*bytes_read),
+            if(!rf_fgets_utf16(tempBuff + (*bytes_read),
                               RF_OPTION_FGETS_READ_BYTESN,
                               f, eof, eol, &bytesN, endianess))
             {
@@ -165,7 +165,7 @@ bool rfFReadLine_UTF16(FILE* f, char eol, char** utf8,
     RF_MALLOC_JMP(codepoints, ((*bytes_read) + 5) * 2, ret = false,
                   cleanup2);
     //decode it into codepoints
-    if(!rfUTF16_Decode(tempBuff, *bytes_read, &charsN,
+    if(!rf_utf16_decode(tempBuff, *bytes_read, &charsN,
                        codepoints, (*bytes_read+5)*2))
     {
 
@@ -175,7 +175,7 @@ bool rfFReadLine_UTF16(FILE* f, char eol, char** utf8,
     }
     //now encode these codepoints into UTF8
     RF_MALLOC_JMP(*utf8, charsN*4, ret = false, cleanup1);
-    if(!rfUTF8_Encode(codepoints, charsN, byteLength, *utf8, charsN*4))
+    if(!rf_utf8_encode(codepoints, charsN, byteLength, *utf8, charsN*4))
     {
         RF_ERROR("Failed to encode the File Descriptor's UTF-16 "
                  "bytestream to UTF-8");
@@ -197,7 +197,7 @@ bool rfFReadLine_UTF16(FILE* f, char eol, char** utf8,
 
 
 //Reads a UTF-32 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
-bool rfFReadLine_UTF32(FILE* f, char eol, char** utf8,
+bool rf_freadline_utf32(FILE* f, char eol, char** utf8,
                        uint32_t* byteLength, char* eof,
                        uint32_t* bytes_read, int endianess)
 {
@@ -207,7 +207,7 @@ bool rfFReadLine_UTF32(FILE* f, char eol, char** utf8,
     char* tempBuff = 0,buffAllocated=false;
     *bytes_read = 0;
 
-    if(!rfFgets_UTF32(buff, RF_OPTION_FGETS_READ_BYTESN, f, eof,
+    if(!rf_fgets_utf32(buff, RF_OPTION_FGETS_READ_BYTESN, f, eof,
                       eol, &bytesN, endianess))
     {
         RF_ERROR("There was an error while reading a line from a UTF-32 "
@@ -229,7 +229,7 @@ bool rfFReadLine_UTF32(FILE* f, char eol, char** utf8,
         //keep reading until we have read all until newline or EOF
         do
         {
-            if(!rfFgets_UTF32(tempBuff + (*bytes_read),
+            if(!rf_fgets_utf32(tempBuff + (*bytes_read),
                               RF_OPTION_FGETS_READ_BYTESN,
                               f, eof, eol, &bytesN, endianess))
             {
@@ -258,7 +258,7 @@ bool rfFReadLine_UTF32(FILE* f, char eol, char** utf8,
     codepoints = (uint32_t*)tempBuff;
     //now encode these codepoints into UTF8
     RF_MALLOC_JMP(*utf8, *bytes_read, ret = false, cleanup);
-    if(!rfUTF8_Encode(codepoints, (*bytes_read)/4, byteLength, *utf8, *bytes_read))
+    if(!rf_utf8_encode(codepoints, (*bytes_read)/4, byteLength, *utf8, *bytes_read))
     {
         RF_ERROR("Failed to encode the File Descriptor's UTF-32 "
                  "bytestream to UTF-8");
@@ -278,7 +278,7 @@ bool rfFReadLine_UTF32(FILE* f, char eol, char** utf8,
 
 
 //This is a function that's similar to c library fgets but it also returns the number of bytes read and works for UTF-32 encoded files
-bool rfFgets_UTF32(char* buff, uint32_t num, FILE* f,
+bool rf_fgets_utf32(char* buff, uint32_t num, FILE* f,
                    char* eofReached, char eol, uint32_t* bytes_read,
                    int endianess)
 {
@@ -298,7 +298,7 @@ bool rfFgets_UTF32(char* buff, uint32_t num, FILE* f,
 
     //if end of file or end of line is not found, keep reading
     do{
-        if(rfFgetc_UTF32(f, (uint32_t*)(buff + (*bytes_read)),
+        if(rf_fgetc_utf32(f, (uint32_t*)(buff + (*bytes_read)),
                          endianess, eofReached) < 0)
         {
             if(*eofReached)
@@ -352,7 +352,7 @@ bool rfFgets_UTF32(char* buff, uint32_t num, FILE* f,
     buff[(*bytes_read)] =  buff[(*bytes_read) + 1] = buff[(*bytes_read)+2] = 
     buff[(*bytes_read)+3] = '\0';
     //finally check yet again for end of file right after the new line
-    if(rfFgetc_UTF32(f,&c, endianess, eofReached) < 0 && !(*eofReached))
+    if(rf_fgetc_utf32(f,&c, endianess, eofReached) < 0 && !(*eofReached))
     {
             RF_ERROR("Reading error while reading from a "
                      "UTF-32 byte stream");
@@ -372,7 +372,7 @@ bool rfFgets_UTF32(char* buff, uint32_t num, FILE* f,
 }
 
 //Gets a number of bytes from a UTF-16 file descriptor
-bool rfFgets_UTF16(char* buff, uint32_t num, FILE* f,
+bool rf_fgets_utf16(char* buff, uint32_t num, FILE* f,
                    char* eofReached, char eol, uint32_t* bytes_read,
                    int endianess)
 {
@@ -393,7 +393,7 @@ bool rfFgets_UTF16(char* buff, uint32_t num, FILE* f,
     *bytes_read = 0;
     //if end of file or end of line is not found, keep reading
     do{
-        bytesN = rfFgetc_UTF16(f,(uint32_t*)(buff + (*bytes_read)), false,
+        bytesN = rf_fgetc_utf16(f,(uint32_t*)(buff + (*bytes_read)), false,
                                endianess, eofReached);
         //error check
         if(bytesN < 0)
@@ -447,7 +447,7 @@ bool rfFgets_UTF16(char* buff, uint32_t num, FILE* f,
     }while(c !=(uint32_t) EOF && !eolReached);
 
     //finally check yet again for end of file right after the new line
-    bytesN = rfFgetc_UTF16(f, &c, false, endianess, eofReached);
+    bytesN = rf_fgetc_utf16(f, &c, false, endianess, eofReached);
     if(bytesN < 0 && !(*eofReached))
     {
         RF_ERROR("An error was encountered while reading the end of "
@@ -468,7 +468,7 @@ bool rfFgets_UTF16(char* buff, uint32_t num, FILE* f,
 }
 
 //Gets a number of bytes from a UTF-8 file descriptor
-bool rfFgets_UTF8(char* buff, uint32_t num, FILE* f,
+bool rf_fgets_utf8(char* buff, uint32_t num, FILE* f,
                    char* eofReached, char eol, uint32_t* bytes_read)
 {
     uint32_t c;
@@ -479,7 +479,7 @@ bool rfFgets_UTF8(char* buff, uint32_t num, FILE* f,
     *bytes_read = 0;
     //if end of file or end of line is not found, keep reading
     do{
-        bytesN = rfFgetc_UTF8(f, (uint32_t*)(buff + (*bytes_read)),
+        bytesN = rf_fgetc_utf8(f, (uint32_t*)(buff + (*bytes_read)),
                               false, eofReached);
         if(*eofReached == true)
         {
@@ -560,7 +560,7 @@ bool rfFgets_UTF8(char* buff, uint32_t num, FILE* f,
 }
 
 //Gets a unicode character from a UTF-8 file descriptor
-int rfFgetc_UTF8(FILE* f, uint32_t *ret, char cp, char* eof)
+int rf_fgetc_utf8(FILE* f, uint32_t *ret, char cp, char* eof)
 {
 #define UTF8_FGETC_FAIL()                                               \
     do{                                                                 \
@@ -630,7 +630,7 @@ int rfFgetc_UTF8(FILE* f, uint32_t *ret, char cp, char* eof)
                 UTF8_FGETC_FAIL();
             }
             //if this second byte is NOT a continuation byte
-            if( !rfUTF8_IsContinuationByte(c2))
+            if( !rf_utf8_is_continuation_byte(c2))
             {
                 RF_ERROR("While decoding a UTF-8 file byte "
                           "stream, and expecting a continuation "
@@ -665,8 +665,8 @@ int rfFgetc_UTF8(FILE* f, uint32_t *ret, char cp, char* eof)
                 UTF8_FGETC_FAIL();
             }
             //if the subsequent bytes are NOT  continuation bytes
-            if( !rfUTF8_IsContinuationByte(c2) ||
-                !rfUTF8_IsContinuationByte(c3))
+            if( !rf_utf8_is_continuation_byte(c2) ||
+                !rf_utf8_is_continuation_byte(c3))
             {
                 RF_ERROR(
                          "While decoding a UTF-8 file byte stream, and "
@@ -717,9 +717,9 @@ int rfFgetc_UTF8(FILE* f, uint32_t *ret, char cp, char* eof)
             }
 
             //if the subsequent bytes are NOT  continuation bytes
-            if( !rfUTF8_IsContinuationByte(c2) ||
-                !rfUTF8_IsContinuationByte(c3) ||
-                !rfUTF8_IsContinuationByte(c4))
+            if( !rf_utf8_is_continuation_byte(c2) ||
+                !rf_utf8_is_continuation_byte(c3) ||
+                !rf_utf8_is_continuation_byte(c4))
             {
                 RF_ERROR(
                     0, "While decoding a UTF-8 file byte stream, and "
@@ -760,7 +760,7 @@ int rfFgetc_UTF8(FILE* f, uint32_t *ret, char cp, char* eof)
 }
 
 //Gets a unicode character from a UTF-16 file descriptor
-int rfFgetc_UTF16(FILE* f, uint32_t *c, char cp, int endianess, char* eof)
+int rf_fgetc_utf16(FILE* f, uint32_t *c, char cp, int endianess, char* eof)
 {
     uint16_t v1,v2;
     *eof = false;
@@ -839,7 +839,7 @@ int rfFgetc_UTF16(FILE* f, uint32_t *c, char cp, int endianess, char* eof)
     return 2;
 }
 //Gets a unicode character from a UTF-32 Little Endian file descriptor
-int rfFgetc_UTF32(FILE* f, uint32_t *c, int endianess, char* eof)
+int rf_fgetc_utf32(FILE* f, uint32_t *c, int endianess, char* eof)
 {
     *eof = false;
 #if RF_OPTION_DEBUG
@@ -870,7 +870,7 @@ int rfFgetc_UTF32(FILE* f, uint32_t *c, int endianess, char* eof)
 
 
 //Moves a unicode character backwards in a UTF-32 file stream
-int rfFback_UTF32(FILE* f, uint32_t *c, int endianess)
+int rf_fback_utf32(FILE* f, uint32_t *c, int endianess)
 {
 #if RF_OPTION_DEBUG
     if(endianess != RF_LITTLE_ENDIAN || endianess != RF_BIG_ENDIAN)
@@ -912,7 +912,7 @@ int rfFback_UTF32(FILE* f, uint32_t *c, int endianess)
 
 
 // Moves a unicode character backwards in a UTF-16 file stream
-int rfFback_UTF16(FILE* f, uint32_t *c, int endianess)
+int rf_fback_utf16(FILE* f, uint32_t *c, int endianess)
 {
     uint16_t v1,v2;
 #if RF_OPTION_DEBUG
@@ -1013,7 +1013,7 @@ int rfFback_UTF16(FILE* f, uint32_t *c, int endianess)
 }
 
 //Moves a unicode character backwards in a UTF-8 file stream
-int rfFback_UTF8(FILE* f, uint32_t *c)
+int rf_fback_utf8(FILE* f, uint32_t *c)
 {
     //read one byte before the current
     int i = 0;
@@ -1045,7 +1045,7 @@ int rfFback_UTF8(FILE* f, uint32_t *c)
             return -1;
         }
         i++;
-    }while(rfUTF8_IsContinuationByte(bytes[i-1]));
+    }while(rf_utf8_is_continuation_byte(bytes[i-1]));
 
     switch(i)//depending on the number of bytes read backwards
     {
@@ -1090,4 +1090,4 @@ int rfFback_UTF8(FILE* f, uint32_t *c)
 
 
 //for creation of external symbol
-i_INLINE_INS int rfStat(RF_String* f, stat_rft* buffer);
+i_INLINE_INS int rfStat(RFstring* f, stat_rft* buffer);

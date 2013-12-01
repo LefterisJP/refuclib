@@ -9,14 +9,14 @@
     #include <Utils/memory.h> 
 //for memcpy
     #include <string.h>
-typedef struct RF_Buffer
+typedef struct RFbuffer
 {
     char* buff;
     size_t size;
     unsigned int index;
-}RF_Buffer;
+}RFbuffer;
 
-i_INLINE_DECL bool rfBuffer_Init(RF_Buffer* b, size_t size)
+i_INLINE_DECL bool rf_buffer_init(RFbuffer* b, size_t size)
 {
     b->size = size;
     b->index = 0;
@@ -24,12 +24,12 @@ i_INLINE_DECL bool rfBuffer_Init(RF_Buffer* b, size_t size)
     return true;
 }
 
-i_INLINE_DECL char* rfBuffer_Ptr(RF_Buffer* b)
+i_INLINE_DECL char* rf_buffer_ptr(RFbuffer* b)
 {
     return b->buff + b->index;
 }
 
-i_INLINE_DECL bool rfBuffer_Increase(RF_Buffer* b, size_t size)
+i_INLINE_DECL bool rf_buffer_increase(RFbuffer* b, size_t size)
 {
     if(size <= b->index + b->size)
     {
@@ -41,41 +41,41 @@ i_INLINE_DECL bool rfBuffer_Increase(RF_Buffer* b, size_t size)
     return true;
 }
 
-i_INLINE_DECL bool rfBuffer_Copy(RF_Buffer* b, const char* src, size_t len)
+i_INLINE_DECL bool rf_buffer_copy(RFbuffer* b, const char* src, size_t len)
 {
-    if(!rfBuffer_Increase(b, len))
+    if(!rf_buffer_increase(b, len))
     {
         return false;
     }
 
-    memcpy(rfBuffer_Ptr(b), src, len);
+    memcpy(rf_buffer_ptr(b), src, len);
     return true;
 }
 
-i_INLINE_DECL size_t rfBuffer_Size(RF_Buffer* b)
+i_INLINE_DECL size_t rf_buffer_size(RFbuffer* b)
 {
     return b->size - b->index;
 }
 
 
-i_INLINE_DECL void rfBuffer_SetIndex(RF_Buffer* b, unsigned int index)
+i_INLINE_DECL void rf_buffer_set_index(RFbuffer* b, unsigned int index)
 {
     b->index = index;
 }
 
-i_INLINE_DECL unsigned int rfBuffer_Index(RF_Buffer* b)
+i_INLINE_DECL unsigned int rf_buffer_index(RFbuffer* b)
 {
     return b->index;
 }
 
-#define rfBuffer_Size_u32(i_BUFF_) \
-    (rfBuffer_Size(i_BUFF_) / sizeof(uint32_t))
+#define rf_buffer_size_u32(i_BUFF_) \
+    (rf_buffer_size(i_BUFF_) / sizeof(uint32_t))
 
-#define rfBuffer_Ptr_u32(i_BUFF_, i_IND_)       \
-    ((uint32_t*)rfBuffer_Ptr(i_BUFF_))[i_IND_]
+#define rf_buffer_ptr_u32(i_BUFF_, i_IND_)       \
+    ((uint32_t*)rf_buffer_ptr(i_BUFF_))[i_IND_]
 
-#define rfBuffer_Increase_u32(i_BUFF_, i_SIZE_) \
-    rfBuffer_Increase(i_BUFF_, (i_SIZE_) * sizeof(uint32_t))
+#define rf_buffer_increase_u32(i_BUFF_, i_SIZE_) \
+    rf_buffer_increase(i_BUFF_, (i_SIZE_) * sizeof(uint32_t))
 
 
 #endif

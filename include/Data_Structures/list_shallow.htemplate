@@ -53,7 +53,7 @@ extern "C"
  ** @return Returns true in succesfull initialization and false otherwise
  **/
 
-i_DECLIMEX_ @DATA_STRUCT*  rfList_Create();
+i_DECLIMEX_ @DATA_STRUCT*  rf_list_create();
 
 /**
  ** @brief Initializes a single linked list of objects
@@ -61,7 +61,7 @@ i_DECLIMEX_ @DATA_STRUCT*  rfList_Create();
  ** @param l the list to initialize
  ** @return Returns true in succesfull initialization and false otherwise
  **/
-i_DECLIMEX_ bool  rfList_Init(@DATA_STRUCT* l);
+i_DECLIMEX_ bool  rf_list_init(@DATA_STRUCT* l);
 
 /**
  ** @brief Copies src into dst
@@ -71,7 +71,7 @@ i_DECLIMEX_ bool  rfList_Init(@DATA_STRUCT* l);
  ** @return Returns @c true in successful copying @c false otherwise
  **
  **/
-i_DECLIMEX_ bool rfList_Copy_IN(@DATA_STRUCT* dst,
+i_DECLIMEX_ bool rf_list_copy_in(@DATA_STRUCT* dst,
                                 @DATA_STRUCT* src);
 /**
  ** @brief Creates and returns an allocated copy of the given 
@@ -81,21 +81,21 @@ i_DECLIMEX_ bool rfList_Copy_IN(@DATA_STRUCT* dst,
  ** @return An allocated @DATA_STRUCT copy of the given list
  **
  **/
-i_DECLIMEX_ @DATA_STRUCT* rfList_Copy_OUT(@DATA_STRUCT* src);
+i_DECLIMEX_ @DATA_STRUCT* rf_list_copy_out(@DATA_STRUCT* src);
 
 /**
  ** @brief Destroys a single linked list of objects
  **
  ** @param a The list to destroy
  **/
-i_DECLIMEX_ void rfList_Destroy(@DATA_STRUCT* a);
+i_DECLIMEX_ void rf_list_destroy(@DATA_STRUCT* a);
 
 /**
  ** @brief Deinitializes a single linked list of objects
  **
  ** @param a The list to destroy
  **/
-i_DECLIMEX_ void rfList_Deinit(@DATA_STRUCT* a);
+i_DECLIMEX_ void rf_list_deinit(@DATA_STRUCT* a);
 
 
 /**
@@ -106,7 +106,7 @@ i_DECLIMEX_ void rfList_Deinit(@DATA_STRUCT* a);
  ** @return Returns @c true in succesfull addition of an element in the
  ** list and @c false otherwise
  **/
-i_DECLIMEX_ bool rfList_Add(@DATA_STRUCT* a, @TYPEPTR e);
+i_DECLIMEX_ bool rf_list_add(@DATA_STRUCT* a, @TYPEPTR e);
 
 /**
  ** @brief Deletes an element from a single linked list
@@ -116,7 +116,7 @@ i_DECLIMEX_ bool rfList_Add(@DATA_STRUCT* a, @TYPEPTR e);
  ** @return Returns @c true if the element is found and deleted from the
  ** list and @c false otherwise
  **/
-i_DECLIMEX_ bool rfList_Delete(@DATA_STRUCT* a, @TYPEPTR e);
+i_DECLIMEX_ bool rf_list_delete(@DATA_STRUCT* a, @TYPEPTR e);
 
 
 
@@ -127,7 +127,7 @@ i_DECLIMEX_ bool rfList_Delete(@DATA_STRUCT* a, @TYPEPTR e);
  ** @param e A pointer to the element to search for in the list
  ** @return Returns @c true if the element is found and false otherwise
  **/
-i_DECLIMEX_ bool rfList_Has(@DATA_STRUCT* a, @TYPEPTR ret);
+i_DECLIMEX_ bool rf_list_has(@DATA_STRUCT* a, @TYPEPTR ret);
 
 /**
  ** This macro is used to iterate a list from each start node until
@@ -137,7 +137,7 @@ i_DECLIMEX_ bool rfList_Has(@DATA_STRUCT* a, @TYPEPTR ret);
  ** the linked list. In every iteration this pointer will point to the 
  ** current data. If type is generic then give a void*
  **/
-#define rfList_Iterate(i_LIST_, i_DATA_PTR_) \
+#define rf_list_iterate(i_LIST_, i_DATA_PTR_) \
     @NODE* i_anode_ptr_ = (i_LIST_)->start->next;\
     for(i_DATA_PTR_ = (i_anode_ptr_->data);        \
         i_anode_ptr_->next != 0;                   \

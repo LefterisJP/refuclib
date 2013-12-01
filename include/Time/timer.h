@@ -22,17 +22,17 @@
 **
 **
 ** -Time/timer.h
-** This header declares macros and functions that operate on RF_Timer
+** This header declares macros and functions that operate on RFtimer
 **
 ---------------------For internal library include make sure to have----------------------------
 #include <rf_options.h>//for the module check
 #include <Definitions/imex.h> //import export macro
 #include <Definitions/types.h> //for the fixed size data types
 #ifdef REFU_LINUX_VERSION
-    #include <time.h>//for clockid_t used in RF_Timer
+    #include <time.h>//for clockid_t used in RFtimer
 #endif
 #ifdef RF_MODULE_TIME_TIMER//module check
-    #include <Time/timer_decl.h> //for RF_Timer
+    #include <Time/timer_decl.h> //for RFtimer
     #include <Time/timer.h>
 #endif
 ---------------------For internal library include make sure to have----------------------------
@@ -70,7 +70,7 @@ extern "C"
 #define RF_TIMER_NANOSECONDS    4
 
 /**
- ** @memberof RF_Timer
+ ** @memberof RFtimer
  ** @brief Initializes a timer
  **
  ** @param t The timer object to initialize
@@ -78,29 +78,29 @@ extern "C"
  ** @return Returns true for correct initialization or false while logging an error otherwise
  **
  **/
-i_DECLIMEX_ char rfTimer_Init(RF_Timer* t,char resolution);
+i_DECLIMEX_ char rf_timer_init(RFtimer* t,char resolution);
 /**
- ** @memberof RF_Timer
+ ** @memberof RFtimer
  ** @brief Allocates and returns a timer object
  **
  ** @param resolution The desired resolution of the timer. Legal values are: @c RF_TIMER_SECONDS, @c RF_TIMER_MILLISECONDS, @c RF_TIMER_MICROSEONDS and @c RF_TIMER_NANOSECONDS
  ** @return Returns the timer object
  **
  **/
-i_DECLIMEX_ RF_Timer* rfTimer_Create(char resolution);
+i_DECLIMEX_ RFtimer* rf_timer_create(char resolution);
 
 /**
- ** @memberof RF_Timer
+ ** @memberof RFtimer
  ** @brief Destroys a timer
  **
  ** Use it only for timers that were made with @ref rfTimer_Create. Timers made with init need no freeing
  ** @param t The timer to destroy
  **
  **/
-i_DECLIMEX_ void rfTimer_Destroy(RF_Timer* t);
+i_DECLIMEX_ void rf_timer_destroy(RFtimer* t);
 
 /**
- ** @memberof RF_Timer
+ ** @memberof RFtimer
  ** @brief Queries a timer
  **
  ** Using this function the timer can be queried. There is a choice between querying with the previously given resolution or with a new resolution. If no change in resolution is
@@ -114,7 +114,7 @@ i_DECLIMEX_ void rfTimer_Destroy(RF_Timer* t);
  ** @return The time difference between this query and the previous one. Or this query and the initialization in the case of this being the first
  **
  **/
-i_DECLIMEX_ double rfTimer_Query(RF_Timer* t,char resolution);
+i_DECLIMEX_ double rf_timer_query(RFtimer* t,char resolution);
 
 #ifdef __cplusplus
 }///closing bracket for calling from C++

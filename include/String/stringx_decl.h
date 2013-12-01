@@ -33,7 +33,7 @@
 ** @brief An extended version of the normal String which offers 
 ** a movable index and dynamic buffer allocation
 **
-** The Extended String is an extension over the simple @ref RF_String
+** The Extended String is an extension over the simple @ref RFstring
 ** that adds functionalities that enable moving
 ** inside the String itself and allocating its size dynamically.
 ** This is accomplished by adding two more members to
@@ -54,7 +54,7 @@
 ** greatly especially for the purposes
 ** of parsing files/streams and editable text. This String is not intended for being
 ** used en mass, saved in arrays/vectors e.t.c.
-** For that use the original @ref RF_String
+** For that use the original @ref RFstring
 **
 ** As far as function calling is concerned if an extended version
 ** of the function exists (starting with rfStringX)
@@ -66,18 +66,18 @@
 **  can be used with extended strings safely, since no specific
 ** version of the function exists, or needs to exist to manipulate Extended Strings.
 **
-** @see RF_String
-** @inherit RF_String
+** @see RFstring
+** @inherit RFstring
 **/
-typedef struct RF_StringX
+typedef struct RFstringx
 {
-    //! The RF_String inherited members
-    RF_String INH_String;
+    //! The RFstring inherited members
+    RFstring INH_String;
     //! The buffer index, denotes how far from the start of the buffer the start of the string has moved
     uint32_t bIndex;
     //! The size of the buffer allocated for this extended String in bytes.
     uint32_t bSize;
-}RF_StringX;
+}RFstringx;
 
 
 

@@ -26,11 +26,11 @@
 #include <Definitions/imex.h>  //for import export macro
 #include <System/rf_system.h>
 //*---------------------Outside module inclusion----------------------------------------
-#include <String/string_decl.h> //for RF_String
-#include <String/stringx_decl.h> //for RF_StringX
+#include <String/string_decl.h> //for RFstring
+#include <String/stringx_decl.h> //for RFstringx
 #include <Definitions/defarg.h> //for the default argument declared string functions that are included below
 #include <String/common.h> //for RFS_()
-#include <String/corex.h> //for rfStringX_Init_buff() and others
+#include <String/corex.h> //for rf_stringx_init_buff() and others
 //for error logging
     #include <Utils/log.h>
 //for memory allocation
@@ -50,7 +50,7 @@
 //Creates a directory
 int32_t rfMakeDir(void* dirnameP,int mode)
 {
-    RF_String* dirname = (RF_String*)dirnameP;
+    RFstring* dirname = (RFstring*)dirnameP;
     int32_t error = RF_SUCCESS;
     RF_ENTER_LOCAL_SCOPE();
 
@@ -79,15 +79,15 @@ int32_t rfMakeDir(void* dirnameP,int mode)
 //Removes a directory and all its files
 int32_t rfRemoveDir(void* dirnameP)
 {
-    RF_String* dirname = (RF_String*)dirnameP;
+    RFstring* dirname = (RFstring*)dirnameP;
     DIR* dir;
     struct dirent *entry;
-    RF_StringX path;
+    RFstringx path;
     struct stat s;
     int32_t ret = RF_SUCCESS;
     RF_ENTER_LOCAL_SCOPE();
 
-    rfStringX_Init_buff(&path,1024,"");
+    rf_stringx_init_buff(&path,1024,"");
     //open the directory
     dir = opendir(dirname->bytes);
     if(!dir)
@@ -95,7 +95,7 @@ int32_t rfRemoveDir(void* dirnameP)
         RF_ERROR("Failed to access directory "RF_STR_PF_FMT" due to opendir() "
                  "errno %d", RF_STR_PF_ARG(dirname), errno);
         ret = errno;
-        ret = RF_LastError;
+        ret = RFlast_error;
         goto cleanup1;
     }
     //keep the previous errno for  comparison
@@ -106,7 +106,7 @@ int32_t rfRemoveDir(void* dirnameP)
         if (strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
         {
             //create the full entry name
-            if(!rfStringX_Assign(
+            if(!rf_stringx_assign(
                    &path,
                    RFS_(RF_STR_PF_FMT RF_DIRSEP "%s",
                         RF_STR_PF_ARG(dirname), entry->d_name)))
@@ -143,11 +143,11 @@ int32_t rfRemoveDir(void* dirnameP)
     }
     closedir(dir);
     //free the path string
-    rfStringX_Deinit(&path);
+    rf_stringx_deinit(&path);
     //check if we finished iterating succesfully
     if(errno != prErrno)
     {
-        ret = RF_LastError;
+        ret = RFlast_error;
         goto cleanup1;
     }
     //finally delete the directory itself
@@ -173,7 +173,7 @@ cleanup1:
 //Deletes a file
 int32_t rfDeleteFile(void* nameP)
 {
-    RF_String* name = (RF_String*)nameP;
+    RFstring* name = (RFstring*)nameP;
     int32_t ret = RF_SUCCESS;
     RF_ENTER_LOCAL_SCOPE();
 
@@ -193,8 +193,8 @@ int32_t rfDeleteFile(void* nameP)
 // Renames a file
 int32_t rfRenameFile(void* nameP,void* newNameP)
 {
-    RF_String* name = (RF_String*)nameP;
-    RF_String* newName = (RF_String*)newNameP;
+    RFstring* name = (RFstring*)nameP;
+    RFstring* newName = (RFstring*)newNameP;
     int32_t ret = RF_SUCCESS;
     RF_ENTER_LOCAL_SCOPE();
 

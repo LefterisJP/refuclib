@@ -36,13 +36,13 @@
 #include <Definitions/imex.h> //for import export macro
 #include <Definitions/types.h>
 #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
-#include <String/string_decl.h> //for RF_String
+#include <String/string_decl.h> //for RFstring
 #include <String/common.h> //for RFS_() macro
 #include <errno.h>  //only if using the stdlibrary functions that report errors with it
 
 /**
-** @Defgroup RF_ErrorLoggingGRP Error Logging
-** @addtogroup RF_ErrorLoggingGRP
+** @Defgroup RFerror_logging_g_r_p Error Logging
+** @addtogroup RFerror_logging_g_r_p
 ** @{
 **/
 
@@ -62,16 +62,16 @@ typedef enum {
     LOG_DEBUG,
 
     LOG_LEVELS
-} RF_LogLevel;
+} RFlog_level;
 
 
 
 
-i_DECLIMEX_ bool rf_LogModule_Init(RF_LogLevel level, char *log_file_name);
+i_DECLIMEX_ bool rf_LogModule_Init(RFlog_level level, char *log_file_name);
 i_DECLIMEX_ void rf_LogModule_Deinit();
-i_DECLIMEX_ void rf_Log(RF_LogLevel level, const char* file,
+i_DECLIMEX_ void rf_Log(RFlog_level level, const char* file,
                         const char* func,
-                        int line, RF_String* msg);
+                        int line, RFstring* msg);
 
 i_DECLIMEX_ bool rf_LogFlush();
 
@@ -123,6 +123,6 @@ MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),\
 
 
 //!@}
-//end of the Doxygen RF_ErrorLoggingGRP group
+//end of the Doxygen RFerror_logging_g_r_p group
 
 #endif//include guards end

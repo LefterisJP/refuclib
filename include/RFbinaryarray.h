@@ -29,11 +29,11 @@
 
 #include <Definitions/imex.h> //for import export macro
 #include <Definitions/types.h>//for fixed size data types
-#include <Data_Structures/binaryarray_decl.h> //for RF_BinarryArray
+#include <Data_Structures/binaryarray_decl.h> //for RFbinarry_array
 #include <Data_Structures/binaryarray.h>
 
 #else
-    #error Attempted to include RF_BinaryArray while not having compiled the library with the appropriate module activated
+    #error Attempted to include RFbinary_array while not having compiled the library with the appropriate module activated
 #endif
 
 #endif//include guards end

@@ -35,7 +35,7 @@
 //*----------------------------End of Includes------------------------------------------
 
 //system info global definition
-RF_SystemInfo rfSysInfo;
+RFsystem_info rfSysInfo;
 
 // A function which detects the system's endianess
 void i_DetectEndianess()

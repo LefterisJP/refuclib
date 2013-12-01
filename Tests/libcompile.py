@@ -67,9 +67,9 @@ def compileLib(verbose, dynamic, compiler):
         "compare_func:test_equal"
         "}]\" "
     )
-    extra_source_opts += "LIST=I,String,test_object "
-    extra_source_opts += "DYNAMICARRAY=I,String "
-    extra_source_opts += "HASHMAP=I,String,generic "
+    extra_source_opts += "LIST=i,string,test_object "
+    extra_source_opts += "DYNAMICARRAY=i,string "
+    extra_source_opts += "HASHMAP=i,string,generic "
 
     if platform.system() == 'Windows':
         sconsCall = ['scons.py', arg, 'COMPILER='+compiler,

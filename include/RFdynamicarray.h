@@ -21,8 +21,8 @@
 **      ==END OF REFU LICENSE==
 **
 */
-#ifndef RF_DYNAMICARRAY_MODULE_HEADERS
-#define RF_DYNAMICARRAY_MODULE_HEADERS
+#ifndef RF_DYNAMIC_ARRAY_MODULE_HEADERS
+#define RF_DYNAMIC_ARRAY_MODULE_HEADERS
 
 #include <rf_options.h>
 #ifdef RF_MODULE_DYNAMICARRAY //module check
@@ -38,7 +38,7 @@
 #endif
 
 #else
-    #error Attempted to include RF_DynamicArray while not having compiled the library with the appropriate module activated
+    #error Attempted to include RFdynamic_array while not having compiled the library with the appropriate module activated
 #endif
 
 #endif//include guards end

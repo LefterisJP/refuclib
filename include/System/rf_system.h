@@ -40,8 +40,8 @@
 
 
 /**
-** @defgroup RF_SystemGRP System
-** @addtogroup RF_SystemGRP
+** @defgroup RFsystem_g_r_p System
+** @addtogroup RFsystem_g_r_p
 ** @{
 **/
 
@@ -228,15 +228,15 @@ i_DECLIMEX_ bool rfFileExists(void* name);
  ** currently supported.
  ** @return A unique id representing the calling thread
  **/
-i_DECLIMEX_ threadid_t rfSystem_GetThreadID();
+i_DECLIMEX_ threadid_t rf_system_get_thread_i_d();
 
 /**
- ** @brief A wrapper for fopen with RF_String
+ ** @brief A wrapper for fopen with RFstring
  */
 i_DECLIMEX_ FILE* rfFopen(void* name, const char* mode);
 
 /**
- ** @brief A wrapper for freopen with RF_String
+ ** @brief A wrapper for freopen with RFstring
  */
 i_DECLIMEX_ FILE* rfFreopen(void* name, const char* mode, FILE* f);
 

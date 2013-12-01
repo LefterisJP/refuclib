@@ -39,16 +39,16 @@ extern "C"
 #endif
 
 /**
-** @defgroup RF_TimeGRP Initialization function
-** @addtogroup RF_TimeGRP
+** @defgroup RFtime_g_r_p Initialization function
+** @addtogroup RFtime_g_r_p
 ** @{
 **/
 
 /**
  ** @brief Suspends the calling thread for a number of seconds
  **
- ** For a function that suspends the thread's operation for milliseconds look at @ref rfSleep_ms()
- ** Under linux <b>DO NOT</b> mix with @ref rfSleep_ms() or any of the timer functions.
+ ** For a function that suspends the thread's operation for milliseconds look at @ref rf_sleep_ms()
+ ** Under linux <b>DO NOT</b> mix with @ref rf_sleep_ms() or any of the timer functions.
  ** @param seconds The number of seconds to suspend the operation of the calling thread for
  **
  **/
@@ -61,7 +61,7 @@ i_DECLIMEX_ void rfSleep(uint32_t seconds);
  ** @param milliseconds The number of milliseconds to suspend the operation of the calling thread for
  **
  **/
-i_DECLIMEX_ void rfSleep_ms(uint32_t milliseconds);
+i_DECLIMEX_ void rf_sleep_ms(uint32_t milliseconds);
 
 //! @} //timegroup ends
 

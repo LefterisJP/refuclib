@@ -86,8 +86,8 @@ i_RP_ISEMPTY(                                                               \
     #define i_RP_NARG_EMPTY_0(V__) V__
 
 /**
- ** @defgroup RF_PreprocessorGRP Preprocessor
- ** @addtogroup RF_PreprocessorGRP
+ ** @defgroup RFpreprocessor_g_r_p Preprocessor
+ ** @addtogroup RFpreprocessor_g_r_p
 //! @{
  **
  **/
@@ -143,7 +143,7 @@ i_RP_ISEMPTY(                                                               \
     #define i_RP_NARG_2(B__, V__) B__(V__)
 
 /**
- ** @ingroup RF_Preprocessor_DefaultArgsGRP
+ ** @ingroup RFpreprocessor_default_args_g_r_p
  ** @brief Selects an appropriate function depending on the number of arguments
  **
  ** This macro selects the function name according to the arguments given and passes both the name and the arguments to the selected function.

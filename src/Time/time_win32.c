@@ -26,11 +26,11 @@
 #include <Definitions/imex.h> //import export macro
 #include <Definitions/types.h> //for the fixed size data types
 #ifdef RF_MODULE_TIME_TIMER//module check
-    #include <Time/timer_decl.h> //for RF_Timer
+    #include <Time/timer_decl.h> //for RFtimer
     #include <Time/timer.h>
 #endif
 #ifdef RF_MODULE_TIME_DATE
-    #include <Time/date_decl.h> //for RF_Date
+    #include <Time/date_decl.h> //for RFdate
     #include <Time/date.h>
 #endif
 //*---------------------Module related inclusion----------------------------------------
@@ -55,7 +55,7 @@ void rfSleep(uint32_t seconds)
     Sleep(seconds*1000);
 }
 //Suspends the calling thread for a number of milliseconds
-void rfSleep_ms(uint32_t milliseconds)
+void rf_sleep_ms(uint32_t milliseconds)
 {
     Sleep(milliseconds);
 }
@@ -63,7 +63,7 @@ void rfSleep_ms(uint32_t milliseconds)
 /*-------------------------------------------------------Timer functions-----------------------------------------------------------------------------------------*/
 #ifdef RF_MODULE_TIME_TIMER
 //initializes a timer
-char rfTimer_Init(RF_Timer* t,char resolution)
+char rf_timer_init(RFtimer* t,char resolution)
 {
     //check if we can actually have such a timer
     if(rfSysInfo.hasHighResTimer==false)
@@ -106,9 +106,9 @@ char rfTimer_Init(RF_Timer* t,char resolution)
     return true;
 }
 // Allocates and returns a timer object
-RF_Timer* rfTimer_Create(char resolution)
+RFtimer* rf_timer_create(char resolution)
 {
-    RF_Timer* ret;
+    RFtimer* ret;
     //check if we can actually have such a timer
     if(rfSysInfo.hasHighResTimer==false)
     {
@@ -151,13 +151,13 @@ RF_Timer* rfTimer_Create(char resolution)
 }
 
 // Destroys a timer
-void rfTimer_Destroy(RF_Timer* t)
+void rf_timer_destroy(RFtimer* t)
 {
     free(t);
 }
 
 // Queries a timer
-double rfTimer_Query(RF_Timer* t,char resolution)
+double rf_timer_query(RFtimer* t,char resolution)
 {
     int64_t query;
     //if a new resolution has been requested
@@ -210,7 +210,7 @@ double rfTimer_Query(RF_Timer* t,char resolution)
 //include private time related macros that don't need to be visible to anyone else
 
 
-//Reads a SYSTEMTIME structure and populates the RF_Date
+//Reads a SYSTEMTIME structure and populates the RFdate
 #define SYSTEMTIME_TO_RF_DATE(i_st,i_date)\
     i_date->seconds = i_st.wSecond;\
     i_date->minutes = i_st.wMinute;\
@@ -229,10 +229,10 @@ double rfTimer_Query(RF_Timer* t,char resolution)
     i_st.wDay = i_date->mDay;\
     i_st.wMonth = i_date->month;\
     i_st.wYear = i_date->year;\
-    i_st.wMilliseconds = 0;/*RF_Date does not have milliseconds so just 0 it*/
+    i_st.wMilliseconds = 0;/*RFdate does not have milliseconds so just 0 it*/
 
 // Initializes a Date
-char rfDate_Init_Now(RF_Date* d,char local)
+char rf_date_init_now(RFdate* d,char local)
 {
     //get the time
     SYSTEMTIME st;
@@ -251,9 +251,9 @@ char rfDate_Init_Now(RF_Date* d,char local)
 }
 
 //Creates a date
-RF_Date* rfDate_Create_Now(char local)
+RFdate* rf_date_create_now(char local)
 {
-    RF_Date* ret;
+    RFdate* ret;
     RF_MALLOC(ret,sizeof(RF_Date))
     //get the time
     SYSTEMTIME st;
@@ -272,7 +272,7 @@ RF_Date* rfDate_Create_Now(char local)
 }
 
 // Sets this date as the current system date and time
-char rfDate_SetToSystem(RF_Date* d)
+char rf_date_set_to_system(RFdate* d)
 {
     SYSTEMTIME st;
     RF_DATE_TO_SYSTEMTIME(d,st)
@@ -280,7 +280,7 @@ char rfDate_SetToSystem(RF_Date* d)
     if(SetSystemTime(&st) == 0)
     {
         RF_WIN32_GETSYSERROR(strBuff)
-        LOG_ERROR("Setting the system time from an RF_Date in Windows failed with Windows Error(%lu):\n%s",RE_DATE_SET_SYSTEMTIME,i_ERROR_CODE,strBuff);
+        LOG_ERROR("Setting the system time from an RFdate in Windows failed with Windows Error(%lu):\n%s",RE_DATE_SET_SYSTEMTIME,i_ERROR_CODE,strBuff);
         LocalFree(strBuff);
         return false;
     }
@@ -288,7 +288,7 @@ char rfDate_SetToSystem(RF_Date* d)
 }
 
 // Sets this date as the current local date and time
-char rfDate_SetToLocal(RF_Date* d)
+char rf_date_set_to_local(RFdate* d)
 {
     SYSTEMTIME st;
     RF_DATE_TO_SYSTEMTIME(d,st)
@@ -296,7 +296,7 @@ char rfDate_SetToLocal(RF_Date* d)
     if(SetLocalTime(&st) == 0)
     {
         RF_WIN32_GETSYSERROR(strBuff)
-        LOG_ERROR("Setting the local time from an RF_Date in Windows failed with Windows Error(%lu):\n%s",RE_DATE_SET_SYSTEMTIME,i_ERROR_CODE,strBuff);
+        LOG_ERROR("Setting the local time from an RFdate in Windows failed with Windows Error(%lu):\n%s",RE_DATE_SET_SYSTEMTIME,i_ERROR_CODE,strBuff);
         LocalFree(strBuff);
         return false;
     }

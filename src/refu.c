@@ -46,7 +46,7 @@
 /*------------- End of includes -------------*/
 
 //Initializes the Refu library
-bool rfInit(char *logstr, uint64_t lmsSize, RF_LogLevel level)
+bool rfInit(char *logstr, uint64_t lmsSize, RFlog_level level)
 {
     rf_LogModule_Init(level, logstr);
     module_string_init();
@@ -55,12 +55,12 @@ bool rfInit(char *logstr, uint64_t lmsSize, RF_LogLevel level)
 
     /* //initialize regu log stream */
     /* if(strcmp(logstr,"stderr") == 0) */
-    /*     RF_Log_Stream = stderr; */
+    /*     RFlog_stream = stderr; */
     /* else if(strcmp(logstr,"stdout")== 0) */
-    /*     RF_Log_Stream = stdout; */
+    /*     RFlog_stream = stdout; */
     /* else//just open the given file */
     /* { */
-    /*     RF_Log_Stream = fopen(logstr,"w"); */
+    /*     RFlog_stream = fopen(logstr,"w"); */
     /*     //Send the standard error also to the same file stream as the chosen rfStdErr */
     /*     if(freopen(logstr,"w",stderr) ==0) */
     /*         printf("Failed to reopen stderr stream to the given file name \"%s\"",logstr); */
@@ -97,7 +97,7 @@ bool rfInit(char *logstr, uint64_t lmsSize, RF_LogLevel level)
     if (lmsSize == 0) {
         lmsSize = RF_OPTION_LOCALSTACK_MEMORY_SIZE;
     }
-    if (!rfLMS_Init(&RF_MainLMS, lmsSize)) {
+    if (!rf_module_lms_init(lmsSize)) {
         RF_ERROR("Could not initialize main thread's local memory stack");
         return false;
     }

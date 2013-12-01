@@ -37,7 +37,7 @@
 #endif
 
 #else
-    #error Attempted to include RF_List while not having compiled the library with the appropriate module activated
+    #error Attempted to include RFlist while not having compiled the library with the appropriate module activated
 #endif
 
 #endif//include guards end

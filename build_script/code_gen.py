@@ -46,8 +46,8 @@ class CodeGen():
        This class encapsulates all of the code generating functionality
     """
 
-    refu_objects = [ "String" ]
-    lms_list = ["String"]
+    refu_objects = [ "string" ]
+    lms_list = ["string"]
     
 
 
@@ -67,49 +67,52 @@ class CodeGen():
         }
 
         # types that can be safely templated from within the library
-        self.library_types = { "I": "int",
-                          "UI": "unsigned int",
-                          "I8": "int8_t",
-                          "UI8": "uint8_t",
-                          "I16": "int16_t",
-                          "UI16": "uint16_t",
-                          "I32": "int32_t",
-                          "UI32": "uint32_t",
-                          "I164": "int64_t",
-                          "UI64": "uint64_t",
-                          "String": "RF_String",
-                          "generic": "void*",
-                          "no_template": "no_template"
+        self.library_types = {
+            "i": "int",
+            "ui": "unsigned int",
+            "i8": "int8_t",
+            "ui8": "uint8_t",
+            "i16": "int16_t",
+            "ui16": "uint16_t",
+            "i32": "int32_t",
+            "ui32": "uint32_t",
+            "i64": "int64_t",
+            "ui64": "uint64_t",
+            "string": "RFstring",
+            "generic": "void*",
+            "no_template": "no_template"
             }
 
         if os.path.isfile(os.path.join(refu_root, json_file_name)):
             self.load_data_from_json(json_file_name)
         else:
-            self.type_dict = { "I": "int",
-                          "UI": "unsigned int",
-                          "I8": "int8_t",
-                          "UI8": "uint8_t",
-                          "I16": "int16_t",
-                          "UI16": "uint16_t",
-                          "I32": "int32_t",
-                          "UI32": "uint32_t",
-                          "I164": "int64_t",
-                          "UI64": "uint64_t",
-                          "String": "RF_String",
-                          "generic": "void*",
+            self.type_dict = { 
+            "i": "int",
+            "ui": "unsigned int",
+            "i8": "int8_t",
+            "ui8": "uint8_t",
+            "i16": "int16_t",
+            "ui16": "uint16_t",
+            "i32": "int32_t",
+            "ui32": "uint32_t",
+            "i64": "int64_t",
+            "ui64": "uint64_t",
+            "string": "RFstring",
+            "generic": "void*",
+            "no_template": "no_template"
             }
 
             self.obj_dict = {
-                "String": {
+                "string": {
                     "init_default_func": "",
-                    "destroy_func": "rfString_Deinit",
-                    "copy_func": "rfString_Copy_IN",
-                    "compare_func": "rfString_Equal",
+                    "destroy_func": "rf_string_deinit",
+                    "copy_func": "rf_string_copy_in",
+                    "compare_func": "rf_string_equal",
                     "headers": ["Definitions/imex.h", # for import export macro
                                 "Definitions/defarg.h", # for default arguments
                                 "Preprocessor/rf_tokens.h", #for defined library tokens
                                 "Definitions/types.h",  #for fixed size data types
-                                "String/string_decl.h",  #for RF_String
+                                "String/string_decl.h",  #for RFstring
                                 "String/core.h"]  #for Equal, Copy_IN and Deinit
                 }
             }

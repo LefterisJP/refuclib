@@ -31,18 +31,18 @@
 
 /*------------- Corrensponding Header inclusion -------------*/
 #include <Definitions/types.h> //for fixed size types needed in various places
-#include <String/string_decl.h>//for RF_String
+#include <String/string_decl.h>//for RFstring
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
 /*------------- Module related inclusion -------------*/
-#include <String/stringx_decl.h> //for RF_StringX
+#include <String/stringx_decl.h> //for RFstringx
 #include <stdarg.h> //needed for the va_list
 #include "common.ph" //for fill_fmt_buffer()
 /*------------- Outside Module inclusion -------------*/
 //for error logging
     #include <Utils/log.h>
 //for UTF8 macro
-   #include <String/unicode.h> //for rfUTF8_VerifyCstr()
+   #include <String/unicode.h> //for rf_utf8_verify_cstr()
 //for local scope macros
     #include <string.h> //for size_t and memset() used in the Local scope macros
     #include <Utils/localmem_decl.h> //for local memory stack
@@ -54,14 +54,14 @@
 #include <stdlib.h> //for exit()
 /*------------- End of includes -------------*/
 
-RF_String* i_rfString_CreateLocal1(const char* s,...)
+RFstring* i_rf_string_create_local1(const char* s,...)
 {
-    RF_String* ret;
+    RFstring* ret;
     va_list args;
     unsigned int size, bIndex;
     char *buffPtr;
     //remember the stack pointer before this macro evaluation
-    i_rfLMS_ArgsEval(return NULL);
+    i_rf_lms_args_eval(return NULL);
 
     //read the var args
     va_start(args, s);
@@ -74,27 +74,27 @@ RF_String* i_rfString_CreateLocal1(const char* s,...)
     va_end(args);
 
     //allocate the string in the local memory stack
-    i_rfLMS_Push(ret, sizeof(RF_String), ret = NULL; goto cleanup_buffer);
+    i_rf_lms_push(ret, sizeof(*ret), ret = NULL; goto cleanup_buffer);
     //get length
-    rfString_ByteLength(ret) = size;
+    rf_string_length_bytes(ret) = size;
     //now that we know the length we can allocate the buffer and copy the bytes
-    i_rfLMS_Push(rfString_Data(ret), ret->length,
+    i_rf_lms_push(rf_string_data(ret), ret->length,
                  ret = NULL; goto cleanup_buffer);
-    memcpy(rfString_Data(ret), buffPtr, rfString_ByteLength(ret));
+    memcpy(rf_string_data(ret), buffPtr, rf_string_length_bytes(ret));
 
 cleanup_buffer:
     //pop back the buffer
-    rfBuffer_SetIndex(TSBUFFA, bIndex);
+    rf_buffer_set_index(TSBUFFA, bIndex);
     return ret;
 }
-RF_String* i_NVrfString_CreateLocal(const char* s)
+RFstring* i_NVrf_string_create_local(const char* s)
 {
-    RF_String* ret;
+    RFstring* ret;
     uint32_t byteLength;
     //remember the stack pointer before this macro evaluation
-    i_rfLMS_ArgsEval(return NULL);
+    i_rf_lms_args_eval(return NULL);
     //check for validity of the given sequence and get the character length
-    if(!rfUTF8_VerifyCstr(s, &byteLength))
+    if(!rf_utf8_verify_cstr(s, &byteLength))
     {
         RF_ERROR("Error at String Allocation due to invalid "
                  "UTF-8 byte sequence");
@@ -102,11 +102,11 @@ RF_String* i_NVrfString_CreateLocal(const char* s)
     }
 
     //allocate the string in the local memory stack
-    i_rfLMS_Push(ret, sizeof(RF_String), return NULL);
+    i_rf_lms_push(ret, sizeof(*ret), return NULL);
     //get length
-    rfString_ByteLength(ret) = byteLength;
-    i_rfLMS_Push(rfString_Data(ret), byteLength, return NULL);
-    memcpy(rfString_Data(ret), s, byteLength);
+    rf_string_length_bytes(ret) = byteLength;
+    i_rf_lms_push(rf_string_data(ret), byteLength, return NULL);
+    memcpy(rf_string_data(ret), s, byteLength);
 
     return ret;
 }

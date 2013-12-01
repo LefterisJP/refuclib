@@ -36,14 +36,14 @@
 
 
 //define The main thread's local stack memory
-RF_LocalMemoryStack RF_MainLMS;
+RFlocal_memory_stack g_main_thread_stack;
 //define the pointer to the thread specific memory stack
-i_THREAD__ RF_LocalMemoryStack* RF_LMS;
+i_THREAD__ RFlocal_memory_stack* RF_LMS;
 
 
 
 // Initializes the local memory stack
-bool rfLMS_Init(RF_LocalMemoryStack* lms, uint64_t size)
+bool rf_lms_init(RFlocal_memory_stack* lms, uint64_t size)
 {
     lms->stackPtr = 0;
     lms->macroEvalsI = 0;
@@ -56,7 +56,7 @@ bool rfLMS_Init(RF_LocalMemoryStack* lms, uint64_t size)
 
 
 //Allocates some memory from the local memory stack
-void* rfLMS_Push(uint64_t size)
+void* rf_lms_push(uint64_t size)
 {
     uint32_t temp;
     if(RF_LMS->stackPtr+size > RF_OPTION_LOCALSTACK_MEMORY_SIZE)
@@ -72,7 +72,7 @@ void* rfLMS_Push(uint64_t size)
 
 
 //Frees some memory from the local memory stack
-bool rfLMS_Pop(uint64_t size)
+bool rf_lms_pop(uint64_t size)
 {
     if(size > RF_LMS->stackPtr)
     {
@@ -87,7 +87,7 @@ bool rfLMS_Pop(uint64_t size)
 
 
 //Keeps the stack pointer before the specific macro evaluation
-bool rfLMS_ArgsEval()
+bool rf_lms_args_eval()
 {
     if(RF_LMS->macroEvalsI+1 >= RF_MAX_FUNC_ARGS)
     {
@@ -100,4 +100,13 @@ bool rfLMS_ArgsEval()
     RF_LMS->macroEvals[RF_LMS->macroEvalsI] = RF_LMS->stackPtr;
     RF_LMS->macroEvalsI++;
     return true;
+}
+
+
+bool rf_module_lms_init(uint64_t size)
+{
+    bool ret;
+    ret = rf_lms_init(&g_main_thread_stack, size);
+    RF_LMS = &g_main_thread_stack;
+    return ret;
 }

@@ -38,14 +38,14 @@
 ** It allows for manipulation of a text file without placing the whole file in memory
 ** and contains many different functions for moving inside the file in regards to specific line positions
 ** or even retrieving said lines themselves inside an @ref RF_String.
-** For individual line parsing it is recommended to use the @ref RF_String and @ref RF_StringX functions.
+** For individual line parsing it is recommended to use the @ref RFstring and @ref RFstringx functions.
 **/
-typedef struct RF_TextFile
+typedef struct RFtextfile
 {
     //! The file descriptor
     FILE* f;
     //! The name of the file
-    RF_String name;
+    RFstring name;
     //! The current line number. Basically represents the line that was last
     //! read by any of the file's functions
     uint64_t line;
@@ -66,7 +66,7 @@ typedef struct RF_TextFile
     char hasBom;
     //! A flag denoting what kind of EOL pattern this particular text file observes
     char eol;
-}RF_TextFile;
+}RFtextfile;
 
 
 #endif//include guards end

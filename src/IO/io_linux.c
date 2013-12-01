@@ -53,14 +53,14 @@ FILE* rfPopen(void* command, const char* mode)
         goto cleanup;
     }
 #endif
-    if(!(cs = rfString_Cstr_ibuff_push(command, &index)))
+    if(!(cs = rf_string_cstr_ibuff_push(command, &index)))
     {
         goto cleanup;
     }
 
     ret = popen(cs, mode);
 
-    rfString_Cstr_ibuff_pop(index);
+    rf_string_cstr_ibuff_pop(index);
 
 
 cleanup:

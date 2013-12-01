@@ -31,7 +31,7 @@
 #include <Definitions/types.h> //for fixed size data types
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <Preprocessor/rf_tokens.h>//for the defined library tokens
-#include <String/string_decl.h> //for RF_String
+#include <String/string_decl.h> //for RFstring
 #include <Definitions/retcodes.h> //for error codes, bool
 
 #ifdef RF_MODULE_HASHMAP_EXTRA
@@ -39,7 +39,7 @@
 #endif
 
 #else
-    #error Attempted to include RF_HashMap while not having compiled the library with the appropriate module activated
+    #error Attempted to include RFhash_map while not having compiled the library with the appropriate module activated
 #endif
 
 #endif//include guards end

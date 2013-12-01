@@ -25,16 +25,16 @@
 
 //*---------------------Corrensponding Header inclusion---------------------------------
 #include <Definitions/types.h> //for fixed size types needed in various places
-#include <String/string_decl.h>//for RF_String
+#include <String/string_decl.h>//for RFstring
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <String/retrieval.h>
 //*---------------------Module related inclusion----------------------------------------
 #include <String/flags.h> //for String macro flags
-#include <String/core.h> //for rfString_Deinit(), rfString_BytePosToCharPos() and others
-#include <String/unicode.h> //rfUTF8_IsContinuationByte()
-#include <String/stringx_decl.h> //for RF_StringX
-#include <String/corex.h> //for rfStringX_Init_unsafe()
+#include <String/core.h> //for rf_string_deinit(), rf_string_byte_pos_to_char_pos() and others
+#include <String/unicode.h> //rf_utf8_is_continuation_byte()
+#include <String/stringx_decl.h> //for RFstringx
+#include <String/corex.h> //for rf_stringx_init_unsafe()
 #include "common.ph" //for required string private macros and functions
 //*---------------------Outside module inclusion----------------------------------------
 //for bool
@@ -56,7 +56,7 @@
 //*----------------------------End of Includes------------------------------------------
 
 // Finds the length of the string in characters
-uint32_t rfString_Length(const void* str)
+uint32_t rf_string_length(const void* str)
 {
     uint32_t length,i;
     RF_STRING_ITERATE_START(str, length, i)
@@ -64,13 +64,13 @@ uint32_t rfString_Length(const void* str)
     return length;
 }
 
-bool rfString_GetChar(const void* str, uint32_t c, uint32_t* cp)
+bool rf_string_get_char(const void* str, uint32_t c, uint32_t* cp)
 {
     uint32_t length, i;
     RF_STRING_ITERATE_START(str, length, i)
         if(length == c)
         {
-            *cp = rfString_BytePosToCodePoint(str, i);
+            *cp = rf_string_byte_pos_to_code_point(str, i);
             return true;
         }
     RF_STRING_ITERATE_END(length, i)
@@ -78,8 +78,8 @@ bool rfString_GetChar(const void* str, uint32_t c, uint32_t* cp)
     return false;
 }
 
-bool rfString_Substr(const void* s, uint32_t startPos,
-                     uint32_t charsN, RF_String* ret)
+bool rf_string_substr(const void* s, uint32_t startPos,
+                     uint32_t charsN, RFstring* ret)
 {
     uint32_t charI,byteI,startI,endI;
     bool started = false, ended = false;
@@ -112,58 +112,58 @@ bool rfString_Substr(const void* s, uint32_t startPos,
         }
     }
     /* else success and init the return string */
-    return rfString_Init_unsafe_nnt(ret,
-                                    rfString_Data(s) + startI,
+    return rf_string_init_unsafe_nnt(ret,
+                                    rf_string_data(s) + startI,
                                     endI - startI
     );
  
 }
 
 
-int32_t rfString_Find(const void* tstr, const void* sstr, const char options)
+int32_t rf_string_find(const void* tstr, const void* sstr, const char options)
 {
     int32_t ret;
     RF_ENTER_LOCAL_SCOPE();
 
-    if((ret = rfString_FindBytePos(tstr, sstr, options)) == RF_FAILURE)
+    if((ret = rf_string_find_byte_pos(tstr, sstr, options)) == RF_FAILURE)
     {
         ret = RF_FAILURE;
         goto cleanup;
     }
 
-    ret = rfString_BytePosToCharPos(tstr, ret, false);
+    ret = rf_string_byte_pos_to_char_pos(tstr, ret, false);
   cleanup:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
 
-int32_t rfString_Find_i(const void* thisstr, const void* sstr,
+int32_t rf_string_find_i(const void* thisstr, const void* sstr,
                         uint32_t startPos, uint32_t length,
                         const char options)
 {
-    RF_String sub;
+    RFstring sub;
     int32_t ret = RF_FAILURE;//the return value
     RF_ENTER_LOCAL_SCOPE();
     //if the substring does not exist fail
-    if(!rfString_Substr(thisstr, startPos, length, &sub))
+    if(!rf_string_substr(thisstr, startPos, length, &sub))
     {
         goto cleanup1;
     }
 
     //now search for the sstr substring inside the sub substring defined by length
-    if((ret=rfString_Find(&sub, sstr, options)) != RF_FAILURE)
+    if((ret=rf_string_find(&sub, sstr, options)) != RF_FAILURE)
     {
         ret += startPos;//return the proper position in the original string
     }
-    rfString_Deinit(&sub);//free the sub substring and return
+    rf_string_deinit(&sub);//free the sub substring and return
 
 cleanup1:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
-unsigned int rfString_Count(const void* tstr, const void* sstr,
+unsigned int rf_string_count(const void* tstr, const void* sstr,
                             const char options)
 {
     int move, index;
@@ -173,20 +173,20 @@ unsigned int rfString_Count(const void* tstr, const void* sstr,
 
     move = index = n = 0;
     //as long as the substring is found in the string
-    while((move = rfString_FindBytePos(
+    while((move = rf_string_find_byte_pos(
                tstr, sstr, options)) != RF_FAILURE)
     {
-        move += rfString_ByteLength(sstr);
+        move += rf_string_length_bytes(sstr);
         //proceed searching inside the string and also increase the counter
         n++;
-        rfString_Data(tstr) += move;
+        rf_string_data(tstr) += move;
         index += move;
-        rfString_ByteLength(tstr) -= move;
+        rf_string_length_bytes(tstr) -= move;
     }
 
     //return string to its original state
-    rfString_Data(tstr) -= index;
-    rfString_ByteLength(tstr) += index;
+    rf_string_data(tstr) -= index;
+    rf_string_length_bytes(tstr) += index;
 
 #ifdef RF_OPTION_DEBUG
   cleanup:
@@ -196,7 +196,7 @@ unsigned int rfString_Count(const void* tstr, const void* sstr,
 }
 
 
-bool rfString_ScanfAfter(const void* str, const void* astr,
+bool rf_string_scanf_after(const void* str, const void* astr,
                          const char* format, void* var)
 {
     char *s;
@@ -205,15 +205,15 @@ bool rfString_ScanfAfter(const void* str, const void* astr,
     RF_ENTER_LOCAL_SCOPE();
     i_NULLPTR_CHECK_2(str, astr, goto cleanup);
 
-    found = strstr_nnt(rfString_Data(str), rfString_ByteLength(str),
-                      rfString_Data(astr), rfString_ByteLength(astr));
+    found = strstr_nnt(rf_string_data(str), rf_string_length_bytes(str),
+                      rf_string_data(astr), rf_string_length_bytes(astr));
     if(!found)
     {
         goto cleanup;
     }
     //get a pointer to the start of the position where sscanf will be used
-    s = rfString_Data(str) + (
-        found - rfString_Data(str) + rfString_ByteLength(astr)
+    s = rf_string_data(str) + (
+        found - rf_string_data(str) + rf_string_length_bytes(astr)
     );
 
     //use sscanf
@@ -229,24 +229,24 @@ cleanup:
 }
 
 
-bool rfString_Between(const void* tstr, const void* lstr,
+bool rf_string_between(const void* tstr, const void* lstr,
                       const void* rstr, void* result, const char options)
 {
     int start, end;
-    RF_String temp;
+    RFstring temp;
     bool ret = false;
     RF_ENTER_LOCAL_SCOPE();
     i_NULLPTR_CHECK_4(tstr, lstr, rstr, result, goto cleanup);
 
     //find the left substring
-    if((start = rfString_FindBytePos(tstr, lstr, options)) == RF_FAILURE)
+    if((start = rf_string_find_byte_pos(tstr, lstr, options)) == RF_FAILURE)
     {
         goto cleanup;
     }
     //get what is after it, no check since we already found it
-    rfString_After(tstr, lstr, &temp, options);
+    rf_string_after(tstr, lstr, &temp, options);
     //find the right substring in the remaining part
-    if((end = rfString_FindBytePos(&temp, rstr, options)) == RF_FAILURE)
+    if((end = rf_string_find_byte_pos(&temp, rstr, options)) == RF_FAILURE)
     {
         goto cleanup1;
     }
@@ -254,9 +254,9 @@ bool rfString_Between(const void* tstr, const void* lstr,
     //initialize the string to return
     if(options & RF_STRINGX_ARGUMENT)
     {
-        if(!rfStringX_Init_unsafe_nnt(
+        if(!rf_stringx_init_unsafe_nnt(
                result,
-               rfString_Data(tstr) + start + rfString_ByteLength(lstr),
+               rf_string_data(tstr) + start + rf_string_length_bytes(lstr),
                end))
         {
             goto cleanup1; 
@@ -264,9 +264,9 @@ bool rfString_Between(const void* tstr, const void* lstr,
     }
     else
     {
-        if(!rfString_Init_unsafe_nnt(
+        if(!rf_string_init_unsafe_nnt(
                result,
-               rfString_Data(tstr) + start + rfString_ByteLength(lstr),
+               rf_string_data(tstr) + start + rf_string_length_bytes(lstr),
                end))
         {
             goto cleanup1; 
@@ -278,16 +278,16 @@ bool rfString_Between(const void* tstr, const void* lstr,
 
 cleanup1:
     //free temp string
-    rfString_Deinit(&temp);
+    rf_string_deinit(&temp);
 cleanup:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
-bool rfString_Beforev(const void* thisstr, void* result, const char options,
+bool rf_string_beforev(const void* thisstr, void* result, const char options,
                       const unsigned char parN,  ...)
 {
-    const RF_String* s;
+    const RFstring* s;
     int32_t i,minPos,thisPos;
     va_list argList;
     bool ret = true;
@@ -299,8 +299,8 @@ bool rfString_Beforev(const void* thisstr, void* result, const char options,
     minPos = INT_MAX;
     for(i = 0; i < parN; i++)
     {
-        s = (const RF_String*) va_arg(argList, RF_String*);
-        if((thisPos= rfString_FindBytePos(thisstr, s, options))!= RF_FAILURE)
+        s = (const RFstring*) va_arg(argList, RFstring*);
+        if((thisPos= rf_string_find_byte_pos(thisstr, s, options))!= RF_FAILURE)
         {
             if(thisPos < minPos)      
             {
@@ -319,7 +319,7 @@ bool rfString_Beforev(const void* thisstr, void* result, const char options,
     //if it is found initialize the substring for return
     if(options & RF_STRINGX_ARGUMENT)
     {
-        if(!rfStringX_Init_unsafe_nnt(result, rfString_Data(thisstr), minPos))
+        if(!rf_stringx_init_unsafe_nnt(result, rf_string_data(thisstr), minPos))
         {
             ret = false;
             goto cleanup; 
@@ -327,7 +327,7 @@ bool rfString_Beforev(const void* thisstr, void* result, const char options,
     }
     else
     {
-        if(!rfString_Init_unsafe_nnt(result, rfString_Data(thisstr), minPos))
+        if(!rf_string_init_unsafe_nnt(result, rf_string_data(thisstr), minPos))
         {
             ret = false;
             goto cleanup; 
@@ -339,7 +339,7 @@ bool rfString_Beforev(const void* thisstr, void* result, const char options,
     return ret;
 }
 
-bool rfString_Before(const void* thisstr, const void* sstr,
+bool rf_string_before(const void* thisstr, const void* sstr,
                      void* result, const char options)
 {
     int32_t rv;
@@ -348,7 +348,7 @@ bool rfString_Before(const void* thisstr, const void* sstr,
     i_NULLPTR_CHECK_3(thisstr, sstr, result, ret = false; goto cleanup);
 
     //find the substring
-    if((rv = rfString_FindBytePos(thisstr, sstr, options)) == RF_FAILURE)
+    if((rv = rf_string_find_byte_pos(thisstr, sstr, options)) == RF_FAILURE)
     {
         ret = false;
         goto cleanup;
@@ -356,7 +356,7 @@ bool rfString_Before(const void* thisstr, const void* sstr,
     //if it is found initialize the substring for return
     if(options & RF_STRINGX_ARGUMENT)
     {
-        if(!rfStringX_Init_unsafe_nnt(result, rfString_Data(thisstr), rv))
+        if(!rf_stringx_init_unsafe_nnt(result, rf_string_data(thisstr), rv))
         {
             ret = false;
             goto cleanup; 
@@ -364,7 +364,7 @@ bool rfString_Before(const void* thisstr, const void* sstr,
     }
     else
     {
-        if(!rfString_Init_unsafe_nnt(result, rfString_Data(thisstr), rv))
+        if(!rf_string_init_unsafe_nnt(result, rf_string_data(thisstr), rv))
         {
             ret = false;
             goto cleanup; 
@@ -376,7 +376,7 @@ bool rfString_Before(const void* thisstr, const void* sstr,
     return ret;
 }
 
-bool rfString_After(const void* thisstr, const void* after,
+bool rf_string_after(const void* thisstr, const void* after,
                     void* result, const char options)
 {
     int32_t bytePos;
@@ -385,18 +385,18 @@ bool rfString_After(const void* thisstr, const void* after,
     i_NULLPTR_CHECK_3(thisstr, after, result, ret = false;goto cleanup);
 
     //check for substring existence
-    if((bytePos = rfString_FindBytePos(thisstr, after, options)) == RF_FAILURE)
+    if((bytePos = rf_string_find_byte_pos(thisstr, after, options)) == RF_FAILURE)
     {
         ret = false;
         goto cleanup;
     }
-    bytePos += rfString_ByteLength(after);
+    bytePos += rf_string_length_bytes(after);
     if(options & RF_STRINGX_ARGUMENT)
     {
-        if(!rfStringX_Init_unsafe_nnt(
+        if(!rf_stringx_init_unsafe_nnt(
                result,
-               rfString_Data(thisstr) + bytePos,
-               rfString_ByteLength(thisstr) - bytePos)
+               rf_string_data(thisstr) + bytePos,
+               rf_string_length_bytes(thisstr) - bytePos)
            )
         {
             ret = false;
@@ -405,10 +405,10 @@ bool rfString_After(const void* thisstr, const void* after,
     }
     else
     {
-        if(!rfString_Init_unsafe_nnt(
+        if(!rf_string_init_unsafe_nnt(
                result,
-               rfString_Data(thisstr) + bytePos,
-               rfString_ByteLength(thisstr) - bytePos)
+               rf_string_data(thisstr) + bytePos,
+               rf_string_length_bytes(thisstr) - bytePos)
            )
         {
             ret = false;
@@ -422,10 +422,10 @@ bool rfString_After(const void* thisstr, const void* after,
 }
 
 
-bool rfString_Afterv(const void* thisstr, void* result,
+bool rf_string_afterv(const void* thisstr, void* result,
                      const char options, const unsigned char parN, ...)
 {
-    const RF_String* s;
+    const RFstring* s;
     int32_t i, minPos, thisPos;
     uint32_t minPosLength=0;
     //will keep the argument list
@@ -439,13 +439,13 @@ bool rfString_Afterv(const void* thisstr, void* result,
     minPos = INT_MAX;
     for(i = 0; i < parN; i++)
     {
-        s = (const RF_String*) va_arg(argList, RF_String*);
-        if((thisPos= rfString_FindBytePos(thisstr, s, options))!= RF_FAILURE)
+        s = (const RFstring*) va_arg(argList, RFstring*);
+        if((thisPos= rf_string_find_byte_pos(thisstr, s, options))!= RF_FAILURE)
         {
             if(thisPos < minPos)
             {
                 minPos = thisPos;
-                minPosLength = rfString_ByteLength(s);
+                minPosLength = rf_string_length_bytes(s);
             }
         }
     }
@@ -460,10 +460,10 @@ bool rfString_Afterv(const void* thisstr, void* result,
     minPos += minPosLength;//go after the found substring
     if(options & RF_STRINGX_ARGUMENT)
     {
-        if(!rfStringX_Init_unsafe_nnt(
+        if(!rf_stringx_init_unsafe_nnt(
                result,
-               rfString_Data(thisstr) + minPos,
-               rfString_ByteLength(thisstr) - minPos)
+               rf_string_data(thisstr) + minPos,
+               rf_string_length_bytes(thisstr) - minPos)
            )
         {
             ret = false;
@@ -472,10 +472,10 @@ bool rfString_Afterv(const void* thisstr, void* result,
     }
     else
     {
-        if(!rfString_Init_unsafe_nnt(
+        if(!rf_string_init_unsafe_nnt(
                result,
-               rfString_Data(thisstr) + minPos,
-               rfString_ByteLength(thisstr) - minPos)
+               rf_string_data(thisstr) + minPos,
+               rf_string_length_bytes(thisstr) - minPos)
            )
         {
             ret = false;

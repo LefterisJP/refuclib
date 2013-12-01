@@ -36,7 +36,7 @@
 #include <Definitions/retcodes.h>
 //for the local scope macros
 #include <Utils/localscope.h>
-//for static RF_String init
+//for static RFstring init
 #include <String/core.h>
 //for string accessors
 #include <String/retrieval.h>
@@ -63,16 +63,16 @@ typedef struct Log
     //! The current size of the log buffer
     uint64_t buff_size;
     //! The log level that we have to keep
-    RF_LogLevel level;
+    RFlog_level level;
     //! The file to which the log is written
     FILE *file;
     //! Mutex to protect the buffer when writting from multiple threads
     //! TODO: Maybe figure out a better synchronization method?
     pthread_mutex_t lock;
-}RF_Log;
-static RF_Log _log;
+}RFlog;
+static RFlog _log;
 
-static const RF_String severity_level_string[] = {
+static const RFstring severity_level_string[] = {
     RF_STRING_STATIC_INIT(" [Emergency] "),
     RF_STRING_STATIC_INIT(" [Alert] "),
     RF_STRING_STATIC_INIT(" [Critical] "),
@@ -90,7 +90,7 @@ static const RF_String severity_level_string[] = {
 /* The buffer position we write at */
 #define OCCUPIED(i_log_) ((i_log_)->index - (i_log_)->buffer)
 
-static bool rfLog_Init(RF_Log *log, RF_LogLevel level, char *log_file_name)
+static bool rf_log_init(RFlog *log, RFlog_level level, char *log_file_name)
 {
     log->buff_size = RF_OPTION_LOG_BUFFER_SIZE;
     log->buffer = malloc(RF_OPTION_LOG_BUFFER_SIZE);
@@ -112,7 +112,7 @@ static bool rfLog_Init(RF_Log *log, RF_LogLevel level, char *log_file_name)
     return true;
 }
 
-static bool rfLog_Flush(RF_Log *log)
+static bool rf_log_flush(RFlog *log)
 {
     size_t rc;
     bool ret = true;
@@ -127,7 +127,7 @@ static bool rfLog_Flush(RF_Log *log)
     return ret;
 }
 
-static void rfLog_Deinit(RF_Log *log)
+static void rf_log_deinit(RFlog *log)
 {
     fclose(log->file);
     pthread_mutex_destroy(&log->lock);
@@ -159,8 +159,8 @@ static void rfLog_Deinit(RF_Log *log)
     }while(0);
 
 
-static inline bool rfLog_AddLocation(
-    RF_Log *log,
+static inline bool rf_log_add_location(
+    RFlog *log,
     const char* file,
     const char* func,
     int line)
@@ -185,11 +185,11 @@ static inline bool rfLog_AddLocation(
     log->index += ret;
     return true;
 }
-static bool format_log_message(RF_Log *log,
-                               RF_LogLevel level,
+static bool format_log_message(RFlog *log,
+                               RFlog_level level,
                                const char* file,
                                const char* func,
-                               int line, RF_String* msg)
+                               int line, RFstring* msg)
 {
     struct timeval tv;
     struct tm *now_tm;
@@ -212,13 +212,13 @@ static bool format_log_message(RF_Log *log,
     log->index += s;
 
     /* Log type */
-    CHECK_BUFFER(log, rfString_ByteLength(&severity_level_string[level]));
+    CHECK_BUFFER(log, rf_string_length_bytes(&severity_level_string[level]));
     memcpy(
         log->index,
-        rfString_Data(&severity_level_string[level]),
-        rfString_ByteLength(&severity_level_string[level])
+        rf_string_data(&severity_level_string[level]),
+        rf_string_length_bytes(&severity_level_string[level])
     );
-    log->index += rfString_ByteLength(&severity_level_string[level]);
+    log->index += rf_string_length_bytes(&severity_level_string[level]);
 
     /* Thread ID */
     CHECK_BUFFER(log, 100);
@@ -229,14 +229,14 @@ static bool format_log_message(RF_Log *log,
     log->index += ret;
 
     /* Location */
-    if (!rfLog_AddLocation(log, file, func, line)) {
+    if (!rf_log_add_location(log, file, func, line)) {
         return false;
     }
 
     /* Message */
-    CHECK_BUFFER(log, rfString_ByteLength(msg) + 1);
-    memcpy(log->index, rfString_Data(msg), rfString_ByteLength(msg));
-    log->index += rfString_ByteLength(msg);
+    CHECK_BUFFER(log, rf_string_length_bytes(msg) + 1);
+    memcpy(log->index, rf_string_data(msg), rf_string_length_bytes(msg));
+    log->index += rf_string_length_bytes(msg);
     *log->index = '\n';
     log->index++;
            
@@ -244,9 +244,9 @@ static bool format_log_message(RF_Log *log,
 }
 
 
-static void rfLog_Add(RF_Log *log, RF_LogLevel level,
+static void rf_log_add(RFlog *log, RFlog_level level,
                       const char* file, const char* func,
-                      int line, RF_String* msg)
+                      int line, RFstring* msg)
 {
     RF_ENTER_LOCAL_SCOPE();
     if(log->level < level)
@@ -270,23 +270,23 @@ static void rfLog_Add(RF_Log *log, RF_LogLevel level,
 
 
 
-bool rf_LogModule_Init(RF_LogLevel level, char *log_file_name)
+bool rf_LogModule_Init(RFlog_level level, char *log_file_name)
 {
-    return rfLog_Init(&_log, level, log_file_name);
+    return rf_log_init(&_log, level, log_file_name);
 }
 
 void rf_LogModule_Deinit()
 {
-    rfLog_Deinit(&_log);
+    rf_log_deinit(&_log);
 }
-void rf_Log(RF_LogLevel level, const char* file,
+void rf_Log(RFlog_level level, const char* file,
             const char* func,
-            int line, RF_String* msg)
+            int line, RFstring* msg)
 {
-    rfLog_Add(&_log, level, file, func, line, msg);
+    rf_log_add(&_log, level, file, func, line, msg);
 }
 
 bool rf_LogFlush()
 {
-    return rfLog_Flush(&_log);
+    return rf_log_flush(&_log);
 }

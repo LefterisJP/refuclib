@@ -39,10 +39,10 @@
 #include <Definitions/inline.h> //for inline definitions
 #include <Definitions/retcodes.h> //for booleans
 #include <IO/common.h> //for stat_rft
-#include <String/string_decl.h> //for RF_String
+#include <String/string_decl.h> //for RFstring
 #include <stdlib.h> //for free
 
-//for rfString_Cstr with buffer
+//for rf_string_cstr with buffer
 #include "../../src/String/conversion.ph"
 
 #ifdef __cplusplus
@@ -67,17 +67,17 @@ extern "C"
 #error TODO
 
 #else
-i_INLINE_DECL int rfStat(RF_String* f, stat_rft* buffer)
+i_INLINE_DECL int rfStat(RFstring* f, stat_rft* buffer)
 {
     unsigned int index;
     int ret;
     char * cs;
-    if(!(cs = rfString_Cstr_ibuff_push(f, &index)))
+    if(!(cs = rf_string_cstr_ibuff_push(f, &index)))
     {
         return -1;
     }
     ret = stat(cs, (struct stat*)buffer);
-    rfString_Cstr_ibuff_pop(index);
+    rf_string_cstr_ibuff_pop(index);
     return ret;
 }
 #endif
@@ -143,7 +143,7 @@ i_INLINE_DECL int rfStat(RF_String* f, stat_rft* buffer)
  ** Even if there is an error the number of bytes read given by @c byteLength
  ** can be trusted.
  **/
-i_DECLIMEX_ bool rfFReadLine_UTF8(FILE* f, char eol, char** utf8,
+i_DECLIMEX_ bool rf_freadline_utf8(FILE* f, char eol, char** utf8,
                                   uint32_t* byteLength,
                                   uint32_t* bufferSize, char* eof);
 
@@ -151,7 +151,7 @@ i_DECLIMEX_ bool rfFReadLine_UTF8(FILE* f, char eol, char** utf8,
  ** @brief Reads a UTF-16 file descriptor until end of line or
  ** EOF is found and returns a UTF-8 byte buffer
  **
- ** The function works just like @ref rfReadLine_UTF8() but for UTF-16
+ ** The function works just like @ref rf_readline_utf8() but for UTF-16
  ** and as such has an extra endianess parameter.
  ** @param endianess Can be either:
  ** + @c RF_BIG_ENDIAN: If the file stream you want to read is encoded in 
@@ -161,7 +161,7 @@ i_DECLIMEX_ bool rfFReadLine_UTF8(FILE* f, char eol, char** utf8,
  ** @param bytes_read: The number of bytes succesfully read from the file
  ** descriptor
  **/
-i_DECLIMEX_ bool rfFReadLine_UTF16(FILE* f, char eol, char** utf8,
+i_DECLIMEX_ bool rf_freadline_utf16(FILE* f, char eol, char** utf8,
                                    uint32_t* byteLength, char* eof,
                                    uint32_t* bytes_read, int endianess);
 
@@ -169,7 +169,7 @@ i_DECLIMEX_ bool rfFReadLine_UTF16(FILE* f, char eol, char** utf8,
  ** @brief Reads a  UTF-32 file descriptor until end of line
  **  or EOF is found and returns a UTF-8 byte buffer
  ** 
- ** The function works just like @ref rfReadLine_UTF8() but for UTF-32
+ ** The function works just like @ref rf_readline_utf8() but for UTF-32
  ** @param endianess Can be either:
  ** + @c RF_BIG_ENDIAN: If the file stream you want to read is encoded in 
  **   big endian 
@@ -178,7 +178,7 @@ i_DECLIMEX_ bool rfFReadLine_UTF16(FILE* f, char eol, char** utf8,
  ** @param bytes_read: The number of bytes succesfully read from the file
  ** descriptor
  **/
-i_DECLIMEX_ bool rfFReadLine_UTF32(FILE* f, char eol, char** utf8,
+i_DECLIMEX_ bool rf_freadline_utf32(FILE* f, char eol, char** utf8,
                                    uint32_t* byteLength, char* eof,
                                    uint32_t* bytes_read, int endianess);
 
@@ -186,21 +186,21 @@ i_DECLIMEX_ bool rfFReadLine_UTF32(FILE* f, char eol, char** utf8,
 /**
  ** @brief Gets a number of bytes from a UTF-32 file descriptor
  **
- ** This function is similar to @ref rfFgets_UTF8() only for UTF32
+ ** This function is similar to @ref rf_fgets_utf8() only for UTF32
  ** @param endianess Can be either:
  ** + @c RF_BIG_ENDIAN: If the file stream you want to read is encoded in 
  **   big endian 
  ** + @c RF_LITTLE_ENDIAN: If the file stream you want to read is encoded in
  **  little endian
  **/
-i_DECLIMEX_ bool rfFgets_UTF32(char* buff, uint32_t num, FILE* f,
+i_DECLIMEX_ bool rf_fgets_utf32(char* buff, uint32_t num, FILE* f,
                                char* eof, char eol, uint32_t* bytes_read,
                                int endianess);
 
 /**
  ** @brief Gets a number of bytes from a UTF-16 file descriptor
  **
- ** This function is similar to @ref rfFgets_UTF8() only for UTF16 and as such
+ ** This function is similar to @ref rf_fgets_utf8() only for UTF16 and as such
  ** has an extra endianess parameter
  ** @param endianess Can be either:
  ** + @c RF_BIG_ENDIAN: If the file stream you want to read is encoded in 
@@ -208,7 +208,7 @@ i_DECLIMEX_ bool rfFgets_UTF32(char* buff, uint32_t num, FILE* f,
  ** + @c RF_LITTLE_ENDIAN: If the file stream you want to read is encoded in
  **  little endian
  **/
-i_DECLIMEX_ bool rfFgets_UTF16(char* buff, uint32_t num, FILE* f,
+i_DECLIMEX_ bool rf_fgets_utf16(char* buff, uint32_t num, FILE* f,
                                  char* eof, char eol, uint32_t* bytes_read,
                                  int endianess);
 
@@ -267,7 +267,7 @@ i_DECLIMEX_ bool rfFgets_UTF16(char* buff, uint32_t num, FILE* f,
  ** @return Returns @c true for success and @c false for an error occuring.
  ** Even if there is an error the number of bytes read can be trusted
  **/
-i_DECLIMEX_ bool rfFgets_UTF8(char* buff, uint32_t num, FILE* f,
+i_DECLIMEX_ bool rf_fgets_utf8(char* buff, uint32_t num, FILE* f,
                               char* eof, char eol, uint32_t* bytes_read);
 
 /**
@@ -299,13 +299,13 @@ i_DECLIMEX_ bool rfFgets_UTF8(char* buff, uint32_t num, FILE* f,
  ** or a negative number if the function fails. If the EOF is reached then 
  ** @c eof will be set to @c true but the function will still return a negative.
  **/
-i_DECLIMEX_ int rfFgetc_UTF8(FILE* f, uint32_t *c, char cp, char* eof);
+i_DECLIMEX_ int rf_fgetc_utf8(FILE* f, uint32_t *c, char cp, char* eof);
 
 
 /**
  ** @brief  Gets a unicode character from a UTF-16 file descriptor
  **
- ** This function acts just like @ref rfFgetc_UTF8() but for UTF16
+ ** This function acts just like @ref rf_fgetc_utf8() but for UTF16
  ** The main difference is that it also takes endianess into account
  ** and as such has en extra argument to that effect.
  ** @param endianess Can be either:
@@ -314,13 +314,13 @@ i_DECLIMEX_ int rfFgetc_UTF8(FILE* f, uint32_t *c, char cp, char* eof);
  ** + @c RF_LITTLE_ENDIAN: If the file stream you want to read is encoded in
  **  little endian
  **/
-i_DECLIMEX_ int rfFgetc_UTF16(FILE* f, uint32_t *c, char cp,
+i_DECLIMEX_ int rf_fgetc_utf16(FILE* f, uint32_t *c, char cp,
                                 int endianess, char* eof);
 
 /**
  ** @brief  Gets a unicode character from a UTF-32  file descriptor
  **
- ** This function acts just like @ref rfFgetc_UTF8() but for UTF32 with the
+ ** This function acts just like @ref rf_fgetc_utf8() but for UTF32 with the
  ** difference that it has no option to return the decoded character since it 
  ** makes no sense for UTF32 and that it accepts an endianess argument.
  ** @param endianess Can be either:
@@ -329,13 +329,13 @@ i_DECLIMEX_ int rfFgetc_UTF16(FILE* f, uint32_t *c, char cp,
  ** + @c RF_LITTLE_ENDIAN: If the file stream you want to read is encoded in
  **  little endian
  **/
-i_DECLIMEX_ int rfFgetc_UTF32(FILE* f, uint32_t *c, int endianess, char* eof);
+i_DECLIMEX_ int rf_fgetc_utf32(FILE* f, uint32_t *c, int endianess, char* eof);
 
 
 /**
  ** @brief Moves a unicode character backwards in a little endian UTF-32 file stream
  **
- ** This function acts just like @ref rfFback_UTF8() except that it is 
+ ** This function acts just like @ref rf_fback_utf8() except that it is 
  ** implemented for UTF-32 encoded byte streams and that it also accepts
  ** an endianess arument.
  ** @param endianess Can be either:
@@ -345,12 +345,12 @@ i_DECLIMEX_ int rfFgetc_UTF32(FILE* f, uint32_t *c, int endianess, char* eof);
  **  little endian
  ** @return Returns either @c 4 for success or negative for failure
  **/
-i_DECLIMEX_ int rfFback_UTF32(FILE* f, uint32_t *c, int endianess);
+i_DECLIMEX_ int rf_fback_utf32(FILE* f, uint32_t *c, int endianess);
 
 /**
  ** @brief Moves a unicode character backwards in a UTF-16 file stream
  **
- ** This function acts just like @ref rfFback_UTF8() except that it is 
+ ** This function acts just like @ref rf_fback_utf8() except that it is 
  ** implemented for UTF-16 encoded byte streams and that it also accepts
  ** an endianess arument.
  ** @param endianess Can be either:
@@ -360,7 +360,7 @@ i_DECLIMEX_ int rfFback_UTF32(FILE* f, uint32_t *c, int endianess);
  **  little endian
  ** @return Returns either @c 2 or @c 4 for success and negative for failure
  **/
-i_DECLIMEX_ int rfFback_UTF16(FILE* f, uint32_t *c, int endianess);
+i_DECLIMEX_ int rf_fback_utf16(FILE* f, uint32_t *c, int endianess);
 
 /**
  ** @brief Moves a unicode character backwards in a UTF-8 file stream
@@ -378,7 +378,7 @@ i_DECLIMEX_ int rfFback_UTF16(FILE* f, uint32_t *c, int endianess);
  ** @return Returns either the number of bytes moved backwards for success
  ** (either @c 4, @c 3, @c 2 or @c 1) or negative number for error
  **/
-i_DECLIMEX_ int rfFback_UTF8(FILE* f, uint32_t *c);
+i_DECLIMEX_ int rf_fback_utf8(FILE* f, uint32_t *c);
 
 /**
  ** @brief Opens another process as a pipe

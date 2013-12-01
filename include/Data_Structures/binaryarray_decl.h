@@ -50,12 +50,12 @@
 ** Functions to set/get values and also to reallocate the array
 ** are provided
 */
-typedef struct RF_BinaryArray
+typedef struct RFbinary_array
 {
     //! The size of the array in values (bits)
     uint32_t size;
     //! The data
     char* data;
-}RF_BinaryArray;
+}RFbinary_array;
 
 #endif//include guards end

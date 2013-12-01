@@ -34,11 +34,11 @@
 **
 ** This structure provides a cross-platform way to measure Date and time and its intervals. Its highest resolution is in seconds. It should not be used as a
 ** timer structure but as a way to retrieve, set or manipulate dates and to measure their intervals. Contains functions that can retrieve the date from the system or set it.
-** Also contains functions that can manipulate a date such as @ref rfDate_AddDays or @ref rfDate_SubMonths which can add days or subtract months from a date
+** Also contains functions that can manipulate a date such as @ref rf_date_add_days or @ref rf_date_sub_months which can add days or subtract months from a date
 ** In some cases the structure can also be interpreted as a time interval. Examples of such usage are in the function that returns the difference between two dates @ref rfDate_Diff.
 ** In there the third parameter is not interpreted as a Date but as a time interval. For more information look at the individual funtions documentation.
 **/
-typedef struct RF_Date
+typedef struct RFdate
 {
     //! The current number of seconds. Values can be in the range of 0-59 (in Linux can be 60 for leap seconds)
     unsigned char seconds;
@@ -58,7 +58,7 @@ typedef struct RF_Date
     char isLeap;
     //! The year
     uint16_t year;
-}RF_Date;
+}RFdate;
 
 
 #endif//include guards end

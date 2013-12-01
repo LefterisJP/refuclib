@@ -39,7 +39,7 @@
 
 #include <stdio.h>//for FILE* used inside printf.h
 #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
-#include <String/string_decl.h> //for RF_String
+#include <String/string_decl.h> //for RFstring
 #include <String/common.h> //for RFS_() macro
 #include <Utils/log.h>
 
@@ -55,14 +55,14 @@
 
 
 /**
- ** Is the internal version of the @ref rfLMS_Push() function. Is used internally in the library
+ ** Is the internal version of the @ref rf_lms_push() function. Is used internally in the library
  ** to allow faster local memory stack objects initialization internally
  ** @param i_ptr_ The pointer to point to the newly allocated place in the stack. Can be 0 if there was not enough size
  ** @param i_size_ The size to allocate
  **
  **/
 
-#define i_rfLMS_Push(i_ptr_, i_size_, i_FAIL_STMT_)    do{              \
+#define i_rf_lms_push(i_ptr_, i_size_, i_FAIL_STMT_)    do{              \
     /* If the size of the stack plus the requested allocation goes beyond the stack size*/\
     if(RF_LMS->stackPtr+(i_size_) > RF_OPTION_LOCALSTACK_MEMORY_SIZE)\
     {\
@@ -79,14 +79,14 @@
 
 
 /**
- ** Is the internal library version of @ref rfLMS_ArgsEval() function.
+ ** Is the internal library version of @ref rf_lms_args_eval() function.
  ** It keeps the stack pointer before a specific function's argument 
  ** evaluation. So that we can know what stack pointer value to return 
  ** to after a function with local objects finishes
  ** @param i_FAIL_STMT_ is the statement to execute in case
  ** of failure
  **/
-#define i_rfLMS_ArgsEval(i_FAIL_STMT_) do{\
+#define i_rf_lms_args_eval(i_FAIL_STMT_) do{\
         /*Check if the function had more local object macros evaluation than the max number of arguments*/ \
         if(RF_LMS->macroEvalsI+1 >= RF_MAX_FUNC_ARGS)                   \
         {                                                               \

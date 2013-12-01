@@ -35,10 +35,10 @@
 #else
     #error Unsupported Operating System
 #endif
-#include <Threads/semaphore_decl.h> //for RF_Semaphore
+#include <Threads/semaphore_decl.h> //for RFsemaphore
 #include <Threads/semaphore.h>
 #else
-    #error Attempted to include RF_Semaphore while not having compiled the library with the Thread module activated
+    #error Attempted to include RFsemaphore while not having compiled the library with the Thread module activated
 #endif
 
 

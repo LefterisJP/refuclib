@@ -29,7 +29,7 @@ static void *corrupt(const char *abortstr,
 	return NULL;
 }
 
-struct RF_ILNode *rfIList_CheckNode(const struct RF_ILNode *node,
+struct RF_ILNode *rf_ilist_check_node(const struct RF_ILNode *node,
                                     const char *abortstr)
 {
 	const struct RF_ILNode *p, *n;
@@ -47,9 +47,9 @@ struct RF_ILNode *rfIList_CheckNode(const struct RF_ILNode *node,
 	return (struct RF_ILNode *)node;
 }
 
-struct RF_ILHead *rfIList_Check(const struct RF_ILHead *h, const char *abortstr)
+struct RF_ILHead *rf_ilist_check(const struct RF_ILHead *h, const char *abortstr)
 {
-	if (!rfIList_CheckNode(&h->n, abortstr))
+	if (!rf_ilist_check_node(&h->n, abortstr))
 		return NULL;
 	return (struct RF_ILHead *)h;
 }

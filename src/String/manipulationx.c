@@ -25,16 +25,16 @@
 
 /*------------- Corrensponding Header inclusion -------------*/
 #include <Definitions/types.h> //for fixed size types needed in various places
-#include <String/string_decl.h>//for RF_String
-#include <String/stringx_decl.h> //for RF_StringX
+#include <String/string_decl.h>//for RFstring
+#include <String/stringx_decl.h> //for RFstringx
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <String/manipulationx.h>
 /*------------- Module related inclusion -------------*/
 #include <String/flags.h> //for the flags
-#include <String/core.h> //for rfString_Deinit
-#include <String/retrieval.h> //for rfString_Between and others
-#include <String/traversalx.h> //for rfStringX_MoveAfter() and other functions
+#include <String/core.h> //for rf_string_deinit
+#include <String/retrieval.h> //for rf_string_between and others
+#include <String/traversalx.h> //for rf_stringx_move_after() and other functions
 #include "common.ph" //for private string functions and macros
 #include "manipulation.ph" //for manipulation only stuff
 /*------------- Outside Module inclusion -------------*/
@@ -55,14 +55,14 @@
     #include <Utils/sanity.h>
 /*------------- End of includes -------------*/
 
-bool rfStringX_Append(RF_StringX* thisstr, const void* other)
+bool rf_stringx_append(RFstringx* thisstr, const void* other)
 {
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
     i_NULLPTR_CHECK_1(other, "append", ret = false;goto cleanup);
 
-    ret = rfStringXGEN_Append(thisstr, rfString_Data(other),
-                              rfString_ByteLength(other));
+    ret = rf_stringxgen_append(thisstr, rf_string_data(other),
+                              rf_string_length_bytes(other));
 
 #ifdef RF_OPTION_DEBUG
   cleanup:
@@ -71,7 +71,7 @@ bool rfStringX_Append(RF_StringX* thisstr, const void* other)
     return ret;
 }
 
-bool rfStringX_Append_chars(RF_StringX* thisstr, const void* other, int chars)
+bool rf_stringx_append_chars(RFstringx* thisstr, const void* other, int chars)
 {
     uint32_t i;
     uint32_t length = 0;
@@ -91,9 +91,9 @@ bool rfStringX_Append_chars(RF_StringX* thisstr, const void* other, int chars)
     //if the end is not found
     if(!end)
     {
-        end = rfString_ByteLength(other);
+        end = rf_string_length_bytes(other);
     }
-    ret = rfStringXGEN_Append(thisstr, rfString_Data(other), end);
+    ret = rf_stringxgen_append(thisstr, rf_string_data(other), end);
 
 #ifdef RF_OPTION_DEBUG
   cleanup:
@@ -102,20 +102,20 @@ bool rfStringX_Append_chars(RF_StringX* thisstr, const void* other, int chars)
     return ret;
 }
 
-bool rfStringX_Append_char(RF_StringX* thisstr, uint32_t unichar)
+bool rf_stringx_append_char(RFstringx* thisstr, uint32_t unichar)
 {
     char utf8[MAX_UTF8C_BYTES];
     int length;
-    if((length = rfUTF8_Encode_single(unichar,utf8)) <= 0)
+    if((length = rf_utf8_encode_single(unichar,utf8)) <= 0)
     {
         RF_ERROR("Encoding the given unicode codepoint to UTF8 failed");
         return false;
     }
 
-    return rfStringXGEN_Append(thisstr, utf8, length);
+    return rf_stringxgen_append(thisstr, utf8, length);
 }
 
-bool rfStringX_Prepend(RF_StringX* thisstr, const void* other)
+bool rf_stringx_prepend(RFstringx* thisstr, const void* other)
 {
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
@@ -124,15 +124,15 @@ bool rfStringX_Prepend(RF_StringX* thisstr, const void* other)
     //if the new string does not fit inside the buffer reallocate it
     RF_STRINGX_REALLOC_JMP(
         thisstr,
-        rfString_ByteLength(thisstr) + rfString_ByteLength(other),
+        rf_string_length_bytes(thisstr) + rf_string_length_bytes(other),
         ret = false,
         cleanup
     );
 
-    if(!rfStringGEN_Prepend(thisstr,
-                            rfString_Data(other),
-                            rfString_ByteLength(thisstr),
-                            rfString_ByteLength(other)))
+    if(!rf_stringgen_prepend(thisstr,
+                            rf_string_data(other),
+                            rf_string_length_bytes(thisstr),
+                            rf_string_length_bytes(other)))
     {
         ret = false;
     }
@@ -141,7 +141,7 @@ bool rfStringX_Prepend(RF_StringX* thisstr, const void* other)
     return ret;
 }
 
-bool rfStringX_Insert(RF_StringX* thisstr, uint32_t pos,
+bool rf_stringx_insert(RFstringx* thisstr, uint32_t pos,
                       const void* other)
 {
     uint32_t length, bytePos, size, i;
@@ -151,13 +151,13 @@ bool rfStringX_Insert(RF_StringX* thisstr, uint32_t pos,
 
 
     //keep the original byte length here
-    size = rfString_ByteLength(thisstr);
+    size = rf_string_length_bytes(thisstr);
     //get the new byte length
-    rfString_ByteLength(thisstr) += rfString_ByteLength(other);
+    rf_string_length_bytes(thisstr) += rf_string_length_bytes(other);
     //check if the new string fits in the buffer and if not reallocate it
     RF_STRINGX_REALLOC_JMP(
         thisstr,
-        rfString_ByteLength(thisstr),
+        rf_string_length_bytes(thisstr),
         ;,
         cleanup);
     //iterate this string to find the byte position of the character position
@@ -176,12 +176,12 @@ bool rfStringX_Insert(RF_StringX* thisstr, uint32_t pos,
         ret = true;
         //move the string's contents to make room for the extra string insertion
         memmove(
-            rfString_Data(thisstr) + rfString_ByteLength(other) + bytePos,
-            rfString_Data(thisstr) + bytePos, size - bytePos);
+            rf_string_data(thisstr) + rf_string_length_bytes(other) + bytePos,
+            rf_string_data(thisstr) + bytePos, size - bytePos);
         //now insert the new string
-        memcpy(rfString_Data(thisstr) + bytePos,
-               rfString_Data(other),
-               rfString_ByteLength(other));
+        memcpy(rf_string_data(thisstr) + bytePos,
+               rf_string_data(other),
+               rf_string_length_bytes(other));
     }
 
   cleanup:
@@ -189,9 +189,9 @@ bool rfStringX_Insert(RF_StringX* thisstr, uint32_t pos,
     return ret;
 }
 
-/*--- RF_StringX unsafe appending functions---*/
+/*--- RFstringx unsafe appending functions---*/
 
-bool rfStringX_Append_bytes(RF_StringX* thisstr, const void* other,
+bool rf_stringx_append_bytes(RFstringx* thisstr, const void* other,
                             const int32_t bytes)
 {
     bool ret = true;
@@ -201,32 +201,32 @@ bool rfStringX_Append_bytes(RF_StringX* thisstr, const void* other,
     //if it does not fit inside the remaining size, reallocate the buffer
     RF_STRINGX_REALLOC_JMP(
         thisstr,
-        rfString_ByteLength(thisstr) + bytes,
+        rf_string_length_bytes(thisstr) + bytes,
         ret = false,
         cleanup);
-    ret = rfStringXGEN_Append(thisstr, rfString_Data(other), bytes);
+    ret = rf_stringxgen_append(thisstr, rf_string_data(other), bytes);
 
   cleanup:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
-bool rfStringX_Append_cstr(RF_StringX* thisstr, const char* cstr)
+bool rf_stringx_append_cstr(RFstringx* thisstr, const char* cstr)
 {
     size_t len = strlen(cstr);
     i_NULLPTR_CHECK_1(other, "append_cstr", ret=false;goto cleanup);
     //if it does not fit inside the remaining size, reallocate the buffer
     RF_STRINGX_REALLOC(
         thisstr,
-        rfString_ByteLength(thisstr) + len,
+        rf_string_length_bytes(thisstr) + len,
         false);
     
-    return rfStringXGEN_Append(thisstr, cstr, len);
+    return rf_stringxgen_append(thisstr, cstr, len);
 }
 
-/*--- RF_StringX replacing functions---*/
+/*--- RFstringx replacing functions---*/
 
-bool rfStringX_Replace(RF_StringX* thisstr, const void* sstr,
+bool rf_stringx_replace(RFstringx* thisstr, const void* sstr,
                        const void* rstr, uint32_t num,
                        const char options)
 {
@@ -243,19 +243,19 @@ bool rfStringX_Replace(RF_StringX* thisstr, const void* sstr,
     }
 
     //act depending on the size difference of rstr and sstr
-    if(rfString_ByteLength(rstr)> rfString_ByteLength(sstr))
+    if(rf_string_length_bytes(rstr)> rf_string_length_bytes(sstr))
     {
         //reallocate the string if needed
         RF_STRINGX_REALLOC_JMP(
             thisstr,
-            rfString_ByteLength(thisstr) + number * (
-                rfString_ByteLength(rstr) - rfString_ByteLength(sstr)
+            rf_string_length_bytes(thisstr) + number * (
+                rf_string_length_bytes(rstr) - rf_string_length_bytes(sstr)
             ),
             ret = false, cleanup
         );
         replace_greater(thisstr, number, sstr, rstr);
     }
-    else if(rfString_ByteLength(rstr) < rfString_ByteLength(sstr))
+    else if(rf_string_length_bytes(rstr) < rf_string_length_bytes(sstr))
     {
         replace_lesser(thisstr, number, sstr, rstr);
     }
@@ -269,13 +269,13 @@ bool rfStringX_Replace(RF_StringX* thisstr, const void* sstr,
     return ret;
 }
 
-bool rfStringX_ReplaceBetween(RF_StringX* thisstr, const void* left,
+bool rf_stringx_replace_between(RFstringx* thisstr, const void* left,
                               const void* right, const void* rstr,
                               char options, uint32_t i)
 {
     uint32_t j,move,start = thisstr->bIndex;
     bool found = false,ret=false;
-    RF_String ss;
+    RFstring ss;
     RF_ENTER_LOCAL_SCOPE();
 
     i_NULLPTR_CHECK_3(left, right, rstr, ret=false; goto cleanup);
@@ -283,7 +283,7 @@ bool rfStringX_ReplaceBetween(RF_StringX* thisstr, const void* left,
     if(i==0)//if we want all occurences replaced
     {
         //while we have occurences of the pair
-        while(!rfString_Between(thisstr, left, right, &ss, options))
+        while(!rf_string_between(thisstr, left, right, &ss, options))
         {
             found = true;
             /*
@@ -291,26 +291,26 @@ bool rfStringX_ReplaceBetween(RF_StringX* thisstr, const void* left,
              * and replace what was found there. No of the functions
              * below fail since the while condition is true
              */
-            rfStringX_MoveAfter(thisstr, left, 0, options);
-            if(rfStringX_Replace(thisstr, &ss, rstr, 1, options))
+            rf_stringx_move_after(thisstr, left, 0, options);
+            if(rf_stringx_replace(thisstr, &ss, rstr, 1, options))
             {
                 goto cleanup1;
             }
             //also move after the right
-            move = rfString_ByteLength(rstr) + rfString_ByteLength(right);
+            move = rf_string_length_bytes(rstr) + rf_string_length_bytes(right);
             thisstr->bIndex += move;
-            rfString_Data(thisstr) += move;
-            rfString_ByteLength(thisstr) -= move;
+            rf_string_data(thisstr) += move;
+            rf_string_length_bytes(thisstr) -= move;
             //free temp string before next iteration
-            rfString_Deinit(&ss);
+            rf_string_deinit(&ss);
         }
 
         if(found)//if we replaced at least 1 occurence
         {
             move = thisstr->bIndex - start;
-            rfString_Data(thisstr) -= move;
+            rf_string_data(thisstr) -= move;
             thisstr->bIndex = start;
-            rfString_ByteLength(thisstr) += move;
+            rf_string_length_bytes(thisstr) += move;
             //success
             ret = true;
         }
@@ -321,43 +321,43 @@ bool rfStringX_ReplaceBetween(RF_StringX* thisstr, const void* left,
     for(j = 1; j < i; j++)
     {
         //move after the pair of the 'j' inbetween substrings
-        if(!rfStringX_MoveAfterPair(thisstr, left, right, 0, options, 0))
+        if(!rf_stringx_move_after_pair(thisstr, left, right, 0, options, 0))
         {
             //and if the occurence does not exist
             move = thisstr->bIndex - start;
-            rfString_Data(thisstr) -= move;
+            rf_string_data(thisstr) -= move;
             thisstr->bIndex = start;
             //and increase its bytelength
-            rfString_ByteLength(thisstr) += move;
+            rf_string_length_bytes(thisstr) += move;
             goto cleanup1;//falure
         }
     }
     //move after the pair of the inbetween substrings we actually want
-    if(!rfString_Between(thisstr, left, right, &ss, options))
+    if(!rf_string_between(thisstr, left, right, &ss, options))
     {
         //and if the occurence does not exist
         move = thisstr->bIndex-start;
-        rfString_Data(thisstr) -= move;
+        rf_string_data(thisstr) -= move;
         thisstr->bIndex = start;
         //and increase its bytelength
-        rfString_ByteLength(thisstr) += move;
+        rf_string_length_bytes(thisstr) += move;
         goto cleanup1;//falure
     }
     ///success
     //move after the left part of the pair
-    rfStringX_MoveAfter(thisstr, left, 0, options);
+    rf_stringx_move_after(thisstr, left, 0, options);
     //and then replace the occurence
-    if(!rfStringX_Replace(thisstr, &ss, rstr, 1, options))
+    if(!rf_stringx_replace(thisstr, &ss, rstr, 1, options))
     {
         //failure
         goto cleanup1;
     }
     //now we are done and should go back
-    rfString_Deinit(&ss);
+    rf_string_deinit(&ss);
     move = thisstr->bIndex - start;
-    rfString_Data(thisstr) -= move;
+    rf_string_data(thisstr) -= move;
     thisstr->bIndex = start;
-    rfString_ByteLength(thisstr) += move;
+    rf_string_length_bytes(thisstr) += move;
 
     //if we get here success
     ret = true;
@@ -369,6 +369,6 @@ cleanup1:
 
 
 
-i_INLINE_INS bool rfStringXGEN_Append(RF_StringX* s,
+i_INLINE_INS bool rf_stringxgen_append(RFstringx* s,
                                       const char* other,
                                       unsigned int bytes_to_copy);

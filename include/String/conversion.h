@@ -43,7 +43,7 @@ extern "C"
 //! @{
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Returns the strings contents as a UTF-16 buffer
  **
  ** @isinherited{StringX}
@@ -56,13 +56,13 @@ extern "C"
  **             this argument to receive the length of
  **             the returned UTF-16 buffer in 16-bit words
  ** @return Returns an allocated UTF-16 buffer. Needs to be freed by the user later.
- ** @see rfString_ToUTF8()
- ** @see rfString_ToUTF32()
+ ** @see rf_string_tout_f8()
+ ** @see rf_string_to_utf32()
  **/
-i_DECLIMEX_ uint16_t* rfString_ToUTF16(const void* s, uint32_t* length);
+i_DECLIMEX_ uint16_t* rf_string_to_utf16(const void* s, uint32_t* length);
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Returns the strings contents as a UTF-32 buffer
  **
  ** @isinherited{StringX}
@@ -75,10 +75,10 @@ i_DECLIMEX_ uint16_t* rfString_ToUTF16(const void* s, uint32_t* length);
  **                    argument to receive the length
  **                   of the returned UTF-32 buffer in codepoints. (32-bit) words
  ** @return Returns an allocated UTF-16 buffer. Needs to be freed by the user later.
- ** @see rfString_ToUTF8()
- ** @see rfString_ToUTF16()
+ ** @see rf_string_tout_f8()
+ ** @see rf_string_to_utf16()
  **/
-i_DECLIMEX_ uint32_t* rfString_ToUTF32(const void* s,uint32_t*length);
+i_DECLIMEX_ uint32_t* rf_string_to_utf32(const void* s,uint32_t*length);
 
 //! @}
 
@@ -86,15 +86,15 @@ i_DECLIMEX_ uint32_t* rfString_ToUTF32(const void* s,uint32_t*length);
 //! @{
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Creates a Cstring representation of the string
  **
  ** @isinherited{StringX}
- ** Since RF_String is not null terminated this function shall allocate
+ ** Since RFstring is not null terminated this function shall allocate
  ** a c string where it will be stored.
  **
  ** @internal
- ** You can also use the internal @ref rfString_Cstr_ibuff_push()
+ ** You can also use the internal @ref rf_string_cstr_ibuff_push()
  ** which combined with popping allows you to avoid mallocs
  ** @endinternal
  **
@@ -104,10 +104,10 @@ i_DECLIMEX_ uint32_t* rfString_ToUTF32(const void* s,uint32_t*length);
  **                @inhtype{String,StringX}
  ** @return        Returns the pointer to the allocated c string
  **/
-i_DECLIMEX_ char* rfString_Cstr(const void* s);
+i_DECLIMEX_ char* rf_string_cstr(const void* s);
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Returns the integer value of a String
  **
  ** @isinherited{StringX}
@@ -117,12 +117,12 @@ i_DECLIMEX_ char* rfString_Cstr(const void* s);
  ** @param[out] v A refence to an integer that will return the float value
  ** @return Returns true in case of succesfull conversion or false if no
  **         integer was represented by the string
- ** @see rfString_ToDouble()
+ ** @see rf_string_to_double()
  **/
-i_DECLIMEX_ bool rfString_ToInt(const void* thisstr, int32_t* v);
+i_DECLIMEX_ bool rf_string_to_int(const void* thisstr, int32_t* v);
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Returns the double value of a String
  **
  ** @isinherited{StringX}
@@ -133,12 +133,12 @@ i_DECLIMEX_ bool rfString_ToInt(const void* thisstr, int32_t* v);
  **               floating point number value
  ** @return Returns @c true if the conversion was succesfull and @c false
  **        otherwise
- ** @see rfString_ToInt()
+ ** @see rf_string_to_int()
  **/
-i_DECLIMEX_ bool rfString_ToDouble(const void* thisstr, double* f);
+i_DECLIMEX_ bool rf_string_to_double(const void* thisstr, double* f);
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Turns any uppercase characters of the string into lower case
  **
  ** @isinherited{StringX}
@@ -147,12 +147,12 @@ i_DECLIMEX_ bool rfString_ToDouble(const void* thisstr, double* f);
  ** be turned into lowercase
  ** @param thisstr The string for which to perform the uppercase
  **                to lowercase conversion
- ** @see rfString_ToUpper()
+ ** @see rf_string_to_upper()
  **/
-i_DECLIMEX_ void rfString_ToLower(void* thisstr);
+i_DECLIMEX_ void rf_string_to_lower(void* thisstr);
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Turns any lowercase characters of the string into upper case
  **
  ** @isinherited{StringX}
@@ -161,18 +161,18 @@ i_DECLIMEX_ void rfString_ToLower(void* thisstr);
  ** into uppercase
  ** @param thisstr The string for which to perform the lowercase to
  **                uppercase conversion
- ** @see rfString_ToLower()
+ ** @see rf_string_to_lower()
  **/
-i_DECLIMEX_ void rfString_ToUpper(void* thisstr);
+i_DECLIMEX_ void rf_string_to_upper(void* thisstr);
 
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Tokenizes the given string
  **
  ** @isinherited{StringX}
  ** Separates it into @c tokensN depending on how many substrings
  ** can be created from the @c sep separatior and stores them
- ** into the Array of RF_String* that should be passed to the
+ ** into the Array of RFstring* that should be passed to the
  ** function. The array gets initialized inside the function and
  ** <b>has to be freed explicitly</b> later by thg user.
  ** Also each String inside the array has to be Deinitialized too.
@@ -188,8 +188,8 @@ i_DECLIMEX_ void rfString_ToUpper(void* thisstr);
  ** @return Returns @c true in success and @c false in case the the
  ** separating character has not been found
  **/
-i_DECLIMEX_ bool rfString_Tokenize(const void* thisstr, const void* sep,
-                                   uint32_t* tokensN, RF_String** tokens);
+i_DECLIMEX_ bool rf_string_tokenize(const void* thisstr, const void* sep,
+                                   uint32_t* tokensN, RFstring** tokens);
 
 //! @}
 

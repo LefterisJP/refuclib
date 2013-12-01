@@ -25,21 +25,21 @@
 
 //*---------------------Corrensponding Header inclusion---------------------------------
 #include <Definitions/types.h> //for fixed size types needed in various places
-#include <String/string_decl.h>//for RF_String
-#include <String/stringx_decl.h> //for RF_StringX
+#include <String/string_decl.h>//for RFstring
+#include <String/stringx_decl.h> //for RFstringx
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <String/traversalx.h>
 //*---------------------Module related inclusion----------------------------------------
 #include <String/flags.h> //for string flags
-#include <String/retrieval.h> //for rfString_Between
-#include <String/core.h> //for rfString_Deinit()
-#include <String/corex.h> //for rfStringX_Deinit()
-#include "common.ph" //for rfString_FindBytePos() and other private macros and functions
+#include <String/retrieval.h> //for rf_string_between
+#include <String/core.h> //for rf_string_deinit()
+#include <String/corex.h> //for rf_stringx_deinit()
+#include "common.ph" //for rf_string_find_byte_pos() and other private macros and functions
 //*---------------------Outside module inclusion----------------------------------------
 //for bool and retcodes
     #include <Definitions/retcodes.h>
-//for rfUTF8_IsContinuationByte()
+//for rf_utf8_is_continuation_byte()
     #include <String/unicode.h>  
 //for RF_HEXEQ_C() macro and others
     #include <Utils/constcmp.h> 
@@ -53,64 +53,64 @@
 //*----------------------------End of Includes------------------------------------------
 
 
-static inline bool move_internal_ptr(RF_StringX* s, int32_t move,
+static inline bool move_internal_ptr(RFstringx* s, int32_t move,
                                      void* resultP, uint32_t len, char options)
 {
     s->bIndex += move;
-    rfString_Data(s) += move;
+    rf_string_data(s) += move;
     //also reduce the byte length of this string
-    rfString_ByteLength(s) -= move;
+    rf_string_length_bytes(s) -= move;
 
     //also if we want the string returned
     if(resultP != 0)
     {
         if(options & RF_STRINGX_ARGUMENT)
         {
-            RF_StringX* result = (RF_StringX*) resultP;
-            rfString_ByteLength(result) = move - len;
+            RFstringx* result = (RFstringx*) resultP;
+            rf_string_length_bytes(result) = move - len;
             result->bSize = (
-                rfString_ByteLength(result) * RF_OPTION_STRINGX_CAPACITY_MULTIPLIER
+                rf_string_length_bytes(result) * RF_OPTION_STRINGX_CAPACITY_MULTIPLIER
             );
             result->bIndex = 0;
-            RF_MALLOC(rfString_Data(result), result->bSize, false);
+            RF_MALLOC(rf_string_data(result), result->bSize, false);
             memcpy(
-                rfString_Data(result),
-                rfString_Data(s) - move,
-                rfString_ByteLength(result)
+                rf_string_data(result),
+                rf_string_data(s) - move,
+                rf_string_length_bytes(result)
             );
         }
         else
         {
-            RF_String* result = (RF_String*) resultP;
-            rfString_ByteLength(result) = move - len;
-            RF_MALLOC(rfString_Data(result), rfString_ByteLength(result), false);
+            RFstring* result = (RFstring*) resultP;
+            rf_string_length_bytes(result) = move - len;
+            RF_MALLOC(rf_string_data(result), rf_string_length_bytes(result), false);
             memcpy(
-                rfString_Data(result),
-                rfString_Data(s) - move,
-                rfString_ByteLength(result)
+                rf_string_data(result),
+                rf_string_data(s) - move,
+                rf_string_length_bytes(result)
             );
         }
     }
     return true;
 }
 
-int32_t rfStringX_MoveAfter(RF_StringX* thisstr, const void* sub,
+int32_t rf_stringx_move_after(RFstringx* thisstr, const void* sub,
                             void* result, const char options)
 {
     int32_t move;
     RF_ENTER_LOCAL_SCOPE();
 
     //check for substring existence and return failure if not found
-    if((move = rfString_FindBytePos(thisstr, sub, options)) == RF_FAILURE)
+    if((move = rf_string_find_byte_pos(thisstr, sub, options)) == RF_FAILURE)
     {
         move = RF_FAILURE;
         goto cleanup;
     }
     //if found, move the internal pointer
-    move += rfString_ByteLength(sub);
+    move += rf_string_length_bytes(sub);
 
     if(!move_internal_ptr(thisstr, move, result,
-                          rfString_ByteLength(sub), options))
+                          rf_string_length_bytes(sub), options))
     {
         move = RF_FAILURE;
     }
@@ -119,14 +119,14 @@ int32_t rfStringX_MoveAfter(RF_StringX* thisstr, const void* sub,
     return move;
 }
 
-void rfStringX_MoveBack(RF_StringX* thisstr, uint32_t n)
+void rf_stringx_move_back(RFstringx* thisstr, uint32_t n)
 {
     uint32_t length;
     length = 0;
 
     while(thisstr->bIndex >0)
     {
-        if(!rfUTF8_IsContinuationByte(rfString_Data(thisstr)[0]))
+        if(!rf_utf8_is_continuation_byte(rf_string_data(thisstr)[0]))
         {
             if(n == length)
             {
@@ -135,21 +135,21 @@ void rfStringX_MoveBack(RF_StringX* thisstr, uint32_t n)
             length ++;
         }
         //so keep changing the internal index and the bytes pointer
-        rfString_Data(thisstr)--;
+        rf_string_data(thisstr)--;
         thisstr->bIndex--;
         //and also keep adding to the bytelength
-        rfString_ByteLength(thisstr) ++;
+        rf_string_length_bytes(thisstr) ++;
     }
 }
 
-void rfStringX_MoveForward(RF_StringX* thisstr, uint32_t n)
+void rf_stringx_move_forward(RFstringx* thisstr, uint32_t n)
 {
     uint32_t length;
     length = 0;
 
     while(thisstr->bIndex < thisstr->bSize)
     {
-        if(!rfUTF8_IsContinuationByte(rfString_Data(thisstr)[0]))
+        if(!rf_utf8_is_continuation_byte(rf_string_data(thisstr)[0]))
         {
             if(n == length)
             {
@@ -158,21 +158,21 @@ void rfStringX_MoveForward(RF_StringX* thisstr, uint32_t n)
             length ++;
         }
         //so keep changing the internal index and the bytes pointer
-        rfString_Data(thisstr)++;
+        rf_string_data(thisstr)++;
         thisstr->bIndex++;
         //and reducing from the byte length
-        rfString_ByteLength(thisstr)--;
+        rf_string_length_bytes(thisstr)--;
     }
 }
 
-void rfStringX_Reset(RF_StringX* thisstr)
+void rf_stringx_reset(RFstringx* thisstr)
 {
-    rfString_Data(thisstr) -= thisstr->bIndex;
-    rfString_ByteLength(thisstr) += thisstr->bIndex;
+    rf_string_data(thisstr) -= thisstr->bIndex;
+    rf_string_length_bytes(thisstr) += thisstr->bIndex;
     thisstr->bIndex = 0;
 }
 
-bool rfStringX_MoveAfterv(RF_StringX* thisstr, void* result, 
+bool rf_stringx_move_afterv(RFstringx* thisstr, void* result, 
                           const char options,
                           const unsigned char parN, ...)
 {
@@ -192,15 +192,15 @@ bool rfStringX_MoveAfterv(RF_StringX* thisstr, void* result,
     for(i = 0; i < parN; i++)
     {
         //get the param
-        RF_String* s = va_arg(argList, RF_String*);
+        RFstring* s = va_arg(argList, RFstring*);
         //if the parameter got found in the string see if it's the closest
-        if((thisPos = rfString_FindBytePos(thisstr, s, options)) != RF_FAILURE)
+        if((thisPos = rf_string_find_byte_pos(thisstr, s, options)) != RF_FAILURE)
         {
             if(thisPos < minPos)
             {
                 minPos = thisPos;
                 //keep the length of the winnning parameter
-                paramLen = rfString_ByteLength(s);
+                paramLen = rf_string_length_bytes(s);
             }
         }
     }
@@ -220,7 +220,7 @@ bool rfStringX_MoveAfterv(RF_StringX* thisstr, void* result,
     return ret;
 }
 
-bool rfStringX_MoveAfterPair(RF_StringX* thisstr, const void* left,
+bool rf_stringx_move_after_pair(RFstringx* thisstr, const void* left,
                              const void* right, void* result,
                              char options, uint32_t occurence)
 {
@@ -239,15 +239,15 @@ bool rfStringX_MoveAfterPair(RF_StringX* thisstr, const void* left,
     for(i = 1; i <= occurence; i ++)
     {
         //attempt to get the in between string
-        if(!rfString_Between(thisstr, left, right, result, options))
+        if(!rf_string_between(thisstr, left, right, result, options))
         {
             ret = false;
             goto cleanup;
         }
 
         //move after this occurence of the pair
-        rfStringX_MoveAfter(thisstr, left, 0, options);
-        rfStringX_MoveAfter(thisstr, right, 0, options);
+        rf_stringx_move_after(thisstr, left, 0, options);
+        rf_stringx_move_after(thisstr, right, 0, options);
 
         //if we found it
         if(i == occurence)
@@ -258,11 +258,11 @@ bool rfStringX_MoveAfterPair(RF_StringX* thisstr, const void* left,
         //else depending on the passed parameter type get rid of this result
         if(options & RF_STRINGX_ARGUMENT)
         {
-            rfStringX_Deinit(result);
+            rf_stringx_deinit(result);
         }
         else
         {
-            rfString_Deinit(result);
+            rf_string_deinit(result);
         }
     }
     //if we get here and the result is not found return failure
@@ -270,16 +270,16 @@ bool rfStringX_MoveAfterPair(RF_StringX* thisstr, const void* left,
     {
         if(options & RF_STRINGX_ARGUMENT)
         {
-            rfStringX_Deinit(result);
+            rf_stringx_deinit(result);
         }
         else
         {
-            rfString_Deinit(result);
+            rf_string_deinit(result);
         }
         //get the pointer back
         move = thisstr->bIndex - start;
-        rfString_Data(thisstr) -= move;
-        rfString_ByteLength(thisstr) += move;
+        rf_string_data(thisstr) -= move;
+        rf_string_length_bytes(thisstr) += move;
         thisstr->bIndex = start;
         ret = false;
         goto cleanup;
@@ -289,11 +289,11 @@ bool rfStringX_MoveAfterPair(RF_StringX* thisstr, const void* left,
     {
         if(options & RF_STRINGX_ARGUMENT)
         {
-            rfStringX_Deinit(result);
+            rf_stringx_deinit(result);
         }
         else
         {
-            rfString_Deinit(result);
+            rf_string_deinit(result);
         }
     }
 

@@ -85,13 +85,13 @@ bool strcmp_nnt(char* s1, unsigned int s1_len,
     return true;
 }
 
-// Internal version of rfString_Find, used for byte position.
-int rfString_FindBytePos(const void* tstr, const void* sstr, const char options)
+// Internal version of rf_string_find, used for byte position.
+int rf_string_find_byte_pos(const void* tstr, const void* sstr, const char options)
 {
 #define CHECK_NOT_CHAR(s_, i_)                  \
     do{                                         \
         /* if is is not a character */          \
-        switch(rfString_Data(s_)[i_])           \
+        switch(rf_string_data(s_)[i_])           \
         {                                       \
         case ' ':case '\t':case '\n':           \
             break;                              \
@@ -106,12 +106,12 @@ int rfString_FindBytePos(const void* tstr, const void* sstr, const char options)
     if(!RF_BITFLAG_ON(options, RF_CASE_IGNORE))
     {
         //if it is not found
-        if(!(found = strstr_nnt(rfString_Data(tstr), rfString_ByteLength(tstr),
-                               rfString_Data(sstr), rfString_ByteLength(sstr))))
+        if(!(found = strstr_nnt(rf_string_data(tstr), rf_string_length_bytes(tstr),
+                               rf_string_data(sstr), rf_string_length_bytes(sstr))))
             return RF_FAILURE;
 
         //get the byte position
-        uint32_t bytepos = found - rfString_Data(tstr);
+        uint32_t bytepos = found - rf_string_data(tstr);
         //if we need the exact string as it is given
         if(RF_BITFLAG_ON(options, RF_MATCH_WORD))
         {
@@ -121,10 +121,10 @@ int rfString_FindBytePos(const void* tstr, const void* sstr, const char options)
                 CHECK_NOT_CHAR(tstr, bytepos - 1);
             }
             //check after the found string
-            if(bytepos + rfString_ByteLength(sstr) != rfString_ByteLength(tstr))
+            if(bytepos + rf_string_length_bytes(sstr) != rf_string_length_bytes(tstr))
             {
                 //if is is not a character
-                CHECK_NOT_CHAR(tstr, bytepos + rfString_ByteLength(sstr));
+                CHECK_NOT_CHAR(tstr, bytepos + rf_string_length_bytes(sstr));
             }
         }//end of the exact string option
         //else return the position in the bytes buffer
@@ -133,17 +133,17 @@ int rfString_FindBytePos(const void* tstr, const void* sstr, const char options)
 
     //else, case insensitive search
     uint32_t i,j;
-    for(i=0; i < rfString_ByteLength(tstr); i ++)
+    for(i=0; i < rf_string_length_bytes(tstr); i ++)
     {
         //if i matches the start of the substring
-        for(j = 0; j < rfString_ByteLength(sstr); j++)
+        for(j = 0; j < rf_string_length_bytes(sstr); j++)
         {
             //if the jth char is a big letter
-            if(rfString_Data(sstr)[j] >= 0x41 && rfString_Data(sstr)[j] <= 0x5a)
+            if(rf_string_data(sstr)[j] >= 0x41 && rf_string_data(sstr)[j] <= 0x5a)
             {
                 //no match
-                if(rfString_Data(sstr)[j] != rfString_Data(tstr)[i+j] &&
-                   rfString_Data(sstr)[j]+32 != rfString_Data(tstr)[i+j])
+                if(rf_string_data(sstr)[j] != rf_string_data(tstr)[i+j] &&
+                   rf_string_data(sstr)[j]+32 != rf_string_data(tstr)[i+j])
                     break;
                 //there is a match in the jth character
                 if(RF_BITFLAG_ON(options, RF_MATCH_WORD))
@@ -160,12 +160,12 @@ int rfString_FindBytePos(const void* tstr, const void* sstr, const char options)
                 }//exact string check if ends
             }
             //small letter
-            else if(rfString_Data(sstr)[j] >= 0x61 && 
-                    rfString_Data(sstr)[j] <= 0x7a)
+            else if(rf_string_data(sstr)[j] >= 0x61 && 
+                    rf_string_data(sstr)[j] <= 0x7a)
             {
                 //no match
-                if(rfString_Data(sstr)[j] != rfString_Data(tstr)[i+j] &&
-                   rfString_Data(sstr)[j]-32 != rfString_Data(tstr)[i+j])
+                if(rf_string_data(sstr)[j] != rf_string_data(tstr)[i+j] &&
+                   rf_string_data(sstr)[j]-32 != rf_string_data(tstr)[i+j])
                     break;
                 //there is a match in the jth character
                 if(RF_BITFLAG_ON(options, RF_MATCH_WORD))
@@ -182,19 +182,19 @@ int rfString_FindBytePos(const void* tstr, const void* sstr, const char options)
                 }//exact string check if ends
             }
             //not a letter and no match
-            else if(rfString_Data(sstr)[j] != rfString_Data(tstr)[i+j])
+            else if(rf_string_data(sstr)[j] != rf_string_data(tstr)[i+j])
             {
                 break;//break off the substring search loop
             }
 
             //we either found it or need to perform one last check for exact string
-            if(j == rfString_ByteLength(sstr) - 1)
+            if(j == rf_string_length_bytes(sstr) - 1)
             {
                 //only if the end of the string is not right after the substring
                 if(RF_BITFLAG_ON(options, RF_MATCH_WORD) &&
-                   i + rfString_ByteLength(sstr) < rfString_ByteLength(tstr))
+                   i + rf_string_length_bytes(sstr) < rf_string_length_bytes(tstr))
                 {
-                    CHECK_NOT_CHAR(tstr, i + rfString_ByteLength(sstr));
+                    CHECK_NOT_CHAR(tstr, i + rf_string_length_bytes(sstr));
                 }//end of the exact string check
                 //succes
                 return i;
@@ -213,6 +213,6 @@ i_INLINE_INS bool fill_fmt_buffer(const char* fmt,
                                   char **buffPtr,
                                   unsigned int *bIndex,
                                   va_list args);
-i_INLINE_INS void rfStringGEN_Append(void* thisstr,
+i_INLINE_INS void rf_stringgen_append(void* thisstr,
                                      const char* other,
                                      unsigned int bytes_to_copy);

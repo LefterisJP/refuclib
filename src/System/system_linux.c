@@ -24,11 +24,11 @@
 /*------------- Corrensponding Header inclusion -------------*/
 #include <System/rf_system.h>
 /*------------- Outside Module inclusion -------------*/
-#include <String/string_decl.h> //for RF_String
-#include <String/stringx_decl.h> //for RF_StringX
+#include <String/string_decl.h> //for RFstring
+#include <String/stringx_decl.h> //for RFstringx
 #include <Definitions/defarg.h> //for the default argument declared string functions that are included below
 #include <String/common.h> //for RFS_()
-#include <String/corex.h> //for rfStringX_Init_buff() and others
+#include <String/corex.h> //for rf_stringx_init_buff() and others
 #include <String/retrieval.h> //for accessors
 #include "../String/conversion.ph" //for the buffer Cstr() conversion
 //for error logging
@@ -64,7 +64,7 @@ bool rfMakeDir(void* dirname, int mode)
     RF_ENTER_LOCAL_SCOPE();
     i_NULLPTR_CHECK_1(dirname, "directory name", ret = false; goto cleanup);
 
-    if(!(cs = rfString_Cstr_ibuff_push(dirname, &index)))
+    if(!(cs = rf_string_cstr_ibuff_push(dirname, &index)))
     {
         ret = false;
         goto cleanup;
@@ -79,7 +79,7 @@ bool rfMakeDir(void* dirname, int mode)
     }
 
 
-    rfString_Cstr_ibuff_pop(index);
+    rf_string_cstr_ibuff_pop(index);
 cleanup:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
@@ -93,18 +93,18 @@ bool rfRemoveDir(void* dirname)
     struct dirent *entry;
     char *cs;
     unsigned int index;
-    RF_StringX path;
+    RFstringx path;
     RF_ENTER_LOCAL_SCOPE();
     i_NULLPTR_CHECK_1(dirname, "directory name",
                       ret = false; goto cleanup_local);
 
-    if(!(cs = rfString_Cstr_ibuff_push(dirname, &index)))
+    if(!(cs = rf_string_cstr_ibuff_push(dirname, &index)))
     {
         ret = false;
         goto cleanup_local;
     }
 
-    if(!rfStringX_Init_buff(&path, 1024, ""))
+    if(!rf_stringx_init_buff(&path, 1024, ""))
     {
         RF_ERROR("Failed to initialize a stringX buffer");
         ret = false;
@@ -127,7 +127,7 @@ bool rfRemoveDir(void* dirname)
         if (strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
         {
             //create the full entry name
-            if(!rfStringX_Assign(
+            if(!rf_stringx_assign(
                    &path,
                    RFS_(RF_STR_PF_FMT RF_DIRSEP "%s",
                         RF_STR_PF_ARG(dirname), entry->d_name)))
@@ -187,9 +187,9 @@ bool rfRemoveDir(void* dirname)
 
 
 cleanup_path:
-    rfStringX_Deinit(&path);
+    rf_stringx_deinit(&path);
 cleanup_cstr_buff:
-    rfString_Cstr_ibuff_pop(index);
+    rf_string_cstr_ibuff_pop(index);
 cleanup_local:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
@@ -203,7 +203,7 @@ bool rfDeleteFile(void* name)
     unsigned int index;
     RF_ENTER_LOCAL_SCOPE();
     i_NULLPTR_CHECK_1(name, "file name", ret = false; goto cleanup);
-    if(!(cs = rfString_Cstr_ibuff_push(name, &index)))
+    if(!(cs = rf_string_cstr_ibuff_push(name, &index)))
     {
         ret = false; goto cleanup;
     }        
@@ -217,7 +217,7 @@ bool rfDeleteFile(void* name)
         ret = false;
     }//end of check of succesful file removal
 
-    rfString_Cstr_ibuff_pop(index);
+    rf_string_cstr_ibuff_pop(index);
  cleanup:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
@@ -233,11 +233,11 @@ bool rfRenameFile(void* name, void* newName)
     RF_ENTER_LOCAL_SCOPE();
     i_NULLPTR_CHECK_2(name, newName, ret = false; goto cleanup);
 
-    if(!(cs_name = rfString_Cstr_ibuff_push(name, &index)))
+    if(!(cs_name = rf_string_cstr_ibuff_push(name, &index)))
     {
         ret = false; goto cleanup;
     }    
-    if(!(cs_new_name = rfString_Cstr_ibuff_push(newName, NULL)))
+    if(!(cs_new_name = rf_string_cstr_ibuff_push(newName, NULL)))
     {
         ret = false; goto cleanup1;
     }
@@ -253,7 +253,7 @@ bool rfRenameFile(void* name, void* newName)
 
 
   cleanup1:
-    rfString_Cstr_ibuff_pop(index);
+    rf_string_cstr_ibuff_pop(index);
   cleanup:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
@@ -263,11 +263,11 @@ bool rfRenameFile(void* name, void* newName)
 bool rfFileExists(void* name)
 {
     stat_rft sb;   
-    RF_String* file_name = name;
+    RFstring* file_name = name;
     return (rfStat(file_name, &sb) == 0);
 }
 
-threadid_t rfSystem_GetThreadID()
+threadid_t rf_system_get_thread_i_d()
 {
     return syscall(SYS_gettid);
 }
@@ -278,12 +278,12 @@ FILE* rfFopen(void* name, const char* mode)
     unsigned int index;
     char* cs;
     FILE* ret;
-    if(!(cs = rfString_Cstr_ibuff_push(name, &index)))
+    if(!(cs = rf_string_cstr_ibuff_push(name, &index)))
     {
         return NULL;
     }
     ret = fopen(cs, mode);
-    rfString_Cstr_ibuff_pop(index);
+    rf_string_cstr_ibuff_pop(index);
     return ret;
 }
 
@@ -292,11 +292,11 @@ FILE* rfFreopen(void* name, const char* mode, FILE* f)
     unsigned int index;
     char* cs;
     FILE* ret;
-    if(!(cs = rfString_Cstr_ibuff_push(name, &index)))
+    if(!(cs = rf_string_cstr_ibuff_push(name, &index)))
     {
         return NULL;
     }
     ret = freopen(cs, mode, f);
-    rfString_Cstr_ibuff_pop(index);
+    rf_string_cstr_ibuff_pop(index);
     return ret;
 }

@@ -25,15 +25,15 @@
 
 /*------------- Corrensponding Header inclusion -------------*/
 #include <Definitions/types.h> //for fixed size types needed in various places
-#include <String/string_decl.h>//for RF_String
-#include <String/stringx_decl.h> //for RF_StringX
+#include <String/string_decl.h>//for RFstring
+#include <String/stringx_decl.h> //for RFstringx
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <String/corex.h>
 /*------------- Module related inclusion -------------*/
-#include <String/traversalx.h> //for rfStringX_Reset()
+#include <String/traversalx.h> //for rf_stringx_reset()
 #include <stdarg.h> //needed for the va_list
-#include <String/core.h> //for some needed RF_String functions
+#include <String/core.h> //for some needed RFstring functions
 #include "common.ph" //for RF_STRINGX_REALLOC()
 /*------------- Outside Module inclusion -------------*/
 //for endianess detection functionality
@@ -57,10 +57,10 @@
 
 /* === Init functions === */
 
-/* --- Functions that already exist for RF_String - START --- */
-RF_StringX* rfStringX_Createv(const char* lit, ...)
+/* --- Functions that already exist for RFstring - START --- */
+RFstringx* rf_stringx_createv(const char* lit, ...)
 {
-    RF_StringX* ret;
+    RFstringx* ret;
     va_list args;
     char *buff_ptr;
     unsigned int size, buff_index;
@@ -77,8 +77,8 @@ RF_StringX* rfStringX_Createv(const char* lit, ...)
     }
     va_end(args);
 
-    RF_MALLOC_JMP(ret, sizeof(RF_StringX), ret = NULL, cleanup_buffer);
-    if(!rfStringX_Init_unsafe_nnt(ret, buff_ptr, size))
+    RF_MALLOC_JMP(ret, sizeof(*ret), ret = NULL, cleanup_buffer);
+    if(!rf_stringx_init_unsafe_nnt(ret, buff_ptr, size))
     {
         free(ret);
         ret = NULL;
@@ -87,17 +87,17 @@ RF_StringX* rfStringX_Createv(const char* lit, ...)
 #ifdef RF_OPTION_DEBUG
 cleanup_buffer:
 #endif
-    rfBuffer_SetIndex(TSBUFFA, buff_index);
+    rf_buffer_set_index(TSBUFFA, buff_index);
 cleanup_lscope:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
-RF_StringX* rfStringX_Create(const char* lit)
+RFstringx* rf_stringx_create(const char* lit)
 {
-    RF_StringX* ret;
-    RF_MALLOC(ret, sizeof(RF_StringX), NULL);
-    if(!rfStringX_Init(ret, lit))
+    RFstringx* ret;
+    RF_MALLOC(ret, sizeof(*ret), NULL);
+    if(!rf_stringx_init(ret, lit))
     {
         free(ret);
         return NULL;
@@ -105,7 +105,7 @@ RF_StringX* rfStringX_Create(const char* lit)
     return ret;
 }
 
-bool rfStringX_Initv(RF_StringX* str, const char* lit, ...)
+bool rf_stringx_initv(RFstringx* str, const char* lit, ...)
 {
     bool ret = true;
     va_list args;
@@ -124,7 +124,7 @@ bool rfStringX_Initv(RF_StringX* str, const char* lit, ...)
     }
     va_end(args);
     //initialize the string
-    if(!rfStringX_Init_unsafe_nnt(str,
+    if(!rf_stringx_init_unsafe_nnt(str,
                                   (const char*)buff_ptr,
                                   size))
     {
@@ -132,40 +132,40 @@ bool rfStringX_Initv(RF_StringX* str, const char* lit, ...)
     }
 
 
-    rfBuffer_SetIndex(TSBUFFA, buff_index);
+    rf_buffer_set_index(TSBUFFA, buff_index);
 cleanup_lscope:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
-bool rfStringX_Init(RF_StringX* str, const char* lit)
+bool rf_stringx_init(RFstringx* str, const char* lit)
 {
     //check the string literal for valid utf-8 byte sequence
     uint32_t byteLength;
-    if(!rfUTF8_VerifyCstr(lit ,&byteLength))
+    if(!rf_utf8_verify_cstr(lit ,&byteLength))
     {
         RF_ERROR("Error at StringX initialization due to invalid UTF-8 "
                  "byte sequence");
         return false;
     }
 
-    return rfStringX_Init_unsafe_nnt(str, lit, byteLength);
+    return rf_stringx_init_unsafe_nnt(str, lit, byteLength);
 }
 
-RF_StringX* rfStringX_Create_cp(uint32_t codepoint)
+RFstringx* rf_stringx_create_cp(uint32_t codepoint)
 {
-    RF_StringX* ret;
-    RF_MALLOC(ret, sizeof(RF_StringX), NULL);
-    if(!rfStringX_Init_cp(ret, codepoint))
+    RFstringx* ret;
+    RF_MALLOC(ret, sizeof(*ret), NULL);
+    if(!rf_stringx_init_cp(ret, codepoint))
     {
         free(ret);
         return NULL;
     }
     return ret;
 }
-bool rfStringX_Init_cp(RF_StringX* str, uint32_t codepoint)
+bool rf_stringx_init_cp(RFstringx* str, uint32_t codepoint)
 {
-    if(!rfString_Init_cp(&str->INH_String, codepoint))
+    if(!rf_string_init_cp(&str->INH_String, codepoint))
     {
         return false;
     }
@@ -174,140 +174,140 @@ bool rfStringX_Init_cp(RF_StringX* str, uint32_t codepoint)
     return true;
 }
 
-RF_StringX* rfStringX_Create_i(int32_t i)
+RFstringx* rf_stringx_create_i(int32_t i)
 {
-    RF_StringX* ret;
-    RF_MALLOC(ret, sizeof(RF_StringX), NULL);
-    if(!rfStringX_Init_i(ret, i))
+    RFstringx* ret;
+    RF_MALLOC(ret, sizeof(*ret), NULL);
+    if(!rf_stringx_init_i(ret, i))
     {
         free(ret);
         return NULL;
     }
     return ret;
 }
-bool rfStringX_Init_i(RF_StringX* str, int32_t i)
+bool rf_stringx_init_i(RFstringx* str, int32_t i)
 {
-    if(!rfString_Init_i(&str->INH_String, i))
+    if(!rf_string_init_i(&str->INH_String, i))
     {
         return false;
     }
 
-    str->bSize = rfString_ByteLength(str);
+    str->bSize = rf_string_length_bytes(str);
     str->bIndex = 0;
     return true;
 }
-RF_StringX* rfStringX_Create_f(float f)
+RFstringx* rf_stringx_create_f(float f)
 {
-    RF_StringX* ret;
-    RF_MALLOC(ret, sizeof(RF_StringX), NULL);
-    if(!rfStringX_Init_f(ret, f))
+    RFstringx* ret;
+    RF_MALLOC(ret, sizeof(*ret), NULL);
+    if(!rf_stringx_init_f(ret, f))
     {
         free(ret);
         return NULL;
     }
     return ret;
 }
-bool rfStringX_Init_f(RF_StringX* str, float f)
+bool rf_stringx_init_f(RFstringx* str, float f)
 {
-    if(!rfString_Init_f(&str->INH_String, f))
+    if(!rf_string_init_f(&str->INH_String, f))
     {
         return false;
     }
-    str->bSize = rfString_ByteLength(str);
+    str->bSize = rf_string_length_bytes(str);
     return true;
 }
 
-RF_StringX* rfStringX_Create_UTF16(const uint16_t* s, unsigned int len)
+RFstringx* rf_stringx_create_utf16(const uint16_t* s, unsigned int len)
 {
-    RF_StringX* ret;
-    RF_MALLOC(ret, sizeof(RF_StringX), NULL);
-    if(!rfStringX_Init_UTF16(ret, s, len))
+    RFstringx* ret;
+    RF_MALLOC(ret, sizeof(*ret), NULL);
+    if(!rf_stringx_init_utf16(ret, s, len))
     {
         free(ret);
         return NULL;
     }
     return ret;
 }
-bool rfStringX_Init_UTF16(RF_StringX* str, const uint16_t* s, unsigned int len)
+bool rf_stringx_init_utf16(RFstringx* str, const uint16_t* s, unsigned int len)
 {
-    if(!rfString_Init_UTF16(&str->INH_String, s, len))
+    if(!rf_string_init_utf16(&str->INH_String, s, len))
     {
         return false;
     }
     str->bIndex = 0;
-    str->bSize = rfString_ByteLength(str);
+    str->bSize = rf_string_length_bytes(str);
     return true;
 }
-RF_StringX* rfStringX_Create_UTF32(const uint32_t* s, unsigned int len)
+RFstringx* rf_stringx_create_utf32(const uint32_t* s, unsigned int len)
 {
-    RF_StringX* ret;
-    RF_MALLOC(ret, sizeof(RF_StringX), NULL);
-    if(!rfStringX_Init_UTF32(ret, s, len))
+    RFstringx* ret;
+    RF_MALLOC(ret, sizeof(*ret), NULL);
+    if(!rf_stringx_init_utf32(ret, s, len))
     {
         free(ret);
         return 0;
     }
     return ret;
 }
-bool rfStringX_Init_UTF32(RF_StringX* str, const uint32_t* codeBuffer,
+bool rf_stringx_init_utf32(RFstringx* str, const uint32_t* codeBuffer,
                           unsigned int len)
 {
-    if(!rfString_Init_UTF32(&str->INH_String, codeBuffer, len))
+    if(!rf_string_init_utf32(&str->INH_String, codeBuffer, len))
     {
         return false;
     }
     str->bIndex = 0;
-    str->bSize = rfString_ByteLength(str);
+    str->bSize = rf_string_length_bytes(str);
     return true;
 }
-RF_StringX* rfStringX_Create_unsafe(const char* lit)
+RFstringx* rf_stringx_create_unsafe(const char* lit)
 {
-    RF_StringX* ret;
-    RF_MALLOC(ret, sizeof(RF_StringX), NULL);
-    if(!rfStringX_Init_unsafe(ret, lit))
+    RFstringx* ret;
+    RF_MALLOC(ret, sizeof(*ret), NULL);
+    if(!rf_stringx_init_unsafe(ret, lit))
     {
         free(ret);
         return NULL;
     }
     return ret;
 }
-bool rfStringX_Init_unsafe(RF_StringX* str, const char* lit)
+bool rf_stringx_init_unsafe(RFstringx* str, const char* lit)
 {
-    if(!rfString_Init_unsafe(&str->INH_String, lit))
+    if(!rf_string_init_unsafe(&str->INH_String, lit))
     {
         return false;
     }
     str->bIndex = 0;
-    str->bSize = rfString_ByteLength(str);
+    str->bSize = rf_string_length_bytes(str);
     return true;
 }
-bool rfStringX_Init_unsafe_nnt(RF_StringX* str, const char* s,
+bool rf_stringx_init_unsafe_nnt(RFstringx* str, const char* s,
                                size_t length)
 {
     str->bSize = length * RF_OPTION_STRINGX_CAPACITY_MULTIPLIER;
-    RF_MALLOC(rfString_Data(str), str->bSize, false);
-    memcpy(rfString_Data(str), s, length);
-    rfString_ByteLength(str) = length;
+    RF_MALLOC(rf_string_data(str), str->bSize, false);
+    memcpy(rf_string_data(str), s, length);
+    rf_string_length_bytes(str) = length;
     str->bIndex = 0;
     return true;
 }
 
-bool rfStringX_Init_unsafe_bnnt(RF_StringX* str, const char* s,
+bool rf_stringx_init_unsafe_bnnt(RFstringx* str, const char* s,
                                 size_t length, size_t buff_size)
 {
     str->bSize = buff_size;
-    RF_MALLOC(rfString_Data(str), str->bSize, false);
-    memcpy(rfString_Data(str), s, length);
-    rfString_ByteLength(str) = length;
+    RF_MALLOC(rf_string_data(str), str->bSize, false);
+    memcpy(rf_string_data(str), s, length);
+    rf_string_length_bytes(str) = length;
     str->bIndex = 0;
     return true;    
 }
 
-/* --- Functions that already exist for RF_String - END --- */
+/* --- Functions that already exist for RFstring - END --- */
 
-RF_StringX* rfStringX_Create_buffv(uint32_t buffSize, const char* lit, ...)
+RFstringx* rf_stringx_create_buffv(uint32_t buffSize, const char* lit, ...)
 {
-    RF_StringX* ret;
+    RFstringx* ret;
     va_list args;
     char *buff_ptr;
     unsigned int size, buff_index;
@@ -329,8 +329,8 @@ RF_StringX* rfStringX_Create_buffv(uint32_t buffSize, const char* lit, ...)
     {
         buffSize = size;
     }
-    RF_MALLOC_JMP(ret, sizeof(RF_StringX), ret = NULL, cleanup_buffer);
-    if(!rfStringX_Init_unsafe_bnnt(ret, buff_ptr, size, buffSize))
+    RF_MALLOC_JMP(ret, sizeof(*ret), ret = NULL, cleanup_buffer);
+    if(!rf_stringx_init_unsafe_bnnt(ret, buff_ptr, size, buffSize))
     {
         free(ret);
         ret = NULL;
@@ -339,16 +339,16 @@ RF_StringX* rfStringX_Create_buffv(uint32_t buffSize, const char* lit, ...)
 #ifdef RF_OPTION_DEBUG
 cleanup_buffer:
 #endif
-    rfBuffer_SetIndex(TSBUFFA, buff_index);
+    rf_buffer_set_index(TSBUFFA, buff_index);
 cleanup_lscope:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
-RF_StringX* rfStringX_Create_buff(uint32_t buffSize,const char* lit)
+RFstringx* rf_stringx_create_buff(uint32_t buffSize,const char* lit)
 {
-    RF_StringX* ret;
-    RF_MALLOC(ret, sizeof(RF_StringX), NULL);
-    if(!rfStringX_Init_buff(ret, buffSize, lit))
+    RFstringx* ret;
+    RF_MALLOC(ret, sizeof(*ret), NULL);
+    if(!rf_stringx_init_buff(ret, buffSize, lit))
     {
         free(ret);
         return NULL;
@@ -357,7 +357,7 @@ RF_StringX* rfStringX_Create_buff(uint32_t buffSize,const char* lit)
 }
 
 
-bool rfStringX_Init_buffv(RF_StringX* str, uint32_t buffSize,
+bool rf_stringx_init_buffv(RFstringx* str, uint32_t buffSize,
                          const char* lit, ...)
 {
     bool ret = true;
@@ -382,20 +382,20 @@ bool rfStringX_Init_buffv(RF_StringX* str, uint32_t buffSize,
     {
         buffSize = size;
     }
-    ret = rfStringX_Init_unsafe_bnnt(str, buff_ptr, size, buffSize);
+    ret = rf_stringx_init_unsafe_bnnt(str, buff_ptr, size, buffSize);
 
-    rfBuffer_SetIndex(TSBUFFA, buff_index);
+    rf_buffer_set_index(TSBUFFA, buff_index);
 cleanup_lscope:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
-bool rfStringX_Init_buff(RF_StringX* str, uint32_t buffSize,
+bool rf_stringx_init_buff(RFstringx* str, uint32_t buffSize,
                              const char* lit)
 {
     //check the string literal for valid utf-8 byte sequence
     uint32_t byteLength;
-    if(!rfUTF8_VerifyCstr(lit, &byteLength))
+    if(!rf_utf8_verify_cstr(lit, &byteLength))
     {
         RF_ERROR("Error at StringX initialization due to invalid UTF-8 "
                   "byte sequence");
@@ -406,25 +406,25 @@ bool rfStringX_Init_buff(RF_StringX* str, uint32_t buffSize,
     {
         buffSize = byteLength;
     }
-    return rfStringX_Init_unsafe_bnnt(str, lit, byteLength, buffSize);
+    return rf_stringx_init_unsafe_bnnt(str, lit, byteLength, buffSize);
 }
 
 
-/*---- Methods to copy/assign an RF_StringX ----*/
+/*---- Methods to copy/assign an RFstringx ----*/
 
-bool rfStringX_Assign(RF_StringX* dst, const void* sourceP)
+bool rf_stringx_assign(RFstringx* dst, const void* sourceP)
 {
-    const RF_String* source = (const RF_String*)sourceP;
+    const RFstring* source = (const RFstring*)sourceP;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    rfStringX_Reset(dst);//make sure that the destination's byte index is reset
+    rf_stringx_reset(dst);//make sure that the destination's byte index is reset
     //only if the new string value won't fit in the buffer reallocate the buffer
-    RF_STRINGX_REALLOC_JMP(dst, rfString_ByteLength(source), ret=false, cleanup);
+    RF_STRINGX_REALLOC_JMP(dst, rf_string_length_bytes(source), ret=false, cleanup);
     //now copy the value and the bytelength
-    memcpy(rfString_Data(dst),
-           rfString_Data(source),
-           rfString_ByteLength(source));
-    rfString_ByteLength(dst) = rfString_ByteLength(source);
+    memcpy(rf_string_data(dst),
+           rf_string_data(source),
+           rf_string_length_bytes(source));
+    rf_string_length_bytes(dst) = rf_string_length_bytes(source);
 
   cleanup:
     RF_EXIT_LOCAL_SCOPE();
@@ -432,59 +432,59 @@ bool rfStringX_Assign(RF_StringX* dst, const void* sourceP)
 }
 
 //Assigns the value of a unicode character to the string
-bool rfStringX_Assign_char(RF_StringX* str, uint32_t codepoint)
+bool rf_stringx_assign_char(RFstringx* str, uint32_t codepoint)
 {
     int bytes;
     //reset the buffer if needed
-    rfStringX_Reset(str);
+    rf_stringx_reset(str);
     //realloc if needed
     if(str->bSize <5)
     {
-        RF_REALLOC(rfString_Data(str), char,
+        RF_REALLOC(rf_string_data(str), char,
                    5 * RF_OPTION_STRINGX_CAPACITY_MULTIPLIER, false);
     }
-    if((bytes=rfUTF8_Encode_single(codepoint, rfString_Data(str))) <= 0)
+    if((bytes=rf_utf8_encode_single(codepoint, rf_string_data(str))) <= 0)
     {
-        RF_ERROR("Assigning a character to an RF_StringX failed "
+        RF_ERROR("Assigning a character to an RFstringx failed "
                  "due to utf8 encoding");
         return false;
     }
-    rfString_ByteLength(str) = bytes;
+    rf_string_length_bytes(str) = bytes;
     return true;
 }
 
 
-// Returns an RF_StringX version of the parameter RF_String
-RF_StringX* rfStringX_FromString_OUT(const RF_String* s)
+// Returns an RFstringx version of the parameter RFstring
+RFstringx* rf_stringx_from_string_out(const RFstring* s)
 {
-    RF_StringX* ret;
-    RF_MALLOC(ret, sizeof(RF_StringX), NULL);
-    if(!rfStringX_FromString_IN(ret, s))
+    RFstringx* ret;
+    RF_MALLOC(ret, sizeof(*ret), NULL);
+    if(!rf_stringx_from_string_in(ret, s))
     {
         free(ret);
         return NULL;
     }
     return ret;
 }
-//Initializes an RF_StringX from an RF_string
-bool rfStringX_FromString_IN(RF_StringX* dst, const RF_String* src)
+//Initializes an RFstringx from an RF_string
+bool rf_stringx_from_string_in(RFstringx* dst, const RFstring* src)
 {
     //allocate the stringX
     dst->bIndex = 0;
-    dst->bSize = rfString_ByteLength(src) * RF_OPTION_STRINGX_CAPACITY_MULTIPLIER;
-    RF_MALLOC(rfString_Data(dst), dst->bSize, false);
-    rfString_ByteLength(dst) = rfString_ByteLength(src);
+    dst->bSize = rf_string_length_bytes(src) * RF_OPTION_STRINGX_CAPACITY_MULTIPLIER;
+    RF_MALLOC(rf_string_data(dst), dst->bSize, false);
+    rf_string_length_bytes(dst) = rf_string_length_bytes(src);
     //copy the bytes from the String
-    memcpy(rfString_Data(dst), rfString_Data(src), rfString_ByteLength(src));
+    memcpy(rf_string_data(dst), rf_string_data(src), rf_string_length_bytes(src));
     return true;
 }
 
 //Creates a copy of an extended String and returns it
-RF_StringX* rfStringX_Copy_OUT(RF_StringX* s)
+RFstringx* rf_stringx_copy_out(RFstringx* s)
 {
-    RF_StringX* ret;
-    RF_MALLOC(ret, sizeof(RF_StringX), NULL);
-    if(!rfStringX_Copy_IN(ret, s))
+    RFstringx* ret;
+    RF_MALLOC(ret, sizeof(*ret), NULL);
+    if(!rf_stringx_copy_in(ret, s))
     {
         free(ret);
         return NULL;
@@ -492,52 +492,52 @@ RF_StringX* rfStringX_Copy_OUT(RF_StringX* s)
     return ret;
 }
 //Copies the given source string into the destination string.
-bool rfStringX_Copy_IN(RF_StringX* dst, RF_StringX* src)
+bool rf_stringx_copy_in(RFstringx* dst, RFstringx* src)
 {
     //assert that the source string is copied from the beginning of its buffer
-    rfString_Data(src) -= src->bIndex;
+    rf_string_data(src) -= src->bIndex;
     //copy the bytes
-    RF_MALLOC(rfString_Data(dst), src->bSize, false);
-    memcpy(rfString_Data(dst), rfString_Data(src), src->bSize);
+    RF_MALLOC(rf_string_data(dst), src->bSize, false);
+    memcpy(rf_string_data(dst), rf_string_data(src), src->bSize);
     //push the source bytes back and also the new copied bytes
     //buffer to the same index
-    rfString_Data(src) += src->bIndex;
-    rfString_Data(dst) += src->bIndex;
+    rf_string_data(src) += src->bIndex;
+    rf_string_data(dst) += src->bIndex;
     //copy the parameters
     dst->bSize = src->bSize;
     dst->bIndex = src->bIndex;
-    rfString_ByteLength(dst) = rfString_ByteLength(src);
+    rf_string_length_bytes(dst) = rf_string_length_bytes(src);
     return true;
 }
-// Copies a certain number of characters from an RF_StringX
-bool rfStringX_Copy_chars(RF_StringX* dst, RF_StringX* src,
+// Copies a certain number of characters from an RFstringx
+bool rf_stringx_copy_chars(RFstringx* dst, RFstringx* src,
                           uint32_t charsN)
 {
     uint32_t i=0,bytePos;
-    rfStringX_Copy_IN(dst, src);
+    rf_stringx_copy_in(dst, src);
     //find the byte position and end the string there
     RF_STRING_ITERATE_START(src, i, bytePos)
     if(i == charsN)
         break;
     RF_STRING_ITERATE_END(i, bytePos)
-    rfString_ByteLength(dst)= bytePos;
+    rf_string_length_bytes(dst)= bytePos;
     return true;
 }
 
-/*--- Methods to get rid of an RF_StringX ---*/
+/*--- Methods to get rid of an RFstringx ---*/
 
-void rfStringX_Destroy(RF_StringX* s)
+void rf_stringx_destroy(RFstringx* s)
 {
     //an extended string can have moved its internal pointer forward
     //so we have to put it back at the origin to free properly
-    rfString_Data(s) -= s->bIndex;
-    free(rfString_Data(s));
+    rf_string_data(s) -= s->bIndex;
+    free(rf_string_data(s));
     free(s);
 }
-void rfStringX_Deinit(RF_StringX* s)
+void rf_stringx_deinit(RFstringx* s)
 {
     //an extended string can have moved its internal pointer forward
     //so we have to put it back at the origin to free properly
-    rfString_Data(s) -= s->bIndex;
-    free(rfString_Data(s));
+    rf_string_data(s) -= s->bIndex;
+    free(rf_string_data(s));
 }

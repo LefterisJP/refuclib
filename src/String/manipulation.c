@@ -24,16 +24,16 @@
 
 /*------------- Corrensponding Header inclusion -------------*/
 #include <Definitions/types.h> //for fixed size types needed in various places
-#include <String/string_decl.h>//for RF_String
+#include <String/string_decl.h>//for RFstring
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <String/manipulation.h>
 /*------------- Module related inclusion -------------*/
-#include <String/stringx_decl.h> //for RF_StringX
-#include <String/corex.h> //for rfStringX_Deinit() and rfStringX_FromString_IN
+#include <String/stringx_decl.h> //for RFstringx
+#include <String/corex.h> //for rf_stringx_deinit() and rf_stringx_from_string_in
 #include <Utils/constcmp.h> //for RF_HEXEQ_C() used in the iteration macros
 #include <String/core.h> //for string iterations
-#include <String/retrieval.h> //for rfString_Length()
+#include <String/retrieval.h> //for rf_string_length()
 #include "common.ph" //for required string private macros and functions
 #include "manipulation.ph" //for manipulation specific common macros
 #include "mod.ph" //for the submod initialization
@@ -62,50 +62,50 @@
  * A function used to fill in a buffer with characters of a string.
  ** Returns number of unicode characters the array was filled with
 */
-static inline int fill_codepoints_from_string(const RF_String* s)
+static inline int fill_codepoints_from_string(const RFstring* s)
 {
     unsigned int i = 0;
     uint32_t charValue, chars_num;
-    chars_num = rfString_Length(s);
-    if(rfString_Length(s) > rfBuffer_Size_u32(TSBUFFA))
+    chars_num = rf_string_length(s);
+    if(rf_string_length(s) > rf_buffer_size_u32(TSBUFFA))
     {
-        if(rfBuffer_Increase_u32(TSBUFFA, chars_num * 2))
+        if(rf_buffer_increase_u32(TSBUFFA, chars_num * 2))
         {
             return -1;
         }
 
     }
-    rfString_Iterate_Start(s, i, charValue)
-        rfBuffer_Ptr_u32(TSBUFFA, i) = charValue;
-    rfString_Iterate_End(i)
+    rf_string_iterate_start(s, i, charValue)
+        rf_buffer_ptr_u32(TSBUFFA, i) = charValue;
+    rf_string_iterate_end(i)
     return chars_num;
 }
 
 
 // Appends the parameter String to this one
-bool rfString_Append(RF_String* thisstr, const void* other)
+bool rf_string_append(RFstring* thisstr, const void* other)
 {
     unsigned int newLen;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
     i_NULLPTR_CHECK_1(other, "append", return false);
 
-    newLen = rfString_ByteLength(thisstr) + rfString_ByteLength(other);
+    newLen = rf_string_length_bytes(thisstr) + rf_string_length_bytes(other);
     //reallocate this string to fit the new addition
-    RF_REALLOC_JMP(rfString_Data(thisstr), char, newLen ,
+    RF_REALLOC_JMP(rf_string_data(thisstr), char, newLen ,
                    ret = false, cleanup);
-    rfStringGEN_Append(thisstr, rfString_Data(other), rfString_ByteLength(other));
+    rf_stringgen_append(thisstr, rf_string_data(other), rf_string_length_bytes(other));
 cleanup:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
-bool rfString_Append_int(RF_String* thisstr, const int32_t i)
+bool rf_string_append_int(RFstring* thisstr, const int32_t i)
 {  
     int rc;
     //reallocate this string to fit the new addition
-    RF_REALLOC(rfString_Data(thisstr), char,
-               rfString_ByteLength(thisstr) + MAX_UINT32_STRING_CHAR_SIZE ,
+    RF_REALLOC(rf_string_data(thisstr), char,
+               rf_string_length_bytes(thisstr) + MAX_UINT32_STRING_CHAR_SIZE ,
                false
     );
     ADD_TYPE_TO_STRING(thisstr, "int", MAX_UINT32_STRING_CHAR_SIZE,
@@ -113,11 +113,11 @@ bool rfString_Append_int(RF_String* thisstr, const int32_t i)
     return true;
 }
 
-bool rfString_Append_double(RF_String* thisstr, const double d)
+bool rf_string_append_double(RFstring* thisstr, const double d)
 {
     int rc;
-    RF_REALLOC(rfString_Data(thisstr), char,
-                   rfString_ByteLength(thisstr) + MAX_DOUBLE_STRING_CHAR_SIZE ,
+    RF_REALLOC(rf_string_data(thisstr), char,
+                   rf_string_length_bytes(thisstr) + MAX_DOUBLE_STRING_CHAR_SIZE ,
                    false
     );
     ADD_TYPE_TO_STRING(thisstr, "double", MAX_DOUBLE_STRING_CHAR_SIZE,
@@ -125,21 +125,21 @@ bool rfString_Append_double(RF_String* thisstr, const double d)
     return true;
 }
 
-bool rfString_Prepend(RF_String* thisstr, const void* other)
+bool rf_string_prepend(RFstring* thisstr, const void* other)
 {
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
     i_NULLPTR_CHECK_1(other, "prepend", ret=false;goto cleanup);
 
     //reallocate this string to fit the new addition
-    RF_REALLOC_JMP(rfString_Data(thisstr), char,
-                   rfString_ByteLength(thisstr) + rfString_ByteLength(other),
+    RF_REALLOC_JMP(rf_string_data(thisstr), char,
+                   rf_string_length_bytes(thisstr) + rf_string_length_bytes(other),
                    ret = false, cleanup);
 
-    if(!rfStringGEN_Prepend(thisstr,
-                            rfString_Data(other),
-                            rfString_ByteLength(thisstr),
-                            rfString_ByteLength(other)))
+    if(!rf_stringgen_prepend(thisstr,
+                            rf_string_data(other),
+                            rf_string_length_bytes(thisstr),
+                            rf_string_length_bytes(other)))
     {
         ret = false;
     }
@@ -149,7 +149,7 @@ bool rfString_Prepend(RF_String* thisstr, const void* other)
     return ret;
 }
 
-bool rfString_Remove(void* thisstr, const void* rstr, uint32_t number,
+bool rf_string_remove(void* thisstr, const void* rstr, uint32_t number,
                      const char options)
 {
     uint32_t i,count,occurences=0;
@@ -161,7 +161,7 @@ bool rfString_Remove(void* thisstr, const void* rstr, uint32_t number,
     //as long as we keep finding rstr in the string keep removing it
     do
     {   
-        bytePos = rfString_FindBytePos(thisstr, rstr, options);
+        bytePos = rf_string_find_byte_pos(thisstr, rstr, options);
         //if the substring is not found
         if(bytePos == RF_FAILURE)
         {
@@ -181,15 +181,15 @@ bool rfString_Remove(void* thisstr, const void* rstr, uint32_t number,
         found = true;
         //move all of the string a position back
         count = 0;
-        for(i = bytePos; i <= rfString_ByteLength(thisstr); i ++)
+        for(i = bytePos; i <= rf_string_length_bytes(thisstr); i ++)
         {
-            rfString_Data(thisstr)[i] = (
-                rfString_Data(thisstr)[i + rfString_ByteLength(rstr)]
+            rf_string_data(thisstr)[i] = (
+                rf_string_data(thisstr)[i + rf_string_length_bytes(rstr)]
             );
             count++;
         }
         //now change the byte length
-        rfString_ByteLength(thisstr) -= rfString_ByteLength(rstr);
+        rf_string_length_bytes(thisstr) -= rf_string_length_bytes(rstr);
         //count number of occurences, if we reached the required, stop
         occurences++;
         if(occurences == number)
@@ -204,7 +204,7 @@ bool rfString_Remove(void* thisstr, const void* rstr, uint32_t number,
 }
 
 //Removes all of the characters of the string except those specified
-bool rfString_KeepOnly(void* thisstr, const void* keepstr)
+bool rf_string_keep_only(void* thisstr, const void* keepstr)
 {
     uint32_t keepLength,i, j, charValue;
     char unused[MAX_UTF8C_BYTES];
@@ -219,12 +219,12 @@ bool rfString_KeepOnly(void* thisstr, const void* keepstr)
 
     //now iterate every character of this string
     i=0;
-    rfString_Iterate_Start(thisstr, i, charValue)
+    rf_string_iterate_start(thisstr, i, charValue)
         //for every character check if it exists in the keep str
         exists = false;
         for(j = 0; j < keepLength; j++)
         {
-            if(rfBuffer_Ptr_u32(TSBUFFA, j) == charValue)
+            if(rf_buffer_ptr_u32(TSBUFFA, j) == charValue)
             {
                 exists = true;
             }
@@ -233,22 +233,22 @@ bool rfString_KeepOnly(void* thisstr, const void* keepstr)
         // effectively gets deleted
         if(!exists)
         {
-            if((charBLength = rfUTF8_Encode_single(charValue, unused)) < 0)
+            if((charBLength = rf_utf8_encode_single(charValue, unused)) < 0)
             {
                 RF_ERROR("Could not decode a codepoint into UTF-8");
                 ret = false;
                 goto cleanup;
             }
-            //this is kind of a dirty way to do it. the rfString_Iterate_Start macro internally uses a byteIndex_ variable
+            //this is kind of a dirty way to do it. the rf_string_iterate_start macro internally uses a byteIndex_ variable
             //we use that here to determine the current byteIndex_ of the string in the iteration and move the string backwards
             memmove(
-                rfString_Data(thisstr) + byteIndex_,
-                rfString_Data(thisstr) + byteIndex_ + charBLength,
-                rfString_ByteLength(thisstr) - byteIndex_);
-            rfString_ByteLength(thisstr) -= charBLength;
+                rf_string_data(thisstr) + byteIndex_,
+                rf_string_data(thisstr) + byteIndex_ + charBLength,
+                rf_string_length_bytes(thisstr) - byteIndex_);
+            rf_string_length_bytes(thisstr) -= charBLength;
             continue;//by contiuing here we make sure that the current string position won't be moved to assure that we also check the newly move characters
         }
-    rfString_Iterate_End(i)
+    rf_string_iterate_end(i)
 
 cleanup:
 
@@ -256,7 +256,7 @@ cleanup:
     return ret;
 }
 
-bool rfString_PruneStart(void* thisstr, uint32_t n)
+bool rf_string_prune_start(void* thisstr, uint32_t n)
 {
     //iterate the characters of the string
     uint32_t i;
@@ -278,22 +278,22 @@ bool rfString_PruneStart(void* thisstr, uint32_t n)
     // and we return failure
     if(!found)
     {
-        rfString_ByteLength(thisstr) = 0;
+        rf_string_length_bytes(thisstr) = 0;
         return false;
     }
 
     //move the string back to cover the empty places
-    for(i = 0; i < rfString_ByteLength(thisstr) - nBytePos; i++)
+    for(i = 0; i < rf_string_length_bytes(thisstr) - nBytePos; i++)
     {
-        rfString_Data(thisstr)[i] = rfString_Data(thisstr)[i + nBytePos];
+        rf_string_data(thisstr)[i] = rf_string_data(thisstr)[i + nBytePos];
     }
     //get the new bytelength
-    rfString_ByteLength(thisstr) -= nBytePos;
+    rf_string_length_bytes(thisstr) -= nBytePos;
 
     return true;
 }
 
-bool rfString_PruneEnd(void* thisstr, uint32_t n)
+bool rf_string_prune_end(void* thisstr, uint32_t n)
 {
     //start the iteration of the characters from the end of the string
     int32_t nBytePos = -1;
@@ -310,16 +310,16 @@ bool rfString_PruneEnd(void* thisstr, uint32_t n)
     //if the string does not have n chars to remove, fail
     if(nBytePos == -1)
     {
-        rfString_Data(thisstr)[0] = '\0';
+        rf_string_data(thisstr)[0] = '\0';
         return false;
     }
 
     //jut set the new byte length
-    rfString_ByteLength(thisstr) -= (rfString_ByteLength(thisstr) - nBytePos);
+    rf_string_length_bytes(thisstr) -= (rf_string_length_bytes(thisstr) - nBytePos);
     return true;
 }
 
-bool rfString_PruneMiddleB(void* thisstr, uint32_t p, uint32_t n)
+bool rf_string_prune_middle_b(void* thisstr, uint32_t p, uint32_t n)
 {
     uint32_t i,length;
     int32_t pBytePos,nBytePos;
@@ -354,14 +354,14 @@ bool rfString_PruneMiddleB(void* thisstr, uint32_t p, uint32_t n)
      *characters and change its length
      */
     memmove(
-        rfString_Data(thisstr) + nBytePos,
-        rfString_Data(thisstr) + pBytePos,
-        rfString_ByteLength(thisstr) - pBytePos + 1);
-    rfString_ByteLength(thisstr) -= (pBytePos - nBytePos);
+        rf_string_data(thisstr) + nBytePos,
+        rf_string_data(thisstr) + pBytePos,
+        rf_string_length_bytes(thisstr) - pBytePos + 1);
+    rf_string_length_bytes(thisstr) -= (pBytePos - nBytePos);
     return true;
 }
 
-bool rfString_PruneMiddleF(void* thisstr, uint32_t p, uint32_t n)
+bool rf_string_prune_middle_f(void* thisstr, uint32_t p, uint32_t n)
 {
     uint32_t j,i,length;
     int32_t pBytePos,nBytePos;
@@ -394,25 +394,25 @@ bool rfString_PruneMiddleF(void* thisstr, uint32_t p, uint32_t n)
      */
     if(nBytePos == -1)
     {
-        rfString_ByteLength(thisstr) -= (
-            rfString_ByteLength(thisstr) - pBytePos
+        rf_string_length_bytes(thisstr) -= (
+            rf_string_length_bytes(thisstr) - pBytePos
         );
         return true;
     }
 
     //move the bytes in the buffer to remove the requested characters
     for(i=pBytePos, j=0;
-        j<= rfString_ByteLength(thisstr) - nBytePos;
+        j<= rf_string_length_bytes(thisstr) - nBytePos;
         i ++,j++) 
     {
-        rfString_Data(thisstr)[i] = rfString_Data(thisstr)[nBytePos + j];
+        rf_string_data(thisstr)[i] = rf_string_data(thisstr)[nBytePos + j];
     }
     //find the new byte length
-    rfString_ByteLength(thisstr) -= (nBytePos - pBytePos);
+    rf_string_length_bytes(thisstr) -= (nBytePos - pBytePos);
     return true;
 }
 
-bool rfString_TrimStart(void* thisstr, const void* sub)
+bool rf_string_trim_start(void* thisstr, const void* sub)
 {
     bool ret = false, noMatch;
     uint32_t i = 0, j, subLength, bytePos;
@@ -434,8 +434,8 @@ bool rfString_TrimStart(void* thisstr, const void* sub)
         for(j = 0; j < subLength; j++)
         {
             //if we got a match
-            if(rfString_BytePosToCodePoint(thisstr, bytePos) == 
-               rfBuffer_Ptr_u32(TSBUFFA, j))
+            if(rf_string_byte_pos_to_code_point(thisstr, bytePos) == 
+               rf_buffer_ptr_u32(TSBUFFA, j))
             {
                 ret = true;
                 noMatch = false;
@@ -452,12 +452,12 @@ bool rfString_TrimStart(void* thisstr, const void* sub)
     if(ret)
     {
         //remove the characters
-        for(i =0; i < rfString_ByteLength(thisstr) - bytePos; i++ )
+        for(i =0; i < rf_string_length_bytes(thisstr) - bytePos; i++ )
         {
-            rfString_Data(thisstr)[i] = rfString_Data(thisstr)[i + bytePos];
+            rf_string_data(thisstr)[i] = rf_string_data(thisstr)[i + bytePos];
         }
         //also change bytelength
-        rfString_ByteLength(thisstr) -= bytePos;
+        rf_string_length_bytes(thisstr) -= bytePos;
     }
 
 #ifdef RF_OPTION_SAFE_MEMORY_ALLOCATION //only used for malloc fail
@@ -467,7 +467,7 @@ bool rfString_TrimStart(void* thisstr, const void* sub)
     return ret;
 }
 
-bool rfString_TrimEnd(void* thisstr, const void* sub)
+bool rf_string_trim_end(void* thisstr, const void* sub)
 {
     char ret = false,noMatch;
     uint32_t i = 0,j,subLength,bytePos,lastBytePos=0;
@@ -489,8 +489,8 @@ bool rfString_TrimEnd(void* thisstr, const void* sub)
         for(j = 0; j < subLength; j++)
         {
             //if we got a match
-            if(rfString_BytePosToCodePoint(thisstr, bytePos) == 
-               rfBuffer_Ptr_u32(TSBUFFA, j))
+            if(rf_string_byte_pos_to_code_point(thisstr, bytePos) == 
+               rf_buffer_ptr_u32(TSBUFFA, j))
             {
                 ret = true;
                 noMatch = false;
@@ -507,8 +507,8 @@ bool rfString_TrimEnd(void* thisstr, const void* sub)
     //if we had any match
     if(ret)
     {
-        rfString_ByteLength(thisstr) -= (
-            rfString_ByteLength(thisstr) - lastBytePos
+        rf_string_length_bytes(thisstr) -= (
+            rf_string_length_bytes(thisstr) - lastBytePos
         );
     }
 
@@ -519,17 +519,17 @@ bool rfString_TrimEnd(void* thisstr, const void* sub)
     return ret;
 }
 
-bool rfString_Trim(void* thisstrP, const void* subP)
+bool rf_string_trim(void* thisstrP, const void* subP)
 {
     RF_ENTER_LOCAL_SCOPE();
-    char res1 = rfString_TrimStart(thisstrP,subP);
-    char res2 = rfString_TrimEnd(thisstrP,subP);
+    char res1 = rf_string_trim_start(thisstrP,subP);
+    char res2 = rf_string_trim_end(thisstrP,subP);
     RF_EXIT_LOCAL_SCOPE();
     return res1|res2;
 }
 
 
-bool rfString_Replace(RF_String* thisstr, const void* sstr,
+bool rf_string_replace(RFstring* thisstr, const void* sstr,
                       const void* rstr, const uint32_t num,
                       const char options)
 {
@@ -546,18 +546,18 @@ bool rfString_Replace(RF_String* thisstr, const void* sstr,
     }
 
     //act depending on the size difference of rstr and sstr
-    if(rfString_ByteLength(rstr)> rfString_ByteLength(sstr))
+    if(rf_string_length_bytes(rstr)> rf_string_length_bytes(sstr))
     {
         RF_REALLOC_JMP(
-            rfString_Data(thisstr), char,
-            rfString_ByteLength(thisstr) + number * (
-                rfString_ByteLength(rstr) - rfString_ByteLength(sstr)
+            rf_string_data(thisstr), char,
+            rf_string_length_bytes(thisstr) + number * (
+                rf_string_length_bytes(rstr) - rf_string_length_bytes(sstr)
             ),
             ret = false, cleanup
         );
         replace_greater(thisstr, number, sstr, rstr);
     }
-    else if(rfString_ByteLength(rstr) < rfString_ByteLength(sstr))
+    else if(rf_string_length_bytes(rstr) < rf_string_length_bytes(sstr))
     {
         replace_lesser(thisstr, number, sstr, rstr);
     }
@@ -573,7 +573,7 @@ bool rfString_Replace(RF_String* thisstr, const void* sstr,
 
 /* module related inline object insertion*/
 
-i_INLINE_INS bool rfStringGEN_Prepend(void* thisstr, const char* other,
+i_INLINE_INS bool rf_stringgen_prepend(void* thisstr, const char* other,
                                       unsigned int orig_size,
                                       unsigned int other_size);
 i_INLINE_INS bool replace_intro(void* s, uint32_t* number, const void* sstr,

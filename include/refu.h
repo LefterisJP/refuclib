@@ -40,8 +40,8 @@ extern "C" {
 #endif
 
 /**
-** @defgroup RF_GeneralGRP Initialization function
-** @addtogroup RF_GeneralGRP
+** @defgroup RFgeneral_g_r_p Initialization function
+** @addtogroup RFgeneral_g_r_p
 ** @{
 **/
 
@@ -60,13 +60,13 @@ extern "C" {
  **                         If 0 then the compile time constant
  **                         RF_OPTION_LOCALSTACK_MEMORY_SIZE is used.
  ** @param level            The level of the logging system. Possible values
- **                         are enumerated by @ref RF_LogLevel
+ **                         are enumerated by @ref RFlog_level
  ** @return                 Returns @c true in success
  **/
-i_DECLIMEX_  bool rfInit(char *logstr, uint64_t size, RF_LogLevel level);
+i_DECLIMEX_  bool rfInit(char *logstr, uint64_t size, RFlog_level level);
 
 //! @}
-//closing RF_GeneralGRP doxygen group
+//closing RFgeneral_g_r_p doxygen group
 
 
 #ifdef __cplusplus

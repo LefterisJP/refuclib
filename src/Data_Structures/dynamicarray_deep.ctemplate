@@ -55,12 +55,12 @@ $ENDIF
 /*------------- End of includes -------------*/
 
 
-@DATA_STRUCT* rfDynamicArray_Create(uint32_t numElements)
+@DATA_STRUCT* rf_dynamic_array_create(uint32_t numElements)
 {
     @DATA_STRUCT* ret;
     //allocate the new array
     RF_MALLOC(ret, sizeof(@DATA_STRUCT), NULL);
-    if(! rfDynamicArray_Init(ret, numElements))
+    if(! rf_dynamic_array_init(ret, numElements))
     {
         free(ret);
         return NULL;
@@ -68,7 +68,7 @@ $ENDIF
     return ret;
 }
 
-bool rfDynamicArray_Init(
+bool rf_dynamic_array_init(
     @DATA_STRUCT* array,
     uint32_t numElements)
 {
@@ -81,7 +81,7 @@ bool rfDynamicArray_Init(
 }
 
 
-bool rfDynamicArray_Copy_IN(@DATA_STRUCT* dst, @DATA_STRUCT* src)
+bool rf_dynamic_array_copy_in(@DATA_STRUCT* dst, @DATA_STRUCT* src)
 {
     uint32_t i;
     dst->bufferCapacity = src->bufferCapacity;
@@ -99,11 +99,11 @@ bool rfDynamicArray_Copy_IN(@DATA_STRUCT* dst, @DATA_STRUCT* src)
     return true;
 }
 
-@DATA_STRUCT* rfDynamicArray_Copy_OUT(@DATA_STRUCT* src)
+@DATA_STRUCT* rf_dynamic_array_copy_out(@DATA_STRUCT* src)
 {
     @DATA_STRUCT* dst;
     RF_MALLOC(dst, sizeof(@DATA_STRUCT), NULL);
-    if(! rfDynamicArray_Copy_IN(dst, src))
+    if(! rf_dynamic_array_copy_in(dst, src))
     {
         free(dst);
         return NULL;
@@ -113,7 +113,7 @@ bool rfDynamicArray_Copy_IN(@DATA_STRUCT* dst, @DATA_STRUCT* src)
 }
 
 
-void rfDynamicArray_Deinit(@DATA_STRUCT* l)
+void rf_dynamic_array_deinit(@DATA_STRUCT* l)
 {
 
     uint32_t i;
@@ -128,14 +128,14 @@ void rfDynamicArray_Deinit(@DATA_STRUCT* l)
     free(l->data);
 }
 
-void rfDynamicArray_Destroy(@DATA_STRUCT* l)
+void rf_dynamic_array_destroy(@DATA_STRUCT* l)
 {
-    rfDynamicArray_Deinit(l);
+    rf_dynamic_array_deinit(l);
     free(l);
 }
 
 
-bool rfDynamicArray_Add(@DATA_STRUCT* l, @TYPEPTR object)
+bool rf_dynamic_array_add(@DATA_STRUCT* l, @TYPEPTR object)
 {
     bool ret = true;
 $IF @LMS
@@ -176,7 +176,7 @@ $ENDIF
     return ret;
 }
 
-bool rfDynamicArray_Get_IN(@DATA_STRUCT* l, uint32_t i, @TYPEPTR ret)
+bool rf_dynamic_array_get_in(@DATA_STRUCT* l, uint32_t i, @TYPEPTR ret)
 {
 $IF @LMS
     RF_ENTER_LOCAL_SCOPE();
@@ -199,7 +199,7 @@ $ENDIF
 
 
 
-@TYPEPTR rfDynamicArray_Get_OUT(
+@TYPEPTR rf_dynamic_array_get_out(
     @DATA_STRUCT* l,
     uint32_t i,
     bool* code)
@@ -216,7 +216,7 @@ $ENDIF
 }
 
 
-bool rfDynamicArray_Set(
+bool rf_dynamic_array_set(
     @DATA_STRUCT* l,
     uint32_t i,
     @TYPEPTR e)
@@ -244,7 +244,7 @@ $ENDIF
     return ret;
 }
 
-bool rfDynamicArray_Remove(@DATA_STRUCT* l, uint32_t i)
+bool rf_dynamic_array_remove(@DATA_STRUCT* l, uint32_t i)
 {
     //if the index points to a non-yet set element
     if(i >= l->size || l->data + i == NULL)

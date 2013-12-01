@@ -24,7 +24,7 @@
 /*------------- Corrensponding Header inclusion -------------*/
 #include <Definitions/imex.h>//for import export macro
 #include <Definitions/types.h> //for fixed size types
-#include <Time/date_decl.h> //for RF_Date
+#include <Time/date_decl.h> //for RFdate
 #include <Time/date.h>
 /*------------- Outside Module inclusion -------------*/
 #include "common.ph"//private time macros
@@ -56,7 +56,7 @@
 
 
 // Initializes a Date object with a specific date
-char rfDate_Init(RF_Date* d,
+char rf_date_init(RFdate* d,
                      unsigned char wDay,
                      unsigned char mDay,
                      unsigned char month,
@@ -142,7 +142,7 @@ char rfDate_Init(RF_Date* d,
 }
 
 // Create a Date object with a specific date
-RF_Date* rfDate_Create(unsigned char wDay,
+RFdate* rf_date_create(unsigned char wDay,
                        unsigned char mDay,
                        unsigned char month,
                        uint16_t year,
@@ -150,9 +150,9 @@ RF_Date* rfDate_Create(unsigned char wDay,
                        unsigned char minutes,
                        unsigned char sec)
 {
-    RF_Date* ret;
-    RF_MALLOC(ret, sizeof(RF_Date), NULL);
-    if(!rfDate_Init(ret, wDay, mDay, month, year, hour, minutes, sec))
+    RFdate* ret;
+    RF_MALLOC(ret, sizeof(*ret), NULL);
+    if(!rf_date_init(ret, wDay, mDay, month, year, hour, minutes, sec))
     {
         free(ret);
         return NULL;
@@ -161,14 +161,14 @@ RF_Date* rfDate_Create(unsigned char wDay,
 }
 
 //Destroys a date
-void rfDate_Destroy(RF_Date* c)
+void rf_date_destroy(RFdate* c)
 {
     free(c);
 }
 
 
 // Adds a number of years to the Date
-void rfDate_AddYears(RF_Date* d, uint32_t years)
+void rf_date_add_years(RFdate* d, uint32_t years)
 {
     d->year += years;
     //also perform the leap year check
@@ -176,14 +176,14 @@ void rfDate_AddYears(RF_Date* d, uint32_t years)
 }
 
 // Removes a number of years from the Date
-void rfDate_SubYears(RF_Date* d, uint32_t years)
+void rf_date_sub_years(RFdate* d, uint32_t years)
 {
     d->year -= years;
     LEAP_YEAR_CHECK(d->year,d->isLeap);
 }
 
 // Adds a number of months to the Date
-void rfDate_AddMonths(RF_Date* d, uint32_t g_months)
+void rf_date_add_months(RFdate* d, uint32_t g_months)
 {
     int32_t months = g_months;
     //if the addition would take us over a year
@@ -191,14 +191,14 @@ void rfDate_AddMonths(RF_Date* d, uint32_t g_months)
     {
         //keep adding years and shrinking the remaining months until we get to an amount of remaining months that would not makes us cross over a year
         months -= 13 - d->month;
-        rfDate_AddYears(d,1);
+        rf_date_add_years(d,1);
         d->month = 1;//got to January since we just changed year
     }
     //by now the number of remaining months to add should not make us cross over the year threshold so
     d->month += months;
 }
 // Removes a number of months frp, the Date
-void rfDate_SubMonths(RF_Date* d, uint32_t g_months)
+void rf_date_sub_months(RFdate* d, uint32_t g_months)
 {
     int32_t months = g_months;
     //if the subtraction would take us more than a year in the past
@@ -206,7 +206,7 @@ void rfDate_SubMonths(RF_Date* d, uint32_t g_months)
     {
         //keep removing years and shrinking the remaining months until we get to an amount of remaining months that would not makes us cross over a year
         months -=  d->month;
-        rfDate_SubYears(d,1);
+        rf_date_sub_years(d,1);
         d->month = 12; //go to december since we just changed a year
     }
     //by now the number of remaining months to remove should not make us cross over the year threshold so
@@ -214,7 +214,7 @@ void rfDate_SubMonths(RF_Date* d, uint32_t g_months)
 }
 
 //Adds a number of days
-void rfDate_AddDays(RF_Date* d, uint32_t g_days)
+void rf_date_add_days(RFdate* d, uint32_t g_days)
 {
     int32_t days = g_days;
     int32_t thisYearDays = 365;
@@ -236,7 +236,7 @@ void rfDate_AddDays(RF_Date* d, uint32_t g_days)
             days -= (366-d->yDay)+1;
         }
 
-        rfDate_AddYears(d,1);
+        rf_date_add_years(d,1);
         //now calculate the year days
         thisYearDays = 365;
         if(d->isLeap == true)
@@ -406,7 +406,7 @@ void rfDate_AddDays(RF_Date* d, uint32_t g_days)
 }
 
 //Removes a number of days
-void rfDate_SubDays(RF_Date* d, uint32_t g_days)
+void rf_date_sub_days(RFdate* d, uint32_t g_days)
 {
     int32_t days = g_days;
 
@@ -415,7 +415,7 @@ void rfDate_SubDays(RF_Date* d, uint32_t g_days)
     {
         //keep removing years and shrinking the remaining days until we get to an amount of remaining days that would not makes us cross over a year
         days -= d->yDay;
-        rfDate_SubYears(d,1);
+        rf_date_sub_years(d,1);
         //after removing a year we start at the previous year's last day
         if(d->isLeap == true)
         {
@@ -563,7 +563,7 @@ void rfDate_SubDays(RF_Date* d, uint32_t g_days)
 }
 
 // Adds a number of hours to the Date
-void rfDate_AddHours(RF_Date* d, uint32_t hours)
+void rf_date_add_hours(RFdate* d, uint32_t hours)
 {
     unsigned char remDayHours = 24-d->hours;
     //if the given hours take us over a day
@@ -574,7 +574,7 @@ void rfDate_AddHours(RF_Date* d, uint32_t hours)
         d->hours = 0; //since we just changed the day
 
         //find out how many days these hours would be and add them
-        rfDate_AddDays(d,(hours/24)+1); //+1 is for the extra day we added due to day change
+        rf_date_add_days(d,(hours/24)+1); //+1 is for the extra day we added due to day change
         //now find the remaining hours to add
         hours = hours%24;
     }
@@ -583,7 +583,7 @@ void rfDate_AddHours(RF_Date* d, uint32_t hours)
 }
 
 // Removes a number of hours from the Date
-void rfDate_SubHours(RF_Date* d, uint32_t hours)
+void rf_date_sub_hours(RFdate* d, uint32_t hours)
 {
     //if the given hours will take us to yesterday and beyond
     if(hours > d->hours)
@@ -593,7 +593,7 @@ void rfDate_SubHours(RF_Date* d, uint32_t hours)
         d->hours = 23; //since we just changed the day
 
         //find out how many days these hours would be and remove them
-        rfDate_SubDays(d,(hours/24)+1);//+1 is for the extra day we remove due to day change
+        rf_date_sub_days(d,(hours/24)+1);//+1 is for the extra day we remove due to day change
         //now find the remaining hours to remove
         hours = hours%24;
     }
@@ -602,7 +602,7 @@ void rfDate_SubHours(RF_Date* d, uint32_t hours)
 }
 
 // Adds a number of minutes to the Date
-void rfDate_AddMinutes(RF_Date* d, uint32_t minutes)
+void rf_date_add_minutes(RFdate* d, uint32_t minutes)
 {
     unsigned char remHoursMins = 60 - d->minutes;
     //if the given minutes take us over the hour
@@ -613,7 +613,7 @@ void rfDate_AddMinutes(RF_Date* d, uint32_t minutes)
         d->minutes = 0; //since we just changed the hour
 
         //find out how many hours these minutes would be and add them
-        rfDate_AddHours(d,(minutes/60)+1); //+1 is for the extra hour we added due to hour change
+        rf_date_add_hours(d,(minutes/60)+1); //+1 is for the extra hour we added due to hour change
         //now find the remaining minutes to add
         minutes = minutes%60;
     }
@@ -621,7 +621,7 @@ void rfDate_AddMinutes(RF_Date* d, uint32_t minutes)
     d->minutes += minutes;
 }
 // Removes a number of minutes from the Date
-void rfDate_SubMinutes(RF_Date* d, uint32_t minutes)
+void rf_date_sub_minutes(RFdate* d, uint32_t minutes)
 {
     //if the given minutes will take us to the previous hour and beyond
     if(minutes > d->minutes)
@@ -631,7 +631,7 @@ void rfDate_SubMinutes(RF_Date* d, uint32_t minutes)
         d->minutes = 59; //since we just changed the hour
 
         //find out how many hours these minutes would be and remove them
-        rfDate_SubHours(d,(minutes/60)+1);//+1 is for the extra hour we remove due to hour change
+        rf_date_sub_hours(d,(minutes/60)+1);//+1 is for the extra hour we remove due to hour change
         //now find the remaining minutes to remove
         minutes = minutes%60;
     }
@@ -641,7 +641,7 @@ void rfDate_SubMinutes(RF_Date* d, uint32_t minutes)
 
 
 // Adds a number of seconds to the Date
-void rfDate_AddSeconds(RF_Date* d, uint32_t seconds)
+void rf_date_add_seconds(RFdate* d, uint32_t seconds)
 {
     unsigned char remMinSeconds = 60 - d->seconds;
     //if the given seconds take us over the minute
@@ -652,7 +652,7 @@ void rfDate_AddSeconds(RF_Date* d, uint32_t seconds)
         d->seconds = 0; //since we just changed the minute
 
         //find out how many minutes these seconds would be and add them
-        rfDate_AddMinutes(d, (seconds/60)+1); //+1 is for the extra minutes we added due to minute change
+        rf_date_add_minutes(d, (seconds/60)+1); //+1 is for the extra minutes we added due to minute change
         //now find the remaining seconds to add
         seconds = seconds%60;
     }
@@ -660,7 +660,7 @@ void rfDate_AddSeconds(RF_Date* d, uint32_t seconds)
     d->seconds += seconds;
 }
 // Removes a number of seconds from the Date
-void rfDate_SubSeconds(RF_Date* d, uint32_t seconds)
+void rf_date_sub_seconds(RFdate* d, uint32_t seconds)
 {
     //if the given seconds will take us to the previous minute and beyond
     if(seconds > d->seconds)
@@ -670,7 +670,7 @@ void rfDate_SubSeconds(RF_Date* d, uint32_t seconds)
         d->seconds = 59; //since we just changed the minute
 
         //find out how many minutes these seconds would be and remove them
-        rfDate_SubMinutes(d,(seconds/60)+1);//+1 is for the extra minute we remove due to minute change
+        rf_date_sub_minutes(d,(seconds/60)+1);//+1 is for the extra minute we remove due to minute change
         //now find the remaining seconds to remove
         seconds = seconds%60;
     }
@@ -680,7 +680,7 @@ void rfDate_SubSeconds(RF_Date* d, uint32_t seconds)
 
 #define UNDETERMINED 0
 // Returns the difference between two dates
-char rfDate_Diff(RF_Date* tDate, RF_Date* oDate, RF_Date* res)
+char rf_date_diff(RFdate* tDate, RFdate* oDate, RFdate* res)
 {
     //char relation = UNDETERMINED;
     //get the differences
@@ -696,24 +696,24 @@ char rfDate_Diff(RF_Date* tDate, RF_Date* oDate, RF_Date* res)
     {
         //PAST
         RF_DATE_ASSIGN_PTR(res,tDate);
-        rfDate_SubYears(res,oDate->year);
-        rfDate_SubMonths(res,oDate->month);
-        rfDate_SubDays(res,oDate->mDay);
-        rfDate_SubHours(res,oDate->hours);
-        rfDate_SubMinutes(res,oDate->minutes);
-        rfDate_SubSeconds(res,oDate->seconds);
+        rf_date_sub_years(res,oDate->year);
+        rf_date_sub_months(res,oDate->month);
+        rf_date_sub_days(res,oDate->mDay);
+        rf_date_sub_hours(res,oDate->hours);
+        rf_date_sub_minutes(res,oDate->minutes);
+        rf_date_sub_seconds(res,oDate->seconds);
         return RF_PAST;
     }
     else if(yDiff > 0)
     {
         //FUTURE
         RF_DATE_ASSIGN_PTR(res,oDate)
-        rfDate_SubYears(res,tDate->year);
-        rfDate_SubMonths(res,tDate->month);
-        rfDate_SubDays(res,tDate->mDay);
-        rfDate_SubHours(res,tDate->hours);
-        rfDate_SubMinutes(res,tDate->minutes);
-        rfDate_SubSeconds(res,tDate->seconds);
+        rf_date_sub_years(res,tDate->year);
+        rf_date_sub_months(res,tDate->month);
+        rf_date_sub_days(res,tDate->mDay);
+        rf_date_sub_hours(res,tDate->hours);
+        rf_date_sub_minutes(res,tDate->minutes);
+        rf_date_sub_seconds(res,tDate->seconds);
         return RF_FUTURE;
     }
 
@@ -723,11 +723,11 @@ char rfDate_Diff(RF_Date* tDate, RF_Date* oDate, RF_Date* res)
         //PAST
         RF_DATE_ASSIGN_PTR(res,tDate);
         res->year = 0;
-        rfDate_SubMonths(res,oDate->month);
-        rfDate_SubDays(res,oDate->mDay);
-        rfDate_SubHours(res,oDate->hours);
-        rfDate_SubMinutes(res,oDate->minutes);
-        rfDate_SubSeconds(res,oDate->seconds);
+        rf_date_sub_months(res,oDate->month);
+        rf_date_sub_days(res,oDate->mDay);
+        rf_date_sub_hours(res,oDate->hours);
+        rf_date_sub_minutes(res,oDate->minutes);
+        rf_date_sub_seconds(res,oDate->seconds);
         return RF_PAST;
     }
     else if(mDiff >0)
@@ -735,11 +735,11 @@ char rfDate_Diff(RF_Date* tDate, RF_Date* oDate, RF_Date* res)
         //FUTURE
         RF_DATE_ASSIGN_PTR(res,oDate)
         res->year = 0;
-        rfDate_SubMonths(res,tDate->month);
-        rfDate_SubDays(res,tDate->mDay);
-        rfDate_SubHours(res,tDate->hours);
-        rfDate_SubMinutes(res,tDate->minutes);
-        rfDate_SubSeconds(res,tDate->seconds);
+        rf_date_sub_months(res,tDate->month);
+        rf_date_sub_days(res,tDate->mDay);
+        rf_date_sub_hours(res,tDate->hours);
+        rf_date_sub_minutes(res,tDate->minutes);
+        rf_date_sub_seconds(res,tDate->seconds);
         return RF_FUTURE;
     }
 
@@ -750,10 +750,10 @@ char rfDate_Diff(RF_Date* tDate, RF_Date* oDate, RF_Date* res)
         RF_DATE_ASSIGN_PTR(res,tDate);
         res->year = 0;
         res->month = 0;
-        rfDate_SubDays(res,oDate->mDay);
-        rfDate_SubHours(res,oDate->hours);
-        rfDate_SubMinutes(res,oDate->minutes);
-        rfDate_SubSeconds(res,oDate->seconds);
+        rf_date_sub_days(res,oDate->mDay);
+        rf_date_sub_hours(res,oDate->hours);
+        rf_date_sub_minutes(res,oDate->minutes);
+        rf_date_sub_seconds(res,oDate->seconds);
         return RF_PAST;
     }
     else if(mDayDiff >0)
@@ -762,10 +762,10 @@ char rfDate_Diff(RF_Date* tDate, RF_Date* oDate, RF_Date* res)
         RF_DATE_ASSIGN_PTR(res,oDate)
         res->year = 0;
         res->month = 0;
-        rfDate_SubDays(res,tDate->mDay);
-        rfDate_SubHours(res,tDate->hours);
-        rfDate_SubMinutes(res,tDate->minutes);
-        rfDate_SubSeconds(res,tDate->seconds);
+        rf_date_sub_days(res,tDate->mDay);
+        rf_date_sub_hours(res,tDate->hours);
+        rf_date_sub_minutes(res,tDate->minutes);
+        rf_date_sub_seconds(res,tDate->seconds);
         return RF_FUTURE;
     }
 
@@ -777,9 +777,9 @@ char rfDate_Diff(RF_Date* tDate, RF_Date* oDate, RF_Date* res)
         res->year = 0;
         res->month = 0;
         res->mDay = 0;
-        rfDate_SubHours(res,oDate->hours);
-        rfDate_SubMinutes(res,oDate->minutes);
-        rfDate_SubSeconds(res,oDate->seconds);
+        rf_date_sub_hours(res,oDate->hours);
+        rf_date_sub_minutes(res,oDate->minutes);
+        rf_date_sub_seconds(res,oDate->seconds);
         return RF_PAST;
     }
     else if(hoursDiff >0)
@@ -789,9 +789,9 @@ char rfDate_Diff(RF_Date* tDate, RF_Date* oDate, RF_Date* res)
         res->year = 0;
         res->month = 0;
         res->mDay = 0;
-        rfDate_SubHours(res,tDate->hours);
-        rfDate_SubMinutes(res,tDate->minutes);
-        rfDate_SubSeconds(res,tDate->seconds);
+        rf_date_sub_hours(res,tDate->hours);
+        rf_date_sub_minutes(res,tDate->minutes);
+        rf_date_sub_seconds(res,tDate->seconds);
         return RF_FUTURE;
     }
 
@@ -804,8 +804,8 @@ char rfDate_Diff(RF_Date* tDate, RF_Date* oDate, RF_Date* res)
         res->month = 0;
         res->mDay = 0;
         res->hours = 0;
-        rfDate_SubMinutes(res,oDate->minutes);
-        rfDate_SubSeconds(res,oDate->seconds);
+        rf_date_sub_minutes(res,oDate->minutes);
+        rf_date_sub_seconds(res,oDate->seconds);
         return RF_PAST;
     }
     else if(minsDiff >0)
@@ -816,8 +816,8 @@ char rfDate_Diff(RF_Date* tDate, RF_Date* oDate, RF_Date* res)
         res->month = 0;
         res->mDay = 0;
         res->hours = 0;
-        rfDate_SubMinutes(res,tDate->minutes);
-        rfDate_SubSeconds(res,tDate->seconds);
+        rf_date_sub_minutes(res,tDate->minutes);
+        rf_date_sub_seconds(res,tDate->seconds);
         return RF_FUTURE;
     }
 
@@ -830,8 +830,8 @@ char rfDate_Diff(RF_Date* tDate, RF_Date* oDate, RF_Date* res)
         res->month = 0;
         res->mDay = 0;
         res->hours = 0;
-        rfDate_SubMinutes(res,oDate->minutes);
-        rfDate_SubSeconds(res,oDate->seconds);
+        rf_date_sub_minutes(res,oDate->minutes);
+        rf_date_sub_seconds(res,oDate->seconds);
         return RF_PAST;
     }
     else if(minsDiff >0)
@@ -842,8 +842,8 @@ char rfDate_Diff(RF_Date* tDate, RF_Date* oDate, RF_Date* res)
         res->month = 0;
         res->mDay = 0;
         res->hours = 0;
-        rfDate_SubMinutes(res,tDate->minutes);
-        rfDate_SubSeconds(res,tDate->seconds);
+        rf_date_sub_minutes(res,tDate->minutes);
+        rf_date_sub_seconds(res,tDate->seconds);
         return RF_FUTURE;
     }
 
@@ -857,7 +857,7 @@ char rfDate_Diff(RF_Date* tDate, RF_Date* oDate, RF_Date* res)
         res->mDay = 0;
         res->hours = 0;
         res->minutes = 0;
-        rfDate_SubSeconds(res,oDate->seconds);
+        rf_date_sub_seconds(res,oDate->seconds);
         return RF_PAST;
     }
     else if(secsDiff >0)
@@ -869,7 +869,7 @@ char rfDate_Diff(RF_Date* tDate, RF_Date* oDate, RF_Date* res)
         res->mDay = 0;
         res->hours = 0;
         res->minutes = 0;
-        rfDate_SubSeconds(res,tDate->seconds);
+        rf_date_sub_seconds(res,tDate->seconds);
         return RF_FUTURE;
     }
 
@@ -880,7 +880,7 @@ char rfDate_Diff(RF_Date* tDate, RF_Date* oDate, RF_Date* res)
 /*
 needs thinking
 // brief Turns a time interval into seconds
-char rfDate_I_ToSeconds(const RF_Date* interval,uint64_t* result)
+char rf_date_i_to_seconds(const RFdate* interval,uint64_t* result)
 {
     *result = 0;
     uint64_t maxYears = ULLONG_MAX/31556926ULL;

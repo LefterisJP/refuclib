@@ -42,19 +42,19 @@ extern "C" {
 #define RF_STR_PF_FMT "%.*s"
 #if RF_OPTION_DEBUG
 #define RF_STR_PF_ARG(i_str_)                    \
-    (i_str_) ? rfString_ByteLength(i_str_) : 0, \
-    (i_str_) ? rfString_Data(i_str) : ""
+    (i_str_) ? rf_string_length_bytes(i_str_) : 0, \
+    (i_str_) ? rf_string_data(i_str) : ""
 #else
 #define RF_STR_PF_ARG(i_str_) \
-    rfString_ByteLength(i_str_), rfString_Data(i_str_) 
+    rf_string_length_bytes(i_str_), rf_string_data(i_str_) 
 #endif
 /**
- ** @memberof RF_String
+ ** @memberof RFstring
  ** @brief Create a termporary String from a String literal
  **
  ** A macro to be used only inside a function call that accepts an
- ** @ref RF_String or any inherited data type
- ** such as @ref RF_StringX. It creates a Temporary RF_String*
+ ** @ref RFstring or any inherited data type
+ ** such as @ref RF_StringX. It creates a Temporary RFstring*
  ** that will be used by the function. This macro accepts from 1 to N arguments.
  **
  ** The first argument shall either be a String literal or a printf styled
@@ -86,17 +86,17 @@ extern "C" {
  ** @isinherited{StringX}
  **/
 #ifdef RF_IAMHERE_FOR_DOXYGEN
-RF_String* RFS_(const char *s, ...);
+RFstring* RFS_(const char *s, ...);
 #else
-#define RFS_(...) i_rfString_CreateLocal(__VA_ARGS__)
+#define RFS_(...) i_rf_string_create_local(__VA_ARGS__)
 #endif
 
-///Internal functions that create a temporary RF_String*
-i_DECLIMEX_ RF_String* i_rfString_CreateLocal1(const char* s,...);
-i_DECLIMEX_ RF_String* i_NVrfString_CreateLocal(const char* s);
-#define i_rfString_CreateLocal(...)  RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATELOCAL,1,__VA_ARGS__)
-#define i_SELECT_RF_STRING_CREATELOCAL1(...) i_NVrfString_CreateLocal(__VA_ARGS__)
-#define i_SELECT_RF_STRING_CREATELOCAL0(...) i_rfString_CreateLocal1(__VA_ARGS__)
+///Internal functions that create a temporary RFstring*
+i_DECLIMEX_ RFstring* i_rf_string_create_local1(const char* s,...);
+i_DECLIMEX_ RFstring* i_NVrf_string_create_local(const char* s);
+#define i_rf_string_create_local(...)  RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATELOCAL,1,__VA_ARGS__)
+#define i_SELECT_RF_STRING_CREATELOCAL1(...) i_NVrf_string_create_local(__VA_ARGS__)
+#define i_SELECT_RF_STRING_CREATELOCAL0(...) i_rf_string_create_local1(__VA_ARGS__)
 
 
 #ifdef __cplusplus

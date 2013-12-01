@@ -36,7 +36,7 @@
 ** on any system that he might need to. This timer is supposed to be used for high resolution counting such as milliseconds
 ** microseconds, or nanoseconds.
 **/
-typedef struct RF_Timer
+typedef struct RFtimer
 {
     //! The resolution of the timer. Will be the value given in the initialization
     char resolution;
@@ -54,7 +54,7 @@ typedef struct RF_Timer
     #error Unsuported timer system
     //!@todo
 #endif
-}RF_Timer;
+}RFtimer;
 
 
 #endif//include guards end

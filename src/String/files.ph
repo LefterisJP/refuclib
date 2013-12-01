@@ -10,7 +10,7 @@
     switch(encoding)                                                    \
     {                                                                   \
         case RF_UTF8:                                                   \
-            if(!rfFReadLine_UTF8(f, eol, &utf8,                         \
+            if(!rf_freadline_utf8(f, eol, &utf8,                         \
                                  &utf8ByteLength, &bytes_read, eof))    \
             {                                                           \
                 RF_ERROR("UTF-8 string "errstr" failed");               \
@@ -18,7 +18,7 @@
             }                                                           \
             break;                                                      \
         case RF_UTF16:                                                  \
-            if(!rfFReadLine_UTF16(f, eol, &utf8, &utf8ByteLength, eof,  \
+            if(!rf_freadline_utf16(f, eol, &utf8, &utf8ByteLength, eof,  \
                                   &bytes_read, endianess))              \
             {                                                           \
                 RF_ERROR("UTF-16 string "errstr" failed");               \
@@ -26,7 +26,7 @@
             }                                                           \
             break;                                                      \
         case RF_UTF32:                                                  \
-            if(!rfFReadLine_UTF32(f, eol, &utf8, &utf8ByteLength, eof,  \
+            if(!rf_freadline_utf32(f, eol, &utf8, &utf8ByteLength, eof,  \
                                   &bytes_read, endianess))              \
             {                                                           \
                 RF_ERROR("UTF-32 string "errstr" failed");               \

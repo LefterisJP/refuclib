@@ -37,7 +37,7 @@ $IFNOT @STRING
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <Preprocessor/rf_tokens.h>//for the defined library tokens
 #include <Definitions/types.h> //for fixed size data types
-#include <String/string_decl.h> //for RF_String
+#include <String/string_decl.h> //for RFstring
 $ENDIF
 #include <Definitions/retcodes.h> //for error codes, bool
 $INCLUDE @DECL_H
@@ -56,9 +56,9 @@ $INCLUDE @H
     #include <Utils/constcmp.h>
 // String module inclusions
 $IFNOT @STRING
-    #include <String/core.h> //for rfString_Equal
+    #include <String/core.h> //for rf_string_equal
 $ENDIF
-    #include <String/retrieval.h> //for rfString_Data and ByteLength
+    #include <String/retrieval.h> //for rf_string_data and ByteLength
 /*------------- libc includes -------------*/
 #include <stdint.h> //used by hsieh's hash
 /*------------- End of includes -------------*/
@@ -123,7 +123,7 @@ static inline uint32_t HsiehHash(const char* data, int len)
 }
 
 // Initializes a hashmap
-char rfHashmap_Init(@DATA_STRUCT* m, uint32_t s)
+char rf_hashmap_init(@DATA_STRUCT* m, uint32_t s)
 {
     int i;
     m->size = s;
@@ -137,11 +137,11 @@ char rfHashmap_Init(@DATA_STRUCT* m, uint32_t s)
 }
 
 // Allocates and returns a hashmap
-@DATA_STRUCT* rfHashmap_Create(uint32_t s)
+@DATA_STRUCT* rf_hashmap_create(uint32_t s)
 {
     @DATA_STRUCT* m;
     RF_MALLOC(m, sizeof(@DATA_STRUCT), NULL);
-    if(! rfHashmap_Init(m, s))
+    if(! rf_hashmap_init(m, s))
     {
         free(m);
         return NULL;
@@ -149,7 +149,7 @@ char rfHashmap_Init(@DATA_STRUCT* m, uint32_t s)
     return m;
 }
 
-bool rfHashmap_Iterate(@DATA_STRUCT* m, bool (*act)(@TYPEPTR, void*),
+bool rf_hashmap_iterate(@DATA_STRUCT* m, bool (*act)(@TYPEPTR, void*),
                        void* user_data)
 {
     @NODE* slot;
@@ -169,7 +169,7 @@ bool rfHashmap_Iterate(@DATA_STRUCT* m, bool (*act)(@TYPEPTR, void*),
     return true;
 }
 
-static char i_InsertValue(@NODE** slots, RF_String* key,
+static char i_InsertValue(@NODE** slots, RFstring* key,
                           bool* exists,
                           @TYPEPTR value, uint32_t size)
 {
@@ -177,7 +177,7 @@ static char i_InsertValue(@NODE** slots, RF_String* key,
     @NODE* s, *pr;
 
     *exists = false;
-    i = HsiehHash(rfString_Data(key), rfString_ByteLength(key));
+    i = HsiehHash(rf_string_data(key), rf_string_length_bytes(key));
     i = i % size;
     s = slots[i];
 
@@ -193,7 +193,7 @@ static char i_InsertValue(@NODE** slots, RF_String* key,
         while(s != NULL)
         {
             // if key already exists in the table
-            if(rfString_Equal(&s->key, key))
+            if(rf_string_equal(&s->key, key))
             {
                 *exists = true;
                 return false;
@@ -208,7 +208,7 @@ static char i_InsertValue(@NODE** slots, RF_String* key,
     }
     //finaly insert the key-value combo
     //copy key
-    if(rfString_Copy_IN(&s->key, key) == false)
+    if(rf_string_copy_in(&s->key, key) == false)
     {
         return false;
     }
@@ -228,7 +228,7 @@ static void i_DestroySlots(@NODE** slots, uint32_t size)
         {
             tmp = s;
             s = s->next;
-            rfString_Deinit(&tmp->key);
+            rf_string_deinit(&tmp->key);
             free(tmp);
         }
     }
@@ -237,20 +237,20 @@ static void i_DestroySlots(@NODE** slots, uint32_t size)
 
 
 // Deinitializes a hashmap
-void rfHashmap_Deinit(@DATA_STRUCT* m)
+void rf_hashmap_deinit(@DATA_STRUCT* m)
 {
     i_DestroySlots(m->slots, m->size);
 }
 // Destroys a hashmap
-void rfHashmap_Destroy(@DATA_STRUCT* m)
+void rf_hashmap_destroy(@DATA_STRUCT* m)
 {
-    rfHashmap_Deinit(m);
+    rf_hashmap_deinit(m);
     free(m);
 }
 
 
 // Insert a value into the Hashmap
-char rfHashmap_Insert(@DATA_STRUCT* m, RF_String* key,
+char rf_hashmap_insert(@DATA_STRUCT* m, RFstring* key,
                       @TYPEPTR value,
                       bool* exists)
 {
@@ -311,7 +311,7 @@ char rfHashmap_Insert(@DATA_STRUCT* m, RF_String* key,
     return ret;
 }
 
-i_DECLIMEX_ @TYPEPTR rfHashmap_Get(@DATA_STRUCT* m, RF_String* key,
+i_DECLIMEX_ @TYPEPTR rf_hashmap_get(@DATA_STRUCT* m, RFstring* key,
                                    bool* found)
 {
     uint32_t i;
@@ -319,13 +319,13 @@ i_DECLIMEX_ @TYPEPTR rfHashmap_Get(@DATA_STRUCT* m, RF_String* key,
     @TYPEPTR ret = 0;
     *found = false;
     RF_ENTER_LOCAL_SCOPE();
-    i = HsiehHash(rfString_Data(key), rfString_ByteLength(key));
+    i = HsiehHash(rf_string_data(key), rf_string_length_bytes(key));
     i = i % m->size;
     s = m->slots[i];
 
     while(s != NULL)
     {
-        if(rfString_Equal(&s->key, key))
+        if(rf_string_equal(&s->key, key))
         {//if key is found get it
             ret = s->value;
             *found = true;

@@ -22,12 +22,12 @@
 **
 **
 ** --String/traversalx.h
-** This header declares the functions that traverse an RF_StringX
+** This header declares the functions that traverse an RFstringx
 **
 ---------------------For internal library include make sure to have----------------------------
 #include <Definitions/types.h> //for fixed size types needed in various places
-#include <String/string_decl.h>//for RF_String
-#include <String/stringx_decl.h> //for RF_StringX
+#include <String/string_decl.h>//for RFstring
+#include <String/stringx_decl.h> //for RFstringx
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <String/traversalx.h>
@@ -43,11 +43,11 @@ extern "C"
 {///opening bracket for calling from C++
 #endif
 
-//! @name Traversing an RF_StringX
+//! @name Traversing an RFstringx
 //! @{
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Moves the internal pointer right after the the first occurence
  ** of substring
  **
@@ -61,41 +61,41 @@ extern "C"
  ** @param result      Pass a pointer to a @c String type to be
  **                    initialized with the substring between the start of
  **                    @c thisstr and the end of the moving. If the passed
- **                    pointer is of RF_StringX type also pass the 
+ **                    pointer is of RFstringx type also pass the 
  **                    @c RF_STRINGX_ARGUMENT bitflag argument in the 
  **                    @c options argument
  **                    If 0 nothing is returned @inhtype{String,StringX}
- ** @param options     @see rfString_Remove() for details of the
+ ** @param options     @see rf_string_remove() for details of the
  **                    possible options. An additional option that can be given:
  **                    + @c RF_STRINGX_ARGUMENT: Pass this bitflag option if the
  **                    pointer you gave for initialization at @c result is
- **                    of RF_StringX type
+ **                    of RFstringx type
  ** @return            Returns the number of positions (bytes) moved
  **                    or RF_FAILURE if the substring was not found in the String
- ** @see rfStringX_MoveAfterv()
- ** @see rfStringX_MoveAfterPair()
- ** @see rfStringX_MoveForward()
- ** @see rfStringX_MoveBack()
- ** @see rfStringX_Reset()
+ ** @see rf_stringx_move_afterv()
+ ** @see rf_stringx_move_after_pair()
+ ** @see rf_stringx_move_forward()
+ ** @see rf_stringx_move_back()
+ ** @see rf_stringx_reset()
  **/
-i_DECLIMEX_ int32_t rfStringX_MoveAfter(RF_StringX* thisstr, const void* sub,
+i_DECLIMEX_ int32_t rf_stringx_move_after(RFstringx* thisstr, const void* sub,
                                         void* result, const char options);
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Moves the internal pointer n characters back
  **
  ** It never goes before the original start of the buffer so there is
  ** no worry of memory corruption.
  ** @param thisstr     The extended string to work on
  ** @param n           The number of characters to move the internal pointer
- ** @see rfStringX_MoveForward()
- ** @see rfStringX_MoveAfter()
- ** @see rfStringX_Reset()
+ ** @see rf_stringx_move_forward()
+ ** @see rf_stringx_move_after()
+ ** @see rf_stringx_reset()
  **/
-i_DECLIMEX_ void rfStringX_MoveBack(RF_StringX* thisstr, uint32_t n);
+i_DECLIMEX_ void rf_stringx_move_back(RFstringx* thisstr, uint32_t n);
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Moves the internal pointer n characters forward
  **
  ** It never goes beyond the buffer's length so there is no fear of memory
@@ -103,24 +103,24 @@ i_DECLIMEX_ void rfStringX_MoveBack(RF_StringX* thisstr, uint32_t n);
  ** we can have it go to non-string buffer data so the user has to be careful.
  ** @param thisstr The extended string to work on
  ** @param n The number of character to move the internal pointer
- ** @see rfStringX_MoveBack()
- ** @see rfStringX_MoveAfter()
- ** @see rfStringX_Reset()
+ ** @see rf_stringx_move_back()
+ ** @see rf_stringx_move_after()
+ ** @see rf_stringx_reset()
  **/
-i_DECLIMEX_ void rfStringX_MoveForward(RF_StringX* thisstr, uint32_t n);
+i_DECLIMEX_ void rf_stringx_move_forward(RFstringx* thisstr, uint32_t n);
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Resets the internal pointer of the StringX
  **
  ** @param thisstr The stringX whose internal pointer to reset
- ** @see rfStringX_MoveForward()
- ** @see rfStringX_MoveBack()
- ** @see rfStringX_MoveAfter()
+ ** @see rf_stringx_move_forward()
+ ** @see rf_stringx_move_back()
+ ** @see rf_stringx_move_after()
  **/
-i_DECLIMEX_ void rfStringX_Reset(RF_StringX* thisstr);
+i_DECLIMEX_ void rf_stringx_reset(RFstringx* thisstr);
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Moves the internal pointer after the first occurence of any
  ** of the given substrings
  **
@@ -131,26 +131,26 @@ i_DECLIMEX_ void rfStringX_Reset(RF_StringX* thisstr);
  ** string type, even temporary strings initialized with the RFS_() macro
  ** @lmsFunction
  ** @param thisstr      The extended string to work on
- ** @param result       For details @see rfStringX_MoveAfter()
- ** @param options      For details @see rfStringX_MoveAfter()
+ ** @param result       For details @see rf_stringx_move_after()
+ ** @param options      For details @see rf_stringx_move_after()
  ** @param parN         The number of parameters
  ** @extraVarArgLim
  ** @param ...          The strings to search for.
  **                     @inhtype{String,StringX} @tmpSTR
  ** @return             true if the substring got initialized and false if
  **                     none of the parameters are found or due to error
- ** @see rfStringX_MoveAfter()
- ** @see rfStringX_MoveAfterPair()
- ** @see rfStringX_MoveForward()
- ** @see rfStringX_MoveBack()
- ** @see rfStringX_Reset()
+ ** @see rf_stringx_move_after()
+ ** @see rf_stringx_move_after_pair()
+ ** @see rf_stringx_move_forward()
+ ** @see rf_stringx_move_back()
+ ** @see rf_stringx_reset()
  **/
-i_DECLIMEX_ bool rfStringX_MoveAfterv(RF_StringX* thisstr, void* result,
+i_DECLIMEX_ bool rf_stringx_move_afterv(RFstringx* thisstr, void* result,
                                       const char options,
                                       const unsigned char parN, ...);
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Moves the internal string pointer after the substring formed
  ** by the @c left and @c right substrings
  **
@@ -165,8 +165,8 @@ i_DECLIMEX_ bool rfStringX_MoveAfterv(RF_StringX* thisstr, void* result,
  **                      @inhtype{String,StringX} @tmpSTR
  ** @param right         The right substring that will define the new substring.
  **                      @inhtype{String,StringX} @tmpSTR
- ** @param result        For details @see rfStringX_MoveAfter()
- ** @param options       For details @see rfStringX_MoveAfter()
+ ** @param result        For details @see rf_stringx_move_after()
+ ** @param options       For details @see rf_stringx_move_after()
  ** @param occurence     If this is not 0 then the function
  **                      will search for the number of occurence given in this
  **                      parameter. If it is 0 it will search for the first
@@ -174,13 +174,13 @@ i_DECLIMEX_ bool rfStringX_MoveAfterv(RF_StringX* thisstr, void* result,
  **                      return false
  ** @return              Returns true if the substring is found and false if
  **                      not and in the case of an error
- ** @see rfStringX_MoveAfter()
- ** @see rfStringX_MoveAfterv()
- ** @see rfStringX_MoveForward()
- ** @see rfStringX_MoveBack()
- ** @see rfStringX_Reset()
+ ** @see rf_stringx_move_after()
+ ** @see rf_stringx_move_afterv()
+ ** @see rf_stringx_move_forward()
+ ** @see rf_stringx_move_back()
+ ** @see rf_stringx_reset()
  **/
-i_DECLIMEX_ bool rfStringX_MoveAfterPair(RF_StringX* thisstr, const void* left,
+i_DECLIMEX_ bool rf_stringx_move_after_pair(RFstringx* thisstr, const void* left,
                                          const void* right, void* result, 
                                          char options, uint32_t occurence);
 

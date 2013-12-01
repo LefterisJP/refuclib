@@ -28,12 +28,12 @@ static void test_AddTail(RF_ILHead* l, int* arr, int arr_size)
     {
         obj = malloc(sizeof(an_object));
         obj->num = arr[i];
-        rfIList_AddTail(l, &obj->lh);
+        rf_ilist_add_tail(l, &obj->lh);
     }
 
     //iterate the list and confirm they have been added correctly
     i=0;
-    rfIList_ForEach(l, obj, lh)
+    rf_ilist_for_each(l, obj, lh)
     {
         EXPECT(obj->num, arr[i]);
         i++;
@@ -50,12 +50,12 @@ static void test_Add(RF_ILHead* l, int* arr, int arr_size)
     {
         obj = malloc(sizeof(an_object));
         obj->num = arr[i];
-        rfIList_Add(l, &obj->lh);
+        rf_ilist_add(l, &obj->lh);
     }
 
     //iterate the list and confirm they have been added correctly
     i=arr_size-1;
-    rfIList_ForEach(l, obj, lh)
+    rf_ilist_for_each(l, obj, lh)
     {
         EXPECT(obj->num, arr[i]);
         i--;
@@ -66,26 +66,26 @@ static void test_Add(RF_ILHead* l, int* arr, int arr_size)
 static void test_Delete(RF_ILHead* l)
 {
     an_object* obj, *tmp;
-    rfIList_ForEach_safe(l, obj, tmp, lh)
+    rf_ilist_for_each_safe(l, obj, tmp, lh)
     {
-        rfIList_DeleteFrom(l, &obj->lh);
+        rf_ilist_delete_from(l, &obj->lh);
         free(obj);
     }
-    EXPECT(rfIList_IsEmpty(l), true);
+    EXPECT(rf_ilist_is_empty(l), true);
 }
 
 static void test_Pop(RF_ILHead* l, int* arr, int arr_size)
 {
     an_object* obj, *tmp;
     int i = arr_size - 1;
-    rfIList_ForEach_safe(l, obj, tmp, lh)
+    rf_ilist_for_each_safe(l, obj, tmp, lh)
     {
-        obj = rfIList_Pop(l, an_object, lh);
+        obj = rf_ilist_pop(l, an_object, lh);
         EXPECT(obj->num, arr[i]);
         free(obj);
         i--;
     }
-    EXPECT(rfIList_IsEmpty(l), true);
+    EXPECT(rf_ilist_is_empty(l), true);
 }
 
 static void test_List_Append_Prepend(RF_ILHead* l1, RF_ILHead* l2,
@@ -100,14 +100,14 @@ static void test_List_Append_Prepend(RF_ILHead* l1, RF_ILHead* l2,
     test_AddTail(l2, arr2, arr2_size);
     test_AddTail(l3, arr3, arr3_size);
 
-    rfIList_PrependList(l1, l2);
-    EXPECT(rfIList_IsEmpty(l2), true);
-    rfIList_AppendList(l1, l3);
-    EXPECT(rfIList_IsEmpty(l3), true);
+    rf_ilist_prepend_list(l1, l2);
+    EXPECT(rf_ilist_is_empty(l2), true);
+    rf_ilist_append_list(l1, l3);
+    EXPECT(rf_ilist_is_empty(l3), true);
 
     //iterate the list and confirm the merging happened correctly
     i=0;
-    rfIList_ForEach(l1, obj, lh)
+    rf_ilist_for_each(l1, obj, lh)
     {
         EXPECT(obj->num, merged_arr[i]);
         i++;
@@ -119,18 +119,18 @@ int main()
     RF_ILHead list1, list2, list3;
     DEFAULT_LIB_INIT();
 
-    rfIList_HeadInit(&list1);
+    rf_ilist_head_init(&list1);
 
     test_AddTail(&list1, arr1, sizeof(arr1)/sizeof(int));
-    EXPECT(rfIList_IsEmpty(&list1), false);
+    EXPECT(rf_ilist_is_empty(&list1), false);
     
     test_Delete(&list1);
 
     test_Add(&list1, arr1, sizeof(arr1)/sizeof(int));
     test_Pop(&list1, arr1, sizeof(arr1)/sizeof(int));
 
-    rfIList_HeadInit(&list2);
-    rfIList_HeadInit(&list3);
+    rf_ilist_head_init(&list2);
+    rf_ilist_head_init(&list3);
     test_List_Append_Prepend(&list1, &list2, &list3,
                              arr1, sizeof(arr1)/sizeof(int),
                              arr2, sizeof(arr2)/sizeof(int),

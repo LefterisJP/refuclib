@@ -32,7 +32,7 @@
 #include <Definitions/types.h> //fixed size data types
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/threadspecific.h> //for the thread specific attribute
-#include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
+#include <Utils/localmem_decl.h> // for RFlocal_memory_stack
 #include <string.h> //for memset()
 #include <stdint.h> //for UINT32_MAX used in RF_ENTER_LOCAL_SCOPE() macro
 

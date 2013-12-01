@@ -30,9 +30,9 @@
 
 #include <stdio.h> //for FILE*
 #include <Definitions/types.h> //for fixed size types needed in various places
-#include <String/string_decl.h>//for RF_String
-#include <String/stringx_decl.h> //for RF_StringX
-#include <IO/textfile_decl.h> //for RF_Textfile
+#include <String/string_decl.h>//for RFstring
+#include <String/stringx_decl.h> //for RFstringx
+#include <IO/textfile_decl.h> //for RFtextfile
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <Definitions/retcodes.h> //for booleans
@@ -44,7 +44,7 @@
 #include <System/rf_system.h>
 
 #else
-    #error Attempted to include RF_TextFile while not having compiled the library with the appropriate module activated
+    #error Attempted to include RFtextfile while not having compiled the library with the appropriate module activated
 #endif
 
 #endif//include guards end

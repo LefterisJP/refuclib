@@ -22,7 +22,7 @@
 **
 **
 ** --String/corex.h
-** This header includes core RF_StringX functionality (initialization, deinitialization, copying e.t.c.)
+** This header includes core RFstringx functionality (initialization, deinitialization, copying e.t.c.)
 **
 **/
 #ifndef RF_STRING_COREX_H
@@ -42,95 +42,95 @@ extern "C"
 {///opening bracket for calling from C++
 #endif
 
-//! @name RF_StringX Creation
+//! @name RFstringx Creation
 //! @{
 
-/* --- Functions that already exist for RF_String - START --- */
+/* --- Functions that already exist for RFstring - START --- */
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  **/
-i_DECLIMEX_ RF_StringX* rfStringX_Create(const char* lit);
-i_DECLIMEX_ RF_StringX* rfStringX_Createv(const char* lit,...);
+i_DECLIMEX_ RFstringx* rf_stringx_create(const char* lit);
+i_DECLIMEX_ RFstringx* rf_stringx_createv(const char* lit,...);
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  **/
-i_DECLIMEX_ bool rfStringX_Init(RF_StringX* str,const char* lit);
-i_DECLIMEX_ bool rfStringX_Initv(RF_StringX* str,const char* lit,...);
+i_DECLIMEX_ bool rf_stringx_init(RFstringx* str,const char* lit);
+i_DECLIMEX_ bool rf_stringx_initv(RFstringx* str,const char* lit,...);
 
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  **/
-i_DECLIMEX_ RF_StringX* rfStringX_Create_cp(uint32_t code);
+i_DECLIMEX_ RFstringx* rf_stringx_create_cp(uint32_t code);
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  **/
-i_DECLIMEX_ bool rfStringX_Init_cp(RF_StringX* str, uint32_t code);
+i_DECLIMEX_ bool rf_stringx_init_cp(RFstringx* str, uint32_t code);
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Allocates and returns an extended String without any checks.
  **/
-i_DECLIMEX_ RF_StringX* rfStringX_Create_unsafe(const char* lit);
+i_DECLIMEX_ RFstringx* rf_stringx_create_unsafe(const char* lit);
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  **/
-i_DECLIMEX_ bool rfStringX_Init_unsafe(RF_StringX* str, const char* lit);
+i_DECLIMEX_ bool rf_stringx_init_unsafe(RFstringx* str, const char* lit);
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  **/
-i_DECLIMEX_ bool rfStringX_Init_unsafe_nnt(RF_StringX* str, const char* s,
+i_DECLIMEX_ bool rf_stringx_init_unsafe_nnt(RFstringx* str, const char* s,
                                            size_t length);
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  **/
-i_DECLIMEX_ bool rfStringX_Init_unsafe_bnnt(
-    RF_StringX* str, const char* s,
+i_DECLIMEX_ bool rf_stringx_init_unsafe_bnnt(
+    RFstringx* str, const char* s,
     size_t length, size_t buff_size);
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  **/
-i_DECLIMEX_ RF_StringX* rfStringX_Create_i(int32_t i);
+i_DECLIMEX_ RFstringx* rf_stringx_create_i(int32_t i);
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  **/
-i_DECLIMEX_ bool rfStringX_Init_i(RF_StringX* str, int32_t i);
+i_DECLIMEX_ bool rf_stringx_init_i(RFstringx* str, int32_t i);
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  **/
-i_DECLIMEX_ RF_StringX* rfStringX_Create_f(float f);
+i_DECLIMEX_ RFstringx* rf_stringx_create_f(float f);
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  **/
-i_DECLIMEX_ bool rfStringX_Init_f(RF_StringX* str, float f);
+i_DECLIMEX_ bool rf_stringx_init_f(RFstringx* str, float f);
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  **/
-i_DECLIMEX_ RF_StringX* rfStringX_Create_UTF16(const uint16_t* s,
+i_DECLIMEX_ RFstringx* rf_stringx_create_utf16(const uint16_t* s,
                                                unsigned int len);
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  **/
-i_DECLIMEX_ bool rfStringX_Init_UTF16(RF_StringX* str,
+i_DECLIMEX_ bool rf_stringx_init_utf16(RFstringx* str,
                                       const uint16_t* s,
                                       unsigned int len);
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  **/
-i_DECLIMEX_ RF_StringX* rfStringX_Create_UTF32(const uint32_t* s,
+i_DECLIMEX_ RFstringx* rf_stringx_create_utf32(const uint32_t* s,
                                                unsigned int len);
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  **/
-i_DECLIMEX_ bool rfStringX_Init_UTF32(RF_StringX* str, const uint32_t* s,
+i_DECLIMEX_ bool rf_stringx_init_utf32(RFstringx* str, const uint32_t* s,
                                       unsigned int len);
 
 
-/* --- Functions that already exist for RF_String - END --- */
+/* --- Functions that already exist for RFstring - END --- */
 
 /**
- ** @memberof RF_StringX
- ** @brief Creates an RF_StingX with a specified buffer size
+ ** @memberof RFstringx
+ ** @brief Creates an RFsting_x with a specified buffer size
  **
  ** Allocates and returns an extended String allocating buffSize
  ** bytes buffer and puts @c lit inside that buffer. If the contents
@@ -143,48 +143,48 @@ i_DECLIMEX_ bool rfStringX_Init_UTF32(RF_StringX* str, const uint32_t* s,
  **                               A check to see if it is
  **                               a valid UTF-8 sequence is performed
  ** @return                       The newly initialized string
- ** @see rfStringX_Init_buff()
+ ** @see rf_stringx_init_buff()
  **/
-i_DECLIMEX_ RF_StringX* rfStringX_Create_buff(uint32_t buffSize,
+i_DECLIMEX_ RFstringx* rf_stringx_create_buff(uint32_t buffSize,
                                               const char* lit);
 
 /**
- ** @memberof RF_StringX
- ** @brief Creates an RF_StingX with a specified buffer size (varargs)
+ ** @memberof RFstringx
+ ** @brief Creates an RFsting_x with a specified buffer size (varargs)
  **/
-i_DECLIMEX_ RF_StringX* rfStringX_Create_buffv(uint32_t buffSize,
+i_DECLIMEX_ RFstringx* rf_stringx_create_buffv(uint32_t buffSize,
                                               const char* lit,
                                                ...);
 
 
 /**
- ** @memberof RF_StringX
- ** @brief Initializes an RF_StingX with a specified buffer size
+ ** @memberof RFstringx
+ ** @brief Initializes an RFsting_x with a specified buffer size
  ** @lmsFunction
- ** @see rfStringX_Create_buff() for details
+ ** @see rf_stringx_create_buff() for details
  **/
-i_DECLIMEX_ bool rfStringX_Init_buff(RF_StringX* str,
+i_DECLIMEX_ bool rf_stringx_init_buff(RFstringx* str,
                                      uint32_t buffSize,
                                      const char* lit);
 
 /**
- ** @memberof RF_StringX
- ** @brief Initializes an RF_StingX with a specified buffer size
+ ** @memberof RFstringx
+ ** @brief Initializes an RFsting_x with a specified buffer size
  ** @lmsFunction
- ** @see rfStringX_Init_buffv() for details
+ ** @see rf_stringx_init_buffv() for details
  **/
-i_DECLIMEX_ bool rfStringX_Init_buffv(RF_StringX* str,
+i_DECLIMEX_ bool rf_stringx_init_buffv(RFstringx* str,
                                      uint32_t buffSize,
                                      const char* lit,
                                       ...);
 
 //! @}
 
-//! @name RF_StringX Copying-Assigning
+//! @name RFstringx Copying-Assigning
 //! @{
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Assigns the value of the source string to the
  ** destination extended string
  **
@@ -195,81 +195,81 @@ i_DECLIMEX_ bool rfStringX_Init_buffv(RF_StringX* str,
  ** @param source The source string, whose values to copy.
  ** @inhtype{String,StringX} @tmpSTR
  ** @return Returns @c true for success and @c false otherwise
- ** @see rfStringX_Assign_char()
+ ** @see rf_stringx_assign_char()
  **/
-i_DECLIMEX_ bool rfStringX_Assign(RF_StringX* dest, const void* source);
+i_DECLIMEX_ bool rf_stringx_assign(RFstringx* dest, const void* source);
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Assigns the value of a unicode character to the string
  **
  ** @param thisstr The string to assign to
  ** @param character The unicode character codepoint to assign to the String
  ** @return Returns @c true for succesfull assignment and @c false
  ** if the given @c character was not a valid unicode codepoint
- ** @see rfStringX_Assign()
+ ** @see rf_stringx_assign()
  **/
-i_DECLIMEX_ bool rfStringX_Assign_char(RF_StringX* thisstr, uint32_t character);
+i_DECLIMEX_ bool rf_stringx_assign_char(RFstringx* thisstr, uint32_t character);
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Nullifies a string
  ** @warning Use null strings at your own risk. None of the RF_String/X
  ** functions currently test for them
  ** A safer and easier alternative is to assign an empty string and
- * check for it with @ref rfString_IsEmpty()
+ * check for it with @ref rf_string_is_empty()
  **/
-#define rfStringX_Null(i_STRING) do{            \
-        rfString_ByteLength(i_STRING) = 0;      \
-        rfString_Data(i_STRING) = NULL;         \
+#define rf_stringx_null(i_STRING) do{            \
+        rf_string_length_bytes(i_STRING) = 0;      \
+        rf_string_data(i_STRING) = NULL;         \
         (i_STRING)->bIndex = 0;                 \
         (i_STRING)->bSize = 0;                  \
 }while(0)
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Checks that a string is null
  **/
-#define rfStringX_IsNull(i_STRING)              \
-    ((rfString_ByteLength(i_STRING) == 0) &&    \
-     (rfString_Data(i_STRING) == NULL))
+#define rf_stringx_is_null(i_STRING)              \
+    ((rf_string_length_bytes(i_STRING) == 0) &&    \
+     (rf_string_data(i_STRING) == NULL))
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @cppignore
- ** @brief Creates an RF_StringX from an RF_string
+ ** @brief Creates an RFstringx from an RF_string
  **
- ** Returns an RF_StringX version of the parameter RF_String
- ** @param s The RF_String from which to create the RF_StringX
- ** @return The RF_StringX version of the parameter string
- ** @see rfStringX_FromString_IN()
- ** @see rfStringX_Copy_OUT()
- ** @see rfStringX_Copy_chars()
+ ** Returns an RFstringx version of the parameter RFstring
+ ** @param s The RFstring from which to create the RFstringx
+ ** @return The RFstringx version of the parameter string
+ ** @see rf_stringx_from_string_in()
+ ** @see rf_stringx_copy_out()
+ ** @see rf_stringx_copy_chars()
  **/
-i_DECLIMEX_ RF_StringX* rfStringX_FromString_OUT(const RF_String* s);
+i_DECLIMEX_ RFstringx* rf_stringx_from_string_out(const RFstring* s);
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @cppignore
- ** @brief Initializes an RF_StringX from an RF_string
+ ** @brief Initializes an RFstringx from an RF_string
  **
- ** @param dst The RF_StringX that will get initialize
- ** @param src The RF_String to copy from
+ ** @param dst The RFstringx that will get initialize
+ ** @param src The RFstring to copy from
  ** @return Returns @c true for success and @c false otherwise
- ** @see rfStringX_FromString_OUT()
- ** @see rfStringX_Copy_IN()
- ** @see rfStringX_Copy_chars()
+ ** @see rf_stringx_from_string_out()
+ ** @see rf_stringx_copy_in()
+ ** @see rf_stringx_copy_chars()
  **/
-i_DECLIMEX_ bool rfStringX_FromString_IN(RF_StringX* dst,
-                                         const RF_String* src);
+i_DECLIMEX_ bool rf_stringx_from_string_in(RFstringx* dst,
+                                         const RFstring* src);
 
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @cppignore
  ** @brief Creates a copy of an extended String and returns it
  **
- ** Also note that the source RF_StringX is not @c const unlike the
- ** RF_String copying functions.
+ ** Also note that the source RFstringx is not @c const unlike the
+ ** RFstring copying functions.
  ** The reason for this is because we actually have to copy all of it,
  ** even if its internal pointer has been moved, in which case
  ** its contents are indeed tampered with in the function so as to allow
@@ -277,23 +277,23 @@ i_DECLIMEX_ bool rfStringX_FromString_IN(RF_StringX* dst,
  ** the contents of the source string are guaranteed to be the same.
  ** @param  s The  string to copy
  ** @return A copy of the string
- ** @see rfStringX_FromString_OUT()
- ** @see rfStringX_Copy_IN()
- ** @see rfStringX_Copy_chars()
+ ** @see rf_stringx_from_string_out()
+ ** @see rf_stringx_copy_in()
+ ** @see rf_stringx_copy_chars()
  **/
-i_DECLIMEX_ RF_StringX* rfStringX_Copy_OUT(RF_StringX* s);
+i_DECLIMEX_ RFstringx* rf_stringx_copy_out(RFstringx* s);
 /**
- ** @memberof RF_StringX
- ** @brief Copies the given source RF_StringX into the destination RF_StringX
+ ** @memberof RFstringx
+ ** @brief Copies the given source RFstringx into the destination RFstringx
  ** @return Returns @c true for success and @c false otherwise
- ** @see rfStringX_FromString_IN()
- ** @see rfStringX_Copy_OUT()
- ** @see rfStringX_Copy_chars()
+ ** @see rf_stringx_from_string_in()
+ ** @see rf_stringx_copy_out()
+ ** @see rf_stringx_copy_chars()
  **/
-i_DECLIMEX_ bool rfStringX_Copy_IN(RF_StringX* dst, RF_StringX* src);
+i_DECLIMEX_ bool rf_stringx_copy_in(RFstringx* dst, RFstringx* src);
 /**
- ** @memberof RF_StringX
- ** @brief Copies a certain number of characters from an RF_StringX
+ ** @memberof RFstringx
+ ** @brief Copies a certain number of characters from an RFstringx
  **
  ** Copies @c n characters from @c src StringX into
  ** the destination @c dst StringX.
@@ -304,37 +304,37 @@ i_DECLIMEX_ bool rfStringX_Copy_IN(RF_StringX* dst, RF_StringX* src);
  ** If the value is bigger than the maximum number of characters then 
  **still all characters are copied.
  ** @return Returns @c true for success and @c false otherwise
- ** @see rfStringX_Copy_OUT()
- ** @see rfStringX_Copy_IN()
+ ** @see rf_stringx_copy_out()
+ ** @see rf_stringx_copy_in()
  **/
-i_DECLIMEX_ bool rfStringX_Copy_chars(RF_StringX* dst, RF_StringX* src,
+i_DECLIMEX_ bool rf_stringx_copy_chars(RFstringx* dst, RFstringx* src,
                                       uint32_t n);
 
 
 //! @}
 
-//! @name Getting rid of an RF_StringX
+//! @name Getting rid of an RFstringx
 //! @{
 
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Destroys an extended String and releases its memory.
  **
  ** Use it for strings made with _Create
  ** @param s The exended String to destroy
- ** @see rfStringX_Deinit()
+ ** @see rf_stringx_deinit()
  **/
-i_DECLIMEX_ void rfStringX_Destroy(RF_StringX* s);
+i_DECLIMEX_ void rf_stringx_destroy(RFstringx* s);
 /**
- ** @memberof RF_StringX
+ ** @memberof RFstringx
  ** @brief Destroys only the contents of the Extended string
  ** without freeing the pointer itself.
  **
  ** Use it for strings made with _Init
  ** @param s The exended String to destroy
- ** @see rfStringX_Destroy()
+ ** @see rf_stringx_destroy()
  **/
-i_DECLIMEX_ void rfStringX_Deinit(RF_StringX* s);
+i_DECLIMEX_ void rf_stringx_deinit(RFstringx* s);
 
 //! @}
 

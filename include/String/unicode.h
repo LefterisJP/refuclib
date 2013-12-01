@@ -50,7 +50,7 @@ enum i_RF_ENCODING_TYPES
 /**
  **  Checks if a given  byte (must be char and not unsigned char) 
  **/
-#define rfUTF8_IsContinuationByte(b__)  \
+#define rf_utf8_is_continuation_byte(b__)  \
     ( RF_HEXEQ_C( (  (~( (b__) ^ 0x80))>>6),0x3 ))
 
 #ifdef __cplusplus
@@ -59,8 +59,8 @@ extern "C"
 #endif
 
 /**
-** @defgroup RF_UnicodeGRP Unicode
-** @addtogroup RF_UnicodeGRP
+** @defgroup RFunicode_g_r_p Unicode
+** @addtogroup RFunicode_g_r_p
 ** @{
 **/
 
@@ -91,7 +91,7 @@ extern "C"
  ** @return Returns @c true for success and @c false otherwise
  **
  **/
-i_DECLIMEX_ bool rfUTF8_Encode(const uint32_t* codepoints, 
+i_DECLIMEX_ bool rf_utf8_encode(const uint32_t* codepoints, 
                                uint32_t charsN, uint32_t* utf8Length,
                                char* utf8, uint32_t buffSize);
 
@@ -108,7 +108,7 @@ i_DECLIMEX_ bool rfUTF8_Encode(const uint32_t* codepoints,
  ** success or @c -1 for error at encoding with additional error logging
  **
  **/
-i_DECLIMEX_ int rfUTF8_Encode_single(const uint32_t codepoint, char* utf8);
+i_DECLIMEX_ int rf_utf8_encode_single(const uint32_t codepoint, char* utf8);
 
 /**
  ** @brief Takes a utf8 buffer and decodes it into unicode codepoints
@@ -129,7 +129,7 @@ i_DECLIMEX_ int rfUTF8_Encode_single(const uint32_t codepoint, char* utf8);
  ** @param buff_size The size of the buffer given at @c code_points.
  ** @return Returns @c true for success and @c false otherwise
  **/
-i_DECLIMEX_ bool rfUTF8_Decode(const char* utf8, uint32_t utf8BLength,
+i_DECLIMEX_ bool rf_utf8_decode(const char* utf8, uint32_t utf8BLength,
                                uint32_t* charsN, uint32_t* code_points,
                                uint32_t buff_size);
 
@@ -157,7 +157,7 @@ i_DECLIMEX_ bool rfUTF8_Decode(const char* utf8, uint32_t utf8BLength,
  **                             given in bytes
  ** @return Returns @c true for success and @c false otherwise
  **/
-i_DECLIMEX_ bool rfUTF16_Decode(const char* buff, uint32_t in_buff_length,
+i_DECLIMEX_ bool rf_utf16_decode(const char* buff, uint32_t in_buff_length,
                                 uint32_t* length, uint32_t* codepoints,
                                 uint32_t buff_size);
 
@@ -179,7 +179,7 @@ i_DECLIMEX_ bool rfUTF16_Decode(const char* buff, uint32_t in_buff_length,
  **                           same size in bytes as that of the codepoints
  ** @return Returns @c true for success and @c false otherwise
  **/
-i_DECLIMEX_ bool rfUTF16_Encode(const uint32_t* codepoints,
+i_DECLIMEX_ bool rf_utf16_encode(const uint32_t* codepoints,
                                 uint32_t charsN, uint32_t* utf16Length,
                                 uint16_t* utf16, uint32_t buff_size);
 
@@ -192,7 +192,7 @@ i_DECLIMEX_ bool rfUTF16_Encode(const uint32_t* codepoints,
  ** @return                 Returns @c true for proper utf8 byte sequence
  **                         and @c false otherwise
  **/
-i_DECLIMEX_ bool rfUTF8_VerifyCstr(const char* bytes,
+i_DECLIMEX_ bool rf_utf8_verify_cstr(const char* bytes,
                                    uint32_t* byteLength);
 
 

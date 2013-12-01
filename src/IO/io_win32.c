@@ -29,7 +29,7 @@
 //*---------------------Outside module inclusion----------------------------------------
 //for error logging
     #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
-    #include <String/string_decl.h> //for RF_String
+    #include <String/string_decl.h> //for RFstring
     #include <String/common.h> //for RFS_() macro
     #include <Utils/log.h>
 //for error codes
@@ -37,7 +37,7 @@
 #include <String/string_decl.h> //since all we need is the struct members
 //for local scope macros
     #include <Definitions/threadspecific.h> //for the thread specific attribute
-    #include <Utils/localmem_decl.h> // for RF_LocalMemoryStack
+    #include <Utils/localmem_decl.h> // for RFlocal_memory_stack
     #include <string.h> //for memset()
     #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
     #include <Utils/localscope.h> //for the local scope macros
@@ -47,7 +47,7 @@
 FILE* rfPopen(void* commandP,const char* mode)
 {
     FILE* ret = 0;
-    RF_String* command = (RF_String*)commandP;
+    RFstring* command = (RFstring*)commandP;
     RF_ENTER_LOCAL_SCOPE();
 #if RF_OPTION_DEBUG
     if( strcmp(mode,"r") != 0 && strcmp(mode,"w") != 0)
