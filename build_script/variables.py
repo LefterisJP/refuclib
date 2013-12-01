@@ -88,8 +88,7 @@ vars.Add(
                      'DYNAMICARRAY',
                      'BINARY_ARRAY',
                      'HASHMAP',
-                     'TIME', 'DATE',
-                     'XML',
+                     'TIME',
                      'PARALLEL',
                      'SYSTEM']
              ))

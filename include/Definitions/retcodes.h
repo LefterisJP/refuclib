@@ -90,33 +90,13 @@ enum {
         /* Memory allocation errors */
         RE_REALLOC_FAILURE,//Happens when realloc can not work due to insufficient memory or segmentation. A pretty bad error code
         RE_MALLOC_FAILURE,//Error during memory allocation using malloc()
-        RE_CALLOC_FAILURE,//Error during memory allocation using calloc()
-
-        /* XML Related errors */
-        RE_XML_OPEN_FAILURE,//Happens when the xml file can not be opened, or created
-        RE_XML_PARSE_FAILURE,//Happens when there is a general parsing error of an XML file
-        RE_XML_STRING_FREAD,//Error during reading a line of the XML file into a String. fread failed
-        RE_XML_UTF_ENCODING, //Error during reading  a line of the XML file into a string. Unexpected UTF encoding
-        RE_XML_OPEN_TAG,//Error during XML parsing if failing to find an xml opening tag
-        RE_XML_UNEXPECTED_EOF,//Error during XML parsing. Unexcepted End of file
-        RE_XML_EOF,//Error during traversing the XML file in the disk. Just denotes that we reached the closing of the root tag
-        RE_XML_READLINE,//Error in XML parsing, a line of the file is corrupted
-        RE_XML_WRITE,//Error in XML output writting, failed to write a line of the file
-        RE_XML_ROOT_NOCHILDREN, //if the root tag has no children and an operation was requested
-        RE_XML_TOSTR, // if during conversion of a tag to a string there was an error
-        RE_XML_NOFILEOP, //if no XML file traversal functions have been called, yet an operation that needs them attempted to occur
-        RE_XML_NOT_INDISK, //if the xml handler in question should have been opened as an in-disk only handler but is not
-        RE_XML_ILLEGAL_OPENFLAG, // if an invalid XML opening flag was given during creation of an XML handler
+        RE_CALLOC_FAILURE,//Error during memory allocation using calloc()r
 
         /* Date and Time errors */
         RE_TIMER_ILLEGAL_RESOLUTION,//Error initializing/querying a timer, with an illegal resolution
         RE_TIMER_HIGHRES_UNSUPPORTED,//Error initializing a timer, the system does not support high resolution performance counter
         RE_TIMER_POSIX,//Error occured while using a posix timer function.
         RE_TIMER_QPC,//Error occured while using Windows Performance Counter function
-        RE_DATE_ILLEGAL_PARAM,//Illegal RFdate parameters given
-        RE_DATE_SYSTEM_ERROR,//Error during initialization of a Date in Linux. The system call returned an error
-        RE_DATE_SET_SYSTEMTIME,//Error during setting the sytem time
-        RE_DATE_ILLEGAL_MONTH, //Occurs when an illegal month value is encountered
 
         /* Data Structure Errors */
         RE_LIST_INIT_FAILURE,//Happens when there is a failure at list initialization. Mostly because of 0 size given.

@@ -25,17 +25,10 @@
 #include <rf_options.h>//for the module check
 #include <Definitions/imex.h> //import export macro
 #include <Definitions/types.h> //for the fixed size data types
-#ifdef RF_MODULE_TIME_TIMER//module check
-    #include <Time/timer_decl.h> //for RFtimer
-    #include <Time/timer.h>
-#endif
-#ifdef RF_MODULE_TIME_DATE
-    #include <Time/date_decl.h> //for RFdate
-    #include <Time/date.h>
-#endif
+#include <Time/timer_decl.h> //for RFtimer
+#include <Time/timer.h>
 //*---------------------Module related inclusion----------------------------------------
 #include <Time/sleep.h> //for the refu sleep functions
-#include "common.ph"//private time macros
 //*---------------------Outside module inclusion----------------------------------------
 #include "../System/info.ph" //to check if we have a high-res timer
 //for error logging
@@ -202,104 +195,3 @@ double rf_timer_query(RFtimer* t,char resolution)
 }
 #endif
 
-
-#ifdef RF_MODULE_TIME_DATE
-
-/**==================================================================RWin32 date specific functions=========================================================================================================*/
-
-//include private time related macros that don't need to be visible to anyone else
-
-
-//Reads a SYSTEMTIME structure and populates the RFdate
-#define SYSTEMTIME_TO_RF_DATE(i_st,i_date)\
-    i_date->seconds = i_st.wSecond;\
-    i_date->minutes = i_st.wMinute;\
-    i_date->hours = i_st.wHour;\
-    i_date->wDay = i_st.wDayOfWeek; /*is the same as the #defines*/\
-    i_date->mDay = i_st.wDay;/*same because windows has it 1-31*/\
-    i_date->month = i_st.wMonth;/*because windows range is 1-12*/\
-    i_date->year = i_st.wYear;
-
-//Reads an RF_DATE structure and populates a SYSTEMTIME Structure
-#define RF_DATE_TO_SYSTEMTIME(i_date,i_st)\
-    i_st.wSecond = i_date->seconds;\
-    i_st.wMinute = i_date->minutes;\
-    i_st.wHour = i_date->hours;\
-    i_st.wDayOfWeek = i_date->wDay;\
-    i_st.wDay = i_date->mDay;\
-    i_st.wMonth = i_date->month;\
-    i_st.wYear = i_date->year;\
-    i_st.wMilliseconds = 0;/*RFdate does not have milliseconds so just 0 it*/
-
-// Initializes a Date
-char rf_date_init_now(RFdate* d,char local)
-{
-    //get the time
-    SYSTEMTIME st;
-    if(local == true)
-        GetLocalTime(&st);
-    else
-        GetSystemTime(&st);
-    //read in the values
-    SYSTEMTIME_TO_RF_DATE(st,d)
-    //check for leap year
-    LEAP_YEAR_CHECK(d->year,d->isLeap)
-    //calculate day of the year
-    GET_DAY_OF_YEAR(d->month,d->mDay,d->isLeap,d->yDay)
-    //success
-    return true;
-}
-
-//Creates a date
-RFdate* rf_date_create_now(char local)
-{
-    RFdate* ret;
-    RF_MALLOC(ret,sizeof(RF_Date))
-    //get the time
-    SYSTEMTIME st;
-    if(local == true)
-        GetLocalTime(&st);
-    else
-        GetSystemTime(&st);
-    //read in the values
-    SYSTEMTIME_TO_RF_DATE(st,ret)
-    //check for leap year
-    LEAP_YEAR_CHECK(ret->year,ret->isLeap);
-    //calculate day of the year
-    GET_DAY_OF_YEAR(ret->month,ret->mDay,ret->isLeap,ret->yDay)
-    //success
-    return ret;
-}
-
-// Sets this date as the current system date and time
-char rf_date_set_to_system(RFdate* d)
-{
-    SYSTEMTIME st;
-    RF_DATE_TO_SYSTEMTIME(d,st)
-
-    if(SetSystemTime(&st) == 0)
-    {
-        RF_WIN32_GETSYSERROR(strBuff)
-        LOG_ERROR("Setting the system time from an RFdate in Windows failed with Windows Error(%lu):\n%s",RE_DATE_SET_SYSTEMTIME,i_ERROR_CODE,strBuff);
-        LocalFree(strBuff);
-        return false;
-    }
-    return true;
-}
-
-// Sets this date as the current local date and time
-char rf_date_set_to_local(RFdate* d)
-{
-    SYSTEMTIME st;
-    RF_DATE_TO_SYSTEMTIME(d,st)
-
-    if(SetLocalTime(&st) == 0)
-    {
-        RF_WIN32_GETSYSERROR(strBuff)
-        LOG_ERROR("Setting the local time from an RFdate in Windows failed with Windows Error(%lu):\n%s",RE_DATE_SET_SYSTEMTIME,i_ERROR_CODE,strBuff);
-        LocalFree(strBuff);
-        return false;
-    }
-    return true;
-}
-#endif

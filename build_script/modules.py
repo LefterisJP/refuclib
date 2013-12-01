@@ -282,13 +282,6 @@ modules.append(
 )
 
 modules.append(
-    Module("DATE",
-           ['Time/date.c'],
-           macro			= "RF_MODULE_TIME_DATE")
-)
-
-
-modules.append(
     Module("SYSTEM",
            ['System/sysinfop.c'],
            win32_sources = ['System/system_win32.c'],
