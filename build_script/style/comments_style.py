@@ -3,12 +3,6 @@ import re
 import sys
 
 from textwrap import TextWrapper
-from difflib import Differ
-
-
-
-
-
 
 class CommentFormatter:
     def __init__(self, column_padding):
@@ -36,8 +30,6 @@ class CommentFormatter:
             break_long_words=True,
             break_on_hyphens=True
         )
-
-        self.diff = Differ()
 
 
     def process_generic_comment_lines(self, s):
@@ -93,13 +85,9 @@ class CommentFormatter:
         ret += self.cm_outro
         return ret
 
-    def reformat_file_comments(self, file_name, replace_file=False):
+    def reformat_comments(self, original_string):
         """Reformats the given file's comments depending on the options"""
-        inF = open(file_name, "r")
-
-        s = inF.read();
-        inF.close()
-        original_string = s[:]
+        s = original_string[:]
         formatted_string = ""
 
         match = self.cr.search(s)
@@ -114,19 +102,8 @@ class CommentFormatter:
             match = self.cr.search(s)
 
         formatted_string += s
+        return formatted_string
 
-        if not replace_file:
-            original_l = original_string.splitlines(True)
-            formatted_l = formatted_string.splitlines(True)
-            res = list(diff.compare(original_l, formatted_l))
-            sys.stdout.writelines(res)
-            return
-
-        # else we replace the file
-        print("Reformatting comments for \"{}\"".format(file_name))
-        outF = open(file_name, "w")
-        outF.write(formatted_string)
-        outF.close()
 
 
 

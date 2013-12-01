@@ -6,6 +6,8 @@ import sys
 import fnmatch
 
 from comments_style import CommentFormatter
+from naming import NamingFormatter
+from utils import Formatter
 
 _dirname = os.path.dirname(os.path.realpath(__file__))
 _diff_exe = "colordiff"
@@ -38,6 +40,18 @@ def parse_arguments():
                         ' if the -C flag was passed')
     parser.add_argument('-C', '--format-comments', action='store_true',
                         help='reformats the style of comments above functions')
+
+    parser.add_argument('-n', '--check-function-naming', action='store_true',
+                        help='checks the style of function naming')
+    parser.add_argument('-N', '--format-function-naming', action='store_true',
+                        help='reformats the style of function naming')
+
+    parser.add_argument('-t', '--check-type-naming', action='store_true',
+                        help='checks the style of type naming')
+    parser.add_argument('-T', '--format-type-naming', action='store_true',
+                        help='reformats the style of type naming')
+
+
     parser.add_argument('-r', '--recursive', action='store_true',
                         help='Expects one or more target directories and '
                         'applies actions recursively to all source files under'
@@ -144,7 +158,7 @@ def reformat_with_astyle(file_name, keep_original=False):
 
 
 
-def apply_checks(args, file_name, comments):
+def apply_checks(args, file_name, formatter, comments, naming):
     """applies all style actions to a single file"""
     if args.check_style:
         check_style()
@@ -153,7 +167,22 @@ def apply_checks(args, file_name, comments):
         reformat_with_astyle(file_name)
 
     if args.check_comments or args.format_comments:
-        comments.reformat_file_comments(file_name, args.format_comments)
+        formatter.reformat_file(
+            file_name, "comments",
+            comments.reformat_file_comments, args.format_comments
+        )
+
+    if args.check_function_naming or args.format_function_naming:
+        formatter.reformat_file(
+            file_name, "function naming",
+            naming.reformat_function_naming, args.format_function_naming
+        )
+
+    if args.check_type_naming or args.format_type_naming:
+        formatter.reformat_file(
+            file_name, "type naming",
+            naming.reformat_type_naming, args.format_type_naming
+        )
 
 
 
@@ -163,9 +192,12 @@ if __name__ == '__main__':
 
     args = parse_arguments()
     comments = CommentFormatter(args.comment_column_padding)
+    naming = NamingFormatter()
+    formatter = Formatter()
     if not args.recursive:
         for target in args.targets:
-            apply_checks(args, os.path.abspath(target), comments)
+            apply_checks(args, os.path.abspath(target),
+                         formatter, comments, naming)
     else:
         matches = []
         for target in args.targets:
@@ -180,5 +212,5 @@ if __name__ == '__main__':
                         matches.append(os.path.join(root, filename))
 
         for f in matches:
-            apply_checks(args, f, comments)
+            apply_checks(args, f, formatter, comments, naming)
 
