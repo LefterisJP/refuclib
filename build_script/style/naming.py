@@ -4,15 +4,15 @@ class NamingFormatter:
     def __init__(self):
         self.funcs_re = re.compile(
             r"rf(?P<rf_object>[A-Z][a-z0-9]+?)_"
-            "(?P<func>([A-Z][a-z0-9_]+?)+?)"
+            "(?P<func>\w+?)"
             "(?=(\n|,|\(|$| ))")
 
         self.camel_re = re.compile(
-            r"_*(?P<word>[A-Z][A-Za-z0-9]*?)"
+            r"_*(?P<word>[A-Za-z0-9]+?)"
             "(?=[A-Z]|_|$|\(| )")
 
         self.types_re = re.compile(
-            r"RF_(?P<rf_object>\w+?)"
+            r"RF_(?P<rf_object>[A-Z][a-z]\w+?)"
             "(?=\*| |\n|$|;)")
 
 
