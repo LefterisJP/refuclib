@@ -3,7 +3,7 @@ import re
 class NamingFormatter:
     def __init__(self):
         self.funcs_re = re.compile(
-            r"rf(?P<rf_object>[A-Z][a-z0-9]+?)_"
+            r"rf(?P<rf_object>[A-Z][A-Za-z0-9]+?)_"
             "(?P<func>\w+?)"
             "(?=(\n|,|\(|$| ))")
 
@@ -16,8 +16,8 @@ class NamingFormatter:
             "(?=\*| |\n|$|;)")
 
 
-    def camel_to_lower(self, fstring):
-        return_string = "_"
+    def camel_to_lower(self, fstring, start_with=""):
+        return_string = start_with
 
         m = self.camel_re.search(fstring)
         while m is not None:
@@ -38,7 +38,7 @@ class NamingFormatter:
             formatted_string += s[:match.start()]
             formatted_string += "rf_"
             formatted_string += match.group("rf_object").lower()
-            formatted_string += self.camel_to_lower(match.group("func"))
+            formatted_string += self.camel_to_lower(match.group("func"), "_")
 
             s = s[match.end():]
             match = self.funcs_re.search(s)
@@ -55,9 +55,8 @@ class NamingFormatter:
         match = self.types_re.search(s)
         while match is not None:
             formatted_string += s[:match.start()]
-            formatted_string += "rf"
+            formatted_string += "RF"
             formatted_string += self.camel_to_lower(match.group("rf_object"))
-            formatted_string += "_t"
 
             s = s[match.end():]
             match = self.types_re.search(s)
