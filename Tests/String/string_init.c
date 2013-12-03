@@ -4,10 +4,10 @@
 #include "../refu_tests.h"
 int main()
 {
-    RFstring s1,s2,s3,s4,s5,s6,s7;
-    RFstringx* sx1,*sx2,sx3;
-    RFstringx sx4,sx5,sx6,sx7,sx8,*sx9;
-    RFstring* sp1;
+    struct RFstring s1,s2,s3,s4,s5,s6,s7;
+    struct RFstringx* sx1,*sx2,sx3;
+    struct RFstringx sx4,sx5,sx6,sx7,sx8,*sx9;
+    struct RFstring* sp1;
     const uint16_t utf16Buffer[] = {0xD834,0xDD1E,0x6771};
     unsigned int utf16b_len = 3 * sizeof(uint16_t);
     const uint32_t utf32Buffer[] = {0x6771,0x4EAC};
@@ -21,13 +21,13 @@ int main()
                       "Printf style initialization",
                       1337, 3.141592, 912341)
     );
-    EXPECT_TRUE(rf_string_init_f(&s3, 1.6180));
-    EXPECT_TRUE(rf_string_init_i(&s4, 1024));
+    EXPECT_TRUE(rf_string_init_double(&s3, 1.6180));
+    EXPECT_TRUE(rf_string_init_int(&s4, 1024));
     EXPECT_TRUE(rf_string_init_cp(&s5, 0x2708));
     //expect all StringX initializations be succesfull
     EXPECT_TRUE(rf_stringx_init(&sx4,"Initializing a StringX"));
-    EXPECT_TRUE(rf_stringx_init_f(&sx5, 3.141592));
-    EXPECT_TRUE(rf_stringx_init_i(&sx6, 4096));
+    EXPECT_TRUE(rf_stringx_init_double(&sx5, 3.141592));
+    EXPECT_TRUE(rf_stringx_init_int(&sx6, 4096));
     EXPECT_NOT(0, sx9=rf_stringx_create_cp(0x2708));
 
     //simply print the strings to see if they initialized correctly

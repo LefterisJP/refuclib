@@ -32,8 +32,8 @@ int checkUTF32(uint32_t* buff)
 
 int main()
 {
-    RFstring s1,s2,s3,s4,s5,s6,s7,s8;
-    RFstring* words;
+    struct RFstring s1,s2,s3,s4,s5,s6,s7,s8;
+    struct RFstring* words;
     uint32_t length,wordsN,i;
     int num;
     double dbl;

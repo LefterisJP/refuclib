@@ -1,51 +1,46 @@
-/**
-**      ==START OF REFU LICENSE==
-**
-** Copyright (c) 2011-2013, Karapetsas Eleftherios
-** All rights reserved.
-** 
-** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-**  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-**  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the distribution.
-**  3. Neither the name of the Original Author of Refu nor the names of its contributors may be used to endorse or promote products derived from
-** 
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
-** INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-** DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-** SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-** WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-**
-**      ==END OF REFU LICENSE==
-**
-**/
+/*
+ *    == START OF REFU LICENSE ==
+ *
+ * Copyright (c) 2011-2013, Karapetsas Eleftherios
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *  1. Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. Neither the name of the Original Author of Refu nor the names of its
+ *     contributors may be used to endorse or promote products derived from
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ *    == END OF REFU LICENSE ==
+*/
+
 /*------------- Corrensponding Header inclusion -------------*/
 #include <System/rf_system.h>
 /*------------- Outside Module inclusion -------------*/
-#include <String/string_decl.h> //for RFstring
-#include <String/stringx_decl.h> //for RFstringx
-#include <Definitions/defarg.h> //for the default argument declared string functions that are included below
-#include <String/common.h> //for RFS_()
-#include <String/corex.h> //for rf_stringx_init_buff() and others
-#include <String/retrieval.h> //for accessors
-#include "../String/conversion.ph" //for the buffer Cstr() conversion
-//for error logging
-    #include <Utils/log.h>
-//for memory allocation
-    #include <Utils/memory.h> //for refu memory allocation
-//for local scope macros
-    #include <Utils/localscope.h>
-//for IO/file function definitions
-    #include <IO/common.h> //stat_rft definition
-    #include <Definitions/inline.h> //for inline definitions
-    #include <IO/common.h> //for stat_rft
-    #include <IO/file.h> //rfStat() definition
-//for Sanity macros
-    #include <Utils/sanity.h>
-/*------------- System specific inclusion --------------*/
-#include <unistd.h> //for rmdir()
+#include <String/rf_str_xdecl.h> //for RFstringx and RF_String
+#include <String/rf_str_common.h> //for RFS_()
+#include <String/rf_str_corex.h> //for rf_stringx_init_buff() and others
+#include <String/rf_str_retrieval.h> //for accessors
+#include "../String/rf_str_conversion.ph" //for the buffer Cstr() conversion
+#include <Utils/log.h> //for error logging
+#include <Utils/memory.h> //for refu memory allocation
+#include <Utils/localscope.h> //for local scope macros
+#include <IO/file.h> //rfStat() definition
+#include <Utils/sanity.h> //for Sanity macros
 /*------------- libc inclusion --------------*/
 #include <errno.h>
 #include <dirent.h>
@@ -93,7 +88,7 @@ bool rfRemoveDir(void* dirname)
     struct dirent *entry;
     char *cs;
     unsigned int index;
-    RFstringx path;
+    struct RFstringx path;
     RF_ENTER_LOCAL_SCOPE();
     i_NULLPTR_CHECK_1(dirname, "directory name",
                       ret = false; goto cleanup_local);
@@ -263,7 +258,7 @@ bool rfRenameFile(void* name, void* newName)
 bool rfFileExists(void* name)
 {
     stat_rft sb;   
-    RFstring* file_name = name;
+    struct RFstring* file_name = name;
     return (rfStat(file_name, &sb) == 0);
 }
 
@@ -273,7 +268,7 @@ threadid_t rf_system_get_thread_i_d()
 }
 
 
-FILE* rfFopen(void* name, const char* mode)
+FILE* rfFopen(const void* name, const char* mode)
 {
     unsigned int index;
     char* cs;
@@ -287,7 +282,7 @@ FILE* rfFopen(void* name, const char* mode)
     return ret;
 }
 
-FILE* rfFreopen(void* name, const char* mode, FILE* f)
+FILE* rfFreopen(const void* name, const char* mode, FILE* f)
 {
     unsigned int index;
     char* cs;

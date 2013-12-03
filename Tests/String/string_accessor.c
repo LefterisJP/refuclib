@@ -21,8 +21,8 @@ int checkEqual(char* b1,char* b2)
 
 int main()
 {
-    RFstring s1,s2;
-    RFstringx sx1;
+    struct RFstring s1,s2;
+    struct RFstringx sx1;
     uint32_t cp;
     char *cs;
     DEFAULT_LIB_INIT();
@@ -59,14 +59,14 @@ int main()
     EXPECT_TRUE(cp == 29987);
     //expect 20581: (decimal value of the character at position 18 '健')
     //this is an internal function and will only work for non-continuation byte positions
-    EXPECT(20581, rf_string_byte_pos_to_code_point(&s2,18));
+    EXPECT(20581, rf_string_bytepos_to_codepoint(&s2,18));
     //expect 9: (character position of byte position 27 '中')
     //also an internal function
-    EXPECT(9, rf_string_byte_pos_to_char_pos(&s2,27,false));
+    EXPECT(9, rf_string_bytepos_to_charpos(&s2,27,false));
     //expect 9: (character position of byte position 29 and if it is a continuation byte take the previous char which is '中')
-    EXPECT(9, rf_string_byte_pos_to_char_pos(&s2,29,true));
+    EXPECT(9, rf_string_bytepos_to_charpos(&s2,29,true));
     //expect 10: (character position of byte position 28 and if it is a continuation byte take the next char which is '国')
-    EXPECT(10, rf_string_byte_pos_to_char_pos(&s2,28,false));
+    EXPECT(10, rf_string_bytepos_to_charpos(&s2,28,false));
 
     //testing null strings
     rf_stringx_null(&sx1);

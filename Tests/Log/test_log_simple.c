@@ -10,7 +10,7 @@
 int main()
 {
     RFtextfile log_file;
-    RFstringx buff;
+    struct RFstringx buff;
     DEFAULT_LIB_INIT();
 
     RF_ERROR("This is an error");

@@ -46,7 +46,7 @@ extern "C"
  ** This function simply initializes a local memory stack and should not 
  ** be used by the user directly. It is used in 2 occasions inside the
  ** library. Once inside the library's
- ** initialization function @ref rfInit() and at every new @ref RFthread
+ ** initialization function @ref rf_init() and at every new @ref RFthread
  **  initialization since this stack is thread specific.
  ** @param lms The Local Memory stack to initialize
  ** @param size The size that the local memory stack will have

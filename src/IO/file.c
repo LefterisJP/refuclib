@@ -26,41 +26,37 @@
 /*------------- Module related inclusion -------------*/
 #include <IO/common.h> //for common I/O flags and definitions
 /*------------- Outside Module inclusion -------------*/
-//for error logging
-    #include <Utils/log.h>
-//for memory allocation macros
-    #include <Utils/memory.h> //for refu memory allocation
-//for unicode related macro
-    #include <String/unicode.h> //for rf_utf8_is_continuationbyte
-//for constant compare macros
-    #include <Utils/constcmp.h> //for RF_HEXLE_US() macro and others
-//for endianess functions
-    #include <Utils/endianess.h>
+#include <Utils/log.h> //for error logging
+#include <Utils/memory.h> //for refu memory allocation
+#include <String/rf_str_unicode.h> //for rf_utf8_is_continuationbyte
+#include <Utils/constcmp.h> //for RF_HEXEQ macros
 /*------------- libc inclusion --------------*/
 #include <string.h>//for memcpy e.t.c.
+#include <assert.h> 
 /*------------- End of includes -------------*/
 
-// Reads a UTF-8 file descriptor until end of line or EOF is found and
-// returns a UTF-8 byte buffer
-bool rf_freadline_utf8(FILE* f, char eol, char** utf8,
-                      uint32_t* byteLength,
-                      uint32_t* bufferSize, char* eof)
+bool rf_file_read_line_utf8(FILE* f, 
+                            enum RFeol_mark eol,
+                            char** utf8,
+                            uint32_t* byte_length,
+                            uint32_t* buffer_size,
+                            char* eof)
 {
     uint32_t bIndex=0;
     uint32_t bytesN;
     //allocate the utf8 buffer
-    *bufferSize = RF_OPTION_FGETS_READ_BYTESN+4;
-    RF_MALLOC(*utf8, *bufferSize, RE_MALLOC_FAILURE);
-    *byteLength = 0;
+    *buffer_size = RF_OPTION_FGETS_READ_BYTESN+4;
+    RF_MALLOC(*utf8, *buffer_size, RE_MALLOC_FAILURE);
+    *byte_length = 0;
     //read the start
-    if(!rf_fgets_utf8(*utf8, RF_OPTION_FGETS_READ_BYTESN, f,
+    if(!rf_file_read_chars_utf8(*utf8, RF_OPTION_FGETS_READ_BYTESN, f,
                      eof, eol, &bytesN))
     {
         free(*utf8);
         RF_ERROR("Failed to read a line from a UTF-8 file");
         return false;
     }
-    (*byteLength) += bytesN;
+    (*byte_length) += bytesN;
 
     //if the last character was a newline we are done
     if(*((*utf8)+bytesN-1) == (char)RF_LF)
@@ -74,15 +70,15 @@ bool rf_freadline_utf8(FILE* f, char eol, char** utf8,
         //keep reading until we have read all until newline or EOF
         while(bytesN >= RF_OPTION_FGETS_READ_BYTESN && (*eof) == false)
         {
-            if(*byteLength+RF_OPTION_FGETS_READ_BYTESN+4 >= *bufferSize)
+            if(*byte_length+RF_OPTION_FGETS_READ_BYTESN+4 >= *buffer_size)
             {
-                *bufferSize = (*byteLength + 
+                *buffer_size = (*byte_length + 
                             RF_OPTION_FGETS_READ_BYTESN+4)*2;
-                 RF_REALLOC(*utf8, char, *bufferSize,
+                 RF_REALLOC(*utf8, char, *buffer_size,
                             false);
             }
             bIndex += bytesN;
-            if(!rf_fgets_utf8((*utf8)+bIndex,
+            if(!rf_file_read_chars_utf8((*utf8)+bIndex,
                              RF_OPTION_FGETS_READ_BYTESN,
                              f, eof, eol, &bytesN))
             {
@@ -90,7 +86,7 @@ bool rf_freadline_utf8(FILE* f, char eol, char** utf8,
                 RF_ERROR("Failed to read a line from a UTF-8 file");
                 return false;
             }
-            (*byteLength) += bytesN;
+            (*byte_length) += bytesN;
 
             //if the last character was a newline break
             if(*((*utf8) + bIndex + bytesN -1) == (char)RF_LF)
@@ -102,10 +98,11 @@ bool rf_freadline_utf8(FILE* f, char eol, char** utf8,
 
     return true;
 }
-//Reads a Little Endian UTF-16 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
-bool rf_freadline_utf16(FILE* f, char eol, char** utf8,
-                         uint32_t* byteLength, char* eof,
-                         uint32_t* bytes_read, int endianess)
+
+bool rf_file_read_line_utf16(FILE* f, enum RFeol_mark eol, char** utf8,
+                             uint32_t* byte_length, char* eof,
+                             uint32_t* bytes_read,
+                             enum RFendianess endianess)
 {
     char buff[RF_OPTION_FGETS_READ_BYTESN+5];
 
@@ -115,7 +112,7 @@ bool rf_freadline_utf16(FILE* f, char eol, char** utf8,
     bool ret = true, buffAllocated = false;
     *bytes_read = 0;
 
-    if(!rf_fgets_utf16(buff, RF_OPTION_FGETS_READ_BYTESN, f, eof,
+    if(!rf_file_read_chars_utf16(buff, RF_OPTION_FGETS_READ_BYTESN, f, eof,
                        eol, &bytesN, endianess))
     {
         RF_ERROR("There was an error while readine a line from a UTF16 file "
@@ -136,7 +133,7 @@ bool rf_freadline_utf16(FILE* f, char eol, char** utf8,
         //keep reading until we have read all until newline or EOF
         do
         {
-            if(!rf_fgets_utf16(tempBuff + (*bytes_read),
+            if(!rf_file_read_chars_utf16(tempBuff + (*bytes_read),
                               RF_OPTION_FGETS_READ_BYTESN,
                               f, eof, eol, &bytesN, endianess))
             {
@@ -175,7 +172,7 @@ bool rf_freadline_utf16(FILE* f, char eol, char** utf8,
     }
     //now encode these codepoints into UTF8
     RF_MALLOC_JMP(*utf8, charsN*4, ret = false, cleanup1);
-    if(!rf_utf8_encode(codepoints, charsN, byteLength, *utf8, charsN*4))
+    if(!rf_utf8_encode(codepoints, charsN, byte_length, *utf8, charsN*4))
     {
         RF_ERROR("Failed to encode the File Descriptor's UTF-16 "
                  "bytestream to UTF-8");
@@ -196,10 +193,11 @@ bool rf_freadline_utf16(FILE* f, char eol, char** utf8,
 }
 
 
-//Reads a UTF-32 file descriptor until end of line or EOF is found and returns a UTF-8 byte buffer
-bool rf_freadline_utf32(FILE* f, char eol, char** utf8,
-                       uint32_t* byteLength, char* eof,
-                       uint32_t* bytes_read, int endianess)
+bool rf_file_read_line_utf32(FILE* f, enum RFeol_mark eol,
+                             char** utf8,
+                             uint32_t* byte_length, char* eof,
+                             uint32_t* bytes_read,
+                             enum RFendianess endianess)
 {
     char buff[RF_OPTION_FGETS_READ_BYTESN+7], ret = true;
     uint32_t *codepoints;
@@ -207,7 +205,7 @@ bool rf_freadline_utf32(FILE* f, char eol, char** utf8,
     char* tempBuff = 0,buffAllocated=false;
     *bytes_read = 0;
 
-    if(!rf_fgets_utf32(buff, RF_OPTION_FGETS_READ_BYTESN, f, eof,
+    if(!rf_file_read_chars_utf32(buff, RF_OPTION_FGETS_READ_BYTESN, f, eof,
                       eol, &bytesN, endianess))
     {
         RF_ERROR("There was an error while reading a line from a UTF-32 "
@@ -229,7 +227,7 @@ bool rf_freadline_utf32(FILE* f, char eol, char** utf8,
         //keep reading until we have read all until newline or EOF
         do
         {
-            if(!rf_fgets_utf32(tempBuff + (*bytes_read),
+            if(!rf_file_read_chars_utf32(tempBuff + (*bytes_read),
                               RF_OPTION_FGETS_READ_BYTESN,
                               f, eof, eol, &bytesN, endianess))
             {
@@ -258,7 +256,7 @@ bool rf_freadline_utf32(FILE* f, char eol, char** utf8,
     codepoints = (uint32_t*)tempBuff;
     //now encode these codepoints into UTF8
     RF_MALLOC_JMP(*utf8, *bytes_read, ret = false, cleanup);
-    if(!rf_utf8_encode(codepoints, (*bytes_read)/4, byteLength, *utf8, *bytes_read))
+    if(!rf_utf8_encode(codepoints, (*bytes_read)/4, byte_length, *utf8, *bytes_read))
     {
         RF_ERROR("Failed to encode the File Descriptor's UTF-32 "
                  "bytestream to UTF-8");
@@ -276,212 +274,23 @@ bool rf_freadline_utf32(FILE* f, char eol, char** utf8,
     return ret;
 }
 
-
-//This is a function that's similar to c library fgets but it also returns the number of bytes read and works for UTF-32 encoded files
-bool rf_fgets_utf32(char* buff, uint32_t num, FILE* f,
-                   char* eofReached, char eol, uint32_t* bytes_read,
-                   int endianess)
-{
-    uint32_t c;
-    bool eolReached;
-    //initialization
-    *eofReached = eolReached = false;
-    *bytes_read = 0;
-
-#if RF_OPTION_DEBUG
-    if(endianess != RF_LITTLE_ENDIAN || endianess != RF_BIG_ENDIAN)
-    {
-        RF_ERROR( "Illegal endianess type given");
-        return false;
-    }
-#endif
-
-    //if end of file or end of line is not found, keep reading
-    do{
-        if(rf_fgetc_utf32(f, (uint32_t*)(buff + (*bytes_read)),
-                         endianess, eofReached) < 0)
-        {
-            if(*eofReached)
-            {
-                break;//EOF found
-            }
-            RF_ERROR("Reading error while reading from a "
-                     "UTF-32 byte stream");
-            return false;
-        }
-
-
-        *bytes_read += 4;
-        //if we have read the number of characters requested by the function
-        if(*bytes_read >= num)
-        {
-            break;
-        }
-
-        //newline check depending on the EOL pattern
-        c = *(uint32_t*)(buff + (*bytes_read) - 4);
-        switch(eol)
-        {
-            case RF_EOL_LF:
-                if(c == RF_LF)
-                {
-                    eolReached = true;
-                }
-            break;
-            case RF_EOL_CRLF:
-                if(c == RF_LF)
-                {
-                    if( (*(uint32_t*)(buff + (*bytes_read) -8)) == RF_CR)
-                    {
-                        eolReached = true;
-                        (*bytes_read) -= 4;
-                        (*(uint32_t*)(buff + (*bytes_read) -4)) = '\n';
-                    }
-                }
-            break;
-            case RF_EOL_CR:
-                if(c == RF_CR)
-                {
-                    eolReached = true;
-                    (*(uint32_t*)(buff + (*bytes_read) -4)) = '\n';
-                }
-            break;
-        }//end of EOL dependent newline check
-    }while(c !=(uint32_t) EOF && !eolReached);
-    //null terminate the buffer for UTF32
-    buff[(*bytes_read)] =  buff[(*bytes_read) + 1] = buff[(*bytes_read)+2] = 
-    buff[(*bytes_read)+3] = '\0';
-    //finally check yet again for end of file right after the new line
-    if(rf_fgetc_utf32(f,&c, endianess, eofReached) < 0 && !(*eofReached))
-    {
-            RF_ERROR("Reading error while reading from a "
-                     "UTF-32 byte stream");
-            return false;
-    }
-
-    if(!(*eofReached))
-    {//unless it's EOF undo the peak ahead
-        if(rfFseek(f,-4,SEEK_CUR) != 0)
-        {
-            RF_ERROR("Failed to undo the peek ahead of the file pointer"
-                     "due to fseek() failure with errno %d", errno);
-            return false;
-        }
-    }
-    return true;
-}
-
-//Gets a number of bytes from a UTF-16 file descriptor
-bool rf_fgets_utf16(char* buff, uint32_t num, FILE* f,
-                   char* eofReached, char eol, uint32_t* bytes_read,
-                   int endianess)
-{
-    uint32_t c;
-    int32_t bytesN;
-    char eolReached;
-
-#if RF_OPTION_DEBUG
-    if(endianess != RF_LITTLE_ENDIAN || endianess != RF_BIG_ENDIAN)
-    {
-        RF_ERROR( "Illegal endianess type given");
-        return false;
-    }
-#endif
-
-    //initialization
-    *eofReached = eolReached = false;
-    *bytes_read = 0;
-    //if end of file or end of line is not found, keep reading
-    do{
-        bytesN = rf_fgetc_utf16(f,(uint32_t*)(buff + (*bytes_read)), false,
-                               endianess, eofReached);
-        //error check
-        if(bytesN < 0)
-        {
-            if(*eofReached)
-            {
-                break;//EOF found
-            }
-            else
-            {
-                RF_ERROR("An error was encountered while reading a stream "
-                         "of bytes from a UTF-16 file descriptor");
-                return false;
-            }
-        }
-        (*bytes_read) += bytesN;
-        //if we have read the number of characters requested by the function
-        if((*bytes_read) >= num)
-        {
-            break;
-        }
-        //newline check depending on the EOL pattern
-        c = *(uint32_t*)(buff + (*bytes_read) - bytesN);
-        switch(eol)
-        {
-            case RF_EOL_LF:
-                if(c == RF_LF)
-                {
-                    eolReached = true;
-                }
-            break;
-            case RF_EOL_CRLF:
-                if(c == RF_LF)
-                {
-                    if( (*(uint16_t*)(buff + (*bytes_read) - bytesN-2)) == RF_CR)
-                    {
-                        eolReached = true;
-                        (*bytes_read) -= 2;
-                        (*(uint16_t*)(buff + (*bytes_read) - 2)) = '\n';
-                    }
-                }
-            break;
-            case RF_EOL_CR:
-                if(c == RF_CR)
-                {
-                    eolReached = true;
-                    (*(uint16_t*)(buff + (*bytes_read) -2)) = '\n';
-                }
-            break;
-        }//end of EOL dependent newline check
-    }while(c !=(uint32_t) EOF && !eolReached);
-
-    //finally check yet again for end of file right after the new line
-    bytesN = rf_fgetc_utf16(f, &c, false, endianess, eofReached);
-    if(bytesN < 0 && !(*eofReached))
-    {
-        RF_ERROR("An error was encountered while reading the end of "
-                 "a stream of bytes from a UTF-16 file descriptor");
-        return false;
-    }
-    
-    if(!(*eofReached))
-    {//unless it's EOF undo the peak ahead
-        if(rfFseek(f,-bytesN,SEEK_CUR) != 0)
-        {
-            RF_ERROR("Failed to undo the peek ahead of the file pointer",
-                     "due to fseek() failure with errno %d", errno);
-            return false;
-        }
-    }
-    return true;
-}
-
 //Gets a number of bytes from a UTF-8 file descriptor
-bool rf_fgets_utf8(char* buff, uint32_t num, FILE* f,
-                   char* eofReached, char eol, uint32_t* bytes_read)
+bool rf_file_read_chars_utf8(char* buff, uint32_t num, FILE* f,
+                             char* eof,
+                             enum RFeol_mark eol,
+                             uint32_t* bytes_read)
 {
     uint32_t c;
     int32_t bytesN;
     bool eolReached;
     //initialization
-    *eofReached = eolReached = false;
+    *eof = eolReached = false;
     *bytes_read = 0;
     //if end of file or end of line is not found, keep reading
     do{
-        bytesN = rf_fgetc_utf8(f, (uint32_t*)(buff + (*bytes_read)),
-                              false, eofReached);
-        if(*eofReached == true)
+        bytesN = rf_file_read_char_utf8(f, (uint32_t*)(buff + (*bytes_read)),
+                              false, eof);
+        if(*eof == true)
         {
             break;//EOF found
         }
@@ -528,6 +337,9 @@ bool rf_fgets_utf8(char* buff, uint32_t num, FILE* f,
                     buff[*bytes_read - 1] = '\n';
                 }
             break;
+        default:
+            assert(0);
+            break;
         }//end of EOL dependent newline check
     }while(c != (uint32_t) EOF && !eolReached);
     //null terminate the buffer for UTF8
@@ -538,7 +350,7 @@ bool rf_fgets_utf8(char* buff, uint32_t num, FILE* f,
     {//check for error
         if(ferror(f) == 0)
         {
-            *eofReached = true;
+            *eof = true;
         }
         else
         {
@@ -559,8 +371,203 @@ bool rf_fgets_utf8(char* buff, uint32_t num, FILE* f,
     return true;
 }
 
-//Gets a unicode character from a UTF-8 file descriptor
-int rf_fgetc_utf8(FILE* f, uint32_t *ret, char cp, char* eof)
+bool rf_file_read_chars_utf16(char* buff, uint32_t num, FILE* f,
+                              char* eof, enum RFeol_mark eol,
+                              uint32_t* bytes_read,
+                              enum RFendianess endianess)
+{
+    uint32_t c;
+    int32_t bytesN;
+    char eolReached;
+
+#if RF_OPTION_DEBUG
+    if(endianess != RF_LITTLE_ENDIAN || endianess != RF_BIG_ENDIAN)
+    {
+        RF_ERROR( "Illegal endianess type given");
+        return false;
+    }
+#endif
+
+    //initialization
+    *eof = eolReached = false;
+    *bytes_read = 0;
+    //if end of file or end of line is not found, keep reading
+    do{
+        bytesN = rf_file_read_char_utf16(f,(uint32_t*)(buff + (*bytes_read)), false,
+                               endianess, eof);
+        //error check
+        if(bytesN < 0)
+        {
+            if(*eof)
+            {
+                break;//EOF found
+            }
+            else
+            {
+                RF_ERROR("An error was encountered while reading a stream "
+                         "of bytes from a UTF-16 file descriptor");
+                return false;
+            }
+        }
+        (*bytes_read) += bytesN;
+        //if we have read the number of characters requested by the function
+        if((*bytes_read) >= num)
+        {
+            break;
+        }
+        //newline check depending on the EOL pattern
+        c = *(uint32_t*)(buff + (*bytes_read) - bytesN);
+        switch(eol)
+        {
+            case RF_EOL_LF:
+                if(c == RF_LF)
+                {
+                    eolReached = true;
+                }
+            break;
+            case RF_EOL_CRLF:
+                if(c == RF_LF)
+                {
+                    if( (*(uint16_t*)(buff + (*bytes_read) - bytesN-2)) == RF_CR)
+                    {
+                        eolReached = true;
+                        (*bytes_read) -= 2;
+                        (*(uint16_t*)(buff + (*bytes_read) - 2)) = '\n';
+                    }
+                }
+            break;
+            case RF_EOL_CR:
+                if(c == RF_CR)
+                {
+                    eolReached = true;
+                    (*(uint16_t*)(buff + (*bytes_read) -2)) = '\n';
+                }
+            break;
+        default:
+            assert(0);
+            break;
+        }//end of EOL dependent newline check
+    }while(c !=(uint32_t) EOF && !eolReached);
+
+    //finally check yet again for end of file right after the new line
+    bytesN = rf_file_read_char_utf16(f, &c, false, endianess, eof);
+    if(bytesN < 0 && !(*eof))
+    {
+        RF_ERROR("An error was encountered while reading the end of "
+                 "a stream of bytes from a UTF-16 file descriptor");
+        return false;
+    }
+    
+    if(!(*eof))
+    {//unless it's EOF undo the peak ahead
+        if(rfFseek(f,-bytesN,SEEK_CUR) != 0)
+        {
+            RF_ERROR("Failed to undo the peek ahead of the file pointer",
+                     "due to fseek() failure with errno %d", errno);
+            return false;
+        }
+    }
+    return true;
+}
+
+bool rf_file_read_chars_utf32(char* buff, uint32_t num, FILE* f,
+                              char* eof, enum RFeol_mark eol,
+                              uint32_t* bytes_read,
+                              enum RFendianess endianess)
+{
+    uint32_t c;
+    bool eolReached;
+    //initialization
+    *eof = eolReached = false;
+    *bytes_read = 0;
+
+#if RF_OPTION_DEBUG
+    if(endianess != RF_LITTLE_ENDIAN || endianess != RF_BIG_ENDIAN)
+    {
+        RF_ERROR( "Illegal endianess type given");
+        return false;
+    }
+#endif
+
+    //if end of file or end of line is not found, keep reading
+    do{
+        if(rf_file_read_char_utf32(f, (uint32_t*)(buff + (*bytes_read)),
+                         endianess, eof) < 0)
+        {
+            if(*eof)
+            {
+                break;//EOF found
+            }
+            RF_ERROR("Reading error while reading from a "
+                     "UTF-32 byte stream");
+            return false;
+        }
+
+
+        *bytes_read += 4;
+        //if we have read the number of characters requested by the function
+        if(*bytes_read >= num)
+        {
+            break;
+        }
+
+        //newline check depending on the EOL pattern
+        c = *(uint32_t*)(buff + (*bytes_read) - 4);
+        switch(eol)
+        {
+            case RF_EOL_LF:
+                if(c == RF_LF)
+                {
+                    eolReached = true;
+                }
+            break;
+            case RF_EOL_CRLF:
+                if(c == RF_LF)
+                {
+                    if( (*(uint32_t*)(buff + (*bytes_read) -8)) == RF_CR)
+                    {
+                        eolReached = true;
+                        (*bytes_read) -= 4;
+                        (*(uint32_t*)(buff + (*bytes_read) -4)) = '\n';
+                    }
+                }
+            break;
+            case RF_EOL_CR:
+                if(c == RF_CR)
+                {
+                    eolReached = true;
+                    (*(uint32_t*)(buff + (*bytes_read) -4)) = '\n';
+                }
+            break;
+        default:
+            assert(0);
+            break;
+        }//end of EOL dependent newline check
+    }while(c !=(uint32_t) EOF && !eolReached);
+    //null terminate the buffer for UTF32
+    buff[(*bytes_read)] =  buff[(*bytes_read) + 1] = buff[(*bytes_read)+2] = 
+    buff[(*bytes_read)+3] = '\0';
+    //finally check yet again for end of file right after the new line
+    if(rf_file_read_char_utf32(f,&c, endianess, eof) < 0 && !(*eof))
+    {
+            RF_ERROR("Reading error while reading from a "
+                     "UTF-32 byte stream");
+            return false;
+    }
+
+    if(!(*eof))
+    {//unless it's EOF undo the peak ahead
+        if(rfFseek(f,-4,SEEK_CUR) != 0)
+        {
+            RF_ERROR("Failed to undo the peek ahead of the file pointer"
+                     "due to fseek() failure with errno %d", errno);
+            return false;
+        }
+    }
+    return true;
+}
+
+int rf_file_read_char_utf8(FILE* f, uint32_t *ret, bool cp, char* eof)
 {
 #define UTF8_FGETC_FAIL()                                               \
     do{                                                                 \
@@ -597,7 +604,7 @@ int rf_fgetc_utf8(FILE* f, uint32_t *ret, char cp, char* eof)
      if( ((c & 0x80)>>7) == 0 )
      {
         ///success
-        if(cp == true)
+        if(cp)
         {
             *ret = c;
         }
@@ -759,8 +766,8 @@ int rf_fgetc_utf8(FILE* f, uint32_t *ret, char cp, char* eof)
 #undef UTF8_FGETC_FAIL
 }
 
-//Gets a unicode character from a UTF-16 file descriptor
-int rf_fgetc_utf16(FILE* f, uint32_t *c, char cp, int endianess, char* eof)
+int rf_file_read_char_utf16(FILE* f, uint32_t *c, bool cp,
+                            enum RFendianess endianess, char* eof)
 {
     uint16_t v1,v2;
     *eof = false;
@@ -821,7 +828,7 @@ int rf_fgetc_utf16(FILE* f, uint32_t *c, char cp, int endianess, char* eof)
             return -1;
         }
 
-        if(cp == true)//if the user wants the decoded codepoint
+        if(cp)//if the user wants the decoded codepoint
         {
             *c = 0;
             *c = v2&0x3ff;
@@ -838,8 +845,10 @@ int rf_fgetc_utf16(FILE* f, uint32_t *c, char cp, int endianess, char* eof)
     *c = v1;
     return 2;
 }
-//Gets a unicode character from a UTF-32 Little Endian file descriptor
-int rf_fgetc_utf32(FILE* f, uint32_t *c, int endianess, char* eof)
+
+int rf_file_read_char_utf32(FILE* f, uint32_t *c,
+                            enum RFendianess endianess,
+                            char* eof)
 {
     *eof = false;
 #if RF_OPTION_DEBUG
@@ -867,52 +876,85 @@ int rf_fgetc_utf32(FILE* f, uint32_t *c, int endianess, char* eof)
     return 4;
 }
 
-
-
-//Moves a unicode character backwards in a UTF-32 file stream
-int rf_fback_utf32(FILE* f, uint32_t *c, int endianess)
+int rf_file_move_back_char_utf8(FILE* f, uint32_t *c)
 {
-#if RF_OPTION_DEBUG
-    if(endianess != RF_LITTLE_ENDIAN || endianess != RF_BIG_ENDIAN)
+    //read one byte before the current
+    int i = 0;
+    char bytes[4];
+    do
     {
-        RF_ERROR( "Illegal endianess type given");
-        return -1;
-    }
-#endif
-
-    //go back and read the last 4 bytes
-    if(rfFseek(f, -4, SEEK_CUR) != 0)
-    {
-        RF_ERROR("Going backwards in a UTF-32 file stream failed due to "
-                 "fseek() fail with errno %d", errno);
-        return -1;
-    }
-    if(fread(c, 4, 1, f) != 1)
-    {
-        if(ferror(f) == 0)
+        if(rfFseek(f, -1, SEEK_CUR) != 0)
         {
-            RF_ERROR("While reading four bytes backwards in a UTF-32 "
-                     "byte stream EOF was encountered");
+            RF_ERROR("Going backwards in a UTF-8 file failed due to "
+                     "fseek() with errno %d", errno);
             return -1;
-        } 
-        RF_ERROR("Reading four bytes backwards in a "
-                 "UTF-32 file stream failed due to fread() failing with "
-                 "errno %d", errno);
-        return -1;
-    }
-    if(rfFseek(f, -4, SEEK_CUR) != 0)
+        }
+        if((bytes[i] = fgetc(f)) == EOF)
+        {
+            if(ferror(f) == 0)
+            {
+                RF_ERROR("The EOF was encountered going backwards in "
+                         "a UTF-8 file. Confused");
+                return -1;
+            }
+            RF_ERROR("Reading a byte backwards in a UTF-8 file failed due "
+                     "to fgetc() returning errno %d", errno);
+            return -1;
+        }
+        if(rfFseek(f, -1, SEEK_CUR) != 0)
+        {
+            RF_ERROR("Going backwards in a UTF-8 file failed due to fseek() "
+                     "with errno %d", errno);
+            return -1;
+        }
+        i++;
+    }while(rf_utf8_is_continuation_byte(bytes[i-1]));
+
+    switch(i)//depending on the number of bytes read backwards
     {
-        RF_ERROR("Going backwards in a UTF-32 file stream failed due to fseek() failing with errno %d", errno);
-        return -1;
+        case 4:
+            *c = 0;
+            //from the fourth byte take the first 6 bits
+            *c = (bytes[0] & 0x3F) ;
+            //from the third byte take the first 6 bits and put them to the left of the previous 6 bits
+            *c |= ((bytes[1] & 0x3F) << 6);
+            //from the second byte take the first 6 bits and put them to the left of the previous 6 bits
+            *c |= ((bytes[2] & 0x3F) << 12);
+            //from the first byte take the first 3 bits and put them to the left of the previous 6 bits
+            *c |= ((bytes[3] & 0x7) << 18);
+        break;
+        case 3:
+            *c = 0;
+            //from the third byte take the first 6 bits
+            *c = (bytes[0] & 0x3F) ;
+            //from the second byte take the first 6 bits and put them to the left of the previous 6 bits
+            *c |= ((bytes[1] & 0x3F) << 6);
+            //from the first byte take the first 4 bits and put them to the left of the previous 6 bits
+            *c |= ((bytes[2] & 0xF) << 12);
+        break;
+        case 2:
+            *c = 0;
+            //from the second byte take the first 6 bits
+            *c = (bytes[0] & 0x3F) ;
+            //from the first byte take the first 5 bits and put them in the start
+            *c |= ((bytes[1] & 0x1F) << 6);
+        break;
+        case 1:
+            *c = bytes[0];
+        break;
+        default:
+            RF_ERROR("During moving one unicode character back in a UTF-8 "
+                     "filestream moved an abnormal number of bytes");
+            return -1;
+        break;
     }
-    //check if we need to be swapping
-    rfProcessByteOrderUI(c, endianess);
-    return 4;
+    return i;
 }
 
 
 // Moves a unicode character backwards in a UTF-16 file stream
-int rf_fback_utf16(FILE* f, uint32_t *c, int endianess)
+int rf_file_move_back_char_utf16(FILE* f, uint32_t *c,
+                                 enum RFendianess endianess)
 {
     uint16_t v1,v2;
 #if RF_OPTION_DEBUG
@@ -1012,82 +1054,46 @@ int rf_fback_utf16(FILE* f, uint32_t *c, int endianess)
     return -1;
 }
 
-//Moves a unicode character backwards in a UTF-8 file stream
-int rf_fback_utf8(FILE* f, uint32_t *c)
+int rf_file_move_back_char_utf32(FILE* f, uint32_t *c,
+                                 enum RFendianess endianess)
 {
-    //read one byte before the current
-    int i = 0;
-    char bytes[4];
-    do
+#if RF_OPTION_DEBUG
+    if(endianess != RF_LITTLE_ENDIAN || endianess != RF_BIG_ENDIAN)
     {
-        if(rfFseek(f, -1, SEEK_CUR) != 0)
-        {
-            RF_ERROR("Going backwards in a UTF-8 file failed due to "
-                     "fseek() with errno %d", errno);
-            return -1;
-        }
-        if((bytes[i] = fgetc(f)) == EOF)
-        {
-            if(ferror(f) == 0)
-            {
-                RF_ERROR("The EOF was encountered going backwards in "
-                         "a UTF-8 file. Confused");
-                return -1;
-            }
-            RF_ERROR("Reading a byte backwards in a UTF-8 file failed due "
-                     "to fgetc() returning errno %d", errno);
-            return -1;
-        }
-        if(rfFseek(f, -1, SEEK_CUR) != 0)
-        {
-            RF_ERROR("Going backwards in a UTF-8 file failed due to fseek() "
-                     "with errno %d", errno);
-            return -1;
-        }
-        i++;
-    }while(rf_utf8_is_continuation_byte(bytes[i-1]));
-
-    switch(i)//depending on the number of bytes read backwards
-    {
-        case 4:
-            *c = 0;
-            //from the fourth byte take the first 6 bits
-            *c = (bytes[0] & 0x3F) ;
-            //from the third byte take the first 6 bits and put them to the left of the previous 6 bits
-            *c |= ((bytes[1] & 0x3F) << 6);
-            //from the second byte take the first 6 bits and put them to the left of the previous 6 bits
-            *c |= ((bytes[2] & 0x3F) << 12);
-            //from the first byte take the first 3 bits and put them to the left of the previous 6 bits
-            *c |= ((bytes[3] & 0x7) << 18);
-        break;
-        case 3:
-            *c = 0;
-            //from the third byte take the first 6 bits
-            *c = (bytes[0] & 0x3F) ;
-            //from the second byte take the first 6 bits and put them to the left of the previous 6 bits
-            *c |= ((bytes[1] & 0x3F) << 6);
-            //from the first byte take the first 4 bits and put them to the left of the previous 6 bits
-            *c |= ((bytes[2] & 0xF) << 12);
-        break;
-        case 2:
-            *c = 0;
-            //from the second byte take the first 6 bits
-            *c = (bytes[0] & 0x3F) ;
-            //from the first byte take the first 5 bits and put them in the start
-            *c |= ((bytes[1] & 0x1F) << 6);
-        break;
-        case 1:
-            *c = bytes[0];
-        break;
-        default:
-            RF_ERROR("During moving one unicode character back in a UTF-8 "
-                     "filestream moved an abnormal number of bytes");
-            return -1;
-        break;
+        RF_ERROR( "Illegal endianess type given");
+        return -1;
     }
-    return i;
+#endif
+
+    //go back and read the last 4 bytes
+    if(rfFseek(f, -4, SEEK_CUR) != 0)
+    {
+        RF_ERROR("Going backwards in a UTF-32 file stream failed due to "
+                 "fseek() fail with errno %d", errno);
+        return -1;
+    }
+    if(fread(c, 4, 1, f) != 1)
+    {
+        if(ferror(f) == 0)
+        {
+            RF_ERROR("While reading four bytes backwards in a UTF-32 "
+                     "byte stream EOF was encountered");
+            return -1;
+        } 
+        RF_ERROR("Reading four bytes backwards in a "
+                 "UTF-32 file stream failed due to fread() failing with "
+                 "errno %d", errno);
+        return -1;
+    }
+    if(rfFseek(f, -4, SEEK_CUR) != 0)
+    {
+        RF_ERROR("Going backwards in a UTF-32 file stream failed due to fseek() failing with errno %d", errno);
+        return -1;
+    }
+    //check if we need to be swapping
+    rfProcessByteOrderUI(c, endianess);
+    return 4;
 }
 
-
 //for creation of external symbol
-i_INLINE_INS int rfStat(RFstring* f, stat_rft* buffer);
+i_INLINE_INS int rfStat(struct RFstring* f, stat_rft* buffer);

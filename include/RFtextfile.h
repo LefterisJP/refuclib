@@ -28,18 +28,7 @@
 #include <rf_options.h> // to include the options
 #ifdef RF_MODULE_IO_TEXTFILE //module check
 
-#include <stdio.h> //for FILE*
-#include <Definitions/types.h> //for fixed size types needed in various places
-#include <String/string_decl.h>//for RFstring
-#include <String/stringx_decl.h> //for RFstringx
-#include <IO/textfile_decl.h> //for RFtextfile
-#include <Definitions/imex.h> //for the import export macro
-#include <Definitions/defarg.h> //for enabling default arguments
-#include <Definitions/retcodes.h> //for booleans
-#include <IO/common.h> //for common I/O flags and definitions
-#include <Utils/endianess.h> //for the endianess macros
 #include <IO/textfile.h>
-
 //for File manipulation
 #include <System/rf_system.h>
 

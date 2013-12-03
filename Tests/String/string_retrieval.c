@@ -4,8 +4,8 @@
 #include "../refu_tests.h"
 int main()
 {
-    RFstring s1,s2,s3,s4,s5,s6,s7;
-    RFstring ret;
+    struct RFstring s1,s2,s3,s4,s5,s6,s7;
+    struct RFstring ret;
 
     DEFAULT_LIB_INIT();
 

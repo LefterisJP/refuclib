@@ -37,7 +37,7 @@ $IFNOT @STRING
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <Preprocessor/rf_tokens.h>//for the defined library tokens
 #include <Definitions/types.h> //for fixed size data types
-#include <String/string_decl.h> //for RFstring
+#include <String/rf_str_decl.h> //for RFstring
 $ENDIF
 #include <Definitions/retcodes.h> //for error codes, bool
 $INCLUDE @DECL_H
@@ -45,20 +45,15 @@ $INCLUDE @H
 /*------------- Module related inclusion -------------*/
 
 /*------------- Outside Module inclusion -------------*/
-//for error logging
-    #include <Utils/log.h>
-//for memory allocation macros
-    #include <Utils/memory.h> //for refu memory allocation
-//for local scope
-    #include <Utils/localscope.h>
-// for FLCMP macros
-    #include <float.h>
-    #include <Utils/constcmp.h>
+#include <Utils/log.h> //for error logging
+#include <Utils/memory.h> //for refu memory allocation
+#include <Utils/localscope.h> //for local scope
+#include <Utils/constcmp.h> // for FLCMP macros
 // String module inclusions
 $IFNOT @STRING
-    #include <String/core.h> //for rf_string_equal
+#include <String/rf_str_core.h> //for rf_string_equal
 $ENDIF
-    #include <String/retrieval.h> //for rf_string_data and ByteLength
+#include <String/rf_str_retrieval.h> //for rf_string_data and ByteLength
 /*------------- libc includes -------------*/
 #include <stdint.h> //used by hsieh's hash
 /*------------- End of includes -------------*/
@@ -169,7 +164,7 @@ bool rf_hashmap_iterate(@DATA_STRUCT* m, bool (*act)(@TYPEPTR, void*),
     return true;
 }
 
-static char i_InsertValue(@NODE** slots, RFstring* key,
+static char i_InsertValue(@NODE** slots, struct RFstring* key,
                           bool* exists,
                           @TYPEPTR value, uint32_t size)
 {
@@ -250,7 +245,7 @@ void rf_hashmap_destroy(@DATA_STRUCT* m)
 
 
 // Insert a value into the Hashmap
-char rf_hashmap_insert(@DATA_STRUCT* m, RFstring* key,
+char rf_hashmap_insert(@DATA_STRUCT* m, struct RFstring* key,
                       @TYPEPTR value,
                       bool* exists)
 {
@@ -311,7 +306,7 @@ char rf_hashmap_insert(@DATA_STRUCT* m, RFstring* key,
     return ret;
 }
 
-i_DECLIMEX_ @TYPEPTR rf_hashmap_get(@DATA_STRUCT* m, RFstring* key,
+i_DECLIMEX_ @TYPEPTR rf_hashmap_get(@DATA_STRUCT* m, struct RFstring* key,
                                    bool* found)
 {
     uint32_t i;

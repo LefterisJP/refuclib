@@ -4,7 +4,7 @@
 #include "../refu_tests.h"
 int main()
 {
-    RFstring s1,s2;
+    struct RFstring s1,s2;
     uint32_t i=0,c;
     DEFAULT_LIB_INIT();
 	

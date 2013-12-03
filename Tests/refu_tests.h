@@ -70,8 +70,8 @@
 
 
 
-#define DEFAULT_LIB_INIT()                                    \
-        EXPECT_TRUE(rfInit("refulib.log",                     \
-                           RF_OPTION_LOCALSTACK_MEMORY_SIZE,  \
-                           LOG_DEBUG)                         \
+#define DEFAULT_LIB_INIT()                                     \
+        EXPECT_TRUE(rf_init("refulib.log",                     \
+                            RF_OPTION_LOCALSTACK_MEMORY_SIZE,  \
+                            LOG_DEBUG)                         \
         )

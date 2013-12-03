@@ -1,49 +1,58 @@
-/**
-**      ==START OF REFU LICENSE==
-**
-** Copyright (c) 2011-2013, Karapetsas Eleftherios
-** All rights reserved.
-** 
-** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-**  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-**  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the distribution.
-**  3. Neither the name of the Original Author of Refu nor the names of its contributors may be used to endorse or promote products derived from
-** 
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
-** INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-** DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-** SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-** WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-**
-**      ==END OF REFU LICENSE==
-**
-**
-** --IO/file.h
-** This header defines functions that operate on FILE descriptors and
-** also those that can open other processes
+/*
+ *    == START OF REFU LICENSE ==
+ *
+ * Copyright (c) 2011-2013, Karapetsas Eleftherios
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *  1. Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. Neither the name of the Original Author of Refu nor the names of its
+ *     contributors may be used to endorse or promote products derived from
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ *    == END OF REFU LICENSE ==
 */
 #ifndef REFU_IO_FILE_H
 #define REFU_IO_FILE_H
 
+
+/*------------- Module Headers inclusion -------------*/
+#include <IO/common.h> //for RFeol_mark
+/*------------- Outside Module inclusion -------------*/
+#include <Definitions/types.h> //for fixed size types needed in various places
+#include <Definitions/imex.h> //for the import export macro
+#include <Definitions/inline.h> //for inline definitions
+#include <Definitions/retcodes.h> //for booleans
+#include "../../src/String/rf_str_conversion.ph" //for rf_string_cstr with buffer
+#include <Utils/endianess.h> //for RFendianess
+#include <String/rf_str_decl.h> //for RFstring
+#include <IO/common.h> //for RFeol_mark
+/*------------- System specific inclusion --------------*/
 #ifdef _MSC_VER
 #error TODO
 #else
 #include <sys/stat.h>
 #endif
+/*------------- libc inclusion --------------*/
 #include <stdio.h> //for FILE*
-#include <Definitions/types.h> //for fixed size types needed in various places
-#include <Definitions/imex.h> //for the import export macro
-#include <Definitions/inline.h> //for inline definitions
-#include <Definitions/retcodes.h> //for booleans
-#include <IO/common.h> //for stat_rft
-#include <String/string_decl.h> //for RFstring
 #include <stdlib.h> //for free
+/*------------- End of includes -------------*/
 
-//for rf_string_cstr with buffer
-#include "../../src/String/conversion.ph"
 
 #ifdef __cplusplus
 extern "C"
@@ -67,7 +76,7 @@ extern "C"
 #error TODO
 
 #else
-i_INLINE_DECL int rfStat(RFstring* f, stat_rft* buffer)
+i_INLINE_DECL int rfStat(struct RFstring* f, stat_rft* buffer)
 {
     unsigned int index;
     int ret;
@@ -120,21 +129,15 @@ i_INLINE_DECL int rfStat(RFstring* f, stat_rft* buffer)
  ** appear in the returned buffer.
  **
  ** @param[in] f The file descriptor to read
- ** @param[in] eol The End Of Line type that this file uses. Legal values are:
- ** + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as
- **      the end of line signal
- ** + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as
- **      the end of line signal
- ** + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as
- **      the end of line signal
- **
+ ** @param[in] eol The End Of Line type that this file uses. Look @ref RFeol_mark
+ **                for possible values
  ** @param[out] utf8 Give here a refence to an unitialized char* that will be
  ** allocated inside the function and contain the utf8 byte buffer. Needs to
  ** be freed by the caller explicitly later
- ** @param[out] byteLength Give an @c uint32_t here to receive the length
+ ** @param[out] byte_length Give an @c uint32_t here to receive the length
  **  of the @c utf8 buffer in bytes. This is also the number of bytes read
  ** from the file
- ** @param[out] bufferSize Give an @c uint32_t here to receive the capacity
+ ** @param[out] buffer_size Give an @c uint32_t here to receive the capacity
  ** of the @c utf8 buffer in bytes
  ** @param[out] eof Pass a pointer to a char to receive a true or false
  **  value in case the end of file with reading this line
@@ -143,9 +146,12 @@ i_INLINE_DECL int rfStat(RFstring* f, stat_rft* buffer)
  ** Even if there is an error the number of bytes read given by @c byteLength
  ** can be trusted.
  **/
-i_DECLIMEX_ bool rf_freadline_utf8(FILE* f, char eol, char** utf8,
-                                  uint32_t* byteLength,
-                                  uint32_t* bufferSize, char* eof);
+i_DECLIMEX_ bool rf_file_read_line_utf8(FILE* f, 
+                                        enum RFeol_mark eol,
+                                        char** utf8,
+                                        uint32_t* byte_length,
+                                        uint32_t* buffer_size,
+                                        char* eof);
 
 /**
  ** @brief Reads a UTF-16 file descriptor until end of line or
@@ -153,64 +159,32 @@ i_DECLIMEX_ bool rf_freadline_utf8(FILE* f, char eol, char** utf8,
  **
  ** The function works just like @ref rf_readline_utf8() but for UTF-16
  ** and as such has an extra endianess parameter.
- ** @param endianess Can be either:
- ** + @c RF_BIG_ENDIAN: If the file stream you want to read is encoded in 
- **   big endian 
- ** + @c RF_LITTLE_ENDIAN: If the file stream you want to read is encoded in
- **  little endian
+ ** @param endianess The endianess of the file. Look @ref RFendianess
+ ** for a listing of possible values
  ** @param bytes_read: The number of bytes succesfully read from the file
  ** descriptor
  **/
-i_DECLIMEX_ bool rf_freadline_utf16(FILE* f, char eol, char** utf8,
-                                   uint32_t* byteLength, char* eof,
-                                   uint32_t* bytes_read, int endianess);
+i_DECLIMEX_ bool rf_file_read_line_utf16(FILE* f, enum RFeol_mark eol,
+                                         char** utf8,
+                                         uint32_t* byte_length, char* eof,
+                                         uint32_t* bytes_read,
+                                         enum RFendianess endianess);
 
 /**
  ** @brief Reads a  UTF-32 file descriptor until end of line
  **  or EOF is found and returns a UTF-8 byte buffer
  ** 
  ** The function works just like @ref rf_readline_utf8() but for UTF-32
- ** @param endianess Can be either:
- ** + @c RF_BIG_ENDIAN: If the file stream you want to read is encoded in 
- **   big endian 
- ** + @c RF_LITTLE_ENDIAN: If the file stream you want to read is encoded in
- **  little endian
+ ** @param endianess The endianess of the file. Look @ref RFendianess
+ ** for a listing of possible values
  ** @param bytes_read: The number of bytes succesfully read from the file
  ** descriptor
  **/
-i_DECLIMEX_ bool rf_freadline_utf32(FILE* f, char eol, char** utf8,
-                                   uint32_t* byteLength, char* eof,
-                                   uint32_t* bytes_read, int endianess);
-
-
-/**
- ** @brief Gets a number of bytes from a UTF-32 file descriptor
- **
- ** This function is similar to @ref rf_fgets_utf8() only for UTF32
- ** @param endianess Can be either:
- ** + @c RF_BIG_ENDIAN: If the file stream you want to read is encoded in 
- **   big endian 
- ** + @c RF_LITTLE_ENDIAN: If the file stream you want to read is encoded in
- **  little endian
- **/
-i_DECLIMEX_ bool rf_fgets_utf32(char* buff, uint32_t num, FILE* f,
-                               char* eof, char eol, uint32_t* bytes_read,
-                               int endianess);
-
-/**
- ** @brief Gets a number of bytes from a UTF-16 file descriptor
- **
- ** This function is similar to @ref rf_fgets_utf8() only for UTF16 and as such
- ** has an extra endianess parameter
- ** @param endianess Can be either:
- ** + @c RF_BIG_ENDIAN: If the file stream you want to read is encoded in 
- **   big endian 
- ** + @c RF_LITTLE_ENDIAN: If the file stream you want to read is encoded in
- **  little endian
- **/
-i_DECLIMEX_ bool rf_fgets_utf16(char* buff, uint32_t num, FILE* f,
-                                 char* eof, char eol, uint32_t* bytes_read,
-                                 int endianess);
+i_DECLIMEX_ bool rf_file_read_line_utf32(FILE* f, enum RFeol_mark eol,
+                                         char** utf8,
+                                         uint32_t* byte_length, char* eof,
+                                         uint32_t* bytes_read,
+                                         enum RFendianess endianess);
 
 
 /**
@@ -252,14 +226,8 @@ i_DECLIMEX_ bool rf_fgets_utf16(char* buff, uint32_t num, FILE* f,
  ** @param[in] f A valid FILE descriptor from which to read the bytes
  ** @param[out] eof Pass a reference to a char to receive a true/false value
  **  for whether EOF has been reached.
- ** @param[in] eol The End Of Line type that this file uses. Legal values are:
- ** + @c RF_EOL_LF: For Unix-style line endings, taking @c '\n' as
- **      the end of line signal
- ** + @c RF_EOL_CRLF: For Windows-style line endings, taking @c "\r\n" as
- **      the end of line signal
- ** + @c RF_EOL_CR: For the old Mac OS style of line endings taking "\r" as
- **      the end of line signal
-
+ ** @param[in] eol The End Of Line type that this file uses.
+ **                Look at @ref RFeol_mark for possible value
  ** @param[out] bytes_read Pass a pointer to a uint32_t to get the number of
  ** bytes read from this function. Even if an error occured this number should
  ** contain how many bytes were read until that point.
@@ -267,8 +235,36 @@ i_DECLIMEX_ bool rf_fgets_utf16(char* buff, uint32_t num, FILE* f,
  ** @return Returns @c true for success and @c false for an error occuring.
  ** Even if there is an error the number of bytes read can be trusted
  **/
-i_DECLIMEX_ bool rf_fgets_utf8(char* buff, uint32_t num, FILE* f,
-                              char* eof, char eol, uint32_t* bytes_read);
+i_DECLIMEX_ bool rf_file_read_chars_utf8(char* buff, uint32_t num, FILE* f,
+                                         char* eof,
+                                         enum RFeol_mark eol,
+                                         uint32_t* bytes_read);
+
+
+/**
+ ** @brief Gets a number of bytes from a UTF-16 file descriptor
+ **
+ ** This function is similar to @ref rf_file_read_chars_utf8() only for UTF16 and as such
+ ** has an extra endianess parameter
+ ** @param endianess The endianess of the input file. For possible values look 
+ **                  at @ref RFendianess
+ **/
+i_DECLIMEX_ bool rf_file_read_chars_utf16(char* buff, uint32_t num, FILE* f,
+                                          char* eof, enum RFeol_mark eol,
+                                          uint32_t* bytes_read,
+                                          enum RFendianess endianess);
+
+/**
+ ** @brief Gets a number of bytes from a UTF-32 file descriptor
+ **
+ ** This function is similar to @ref rf_file_read_chars_utf8() only for UTF32
+ ** @param endianess The endianess of the input file. For possible values look 
+ **                  at @ref RFendianess
+ **/
+i_DECLIMEX_ bool rf_file_read_chars_utf32(char* buff, uint32_t num, FILE* f,
+                                          char* eof, enum RFeol_mark eol,
+                                          uint32_t* bytes_read,
+                                          enum RFendianess endianess);
 
 /**
  ** @brief  Gets a unicode character from a UTF-8 file descriptor
@@ -299,68 +295,33 @@ i_DECLIMEX_ bool rf_fgets_utf8(char* buff, uint32_t num, FILE* f,
  ** or a negative number if the function fails. If the EOF is reached then 
  ** @c eof will be set to @c true but the function will still return a negative.
  **/
-i_DECLIMEX_ int rf_fgetc_utf8(FILE* f, uint32_t *c, char cp, char* eof);
+i_DECLIMEX_ int rf_file_read_char_utf8(FILE* f, uint32_t *c, bool cp, char* eof);
 
 
 /**
  ** @brief  Gets a unicode character from a UTF-16 file descriptor
  **
- ** This function acts just like @ref rf_fgetc_utf8() but for UTF16
+ ** This function acts just like @ref rf_file_read_char_utf8() but for UTF16
  ** The main difference is that it also takes endianess into account
  ** and as such has en extra argument to that effect.
- ** @param endianess Can be either:
- ** + @c RF_BIG_ENDIAN: If the file stream you want to read is encoded in 
- **   big endian 
- ** + @c RF_LITTLE_ENDIAN: If the file stream you want to read is encoded in
- **  little endian
+ ** @param endianess The endianess of the input file. For possible values look 
+ **                  at @ref RFendianess
  **/
-i_DECLIMEX_ int rf_fgetc_utf16(FILE* f, uint32_t *c, char cp,
-                                int endianess, char* eof);
+i_DECLIMEX_ int rf_file_read_char_utf16(FILE* f, uint32_t *c, bool cp,
+                                        enum RFendianess endianess, char* eof);
 
 /**
  ** @brief  Gets a unicode character from a UTF-32  file descriptor
  **
- ** This function acts just like @ref rf_fgetc_utf8() but for UTF32 with the
+ ** This function acts just like @ref rf_file_read_char_utf8() but for UTF32 with the
  ** difference that it has no option to return the decoded character since it 
  ** makes no sense for UTF32 and that it accepts an endianess argument.
- ** @param endianess Can be either:
- ** + @c RF_BIG_ENDIAN: If the file stream you want to read is encoded in 
- **   big endian 
- ** + @c RF_LITTLE_ENDIAN: If the file stream you want to read is encoded in
- **  little endian
+ ** @param endianess The endianess of the input file. For possible values look 
+ **                  at @ref RFendianess
  **/
-i_DECLIMEX_ int rf_fgetc_utf32(FILE* f, uint32_t *c, int endianess, char* eof);
-
-
-/**
- ** @brief Moves a unicode character backwards in a little endian UTF-32 file stream
- **
- ** This function acts just like @ref rf_fback_utf8() except that it is 
- ** implemented for UTF-32 encoded byte streams and that it also accepts
- ** an endianess arument.
- ** @param endianess Can be either:
- ** + @c RF_BIG_ENDIAN: If the file stream you want to read is encoded in 
- **   big endian 
- ** + @c RF_LITTLE_ENDIAN: If the file stream you want to read is encoded in
- **  little endian
- ** @return Returns either @c 4 for success or negative for failure
- **/
-i_DECLIMEX_ int rf_fback_utf32(FILE* f, uint32_t *c, int endianess);
-
-/**
- ** @brief Moves a unicode character backwards in a UTF-16 file stream
- **
- ** This function acts just like @ref rf_fback_utf8() except that it is 
- ** implemented for UTF-16 encoded byte streams and that it also accepts
- ** an endianess arument.
- ** @param endianess Can be either:
- ** + @c RF_BIG_ENDIAN: If the file stream you want to read is encoded in 
- **   big endian 
- ** + @c RF_LITTLE_ENDIAN: If the file stream you want to read is encoded in
- **  little endian
- ** @return Returns either @c 2 or @c 4 for success and negative for failure
- **/
-i_DECLIMEX_ int rf_fback_utf16(FILE* f, uint32_t *c, int endianess);
+i_DECLIMEX_ int rf_file_read_char_utf32(FILE* f, uint32_t *c,
+                                        enum RFendianess endianess,
+                                        char* eof);
 
 /**
  ** @brief Moves a unicode character backwards in a UTF-8 file stream
@@ -378,7 +339,33 @@ i_DECLIMEX_ int rf_fback_utf16(FILE* f, uint32_t *c, int endianess);
  ** @return Returns either the number of bytes moved backwards for success
  ** (either @c 4, @c 3, @c 2 or @c 1) or negative number for error
  **/
-i_DECLIMEX_ int rf_fback_utf8(FILE* f, uint32_t *c);
+i_DECLIMEX_ int rf_file_move_back_char_utf8(FILE* f, uint32_t *c);
+
+/**
+ ** @brief Moves a unicode character backwards in a UTF-16 file stream
+ **
+ ** This function acts just like @ref rf_file_move_back_char_utf8() except that it is 
+ ** implemented for UTF-16 encoded byte streams and that it also accepts
+ ** an endianess arument.
+ ** @param endianess The endianess of the input file. For possible values look 
+ **                  at @ref RFendianess
+ ** @return Returns either @c 2 or @c 4 for success and negative for failure
+ **/
+i_DECLIMEX_ int rf_file_move_back_char_utf16(FILE* f, uint32_t *c,
+                                             enum RFendianess endianess);
+
+/**
+ ** @brief Moves a unicode character backwards in a little endian UTF-32 file stream
+ **
+ ** This function acts just like @ref rf_file_move_back_char_utf8() except that it is 
+ ** implemented for UTF-32 encoded byte streams and that it also accepts
+ ** an endianess arument.
+ ** @param endianess The endianess of the input file. For possible values look 
+ **                  at @ref RFendianess
+ ** @return Returns either @c 4 for success or negative for failure
+ **/
+i_DECLIMEX_ int rf_file_move_back_char_utf32(FILE* f, uint32_t *c,
+                                             enum RFendianess endianess);
 
 /**
  ** @brief Opens another process as a pipe
@@ -397,19 +384,19 @@ i_DECLIMEX_ int rf_fback_utf8(FILE* f, uint32_t *c);
  ** If there was an error @c 0 is returned and an error is logged.
  **
  **/
-i_DECLIMEX_ FILE* rfPopen(void* command, const char* mode);
+i_DECLIMEX_ FILE* rf_popen(void* command, const char* mode);
 
 
 /**
  ** @brief Closes a pipe
  **
- ** This function is a cross-platform wrapper for pclose. It closes a file descriptor opened with @ref rfPopen() and
+ ** This function is a cross-platform wrapper for pclose. It closes a file descriptor opened with @ref rf_popen() and
  ** returns the exit code of the process that was running
- ** @param stream The file descriptor of the pipe returned by @ref rfPopen() that we want to close
+ ** @param stream The file descriptor of the pipe returned by @ref rf_popen() that we want to close
  ** @return Returns the exit code of the process or -1 if there was an error
  **
  **/
-i_DECLIMEX_ int rfPclose(FILE* stream);
+i_DECLIMEX_ int rf_pclose(FILE* stream);
 
 //! @} End of I/O group
 

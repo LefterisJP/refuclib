@@ -117,6 +117,8 @@ class Analyzer:
                 t = self.find_type_r(ID, c)
                 if t is not None:
                     return t
+        elif type(node) is c_ast.Struct:
+            return node.name
         elif type(node) is c_ast.Decl:
             if node.name == ID: # if name matches
                 return self.find_type_r(ID, node.type)
@@ -133,6 +135,7 @@ class Analyzer:
             # for now no special pointer handling. Just add the asterisk in the
             # type string
             return self.find_type_r(ID, node.type) + "*"
+
         elif type(node) is c_ast.BinaryOp:
             # for now just take the type of left side of operation
             # irrespective of op type

@@ -1,62 +1,58 @@
-/**
-**      ==START OF REFU LICENSE==
-**
-** Copyright (c) 2011-2013, Karapetsas Eleftherios
-** All rights reserved.
-** 
-** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-**  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-**  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the distribution.
-**  3. Neither the name of the Original Author of Refu nor the names of its contributors may be used to endorse or promote products derived from
-** 
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
-** INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-** DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-** SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-** WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-**
-**      ==END OF REFU LICENSE==
-**
+/*
+ *    == START OF REFU LICENSE ==
+ *
+ * Copyright (c) 2011-2013, Karapetsas Eleftherios
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *  1. Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. Neither the name of the Original Author of Refu nor the names of its
+ *     contributors may be used to endorse or promote products derived from
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ *    == END OF REFU LICENSE ==
 */
+
+
 /*------------- Corrensponding Header inclusion -------------*/
 #include <IO/textfile.h>
 /*------------- Module related inclusion -------------*/
-//neded by IO/file.h
-#include <Definitions/inline.h> //for inline definitions
-#include <Definitions/retcodes.h> //for error codes, logged in allocation failure
 #include <IO/file.h> //for all the IO functions
-
 #include "textfile.ph"//for the private textfile functionality
-#include <String/unicode.h> //for rfReadLine family of functions
 /*------------- Outside Module inclusion -------------*/
-#include <String/common.h>//for RFS_()
-#include <String/core.h> //for rf_string_destroy(),and copying functions
-#include <String/corex.h> //for rf_stringx_assign functions
-#include <String/retrieval.h> //for rf_string_count() and others
-#include <String/manipulation.h>
-#include <String/filesx.h> //for rfStringX file functions
-#include <String/files.h> //for rfStringX file functions
-#include <String/traversalx.h> //for rf_stringx_reset()
+#include <String/rf_str_common.h>//for RFS_()
+#include <String/rf_str_core.h> //for rf_string_destroy(),and copying functions
+#include <String/rf_str_corex.h> //for rf_stringx_assign functions
+#include <String/rf_str_retrieval.h> //for rf_string_count() and others
+#include <String/rf_str_manipulation.h>
+#include <String/rf_str_filesx.h> //for rfStringX file functions
+#include <String/rf_str_files.h> //for rfStringX file functions
+#include <String/rf_str_traversalx.h> //for rf_stringx_reset()
+#include <String/rf_str_unicode.h> //for rfReadLine family of functions
+#include "../String/rf_str_conversion.ph" //for rf_string_cstr with buffer
 
-//for the endianess stuff
-    #include <Utils/endianess.h>
-//for error logging
-    #include <Utils/log.h>
-//for memory allocation macros
-    #include <Utils/memory.h> //for refu memory allocation
-//for System functions
-    #include <System/rf_system.h>
-//for constant comparisons
-    #include <Utils/constcmp.h> //for RF_HEXEQ_I() macro and others
-//for local scope macros
-    #include <Utils/localscope.h> //for the local scope macros
-//for the sanity check macros
-    #include <Utils/sanity.h>
-//for rf_string_cstr with buffer
-#include "../String/conversion.ph"
+#include <Utils/endianess.h> //for the endianess stuff
+#include <Utils/log.h> //for error logging
+#include <Utils/memory.h> //for refu memory allocation
+#include <System/rf_system.h> //for System functions
+#include <Utils/constcmp.h> //for RF_HEXEQ_I() macro and others
+#include <Utils/localscope.h> //for the local scope macros
+#include <Utils/sanity.h> //for the sanity check macros
 /*------------- libc inclusion --------------*/
 #include <errno.h>
 /*------------- End of includes -------------*/
@@ -70,7 +66,7 @@ static const char BOM_UTF32_BE[4] = {0, 0, 0xFE, 0xFF};
 /**
  ** @brief Writes string to a file appending the proper end of line
  */
-static inline char write_to_file_eol(FILE* f, RFtextfile *t, RFstring* str)
+static inline char write_to_file_eol(FILE* f, RFtextfile *t, struct RFstring* str)
 {
     char ret;
     if(t->eol == RF_EOL_CRLF)
@@ -165,13 +161,13 @@ static char handle_EOL(RFtextfile* t, char eol)
             switch(t->encoding)
             {
                case RF_UTF8:
-                   ret = rf_fgetc_utf8(t->f,&c,true, &eof_reached);
+                   ret = rf_file_read_char_utf8(t->f,&c,true, &eof_reached);
                break;
                case RF_UTF16:
-                   ret = rf_fgetc_utf16(t->f,&c,true, t->endianess, &eof_reached);
+                   ret = rf_file_read_char_utf16(t->f,&c,true, t->endianess, &eof_reached);
                break;
                case RF_UTF32:
-                   ret = rf_fgetc_utf32(t->f, &c, t->endianess, &eof_reached);
+                   ret = rf_file_read_char_utf32(t->f, &c, t->endianess, &eof_reached);
                break;
             }
             //check for reading problem
@@ -186,14 +182,14 @@ static char handle_EOL(RFtextfile* t, char eol)
                 switch(t->encoding)
                 {
                    case RF_UTF8:
-                       ret = rf_fgetc_utf8(t->f,&n,true, &eof_reached);
+                       ret = rf_file_read_char_utf8(t->f,&n,true, &eof_reached);
                    break;
                    case RF_UTF16:
-                       ret = rf_fgetc_utf16(t->f, &n, true, t->endianess,
+                       ret = rf_file_read_char_utf16(t->f, &n, true, t->endianess,
                                            &eof_reached);
                    break;
                    case RF_UTF32:
-                       ret = rf_fgetc_utf32(t->f, &n, t->endianess,
+                       ret = rf_file_read_char_utf32(t->f, &n, t->endianess,
                                            &eof_reached);
                    break;
                 }
@@ -310,7 +306,7 @@ static char check_BOM_UTF8(RFtextfile* t, int endianess)
 {
     uint32_t c;
     char eof;
-    if(!rf_fgetc_utf8(t->f, &c, false, &eof))
+    if(!rf_file_read_char_utf8(t->f, &c, false, &eof))
     {
         return false;
     }
@@ -596,10 +592,9 @@ static char determine_endianess(RFtextfile* t, int encoding,
 
 //Initializes a new text file
 
-char rf_textfile_init(RFtextfile* t, const void* nameP, char mode,
+char rf_textfile_init(RFtextfile* t, const void* name, char mode,
                      int endianess, int encoding, char eol)
 {
-    RFstring* name = (RFstring*) nameP;
     char ret = true;
     RF_ENTER_LOCAL_SCOPE();
 
@@ -914,7 +909,7 @@ char rf_textfile_set_mode(RFtextfile* t, char mode)
 }
 
 
-int rf_textfile_read_line_chars(RFtextfile* t, RFstringx* line,
+int rf_textfile_read_line_chars(RFtextfile* t, struct RFstringx* line,
                         uint32_t characters)
 {
     foff_rft startOff;
@@ -940,7 +935,7 @@ int rf_textfile_read_line_chars(RFtextfile* t, RFstringx* line,
     rf_stringx_reset(line);
 
     //Read the file depending on the encoding
-    if(!rf_stringx_f_assign(line, t->f, &eof, t->eol, t->encoding, t->endianess))
+    if(!rf_stringx_from_file_assign(line, t->f, &eof, t->eol, t->encoding, t->endianess))
     {
         RF_ERROR(
                  "Reading line [%llu] of a text file failed", t->line);
@@ -969,7 +964,7 @@ int rf_textfile_read_line_chars(RFtextfile* t, RFstringx* line,
     return RF_SUCCESS;
 }
 
-int rf_textfile_read_line(RFtextfile* t, RFstringx* line)
+int rf_textfile_read_line(RFtextfile* t, struct RFstringx* line)
 {
     char eof = false;
     foff_rft startOff;
@@ -994,7 +989,7 @@ int rf_textfile_read_line(RFtextfile* t, RFstringx* line)
     rf_stringx_reset(line);
 
     //Read the file depending on the encoding
-    if(!rf_stringx_f_assign(line, t->f, &eof, t->eol, t->encoding, t->endianess))
+    if(!rf_stringx_from_file_assign(line, t->f, &eof, t->eol, t->encoding, t->endianess))
     {
         RF_ERROR(
                  "Reading line [%llu] of a text file failed", t->line);
@@ -1021,13 +1016,13 @@ int rf_textfile_read_line(RFtextfile* t, RFstringx* line)
 
 //Gets a specific line from a Text File starting from the beginning
 int32_t rf_textfile_get_line_begin(RFtextfile* t, uint64_t lineN,
-                                 RFstringx* line)
+                                 struct RFstringx* line)
 {
     uint64_t prLine,i=1;
     int32_t error;
     foff_rft prOff;
     char prEof;
-    RFstringx buffer;
+    struct RFstringx buffer;
     //in the very beginning keep the previous file position
     prLine = t->line;
 
@@ -1112,7 +1107,7 @@ int32_t rf_textfile_get_line_begin(RFtextfile* t, uint64_t lineN,
 }
 //Gets a specific line from a Text File
 int32_t rf_textfile_get_line(RFtextfile* t, uint64_t lineN,
-                           RFstringx* line)
+                           struct RFstringx* line)
 {
     uint64_t prLine;
     char prEof;
@@ -1163,7 +1158,7 @@ int32_t rf_textfile_move_lines(RFtextfile* t, int64_t linesN)
     int32_t error;
     uint64_t targetLine;
     char prEof;
-    RFstringx buffer;
+    struct RFstringx buffer;
     //in the very beginning keep the previous file position and line number
     prLine = t->line;
     prEof = t->eof;
@@ -1316,7 +1311,7 @@ int32_t rf_textfile_move_chars_f(RFtextfile* t, uint64_t charsN)
         switch(t->encoding)
         {
             case RF_UTF8:
-                if(rf_fgetc_utf8(t->f, &c,true, &eof_reached) < 0)
+                if(rf_file_read_char_utf8(t->f, &c,true, &eof_reached) < 0)
                 {
 
                     RF_ERROR(
@@ -1327,7 +1322,7 @@ int32_t rf_textfile_move_chars_f(RFtextfile* t, uint64_t charsN)
                 }
             break;
             case RF_UTF16:
-                if(rf_fgetc_utf16(t->f, &c, true, t->endianess,
+                if(rf_file_read_char_utf16(t->f, &c, true, t->endianess,
                                    &eof_reached) < 0)
                 {
                     RF_ERROR(
@@ -1338,7 +1333,7 @@ int32_t rf_textfile_move_chars_f(RFtextfile* t, uint64_t charsN)
                 }
             break;
             case RF_UTF32:
-                if(rf_fgetc_utf32(t->f, &c, t->endianess, &eof_reached) < 0)
+                if(rf_file_read_char_utf32(t->f, &c, t->endianess, &eof_reached) < 0)
                 {
                     RF_ERROR(
                         0, "There was an error while moving forward in "
@@ -1371,7 +1366,7 @@ int32_t rf_textfile_move_chars_b(RFtextfile* t, uint64_t charsN)
         switch(t->encoding)
         {
             case RF_UTF8:
-                if(rf_fback_utf8(t->f,&c) < 0)
+                if(rf_file_move_back_char_utf8(t->f,&c) < 0)
                 {
                     
                     RF_ERROR(
@@ -1382,7 +1377,7 @@ int32_t rf_textfile_move_chars_b(RFtextfile* t, uint64_t charsN)
                 }
             break;
             case RF_UTF16:
-                if(rf_fback_utf16(t->f, &c, t->endianess) < 0)
+                if(rf_file_move_back_char_utf16(t->f, &c, t->endianess) < 0)
                 {
 
                     RF_ERROR(
@@ -1393,7 +1388,7 @@ int32_t rf_textfile_move_chars_b(RFtextfile* t, uint64_t charsN)
                 }
             break;
             case RF_UTF32:
-                if(rf_fback_utf32(t->f,&c, t->endianess) < 0)
+                if(rf_file_move_back_char_utf32(t->f,&c, t->endianess) < 0)
                 {
 
                     RF_ERROR(
@@ -1592,7 +1587,7 @@ char rf_textfile_write(RFtextfile* t, void* stringP)
     uint32_t linesN;
     char ret = true;
     char allocatedS = false;
-    RFstring* s = (RFstring*)stringP;
+    struct RFstring* s = (struct RFstring*)stringP;
     RF_ENTER_LOCAL_SCOPE();
 
 #if RF_OPTION_DEBUG
@@ -1615,7 +1610,7 @@ char rf_textfile_write(RFtextfile* t, void* stringP)
         allocatedS = true;
         //making a new one since stringP can be on the local stack and we
         //can't use replace since that would act on the local stack
-        s = rf_string_copy_out((RFstring*)stringP);
+        s = rf_string_copy_out((struct RFstring*)stringP);
         if(t->eol==RF_EOL_CRLF)
         {
             if(!rf_string_replace(s, RFS_("\n"), RFS_("\xD\n"),0,0))
@@ -1668,12 +1663,12 @@ cleanup1:
 bool rf_textfile_insert(RFtextfile* t,uint64_t lineN,void* string,
                        bool after)
 {
-    RFstring tempFileName;
+    struct RFstring tempFileName;
     bool lineFound,allocatedS, ret = true;
     foff_rft tOff=0;
     FILE* newFile;
     uint32_t linesCount;
-    RFstringx buffer;
+    struct RFstringx buffer;
     //get the function's arguments
     int32_t error;
     RF_ENTER_LOCAL_SCOPE();
@@ -1941,12 +1936,12 @@ cleanup0:
 //Removes a specific line from the text file
 char rf_textfile_remove(RFtextfile* t, uint64_t lineN)
 {
-    RFstring tempFileName;
+    struct RFstring tempFileName;
     char prEof, lineFound, ret = true;
     foff_rft prOff;
     uint64_t prLine;
     FILE* newFile;
-    RFstringx buffer;
+    struct RFstringx buffer;
     int32_t error;
     lineFound = false;
     //determine the target line
@@ -2119,14 +2114,14 @@ cleanup1:
 //Replaces a line of the textfile with the given string
 char rf_textfile_replace(RFtextfile* t, uint64_t lineN, void* stringP)
 {
-    RFstring tempFileName;
+    struct RFstring tempFileName;
     char lineFound,allocatedS;
     char ret = true;
     FILE* newFile;
     uint32_t linesCount;
-    RFstringx buffer;
+    struct RFstringx buffer;
     foff_rft tOff=0;
-    RFstring* string = (RFstring*)stringP;
+    struct RFstring* string = (struct RFstring*)stringP;
     int32_t error;
     RF_ENTER_LOCAL_SCOPE();
 
@@ -2157,7 +2152,7 @@ char rf_textfile_replace(RFtextfile* t, uint64_t lineN, void* stringP)
     if(t->eol != RF_EOL_LF && linesCount>0)
     {
         allocatedS = true;
-        if((string = rf_string_copy_out((RFstring*)stringP)) == NULL)
+        if((string = rf_string_copy_out((struct RFstring*)stringP)) == NULL)
         {
             RF_ERROR("String copying failed");
             ret = false;

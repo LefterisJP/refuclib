@@ -31,14 +31,17 @@
 #ifndef RF_UTILS_LOG_H
 #define RF_UTILS_LOG_H
 
-
+/*------------- Outside Module inclusion -------------*/
 #include <rf_options.h> //for the logging level defines
+#include <Definitions/retcodes.h> //for bool
 #include <Definitions/imex.h> //for import export macro
-#include <Definitions/types.h>
+#include <Definitions/types.h> //for fixed size types
 #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
-#include <String/string_decl.h> //for RFstring
-#include <String/common.h> //for RFS_() macro
-#include <errno.h>  //only if using the stdlibrary functions that report errors with it
+#include <String/rf_str_decl.h> //for RFstring
+#include <String/rf_str_common.h> //for RFS_() macro
+/*------------- libc inclusion -------------*/
+#include <errno.h>  // for std library function error reporting
+/*------------- End of includes -------------*/
 
 /**
 ** @Defgroup RFerror_logging_g_r_p Error Logging
@@ -51,7 +54,7 @@
  * the syslog protocol as defined in RFC 5424
  * http://tools.ietf.org/html/rfc5424
  */
-typedef enum {
+enum RFlog_level{
     LOG_EMERGENCY = 0,
     LOG_ALERT,
     LOG_CRITICAL,
@@ -62,16 +65,16 @@ typedef enum {
     LOG_DEBUG,
 
     LOG_LEVELS
-} RFlog_level;
+};
 
 
 
 
-i_DECLIMEX_ bool rf_LogModule_Init(RFlog_level level, char *log_file_name);
+i_DECLIMEX_ bool rf_LogModule_Init(enum RFlog_level level, char *log_file_name);
 i_DECLIMEX_ void rf_LogModule_Deinit();
-i_DECLIMEX_ void rf_Log(RFlog_level level, const char* file,
+i_DECLIMEX_ void rf_Log(enum RFlog_level level, const char* file,
                         const char* func,
-                        int line, RFstring* msg);
+                        int line, struct RFstring* msg);
 
 i_DECLIMEX_ bool rf_LogFlush();
 

@@ -78,7 +78,7 @@ class CodeGen():
             "ui32": "uint32_t",
             "i64": "int64_t",
             "ui64": "uint64_t",
-            "string": "RFstring",
+            "string": "struct RFstring",
             "generic": "void*",
             "no_template": "no_template"
             }
@@ -97,7 +97,7 @@ class CodeGen():
             "ui32": "uint32_t",
             "i64": "int64_t",
             "ui64": "uint64_t",
-            "string": "RFstring",
+            "string": "struct RFstring",
             "generic": "void*",
             "no_template": "no_template"
             }
@@ -108,12 +108,14 @@ class CodeGen():
                     "destroy_func": "rf_string_deinit",
                     "copy_func": "rf_string_copy_in",
                     "compare_func": "rf_string_equal",
-                    "headers": ["Definitions/imex.h", # for import export macro
-                                "Definitions/defarg.h", # for default arguments
-                                "Preprocessor/rf_tokens.h", #for defined library tokens
-                                "Definitions/types.h",  #for fixed size data types
-                                "String/string_decl.h",  #for RFstring
-                                "String/core.h"]  #for Equal, Copy_IN and Deinit
+                    "headers": [
+                        "Definitions/imex.h", # for import export macro
+                        "Definitions/defarg.h", # for default arguments
+                        "Preprocessor/rf_tokens.h", #for defined library tokens
+                        "Definitions/types.h",  #for fixed size data types
+                        "String/rf_str_decl.h",  #for RFstring
+                        "String/rf_str_core.h" #for Equal, Copy_IN and Deinit
+                    ]  
                 }
             }
 

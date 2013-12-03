@@ -12,7 +12,7 @@ int main()
 {
     RFdynamic_array_i a1;
     RFdynamic_array_string a2, *a3;
-    RFstring s, *sp;
+    struct RFstring s, *sp;
     int i, ret;
     bool code;
     DEFAULT_LIB_INIT();

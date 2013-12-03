@@ -172,12 +172,15 @@ modules.append(
 
 modules.append(
     Module("STRING",
-           ['String/common.c', 'String/commonp.c', 'String/conversion.c',
-            'String/conversionp.c', 
-            'String/core.c', 'String/corex.c', 'String/files.c',
-            'String/filesx.c', 'String/mod.c', 'String/manipulation.c',
-            'String/manipulationx.c', 'String/retrieval.c',
-            'String/traversalx.c', 'String/unicode.c'],
+           ['String/rf_str_common.c', 'String/rf_str_commonp.c',
+            'String/rf_str_conversion.c',
+            'String/rf_str_conversionp.c', 
+            'String/rf_str_core.c', 'String/rf_str_corex.c',
+            'String/rf_str_files.c',
+            'String/rf_str_filesx.c', 'String/rf_str_module.c',
+            'String/rf_str_manipulation.c',
+            'String/rf_str_manipulationx.c', 'String/rf_str_retrieval.c',
+            'String/rf_str_traversalx.c', 'String/rf_str_unicode.c'],
            macro = "RF_MODULE_STRINGS",
            dependencies	= ['IO'])
 )

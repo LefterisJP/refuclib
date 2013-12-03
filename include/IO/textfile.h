@@ -1,44 +1,50 @@
-
-/**
-**      ==START OF REFU LICENSE==
-**
-** Copyright (c) 2011-2013, Karapetsas Eleftherios
-** All rights reserved.
-**
-** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-**  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-**  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the distribution.
-**  3. Neither the name of the Original Author of Refu nor the names of its contributors may be used to endorse or promote products derived from
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
-** INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-** DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-** SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-** WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-**
-**      ==END OF REFU LICENSE==
-**
-**
-** --IO/textfile.h
-** This header declares all the functions that operate on RFtextfile
+/*
+ *    == START OF REFU LICENSE ==
+ *
+ * Copyright (c) 2011-2013, Karapetsas Eleftherios
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *  1. Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. Neither the name of the Original Author of Refu nor the names of its
+ *     contributors may be used to endorse or promote products derived from
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ *    == END OF REFU LICENSE ==
 */
 
 #ifndef RF_TEXTFILE_H
 #define RF_TEXTFILE_H
 
-#include <stdio.h> //for FILE*
-#include <Definitions/types.h> //for fixed size types needed in various places
-#include <String/string_decl.h>//for RFstring
-#include <String/stringx_decl.h> //for RFstringx
+/*------------- Module Headers inclusion -------------*/
+#include <IO/common.h> //for common I/O flags and definitions
 #include <IO/textfile_decl.h> //for RFtextfile
+/*------------- Outside Module inclusion -------------*/
+#include <Definitions/types.h> //for fixed size types needed in various places
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
-#include <IO/common.h> //for common I/O flags and definitions
 #include <Definitions/retcodes.h> //for bool
-#include <String/unicode.h> //for unicode definitions
+#include <String/rf_str_unicode.h> //for unicode definitions
+#include <String/rf_str_xdecl.h> //for stringx 
+/*------------- libc inclusion --------------*/
+#include <stdio.h> //for FILE*
+/*------------- End of includes -------------*/
+
 #ifdef __cplusplus
 extern "C"
 {///opening bracket for calling from C++
@@ -429,7 +435,7 @@ i_DECLIMEX_ int32_t rf_textfile_go_to_offset(RFtextfile* t, foff_rft offset,
  **                                   encountered while reading and a negative
  **                                   number for error
  **/
-i_DECLIMEX_ int rf_textfile_read_line(RFtextfile* t, RFstringx* line);
+i_DECLIMEX_ int rf_textfile_read_line(RFtextfile* t, struct RFstringx* line);
 
 /**
  ** @memberof RFtextfile
@@ -444,7 +450,8 @@ i_DECLIMEX_ int rf_textfile_read_line(RFtextfile* t, RFstringx* line);
  **                                 here the file pointer will still
  **                                 move to the start of the next line.
  **/
-i_DECLIMEX_ int rf_textfile_read_line_chars(RFtextfile* t, RFstringx* line,
+i_DECLIMEX_ int rf_textfile_read_line_chars(RFtextfile* t, 
+                                            struct RFstringx* line,
                                           uint32_t characters);
 
 
@@ -493,8 +500,8 @@ i_DECLIMEX_ char rf_textfile_get_offset(RFtextfile* t, foff_rft* offset);
  ** line does not exist
  **/
 i_DECLIMEX_ int32_t rf_textfile_get_line_begin(RFtextfile* t,
-                                             uint64_t lineN,
-                                             RFstringx* line);
+                                               uint64_t lineN,
+                                               struct RFstringx* line);
 /**
  ** @memberof RFtextfile
  ** @brief Gets a specific line from a Text File
@@ -528,7 +535,7 @@ i_DECLIMEX_ int32_t rf_textfile_get_line_begin(RFtextfile* t,
  **
  **/
 i_DECLIMEX_ int32_t rf_textfile_get_line(RFtextfile* t, uint64_t lineN,
-                                       RFstringx* line);
+                                         struct RFstringx* line);
 
 //! @}
 
@@ -601,7 +608,7 @@ i_DECLIMEX_ char rf_textfile_write(RFtextfile* t, void* string);
  ** @return                       Returns @c true for success @c false for error
  **/
 i_DECLIMEX_ bool rf_textfile_insert(RFtextfile* t, uint64_t lineN,
-                                   void* string, bool after);
+                                    void* string, bool after);
 
 
 /**

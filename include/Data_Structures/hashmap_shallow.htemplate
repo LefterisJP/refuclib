@@ -106,7 +106,7 @@ i_DECLIMEX_ void rf_hashmap_destroy(@DATA_STRUCT* m);
  ** already exists in the table
  ** @return @c true if all is fine and @c false otherwise
  */
-i_DECLIMEX_ char rf_hashmap_insert(@DATA_STRUCT* m, RFstring* key,
+i_DECLIMEX_ char rf_hashmap_insert(@DATA_STRUCT* m, struct RFstring* key,
                                   @TYPEPTR value,
                                   bool* exists);
 
@@ -119,7 +119,7 @@ i_DECLIMEX_ char rf_hashmap_insert(@DATA_STRUCT* m, RFstring* key,
  ** @return If the value for the key exist a pointer to it
  ** will be returned. If not NULL.
  */
-i_DECLIMEX_ @TYPEPTR rf_hashmap_get(@DATA_STRUCT* m, RFstring* key, bool* found);
+i_DECLIMEX_ @TYPEPTR rf_hashmap_get(@DATA_STRUCT* m, struct RFstring* key, bool* found);
 
 #ifdef __cplusplus
 }///closing bracket for calling from C++

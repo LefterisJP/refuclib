@@ -1,42 +1,43 @@
-/**
-**      ==START OF REFU LICENSE==
-**
-** Copyright (c) 2011-2013, Karapetsas Eleftherios
-** All rights reserved.
-** 
-** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-**  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-**  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the distribution.
-**  3. Neither the name of the Original Author of Refu nor the names of its contributors may be used to endorse or promote products derived from
-** 
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
-** INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-** DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-** SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-** WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-**
-**      ==END OF REFU LICENSE==
-**
-**
-** --System/rf_system.h
-** This header declares functions and macros that act on the respective system, such as file creation, deletion e.t.c.
+/*
+ *    == START OF REFU LICENSE ==
+ *
+ * Copyright (c) 2011-2013, Karapetsas Eleftherios
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *  1. Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. Neither the name of the Original Author of Refu nor the names of its
+ *     contributors may be used to endorse or promote products derived from
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ *    == END OF REFU LICENSE ==
 */
 #ifndef RF_SYSTEM_H
 #define RF_SYSTEM_H
 
-//for fixed size data types
-    #include <Definitions/types.h> 
-//for import export macro
-    #include <Definitions/imex.h>  
-//for bool
-    #include <Definitions/retcodes.h> 
-//for syscall, tid and pid_t
-   #include <sys/types.h> 
-//for FILE* and friends
-   #include <stdio.h>   
+/*------------- Outside Module inclusion -------------*/
+#include <Definitions/types.h> //for fixed size data types
+#include <Definitions/imex.h>  //for import export macro
+#include <Definitions/retcodes.h> //for bool
+/*------------- libc inclusion --------------*/
+#include <sys/types.h> //for syscall, tid and pid_t
+#include <stdio.h> //for FILE* and friends
+/*------------- End of includes -------------*/
 
 
 /**
@@ -233,12 +234,12 @@ i_DECLIMEX_ threadid_t rf_system_get_thread_i_d();
 /**
  ** @brief A wrapper for fopen with RFstring
  */
-i_DECLIMEX_ FILE* rfFopen(void* name, const char* mode);
+i_DECLIMEX_ FILE* rfFopen(const void* name, const char* mode);
 
 /**
  ** @brief A wrapper for freopen with RFstring
  */
-i_DECLIMEX_ FILE* rfFreopen(void* name, const char* mode, FILE* f);
+i_DECLIMEX_ FILE* rfFreopen(const void* name, const char* mode, FILE* f);
 
 //! @}
 //end of system group

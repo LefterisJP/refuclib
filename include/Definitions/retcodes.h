@@ -204,7 +204,7 @@ enum {
         RE_FILE_IO, // Occurs if there was a physical I/O error during the file operation
         RE_FILE_DELETE,//Occurs if there was an inability to delete a file from the file system
         RE_FILE_RENAME,//Occurs if there was an inability to rename a file from the file system
-        RE_POPEN_INVALID_MODE, //Occurs if an invalid mode argument was passed to rfPopen
+        RE_POPEN_INVALID_MODE, //Occurs if an invalid mode argument was passed to rf_popen
         RE_FILE_BUSY,// Occurs if the operation to be done to the file failed because the file was accessed by another process or by the system
         RE_FILE_RO,// Occurs if the operation to be done to the file failed because it is a read only file
         RE_FILE_MOUNT,// Occurs if the operation happens between two different mounting points

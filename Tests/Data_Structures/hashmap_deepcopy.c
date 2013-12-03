@@ -40,7 +40,7 @@ char* m3_values[] = {
 #define m3_size (sizeof(m3_values)/sizeof(char*))
 
 /* function used to test hashmap iteration for String:String hashmap */
-static bool string_on_iterate(RFstring* s, void* user_data)
+static bool string_on_iterate(struct RFstring* s, void* user_data)
 {
     int i;
     bool success = false;
@@ -65,7 +65,7 @@ int main()
 {
     RFhashmap_string* m3;
     int i;
-    RFstring str, *strp;
+    struct RFstring str, *strp;
     bool exists;
     DEFAULT_LIB_INIT();
 

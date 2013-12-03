@@ -25,7 +25,7 @@ void iterate_ll_ints(RFlist_i* l, int* arr)
 //a function to check the string data
 void iterate_ll_strings(RFlist_string* l)
 {
-    RFstring* s;
+    struct RFstring* s;
     int i = 0;
     rf_list_string_iterate(l, s)
     {
@@ -47,7 +47,7 @@ void iterate_ll_strings(RFlist_string* l)
 
 void iterate_ll_stringsdel(RFlist_string* l)
 {
-    RFstring* s;
+    struct RFstring* s;
     int i = 0;
     rf_list_string_iterate(l, s)
     {
@@ -68,7 +68,7 @@ int main()
     RFlist_i l1;
     RFlist_string *l2, l3;
     RFlist_test_object t1;
-    RFstring s;
+    struct RFstring s;
     int i;
     DEFAULT_LIB_INIT();
 

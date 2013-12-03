@@ -31,7 +31,7 @@
 #include <Definitions/types.h> //for fixed size data types
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <Preprocessor/rf_tokens.h>//for the defined library tokens
-#include <String/string_decl.h> //for RFstring
+#include <String/rf_str_decl.h> //for RFstring
 #include <Definitions/retcodes.h> //for error codes, bool
 
 #ifdef RF_MODULE_HASHMAP_EXTRA

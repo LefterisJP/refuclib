@@ -4,9 +4,9 @@
 #include "../refu_tests.h"
 int main()
 {
-    RFstring s1,s2,s3,s4,s5;
-    RFstring ret,ret2;
-    RFstringx retx1;
+    struct RFstring s1,s2,s3,s4,s5;
+    struct RFstring ret,ret2;
+    struct RFstringx retx1;
     int year;
     DEFAULT_LIB_INIT();
 

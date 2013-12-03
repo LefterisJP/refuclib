@@ -49,7 +49,7 @@ $ENDIF
 
 typedef struct @NODE
 {
-    RFstring key;
+    struct RFstring key;
     @TYPE  value;
     struct @NODE* next;
 }@NODE;

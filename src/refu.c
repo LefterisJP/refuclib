@@ -36,7 +36,7 @@
 #include <Utils/log.h> /* logging system */
 #include "Internal/internal_mod.ph" /* internal data initialization */
 /*------------- Modules init/deinit -------------*/
-#include "String/mod.ph"
+#include "String/rf_str_mod.ph"
 /*------------- System Specific includes -------------*/
 #ifdef REFU_WIN32_VERSION
 #include <windows.h> //for QueryPerformanceFrequency() and other related flags
@@ -46,10 +46,10 @@
 /*------------- End of includes -------------*/
 
 //Initializes the Refu library
-bool rfInit(char *logstr, uint64_t lmsSize, RFlog_level level)
+bool rf_init(char *logstr, uint64_t lmsSize, enum RFlog_level level)
 {
     rf_LogModule_Init(level, logstr);
-    module_string_init();
+    rf_module_string_init();
     module_internal_init();
 
 

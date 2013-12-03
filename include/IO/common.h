@@ -72,13 +72,14 @@ typedef struct stat stat_rft;
 #endif
 
 /**
- ** The different end of line types for text files
- **
+ ** The different end of line mark types for
  **/
-#define RF_EOL_AUTO     0
-#define RF_EOL_LF       1
-#define RF_EOL_CRLF     2
-#define RF_EOL_CR       3
+enum RFeol_mark {
+    RF_EOL_AUTO  = 1,/*!< Used by functions that can autodetect the eol mark */
+    RF_EOL_LF, /*!< Unix style line ending with '\n' */
+    RF_EOL_CRLF, /*!< Windows style line ending with '\r\n' */
+    RF_EOL_CR /*!< Macintosh style line ending with '\r' */
+};
 #define RF_EOL_DEFAULT  RF_EOL_LF//the default value is LF only (Unix-style)
 
 #endif//include guards end

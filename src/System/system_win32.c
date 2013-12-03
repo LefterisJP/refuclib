@@ -26,8 +26,7 @@
 #include <Definitions/imex.h>  //for import export macro
 #include <System/rf_system.h>
 //*---------------------Outside module inclusion----------------------------------------
-#include <String/string_decl.h> //for RFstring
-#include <String/stringx_decl.h> //for RFstringx
+#include <String/rf_string_xdecl.h> //for RFstring
 #include <Definitions/defarg.h> //for the default argument declared string functions that are included below
 #include <String/common.h> //for RFS_()
 #include <String/corex.h> //for rf_stringx_init_buff() and others

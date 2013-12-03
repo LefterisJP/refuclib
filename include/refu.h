@@ -63,7 +63,7 @@ extern "C" {
  **                         are enumerated by @ref RFlog_level
  ** @return                 Returns @c true in success
  **/
-i_DECLIMEX_  bool rfInit(char *logstr, uint64_t size, RFlog_level level);
+i_DECLIMEX_  bool rf_init(char *logstr, uint64_t size, enum RFlog_level level);
 
 //! @}
 //closing RFgeneral_g_r_p doxygen group

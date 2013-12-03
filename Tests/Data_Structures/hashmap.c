@@ -12,10 +12,10 @@ typedef struct an_object
 {
     int num;
     float f;
-    RFstring s;
+    struct RFstring s;
 }an_object;
 
-static an_object* an_object_create(int n, float f, RFstring* s)
+static an_object* an_object_create(int n, float f, struct RFstring* s)
 {
     an_object* ret;
     RF_MALLOC(ret, sizeof(*ret), NULL);

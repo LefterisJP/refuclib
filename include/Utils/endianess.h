@@ -31,12 +31,14 @@
 #include <Definitions/imex.h> //import export macro
 #include <Definitions/types.h> //fixed size data types
 
-enum i_RF_ENDIANESS_TYPES 
-    {
-        RF_LITTLE_ENDIAN = 1,
-        RF_BIG_ENDIAN,
-        RF_ENDIANESS_UNKNOWN
-    };
+/**
+ ** Represents the endianess of a file or byte stream
+ **/
+enum RFendianess {
+    RF_LITTLE_ENDIAN = 1, /*!< Little Endian byte order */
+    RF_BIG_ENDIAN, /*!< Big Endian byte order */
+    RF_ENDIANESS_UNKNOWN /*!< Signigies we are not sure of the byte order */
+};
 
 
 #ifdef __cplusplus

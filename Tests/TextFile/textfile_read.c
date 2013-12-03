@@ -6,7 +6,7 @@
 int main()
 {
     RFtextfile f;
-    RFstringx line;
+    struct RFstringx line;
 
     DEFAULT_LIB_INIT();
     //initialize the buffer

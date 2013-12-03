@@ -8,14 +8,14 @@ static void test_file_encoding(const char* filename, int encoding,
                        int endianess)
 {
     FILE* inF, *f;
-    RFstring s1,s2;
-    RFstringx sx1,sx2;
+    struct RFstring s1,s2;
+    struct RFstringx sx1,sx2;
     char eof;
 
     //things like BOM in the start of the file
     EXPECT_NOT(0, inF=fopen(filename, "rb"));
     //expect to see succesfull initialization
-    EXPECTGE(rf_string_f_init(&s1, inF, &eof, RF_EOL_LF,
+    EXPECTGE(rf_string_from_file_init(&s1, inF, &eof, RF_EOL_LF,
                             encoding, endianess, NULL),
              0);
 	
@@ -23,11 +23,11 @@ static void test_file_encoding(const char* filename, int encoding,
     EXPECT(true,rf_string_prune_start(&s1,1));
     EXPECTGE(printf(RF_STR_PF_FMT, RF_STR_PF_ARG(&s1)), 0);//ending newline is included since we don't use RFtextfile, RF_SUCCESS)
     //assign the next line to the same string
-    EXPECTGE(rf_string_f_assign(&s1, inF, &eof, RF_EOL_LF,
+    EXPECTGE(rf_string_from_file_assign(&s1, inF, &eof, RF_EOL_LF,
                               encoding, endianess),
              0);
     //append the next line to the same string
-    EXPECTGE(rf_string_f_append(&s1, inF, &eof, RF_EOL_LF,
+    EXPECTGE(rf_string_from_file_append(&s1, inF, &eof, RF_EOL_LF,
                               encoding, endianess),
              0);
     EXPECT_MSG(true,
@@ -42,7 +42,7 @@ static void test_file_encoding(const char* filename, int encoding,
     EXPECT(0,fseek(f,0,SEEK_SET));
 
   //read from that same file and compare
-    EXPECTGE(rf_string_f_init(&s2, f, &eof, RF_EOL_LF,
+    EXPECTGE(rf_string_from_file_init(&s2, f, &eof, RF_EOL_LF,
                             encoding, endianess, NULL),
              0);
     EXPECT(true,rf_string_equal(&s1,&s2));
@@ -51,16 +51,16 @@ static void test_file_encoding(const char* filename, int encoding,
     fclose(f);
     EXPECT(0, fseek(inF, 0, SEEK_SET));
 	
-    EXPECTGE(rf_stringx_f_init(&sx1, inF, &eof, RF_EOL_LF,
+    EXPECTGE(rf_stringx_from_file_init(&sx1, inF, &eof, RF_EOL_LF,
                              encoding, endianess),
              0);
     EXPECT(true,rf_string_prune_start(&sx1,1));
     EXPECTGE(printf(RF_STR_PF_FMT, RF_STR_PF_ARG(&sx1)), 0);//ending newline is included since we don't use RFtextfile, RF_SUCCESS)
-    EXPECTGE(rf_stringx_f_assign(&sx1, inF, &eof, RF_EOL_LF,
+    EXPECTGE(rf_stringx_from_file_assign(&sx1, inF, &eof, RF_EOL_LF,
                                encoding, endianess),
              0);
     //append the next line to the same string
-    EXPECTGE(rf_stringx_f_append(&sx1, inF, &eof, RF_EOL_LF,
+    EXPECTGE(rf_stringx_from_file_append(&sx1, inF, &eof, RF_EOL_LF,
                                encoding, endianess),
              0);
     EXPECT_MSG(true,
@@ -75,7 +75,7 @@ static void test_file_encoding(const char* filename, int encoding,
     EXPECT(0, fseek(f,0,SEEK_SET));
 
     //read from that same file and compare
-    EXPECTGE(rf_stringx_f_init(&sx2, f, &eof, RF_EOL_LF,
+    EXPECTGE(rf_stringx_from_file_init(&sx2, f, &eof, RF_EOL_LF,
                              encoding, endianess),
              0);
     EXPECT(true,rf_string_equal(&sx1, &sx2));

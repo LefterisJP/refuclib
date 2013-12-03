@@ -167,7 +167,7 @@ vars.Add('LOCALSTACK_MEMORY_SIZE',
          ' or the RFXML_() macro are initialized in this stack. Make sure '
          'to provide a big enough value so that no overflow happens for your'
          ' program. The default value is used if '
-         'no specific value is provided at rfInit()', 1048576)
+         'no specific value is provided at rf_init()', 1048576)
 
 vars.Add('MAX_WORKER_THREADS',
          'The maximum number of worker threads we can have', 32)

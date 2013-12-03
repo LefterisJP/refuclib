@@ -5,9 +5,9 @@
 #include "../refu_tests.h"
 
 //the lines against which we check each file type
-static RFstring lines[5];
+static struct RFstring lines[5];
 
-void writeTest(int endianess, int encoding, RFstringx* buff)
+void writeTest(int endianess, int encoding, struct RFstringx* buff)
 {
     RFtextfile outF,inF;
     uint32_t i=0; 
@@ -63,7 +63,7 @@ void writeTest(int endianess, int encoding, RFstringx* buff)
 
 int main()
 {
-    RFstringx buffer;
+    struct RFstringx buffer;
 	
     DEFAULT_LIB_INIT();
 	//initialize the lines we are gonna use for checking

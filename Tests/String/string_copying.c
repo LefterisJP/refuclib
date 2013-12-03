@@ -4,8 +4,8 @@
 #include "../refu_tests.h"
 int main()
 {
-    RFstring s1,*s2,s3,s4,s5;
-    RFstringx sx1,*sx2,sx3,sx4,*sx5,sx6;
+    struct RFstring s1,*s2,s3,s4,s5;
+    struct RFstringx sx1,*sx2,sx3,sx4,*sx5,sx6;
     DEFAULT_LIB_INIT();
 	
     //testing RFstring copying functions

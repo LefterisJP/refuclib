@@ -29,22 +29,16 @@
 //*---------------------Outside module inclusion----------------------------------------
 //for error logging
     #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
-    #include <String/string_decl.h> //for RFstring
-    #include <String/common.h> //for RFS_() macro
+    #include <String/rf_str_decl.h> //for RFstring
+    #include <String/rf_str_common.h> //for RFS_() macro
     #include <Utils/log.h>
 //for error codes
 #include <Definitions/retcodes.h> //for error codes
-#include <String/string_decl.h> //since all we need is the struct members
-//for local scope macros
-    #include <Definitions/threadspecific.h> //for the thread specific attribute
-    #include <Utils/localmem_decl.h> // for RFlocal_memory_stack
-    #include <string.h> //for memset()
-    #include <limits.h> //for ULONG_MAX used in RF_ENTER_LOCAL_SCOPE() macro
-    #include <Utils/localscope.h> //for the local scope macros
+#include <Utils/localscope.h> //for the local scope macros
 //*----------------------------End of Includes------------------------------------------
 
 //Opens another process as a pipe
-FILE* rfPopen(void* commandP,const char* mode)
+FILE* rf_popen(void* commandP,const char* mode)
 {
     FILE* ret = 0;
     RFstring* command = (RFstring*)commandP;
@@ -52,7 +46,7 @@ FILE* rfPopen(void* commandP,const char* mode)
 #if RF_OPTION_DEBUG
     if( strcmp(mode,"r") != 0 && strcmp(mode,"w") != 0)
     {
-        RF_ERROR("Invalid mode argument provided to rfPopen()");
+        RF_ERROR("Invalid mode argument provided to rf_popen()");
         goto cleanup;
     }
 #endif
@@ -67,7 +61,7 @@ FILE* rfPopen(void* commandP,const char* mode)
 }
 
 //Closes a pipe
-int rfPclose(FILE* stream)
+int rf_pclose(FILE* stream)
 {
     return _pclose(stream);
 }
