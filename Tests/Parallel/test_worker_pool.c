@@ -1,5 +1,5 @@
 #include <refu.h>
-#include <Parallel/worker_pool.h>
+#include <Parallel/rf_worker_pool.h>
 #include <Utils/constcmp.h>
 #include "../refu_tests.h"
 

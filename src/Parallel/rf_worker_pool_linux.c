@@ -29,7 +29,7 @@
 */
 
 /*------------- Corrensponding Header inclusion -------------*/
-#include <Parallel/worker_pool.h>
+#include <Parallel/rf_worker_pool.h>
 /*------------- Refu C library inclusion -------------*/
 #include <Utils/log.h>
 #include <Utils/memory.h>

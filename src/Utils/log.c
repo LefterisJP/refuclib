@@ -35,7 +35,7 @@
 #include <Utils/localscope.h> //for the local scope macros
 #include <String/rf_str_core.h> //for static RFstring init
 #include <String/rf_str_retrieval.h> //for string accessors
-#include <Parallel/threading.h> //for thread id
+#include <Parallel/rf_threading.h> //for thread id and RFmutex
 /*------------- libc inclusion -------------*/
 #include <stdio.h> //for printf
 #include <string.h> //for memcpy
@@ -43,10 +43,7 @@
 #include <sys/time.h> //for timestamps
 #include <time.h> //for strftime()
 #include <assert.h>
-/*------------- System specific inclusion -------------*/
-#include <pthread.h>
 /*------------- End of includes -------------*/
-
 
 struct RFlog {
     //! The buffer where the log will be kept
@@ -61,7 +58,7 @@ struct RFlog {
     FILE *file;
     //! Mutex to protect the buffer when writting from multiple threads
     //! TODO: Maybe figure out a better synchronization method?
-    pthread_mutex_t lock;
+    struct RFmutex lock;
 };
 static struct RFlog _log;
 
@@ -95,7 +92,7 @@ static bool rf_log_init(struct RFlog *log,
     }
     log->index = log->buffer;
     log->level = level;
-    if (pthread_mutex_init(&log->lock, NULL) != 0) {
+    if (!rf_mutex_init(&log->lock)) {
         assert(0);
         return false;
     }
@@ -111,21 +108,21 @@ static bool rf_log_flush(struct RFlog *log)
 {
     size_t rc;
     bool ret = true;
-    pthread_mutex_lock(&log->lock);
+    rf_mutex_lock(&log->lock);
     rc = fwrite(log->buffer, 1, OCCUPIED(log), log->file);
     if (rc != OCCUPIED(log)) {
         ret = false;
     }
     fflush(log->file);
     log->index = log->buffer;
-    pthread_mutex_unlock(&log->lock);
+    rf_mutex_unlock(&log->lock);
     return ret;
 }
 
 static void rf_log_deinit(struct RFlog *log)
 {
     fclose(log->file);
-    pthread_mutex_destroy(&log->lock);
+    rf_mutex_deinit(&log->lock);
     free(log->buffer);
 }
 
@@ -252,13 +249,13 @@ static void rf_log_add(struct RFlog *log, enum RFlog_level level,
 
 
     /* TODO: Maybe use different synchronization strategy here? */
-    pthread_mutex_lock(&log->lock);
+    rf_mutex_lock(&log->lock);
     if(!format_log_message(log, level, file, func, line, msg))
     {
         //TODO: how to handle this?
         assert(0);
     }
-    pthread_mutex_unlock(&log->lock);
+    rf_mutex_unlock(&log->lock);
     RF_EXIT_LOCAL_SCOPE();
     return;
 }

@@ -30,6 +30,13 @@
 #ifndef REFU_THREADING_H
 #define REFU_THREADING_H
 
+
+#ifdef REFU_WIN32_VERSION
+#include <Parallel/rf_threading_win32.h
+#else
+#include <Parallel/rf_threading_linux.h>
+#endif
+
 /**
  ** @brief Gives an id unique to the calling thread
  **/
