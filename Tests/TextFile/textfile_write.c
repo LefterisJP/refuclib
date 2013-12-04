@@ -108,7 +108,7 @@ int main()
 	
     //cleanup
     rf_stringx_deinit(&buffer);
-    EXPECT(true, rfDeleteFile(RFS_("writefile")));
+    EXPECT(true, rf_system_delete_file(RFS_("writefile")));
 
     return 0;
 }

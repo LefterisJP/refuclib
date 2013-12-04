@@ -47,7 +47,7 @@
 /*------------- End of includes -------------*/
 
 //Creates a directory
-int32_t rfMakeDir(void* dirnameP,int mode)
+int32_t rf_system_make_dir(void* dirnameP,int mode)
 {
     RFstring* dirname = (RFstring*)dirnameP;
     int32_t error = RF_SUCCESS;
@@ -76,7 +76,7 @@ int32_t rfMakeDir(void* dirnameP,int mode)
 }
 
 //Removes a directory and all its files
-int32_t rfRemoveDir(void* dirnameP)
+int32_t rf_system_remove_dir(void* dirnameP)
 {
     RFstring* dirname = (RFstring*)dirnameP;
     DIR* dir;
@@ -117,7 +117,7 @@ int32_t rfRemoveDir(void* dirnameP)
             stat(path.INH_String.bytes, &s);
             if (s.st_mode & S_IFDIR)
             {
-                if( (ret = rfRemoveDir(&path)) != RF_SUCCESS)
+                if( (ret = rf_system_remove_dir(&path)) != RF_SUCCESS)
                     goto cleanup1;
                 //else we deleted that directory and we should go to the next entry of this directory
                 continue;
@@ -170,7 +170,7 @@ cleanup1:
 }
 
 //Deletes a file
-int32_t rfDeleteFile(void* nameP)
+int32_t rf_system_delete_file(void* nameP)
 {
     RFstring* name = (RFstring*)nameP;
     int32_t ret = RF_SUCCESS;
@@ -190,7 +190,7 @@ int32_t rfDeleteFile(void* nameP)
     return ret;
 }
 // Renames a file
-int32_t rfRenameFile(void* nameP,void* newNameP)
+int32_t rf_system_rename_file(void* nameP,void* newNameP)
 {
     RFstring* name = (RFstring*)nameP;
     RFstring* newName = (RFstring*)newNameP;

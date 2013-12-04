@@ -120,7 +120,7 @@
         /*if the file mode is writing then reopen in reading mode*/     \
         if((i_TEXTFILE_)->mode == RF_FILE_WRITE)                        \
         {                                                               \
-            if(((i_TEXTFILE_)->f = rfFreopen(&(i_TEXTFILE_)->name, "r"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0) \
+            if(((i_TEXTFILE_)->f = rf_freopen(&(i_TEXTFILE_)->name, "r"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0) \
             {                                                           \
                 RF_ERROR("Switching from writing to reading mode failed" \
                          "due to freopen() with errno %d", errno);      \
@@ -177,7 +177,7 @@
         /*if the file mode is writing then reopen in reading mode*/     \
         if((i_TEXTFILE_)->mode == RF_FILE_WRITE)                        \
         {                                                               \
-            if(((i_TEXTFILE_)->f = rfFreopen(&(i_TEXTFILE_)->name, "r"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0) \
+            if(((i_TEXTFILE_)->f = rf_freopen(&(i_TEXTFILE_)->name, "r"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0) \
             {                                                           \
                 RF_ERROR("Switching from writing to reading mode failed " \
                                "due to freopen() with errno %d", errno); \
@@ -234,7 +234,7 @@
     /*if the file mode is reading then reopen in writing mode*/         \
     if((i_TEXTFILE_)->mode == RF_FILE_READ)                             \
     {                                                                   \
-        if( ((i_TEXTFILE_)->f = rfFreopen(&(i_TEXTFILE_)->name, "a"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0) \
+        if( ((i_TEXTFILE_)->f = rf_freopen(&(i_TEXTFILE_)->name, "a"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0) \
         {                                                               \
             RF_ERROR("Switching from reading to writting mode failed "  \
                      "due to freopen() with errno %d", errno);          \
@@ -289,7 +289,7 @@
          /*if the file mode is reading then reopen in writing mode*/    \
          if((i_TEXTFILE_)->mode == RF_FILE_READ)                        \
          {                                                              \
-             if( ((i_TEXTFILE_)->f = rfFreopen(&(i_TEXTFILE_)->name, "a"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0) \
+             if( ((i_TEXTFILE_)->f = rf_freopen(&(i_TEXTFILE_)->name, "a"i_PLUSB_WIN32,(i_TEXTFILE_)->f)) == 0) \
              {                                                          \
                  RF_ERROR("Switching from reading to writting mode failed" \
                           "due to freopen() with errno %d", errno);     \

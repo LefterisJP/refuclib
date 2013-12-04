@@ -101,7 +101,7 @@ int main()
     test_file_encoding("utf32lestringfile", RF_UTF32, RF_LITTLE_ENDIAN);
 
     
-    EXPECT(true, rfDeleteFile(RFS_("outputfile")));
+    EXPECT(true, rf_system_delete_file(RFS_("outputfile")));
 
 	return 0;
 }

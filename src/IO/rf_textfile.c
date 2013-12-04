@@ -635,23 +635,23 @@ bool rf_textfile_init(struct RFtextfile* t, const void* name,
     {
         case RF_FILE_WRITE:
             t->mode = RF_FILE_READWRITE;
-            t->f = rfFopen(name, "a"i_PLUSB_WIN32"+");
+            t->f = rf_fopen(name, "a"i_PLUSB_WIN32"+");
         break;
         case RF_FILE_READ:
             t->mode = RF_FILE_READ;
-            t->f = rfFopen(name, "r"i_PLUSB_WIN32);
+            t->f = rf_fopen(name, "r"i_PLUSB_WIN32);
         break;
         case RF_FILE_NEW:
             t->mode=RF_FILE_WRITE;
-            t->f = rfFopen(name, "w"i_PLUSB_WIN32);
+            t->f = rf_fopen(name, "w"i_PLUSB_WIN32);
         break;
         case RF_FILE_READWRITE:
             t->mode = RF_FILE_READWRITE;
-            t->f = rfFopen(name, "r"i_PLUSB_WIN32"+");
+            t->f = rf_fopen(name, "r"i_PLUSB_WIN32"+");
         break;
         case RF_FILE_READWRITE_NEW:
             t->mode = RF_FILE_READWRITE;
-            t->f = rfFopen(name, "w"i_PLUSB_WIN32"+");
+            t->f = rf_fopen(name, "w"i_PLUSB_WIN32"+");
         break;
         default:
             RF_ERROR("Attempted to initialize textfile \""RF_STR_PF_FMT"\" with "
@@ -776,7 +776,7 @@ bool rf_textfile_copy_in(struct RFtextfile* dst, struct RFtextfile* src)
     //open the same file with the same mode and at the same position
     if(src->mode == RF_FILE_WRITE)
     {
-        if((dst->f = rfFopen(&src->name, "a")) == NULL)
+        if((dst->f = rf_fopen(&src->name, "a")) == NULL)
         {
             RF_ERROR(
                 "During copying from Textfile \""RF_STR_PF_FMT"\""
@@ -788,7 +788,7 @@ bool rf_textfile_copy_in(struct RFtextfile* dst, struct RFtextfile* src)
     }
     else if(src->mode == RF_FILE_READ)
     {
-        if((dst->f = rfFopen(&src->name, "r")) == NULL)
+        if((dst->f = rf_fopen(&src->name, "r")) == NULL)
         {
             RF_ERROR(
                 "During copying from Textfile \""RF_STR_PF_FMT"\""
@@ -800,7 +800,7 @@ bool rf_textfile_copy_in(struct RFtextfile* dst, struct RFtextfile* src)
     }
     else
     {
-        if((dst->f = rfFopen(&src->name, "r+")) == NULL)
+        if((dst->f = rf_fopen(&src->name, "r+")) == NULL)
         {
             RF_ERROR(
                 "During copying from Textfile \""RF_STR_PF_FMT"\""
@@ -872,7 +872,7 @@ bool rf_textfile_set_mode(struct RFtextfile* t, enum RFtextfile_mode mode)
             {
                 return true;
             }
-            if((temp = rfFreopen(&t->name, "a", t->f)) == 0)
+            if((temp = rf_freopen(&t->name, "a", t->f)) == 0)
             {
                 RF_ERROR("Changing the file access to write mode failed "
                          "due to freopen() with errno %d", errno);
@@ -885,7 +885,7 @@ bool rf_textfile_set_mode(struct RFtextfile* t, enum RFtextfile_mode mode)
             {
                 return true;
             }
-            if((temp = rfFreopen(&t->name, "r", t->f)) == 0)
+            if((temp = rf_freopen(&t->name, "r", t->f)) == 0)
             {
                 RF_ERROR("Changing the file access to read mode failed "
                          "due to freopen() with errno %d", errno);
@@ -898,7 +898,7 @@ bool rf_textfile_set_mode(struct RFtextfile* t, enum RFtextfile_mode mode)
             {
                 return true;
             }
-            if((temp = rfFreopen(&t->name, "r+", t->f)) == 0)
+            if((temp = rf_freopen(&t->name, "r+", t->f)) == 0)
             {
                 RF_ERROR("Changing the file access to read mode failed "
                          "due to freopen() with errno %d", errno);
@@ -1770,7 +1770,7 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
         ret = false;
         goto cleanup1;
     }
-    if(!(newFile = rfFopen(&tempFileName, "w"i_PLUSB_WIN32)))
+    if(!(newFile = rf_fopen(&tempFileName, "w"i_PLUSB_WIN32)))
     {
         RF_ERROR("Opening a temporary file failed due to fopen() with "
                  "errno %d", errno);
@@ -1889,7 +1889,7 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
     }
     //delete the old file
     fclose(t->f);
-    if(!rfDeleteFile(&t->name))
+    if(!rf_system_delete_file(&t->name))
     {
         ret = false;
         RF_ERROR("After the insertion operation the temporary file used"
@@ -1898,7 +1898,7 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
     }
     //rename the temp file to be the new file
     fclose(newFile);
-    if(!rfRenameFile(&tempFileName, &t->name))
+    if(!rf_system_rename_file(&tempFileName, &t->name))
     {
         ret = false;
         RF_ERROR("After the insertion operation the temporary file used"
@@ -1907,7 +1907,7 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
     }
     //after renaming we no longer need the string
     rf_string_deinit(&tempFileName);
-    if(!(t->f = rfFopen(&t->name, "r"i_PLUSB_WIN32"+")))
+    if(!(t->f = rf_fopen(&t->name, "r"i_PLUSB_WIN32"+")))
     {
         RF_ERROR("Failed to open the edited file after insertion "
                  "due to fopen() with errno %d", errno);
@@ -1934,7 +1934,7 @@ cleanup3:
     rf_stringx_deinit(&buffer);
 cleanup2:
     fclose(newFile);
-    if(!rfDeleteFile(&tempFileName))
+    if(!rf_system_delete_file(&tempFileName))
     {
         RF_ERROR("Failed to delete file "RF_STR_PF_FMT" during cleanup",
                  RF_STR_PF_ARG(&tempFileName));
@@ -2000,7 +2000,7 @@ bool rf_textfile_remove(struct RFtextfile* t, uint64_t lineN)
         ret = false;
         goto cleanup1;
     }
-    if((newFile = rfFopen(&tempFileName, "w"i_PLUSB_WIN32)) == NULL)
+    if((newFile = rf_fopen(&tempFileName, "w"i_PLUSB_WIN32)) == NULL)
     {    ///need to cleanup the temporary file -- cleanup2
         RF_ERROR("Failed to open a temporary file during text file line"
                  " removal due to fopen() with errno %d", errno);
@@ -2075,7 +2075,7 @@ bool rf_textfile_remove(struct RFtextfile* t, uint64_t lineN)
     }
     //delete the old file
     fclose(t->f);
-    if(!rfDeleteFile(&t->name))
+    if(!rf_system_delete_file(&t->name))
     {
         RF_ERROR(
                  "After the removal operation the temporary file used, could "
@@ -2085,7 +2085,7 @@ bool rf_textfile_remove(struct RFtextfile* t, uint64_t lineN)
     }
     //rename the temp file to be the new file
     fclose(newFile); /// no need to clean this up anymore, back to cleanup1
-    if(!rfRenameFile(&tempFileName,&t->name))
+    if(!rf_system_rename_file(&tempFileName,&t->name))
     {
         RF_ERROR(
                  "After the removal operation the temporary file used, could "
@@ -2095,7 +2095,7 @@ bool rf_textfile_remove(struct RFtextfile* t, uint64_t lineN)
     }
     //after renaming we no longer need the string
     rf_string_deinit(&tempFileName);
-    if((t->f = rfFopen(&t->name, "r"i_PLUSB_WIN32"+")) == NULL)
+    if((t->f = rf_fopen(&t->name, "r"i_PLUSB_WIN32"+")) == NULL)
     {
         RF_ERROR("Error at opening the renamed file after the textfile "
                  "removal operation");
@@ -2119,7 +2119,7 @@ cleanup3:
     rf_stringx_deinit(&buffer);
 cleanup2:
     fclose(newFile);
-    if(!rfDeleteFile(&tempFileName))
+    if(!rf_system_delete_file(&tempFileName))
     {
         RF_ERROR("Failed to delete file "RF_STR_PF_FMT" during cleanup",
                  RF_STR_PF_ARG(&tempFileName));
@@ -2219,7 +2219,7 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
         ret = false;
         goto cleanup1;
     }
-    if((newFile = rfFopen(&tempFileName, "w"i_PLUSB_WIN32)) == NULL)
+    if((newFile = rf_fopen(&tempFileName, "w"i_PLUSB_WIN32)) == NULL)
     {
         RF_ERROR("Failed to open a temporary file during line replacing");
         ret = false;
@@ -2308,7 +2308,7 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
     }
     //delete the old file
     fclose(t->f);
-    if(!rfDeleteFile(&t->name)) ///back to cleanup2
+    if(!rf_system_delete_file(&t->name)) ///back to cleanup2
     {
         RF_ERROR("After the replacement operation the temporary file "
                  "used, could not be deleted");
@@ -2317,7 +2317,7 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
     }
     //rename the temp file to be the new file
     fclose(newFile);
-    if(!rfRenameFile(&tempFileName,&t->name))
+    if(!rf_system_rename_file(&tempFileName,&t->name))
     {
         RF_ERROR("After the replacement operation the temporary file "
                  "used, could not be renamed to the original file");
@@ -2326,7 +2326,7 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
     }
     //after renaming the file we no longer need the string
     rf_string_deinit(&tempFileName);
-    if((t->f = rfFopen(&t->name, "r"i_PLUSB_WIN32"+")) == NULL)
+    if((t->f = rf_fopen(&t->name, "r"i_PLUSB_WIN32"+")) == NULL)
     {
         RF_ERROR("Failed to open the edited file after textfile line "
                  "replacing due to fopen() with errno %d", errno);
@@ -2348,7 +2348,7 @@ cleanup3:
     rf_stringx_deinit(&buffer);
 cleanup2:
     fclose(newFile);
-    if(!rfDeleteFile(&tempFileName))
+    if(!rf_system_delete_file(&tempFileName))
     {
         RF_ERROR("Failed to delete file "RF_STR_PF_FMT" during cleanup",
                  RF_STR_PF_ARG(&tempFileName));

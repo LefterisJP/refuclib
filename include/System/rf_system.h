@@ -49,7 +49,7 @@
 /**
  * Identifier for a thread
  */
-typedef pid_t threadid_t;
+typedef pid_t RFthread_id;
 
 //The directory separator depending on the user's system
 #ifdef REFU_WIN32_VERSION
@@ -175,7 +175,7 @@ extern "C"
  ** + @c RFP_ISVTX: This is the sticky bit
  ** @return Returns @c true for success and @c false for error
  **/
-i_DECLIMEX_ bool rfMakeDir(void* dirname,int mode);
+i_DECLIMEX_ bool rf_system_make_dir(void* dirname, int mode);
 
 /**
  ** @brief Removes a directory and all its files recursively
@@ -193,7 +193,7 @@ i_DECLIMEX_ bool rfMakeDir(void* dirname,int mode);
  ** @inhtype{String,StringX} @tmpSTR
  ** @return Returns @c true for success and @c false otherwise
  **/
-i_DECLIMEX_ bool rfRemoveDir(void* dirname);
+i_DECLIMEX_ bool rf_system_remove_dir(void* dirname);
 
 
 /**
@@ -205,7 +205,7 @@ i_DECLIMEX_ bool rfRemoveDir(void* dirname);
  ** @inhtype{String,StringX} @tmpSTR
  ** @return Returns @c true for success and @c false for failure
  **/
-i_DECLIMEX_ bool rfDeleteFile(void* name);
+i_DECLIMEX_ bool rf_system_delete_file(void* name);
 
 
 /**
@@ -219,7 +219,7 @@ i_DECLIMEX_ bool rfDeleteFile(void* name);
  ** @inhtype{String,StringX} @tmpSTR
  ** @return Returns @c true for success and @c false if an error occured
  **/
-i_DECLIMEX_ bool rfRenameFile(void* name, void* newName);
+i_DECLIMEX_ bool rf_system_rename_file(void* name, void* newName);
 
 /**
  ** @brief Check that a file exists
@@ -230,7 +230,7 @@ i_DECLIMEX_ bool rfRenameFile(void* name, void* newName);
  ** @inhtype{String,StringX} @tmpSTR
  ** @return Returns @c true if the file exists and @c false otherwise
  **/
-i_DECLIMEX_ bool rfFileExists(void* name);
+i_DECLIMEX_ bool rf_system_file_exists(void* name);
 
 
 /**
@@ -241,17 +241,17 @@ i_DECLIMEX_ bool rfFileExists(void* name);
  ** currently supported.
  ** @return A unique id representing the calling thread
  **/
-i_DECLIMEX_ threadid_t rf_system_get_thread_i_d();
+i_DECLIMEX_ RFthread_id rf_system_get_thread_id();
 
 /**
  ** @brief A wrapper for fopen with RFstring
  */
-i_DECLIMEX_ FILE* rfFopen(const void* name, const char* mode);
+i_DECLIMEX_ FILE* rf_fopen(const void* name, const char* mode);
 
 /**
  ** @brief A wrapper for freopen with RFstring
  */
-i_DECLIMEX_ FILE* rfFreopen(const void* name, const char* mode, FILE* f);
+i_DECLIMEX_ FILE* rf_freopen(const void* name, const char* mode, FILE* f);
 
 /**
  ** @brief Opens another process as a pipe

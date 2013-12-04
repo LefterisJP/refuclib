@@ -51,7 +51,7 @@
 
 
 //Creates a directory
-bool rfMakeDir(void* dirname, int mode)
+bool rf_system_make_dir(void* dirname, int mode)
 {
     char* cs;
     unsigned int index;
@@ -81,7 +81,7 @@ cleanup:
 }
 
 //Removes a directory and all its files
-bool rfRemoveDir(void* dirname)
+bool rf_system_remove_dir(void* dirname)
 {
     bool ret = true;
     DIR* dir;
@@ -135,9 +135,9 @@ bool rfRemoveDir(void* dirname)
             //if this directory entry is a directory itself, call the function recursively
             if (entry->d_type == DT_DIR)
             {
-                if(!rfRemoveDir(&path))
+                if(!rf_system_remove_dir(&path))
                 {
-                    RF_ERROR("Calling rfRemoveDir on directory "
+                    RF_ERROR("Calling rf_system_remove_dir on directory "
                              "\""RF_STR_PF_FMT"\" failed",
                              RF_STR_PF_ARG(&path));
                     ret = false;
@@ -147,7 +147,7 @@ bool rfRemoveDir(void* dirname)
                 continue;
             }
             //if we get here this means it's a file that needs deletion
-            if(!rfDeleteFile(&path))
+            if(!rf_system_delete_file(&path))
             {
                 RF_ERROR("Failed to remove file \""RF_STR_PF_FMT"\""
                          " due to unlink() "
@@ -172,7 +172,7 @@ bool rfRemoveDir(void* dirname)
         goto cleanup_path;
     }
     //finally delete the directory itself
-    if(!rfRemoveDir(dirname))
+    if(!rf_system_remove_dir(dirname))
     {
         RF_ERROR("Failed to remove directory \""RF_STR_PF_FMT"\" "
                  "due to rmdir() errno %d",
@@ -191,7 +191,7 @@ cleanup_local:
 }
 
 //Deletes a file
-bool rfDeleteFile(void* name)
+bool rf_system_delete_file(void* name)
 {
     bool ret = true;
     char *cs;
@@ -219,7 +219,7 @@ bool rfDeleteFile(void* name)
 }
 
 // Renames a file
-bool rfRenameFile(void* name, void* newName)
+bool rf_system_rename_file(void* name, void* newName)
 {
     bool ret = true;
     char *cs_name;
@@ -255,20 +255,20 @@ bool rfRenameFile(void* name, void* newName)
 }
 
 
-bool rfFileExists(void* name)
+bool rf_system_file_exists(void* name)
 {
     stat_rft sb;   
     struct RFstring* file_name = name;
     return (rfStat(file_name, &sb) == 0);
 }
 
-threadid_t rf_system_get_thread_i_d()
+RFthread_id rf_system_get_thread_id()
 {
     return syscall(SYS_gettid);
 }
 
 
-FILE* rfFopen(const void* name, const char* mode)
+FILE* rf_fopen(const void* name, const char* mode)
 {
     unsigned int index;
     char* cs;
@@ -282,7 +282,7 @@ FILE* rfFopen(const void* name, const char* mode)
     return ret;
 }
 
-FILE* rfFreopen(const void* name, const char* mode, FILE* f)
+FILE* rf_freopen(const void* name, const char* mode, FILE* f)
 {
     unsigned int index;
     char* cs;
