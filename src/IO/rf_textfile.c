@@ -50,6 +50,7 @@
 #include <Utils/log.h> //for error logging
 #include <Utils/memory.h> //for refu memory allocation
 #include <System/rf_system.h> //for System functions
+#include <System/rf_system_info.h> //for getting the system endianess
 #include <Utils/constcmp.h> //for RF_HEXEQ_I() macro and others
 #include <Utils/localscope.h> //for the local scope macros
 #include <Utils/sanity.h> //for the sanity check macros
@@ -66,7 +67,8 @@ static const char BOM_UTF32_BE[4] = {0, 0, 0xFE, 0xFF};
 /**
  ** @brief Writes string to a file appending the proper end of line
  */
-static inline char write_to_file_eol(FILE* f, RFtextfile *t, struct RFstring* str)
+static inline bool write_to_file_eol(FILE* f, struct RFtextfile *t,
+                                     struct RFstring* str)
 {
     char ret;
     if(t->eol == RF_EOL_CRLF)
@@ -89,7 +91,7 @@ static inline char write_to_file_eol(FILE* f, RFtextfile *t, struct RFstring* st
 
 /* Takes a textfile's inner FILE* to the beginning of the file depending
    on the encoding and BOM existence. Can fail and returns an appropriate error*/
-static inline char goto_filestart(RFtextfile* t)
+static inline bool goto_filestart(struct RFtextfile* t)
 {
     //depending on the encoding of the file
     int byteOffset = 0;
@@ -131,7 +133,7 @@ static inline char goto_filestart(RFtextfile* t)
 
 /* Handles the EOL encoding for this textfile by either setting the desired
    encoding pattern or auto detecting it */
-static char handle_EOL(RFtextfile* t, char eol)
+static bool handle_EOL(struct RFtextfile* t, enum RFeol_mark eol)
 {
     uint32_t c,n;
     char ret=true;
@@ -236,7 +238,8 @@ static char handle_EOL(RFtextfile* t, char eol)
 
 /* Adds a Byte order mark to the file at the current position.
    Only to be used at the start of the file */
-static char add_BOM(FILE* f, int encoding, int endianess)
+static bool add_BOM(FILE* f, enum RFtext_encoding encoding,
+                    enum RFendianess endianess)
 {
 #define FWRITE_FAIL(i_msg_)                                             \
     do{                                                                 \
@@ -302,7 +305,7 @@ static char add_BOM(FILE* f, int encoding, int endianess)
 #undef FWRITE_FAIL
 }
 
-static char check_BOM_UTF8(RFtextfile* t, int endianess)
+static bool check_BOM_UTF8(struct RFtextfile* t, enum RFendianess endianess)
 {
     uint32_t c;
     char eof;
@@ -329,11 +332,11 @@ static char check_BOM_UTF8(RFtextfile* t, int endianess)
         return false;
     }
     t->encoding = RF_UTF8;
-    t->endianess = rfEndianess();
+    t->endianess = rf_system_get_endianess();
     return true;
 }
 
-static char check_BOM_UTF16(RFtextfile* t, int endianess)
+static bool check_BOM_UTF16(struct RFtextfile* t, enum RFendianess endianess)
 {
     //search for the BOM
     uint16_t c;
@@ -381,8 +384,7 @@ static char check_BOM_UTF16(RFtextfile* t, int endianess)
     return true;
 }
 
-
-static char check_BOM_UTF32(RFtextfile* t, int endianess)
+static bool check_BOM_UTF32(struct RFtextfile* t, enum RFendianess endianess)
 {
     //search for the BOM
     uint32_t c;
@@ -430,7 +432,7 @@ static char check_BOM_UTF32(RFtextfile* t, int endianess)
 }
 
 
-static char scan_for_space_UTF16(RFtextfile* t)
+static bool scan_for_space_UTF16(struct RFtextfile* t)
 {
     uint32_t c, bytesN=0;
     //go back to start
@@ -477,7 +479,7 @@ static char scan_for_space_UTF16(RFtextfile* t)
 }
 
 
-static char scan_for_space_UTF32(RFtextfile* t)
+static bool scan_for_space_UTF32(struct RFtextfile* t)
 {
     uint32_t c, bytesN=0;
     //go back to start
@@ -525,8 +527,9 @@ static char scan_for_space_UTF32(RFtextfile* t)
 }
 
 /* Scans a textfile's beginning for a BOM or space character to determine endianess*/
-static char determine_endianess(RFtextfile* t, int encoding,
-    int endianess)
+static bool determine_endianess(struct RFtextfile* t,
+                                enum RFtext_encoding encoding,
+                                enum RFendianess endianess)
 {
     //in case no detection works go with what we have in the beginning
     if(endianess != RF_ENDIANESS_UNKNOWN)
@@ -571,7 +574,7 @@ static char determine_endianess(RFtextfile* t, int encoding,
             if(!check_BOM_UTF8(t, endianess))
             {
                 //no BOM, just take the system's endianess
-                t->endianess = rfEndianess();
+                t->endianess = rf_system_get_endianess();
             }
         break;
         default:
@@ -590,12 +593,15 @@ static char determine_endianess(RFtextfile* t, int encoding,
     return true;
 }
 
-//Initializes a new text file
+/* --- Textfile Creation Functions --- */
 
-char rf_textfile_init(RFtextfile* t, const void* name, char mode,
-                     int endianess, int encoding, char eol)
+bool rf_textfile_init(struct RFtextfile* t, const void* name,
+                      enum RFtextfile_mode mode,
+                      enum RFendianess endianess,
+                      enum RFtext_encoding encoding,
+                      enum RFeol_mark eol)
 {
-    char ret = true;
+    bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
 
 #if RF_OPTION_DEBUG
@@ -715,7 +721,7 @@ char rf_textfile_init(RFtextfile* t, const void* name, char mode,
         t->encoding = encoding;
         if(endianess == RF_ENDIANESS_UNKNOWN)
         {
-            endianess = rfEndianess();
+            endianess = rf_system_get_endianess();
         }
         t->endianess = endianess;
         //add a BOM if required
@@ -734,10 +740,13 @@ cleanup1:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
-RFtextfile* rf_textfile_create(const void* name, char mode,
-                               int endianess, int encoding, char eol)
+struct RFtextfile* rf_textfile_create(const void* name,
+                                      enum RFtextfile_mode mode,
+                                      enum RFendianess endianess,
+                                      enum RFtext_encoding encoding,
+                                      enum RFeol_mark eol)
 {
-    RFtextfile* ret;
+    struct RFtextfile* ret;
     RF_ENTER_LOCAL_SCOPE();
     RF_MALLOC_JMP(ret, sizeof(*ret), ret = NULL, cleanup);
     if(!rf_textfile_init(ret, name, mode, endianess, encoding, eol))
@@ -753,9 +762,9 @@ RFtextfile* rf_textfile_create(const void* name, char mode,
     return ret;
 }
 
+/* --- Textfile Copying Functions --- */
 
-//Copies one textfile into another
-char rf_textfile_copy_in(RFtextfile* dst, RFtextfile* src)
+bool rf_textfile_copy_in(struct RFtextfile* dst, struct RFtextfile* src)
 {
     fpos_t pos;
     //get the data
@@ -825,10 +834,9 @@ char rf_textfile_copy_in(RFtextfile* dst, RFtextfile* src)
     }
     return true;
 }
-//Allocates and returns a copy of an RFtextfile
-RFtextfile* rf_textfile_copy_out(RFtextfile* src)
+struct RFtextfile* rf_textfile_copy_out(struct RFtextfile* src)
 {
-    RFtextfile* dst;
+    struct RFtextfile* dst;
     RF_MALLOC(dst, sizeof(*dst), NULL);
     if(!rf_textfile_copy_in(dst, src))
     {
@@ -838,24 +846,24 @@ RFtextfile* rf_textfile_copy_out(RFtextfile* src)
     return dst;
 }
 
+/* --- Textfile Destruction Functions --- */
 
-// Deinitalizes a text file
-void rf_textfile_deinit(RFtextfile* t)
+void rf_textfile_deinit(struct RFtextfile* t)
 {
     fclose(t->f);
     rf_string_deinit(&t->name);
 }
 
-// Destroys a text file
-void rf_textfile_destroy(RFtextfile* t)
+void rf_textfile_destroy(struct RFtextfile* t)
 {
     fclose(t->f);
     rf_string_deinit(&t->name);
     free(t);
 }
 
-//Changes the file access mode of the TextFile
-char rf_textfile_set_mode(RFtextfile* t, char mode)
+/* --- Textfile Conversion Functions --- */
+
+bool rf_textfile_set_mode(struct RFtextfile* t, enum RFtextfile_mode mode)
 {
     FILE* temp;
     switch(mode)
@@ -908,253 +916,14 @@ char rf_textfile_set_mode(RFtextfile* t, char mode)
     return true;
 }
 
+/* --- Textfile Traversal Functions --- */
 
-int rf_textfile_read_line_chars(RFtextfile* t, struct RFstringx* line,
-                        uint32_t characters)
-{
-    foff_rft startOff;
-    char eof = false;
-    //check if we can read from this textfile
-    RF_TEXTFILE_CANREAD(t, -1);
-    //get the file offset at the function's start
-    if((startOff = rfFtell(t->f))== (foff_rft)-1)
-    {
-        RF_ERROR("Reading the file position at function start failed "
-                 "due to ftell() with errno %d", errno);
-                
-        return -1;
-    }
-    //set the operation
-    t->previousOp = RF_FILE_READ;
-    //check for eof
-    if(t->eof == true)
-    {
-        return RE_FILE_EOF;
-    }
-    //make sure that the line StringX internal pointer is reset
-    rf_stringx_reset(line);
-
-    //Read the file depending on the encoding
-    if(!rf_stringx_from_file_assign(line, t->f, &eof, t->eol, t->encoding, t->endianess))
-    {
-        RF_ERROR(
-                 "Reading line [%llu] of a text file failed", t->line);
-        if(rfFseek(t->f,startOff,SEEK_SET) != 0)
-        {
-            RF_ERROR("After a failed readline operation rewindind "
-                     "the file pointer to its value before the function"
-                     "'s execution failed due to fseek() errno %d", errno);
-        }
-        return -1;        
-    }
-
-    if(characters != 0)//if we need specific characters
-    {
-        uint32_t charsN = rf_string_length(line);
-        rf_string_prune_end(line,charsN-characters);
-    }
-    //else if the end of line was found make sure it's not included in the returned string
-    else if(rf_string_data(line)[rf_string_length_bytes(line) - 1] == '\n')
-    {
-        rf_string_length_bytes(line)--;
-    }
-    //success
-    t->line++;
-    t->eof = eof;
-    return RF_SUCCESS;
-}
-
-int rf_textfile_read_line(RFtextfile* t, struct RFstringx* line)
-{
-    char eof = false;
-    foff_rft startOff;
-
-    //check if we can read from this textfile
-    RF_TEXTFILE_CANREAD(t, -1);
-    //set the file operation
-    t->previousOp = RF_FILE_READ;
-    //get the file position at start
-    if((startOff = rfFtell(t->f))== (foff_rft)-1)
-    {
-        RF_ERROR("Reading the file position at function start failed "
-                 "due to ftell() with errno %d", errno);
-        return -1;
-    }
-    //check for eof
-    if(t->eof == true)
-    {
-        return RE_FILE_EOF;
-    }
-    //make sure that the line StringX internal pointer is reset
-    rf_stringx_reset(line);
-
-    //Read the file depending on the encoding
-    if(!rf_stringx_from_file_assign(line, t->f, &eof, t->eol, t->encoding, t->endianess))
-    {
-        RF_ERROR(
-                 "Reading line [%llu] of a text file failed", t->line);
-        if(rfFseek(t->f,startOff,SEEK_SET) != 0)
-        {
-            RF_ERROR("After a failed readline operation rewinding "
-                     "the file pointer to its value before the function"
-                     "'s execution failed due to fseek() errno %d",
-                     errno);
-        }
-        return -1;        
-    }
-    //success
-    t->line++;
-    t->eof = eof;
-    //also if the end of line was found make sure it's not included in the returned string
-    if(rf_string_length_bytes(line) > 0 && 
-       rf_string_data(line)[rf_string_length_bytes(line) - 1] == '\n')
-    {
-        rf_string_length_bytes(line)--;
-    }
-    return RF_SUCCESS;
-}
-
-//Gets a specific line from a Text File starting from the beginning
-int32_t rf_textfile_get_line_begin(RFtextfile* t, uint64_t lineN,
-                                 struct RFstringx* line)
-{
-    uint64_t prLine,i=1;
-    int32_t error;
-    foff_rft prOff;
-    char prEof;
-    struct RFstringx buffer;
-    //in the very beginning keep the previous file position
-    prLine = t->line;
-
-    if(lineN == 0)
-    {
-        RF_ERROR(
-                 "Invalid input given for the lineN argument. It can never be"
-                 " zero");
-        return -1;
-    }
-
-    if((prOff = rfFtell(t->f)) == (foff_rft)-1)
-    {
-        RF_ERROR("Querying current file pointer at function start failed "
-                 "due to ftell() with errno %d", errno);
-        return -1;
-    }
-    prEof = t->eof;
-    //now get the position to the beginning of the file
-    if(!goto_filestart(t))
-    {
-        RF_ERROR(
-                 "Failed to move the internal filepointer"
-                 " of TextFile \""RF_STR_PF_FMT"\" "
-                 "to the beginning", RF_STR_PF_ARG(&t->name));
-        return -1;
-        
-    }
-
-    ///since we got here start reading the file again, line by line until we 
-    //get to the requested line. Also initialize the buffer string for readline
-    if(!rf_stringx_init_buff(&buffer,RF_OPTION_FGETS_READ_BYTESN,""))
-    {
-        RF_ERROR("Failed to initialize the line buffer string");
-        return -1;
-    }
-    //read all the lines until you get to the one we need
-    while((error = rf_textfile_read_line(t,&buffer)) == RF_SUCCESS)
-    {
-        //if this is the line we need, assign it to the given string
-        if(i==lineN)
-        {
-            if(rf_stringx_assign(line,&buffer) == false)
-            {
-                RF_ERROR("Failure at string assignment when reading lines "
-                         "from Textfile \""RF_STR_PF_FMT"\"",
-                         RF_STR_PF_ARG(&t->name));
-                return -1;
-            }
-            break;
-        }
-        i++;
-    }
-    //if we get here and we haven't reached the line
-    if(i != lineN)
-    {
-        if(error == RE_FILE_EOF)
-        {
-            TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, -1);
-            RF_ERROR(
-                     "While searching for line [%llu] in Text File"
-                     " \""RF_STR_PF_FMT"\" the"
-                     " end of file was found before being able to reach that "
-                     "line", lineN, RF_STR_PF_ARG(&t->name));
-            return RE_FILE_EOF;
-        }
-        //else there was an error at line reading
-        TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, -1);
-        RF_ERROR(
-                 "While reading Text File's lines "
-                 "\""RF_STR_PF_FMT"\" there was an error "
-                 "in file reading. File must be corrupt",
-                 RF_STR_PF_ARG(&t->name));
-        return -1;
-    }
-    //success
-    //now we are done so we can return the line number and the file pointer to
-    //their original positions, also free stuff
-    rf_stringx_deinit(&buffer);
-    TEXTFILE_RESETPTR(t, prLine, prEof, prOff, -1);
-    return RF_SUCCESS;
-}
-//Gets a specific line from a Text File
-int32_t rf_textfile_get_line(RFtextfile* t, uint64_t lineN,
-                           struct RFstringx* line)
-{
-    uint64_t prLine;
-    char prEof;
-    foff_rft prOff;
-    int32_t error;
-    //in the very beginning keep the previous file position and line number
-    prLine = t->line;
-    if((prOff = rfFtell(t->f)) == (foff_rft)-1)
-    {
-        RF_ERROR("Querying current file pointer at function start failed "
-                 "due to ftell() with errno %d", errno);
-        return -1;
-    }
-    prEof = t->eof;
-    //move to the beginning of the line and get it. If there was an error reset everything back
-    if((error=rf_textfile_move_lines(t,lineN-t->line)) != RF_SUCCESS)
-    {
-        TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff,-1);
-        if(error == RE_FILE_EOF)
-        {
-            RF_ERROR("Tried to move beyond the end of file for Textfile "
-                     "\""RF_STR_PF_FMT"\" while requesting a line",
-                     RF_STR_PF_ARG(&t->name));
-            return error;
-        }
-        RF_ERROR("Error at getting a line for Textfile "
-                 "\""RF_STR_PF_FMT"\"", RF_STR_PF_ARG(&t->name));
-        return -1;
-    }
-    //and now get it
-    if(rf_textfile_read_line(t,line) != RF_SUCCESS)
-    {
-        RF_ERROR("Error at getting the requested line for Textfile "
-                 "\""RF_STR_PF_FMT"\"", RF_STR_PF_ARG(&t->name));
-        return -1;
-    }
-    //success, so we can return the line number and the file pointer to their original positions
-    TEXTFILE_RESETPTR(t, prLine, prEof, prOff, -1);
-    return RF_SUCCESS;
-}
-
-//Moves the file pointer by a given number of lines relative to the current line
-int32_t rf_textfile_move_lines(RFtextfile* t, int64_t linesN)
+int32_t rf_textfile_move_lines(struct RFtextfile* t,
+                               int64_t linesN)
 {
     uint64_t prLine;
     uint32_t i;
-    foff_rft prOff;
+    RFfile_offset prOff;
     int32_t error;
     uint64_t targetLine;
     char prEof;
@@ -1162,7 +931,7 @@ int32_t rf_textfile_move_lines(RFtextfile* t, int64_t linesN)
     //in the very beginning keep the previous file position and line number
     prLine = t->line;
     prEof = t->eof;
-    if((prOff = rfFtell(t->f)) == (foff_rft)-1)
+    if((prOff = rfFtell(t->f)) == (RFfile_offset)-1)
     {
         RF_ERROR("Querying current file pointer at function start failed "
                  "due to ftell() with errno %d", errno);
@@ -1282,8 +1051,7 @@ int32_t rf_textfile_move_lines(RFtextfile* t, int64_t linesN)
     return RF_SUCCESS;
 }
 
-//Moves the internal file pointer by a number of characters
-int32_t rf_textfile_move_chars(RFtextfile* t,int64_t charsN)
+int32_t rf_textfile_move_chars(struct RFtextfile* t, int64_t charsN)
 {
     //do nothing if charsN is 0
     if(charsN == 0)
@@ -1298,8 +1066,7 @@ int32_t rf_textfile_move_chars(RFtextfile* t,int64_t charsN)
     return rf_textfile_move_chars_b(t,(uint64_t)(charsN*-1));
 }
 
-//Moves the internal file pointer by an amount of characters forward
-int32_t rf_textfile_move_chars_f(RFtextfile* t, uint64_t charsN)
+int32_t rf_textfile_move_chars_f(struct RFtextfile* t, uint64_t charsN)
 {
     uint32_t c;
     uint64_t i;
@@ -1354,8 +1121,8 @@ int32_t rf_textfile_move_chars_f(RFtextfile* t, uint64_t charsN)
     }//end of for
     return i;
 }
-//Moves the internal file pointer by an amount of characters forward
-int32_t rf_textfile_move_chars_b(RFtextfile* t, uint64_t charsN)
+
+int32_t rf_textfile_move_chars_b(struct RFtextfile* t, uint64_t charsN)
 {
     uint32_t c;
     uint64_t i;
@@ -1409,8 +1176,7 @@ int32_t rf_textfile_move_chars_b(RFtextfile* t, uint64_t charsN)
     return i;
 }
 
-// Moves the file pointer to the start of the given line
-int32_t rf_textfile_go_to_line(RFtextfile* t, uint64_t lineN)
+int32_t rf_textfile_go_to_line(struct RFtextfile* t, uint64_t lineN)
 {
     if(lineN == 0)
     {
@@ -1438,16 +1204,16 @@ int32_t rf_textfile_go_to_line(RFtextfile* t, uint64_t lineN)
     }
     return rf_textfile_move_lines(t, lineN - t->line);
 }
-//Moves the file pointer at the given offset
-int32_t rf_textfile_go_to_offset(RFtextfile* t, foff_rft offset,
-                              int origin)
+
+int32_t rf_textfile_go_to_offset(struct RFtextfile* t, RFfile_offset offset,
+                                 int origin)
 {
     uint64_t prLine;
-    foff_rft prOff;
+    RFfile_offset prOff;
     char prEof;
     //in the very beginning keep the previous file position and line number
     prLine = t->line;
-    if((prOff = rfFtell(t->f)) == (foff_rft)-1)
+    if((prOff = rfFtell(t->f)) == (RFfile_offset)-1)
     {
         RF_ERROR("Querying current file pointer at function start failed "
                  "due to ftell() with errno %d", errno);
@@ -1457,7 +1223,7 @@ int32_t rf_textfile_go_to_offset(RFtextfile* t, foff_rft offset,
     ///From the beginning Case
     if(origin == SEEK_SET)
     {
-        foff_rft cOff;
+        RFfile_offset cOff;
         if(offset < 0)//illegal values combination
         {
             RF_ERROR("Illegal input to the function. Can't have negative "
@@ -1492,7 +1258,7 @@ int32_t rf_textfile_go_to_offset(RFtextfile* t, foff_rft offset,
                     return RE_FILE_EOF;
             }
 
-            if((cOff = rfFtell(t->f)) == (foff_rft)-1)//get the current file position
+            if((cOff = rfFtell(t->f)) == (RFfile_offset)-1)//get the current file position
             {
                 RF_ERROR("Moving forward and querying file pointer failed "
                          "due to ftell() with errno %d", errno);
@@ -1502,7 +1268,7 @@ int32_t rf_textfile_go_to_offset(RFtextfile* t, foff_rft offset,
     }//end of SEEK_SET (from beginning case)
     else if(origin == SEEK_CUR)///from the current position case
     {
-        foff_rft cOff,tOffset = prOff+offset;//the target offset
+        RFfile_offset cOff,tOffset = prOff+offset;//the target offset
         if(offset == 0)
         {
             return RF_SUCCESS;
@@ -1529,7 +1295,7 @@ int32_t rf_textfile_go_to_offset(RFtextfile* t, foff_rft offset,
                              RF_STR_PF_ARG(&t->name));
                     return RE_FILE_EOF;
                 }
-                if((cOff = rfFtell(t->f)) == (foff_rft)-1)//get the current file position
+                if((cOff = rfFtell(t->f)) == (RFfile_offset)-1)//get the current file position
                 {
                     RF_ERROR(
                         "Moving forward and querying file pointer failed due "
@@ -1556,7 +1322,7 @@ int32_t rf_textfile_go_to_offset(RFtextfile* t, foff_rft offset,
                              RF_STR_PF_ARG(&t->name));
                     return -1;
                 }
-                if((cOff = rfFtell(t->f)) == (foff_rft)-1)//get the current file position
+                if((cOff = rfFtell(t->f)) == (RFfile_offset)-1)//get the current file position
                 {
                     RF_ERROR(
                         "Moving backwards and querying file pointer failed "
@@ -1581,13 +1347,267 @@ int32_t rf_textfile_go_to_offset(RFtextfile* t, foff_rft offset,
     return RF_SUCCESS;
 }
 
-// Writes an RFstring to the end of the text file
-char rf_textfile_write(RFtextfile* t, void* stringP)
+int rf_textfile_read_line(struct RFtextfile* t, struct RFstringx* line)
+{
+    char eof = false;
+    RFfile_offset startOff;
+
+    //check if we can read from this textfile
+    RF_TEXTFILE_CANREAD(t, -1);
+    //set the file operation
+    t->previousOp = RF_FILE_READ;
+    //get the file position at start
+    if((startOff = rfFtell(t->f))== (RFfile_offset)-1)
+    {
+        RF_ERROR("Reading the file position at function start failed "
+                 "due to ftell() with errno %d", errno);
+        return -1;
+    }
+    //check for eof
+    if(t->eof == true)
+    {
+        return RE_FILE_EOF;
+    }
+    //make sure that the line StringX internal pointer is reset
+    rf_stringx_reset(line);
+
+    //Read the file depending on the encoding
+    if(!rf_stringx_from_file_assign(line, t->f, &eof, t->eol, t->encoding, t->endianess))
+    {
+        RF_ERROR(
+                 "Reading line [%llu] of a text file failed", t->line);
+        if(rfFseek(t->f,startOff,SEEK_SET) != 0)
+        {
+            RF_ERROR("After a failed readline operation rewinding "
+                     "the file pointer to its value before the function"
+                     "'s execution failed due to fseek() errno %d",
+                     errno);
+        }
+        return -1;        
+    }
+    //success
+    t->line++;
+    t->eof = eof;
+    //also if the end of line was found make sure it's not included in the returned string
+    if(rf_string_length_bytes(line) > 0 && 
+       rf_string_data(line)[rf_string_length_bytes(line) - 1] == '\n')
+    {
+        rf_string_length_bytes(line)--;
+    }
+    return RF_SUCCESS;
+}
+
+/* --- Textfile Retrieval Functions --- */
+
+int rf_textfile_read_line_chars(struct RFtextfile* t,
+                                struct RFstringx* line,
+                                uint32_t characters)
+{
+    RFfile_offset startOff;
+    char eof = false;
+    //check if we can read from this textfile
+    RF_TEXTFILE_CANREAD(t, -1);
+    //get the file offset at the function's start
+    if((startOff = rfFtell(t->f))== (RFfile_offset)-1)
+    {
+        RF_ERROR("Reading the file position at function start failed "
+                 "due to ftell() with errno %d", errno);
+                
+        return -1;
+    }
+    //set the operation
+    t->previousOp = RF_FILE_READ;
+    //check for eof
+    if(t->eof == true)
+    {
+        return RE_FILE_EOF;
+    }
+    //make sure that the line StringX internal pointer is reset
+    rf_stringx_reset(line);
+
+    //Read the file depending on the encoding
+    if(!rf_stringx_from_file_assign(line, t->f, &eof, t->eol, t->encoding, t->endianess))
+    {
+        RF_ERROR(
+                 "Reading line [%llu] of a text file failed", t->line);
+        if(rfFseek(t->f,startOff,SEEK_SET) != 0)
+        {
+            RF_ERROR("After a failed readline operation rewindind "
+                     "the file pointer to its value before the function"
+                     "'s execution failed due to fseek() errno %d", errno);
+        }
+        return -1;        
+    }
+
+    if(characters != 0)//if we need specific characters
+    {
+        uint32_t charsN = rf_string_length(line);
+        rf_string_prune_end(line,charsN-characters);
+    }
+    //else if the end of line was found make sure it's not included in the returned string
+    else if(rf_string_data(line)[rf_string_length_bytes(line) - 1] == '\n')
+    {
+        rf_string_length_bytes(line)--;
+    }
+    //success
+    t->line++;
+    t->eof = eof;
+    return RF_SUCCESS;
+}
+
+bool rf_textfile_get_offset(struct RFtextfile* t, RFfile_offset* offset)
+{
+    if(((*offset) = rfFtell(t->f)) == (RFfile_offset)-1)
+    {
+        RF_ERROR("Retrieving the current file offset failed "
+                 "due to ftell() with errno %d", errno);
+        return false;
+    }
+    return true;
+}
+
+//Gets a specific line from a Text File starting from the beginning
+int32_t rf_textfile_get_line_begin(struct RFtextfile* t, uint64_t lineN,
+                                   struct RFstringx* line)
+{
+    uint64_t prLine,i=1;
+    int32_t error;
+    RFfile_offset prOff;
+    char prEof;
+    struct RFstringx buffer;
+    //in the very beginning keep the previous file position
+    prLine = t->line;
+
+    if(lineN == 0)
+    {
+        RF_ERROR(
+                 "Invalid input given for the lineN argument. It can never be"
+                 " zero");
+        return -1;
+    }
+
+    if((prOff = rfFtell(t->f)) == (RFfile_offset)-1)
+    {
+        RF_ERROR("Querying current file pointer at function start failed "
+                 "due to ftell() with errno %d", errno);
+        return -1;
+    }
+    prEof = t->eof;
+    //now get the position to the beginning of the file
+    if(!goto_filestart(t))
+    {
+        RF_ERROR(
+                 "Failed to move the internal filepointer"
+                 " of TextFile \""RF_STR_PF_FMT"\" "
+                 "to the beginning", RF_STR_PF_ARG(&t->name));
+        return -1;
+        
+    }
+
+    ///since we got here start reading the file again, line by line until we 
+    //get to the requested line. Also initialize the buffer string for readline
+    if(!rf_stringx_init_buff(&buffer,RF_OPTION_FGETS_READ_BYTESN,""))
+    {
+        RF_ERROR("Failed to initialize the line buffer string");
+        return -1;
+    }
+    //read all the lines until you get to the one we need
+    while((error = rf_textfile_read_line(t,&buffer)) == RF_SUCCESS)
+    {
+        //if this is the line we need, assign it to the given string
+        if(i==lineN)
+        {
+            if(rf_stringx_assign(line,&buffer) == false)
+            {
+                RF_ERROR("Failure at string assignment when reading lines "
+                         "from Textfile \""RF_STR_PF_FMT"\"",
+                         RF_STR_PF_ARG(&t->name));
+                return -1;
+            }
+            break;
+        }
+        i++;
+    }
+    //if we get here and we haven't reached the line
+    if(i != lineN)
+    {
+        if(error == RE_FILE_EOF)
+        {
+            TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, -1);
+            RF_ERROR(
+                     "While searching for line [%llu] in Text File"
+                     " \""RF_STR_PF_FMT"\" the"
+                     " end of file was found before being able to reach that "
+                     "line", lineN, RF_STR_PF_ARG(&t->name));
+            return RE_FILE_EOF;
+        }
+        //else there was an error at line reading
+        TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, -1);
+        RF_ERROR(
+                 "While reading Text File's lines "
+                 "\""RF_STR_PF_FMT"\" there was an error "
+                 "in file reading. File must be corrupt",
+                 RF_STR_PF_ARG(&t->name));
+        return -1;
+    }
+    //success
+    //now we are done so we can return the line number and the file pointer to
+    //their original positions, also free stuff
+    rf_stringx_deinit(&buffer);
+    TEXTFILE_RESETPTR(t, prLine, prEof, prOff, -1);
+    return RF_SUCCESS;
+}
+
+int32_t rf_textfile_get_line(struct RFtextfile* t, uint64_t lineN,
+                             struct RFstringx* line)
+{
+    uint64_t prLine;
+    char prEof;
+    RFfile_offset prOff;
+    int32_t error;
+    //in the very beginning keep the previous file position and line number
+    prLine = t->line;
+    if((prOff = rfFtell(t->f)) == (RFfile_offset)-1)
+    {
+        RF_ERROR("Querying current file pointer at function start failed "
+                 "due to ftell() with errno %d", errno);
+        return -1;
+    }
+    prEof = t->eof;
+    //move to the beginning of the line and get it. If there was an error reset everything back
+    if((error=rf_textfile_move_lines(t,lineN-t->line)) != RF_SUCCESS)
+    {
+        TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff,-1);
+        if(error == RE_FILE_EOF)
+        {
+            RF_ERROR("Tried to move beyond the end of file for Textfile "
+                     "\""RF_STR_PF_FMT"\" while requesting a line",
+                     RF_STR_PF_ARG(&t->name));
+            return error;
+        }
+        RF_ERROR("Error at getting a line for Textfile "
+                 "\""RF_STR_PF_FMT"\"", RF_STR_PF_ARG(&t->name));
+        return -1;
+    }
+    //and now get it
+    if(rf_textfile_read_line(t,line) != RF_SUCCESS)
+    {
+        RF_ERROR("Error at getting the requested line for Textfile "
+                 "\""RF_STR_PF_FMT"\"", RF_STR_PF_ARG(&t->name));
+        return -1;
+    }
+    //success, so we can return the line number and the file pointer to their original positions
+    TEXTFILE_RESETPTR(t, prLine, prEof, prOff, -1);
+    return RF_SUCCESS;
+}
+
+/* --- Textfile Writting Functions --- */
+
+bool rf_textfile_write(struct RFtextfile* t, void* s)
 {
     uint32_t linesN;
     char ret = true;
     char allocatedS = false;
-    struct RFstring* s = (struct RFstring*)stringP;
     RF_ENTER_LOCAL_SCOPE();
 
 #if RF_OPTION_DEBUG
@@ -1610,7 +1630,7 @@ char rf_textfile_write(RFtextfile* t, void* stringP)
         allocatedS = true;
         //making a new one since stringP can be on the local stack and we
         //can't use replace since that would act on the local stack
-        s = rf_string_copy_out((struct RFstring*)stringP);
+        s = rf_string_copy_out((struct RFstring*)s);
         if(t->eol==RF_EOL_CRLF)
         {
             if(!rf_string_replace(s, RFS_("\n"), RFS_("\xD\n"),0,0))
@@ -1660,12 +1680,12 @@ cleanup1:
 
 
 //Inserts a line into a specific part of the Text File
-bool rf_textfile_insert(RFtextfile* t,uint64_t lineN,void* string,
-                       bool after)
+bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN, 
+                        void* string, bool after)
 {
     struct RFstring tempFileName;
     bool lineFound,allocatedS, ret = true;
-    foff_rft tOff=0;
+    RFfile_offset tOff=0;
     FILE* newFile;
     uint32_t linesCount;
     struct RFstringx buffer;
@@ -1773,7 +1793,7 @@ bool rf_textfile_insert(RFtextfile* t,uint64_t lineN,void* string,
     {
         lineFound = true;
         //get the file offset that we are going to come back to in success
-        if((tOff = rfFtell(newFile))== (foff_rft)-1)
+        if((tOff = rfFtell(newFile))== (RFfile_offset)-1)
         {
             RF_ERROR("Reading the file position failed due to ftell() "
                      "with errno %d", errno);
@@ -1824,7 +1844,7 @@ bool rf_textfile_insert(RFtextfile* t,uint64_t lineN,void* string,
         // the current line changes
         {
             lineFound = true;
-            if((tOff = rfFtell(newFile)) == (foff_rft)-1)
+            if((tOff = rfFtell(newFile)) == (RFfile_offset)-1)
             {
                 //get the file offset that we are going to
                 //come back to in success
@@ -1934,11 +1954,11 @@ cleanup0:
 
 
 //Removes a specific line from the text file
-char rf_textfile_remove(RFtextfile* t, uint64_t lineN)
+bool rf_textfile_remove(struct RFtextfile* t, uint64_t lineN)
 {
     struct RFstring tempFileName;
     char prEof, lineFound, ret = true;
-    foff_rft prOff;
+    RFfile_offset prOff;
     uint64_t prLine;
     FILE* newFile;
     struct RFstringx buffer;
@@ -1954,7 +1974,7 @@ char rf_textfile_remove(RFtextfile* t, uint64_t lineN)
     //in the very beginning keep the previous file position and line number
     prLine = t->line;
     prEof = t->eof;
-    if((prOff = rfFtell(t->f)) == (foff_rft)-1)
+    if((prOff = rfFtell(t->f)) == (RFfile_offset)-1)
     {
         RF_ERROR("Querying current file pointer at function start failed "
                  "due to ftell() with errno %d", errno);
@@ -2112,7 +2132,7 @@ cleanup1:
     return ret;
 }
 //Replaces a line of the textfile with the given string
-char rf_textfile_replace(RFtextfile* t, uint64_t lineN, void* stringP)
+bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
 {
     struct RFstring tempFileName;
     char lineFound,allocatedS;
@@ -2120,8 +2140,7 @@ char rf_textfile_replace(RFtextfile* t, uint64_t lineN, void* stringP)
     FILE* newFile;
     uint32_t linesCount;
     struct RFstringx buffer;
-    foff_rft tOff=0;
-    struct RFstring* string = (struct RFstring*)stringP;
+    RFfile_offset tOff=0;
     int32_t error;
     RF_ENTER_LOCAL_SCOPE();
 
@@ -2152,7 +2171,7 @@ char rf_textfile_replace(RFtextfile* t, uint64_t lineN, void* stringP)
     if(t->eol != RF_EOL_LF && linesCount>0)
     {
         allocatedS = true;
-        if((string = rf_string_copy_out((struct RFstring*)stringP)) == NULL)
+        if((string = rf_string_copy_out((struct RFstring*)string)) == NULL)
         {
             RF_ERROR("String copying failed");
             ret = false;
@@ -2246,7 +2265,7 @@ char rf_textfile_replace(RFtextfile* t, uint64_t lineN, void* stringP)
         else//else this is the line to replace so..
         {
             lineFound = true;
-            if((tOff = rfFtell(newFile))== (foff_rft)-1)//get the file offset that we are going to come back to in success
+            if((tOff = rfFtell(newFile))== (RFfile_offset)-1)//get the file offset that we are going to come back to in success
             {
                 RF_ERROR("Reading the file position failed due to ftell() "
                          "with errno %d", errno);
@@ -2347,15 +2366,3 @@ cleanup0:
     return ret;
 }
 
-
-//Gets the current byte offset of the file
-char rf_textfile_get_offset(RFtextfile* t, foff_rft* offset)
-{
-    if(((*offset) = rfFtell(t->f)) == (foff_rft)-1)
-    {
-        RF_ERROR("Retrieving the current file offset failed "
-                 "due to ftell() with errno %d", errno);
-        return false;
-    }
-    return true;
-}

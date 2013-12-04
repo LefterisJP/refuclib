@@ -212,3 +212,31 @@ int32_t rfRenameFile(void* nameP,void* newNameP)
     return ret;
 }
 
+//Opens another process as a pipe
+FILE* rf_popen(void* commandP,const char* mode)
+{
+    FILE* ret = 0;
+    RFstring* command = (RFstring*)commandP;
+    RF_ENTER_LOCAL_SCOPE();
+#if RF_OPTION_DEBUG
+    if( strcmp(mode,"r") != 0 && strcmp(mode,"w") != 0)
+    {
+        RF_ERROR("Invalid mode argument provided to rf_popen()");
+        goto cleanup;
+    }
+#endif
+
+    ret = _popen(command->bytes,mode);
+
+#if RF_OPTION_DEBUG
+  cleanup:
+#endif
+    RF_EXIT_LOCAL_SCOPE();
+    return ret;
+}
+
+//Closes a pipe
+int rf_pclose(FILE* stream)
+{
+    return _pclose(stream);
+}

@@ -74,7 +74,7 @@
  ** In case of error it returns @c i_RET_
  **/
 #define TEXTFILE_RESETPTR(i_TEXTFILE_,i_PRLINE_,i_PREOF_,i_PROFF_, i_RET_) do{ \
-        foff_rft i_tomove_ = i_PROFF_ - rfFtell((i_TEXTFILE_)->f);      \
+        RFfile_offset i_tomove_ = i_PROFF_ - rfFtell((i_TEXTFILE_)->f);      \
         if(rfFseek((i_TEXTFILE_)->f, i_tomove_, SEEK_CUR) != 0)         \
         {                                                               \
             RF_ERROR("Resetting the file pointer to a given position failed" \
@@ -92,7 +92,7 @@
  **/
 #define TEXTFILE_RESETPTR_JMP(i_TEXTFILE_,i_PRLINE_,i_PREOF_,           \
                               i_PROFF_, i_STMT_, i_FLAG_) do{          \
-        foff_rft i_tomove_ = i_PROFF_ - rfFtell((i_TEXTFILE_)->f);      \
+        RFfile_offset i_tomove_ = i_PROFF_ - rfFtell((i_TEXTFILE_)->f);      \
         if(rfFseek((i_TEXTFILE_)->f, i_tomove_, SEEK_CUR) != 0)         \
         {                                                               \
             RF_ERROR("Resetting the file pointer to a given position failed "\
@@ -110,8 +110,8 @@
  **/
 #define RF_TEXTFILE_CANREAD(i_TEXTFILE_, i_RET_) do{   \
         /*Get current file position*/       \
-        foff_rft i_cPos_;                               \
-        if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (foff_rft)-1) \
+        RFfile_offset i_cPos_;                               \
+        if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (RFfile_offset)-1) \
         {                                                       \
             RF_ERROR("Querying the current file position failed "       \
                      "due to ftell() with errno %d", errno);            \
@@ -166,8 +166,8 @@
  **/
 #define RF_TEXTFILE_CANREAD_JMP(i_TEXTFILE_, i_STMT_, i_FLAG_) do{  \
         /*Get current file position*/       \
-        foff_rft i_cPos_;                               \
-        if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (foff_rft)-1) \
+        RFfile_offset i_cPos_;                               \
+        if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (RFfile_offset)-1) \
         {                                                       \
             RF_ERROR("Querying the current file position failed "       \
                      "due to ftell() with errno %d", errno);            \
@@ -224,8 +224,8 @@
  **/
 #define RF_TEXTFILE_CANWRITE(i_TEXTFILE_, i_RET_){                      \
     /*Get current file position*/                                       \
-    foff_rft i_cPos_;                                                   \
-    if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (foff_rft)-1)             \
+    RFfile_offset i_cPos_;                                                   \
+    if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (RFfile_offset)-1)             \
     {                                                                   \
             RF_ERROR("Querying the current file position failed "       \
                      "due to ftell() with errno %d", errno);            \
@@ -278,8 +278,8 @@
  **/
 #define RF_TEXTFILE_CANWRITE_JMP(i_TEXTFILE_, i_STMT_, i_FLAG_){    \
          /*Get current file position*/                              \
-         foff_rft i_cPos_;                                          \
-         if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (foff_rft)-1)        \
+         RFfile_offset i_cPos_;                                          \
+         if((i_cPos_=rfFtell((i_TEXTFILE_)->f)) == (RFfile_offset)-1)        \
          {                                                              \
             RF_ERROR("Querying the current file position failed "       \
                      "due to ftell() with errno %d", errno);            \

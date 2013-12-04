@@ -32,14 +32,12 @@
 #define RF_TEXTFILE_H
 
 /*------------- Module Headers inclusion -------------*/
-#include <IO/rf_io_common.h> //for common I/O flags and definitions
 #include <IO/rf_textfile_decl.h> //for RFtextfile
 /*------------- Outside Module inclusion -------------*/
 #include <Definitions/types.h> //for fixed size types needed in various places
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <Definitions/retcodes.h> //for bool
-#include <String/rf_str_unicode.h> //for unicode definitions
 #include <String/rf_str_xdecl.h> //for stringx 
 /*------------- libc inclusion --------------*/
 #include <stdio.h> //for FILE*
@@ -50,29 +48,14 @@ extern "C"
 {///opening bracket for calling from C++
 #endif
 
-//! The modes of file opening
-enum i_RF_TEXTFILE_OPEN_TYPES
-    {
-        /// The file is open for reading
-        RF_FILE_READ = 1,
-        /// The file is open for writing
-        RF_FILE_WRITE,
-        /// The file is open for both reading and writing
-        RF_FILE_READWRITE,
-        /// The file opens for writting and if it already exists
-        /// its contents are erased
-        RF_FILE_NEW,
-        /// Creates a new file for reading and writting.
-        /// If the file already exists its contents are erased
-        RF_FILE_READWRITE_NEW
-    };
+
+
 
 
 //! @name Creation functions
 //! @{
 
 /**
- ** @memberof RFtextfile
  ** @brief Initializes a new text file
  **
  ** This function initializes a new textfile object. You have the option to
@@ -92,24 +75,8 @@ enum i_RF_TEXTFILE_OPEN_TYPES
  ** @param name                   The name of the file.
  **                               @inhtype{String,StringX} @tmpSTR
  ** @param mode                   The mode with which to access the file.
- **                               Should be one of the following values:
- **                                   + @c RF_FILE_READ: Opens an already
- **                                     existing file for writting.
- **                                   + @c RF_FILE_WRITE: Opens an already
- **                                     existing file for writting. If the
- **                                     file does not exist it is created. If
- **                                     it exists its contents <b>are not</b>
- **                                     erased.
- **                                   + @c RF_FILE_NEW: Opens a file for writing.
- **                                     If the file already exists its contents
- **                                     are erased.
- **                                   + @c RF_FILE_READWRITE: Opens a file for
- **                                        both reading and writting. The file
- **                                        must exist.
- **                                   + @c RF_FILE_READWRITE_NEW: Opens a new file
- **                                        both both reading and writting. If the
- **                                        file already exists its contents are
- **                                        erased.
+ **                               For legal values take a look 
+ **                               at @ref RFtextfile_mode
  **
  **                               This parameter serves as but a hint of what
  **                               operation should follow the initialization. 
@@ -122,15 +89,12 @@ enum i_RF_TEXTFILE_OPEN_TYPES
  **                               read/write mode.
  ** @param endianess              The endianess of the file. Is useful only if
  **                               the encoding of the file is in UTF-32 or UTF-16.
- **                               The legal values for this field are 
- **                               @c RF_LITTLE_ENDIAN or @c RF_BIG_ENDIAN or
- **                               @c RF_ENDIANESS_UNKNOWN. In the latter case
+ **                               Look at @ref RFendianess for possible values.
+ **                               In the case or @ref RF_ENDIANESS_UNKNOWN
  **                               the file is scanned in an attempt to determine
  **                               its endianess
- ** @param encoding               The encoding of the file. Can be one of:
- **                                   + @c RF_UTF8: For Unicode UTF-8 encoding
- **                                   + @c RF_UTF16: For Unicode UTF-16 encoding
- **                                   + @c RF_UTF32: For Unicode UTF-32 encoding
+ ** @param encoding               The encoding of the file. For legal values
+ **                               take a look at @ref RFtext_encoding
  **
  ** @param eol                    The End Of Line type that this textfile uses.
  **                               The value of @c RF_EOL_AUTO should not be given
@@ -138,29 +102,20 @@ enum i_RF_TEXTFILE_OPEN_TYPES
  **                               an invalid argument error is logged and the file
  **                               is initialized with @c RF_EOL_LF. In addition
  **                               if the auto-detection fails for some reason
- **                               the default @c RF_EOL_LF will be used and
+ **                               the default @c RF_EOL_DEFAULT will be used and
  **                               appropriate error logging will be performed.
- **                               The default value is @c RF_EOL_LF.
- **                               Possible values are:
- **                                   + @c RF_EOL_AUTO: For the function to
- **                                     attempt and auto detect the line
- **                                     endings used by the file
- **                                   + @c RF_EOL_LF: For Unix-style line endings,
- **                                     taking @c '\n' as the end of line signal
- **                                   + @c RE_EOL_CR: For Macintosh-style line
- **                                     endings, taking @c '\r' as the end of
- **                                     line signal
- **                                   + @c RF_EOL_CRLF: For Windows-style line
- **                                        endings, taking @c "\r\n"
- **                                        as the end of line signal
+ **                               For possible value look at @ref RFeol_mark
  **
  ** @return                       Returns @c true in success
  **/
-i_DECLIMEX_ char rf_textfile_init(RFtextfile* t, const void* name, char mode,
-                                 int endianess, int encoding, char eol);
+i_DECLIMEX_ bool rf_textfile_init(struct RFtextfile* t, const void* name,
+                                  enum RFtextfile_mode mode,
+                                  enum RFendianess endianess,
+                                  enum RFtext_encoding encoding,
+                                  enum RFeol_mark eol
+);
 
 /**
- ** @memberof RFtextfile
  ** @brief Creates a new text file
  **
  ** Allocates and returns a new text file
@@ -168,10 +123,13 @@ i_DECLIMEX_ char rf_textfile_init(RFtextfile* t, const void* name, char mode,
  ** Behaves exactly like @ref rf_textfile_init() so refer to it for the explanation
  ** of the arguments
  **/
-
-i_DECLIMEX_ RFtextfile* rf_textfile_create(const void* name, char mode,
-                                           int endianess, int encoding,
-                                           char eol);
+i_DECLIMEX_ struct RFtextfile* rf_textfile_create(
+    const void* name,
+    enum RFtextfile_mode mode,
+    enum RFendianess endianess,
+    enum RFtext_encoding encoding,
+    enum RFeol_mark eol
+);
 
 
 //! @}
@@ -179,7 +137,6 @@ i_DECLIMEX_ RFtextfile* rf_textfile_create(const void* name, char mode,
 //! @{
 
 /**
- ** @memberof RFtextfile
  ** @brief Copies one textfile handle into another
  **
  ** Copies textfile @c src into textfile @c dst
@@ -190,9 +147,9 @@ i_DECLIMEX_ RFtextfile* rf_textfile_create(const void* name, char mode,
  ** @return Returns @c true for success and @c false otherwise
  **
  **/
-i_DECLIMEX_ char rf_textfile_copy_in(RFtextfile* dst, RFtextfile* src);
+i_DECLIMEX_ bool rf_textfile_copy_in(struct RFtextfile* dst,
+                                     struct RFtextfile* src);
 /**
- ** @memberof RFtextfile
  ** @brief Allocates and returns a copy of an RFtextfile handler
  **
  ** This does not create a whole new textfile in disk. It just creates an identical
@@ -201,30 +158,28 @@ i_DECLIMEX_ char rf_textfile_copy_in(RFtextfile* dst, RFtextfile* src);
  ** @return A newly allocated copy of @c src or @c NULL for error
  **
  **/
-i_DECLIMEX_ RFtextfile* rf_textfile_copy_out(RFtextfile* src);
+i_DECLIMEX_ struct RFtextfile* rf_textfile_copy_out(struct RFtextfile* src);
 
 //!@}
 //!@name Destruction functions
 //!@{
 
 /**
- ** @memberof RFtextfile
  ** @brief Deinitalizes a text file
  **
  ** Use it to cleanup text files created with @ref rf_textfile_init
  ** @param t The text file to cleanup
  **
  **/
-i_DECLIMEX_ void rf_textfile_deinit(RFtextfile* t);
+i_DECLIMEX_ void rf_textfile_deinit(struct RFtextfile* t);
 /**
- ** @memberof RFtextfile
  ** @brief Destroys a text file
  **
  ** Use it to cleanup text files created with @ref rf_textfile_create
  ** @param t The text file to cleanup
  **
  **/
-i_DECLIMEX_ void rf_textfile_destroy(RFtextfile* t);
+i_DECLIMEX_ void rf_textfile_destroy(struct RFtextfile* t);
 
 //! @}
 
@@ -232,7 +187,6 @@ i_DECLIMEX_ void rf_textfile_destroy(RFtextfile* t);
 //! @{
 
 /**
- ** @memberof RFtextfile
  ** @brief Changes the file access mode of the TextFile
  **
  ** @param mode Give the new file access mode here. The only legal values are:
@@ -243,7 +197,8 @@ i_DECLIMEX_ void rf_textfile_destroy(RFtextfile* t);
  ** If another value is given this function will fail.
  ** @return Returns @c true for success and @c false for failure
  **/
-i_DECLIMEX_ char rf_textfile_set_mode(RFtextfile* t, char mode);
+i_DECLIMEX_ bool rf_textfile_set_mode(struct RFtextfile* t,
+                                      enum RFtextfile_mode mode);
 
 //! @}
 
@@ -251,7 +206,6 @@ i_DECLIMEX_ char rf_textfile_set_mode(RFtextfile* t, char mode);
 //! @{
 
 /**
- ** @memberof RFtextfile
  ** @brief Moves the file pointer by a given number of lines relative to
  ** the current line
  **
@@ -287,11 +241,11 @@ i_DECLIMEX_ char rf_textfile_set_mode(RFtextfile* t, char mode);
  ** the required amount of @c linesN
  ** + A negative number for any other error
  **/
-i_DECLIMEX_ int32_t rf_textfile_move_lines(RFtextfile* t, int64_t linesN);
+i_DECLIMEX_ int32_t rf_textfile_move_lines(struct RFtextfile* t,
+                                           int64_t linesN);
 
 
 /**
- ** @memberof RFtextfile
  ** @brief Moves the internal file pointer by a number of characters
  **
  ** Moves the file pointer @c charsN characters forward if positive and
@@ -306,10 +260,10 @@ i_DECLIMEX_ int32_t rf_textfile_move_lines(RFtextfile* t, int64_t linesN);
  ** @return Returns the number of characters moved in either direction
  **  or a negative number for failure
  **/
-i_DECLIMEX_ int32_t rf_textfile_move_chars(RFtextfile* t, int64_t charsN);
+i_DECLIMEX_ int32_t rf_textfile_move_chars(struct RFtextfile* t,
+                                           int64_t charsN);
 
 /**
- ** @memberof RFtextfile
  ** @brief Moves the internal file pointer forward by an amount of characters
  **
  ** If the End of file is encountered while attempting to move a character forward
@@ -326,9 +280,9 @@ i_DECLIMEX_ int32_t rf_textfile_move_chars(RFtextfile* t, int64_t charsN);
  ** will be less than the requested number of characters and the textfile's
  ** EOF flag will be set
  **/
-i_DECLIMEX_ int32_t rf_textfile_move_chars_f(RFtextfile* t, uint64_t charsN);
+i_DECLIMEX_ int32_t rf_textfile_move_chars_f(struct RFtextfile* t,
+                                             uint64_t charsN);
 /**
- ** @memberof RFtextfile
  ** @brief Moves the internal file pointer backward by an amount of characters
  **
  ** @param[in] t The Text File to operate on
@@ -338,10 +292,10 @@ i_DECLIMEX_ int32_t rf_textfile_move_chars_f(RFtextfile* t, uint64_t charsN);
  ** of characters will be less than the requested number of characters and
  ** the textfile's EOF flag will be set
  **/
-i_DECLIMEX_ int32_t rf_textfile_move_chars_b(RFtextfile* t, uint64_t charsN);
+i_DECLIMEX_ int32_t rf_textfile_move_chars_b(struct RFtextfile* t,
+                                             uint64_t charsN);
 
 /**
- ** @memberof RFtextfile
  ** @brief Moves the file pointer at the start of the given line
  **
  ** Moves the file pointer at the beginning of the line at @c lineN and it is
@@ -357,10 +311,9 @@ i_DECLIMEX_ int32_t rf_textfile_move_chars_b(RFtextfile* t, uint64_t charsN);
  ** EOF has been encountered while searching for the line because the line does
  ** not exist
  **/
-i_DECLIMEX_ int32_t rf_textfile_go_to_line(RFtextfile* t, uint64_t lineN);
+i_DECLIMEX_ int32_t rf_textfile_go_to_line(struct RFtextfile* t, uint64_t lineN);
 
 /**
- ** @memberof RFtextfile
  ** @brief Moves the file pointer at the given offset
  **
  ** Moves the file pointer at the specified file offset also updating the
@@ -398,8 +351,9 @@ i_DECLIMEX_ int32_t rf_textfile_go_to_line(RFtextfile* t, uint64_t lineN);
  ** If the EOF has been encountered while moving it returns RE_FILE_EOF while
  ** in the case of any other error it returns a negative number
  **/
-i_DECLIMEX_ int32_t rf_textfile_go_to_offset(RFtextfile* t, foff_rft offset,
-                                          int origin);
+i_DECLIMEX_ int32_t rf_textfile_go_to_offset(struct RFtextfile* t,
+                                             RFfile_offset offset,
+                                             int origin);
 
 //! @}
 
@@ -407,7 +361,6 @@ i_DECLIMEX_ int32_t rf_textfile_go_to_offset(RFtextfile* t, foff_rft offset,
 //! @{
 
 /**
- ** @memberof RFtextfile
  ** @brief Reads the next line of the text file
  **
  ** Reads the next line of the Text File and moves the file pointer to the
@@ -435,10 +388,10 @@ i_DECLIMEX_ int32_t rf_textfile_go_to_offset(RFtextfile* t, foff_rft offset,
  **                                   encountered while reading and a negative
  **                                   number for error
  **/
-i_DECLIMEX_ int rf_textfile_read_line(RFtextfile* t, struct RFstringx* line);
+i_DECLIMEX_ int rf_textfile_read_line(struct RFtextfile* t,
+                                      struct RFstringx* line);
 
 /**
- ** @memberof RFtextfile
  ** @brief Reads a specific number of characters from the next line
  **        @see rf_textfile_read_line() for more details
  **
@@ -450,24 +403,22 @@ i_DECLIMEX_ int rf_textfile_read_line(RFtextfile* t, struct RFstringx* line);
  **                                 here the file pointer will still
  **                                 move to the start of the next line.
  **/
-i_DECLIMEX_ int rf_textfile_read_line_chars(RFtextfile* t, 
+i_DECLIMEX_ int rf_textfile_read_line_chars(struct RFtextfile* t, 
                                             struct RFstringx* line,
-                                          uint32_t characters);
+                                            uint32_t characters);
 
 
 /**
- ** @memberof RFtextfile
  ** @brief Gets the current byte offset of the file
  **
  ** @param[in] t The textfile whose offset to get
- ** @param[out] offset Give a reference to an @c foff_rft type to receive the
+ ** @param[out] offset Give a reference to an @c RFfile_offset type to receive the
  ** file offset of the Textfile
  ** @return Returns @c true for success and @c false for error
  **/
-i_DECLIMEX_ char rf_textfile_get_offset(RFtextfile* t, foff_rft* offset);
+i_DECLIMEX_ bool rf_textfile_get_offset(struct RFtextfile* t, RFfile_offset* offset);
 
 /**
- ** @memberof RFtextfile
  ** @brief Gets a specific line from a Text File starting from the beginning
  ** of the file
  **
@@ -499,11 +450,10 @@ i_DECLIMEX_ char rf_textfile_get_offset(RFtextfile* t, foff_rft* offset);
  ** failure it returns a negative number. Can also return @c RE_FILE_EOF if the
  ** line does not exist
  **/
-i_DECLIMEX_ int32_t rf_textfile_get_line_begin(RFtextfile* t,
+i_DECLIMEX_ int32_t rf_textfile_get_line_begin(struct RFtextfile* t,
                                                uint64_t lineN,
                                                struct RFstringx* line);
 /**
- ** @memberof RFtextfile
  ** @brief Gets a specific line from a Text File
  **
  ** Searches the text file for line @c lineN with the first line being @c 1.
@@ -534,7 +484,7 @@ i_DECLIMEX_ int32_t rf_textfile_get_line_begin(RFtextfile* t,
  ** line does not exist
  **
  **/
-i_DECLIMEX_ int32_t rf_textfile_get_line(RFtextfile* t, uint64_t lineN,
+i_DECLIMEX_ int32_t rf_textfile_get_line(struct RFtextfile* t, uint64_t lineN,
                                          struct RFstringx* line);
 
 //! @}
@@ -543,7 +493,6 @@ i_DECLIMEX_ int32_t rf_textfile_get_line(RFtextfile* t, uint64_t lineN,
 //! @{
 
 /**
- ** @memberof RFtextfile
  ** @brief Writes an RFstring to the current file position
  **
  ** Writes the given @c string at the current file position
@@ -562,11 +511,10 @@ i_DECLIMEX_ int32_t rf_textfile_get_line(RFtextfile* t, uint64_t lineN,
  ** @return Returns @c true for succesfull writting and @c false if an
  ** error happened
  **/
-i_DECLIMEX_ char rf_textfile_write(RFtextfile* t, void* string);
+i_DECLIMEX_ bool rf_textfile_write(struct RFtextfile* t, void* string);
 
 
 /**
- ** @memberof RFtextfile
  ** @brief Inserts a line into a specific part of the Text File
  **
  ** Inserts the contents of @c string inside the text file  either right after
@@ -607,12 +555,11 @@ i_DECLIMEX_ char rf_textfile_write(RFtextfile* t, void* string);
  **                               before
  ** @return                       Returns @c true for success @c false for error
  **/
-i_DECLIMEX_ bool rf_textfile_insert(RFtextfile* t, uint64_t lineN,
+i_DECLIMEX_ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
                                     void* string, bool after);
 
 
 /**
- ** @memberof RFtextfile
  ** @brief Removes a specific line from the text file
  **
  ** Searches the text file for line @c lineN and removes the line
@@ -626,10 +573,9 @@ i_DECLIMEX_ bool rf_textfile_insert(RFtextfile* t, uint64_t lineN,
  ** If 0 is given the function shall return error.
  ** @return Returns @c true for success and @c false for error
  **/
-i_DECLIMEX_ char rf_textfile_remove(RFtextfile* t, uint64_t lineN);
+i_DECLIMEX_ bool rf_textfile_remove(struct RFtextfile* t, uint64_t lineN);
 
 /**
- ** @memberof RFtextfile
  ** @brief Replaces a line of the textfile with another one
  **
  ** Searches the text file for line @c lineN and replaces it with
@@ -656,8 +602,8 @@ i_DECLIMEX_ char rf_textfile_remove(RFtextfile* t, uint64_t lineN);
  ** @inhtype{String,StringX} @tmpSTR
  ** @return Returns @c true for success and @c false for error
  **/
-i_DECLIMEX_ char rf_textfile_replace(RFtextfile* t, uint64_t lineN,
-                                       void* string);
+i_DECLIMEX_ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN,
+                                     void* string);
 
 //! @}
 

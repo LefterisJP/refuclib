@@ -22,33 +22,9 @@
 **
 */
 
-
-
-
 /*------------- Corrensponding Header inclusion -------------*/
 #include <Utils/endianess.h>
-/*------------- Outside Module inclusion -------------*/
-    #ifdef REFU_LINUX_VERSION
-    #include <time.h> //for clockid_t used in the System info structure
-    #endif
-#include "../System/info.ph" //for the System info private struct
 /*------------- End of includes -------------*/
-
-
-//A function that returns the endianess of the system
-char rfEndianess()
-{
-    return rfSysInfo.endianess;
-}
-
-char rfOtherEndianess()
-{
-    if(rfSysInfo.endianess == RF_LITTLE_ENDIAN)
-    {
-        return RF_BIG_ENDIAN;
-    }
-    return RF_LITTLE_ENDIAN;
-}
 
 // Swaps the endianness of the variable
 void rfSwapEndianUS(uint16_t* v)
@@ -85,7 +61,6 @@ void rfSwapEndianUL(uint32_t*   v)
 
 void rfProcessByteOrderUI(uint32_t* v, int file_endianess)
 {
-    /* if(file_endianess != rfEndianess()) */
     if(file_endianess == RF_LITTLE_ENDIAN)
     {
         rfSwapEndianUI(v);
@@ -94,7 +69,6 @@ void rfProcessByteOrderUI(uint32_t* v, int file_endianess)
 
 void rfProcessByteOrderUS(uint16_t* v, int file_endianess)
 {
-    /* if(file_endianess != rfEndianess()) */
     if(file_endianess == RF_LITTLE_ENDIAN)
     {
         rfSwapEndianUS(v);
@@ -104,7 +78,6 @@ void rfProcessByteOrderUSA(uint16_t* v, unsigned int length,
                            int file_endianess)
 {
     unsigned int i;
-    /* if(file_endianess != rfEndianess()) */
     if(file_endianess == RF_LITTLE_ENDIAN)
     {
         for(i = 0; i < length; i ++)
@@ -118,7 +91,6 @@ void rfProcessByteOrderUIA(uint32_t* v, unsigned int length,
                            int file_endianess)
 {
     unsigned int i;
-    /* if(file_endianess != rfEndianess()) */
     if(file_endianess == RF_LITTLE_ENDIAN)
     {
         for(i = 0; i < length; i ++)

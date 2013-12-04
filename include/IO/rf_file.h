@@ -366,36 +366,7 @@ i_DECLIMEX_ int rf_file_move_back_char_utf16(FILE* f, uint32_t *c,
 i_DECLIMEX_ int rf_file_move_back_char_utf32(FILE* f, uint32_t *c,
                                              enum RFendianess endianess);
 
-/**
- ** @brief Opens another process as a pipe
- **
- ** This function is a cross-platform popen wrapper. In linux it uses popen and in Windows it uses
- ** _popen.
- ** @lmsFunction
- ** @param command The string with the command to execute. Is basically the name of the program/process you want to spawn
- ** with its full path and its parameters. @inhtype{String,StringX} @tmpSTR
- ** @param mode The mode you want the pipe to work in. There are two possible values:
- ** + @c "r" The calling process can read the spawned command's standard output via the returned stream.
- ** + @c "w" The calling process can write to the spawned command's standard input via the returned stream.
- **
- ** Anything else will result in an error
- ** @return For success popen will return a FILE descriptor that can be used to either read or write from the pipe.
- ** If there was an error @c 0 is returned and an error is logged.
- **
- **/
-i_DECLIMEX_ FILE* rf_popen(void* command, const char* mode);
 
-
-/**
- ** @brief Closes a pipe
- **
- ** This function is a cross-platform wrapper for pclose. It closes a file descriptor opened with @ref rf_popen() and
- ** returns the exit code of the process that was running
- ** @param stream The file descriptor of the pipe returned by @ref rf_popen() that we want to close
- ** @return Returns the exit code of the process or -1 if there was an error
- **
- **/
-i_DECLIMEX_ int rf_pclose(FILE* stream);
 
 //! @} End of I/O group
 

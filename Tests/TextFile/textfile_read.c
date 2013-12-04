@@ -5,7 +5,7 @@
 
 int main()
 {
-    RFtextfile f;
+    struct RFtextfile f;
     struct RFstringx line;
 
     DEFAULT_LIB_INIT();

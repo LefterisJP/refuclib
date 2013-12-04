@@ -9,7 +9,7 @@ static struct RFstring lines[5];
 
 void writeTest(int endianess, int encoding, struct RFstringx* buff)
 {
-    RFtextfile outF,inF;
+    struct RFtextfile outF, inF;
     uint32_t i=0; 
 
     EXPECT(true,

@@ -3,13 +3,9 @@
 #include <RFstring.h>
 #include "../refu_tests.h"
 
-
-
-
-
 int main()
 {
-    RFtextfile log_file;
+    struct RFtextfile log_file;
     struct RFstringx buff;
     DEFAULT_LIB_INIT();
 

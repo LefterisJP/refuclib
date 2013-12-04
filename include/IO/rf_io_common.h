@@ -38,9 +38,9 @@
 #if _FILE_OFFSET_BITS == 64
 
 #ifdef _MSC_VER
-typedef __int64 foff_rft;
+typedef __int64 RFfile_offset;
 #else
-typedef off64_t foff_rft;
+typedef off64_t RFfile_offset;
 #endif
 
 /* for now, don't have a stat_t equivalent in windows */
@@ -49,10 +49,10 @@ typedef struct stat64 stat_rft;
 #else /* __ FILE_OFFSET_BITS != 64 */
 
 #ifdef _MSC_VER
-typedef __int32 foff_rft;
+typedef __int32 RFfile_offset;
 #else
 
-typedef off_t foff_rft;
+typedef off_t RFfile_offset;
 #endif
 
 /* for now, don't have a stat_t equivalent in windows */

@@ -26,42 +26,51 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *    == END OF REFU LICENSE ==
-*/
+ */
+#ifndef RF_SYSTEM_INFO_LINUX_H
+#define RF_SYSTEM_INFO_LINUX_H
 
-
-/*------------- Corrensponding Header inclusion -------------*/
-#include <IO/rf_file.h>
-/*------------- Outside Module inclusion -------------*/
-#include <Utils/log.h> //for error logging
-#include <Definitions/retcodes.h> //for error codes
-#include <Utils/localscope.h> //for the local scope macros
-/*------------- End of includes -------------*/
-
-//Opens another process as a pipe
-FILE* rf_popen(void* commandP,const char* mode)
-{
-    FILE* ret = 0;
-    RFstring* command = (RFstring*)commandP;
-    RF_ENTER_LOCAL_SCOPE();
-#if RF_OPTION_DEBUG
-    if( strcmp(mode,"r") != 0 && strcmp(mode,"w") != 0)
-    {
-        RF_ERROR("Invalid mode argument provided to rf_popen()");
-        goto cleanup;
-    }
+#ifdef REFU_LINUX_VERSION
+#include <System/rf_system_info_linux.h>
+#else
+#include <System/rf_system_info_win32.h>
 #endif
 
-    ret = _popen(command->bytes,mode);
 
-#if RF_OPTION_DEBUG
-  cleanup:
-#endif
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
-}
+#include <time.h> /* for clockid_t */
 
-//Closes a pipe
-int rf_pclose(FILE* stream)
+
+/**
+ **Globals for Systeminformation
+ **
+ **/
+typedef struct RFsystem_info
 {
-    return _pclose(stream);
-}
+    //! A byte holding the system's endianess. Is @c 0 (@c RF_LITTLE_ENDIAN) for little endian and @c 1 (@c RF_BIG_ENDIAN) for big endian
+    char endianess;
+    //! A boolean flag indicating whether the system supports high resolution performance counter in windows and clock_gettime in Linux
+    char hasHighResTimer;
+#ifdef REFU_WIN32_VERSION
+    //! In Windows we should also keep the PCFrequency in case we want to use a performance counter
+    int64_t pcFrequency;
+#elif defined(REFU_LINUX_VERSION)
+    //! In Linux we will keep the type of the high res counter to be used by the timers
+    clockid_t   timerType;
+#else
+    //! @todo
+#endif
+}RFsystem_info;
+
+
+//system info global declaration
+extern RFsystem_info rfSysInfo;
+
+
+/**
+ ** A function which detects the system's endianess
+ **
+ **/
+void i_DetectEndianess();
+
+
+#endif//include guards end

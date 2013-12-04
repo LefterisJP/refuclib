@@ -31,16 +31,12 @@
 /*------------- Corrensponding Header inclusion -------------*/
 #include <refu.h>
 /*------------- Outside Module inclusion -------------*/
-#include "System/info.ph" /* detecting endianess */
-#include <Utils/localmem.h> /* local memory stack */
-#include <Utils/log.h> /* logging system */
-#include "Internal/internal_mod.ph" /* internal data initialization */
+#include <Utils/localmem.h> // local memory stack
+#include <Utils/log.h> // logging system
+#include <System/rf_system_info.h> // for rf_system_init()
+#include "Internal/internal_mod.ph" // internal data initialization
 /*------------- Modules init/deinit -------------*/
 #include "String/rf_str_mod.ph"
-/*------------- System Specific includes -------------*/
-#ifdef REFU_WIN32_VERSION
-#include <windows.h> //for QueryPerformanceFrequency() and other related flags
-#endif
 /*------------- libc includes -------------*/
 #include <string.h> //for strcmp
 /*------------- End of includes -------------*/
@@ -49,6 +45,8 @@
 bool rf_init(char *logstr, uint64_t lmsSize, enum RFlog_level level)
 {
     rf_LogModule_Init(level, logstr);
+    // get system endianess among other things
+    rf_system_init();
     rf_module_string_init();
     module_internal_init();
 
@@ -66,33 +64,6 @@ bool rf_init(char *logstr, uint64_t lmsSize, enum RFlog_level level)
     /*         printf("Failed to reopen stderr stream to the given file name \"%s\"",logstr); */
     /* } */
 
-    //detect system endianess and save it in rfSysInfo
-    i_DetectEndianess();
-
-#ifdef REFU_WIN32_VERSION
-    rfSysInfo.hasHighResTimer = QueryPerformanceFrequency(
-        (LARGE_INTEGER *)&rfSysInfo.pcFrequency,
-    );
-#elif defined(REFU_LINUX_VERSION)
-    rfSysInfo.hasHighResTimer = true;
-    if (clock_getres(CLOCK_PROCESS_CPUTIME_ID, 0) == -1) {
-        if (clock_getres(CLOCK_MONOTONIC, 0) == -1) {
-            if (clock_getres(CLOCK_REALTIME, 0) == -1) {
-                RF_ERROR("No high resolution timer is supported. Even "
-                         "CLOCK_REALTIME initialization failed.");
-                rfSysInfo.hasHighResTimer = false;
-            } else {
-                rfSysInfo.timerType = CLOCK_REALTIME;
-            }
-        } else {
-            rfSysInfo.timerType = CLOCK_MONOTONIC;
-        }
-    } else {
-        rfSysInfo.timerType = CLOCK_PROCESS_CPUTIME_ID;
-    }
-#else
-    //! @todo
-#endif
     //initialize the main thread's local stack memory
     if (lmsSize == 0) {
         lmsSize = RF_OPTION_LOCALSTACK_MEMORY_SIZE;

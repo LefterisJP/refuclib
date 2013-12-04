@@ -200,8 +200,8 @@ modules.append(
     Module("IO",
            ['IO/rf_file.c'],
            macro = "RF_MODULE_IO",
-           win32_sources = ['IO/rf_io_win32.c'],
-           linux_sources = ['IO/rf_io_linux.c'])
+           win32_sources = [],
+           linux_sources = [])
 )
 
 modules.append(
@@ -286,9 +286,15 @@ modules.append(
 
 modules.append(
     Module("SYSTEM",
-           ['System/sysinfop.c'],
-           win32_sources = ['System/system_win32.c'],
-           linux_sources = ['System/system_linux.c'],
+           [],
+           win32_sources = [
+               'System/rf_system_win32.c',
+               'System/rf_system_info_win32.c'
+           ],
+           linux_sources = [
+               'System/rf_system_linux.c',
+               'System/rf_system_info_linux.c'
+           ],
            macro = "RF_MODULE_SYSTEM")
 )
 

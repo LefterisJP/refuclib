@@ -5,7 +5,7 @@
 
 int main()
 {
-    RFtextfile f;
+    struct RFtextfile f;
 
     DEFAULT_LIB_INIT();
 	//attempt auto detection of line ending for an LF unix style UTF-8 text file

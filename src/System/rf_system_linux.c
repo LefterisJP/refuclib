@@ -295,3 +295,37 @@ FILE* rfFreopen(const void* name, const char* mode, FILE* f)
     rf_string_cstr_ibuff_pop(index);
     return ret;
 }
+
+FILE* rf_popen(void* command, const char* mode)
+{
+    FILE* ret = NULL;
+    unsigned int index;
+    char *cs;
+    RF_ENTER_LOCAL_SCOPE();
+
+#if RF_OPTION_DEBUG
+    if( strcmp(mode,"r") != 0 && strcmp(mode,"w") != 0)
+    {
+        RF_ERROR("Invalid mode argument provided to rf_popen()");
+        goto cleanup;
+    }
+#endif
+    if(!(cs = rf_string_cstr_ibuff_push(command, &index)))
+    {
+        goto cleanup;
+    }
+
+    ret = popen(cs, mode);
+
+    rf_string_cstr_ibuff_pop(index);
+
+
+cleanup:
+    RF_EXIT_LOCAL_SCOPE();
+    return ret;
+}
+
+int rf_pclose(FILE* stream)
+{
+    return pclose(stream);
+}

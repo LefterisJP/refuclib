@@ -26,51 +26,34 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *    == END OF REFU LICENSE ==
-*/
+ */
+#ifndef RF_SYSTEM_INFO_H
+#define RF_SYSTEM_INFO_H
 
-/*------------- Corrensponding Header inclusion -------------*/
-#include <IO/rf_file.h> 
 /*------------- Outside Module inclusion -------------*/
-#include <Utils/log.h> //for error logging
-#include <Definitions/retcodes.h> //for error codes
-#include "../String/rf_str_conversion.ph" //for the buffered Cstr() conversion
-#include <Utils/localscope.h> //for the local scope macros
+#include <Definitions/retcodes.h> //for bool
+#include <Definitions/imex.h> //for the import export macro
+#include <Utils/endianess.h> //for RFendianess
 /*------------- End of includes -------------*/
+/**
+ ** Initializes the system information holding structure
+ **/
+void rf_system_init();
 
+/**
+ ** Returns the endianess of the system. For possible values look
+ ** at @ref RFendianess
+ **/
+i_DECLIMEX_ enum RFendianess rf_system_get_endianess();
+/**
+ ** Returns the opposite of the endianess of the system.
+ ** For possible values look at @ref RFendianess
+ **/
+i_DECLIMEX_ enum RFendianess rf_system_get_other_endianess();
 
-//Opens another process as a pipe
-FILE* rf_popen(void* command, const char* mode)
-{
-    FILE* ret = NULL;
-    unsigned int index;
-    char *cs;
-    RF_ENTER_LOCAL_SCOPE();
+/**
+ ** Returns @c true if high resolution timers are supported or not
+ **/
+i_DECLIMEX_ bool rf_system_has_high_res_timer();
 
-#if RF_OPTION_DEBUG
-    if( strcmp(mode,"r") != 0 && strcmp(mode,"w") != 0)
-    {
-        RF_ERROR("Invalid mode argument provided to rf_popen()");
-        goto cleanup;
-    }
-#endif
-    if(!(cs = rf_string_cstr_ibuff_push(command, &index)))
-    {
-        goto cleanup;
-    }
-
-    ret = popen(cs, mode);
-
-    rf_string_cstr_ibuff_pop(index);
-
-
-cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
-}
-
-
-//Closes a pipe
-int rf_pclose(FILE* stream)
-{
-    return pclose(stream);
-}
+#endif//include guards end
