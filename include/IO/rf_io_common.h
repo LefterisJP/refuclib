@@ -27,19 +27,65 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  *    == END OF REFU LICENSE ==
 */
+#ifndef RF_COMMON_FLAGS_H
+#define RF_COMMON_FLAGS_H
 
-#ifndef RF_TEXTFILE_MODULE_HEADERS
-#define RF_TEXTFILE_MODULE_HEADERS
+#include <sys/types.h>
 
-#include <rf_options.h> // to include the options
-#ifdef RF_MODULE_IO_TEXTFILE //module check
+/**
+ ** This is the type that represents the file offset
+ **/
+#if _FILE_OFFSET_BITS == 64
 
-#include <IO/rf_textfile.h>
-//for File manipulation
-#include <System/rf_system.h>
-
+#ifdef _MSC_VER
+typedef __int64 foff_rft;
 #else
-    #error Attempted to include RFtextfile while not having compiled the library with the appropriate module activated
+typedef off64_t foff_rft;
 #endif
+
+/* for now, don't have a stat_t equivalent in windows */
+typedef struct stat64 stat_rft;
+
+#else /* __ FILE_OFFSET_BITS != 64 */
+
+#ifdef _MSC_VER
+typedef __int32 foff_rft;
+#else
+
+typedef off_t foff_rft;
+#endif
+
+/* for now, don't have a stat_t equivalent in windows */
+typedef struct stat stat_rft;
+
+#endif
+
+/**
+ ** New line feed
+ **
+ **/
+#define RF_LF   0xA
+/**
+ ** Carriage Return
+ **
+ **/
+#define RF_CR   0xD
+
+#ifdef REFU_WIN32_VERSION
+    #define i_PLUSB_WIN32   "b"
+#else
+    #define i_PLUSB_WIN32   ""
+#endif
+
+/**
+ ** The different end of line mark types for
+ **/
+enum RFeol_mark {
+    RF_EOL_AUTO  = 1,/*!< Used by functions that can autodetect the eol mark */
+    RF_EOL_LF, /*!< Unix style line ending with '\n' */
+    RF_EOL_CRLF, /*!< Windows style line ending with '\r\n' */
+    RF_EOL_CR /*!< Macintosh style line ending with '\r' */
+};
+#define RF_EOL_DEFAULT  RF_EOL_LF//the default value is LF only (Unix-style)
 
 #endif//include guards end

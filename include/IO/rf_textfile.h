@@ -32,8 +32,8 @@
 #define RF_TEXTFILE_H
 
 /*------------- Module Headers inclusion -------------*/
-#include <IO/common.h> //for common I/O flags and definitions
-#include <IO/textfile_decl.h> //for RFtextfile
+#include <IO/rf_io_common.h> //for common I/O flags and definitions
+#include <IO/rf_textfile_decl.h> //for RFtextfile
 /*------------- Outside Module inclusion -------------*/
 #include <Definitions/types.h> //for fixed size types needed in various places
 #include <Definitions/imex.h> //for the import export macro

@@ -28,18 +28,49 @@
  *    == END OF REFU LICENSE ==
 */
 
-#ifndef RF_TEXTFILE_MODULE_HEADERS
-#define RF_TEXTFILE_MODULE_HEADERS
+/*------------- Corrensponding Header inclusion -------------*/
+#include <IO/rf_file.h> 
+/*------------- Outside Module inclusion -------------*/
+#include <Utils/log.h> //for error logging
+#include <Definitions/retcodes.h> //for error codes
+#include "../String/rf_str_conversion.ph" //for the buffered Cstr() conversion
+#include <Utils/localscope.h> //for the local scope macros
+/*------------- End of includes -------------*/
 
-#include <rf_options.h> // to include the options
-#ifdef RF_MODULE_IO_TEXTFILE //module check
 
-#include <IO/rf_textfile.h>
-//for File manipulation
-#include <System/rf_system.h>
+//Opens another process as a pipe
+FILE* rf_popen(void* command, const char* mode)
+{
+    FILE* ret = NULL;
+    unsigned int index;
+    char *cs;
+    RF_ENTER_LOCAL_SCOPE();
 
-#else
-    #error Attempted to include RFtextfile while not having compiled the library with the appropriate module activated
+#if RF_OPTION_DEBUG
+    if( strcmp(mode,"r") != 0 && strcmp(mode,"w") != 0)
+    {
+        RF_ERROR("Invalid mode argument provided to rf_popen()");
+        goto cleanup;
+    }
 #endif
+    if(!(cs = rf_string_cstr_ibuff_push(command, &index)))
+    {
+        goto cleanup;
+    }
 
-#endif//include guards end
+    ret = popen(cs, mode);
+
+    rf_string_cstr_ibuff_pop(index);
+
+
+cleanup:
+    RF_EXIT_LOCAL_SCOPE();
+    return ret;
+}
+
+
+//Closes a pipe
+int rf_pclose(FILE* stream)
+{
+    return pclose(stream);
+}

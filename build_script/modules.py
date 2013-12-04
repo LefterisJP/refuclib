@@ -198,15 +198,15 @@ modules.append(
 
 modules.append(
     Module("IO",
-           ['IO/file.c'],
+           ['IO/rf_file.c'],
            macro = "RF_MODULE_IO",
-           win32_sources = ['IO/io_win32.c'],
-           linux_sources = ['IO/io_linux.c'])
+           win32_sources = ['IO/rf_io_win32.c'],
+           linux_sources = ['IO/rf_io_linux.c'])
 )
 
 modules.append(
     Module("TEXTFILE", 
-           ['IO/textfile.c'],
+           ['IO/rf_textfile.c'],
            macro = "RF_MODULE_IO_TEXTFILE",
            dependencies	= ['STRING'])
 )

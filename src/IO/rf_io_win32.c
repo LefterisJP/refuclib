@@ -28,24 +28,21 @@
  *    == END OF REFU LICENSE ==
 */
 
+
 /*------------- Corrensponding Header inclusion -------------*/
-#include <IO/file.h> 
+#include <IO/rf_file.h>
 /*------------- Outside Module inclusion -------------*/
 #include <Utils/log.h> //for error logging
 #include <Definitions/retcodes.h> //for error codes
-#include "../String/rf_str_conversion.ph" //for the buffered Cstr() conversion
 #include <Utils/localscope.h> //for the local scope macros
 /*------------- End of includes -------------*/
 
-
 //Opens another process as a pipe
-FILE* rf_popen(void* command, const char* mode)
+FILE* rf_popen(void* commandP,const char* mode)
 {
-    FILE* ret = NULL;
-    unsigned int index;
-    char *cs;
+    FILE* ret = 0;
+    RFstring* command = (RFstring*)commandP;
     RF_ENTER_LOCAL_SCOPE();
-
 #if RF_OPTION_DEBUG
     if( strcmp(mode,"r") != 0 && strcmp(mode,"w") != 0)
     {
@@ -53,24 +50,18 @@ FILE* rf_popen(void* command, const char* mode)
         goto cleanup;
     }
 #endif
-    if(!(cs = rf_string_cstr_ibuff_push(command, &index)))
-    {
-        goto cleanup;
-    }
 
-    ret = popen(cs, mode);
+    ret = _popen(command->bytes,mode);
 
-    rf_string_cstr_ibuff_pop(index);
-
-
-cleanup:
+#if RF_OPTION_DEBUG
+  cleanup:
+#endif
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
-
 //Closes a pipe
 int rf_pclose(FILE* stream)
 {
-    return pclose(stream);
+    return _pclose(stream);
 }

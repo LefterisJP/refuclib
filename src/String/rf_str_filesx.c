@@ -36,7 +36,7 @@
 #include <String/rf_str_traversalx.h> //for rf_stringx_reset and others
 #include "rf_str_files.ph" //for some macros
 #include <String/rf_str_files.h> //for rf_string_from_file_init e.t.c.
-#include <IO/file.h> //for rfReadLine family  of functions
+#include <IO/rf_file.h> //for rfReadLine family  of functions
 #include "rf_str_manipulation.ph" //for rf_stringxget_append()
 /*------------- Outside Module inclusion -------------*/
 #include <Utils/log.h> //for error logging macros

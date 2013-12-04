@@ -39,7 +39,7 @@
 /*------------- Outside Module inclusion -------------*/
 #include <Utils/log.h> //for error logging
 #include <Utils/memory.h> //for memory allocation
-#include <IO/file.h> //for rfReadLine family  of functions
+#include <IO/rf_file.h> //for rfReadLine family  of functions
 #include <Utils/localscope.h> //for local scope macros
 /*------------- libc inclusion --------------*/
 #include <stdio.h> //for FILE*

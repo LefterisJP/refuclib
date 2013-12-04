@@ -39,7 +39,7 @@
 #include <Utils/log.h> //for error logging
 #include <Utils/memory.h> //for refu memory allocation
 #include <Utils/localscope.h> //for local scope macros
-#include <IO/file.h> //rfStat() definition
+#include <IO/rf_file.h> //rfStat() definition
 #include <Utils/sanity.h> //for Sanity macros
 /*------------- libc inclusion --------------*/
 #include <errno.h>

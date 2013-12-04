@@ -38,7 +38,7 @@
 #include <Definitions/types.h> //for exact sized types
 #include <Definitions/retcodes.h> //for bool
 #include <Utils/endianess.h> //for RFendianess
-#include <IO/common.h> //for RFeol_mark
+#include <IO/rf_io_common.h> //for RFeol_mark
 /*------------- libc inclusion --------------*/
 #include <stdio.h> //for FILE
 #include <string.h> //for size_t

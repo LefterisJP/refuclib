@@ -30,10 +30,10 @@
 
 
 /*------------- Corrensponding Header inclusion -------------*/
-#include <IO/textfile.h>
+#include <IO/rf_textfile.h>
 /*------------- Module related inclusion -------------*/
-#include <IO/file.h> //for all the IO functions
-#include "textfile.ph"//for the private textfile functionality
+#include <IO/rf_file.h> //for all the IO functions
+#include "rf_textfile.ph"//for the private textfile functionality
 /*------------- Outside Module inclusion -------------*/
 #include <String/rf_str_common.h>//for RFS_()
 #include <String/rf_str_core.h> //for rf_string_destroy(),and copying functions

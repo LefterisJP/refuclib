@@ -32,7 +32,7 @@
 
 
 /*------------- Module Headers inclusion -------------*/
-#include <IO/common.h> //for RFeol_mark
+#include <IO/rf_io_common.h> //for RFeol_mark
 /*------------- Outside Module inclusion -------------*/
 #include <Definitions/types.h> //for fixed size types needed in various places
 #include <Definitions/imex.h> //for the import export macro
@@ -41,7 +41,6 @@
 #include "../../src/String/rf_str_conversion.ph" //for rf_string_cstr with buffer
 #include <Utils/endianess.h> //for RFendianess
 #include <String/rf_str_decl.h> //for RFstring
-#include <IO/common.h> //for RFeol_mark
 /*------------- System specific inclusion --------------*/
 #ifdef _MSC_VER
 #error TODO
