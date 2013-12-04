@@ -103,9 +103,12 @@ bool rf_lms_args_eval()
 }
 
 
-bool rf_module_lms_init(uint64_t size)
+bool rf_lms_activate(uint64_t size)
 {
     bool ret;
+    if (!size) {
+        size = RF_OPTION_LOCALSTACK_MEMORY_SIZE;
+    }
     ret = rf_lms_init(&g_main_thread_stack, size);
     RF_LMS = &g_main_thread_stack;
     return ret;

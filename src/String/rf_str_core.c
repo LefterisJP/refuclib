@@ -39,7 +39,7 @@
 #include <Utils/log.h> //for error logging
 #include <Utils/localscope.h>//for local scope macros
 #include <Utils/memory.h> //for refu memory allocation
-#include "../Internal/internal_mod.ph" //for the internal buffer
+#include "../Internal/rf_internal_mod.ph" //for the internal buffer
 /*------------- libc inclusion --------------*/
 #include <stdarg.h> //for va_args
 #include <stdio.h> // for snprintf

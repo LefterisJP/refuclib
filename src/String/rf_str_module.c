@@ -2,7 +2,7 @@
 
 
 //just leaving it here in case I need it later
-bool rf_module_string_init()
+bool rf_string_activate()
 {
     return true;
 }

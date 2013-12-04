@@ -288,7 +288,7 @@ i_DECLIMEX_ int rf_pclose(FILE* stream);
 /**
  ** Initializes the system information holding structure
  **/
-void rf_module_system_init();
+bool rf_system_activate();
 
 //! @}
 //end of system group

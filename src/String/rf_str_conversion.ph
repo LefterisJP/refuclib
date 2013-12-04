@@ -3,7 +3,7 @@
 
 /*------------- Outside Module inclusion -------------*/
 #include <Definitions/inline.h> //for inline
-#include "../Internal/internal_mod.ph" //for internal buffer
+#include "../Internal/rf_internal_mod.ph" //for internal buffer
 /*------------- End of includes -------------*/
 
 

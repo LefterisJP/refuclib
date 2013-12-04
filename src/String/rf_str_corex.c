@@ -42,7 +42,7 @@
 #include <Utils/constcmp.h>  //for RF_HEXLE_UI() macro and others
 #include <Utils/localscope.h>//for local scope macros
 #include <Utils/memory.h> //for refu memory allocation
-#include "../Internal/internal_mod.ph" //for the internal buffer
+#include "../Internal/rf_internal_mod.ph" //for the internal buffer
 /*------------- libc inclusion --------------*/
 #include <stdarg.h> //needed for the va_list
 #include <stdio.h> // for snprintf

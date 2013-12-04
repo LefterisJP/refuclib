@@ -1,11 +1,11 @@
-#include "internal_mod.ph"
+#include "rf_internal_mod.ph"
 
 #include <Utils/buffer.h>
 
 
 i_THREAD__ RFbuffer _tsbuffa;
 
-bool module_internal_init_ts()
+bool rf_internal_activate_ts()
 {
     if(!rf_buffer_init(&_tsbuffa, 512))
     {
@@ -13,8 +13,8 @@ bool module_internal_init_ts()
     }
     return true;
 }
-bool module_internal_init()
+bool rf_internal_activate()
 {
-    return module_internal_init_ts();
+    return rf_internal_activate_ts();
 }
 

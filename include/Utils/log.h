@@ -70,8 +70,8 @@ enum RFlog_level{
 
 
 
-i_DECLIMEX_ bool rf_module_log_init(enum RFlog_level level, char *log_file_name);
-i_DECLIMEX_ void rf_module_log_deinit();
+i_DECLIMEX_ bool rf_log_activate(enum RFlog_level level, char *log_file_name);
+i_DECLIMEX_ void rf_log_deactivate();
 i_DECLIMEX_ void rf_log(enum RFlog_level level, const char* file,
                         const char* func,
                         int line, struct RFstring* msg);
@@ -81,6 +81,13 @@ i_DECLIMEX_ bool rf_log_flush();
 
 /*--- Logging macros --- */
 
+#define RF_ALERT(...) rf_log(LOG_ALERT, __FILE__, __func__,       \
+                             __LINE__,                            \
+                             RFS_(__VA_ARGS__))
+
+#define RF_CRITICAL(...) rf_log(LOG_CRITICAL, __FILE__, __func__, \
+                                __LINE__,                         \
+                                RFS_(__VA_ARGS__))
 
 #define RF_ERROR(...) rf_log(LOG_ERROR, __FILE__, __func__, \
                              __LINE__,                      \

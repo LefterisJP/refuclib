@@ -330,7 +330,7 @@ int rf_pclose(FILE* stream)
     return pclose(stream);
 }
 
-void rf_module_system_init()
+bool rf_system_activate()
 {
     int32_t anint;
     
@@ -356,4 +356,5 @@ void rf_module_system_init()
     } else {
         g_sys_info.timerType = CLOCK_PROCESS_CPUTIME_ID;
     }
+    return true;
 }

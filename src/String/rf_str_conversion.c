@@ -43,7 +43,7 @@
 #include <Utils/localscope.h> //for local scope macros
 #include <Utils/memory.h> //for refu memory allocation
 #include <Utils/math.h> //for rfMax
-#include "../Internal/internal_mod.ph" //for the internal buffer
+#include "../Internal/rf_internal_mod.ph" //for the internal buffer
 /*------------- libc inclusion --------------*/
 #include <errno.h> //for errno
 #include <math.h> //for HUGE_VAL

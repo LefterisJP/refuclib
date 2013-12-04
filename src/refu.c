@@ -33,32 +33,43 @@
 /*------------- Outside Module inclusion -------------*/
 #include <Utils/localmem.h> // local memory stack
 #include <Utils/log.h> // logging system
-#include <System/rf_system.h> // for rf_module_system_init()
-#include "Internal/internal_mod.ph" // internal data initialization
-/*------------- Modules init/deinit -------------*/
+#include <System/rf_system.h> // for rf_system_activate()
+#include "Internal/rf_internal_mod.ph" // internal data initialization
+/*------------- Modules activation/deactivation -------------*/
 #include "String/rf_str_mod.ph"
 /*------------- libc includes -------------*/
 #include <string.h> //for strcmp
+#include <stdlib.h> //for exit()
 /*------------- End of includes -------------*/
 
 //Initializes the Refu library
 bool rf_init(char *logstr, uint64_t lmsSize, enum RFlog_level level)
 {
-    rf_module_log_init(level, logstr);
-    rf_module_system_init();
-    rf_module_string_init();
-    module_internal_init();
-
-    //initialize the main thread's local stack memory
-    if (lmsSize == 0) {
-        lmsSize = RF_OPTION_LOCALSTACK_MEMORY_SIZE;
+    bool ret = false;
+    /* activate all modules */
+    if (!rf_log_activate(level, logstr)) {
+        goto cleanup;
     }
-    if (!rf_module_lms_init(lmsSize)) {
-        RF_ERROR("Could not initialize main thread's local memory stack");
-        return false;
+    if (!rf_string_activate()) {
+        RF_ERROR("Failed to initialize the string module");
+        goto cleanup;
     }
+    if (!rf_system_activate()) {
+        RF_ERROR("Failed to initialize the system module");
+        goto cleanup;
+    }
+    if (!rf_internal_activate()) {
+        RF_ERROR("Failed to initialize the internal module");
+        goto cleanup;
+    }
+    if (!rf_lms_activate(lmsSize)) {
+        RF_ERROR("Failed to initialize the local memory stack");
+        goto cleanup;
+    }
+    ret = true;
 
-    return true;
+cleanup:
+    return ret;
 }
 
 

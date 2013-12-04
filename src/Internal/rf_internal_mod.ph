@@ -11,7 +11,7 @@
 extern i_THREAD__ RFbuffer _tsbuffa;
 #define TSBUFFA (&_tsbuffa)
 
-bool module_internal_init_ts();
-bool module_internal_init();
+bool rf_internal_activate_ts();
+bool rf_internal_activate();
 
 #endif

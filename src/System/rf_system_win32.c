@@ -241,7 +241,7 @@ int rf_pclose(FILE* stream)
     return _pclose(stream);
 }
 
-void rf_module_system_init()
+bool rf_system_activate()
 {
     int32_t anint;
 
@@ -253,4 +253,6 @@ void rf_module_system_init()
     g_sys_info.hasHighResTimer = QueryPerformanceFrequency(
         (LARGE_INTEGER *)&g_sys_info.pc_frequency,
     );
+
+    return true;
 }

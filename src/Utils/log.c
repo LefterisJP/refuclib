@@ -262,12 +262,12 @@ static void log_add(struct RFlog *log, enum RFlog_level level,
 
 
 
-bool rf_module_log_init(enum RFlog_level level, char *log_file_name)
+bool rf_log_activate(enum RFlog_level level, char *log_file_name)
 {
     return log_init(&_log, level, log_file_name);
 }
 
-void rf_module_log_deinit()
+void rf_log_deactivate()
 {
     log_deinit(&_log);
 }

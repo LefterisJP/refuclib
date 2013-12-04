@@ -3,7 +3,7 @@
 
 #include <Definitions/retcodes.h> //for bool
 
-bool rf_module_string_init();
+bool rf_string_activate();
 
 
 #endif
