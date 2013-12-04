@@ -50,7 +50,6 @@
 #include <Utils/log.h> //for error logging
 #include <Utils/memory.h> //for refu memory allocation
 #include <System/rf_system.h> //for System functions
-#include <System/rf_system_info.h> //for getting the system endianess
 #include <Utils/constcmp.h> //for RF_HEXEQ_I() macro and others
 #include <Utils/localscope.h> //for the local scope macros
 #include <Utils/sanity.h> //for the sanity check macros

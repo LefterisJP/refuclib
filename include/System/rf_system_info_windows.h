@@ -27,33 +27,67 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  *    == END OF REFU LICENSE ==
  */
-#ifndef RF_SYSTEM_INFO_H
-#define RF_SYSTEM_INFO_H
+#ifndef RF_SYSTEM_INFO_WIN32_H
+#define RF_SYSTEM_INFO_WIN32_H
 
 /*------------- Outside Module inclusion -------------*/
 #include <Definitions/retcodes.h> //for bool
+#include <Definitions/inline.h> //for inline attribute
 #include <Definitions/imex.h> //for the import export macro
 #include <Utils/endianess.h> //for RFendianess
 /*------------- End of includes -------------*/
+
+
 /**
- ** Initializes the system information holding structure
- **/
-void rf_system_init();
+ ** System information holding structure
+ */
+struct RFsystem_info {
+    /**
+     * A byte holding the system's endianess. 
+     *Look @ref RFendianess for legal values
+     */
+    enum RFendianess endianess;
+    /**
+     *A boolean flag indicating whether the system supports high
+     * resolution performance counter in windows and clock_gettime in Linux
+     */
+    bool has_high_res_timer;
+    /**
+     *In Windows we should also keep the PCFrequency in case we want
+     * to use a performance counter
+     */
+    int64_t pc_frequency;
+};
+extern struct RFsystem_info g_sys_info;
 
 /**
  ** Returns the endianess of the system. For possible values look
  ** at @ref RFendianess
  **/
-i_DECLIMEX_ enum RFendianess rf_system_get_endianess();
+i_DECLIMEX_ i_INLINE_DECL enum RFendianess rf_system_get_endianess()
+{
+    return g_sys_info.endianess;
+}
 /**
  ** Returns the opposite of the endianess of the system.
  ** For possible values look at @ref RFendianess
  **/
-i_DECLIMEX_ enum RFendianess rf_system_get_other_endianess();
+i_DECLIMEX_ i_INLINE_DECL enum RFendianess rf_system_get_other_endianess()
+{
+    if(g_sys_info.endianess == RF_LITTLE_ENDIAN)
+    {
+        return RF_BIG_ENDIAN;
+    }
+    return RF_LITTLE_ENDIAN;
+}
 
 /**
  ** Returns @c true if high resolution timers are supported or not
  **/
-i_DECLIMEX_ bool rf_system_has_high_res_timer();
+i_DECLIMEX_ i_INLINE_DECL bool rf_system_has_high_res_timer()
+{
+    return g_sys_info.has_high_res_timer;
+}
+
 
 #endif//include guards end

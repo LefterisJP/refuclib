@@ -33,7 +33,7 @@
 /*------------- Outside Module inclusion -------------*/
 #include <Utils/localmem.h> // local memory stack
 #include <Utils/log.h> // logging system
-#include <System/rf_system_info.h> // for rf_system_init()
+#include <System/rf_system.h> // for rf_module_system_init()
 #include "Internal/internal_mod.ph" // internal data initialization
 /*------------- Modules init/deinit -------------*/
 #include "String/rf_str_mod.ph"
@@ -45,8 +45,7 @@
 bool rf_init(char *logstr, uint64_t lmsSize, enum RFlog_level level)
 {
     rf_LogModule_Init(level, logstr);
-    // get system endianess among other things
-    rf_system_init();
+    rf_module_system_init();
     rf_module_string_init();
     module_internal_init();
 

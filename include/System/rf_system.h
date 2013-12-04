@@ -122,6 +122,18 @@ typedef pid_t threadid_t;
     #define RFP_ISVTX S_ISVTX
 #endif
 
+
+/* include the appropriate system info */
+#ifdef REFU_LINUX_VERSION
+#include <System/rf_system_info_linux.h>
+#elif defined (REFU_WIN32_VERSION)
+#include <System/rf_system_info_win32.h>
+#else
+#error TODO
+#endif
+
+
+
 #ifdef __cplusplus
 extern "C"
 {///opening bracket for calling from C++
@@ -271,6 +283,12 @@ i_DECLIMEX_ FILE* rf_popen(void* command, const char* mode);
  **
  **/
 i_DECLIMEX_ int rf_pclose(FILE* stream);
+
+
+/**
+ ** Initializes the system information holding structure
+ **/
+void rf_module_system_init();
 
 //! @}
 //end of system group

@@ -29,67 +29,13 @@
  */
 
 
-/*------------- Outside Module inclusion -------------*/
-#include <Definitions/types.h> //for exact size data types
-#include <Definitions/retcodes.h> //for bool
-#include <Utils/endianess.h> //for RFendianess
-/*------------- System specific inclusion --------------*/
-#include <windows.h> //for QueryPerformanceFrequency()
+/*------------- Corrensponding Header inclusion -------------*/
+#include <System/rf_system_info_win32.h>
 /*------------- End of includes -------------*/
 
-
-/**
- ** System information holding structure
- */
-struct RFsystem_info {
-    /**
-     * A byte holding the system's endianess. 
-     *Look @ref RFendianess for legal values
-     */
-    enum RFendianess endianess;
-    /**
-     *A boolean flag indicating whether the system supports high
-     * resolution performance counter in windows and clock_gettime in Linux
-     */
-    bool has_high_res_timer;
-    /**
-     *In Windows we should also keep the PCFrequency in case we want
-     * to use a performance counter
-     */
-    int64_t pc_frequency;
-};
 //system info global definition
 struct RFsystem_info g_sys_info;
 
-void rf_system_init()
-{
-    int32_t anint;
-
-    /* get endianess */
-    anint= (int32_t)0xdeadbeef;
-    g_sys_info.endianess = (*(char *)&anint == (char)0xef)?
-    RF_LITTLE_ENDIAN : RF_BIG_ENDIAN;
-    /* see if we can have High resolution timer */
-    g_sys_info.hasHighResTimer = QueryPerformanceFrequency(
-        (LARGE_INTEGER *)&g_sys_info.pc_frequency,
-    );
-}
-
-enum RFendianess rf_system_get_endianess()
-{
-    return g_sys_info.endianess;
-}
-
-enum RFendianess rf_system_get_other_endianess()
-{
-    if(g_sys_info.endianess == RF_LITTLE_ENDIAN)
-    {
-        return RF_BIG_ENDIAN;
-    }
-    return RF_LITTLE_ENDIAN;
-}
-
-bool rf_system_has_high_res_timer()
-{
-    return g_sys_info.has_high_res_timer;
-}
+i_INLINE_INS enum RFendianess rf_system_get_endianess();
+i_INLINE_INS enum RFendianess rf_system_get_other_endianess();
+i_INLINE_INS bool rf_system_has_high_res_timer();

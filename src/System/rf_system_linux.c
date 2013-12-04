@@ -329,3 +329,31 @@ int rf_pclose(FILE* stream)
 {
     return pclose(stream);
 }
+
+void rf_module_system_init()
+{
+    int32_t anint;
+    
+    /* get system endianess */
+    anint= (int32_t)0xdeadbeef;
+    g_sys_info.endianess = (*(char *)&anint == (char)0xef)?
+    RF_LITTLE_ENDIAN : RF_BIG_ENDIAN;
+
+    /* see if we can have high res timer */
+    g_sys_info.has_high_res_timer = true;
+    if (clock_getres(CLOCK_PROCESS_CPUTIME_ID, 0) == -1) {
+        if (clock_getres(CLOCK_MONOTONIC, 0) == -1) {
+            if (clock_getres(CLOCK_REALTIME, 0) == -1) {
+                RF_ERROR("No high resolution timer is supported. Even "
+                         "CLOCK_REALTIME initialization failed.");
+                g_sys_info.has_high_res_timer = false;
+            } else {
+                g_sys_info.timerType = CLOCK_REALTIME;
+            }
+        } else {
+            g_sys_info.timerType = CLOCK_MONOTONIC;
+        }
+    } else {
+        g_sys_info.timerType = CLOCK_PROCESS_CPUTIME_ID;
+    }
+}
