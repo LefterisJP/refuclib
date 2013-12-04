@@ -80,7 +80,7 @@ static const struct RFstring severity_level_string[] = {
 /* The buffer position we write at */
 #define OCCUPIED(i_log_) ((i_log_)->index - (i_log_)->buffer)
 
-static bool rf_log_init(struct RFlog *log,
+static bool log_init(struct RFlog *log,
                         enum RFlog_level level,
                         char *log_file_name)
 {
@@ -104,7 +104,7 @@ static bool rf_log_init(struct RFlog *log,
     return true;
 }
 
-static bool rf_log_flush(struct RFlog *log)
+static bool log_flush(struct RFlog *log)
 {
     size_t rc;
     bool ret = true;
@@ -119,7 +119,7 @@ static bool rf_log_flush(struct RFlog *log)
     return ret;
 }
 
-static void rf_log_deinit(struct RFlog *log)
+static void log_deinit(struct RFlog *log)
 {
     fclose(log->file);
     rf_mutex_deinit(&log->lock);
@@ -236,7 +236,7 @@ static bool format_log_message(struct RFlog *log,
 }
 
 
-static void rf_log_add(struct RFlog *log, enum RFlog_level level,
+static void log_add(struct RFlog *log, enum RFlog_level level,
                        const char* file, const char* func,
                        int line, struct RFstring* msg)
 {
@@ -262,24 +262,24 @@ static void rf_log_add(struct RFlog *log, enum RFlog_level level,
 
 
 
-bool rf_LogModule_Init(enum RFlog_level level, char *log_file_name)
+bool rf_module_log_init(enum RFlog_level level, char *log_file_name)
 {
-    return rf_log_init(&_log, level, log_file_name);
+    return log_init(&_log, level, log_file_name);
 }
 
-void rf_LogModule_Deinit()
+void rf_module_log_deinit()
 {
-    rf_log_deinit(&_log);
+    log_deinit(&_log);
 }
-void rf_Log(enum RFlog_level level,
+void rf_log(enum RFlog_level level,
             const char* file,
             const char* func,
             int line, struct RFstring* msg)
 {
-    rf_log_add(&_log, level, file, func, line, msg);
+    log_add(&_log, level, file, func, line, msg);
 }
 
-bool rf_LogFlush()
+bool rf_log_flush()
 {
-    return rf_log_flush(&_log);
+    return log_flush(&_log);
 }

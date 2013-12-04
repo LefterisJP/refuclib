@@ -13,7 +13,7 @@ int main()
     RF_INFO("This is an info");
     RF_WARNING("This is a warning");
     RF_DEBUG("This is a debug message");
-    EXPECT_TRUE(rf_LogFlush());
+    EXPECT_TRUE(rf_log_flush());
 
     EXPECT_TRUE(rf_textfile_init(&log_file, RFS_("refulib.log"), RF_FILE_READ,
                                 RF_LITTLE_ENDIAN, RF_UTF8, RF_EOL_LF));

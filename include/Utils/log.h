@@ -44,8 +44,8 @@
 /*------------- End of includes -------------*/
 
 /**
-** @Defgroup RFerror_logging_g_r_p Error Logging
-** @addtogroup RFerror_logging_g_r_p
+** @Defgroup RFerror_logging_GRP Error Logging
+** @addtogroup RFerror_logging_GRP
 ** @{
 **/
 
@@ -70,30 +70,30 @@ enum RFlog_level{
 
 
 
-i_DECLIMEX_ bool rf_LogModule_Init(enum RFlog_level level, char *log_file_name);
-i_DECLIMEX_ void rf_LogModule_Deinit();
-i_DECLIMEX_ void rf_Log(enum RFlog_level level, const char* file,
+i_DECLIMEX_ bool rf_module_log_init(enum RFlog_level level, char *log_file_name);
+i_DECLIMEX_ void rf_module_log_deinit();
+i_DECLIMEX_ void rf_log(enum RFlog_level level, const char* file,
                         const char* func,
                         int line, struct RFstring* msg);
 
-i_DECLIMEX_ bool rf_LogFlush();
+i_DECLIMEX_ bool rf_log_flush();
 
 
 /*--- Logging macros --- */
 
 
-#define RF_ERROR(...) rf_Log(LOG_ERROR, __FILE__, __func__, \
+#define RF_ERROR(...) rf_log(LOG_ERROR, __FILE__, __func__, \
                              __LINE__,                      \
                              RFS_(__VA_ARGS__))
-#define RF_INFO(...) rf_Log(LOG_INFO, __FILE__, __func__, \
+#define RF_INFO(...) rf_log(LOG_INFO, __FILE__, __func__, \
                             __LINE__,                     \
                             RFS_(__VA_ARGS__))
-#define RF_WARNING(...)  rf_Log(LOG_WARNING, __FILE__, __func__,  \
+#define RF_WARNING(...)  rf_log(LOG_WARNING, __FILE__, __func__,  \
                                 __LINE__,                         \
                                 RFS_(__VA_ARGS__))
 
 #ifdef RF_OPTION_DEBUG
-#define RF_DEBUG(...)  rf_Log(LOG_DEBUG, __FILE__, __func__,  \
+#define RF_DEBUG(...)  rf_log(LOG_DEBUG, __FILE__, __func__,  \
                               __LINE__, RFS_(__VA_ARGS__))
 #else
 #define RF_DEBUG(...)

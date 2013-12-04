@@ -44,24 +44,10 @@
 //Initializes the Refu library
 bool rf_init(char *logstr, uint64_t lmsSize, enum RFlog_level level)
 {
-    rf_LogModule_Init(level, logstr);
+    rf_module_log_init(level, logstr);
     rf_module_system_init();
     rf_module_string_init();
     module_internal_init();
-
-
-    /* //initialize regu log stream */
-    /* if(strcmp(logstr,"stderr") == 0) */
-    /*     RFlog_stream = stderr; */
-    /* else if(strcmp(logstr,"stdout")== 0) */
-    /*     RFlog_stream = stdout; */
-    /* else//just open the given file */
-    /* { */
-    /*     RFlog_stream = fopen(logstr,"w"); */
-    /*     //Send the standard error also to the same file stream as the chosen rfStdErr */
-    /*     if(freopen(logstr,"w",stderr) ==0) */
-    /*         printf("Failed to reopen stderr stream to the given file name \"%s\"",logstr); */
-    /* } */
 
     //initialize the main thread's local stack memory
     if (lmsSize == 0) {
