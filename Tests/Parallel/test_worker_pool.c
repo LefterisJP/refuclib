@@ -1,6 +1,7 @@
 #include <refu.h>
 #include <Parallel/rf_worker_pool.h>
 #include <Utils/constcmp.h>
+#include <Time/sleep.h>
 #include "../refu_tests.h"
 
 #include <time.h>
@@ -56,6 +57,8 @@ int main()
     for (i =0; i < THREADS_NUMBER; i++) {
         rf_workerpool_add_task(pool, calculatePi, NULL);        
     }
+    /* give them some time to finish */
+    rf_sleep_ms(100);
     /* destroy the pool and wait till all is done */
     rf_workerpool_destroy(pool);
 

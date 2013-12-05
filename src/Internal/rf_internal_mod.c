@@ -18,3 +18,12 @@ bool rf_internal_activate()
     return rf_internal_activate_ts();
 }
 
+void rf_internal_deactivate_ts()
+{
+    rf_buffer_deinit(&_tsbuffa);
+}
+void rf_internal_deactivate()
+{
+    rf_internal_deactivate_ts();
+}
+

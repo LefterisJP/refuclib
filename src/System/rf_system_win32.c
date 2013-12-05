@@ -256,3 +256,8 @@ bool rf_system_activate()
 
     return true;
 }
+
+void rf_system_deactivate()
+{
+    //nothing needed for now
+}

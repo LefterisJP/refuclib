@@ -4,6 +4,7 @@
 #include <Definitions/retcodes.h> //for bool
 
 bool rf_string_activate();
+void rf_string_deactivate();
 
 
 #endif

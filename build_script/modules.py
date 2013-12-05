@@ -187,7 +187,7 @@ modules.append(
 
 modules.append(
     Module("Parallel",
-           [],
+           ['Parallel/rf_threading.c'],
            win32_sources = [''],
            linux_sources = ['Parallel/rf_worker_pool_linux.c',
                             'Parallel/rf_threading_linux.c'],

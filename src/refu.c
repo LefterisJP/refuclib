@@ -50,20 +50,20 @@ bool rf_init(char *logstr, uint64_t lmsSize, enum RFlog_level level)
     if (!rf_log_activate(level, logstr)) {
         goto cleanup;
     }
-    if (!rf_string_activate()) {
-        RF_ERROR("Failed to initialize the string module");
+    if (!rf_lms_activate(lmsSize, true)) {
+        RF_ERROR("Failed to initialize the local memory stack");
         goto cleanup;
     }
-    if (!rf_system_activate()) {
-        RF_ERROR("Failed to initialize the system module");
+    if (!rf_string_activate()) {
+        RF_ERROR("Failed to initialize the string module");
         goto cleanup;
     }
     if (!rf_internal_activate()) {
         RF_ERROR("Failed to initialize the internal module");
         goto cleanup;
     }
-    if (!rf_lms_activate(lmsSize)) {
-        RF_ERROR("Failed to initialize the local memory stack");
+    if (!rf_system_activate()) {
+        RF_ERROR("Failed to initialize the system module");
         goto cleanup;
     }
     ret = true;
@@ -72,4 +72,11 @@ cleanup:
     return ret;
 }
 
-
+void rf_deinit()
+{
+    rf_system_deactivate();
+    rf_internal_deactivate();
+    rf_string_deactivate();
+    rf_lms_deactivate(true);
+    rf_log_deactivate();
+}

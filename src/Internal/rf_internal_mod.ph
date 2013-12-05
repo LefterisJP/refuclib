@@ -13,5 +13,7 @@ extern i_THREAD__ RFbuffer _tsbuffa;
 
 bool rf_internal_activate_ts();
 bool rf_internal_activate();
+void rf_internal_deactivate_ts();
+void rf_internal_deactivate();
 
 #endif

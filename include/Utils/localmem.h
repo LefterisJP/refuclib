@@ -57,6 +57,11 @@ extern "C"
 bool rf_lms_init(RFlocal_memory_stack* lms, uint64_t size);
 
 /**
+ ** Frees the memory of the local memory stack
+ **/
+void rf_lms_deinit(RFlocal_memory_stack *lms);
+
+/**
  ** @brief Pushes the local memory stack
  **
  ** This function simply pushes the local memory stack for @c size bytes so
@@ -104,9 +109,18 @@ i_DECLIMEX_ bool rf_lms_args_eval();
  ** Activation function for the local memory stack module
  ** @param size The size in bytes with which the stack should
  ** be allocated. If 0 is given then the default value is used.
+ ** @param is_main Should be true if this activates the local
+ ** memory stack of the main thread.
  ** @return Returns @c true in succesful allocation.
  **/
-i_DECLIMEX_ bool rf_lms_activate(uint64_t size);
+i_DECLIMEX_ bool rf_lms_activate(uint64_t size, bool is_main);
+
+/**
+ ** Deactivation function for the local memory stack module
+ ** @param is_main Should be true if this deactivates the local
+ ** memory stack of the main thread
+ **/
+i_DECLIMEX_ void rf_lms_deactivate(bool is_main);
 
 #ifdef __cplusplus
 } //closing bracket for C++ calling

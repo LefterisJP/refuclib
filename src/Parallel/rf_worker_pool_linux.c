@@ -30,6 +30,8 @@
 
 /*------------- Corrensponding Header inclusion -------------*/
 #include <Parallel/rf_worker_pool.h>
+/*------------- Module related inclusion -------------*/
+#include <Parallel/rf_threading.h>
 /*------------- Refu C library inclusion -------------*/
 #include <Utils/log.h>
 #include <Utils/memory.h>
@@ -74,7 +76,10 @@ static void *WorkerLoop(void *t)
 {
     RFworker_thread *worker = t;
     RFworker_task *task;
-    /* do all thread specific initialization here*/
+    /* do all thread specific initialization here */
+    if(!rf_init_thread_specific()) {
+        return 0;
+    }
 
     while(!worker->must_terminate) {
         usleep(RF_OPTION_WORKER_SLEEP_MICROSECONDS);
@@ -88,6 +93,7 @@ static void *WorkerLoop(void *t)
     }
 
     /* do all thread specific freeing here */
+    rf_deinit_thread_specific();
     return 0;
 }
 

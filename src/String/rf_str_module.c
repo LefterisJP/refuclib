@@ -6,3 +6,7 @@ bool rf_string_activate()
 {
     return true;
 }
+
+void rf_string_deactivate()
+{
+}

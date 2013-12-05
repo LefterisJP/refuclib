@@ -24,6 +24,11 @@ i_INLINE_DECL bool rf_buffer_init(RFbuffer* b, size_t size)
     return true;
 }
 
+i_INLINE_DECL void rf_buffer_deinit(RFbuffer* b)
+{
+    free(b->buff);
+}
+
 i_INLINE_DECL char* rf_buffer_ptr(RFbuffer* b)
 {
     return b->buff + b->index;

@@ -27,32 +27,34 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  *    == END OF REFU LICENSE ==
 */
-#ifndef REFU_THREADING_H
-#define REFU_THREADING_H
-
-#ifdef REFU_WIN32_VERSION
-#include <Parallel/rf_threading_win32.h
-#else
-#include <Parallel/rf_threading_linux.h>
-#endif
-
+/*------------- Corrensponding Header inclusion -------------*/
+#include <Parallel/rf_threading.h>
 /*------------- Outside Module inclusion -------------*/
-#include <Definitions/imex.h> //for import export macro
+#include <Utils/log.h>
+#include <Utils/localmem.h>
+#include "../Internal/rf_internal_mod.ph"
 /*------------- End of includes -------------*/
 
-/**
- ** Initializes all thread specific data of the library
- **/
-i_DECLIMEX_ bool rf_init_thread_specific();
 
-/**
- ** Deinitializes all thread specific data of the library
- **/
-i_DECLIMEX_ void rf_deinit_thread_specific();
+bool rf_init_thread_specific()
+{
+    if (!rf_internal_activate_ts()) {
+        RF_ERROR("Could not activate the internal module for thread %#010x",
+                 rf_ThreadGetId());
+        return false;
+    }
+    if (!rf_lms_activate(0, false)) {
+        RF_ERROR("Could not activate the local memory stack "
+                 "module for thread %#010x",
+                 rf_ThreadGetId());
+        return false;
+    }
+    return true;
+}
 
-/**
- ** @brief Gives an id unique to the calling thread
- **/
-int rf_ThreadGetId();
 
-#endif
+void rf_deinit_thread_specific()
+{
+    rf_lms_deactivate(false);
+    rf_internal_deactivate_ts();
+}

@@ -1,24 +1,31 @@
-/**
-**      ==START OF REFU LICENSE==
-**
-** Copyright (c) 2011-2013, Karapetsas Eleftherios
-** All rights reserved.
-** 
-** Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-**  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-**  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the distribution.
-**  3. Neither the name of the Original Author of Refu nor the names of its contributors may be used to endorse or promote products derived from
-** 
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
-** INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-** DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-** SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-** WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-**
-**      ==END OF REFU LICENSE==
+/*
+ *    == START OF REFU LICENSE ==
+ *
+ * Copyright (c) 2011-2013, Karapetsas Eleftherios
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *  1. Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. Neither the name of the Original Author of Refu nor the names of its
+ *     contributors may be used to endorse or promote products derived from
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ *    == END OF REFU LICENSE ==
 */
 
 /*------------- Corrensponding Header inclusion -------------*/
@@ -40,8 +47,6 @@ RFlocal_memory_stack g_main_thread_stack;
 //define the pointer to the thread specific memory stack
 i_THREAD__ RFlocal_memory_stack* RF_LMS;
 
-
-
 // Initializes the local memory stack
 bool rf_lms_init(RFlocal_memory_stack* lms, uint64_t size)
 {
@@ -52,6 +57,12 @@ bool rf_lms_init(RFlocal_memory_stack* lms, uint64_t size)
     //also make the thread specific pointer point to this local memory stack
     RF_LMS = lms;
     return true;
+}
+
+void rf_lms_deinit(RFlocal_memory_stack *lms)
+{
+    free(lms->stack);
+    RF_LMS = NULL;
 }
 
 
@@ -103,13 +114,28 @@ bool rf_lms_args_eval()
 }
 
 
-bool rf_lms_activate(uint64_t size)
+bool rf_lms_activate(uint64_t size, bool is_main)
 {
     bool ret;
     if (!size) {
         size = RF_OPTION_LOCALSTACK_MEMORY_SIZE;
     }
-    ret = rf_lms_init(&g_main_thread_stack, size);
-    RF_LMS = &g_main_thread_stack;
+    if (is_main) {
+        ret = rf_lms_init(&g_main_thread_stack, size);
+        RF_LMS = &g_main_thread_stack;
+    } else {
+        RFlocal_memory_stack *lms;
+        RF_MALLOC(lms, sizeof(*lms), false);
+        ret = rf_lms_init(lms, size);
+        RF_LMS = lms;
+    }
     return ret;
+}
+
+void rf_lms_deactivate(bool is_main)
+{
+    rf_lms_deinit(RF_LMS);
+    if (!is_main) {
+        free(RF_LMS);
+    }
 }
