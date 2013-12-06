@@ -22,9 +22,62 @@ START_TEST(test_string_init) {
     ck_assert(rf_string_init(&s, "This is the test of String initialization"));
     const char* cstr = "This is the test of String initialization";
     ck_assert_int_eq(0, memcmp(rf_string_data(&s), cstr, strlen(cstr)));
-
     
+    ck_assert(!rf_string_init(&s, NULL));
+    ck_assert(!rf_string_init(NULL, NULL));
+
+    rf_string_deinit(&s);
 }END_TEST
+
+START_TEST(test_stringx_init) {
+    struct RFstringx sx;
+
+    //expect all StringX initializations be succesfull
+    ck_assert(rf_stringx_init(&sx, "Initializing a StringX"));
+    const char* cstr = "Initializing a StringX";
+    ck_assert_int_eq(0, memcmp(rf_string_data(&sx), cstr, strlen(cstr)));
+    
+    ck_assert(!rf_stringx_init(&sx, NULL));
+    ck_assert(!rf_stringx_init(&sx, NULL));
+
+    rf_stringx_deinit(&sx);
+}END_TEST
+
+START_TEST(test_string_initv) {
+    struct RFstring s;
+    ck_assert(
+        rf_string_initv(&s,
+                        "%s %d %.3f %u",
+                        "Printf style initialization",
+                        1337, 3.141592, 912341)
+    );
+    const char* cstr = "Printf style initialization 1337 3.142 912341";
+    ck_assert_int_eq(0, memcmp(rf_string_data(&s), cstr, strlen(cstr)));
+
+    ck_assert(!rf_string_initv(&s, NULL));
+    ck_assert(!rf_string_initv(NULL, NULL));
+
+    rf_string_deinit(&s);    
+}END_TEST
+
+START_TEST(test_stringx_initv) {
+    struct RFstringx sx;
+    ck_assert(
+        rf_stringx_initv(&sx,
+                        "%s %d %.3f %u",
+                        "Printf style initialization",
+                        1337, 3.141592, 912341)
+    );
+    const char* cstr = "Printf style initialization 1337 3.142 912341";
+    ck_assert_int_eq(0, memcmp(rf_string_data(&sx), cstr, strlen(cstr)));
+
+    ck_assert(!rf_stringx_initv(&sx, NULL));
+    ck_assert(!rf_stringx_initv(NULL, NULL));
+
+    rf_stringx_deinit(&sx);
+}END_TEST
+
+
 
 #if 0
 START_TEST(test_init_string_simple) {
@@ -57,23 +110,17 @@ START_TEST(test_init_string_simple) {
 }END_TEST
 #endif
 
-START_TEST(test_stringx_init) {
-    struct RFstringx sx;
-
-    //expect all StringX initializations be succesfull
-    ck_assert(rf_stringx_init(&sx, "Initializing a StringX"));
-    const char* cstr = "Initializing a StringX";
-    ck_assert_int_eq(0, memcmp(rf_string_data(&sx), cstr, strlen(cstr)));
-}END_TEST
 
 Suite *string_initialization_suite_create(void)
 {
     Suite *s = suite_create("String Initialization");
 
-    TCase *tc_string = tcase_create("String");
+    TCase *tc_string = tcase_create("String basic");
     tcase_add_checked_fixture(tc_string, setup, teardown);
     tcase_add_test(tc_string, test_string_init);
     tcase_add_test(tc_string, test_stringx_init);
+    tcase_add_test(tc_string, test_string_initv);
+    tcase_add_test(tc_string, test_stringx_initv);
     suite_add_tcase(s, tc_string);
     return s;
 }

@@ -42,6 +42,7 @@
 #include <Utils/constcmp.h>  //for RF_HEXLE_UI() macro and others
 #include <Utils/localscope.h>//for local scope macros
 #include <Utils/memory.h> //for refu memory allocation
+#include <Utils/sanity.h> //for the sanity check macros
 #include "../Internal/rf_internal_mod.ph" //for the internal buffer
 /*------------- libc inclusion --------------*/
 #include <stdarg.h> //needed for the va_list
@@ -105,6 +106,13 @@ bool rf_stringx_initv(struct RFstringx* str, const char* lit, ...)
     char *buff_ptr;
     unsigned int size, buff_index;
     RF_ENTER_LOCAL_SCOPE();
+    i_NULLPTR_CHECK_1(str, "string", ret=false;goto cleanup_lscope);
+
+    if (!lit) {
+        RF_ERROR("String initialization failed due to null pointer input");
+        ret = false;
+        goto cleanup_lscope;
+    }
 
     va_start(args, lit);
     //read the var args
@@ -135,6 +143,11 @@ bool rf_stringx_init(struct RFstringx* str, const char* lit)
 {
     //check the string literal for valid utf-8 byte sequence
     uint32_t byteLength;
+    i_NULLPTR_CHECK_1(str, "string", false);
+    if (!lit) {
+        RF_ERROR("Failed to initialize string due to null c string input");
+        return false;
+    }
     if(!rf_utf8_verify_cstr(lit ,&byteLength))
     {
         RF_ERROR("Error at StringX initialization due to invalid UTF-8 "

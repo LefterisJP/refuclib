@@ -39,6 +39,7 @@
 #include <Utils/log.h> //for error logging
 #include <Utils/localscope.h>//for local scope macros
 #include <Utils/memory.h> //for refu memory allocation
+#include <Utils/sanity.h> //for the sanity check macros
 #include "../Internal/rf_internal_mod.ph" //for the internal buffer
 /*------------- libc inclusion --------------*/
 #include <stdarg.h> //for va_args
@@ -105,6 +106,14 @@ bool rf_string_initv(struct RFstring* str, const char* s, ...)
     bool ret = true;
     char *buff_ptr;
     RF_ENTER_LOCAL_SCOPE();
+    i_NULLPTR_CHECK_1(str, "string", ret = false;goto cleanup_lscope);
+
+    if (!s) {
+        RF_ERROR("String initialization failed due to null pointer input");
+        ret = false;
+        goto cleanup_lscope;
+    }
+
     va_start(args, s);
     //read the var args
     if(!fill_fmt_buffer(s, &size, &buff_ptr, &buff_index, args))
@@ -135,6 +144,12 @@ bool rf_string_init(struct RFstring* str, const char* s)
 {
     //check for validity of the given sequence and get the character length
     uint32_t byteLength;
+    i_NULLPTR_CHECK_1(str, "string", false);
+
+    if (!s) {
+        RF_ERROR("Attempted to initialize string with a null c string");
+        return false;
+    }
     if(!rf_utf8_verify_cstr(s, &byteLength))
     {
         RF_ERROR("Error at String Initialization due to invalid UTF-8 "

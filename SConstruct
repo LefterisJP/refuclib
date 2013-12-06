@@ -59,9 +59,9 @@ env.Append(LINKFLAGS=temp['LINKER_SHARED_FLAGS'])
 #  affecting one another
 
 #only if actually building setup the required modules
-if 'shared' in COMMAND_LINE_TARGETS or 'static' in COMMAND_LINE_TARGETS or 'check' in COMMAND_LINE_TARGETS:
-    (modules, sources) = setup_modules(temp, env, targetSystem,
-                                       refu_dir, code_gen)
+# if 'shared' in COMMAND_LINE_TARGETS or 'static' in COMMAND_LINE_TARGETS or 'check' in COMMAND_LINE_TARGETS:
+(modules, sources) = setup_modules(temp, env, targetSystem,
+                                   refu_dir, code_gen)
 
 #setup the variables of the configuration file
 setupConfigVars(temp, env)
