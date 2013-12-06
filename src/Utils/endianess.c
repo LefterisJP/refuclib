@@ -27,54 +27,46 @@
 /*------------- End of includes -------------*/
 
 // Swaps the endianness of the variable
-void rfSwapEndianUS(uint16_t* v)
+void rf_swap_endianess_u16(uint16_t* v)
 {
     *v = (*v>>8)|(*v<<8);
 }
 
 //Swaps the endianness of the variable
-void rfSwapEndianS(int16_t* v)
+void rf_swap_endianess_i16(int16_t* v)
 {
     *v = ((*v&0xff00)>> 8) |((*v&0x00ff)<<8);
 }
-
 // Swaps the endianness of the variable
-void rfSwapEndianUI(uint32_t*   v)
+void rf_swap_endianess_i32(int32_t*   v)
 {
     *v = (*v>>24) | ((*v<<8) & 0x00FF0000) |
     ((*v>>8) & 0x0000FF00) | (*v<<24);
 }
 // Swaps the endianness of the variable
-void rfSwapEndianI(int32_t*   v)
-{
-    *v = (*v>>24) | ((*v<<8) & 0x00FF0000) |
-    ((*v>>8) & 0x0000FF00) | (*v<<24);
-}
-
-// Swaps the endianness of the variable
-void rfSwapEndianUL(uint32_t*   v)
+void rf_swap_endianess_u32(uint32_t*   v)
 {
     *v = (*v>>24) | ((*v<<8) & 0x00FF0000) |
     ((*v>>8) & 0x0000FF00) | (*v<<24);
 }
 
 
-void rfProcessByteOrderUI(uint32_t* v, int file_endianess)
+void rf_process_byte_order_u32(uint32_t* v, int file_endianess)
 {
     if(file_endianess == RF_LITTLE_ENDIAN)
     {
-        rfSwapEndianUI(v);
+        rf_swap_endianess_u32(v);
     }
 }
 
-void rfProcessByteOrderUS(uint16_t* v, int file_endianess)
+void rf_process_byte_order_u16(uint16_t* v, int file_endianess)
 {
     if(file_endianess == RF_LITTLE_ENDIAN)
     {
-        rfSwapEndianUS(v);
+        rf_swap_endianess_u16(v);
     }
 }
-void rfProcessByteOrderUSA(uint16_t* v, unsigned int length,
+void rf_process_byte_order_u16A(uint16_t* v, unsigned int length,
                            int file_endianess)
 {
     unsigned int i;
@@ -82,12 +74,12 @@ void rfProcessByteOrderUSA(uint16_t* v, unsigned int length,
     {
         for(i = 0; i < length; i ++)
         {
-            rfSwapEndianUS(&v[i]);
+            rf_swap_endianess_u16(&v[i]);
         }
     }
 }
 
-void rfProcessByteOrderUIA(uint32_t* v, unsigned int length,
+void rf_process_byte_order_u32A(uint32_t* v, unsigned int length,
                            int file_endianess)
 {
     unsigned int i;
@@ -95,7 +87,7 @@ void rfProcessByteOrderUIA(uint32_t* v, unsigned int length,
     {
         for(i = 0; i < length; i ++)
         {
-            rfSwapEndianUI(&v[i]);
+            rf_swap_endianess_u32(&v[i]);
         }
     }
 }

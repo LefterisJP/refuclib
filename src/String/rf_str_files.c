@@ -186,7 +186,7 @@ bool rf_string_fwrite(void* s, FILE* f,
                 RF_ERROR("Error in converting a string to UTF-16 LE");
                 goto cleanup1;
             }
-            rfProcessByteOrderUSA(utf16, length, endianess);
+            rf_process_byte_order_u16A(utf16, length, endianess);
             if(fwrite(utf16, 2, length, f) != length)
             {
                 free(utf16);
@@ -202,7 +202,7 @@ bool rf_string_fwrite(void* s, FILE* f,
                 RF_ERROR("Error in converting a string to LE UTF-32");
                 goto cleanup1;
             }
-            rfProcessByteOrderUIA(utf32, length, endianess);
+            rf_process_byte_order_u32A(utf32, length, endianess);
             if(fwrite(utf32, 4, length, f) != length)
             {
                 free(utf32);

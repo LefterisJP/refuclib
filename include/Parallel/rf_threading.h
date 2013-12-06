@@ -53,6 +53,6 @@ i_DECLIMEX_ void rf_deinit_thread_specific();
 /**
  ** @brief Gives an id unique to the calling thread
  **/
-int rf_ThreadGetId();
+int rf_thread_get_id();
 
 #endif

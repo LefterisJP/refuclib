@@ -54,12 +54,12 @@ extern "C"
  ** @return Returns @c true if initialized correctly and @c false otherwise
  **
  **/
-bool rf_lms_init(RFlocal_memory_stack* lms, uint64_t size);
+bool rf_lms_init(struct RFlocal_memory_stack* lms, uint64_t size);
 
 /**
  ** Frees the memory of the local memory stack
  **/
-void rf_lms_deinit(RFlocal_memory_stack *lms);
+void rf_lms_deinit(struct RFlocal_memory_stack *lms);
 
 /**
  ** @brief Pushes the local memory stack

@@ -797,7 +797,7 @@ int rf_file_read_char_utf16(FILE* f, uint32_t *c, bool cp,
                  "due to fread() failing with errno %d", errno);
         return -1;
     }
-    rfProcessByteOrderUS(&v1, endianess);
+    rf_process_byte_order_u16(&v1, endianess);
 
     /*If the value is in the surrogate area*/
     if(RF_HEXGE_US(v1,0xD800) && RF_HEXLE_US(v1,0xDFFF))
@@ -825,7 +825,7 @@ int rf_file_read_char_utf16(FILE* f, uint32_t *c, bool cp,
                 "due to fread() failing with errno %d", errno);
             return -1;
         }
-        rfProcessByteOrderUS(&v2, endianess);
+        rf_process_byte_order_u16(&v2, endianess);
         if(RF_HEXL_US(v2, 0xDC00) || RF_HEXG_US(v2, 0xDFFF))
         {
             RF_ERROR(
@@ -878,7 +878,7 @@ int rf_file_read_char_utf32(FILE* f, uint32_t *c,
         return -1;
     }
     //check if we need to be swapping
-    rfProcessByteOrderUI(c, endianess);
+    rf_process_byte_order_u32(c, endianess);
     return 4;
 }
 
@@ -996,7 +996,7 @@ int rf_file_move_back_char_utf16(FILE* f, uint32_t *c,
                  "fseek() with errno %d", errno);
         return -1;
     }
-    rfProcessByteOrderUS(&v1, endianess);
+    rf_process_byte_order_u16(&v1, endianess);
 
     /*If the word is a surrogate pair*/
     if(RF_HEXGE_US(v1,0xDC00) && RF_HEXLE_US(v1,0xDFFF))
@@ -1027,7 +1027,7 @@ int rf_file_move_back_char_utf16(FILE* f, uint32_t *c,
                      "due to fseek() with errno %d", errno);
             return -1;
         }
-        rfProcessByteOrderUS(&v2, endianess);
+        rf_process_byte_order_u16(&v2, endianess);
 
         if(RF_HEXL_US(v2,0xD800) || RF_HEXG_US(v2,0xDBFF))
         {
@@ -1097,7 +1097,7 @@ int rf_file_move_back_char_utf32(FILE* f, uint32_t *c,
         return -1;
     }
     //check if we need to be swapping
-    rfProcessByteOrderUI(c, endianess);
+    rf_process_byte_order_u32(c, endianess);
     return 4;
 }
 

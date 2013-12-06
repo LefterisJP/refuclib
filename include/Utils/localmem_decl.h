@@ -28,8 +28,6 @@
  *    == END OF REFU LICENSE ==
 */
 
-
-
 #ifndef RF_LOCAL_MEMORY_DECL_H
 #define RF_LOCAL_MEMORY_DECL_H
 
@@ -57,8 +55,7 @@
  ** and so in the case of having two macros that create a temporary object a way was needed to determine
  ** which came first and hence determine where the stack pointer was before a function call.
 **/
-typedef struct RFlocal_memory_stack
-{
+struct RFlocal_memory_stack {
     //! The local memory stack
     char* stack;
     //! The local memory stack pointer
@@ -67,12 +64,12 @@ typedef struct RFlocal_memory_stack
     uint32_t macroEvals[RF_MAX_FUNC_ARGS];
     //! The index to the macro evaluations array
     uint32_t macroEvalsI;
-}RFlocal_memory_stack;
+};
 
 /**
  ** Declare a pointer to the thread-specific local memory stack
  **
  **/
-extern i_THREAD__ i_DECLIMEX_  RFlocal_memory_stack* RF_LMS;
+extern i_THREAD__ i_DECLIMEX_  struct RFlocal_memory_stack* RF_LMS;
 
 #endif //include guards end

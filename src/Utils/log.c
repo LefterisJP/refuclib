@@ -214,7 +214,7 @@ static bool format_log_message(struct RFlog *log,
 
     /* Thread ID */
     CHECK_BUFFER(log, 100);
-    ret = snprintf(log->index, 100, "(Thread %#010x)", rf_ThreadGetId());
+    ret = snprintf(log->index, 100, "(Thread %#010x)", rf_thread_get_id());
     if(ret < 0 || ret >= 100) {
         return false;
     }

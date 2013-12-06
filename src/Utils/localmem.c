@@ -43,12 +43,12 @@
 
 
 //define The main thread's local stack memory
-RFlocal_memory_stack g_main_thread_stack;
+struct RFlocal_memory_stack g_main_thread_stack;
 //define the pointer to the thread specific memory stack
-i_THREAD__ RFlocal_memory_stack* RF_LMS;
+i_THREAD__ struct RFlocal_memory_stack* RF_LMS;
 
 // Initializes the local memory stack
-bool rf_lms_init(RFlocal_memory_stack* lms, uint64_t size)
+bool rf_lms_init(struct RFlocal_memory_stack* lms, uint64_t size)
 {
     lms->stackPtr = 0;
     lms->macroEvalsI = 0;
@@ -59,7 +59,7 @@ bool rf_lms_init(RFlocal_memory_stack* lms, uint64_t size)
     return true;
 }
 
-void rf_lms_deinit(RFlocal_memory_stack *lms)
+void rf_lms_deinit(struct RFlocal_memory_stack *lms)
 {
     free(lms->stack);
     RF_LMS = NULL;
@@ -124,7 +124,7 @@ bool rf_lms_activate(uint64_t size, bool is_main)
         ret = rf_lms_init(&g_main_thread_stack, size);
         RF_LMS = &g_main_thread_stack;
     } else {
-        RFlocal_memory_stack *lms;
+        struct RFlocal_memory_stack *lms;
         RF_MALLOC(lms, sizeof(*lms), false);
         ret = rf_lms_init(lms, size);
         RF_LMS = lms;

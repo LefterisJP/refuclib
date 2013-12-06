@@ -3,7 +3,7 @@
 #include <Utils/buffer.h>
 
 
-i_THREAD__ RFbuffer _tsbuffa;
+i_THREAD__ struct RFbuffer _tsbuffa;
 
 bool rf_internal_activate_ts()
 {

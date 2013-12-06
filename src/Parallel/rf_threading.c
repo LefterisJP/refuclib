@@ -40,13 +40,13 @@ bool rf_init_thread_specific()
 {
     if (!rf_internal_activate_ts()) {
         RF_ERROR("Could not activate the internal module for thread %#010x",
-                 rf_ThreadGetId());
+                 rf_thread_get_id());
         return false;
     }
     if (!rf_lms_activate(0, false)) {
         RF_ERROR("Could not activate the local memory stack "
                  "module for thread %#010x",
-                 rf_ThreadGetId());
+                 rf_thread_get_id());
         return false;
     }
     return true;

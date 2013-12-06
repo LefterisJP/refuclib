@@ -42,7 +42,7 @@
 #include <Utils/log.h>
 #include <Utils/localscope.h> //for local scope macros
 #include <Utils/memory.h> //for refu memory allocation
-#include <Utils/math.h> //for rfMax
+#include <Utils/math.h> //for rf_math_max
 #include "../Internal/rf_internal_mod.ph" //for the internal buffer
 /*------------- libc inclusion --------------*/
 #include <errno.h> //for errno
@@ -106,7 +106,7 @@ bool rf_string_to_int(const void* str, int32_t* v)
     char buff[MAX_UINT32_STRING_CHAR_SIZE + 1];
     int index;
 
-    index = rfMax(MAX_UINT32_STRING_CHAR_SIZE, rf_string_length_bytes(str));
+    index = rf_math_max(MAX_UINT32_STRING_CHAR_SIZE, rf_string_length_bytes(str));
     memcpy(buff, rf_string_data(str), index);
     buff[index] = '\0';
 
@@ -127,7 +127,7 @@ bool rf_string_to_double(const void* str, double* f)
     char buff[MAX_DOUBLE_STRING_CHAR_SIZE + 1];
     int index;
 
-    index = rfMax(MAX_DOUBLE_STRING_CHAR_SIZE, rf_string_length_bytes(str));
+    index = rf_math_max(MAX_DOUBLE_STRING_CHAR_SIZE, rf_string_length_bytes(str));
     memcpy(buff, rf_string_data(str), index);
     buff[index] = '\0';
 

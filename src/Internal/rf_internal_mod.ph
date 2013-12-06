@@ -8,7 +8,7 @@
 //for thread specific attribute
     #include <Definitions/threadspecific.h>
 
-extern i_THREAD__ RFbuffer _tsbuffa;
+extern i_THREAD__ struct RFbuffer _tsbuffa;
 #define TSBUFFA (&_tsbuffa)
 
 bool rf_internal_activate_ts();

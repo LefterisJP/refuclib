@@ -82,9 +82,9 @@ vars.Add(
                      'ALL',
                      'STRING',
                      'IO', 'TEXTFILE',
-                     'DATA_STRUCTURES', 
+                     'DATA_STRUCTURES',
                      'INTRUSIVE_LIST',
-                     'LIST', 
+                     'LIST',
                      'DYNAMICARRAY',
                      'BINARY_ARRAY',
                      'HASHMAP',
@@ -130,7 +130,7 @@ vars.Add(
 vars.Add('LOG_BUFFER_SIZE', 'The initial size to allocate for the Logging '
          'system buffer', 4096)
 
-                 
+
 vars.Add('DEBUG', "This option determines if this will be a Debug Build (0"
          "or 1), and if more than 1 it can indicate a different debug level",
          0)
@@ -194,5 +194,23 @@ vars.Add('HASHMAP_LOAD_FACTOR', 'This option determines when the hashmap '
          'the ratio of occupied slots over the map\'s size is greater '
          'than this value then rehashing of the map will take place.',
          0.7)
+
+# --------- Unit Testing variables --------
+
+vars.Add(
+    EnumVariable(
+        'TESTS_OUTPUT', 'This options determines the way that the outputs '
+        'of the tests shall be shown. Since currently we are using Check '
+        'as the unit testing framework here is an explanation of the possible '
+        'values: http://check.sourceforge.net/doc/check_html/check_8.html#Index',
+        'CK_VERBOSE',
+        allowed_values=(
+            'CK_SILENT',
+            'CK_MINIMAL',
+            'CK_NORMAL',
+            'CK_VERBOSE'
+        )
+))
+
 
 Return('vars')

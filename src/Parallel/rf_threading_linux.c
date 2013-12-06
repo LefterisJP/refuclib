@@ -30,7 +30,7 @@
 
 #include <Parallel/rf_threading.h>
 
-int rf_ThreadGetId()
+int rf_thread_get_id()
 {
     return pthread_self();
 }

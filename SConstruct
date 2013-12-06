@@ -1,5 +1,6 @@
 import os
 import platform
+import subprocess
 
 SConscript('build_script/compilers.py')
 SConscript('build_script/modules.py')
@@ -19,7 +20,8 @@ legalBuildTargets = [
     'static',
     'test_shared',
     'test_static',
-    'test']
+    'test',
+    'check']
 
 # read the configuration file variable and the extra objects
 (config_file, extra_objects, refu_dir, args_before) = SConscript(
@@ -57,7 +59,7 @@ env.Append(LINKFLAGS=temp['LINKER_SHARED_FLAGS'])
 #  affecting one another
 
 #only if actually building setup the required modules
-if 'shared' in COMMAND_LINE_TARGETS or 'static' in COMMAND_LINE_TARGETS:
+if 'shared' in COMMAND_LINE_TARGETS or 'static' in COMMAND_LINE_TARGETS or 'check' in COMMAND_LINE_TARGETS:
     (modules, sources) = setup_modules(temp, env, targetSystem,
                                        refu_dir, code_gen)
 
@@ -160,6 +162,40 @@ if 'test_static' in COMMAND_LINE_TARGETS:
     test_static = env.Program(os.path.join('Tests', 'test'),
                               test_sources)
     env.Alias('test_static', test_static)
+
+
+
+# Unit Testing
+def run_tests(target, source, env):
+    """For now this title is moved in the ./check binary,
+    so unless this can be made to work it will go away
+    """
+    print("\n\n=== Running Refu C library Unit Tests ===")
+    subprocess.call("./check {}".format(env['TESTS_OUTPUT']))
+
+env.Append(LIBS='check')
+unit_tests_files = [
+    'test_main.c',
+    'test_string_init.c'
+]
+unit_tests_files = ['Tests/Unit_Tests/' + s for s in unit_tests_files]
+unit_tests_files.extend(['src/' + s for s in sources])
+program = env.Program('check', unit_tests_files)
+
+env.SetDefault(TESTS_OUTPUT=temp['TESTS_OUTPUT'])
+
+test_run = env.Command(
+    target="test_run",
+    source='check',
+    # action=run_tests
+    action="./check {}".format(temp['TESTS_OUTPUT'])
+)
+check_alias = Alias('check', [test_run])
+# Simply required.  Without it, 'check' is never considered out of date.
+AlwaysBuild(check_alias)
+
+
+
 #generate help text for the variables
 Help(vars.GenerateHelpText(env))
 Help(args_before.GenerateHelpText(env))

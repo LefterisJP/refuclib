@@ -55,40 +55,34 @@ extern "C"
  ** (Because when you shift right >> a signed number the bits get filled by the sign and not zeros
  ** @param v The Variable whose endianness we wanna change
  **/
-i_DECLIMEX_ void rfSwapEndianUS(uint16_t* v);
+i_DECLIMEX_ void rf_swap_endianess_u16(uint16_t* v);
 /**
  ** Swaps the endianness of the variable
  ** @param v The Variable whose endianness we wanna change
  **/
-i_DECLIMEX_ void rfSwapEndianS(int16_t* v);
-/**
- ** Swaps the endianness of the variable
- ** @param v The Variable whose endianness we wanna change
- **
- **/
-i_DECLIMEX_ void rfSwapEndianUI(uint32_t*   v);
+i_DECLIMEX_ void rf_swap_endianess_i16(int16_t* v);
 /**
  ** Swaps the endianness of the variable
  ** @param v The Variable whose endianness we wanna change
  **
  **/
-i_DECLIMEX_ void rfSwapEndianI(int32_t*   v);
+i_DECLIMEX_ void rf_swap_endianess_i32(int32_t*   v);
 /**
  ** Swaps the endianness of the variable
  ** @param v The Variable whose endianness we wanna change
  **
  **/
-i_DECLIMEX_ void rfSwapEndianUL(uint32_t*   v);
+i_DECLIMEX_ void rf_swap_endianess_u32(uint32_t*   v);
 
 
 
 
-i_DECLIMEX_ void rfProcessByteOrderUS(uint16_t* v, int file_endianess);
-i_DECLIMEX_ void rfProcessByteOrderUI(uint32_t* v, int file_endianess);
-i_DECLIMEX_ void rfProcessByteOrderUSA(uint16_t* v, unsigned int length,
+i_DECLIMEX_ void rf_process_byte_order_u16(uint16_t* v, int file_endianess);
+i_DECLIMEX_ void rf_process_byte_order_u32(uint32_t* v, int file_endianess);
+i_DECLIMEX_ void rf_process_byte_order_u16A(uint16_t* v, unsigned int length,
                            int file_endianess);
 
-i_DECLIMEX_ void rfProcessByteOrderUIA(uint32_t* v, unsigned int length,
+i_DECLIMEX_ void rf_process_byte_order_u32A(uint32_t* v, unsigned int length,
                            int file_endianess);
 
 
