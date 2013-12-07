@@ -85,7 +85,7 @@
 
 
 /* ---- SAFE MEMORY ALLOCATION macros ---- */
-#ifdef RF_OPTION_SAFE_MEMORY_ALLOCATION
+#if defined(RF_OPTION_SAFE_MEMORY_ALLOCATION) || defined(RF_OPTION_DEBUG)
 
 /**
  ** Wrapper macro of the malloc() function that does check for memory
@@ -156,15 +156,15 @@
  ** if the memory allocation fails
  **
  **/
-#define RF_CALLOC_JMP(CALLOC_RETURN_,CALLOC_NUM_,                       \
-                      CALLOC_SIZE_, STMT_, GOTOFLAG_)                   \
-    do{ CALLOC_RETURN_ = calloc( (CALLOC_NUM_), (CALLOC_SIZE_) );       \
-        if(CALLOC_RETURN_ == NULL)                                      \
-        {                                                               \
-        RF_ERROR("calloc() failure");              \
-            STMT_;
-            goto GOTOFLAG__;                                             \
-        } }while(0)
+#define RF_CALLOC_JMP(CALLOC_RETURN_,CALLOC_NUM_,                     \
+                      CALLOC_SIZE_, STMT_, GOTOFLAG_)                 \
+        do{ CALLOC_RETURN_ = calloc( (CALLOC_NUM_), (CALLOC_SIZE_) ); \
+            if(CALLOC_RETURN_ == NULL)                                \
+            {                                                         \
+                RF_ERROR("calloc() failure");                         \
+                STMT_;                                                \
+                goto GOTOFLAG_;                                       \
+            } }while(0)
 
 /* ---- NOT SAFE MEMORY ALLOCATION macros ---- */
 #else

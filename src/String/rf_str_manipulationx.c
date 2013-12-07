@@ -203,7 +203,7 @@ bool rf_stringx_append_bytes(struct RFstringx* thisstr, const void* other,
 bool rf_stringx_append_cstr(struct RFstringx* thisstr, const char* cstr)
 {
     size_t len = strlen(cstr);
-    i_NULLPTR_CHECK_1(other, "append_cstr", ret=false;goto cleanup);
+
     //if it does not fit inside the remaining size, reallocate the buffer
     RF_STRINGX_REALLOC(
         thisstr,
@@ -268,7 +268,7 @@ bool rf_stringx_replace_between(struct RFstringx* thisstr, const void* left,
     struct RFstring ss;
     RF_ENTER_LOCAL_SCOPE();
 
-    i_NULLPTR_CHECK_3(left, right, rstr, ret=false; goto cleanup);
+    i_NULLPTR_CHECK_3(left, right, rstr, ret=false; goto cleanup1);
 
     if(i==0)//if we want all occurences replaced
     {

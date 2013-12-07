@@ -52,28 +52,28 @@
         }                                                     \
     }while(0)
 
-#define i_NULLPTR_CHECK_2(ptr1_, ptr2_, fail_)      \
-    do{                                             \
-        if(!ptr1 || !ptr2_)                         \
-        {                                           \
-            RF_ERROR("NULL pointer detected") ;     \
-            fail_;                                  \
-        }                                           \
+#define i_NULLPTR_CHECK_2(ptr1_, ptr2_, fail_)  \
+    do{                                         \
+        if(!ptr1_ || !ptr2_)                    \
+        {                                       \
+            RF_ERROR("NULL pointer detected") ; \
+            fail_;                              \
+        }                                       \
     }while(0)
 
 
 #define i_NULLPTR_CHECK_3(ptr1_, ptr2_, ptr3_, fail_) \
     do{                                               \
-        if(!ptr1 || !ptr2_ || !ptr3_)                 \
+        if(!ptr1_ || !ptr2_ || !ptr3_)                \
         {                                             \
             RF_ERROR("NULL pointer detected") ;       \
             fail_;                                    \
         }                                             \
     }while(0)
 
-#define i_NULLPTR_CHECK_4(ptr1_, ptr2_, ptr3_, ptr_4, fail_)  \
+#define i_NULLPTR_CHECK_4(ptr1_, ptr2_, ptr3_, ptr4_, fail_)  \
     do{                                                       \
-        if(!ptr1 || !ptr2_ || !ptr3_ || !ptr4_)               \
+        if(!ptr1_ || !ptr2_ || !ptr3_ || !ptr4_)              \
         {                                                     \
             RF_ERROR("NULL pointer detected") ;               \
             fail_;                                            \

@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 
-Suite *string_initialization_suite_create(void);
+Suite *string_core_suite_create(void);
 
 static const char *SILENT = "CK_SILENT";
 static const char *MINIMAL = "CK_MINIMAL";
@@ -28,17 +28,34 @@ static enum print_output choose_print_output(char* arg)
     }
 }
 
+static enum fork_status choose_fork_status(char* arg)
+{
+    enum fork_status type = CK_FORK;
+    if (strcmp(arg, "False") == 0) {
+        type = CK_NOFORK;
+    }
+    return type;
+}
 
 int main(int argc, char **argv)
 {
     int number_failed;
     enum print_output print_type;
+    enum fork_status fork_type;
+    /* default values */
     print_type = CK_VERBOSE;
+    fork_type = CK_FORK;
+
     if (argc >= 2) {
         print_type = choose_print_output(argv[1]);
     }
+    if (argc >= 3) {
+        fork_type = choose_fork_status(argv[2]);
+    }
+
     printf("\n\n=== Running Refu C library Unit Tests ===\n");
-    SRunner *sr = srunner_create(string_initialization_suite_create());
+    SRunner *sr = srunner_create(string_core_suite_create());
+    srunner_set_fork_status (sr, fork_type);
     srunner_run_all(sr, print_type);
     number_failed = srunner_ntests_failed(sr);
     srunner_free(sr);

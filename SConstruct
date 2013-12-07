@@ -173,23 +173,27 @@ def run_tests(target, source, env):
     print("\n\n=== Running Refu C library Unit Tests ===")
     subprocess.call("./check {}".format(env['TESTS_OUTPUT']))
 
-env.Append(LIBS='check')
 unit_tests_files = [
     'test_main.c',
-    'test_string_init.c'
+    'test_string_core.c'
 ]
 unit_tests_files = ['Tests/Unit_Tests/' + s for s in unit_tests_files]
 unit_tests_files.extend(['src/' + s for s in sources])
-program = env.Program('check', unit_tests_files)
-
-env.SetDefault(TESTS_OUTPUT=temp['TESTS_OUTPUT'])
+libs_check = env['LIBS']
+libs_check.append('check')
+cppdefines_check = env['CPPDEFINES']
+cppdefines_check['RF_OPTION_DEBUG'] = None
+program = env.Program('check', unit_tests_files, LIBS=libs_check,
+                      CPPDEFINE=cppdefines_check)
 
 test_run = env.Command(
     target="test_run",
     source='check',
     # action=run_tests
-    action="./check {}".format(temp['TESTS_OUTPUT'])
-)
+    action="./check {} {}".format(
+        temp['UNIT_TESTS_OUTPUT'],
+        temp['UNIT_TESTS_FORK']
+))
 check_alias = Alias('check', [test_run])
 # Simply required.  Without it, 'check' is never considered out of date.
 AlwaysBuild(check_alias)

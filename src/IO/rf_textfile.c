@@ -754,7 +754,7 @@ struct RFtextfile* rf_textfile_create(const void* name,
         ret = NULL;
     }
 
-#ifdef RF_OPTION_SAFE_MEMORY_ALLOCATION
+#if defined(RF_OPTION_SAFE_MEMORY_ALLOCATION) || defined(RF_OPTION_DEBUG)
   cleanup:
 #endif
     RF_EXIT_LOCAL_SCOPE();
@@ -1614,7 +1614,7 @@ bool rf_textfile_write(struct RFtextfile* t, void* s)
     {
         RF_ERROR("Provided a null pointer for the to-write string");
         ret = false;
-        goto cleanup;
+        goto cleanup1;
     }
 #endif
 

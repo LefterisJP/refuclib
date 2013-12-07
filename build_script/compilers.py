@@ -93,6 +93,7 @@ def setupCompiler(env, os, arg_env):
     #add debug symbols to the compiler if Debug is not 0
     if arg_env['DEBUG'] != 0:
         add_compiler_field(env, os, compiler_name, 'CCFLAGS', 'debug_flags')
+        env.Append(CPPDEFINES={'RF_OPTION_DEBUG': None})
 
     # figure out the tools value
     env.Replace(tools=compilers[compiler_name].toolsValues[os])

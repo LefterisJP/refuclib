@@ -143,7 +143,7 @@ bool rf_stringx_init(struct RFstringx* str, const char* lit)
 {
     //check the string literal for valid utf-8 byte sequence
     uint32_t byteLength;
-    i_NULLPTR_CHECK_1(str, "string", false);
+    i_NULLPTR_CHECK_1(str, "string", return false);
     if (!lit) {
         RF_ERROR("Failed to initialize string due to null c string input");
         return false;
@@ -171,6 +171,7 @@ struct RFstringx* rf_stringx_create_cp(uint32_t codepoint)
 }
 bool rf_stringx_init_cp(struct RFstringx* str, uint32_t codepoint)
 {
+    i_NULLPTR_CHECK_1(str, "string", return false);
     if(!rf_string_init_cp(&str->INH_String, codepoint))
     {
         return false;
@@ -180,7 +181,7 @@ bool rf_stringx_init_cp(struct RFstringx* str, uint32_t codepoint)
     return true;
 }
 
-struct RFstringx* rf_stringx_create_i(int i)
+struct RFstringx* rf_stringx_create_int(int i)
 {
     struct RFstringx* ret;
     RF_MALLOC(ret, sizeof(*ret), NULL);
@@ -193,6 +194,7 @@ struct RFstringx* rf_stringx_create_i(int i)
 }
 bool rf_stringx_init_int(struct RFstringx* str, int i)
 {
+    i_NULLPTR_CHECK_1(str, "string", return false);
     if(!rf_string_init_int(&str->INH_String, i))
     {
         return false;
@@ -215,6 +217,7 @@ struct RFstringx* rf_stringx_create_double(double d)
 }
 bool rf_stringx_init_double(struct RFstringx* str, double d)
 {
+    i_NULLPTR_CHECK_1(str, "string", return false);
     if(!rf_string_init_double(&str->INH_String, d))
     {
         return false;
@@ -234,8 +237,11 @@ struct RFstringx* rf_stringx_create_utf16(const uint16_t* s, unsigned int len)
     }
     return ret;
 }
-bool rf_stringx_init_utf16(struct RFstringx* str, const uint16_t* s, unsigned int len)
+bool rf_stringx_init_utf16(struct RFstringx* str,
+                           const uint16_t* s,
+                           unsigned int len)
 {
+    i_NULLPTR_CHECK_1(str, "string", return false);
     if(!rf_string_init_utf16(&str->INH_String, s, len))
     {
         return false;

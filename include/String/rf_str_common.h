@@ -44,13 +44,19 @@ extern "C" {
 #endif
 
 #define RF_STR_PF_FMT "%.*s"
+#define RF_STR_PF_ARG(i_str_) \
+    rf_string_length_bytes(i_str_), rf_string_data(i_str_) 
+#if 0 /* TODO: Using this I get address always evaluates to true in some cases,
+         think how we can get rid of that warning */
+
 #if RF_OPTION_DEBUG
-#define RF_STR_PF_ARG(i_str_)                    \
+#define RF_STR_PF_ARG(i_str_)                      \
     (i_str_) ? rf_string_length_bytes(i_str_) : 0, \
-    (i_str_) ? rf_string_data(i_str) : ""
+        (i_str_) ? rf_string_data(i_str_) : ""
 #else
 #define RF_STR_PF_ARG(i_str_) \
     rf_string_length_bytes(i_str_), rf_string_data(i_str_) 
+#endif
 #endif
 /**
  ** @brief Create a termporary String from a String literal

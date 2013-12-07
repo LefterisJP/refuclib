@@ -410,7 +410,7 @@ bool rf_string_trim_start(void* thisstr, const void* sub)
     bool ret = false, noMatch;
     uint32_t i = 0, j, subLength, bytePos;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_1(sub, "substring", ret=false;goto cleanup);
+    i_NULLPTR_CHECK_1(sub, "substring", ret=false; goto cleanup);
 
     //get all the codepoints of the string
     subLength = fill_codepoints_from_string(sub);
@@ -453,7 +453,7 @@ bool rf_string_trim_start(void* thisstr, const void* sub)
         rf_string_length_bytes(thisstr) -= bytePos;
     }
 
-#ifdef RF_OPTION_SAFE_MEMORY_ALLOCATION //only used for malloc fail
+#if defined(RF_OPTION_SAFE_MEMORY_ALLOCATION) || defined(RF_OPTION_DEBUG)
   cleanup:
 #endif
     RF_EXIT_LOCAL_SCOPE();
