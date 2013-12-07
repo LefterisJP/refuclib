@@ -183,6 +183,7 @@ libs_check = env['LIBS']
 libs_check.append('check')
 cppdefines_check = env['CPPDEFINES']
 cppdefines_check['RF_OPTION_DEBUG'] = None
+cppdefines_check['RF_OPTION_INSANITY_CHECKS'] = None
 program = env.Program('check', unit_tests_files, LIBS=libs_check,
                       CPPDEFINE=cppdefines_check)
 

@@ -87,4 +87,51 @@
 #define i_NULLPTR_CHECK_4(ptr1_, ptr2_, ptr3_, ptr4_, fail_)      
 #endif
 
+
+
+#if RF_OPTION_INSANITY_CHECKS
+#define i_NULLPTR_INSANITY_CHECK_1(ptr_, argname_, fail_)     \
+    do{                                                       \
+        if(!ptr_)                                             \
+        {                                                     \
+            RF_ERROR("Provided a NULL pointer for "argname_); \
+            fail_;                                            \
+        }                                                     \
+    }while(0)
+
+#define i_NULLPTR_INSANITY_CHECK_2(ptr1_, ptr2_, fail_) \
+        do{                                             \
+            if(!ptr1_ || !ptr2_)                        \
+            {                                           \
+                RF_ERROR("NULL pointer detected") ;     \
+                fail_;                                  \
+            }                                           \
+        }while(0)
+
+
+#define i_NULLPTR_INSANITY_CHECK_3(ptr1_, ptr2_, ptr3_, fail_)  \
+        do{                                                     \
+            if(!ptr1_ || !ptr2_ || !ptr3_)                      \
+            {                                                   \
+                RF_ERROR("NULL pointer detected") ;             \
+                fail_;                                          \
+            }                                                   \
+        }while(0)
+
+#define i_NULLPTR_INSANITY_CHECK_4(ptr1_, ptr2_, ptr3_, ptr4_, fail_) \
+        do{                                                           \
+            if(!ptr1_ || !ptr2_ || !ptr3_ || !ptr4_)                  \
+            {                                                         \
+                RF_ERROR("NULL pointer detected") ;                   \
+                fail_;                                                \
+            }                                                         \
+        }while(0)
+
+#else
+#define i_NULLPTR_INSANITY_CHECK_1(ptr_, argname_, ret_) 
+#define i_NULLPTR_INSANITY_CHECK_2(ptr1_, ptr2_, fail_)      
+#define i_NULLPTR_INSANITY_CHECK_3(ptr1_, ptr2_, ptr3_, fail_)      
+#define i_NULLPTR_INSANITY_CHECK_4(ptr1_, ptr2_, ptr3_, ptr4_, fail_)      
+#endif
+
 #endif /* include guards end */

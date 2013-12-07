@@ -144,6 +144,13 @@ vars.Add(
                  'for this option are \'yes\' and \'no\'.'
                  ,'no' ))
 
+vars.Add(
+    BoolVariable('INSANITY_CHECKS',
+                 'If \'yes\' then the library\'s insanity checks will be '
+                 'activated. These are checks for things that really should '
+                 'not ever happen'
+                 ,'no' ))
+
 vars.Add('FGETS_READ_BYTESN', 'This option is the number of bytes that will '
          'be read each time by the library\'s version of fgets. Must be a '
          'positive integer number.', 512)

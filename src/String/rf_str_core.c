@@ -106,7 +106,7 @@ bool rf_string_initv(struct RFstring* str, const char* s, ...)
     bool ret = true;
     char *buff_ptr;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_1(str, "string", ret = false;goto cleanup_lscope);
+    i_NULLPTR_INSANITY_CHECK_1(str, "string", ret = false;goto cleanup_lscope);
 
     if (!s) {
         RF_ERROR("String initialization failed due to null pointer input");
@@ -144,7 +144,7 @@ bool rf_string_init(struct RFstring* str, const char* s)
 {
     //check for validity of the given sequence and get the character length
     uint32_t byteLength;
-    i_NULLPTR_CHECK_1(str, "string", return false);
+    i_NULLPTR_INSANITY_CHECK_1(str, "string", return false);
 
     if (!s) {
         RF_ERROR("Attempted to initialize string with a null c string");
@@ -184,7 +184,7 @@ struct RFstring* rf_string_create_cp(uint32_t codepoint)
 //Turns a unicode code point in a String (encoded in UTF-8).
 bool rf_string_init_cp(struct RFstring* str, uint32_t codepoint)
 {
-    i_NULLPTR_CHECK_1(str, "string", return false);
+    i_NULLPTR_INSANITY_CHECK_1(str, "string", return false);
     //alloc enough for a utf8 character
     RF_MALLOC(rf_string_data(str), MAX_UTF8C_BYTES, false);
     rf_string_length_bytes(str) = rf_utf8_encode_single(
@@ -216,7 +216,7 @@ bool rf_string_init_int(struct RFstring* str, int i)
     int len;
     //put the int32_t into a buffer and turn it in a char*
     char buff[MAX_UINT32_STRING_CHAR_SIZE];
-    i_NULLPTR_CHECK_1(str, "string", return false);
+    i_NULLPTR_INSANITY_CHECK_1(str, "string", return false);
 
     len = snprintf(buff, MAX_UINT32_STRING_CHAR_SIZE, "%d", i);
     if(len < 0 || len >= MAX_UINT32_STRING_CHAR_SIZE)
@@ -248,7 +248,7 @@ bool rf_string_init_double(struct RFstring* str, double f)
 {
     char buff[MAX_DOUBLE_STRING_CHAR_SIZE];
     int len;
-    i_NULLPTR_CHECK_1(str, "string", return false);
+    i_NULLPTR_INSANITY_CHECK_1(str, "string", return false);
 
     len = snprintf(buff, MAX_DOUBLE_STRING_CHAR_SIZE, "%f", f);
     if(len < 0 || len >= MAX_DOUBLE_STRING_CHAR_SIZE)
@@ -284,7 +284,7 @@ bool rf_string_init_utf16(struct RFstring* str, const uint16_t* s, unsigned int 
     uint32_t* codepoints;
     uint32_t characterLength, utf8ByteLength;
     char* utf8;
-    i_NULLPTR_CHECK_1(str, "string", return false);
+    i_NULLPTR_INSANITY_CHECK_1(str, "string", return false);
 
     if (!s) {
         RF_ERROR("Provided NULL UTF-16 byte sequence");
