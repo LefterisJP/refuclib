@@ -264,6 +264,7 @@ struct RFstringx* rf_stringx_create_utf32(const uint32_t* s, unsigned int len)
 bool rf_stringx_init_utf32(struct RFstringx* str, const uint32_t* codeBuffer,
                           unsigned int len)
 {
+    i_NULLPTR_INSANITY_CHECK_1(str, "string", return false);
     if(!rf_string_init_utf32(&str->INH_String, codeBuffer, len))
     {
         return false;

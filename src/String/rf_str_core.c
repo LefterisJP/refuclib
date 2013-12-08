@@ -337,6 +337,12 @@ bool rf_string_init_utf32(struct RFstring* str, const uint32_t* codeBuffer,
     //find the length of the utf32 buffer in characters
     uint32_t utf8ByteLength;
     char *utf8;
+    i_NULLPTR_INSANITY_CHECK_1(str, "string", return false);
+
+    if (!codeBuffer) {
+        RF_ERROR("Provided null pointer for the input byte stream");
+        return false;
+    }
 
     //turn the codepoints into a utf-8 encoded buffer
     RF_MALLOC(utf8, length * 4, false);
