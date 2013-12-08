@@ -76,7 +76,7 @@ bool rf_string_substr(const void* s, uint32_t startPos,
     uint32_t charI,byteI,startI,endI;
     bool started = false, ended = false;
     startI = endI = 0;
-    i_NULLPTR_CHECK_2(s, ret, return false);
+    RF_CHECK_NOT_NULL_DEBUG_2(s, ret, return false);
 
     RF_STRING_ITERATE_START(s, charI, byteI)
         if(charI == startPos)
@@ -162,7 +162,7 @@ unsigned int rf_string_count(const void* tstr, const void* sstr,
     int move, index;
     unsigned int n;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_2(tstr, sstr, goto cleanup);
+    RF_CHECK_NOT_NULL_DEBUG_2(tstr, sstr, goto cleanup);
 
     move = index = n = 0;
     //as long as the substring is found in the string
@@ -196,7 +196,7 @@ bool rf_string_scanf_after(const void* str, const void* astr,
     const char *found;
     bool ret = false;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_2(str, astr, goto cleanup);
+    RF_CHECK_NOT_NULL_DEBUG_2(str, astr, goto cleanup);
 
     found = strstr_nnt(rf_string_data(str), rf_string_length_bytes(str),
                       rf_string_data(astr), rf_string_length_bytes(astr));
@@ -230,7 +230,7 @@ bool rf_string_between(const void* tstr, const void* lstr,
     struct RFstring temp;
     bool ret = false;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_4(tstr, lstr, rstr, result, goto cleanup);
+    RF_CHECK_NOT_NULL_DEBUG_4(tstr, lstr, rstr, result, goto cleanup);
 
     //find the left substring
     if((start = rf_string_find_byte_pos(tstr, lstr, options)) == RF_FAILURE)
@@ -287,7 +287,7 @@ bool rf_string_beforev(const void* thisstr, void* result,
     va_list argList;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_2(thisstr, result, ret = false; goto cleanup);
+    RF_CHECK_NOT_NULL_DEBUG_2(thisstr, result, ret = false; goto cleanup);
 
     //get the parameter characters
     va_start(argList, parN);
@@ -341,7 +341,7 @@ bool rf_string_before(const void* thisstr, const void* sstr,
     int32_t rv;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_3(thisstr, sstr, result, ret = false; goto cleanup);
+    RF_CHECK_NOT_NULL_DEBUG_3(thisstr, sstr, result, ret = false; goto cleanup);
 
     //find the substring
     if((rv = rf_string_find_byte_pos(thisstr, sstr, options)) == RF_FAILURE)
@@ -379,7 +379,7 @@ bool rf_string_after(const void* thisstr, const void* after,
     int32_t bytePos;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_3(thisstr, after, result, ret = false;goto cleanup);
+    RF_CHECK_NOT_NULL_DEBUG_3(thisstr, after, result, ret = false;goto cleanup);
 
     //check for substring existence
     if((bytePos = rf_string_find_byte_pos(thisstr, after, options)) == RF_FAILURE)
@@ -430,7 +430,7 @@ bool rf_string_afterv(const void* thisstr, void* result,
     va_list argList;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_2(thisstr, result, ret = false; goto cleanup);
+    RF_CHECK_NOT_NULL_DEBUG_2(thisstr, result, ret = false; goto cleanup);
 
     //get the parameter characters
     va_start(argList,parN);

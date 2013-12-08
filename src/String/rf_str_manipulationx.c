@@ -48,7 +48,7 @@ bool rf_stringx_append(struct RFstringx* thisstr, const void* other)
 {
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_1(other, "append", ret = false;goto cleanup);
+    RF_CHECK_NOT_NULL_DEBUG_1(other, "append", ret = false;goto cleanup);
 
     ret = rf_stringx_generic_append(thisstr, rf_string_data(other),
                               rf_string_length_bytes(other));
@@ -67,7 +67,7 @@ bool rf_stringx_append_chars(struct RFstringx* thisstr, const void* other, int c
     unsigned end = 0;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_1(other, "append", ret = false; goto cleanup);
+    RF_CHECK_NOT_NULL_DEBUG_1(other, "append", ret = false; goto cleanup);
 
     //find out the bytelength of the requested char position
     RF_STRING_ITERATE_START(other, length, i);
@@ -108,7 +108,7 @@ bool rf_stringx_prepend(struct RFstringx* thisstr, const void* other)
 {
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_1(other, "prepend", ret=false;goto cleanup);
+    RF_CHECK_NOT_NULL_DEBUG_1(other, "prepend", ret=false;goto cleanup);
 
     //if the new string does not fit inside the buffer reallocate it
     RF_STRINGX_REALLOC_JMP(
@@ -136,7 +136,7 @@ bool rf_stringx_insert(struct RFstringx* thisstr, uint32_t pos,
     uint32_t length, bytePos, size, i;
     bool found = false, ret = false;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_1(other, "insert", goto cleanup);
+    RF_CHECK_NOT_NULL_DEBUG_1(other, "insert", goto cleanup);
 
 
     //keep the original byte length here
@@ -185,7 +185,7 @@ bool rf_stringx_append_bytes(struct RFstringx* thisstr, const void* other,
 {
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_1(other, "append_bytes", ret=false;goto cleanup);
+    RF_CHECK_NOT_NULL_DEBUG_1(other, "append_bytes", ret=false;goto cleanup);
 
     //if it does not fit inside the remaining size, reallocate the buffer
     RF_STRINGX_REALLOC_JMP(
@@ -223,7 +223,7 @@ bool rf_stringx_replace(struct RFstringx* thisstr, const void* sstr,
     uint32_t number = num;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_2(sstr, rstr, ret=false;goto cleanup);
+    RF_CHECK_NOT_NULL_DEBUG_2(sstr, rstr, ret=false;goto cleanup);
 
     if(!replace_intro(thisstr, &number, sstr, options))
     {
@@ -268,7 +268,7 @@ bool rf_stringx_replace_between(struct RFstringx* thisstr, const void* left,
     struct RFstring ss;
     RF_ENTER_LOCAL_SCOPE();
 
-    i_NULLPTR_CHECK_3(left, right, rstr, ret=false; goto cleanup1);
+    RF_CHECK_NOT_NULL_DEBUG_3(left, right, rstr, ret=false; goto cleanup1);
 
     if(i==0)//if we want all occurences replaced
     {

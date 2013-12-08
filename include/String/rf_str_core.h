@@ -341,7 +341,8 @@ i_DECLIMEX_ bool rf_string_copy_in(struct RFstring* dst, const void* src);
  ** @param src The string to copy from. @inhtype{String,StringX}
  ** @param n The number of characters to copy from the @c src string
  ** If the value is bigger than the maximum number of characters 
- ** then still all characters are copied.
+ ** then still all characters are copied. If it is 0 then an empty
+ ** string is initialized as the copy.
  ** @return Returns @c true for success and @c false otherwise
  ** @see rf_string_copy_in()
  ** @see rf_string_copy_out()

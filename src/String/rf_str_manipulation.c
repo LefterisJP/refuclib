@@ -81,7 +81,7 @@ bool rf_string_append(struct RFstring* thisstr, const void* other)
     unsigned int newLen;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_1(other, "append", return false);
+    RF_CHECK_NOT_NULL_DEBUG_1(other, "append", return false);
 
     newLen = rf_string_length_bytes(thisstr) + rf_string_length_bytes(other);
     //reallocate this string to fit the new addition
@@ -122,7 +122,7 @@ bool rf_string_prepend(struct RFstring* thisstr, const void* other)
 {
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_1(other, "prepend", ret=false;goto cleanup);
+    RF_CHECK_NOT_NULL_DEBUG_1(other, "prepend", ret=false;goto cleanup);
 
     //reallocate this string to fit the new addition
     RF_REALLOC_JMP(rf_string_data(thisstr), char,
@@ -149,7 +149,7 @@ bool rf_string_remove(void* thisstr, const void* rstr, uint32_t number,
     int32_t bytePos;
     char found = false, ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_1(rstr, "remove", ret=false;goto cleanup);
+    RF_CHECK_NOT_NULL_DEBUG_1(rstr, "remove", ret=false;goto cleanup);
 
     //as long as we keep finding rstr in the string keep removing it
     do
@@ -205,7 +205,7 @@ bool rf_string_keep_only(void* thisstr, const void* keepstr)
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
 
-    i_NULLPTR_CHECK_1(keepstr, "keep", ret=false;goto cleanup);
+    RF_CHECK_NOT_NULL_DEBUG_1(keepstr, "keep", ret=false;goto cleanup);
     //get all characters of the string in the array
     keepLength = fill_codepoints_from_string(keepstr);
     if(keepLength < 0 ) {return false;}
@@ -410,7 +410,7 @@ bool rf_string_trim_start(void* thisstr, const void* sub)
     bool ret = false, noMatch;
     uint32_t i = 0, j, subLength, bytePos;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_1(sub, "substring", ret=false; goto cleanup);
+    RF_CHECK_NOT_NULL_DEBUG_1(sub, "substring", ret=false; goto cleanup);
 
     //get all the codepoints of the string
     subLength = fill_codepoints_from_string(sub);
@@ -465,7 +465,7 @@ bool rf_string_trim_end(void* thisstr, const void* sub)
     char ret = false,noMatch;
     uint32_t i = 0,j,subLength,bytePos,lastBytePos=0;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_1(sub, "substring", ret=false;goto cleanup);
+    RF_CHECK_NOT_NULL_DEBUG_1(sub, "substring", ret=false;goto cleanup);
 
     //get all the codepoints of the string
     subLength = fill_codepoints_from_string(sub);
@@ -530,7 +530,7 @@ bool rf_string_replace(struct RFstring* thisstr, const void* sstr,
     uint32_t number = num;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_2(sstr, rstr, ret=false;goto cleanup);
+    RF_CHECK_NOT_NULL_DEBUG_2(sstr, rstr, ret=false;goto cleanup);
 
     if(!replace_intro(thisstr, &number, sstr, options))
     {

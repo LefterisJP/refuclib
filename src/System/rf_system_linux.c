@@ -57,7 +57,7 @@ bool rf_system_make_dir(void* dirname, int mode)
     unsigned int index;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_1(dirname, "directory name", ret = false; goto cleanup);
+    RF_CHECK_NOT_NULL_DEBUG_1(dirname, "directory name", ret = false; goto cleanup);
 
     if(!(cs = rf_string_cstr_ibuff_push(dirname, &index)))
     {
@@ -90,7 +90,7 @@ bool rf_system_remove_dir(void* dirname)
     unsigned int index;
     struct RFstringx path;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_1(dirname, "directory name",
+    RF_CHECK_NOT_NULL_DEBUG_1(dirname, "directory name",
                       ret = false; goto cleanup_local);
 
     if(!(cs = rf_string_cstr_ibuff_push(dirname, &index)))
@@ -197,7 +197,7 @@ bool rf_system_delete_file(void* name)
     char *cs;
     unsigned int index;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_1(name, "file name", ret = false; goto cleanup);
+    RF_CHECK_NOT_NULL_DEBUG_1(name, "file name", ret = false; goto cleanup);
     if(!(cs = rf_string_cstr_ibuff_push(name, &index)))
     {
         ret = false; goto cleanup;
@@ -226,7 +226,7 @@ bool rf_system_rename_file(void* name, void* newName)
     char *cs_new_name;
     unsigned int index;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_2(name, newName, ret = false; goto cleanup);
+    RF_CHECK_NOT_NULL_DEBUG_2(name, newName, ret = false; goto cleanup);
 
     if(!(cs_name = rf_string_cstr_ibuff_push(name, &index)))
     {

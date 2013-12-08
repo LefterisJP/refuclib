@@ -1691,7 +1691,7 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
     //get the function's arguments
     int32_t error;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_CHECK_1(string, "insert_string", ret = false; goto cleanup0);
+    RF_CHECK_NOT_NULL_DEBUG_1(string, "insert_string", ret = false; goto cleanup0);
 
     lineFound = allocatedS = false;
     //determine the target line

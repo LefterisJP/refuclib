@@ -59,6 +59,11 @@ struct RFstringx* rf_stringx_createv(const char* lit, ...)
     char *buff_ptr;
     unsigned int size, buff_index;
     RF_ENTER_LOCAL_SCOPE();
+    if (!lit) {
+        RF_ERROR("String initialization failed due to null pointer input");
+        ret = NULL;
+        goto cleanup_lscope;
+    }
 
     va_start(args, lit);
     //read the var args
@@ -106,7 +111,7 @@ bool rf_stringx_initv(struct RFstringx* str, const char* lit, ...)
     char *buff_ptr;
     unsigned int size, buff_index;
     RF_ENTER_LOCAL_SCOPE();
-    i_NULLPTR_INSANITY_CHECK_1(str, "string", ret=false;goto cleanup_lscope);
+    RF_ASSERT(str);
 
     if (!lit) {
         RF_ERROR("String initialization failed due to null pointer input");
@@ -143,7 +148,8 @@ bool rf_stringx_init(struct RFstringx* str, const char* lit)
 {
     //check the string literal for valid utf-8 byte sequence
     uint32_t byteLength;
-    i_NULLPTR_INSANITY_CHECK_1(str, "string", return false);
+    RF_ASSERT(str);
+
     if (!lit) {
         RF_ERROR("Failed to initialize string due to null c string input");
         return false;
@@ -171,7 +177,7 @@ struct RFstringx* rf_stringx_create_cp(uint32_t codepoint)
 }
 bool rf_stringx_init_cp(struct RFstringx* str, uint32_t codepoint)
 {
-    i_NULLPTR_INSANITY_CHECK_1(str, "string", return false);
+    RF_ASSERT(str);
     if(!rf_string_init_cp(&str->INH_String, codepoint))
     {
         return false;
@@ -194,7 +200,7 @@ struct RFstringx* rf_stringx_create_int(int i)
 }
 bool rf_stringx_init_int(struct RFstringx* str, int i)
 {
-    i_NULLPTR_INSANITY_CHECK_1(str, "string", return false);
+    RF_ASSERT(str);
     if(!rf_string_init_int(&str->INH_String, i))
     {
         return false;
@@ -217,7 +223,7 @@ struct RFstringx* rf_stringx_create_double(double d)
 }
 bool rf_stringx_init_double(struct RFstringx* str, double d)
 {
-    i_NULLPTR_INSANITY_CHECK_1(str, "string", return false);
+    RF_ASSERT(str);
     if(!rf_string_init_double(&str->INH_String, d))
     {
         return false;
@@ -241,7 +247,7 @@ bool rf_stringx_init_utf16(struct RFstringx* str,
                            const uint16_t* s,
                            unsigned int len)
 {
-    i_NULLPTR_INSANITY_CHECK_1(str, "string", return false);
+    RF_ASSERT(str);
     if(!rf_string_init_utf16(&str->INH_String, s, len))
     {
         return false;
@@ -264,7 +270,7 @@ struct RFstringx* rf_stringx_create_utf32(const uint32_t* s, unsigned int len)
 bool rf_stringx_init_utf32(struct RFstringx* str, const uint32_t* codeBuffer,
                           unsigned int len)
 {
-    i_NULLPTR_INSANITY_CHECK_1(str, "string", return false);
+    RF_ASSERT(str);
     if(!rf_string_init_utf32(&str->INH_String, codeBuffer, len))
     {
         return false;
@@ -297,6 +303,7 @@ bool rf_stringx_init_unsafe(struct RFstringx* str, const char* lit)
 bool rf_stringx_init_unsafe_nnt(struct RFstringx* str, const char* s,
                                size_t length)
 {
+    RF_ASSERT(str);
     str->bSize = length * RF_OPTION_STRINGX_CAPACITY_MULTIPLIER;
     RF_MALLOC(rf_string_data(str), str->bSize, false);
     memcpy(rf_string_data(str), s, length);
@@ -308,6 +315,7 @@ bool rf_stringx_init_unsafe_nnt(struct RFstringx* str, const char* s,
 bool rf_stringx_init_unsafe_bnnt(struct RFstringx* str, const char* s,
                                 size_t length, size_t buff_size)
 {
+    RF_ASSERT(str);
     str->bSize = buff_size;
     RF_MALLOC(rf_string_data(str), str->bSize, false);
     memcpy(rf_string_data(str), s, length);
@@ -325,6 +333,12 @@ struct RFstringx* rf_stringx_create_buffv(uint32_t buffSize, const char* lit, ..
     char *buff_ptr;
     unsigned int size, buff_index;
     RF_ENTER_LOCAL_SCOPE();
+    
+    if (!lit) {
+        RF_ERROR("Provided null pointer for the string literal");
+        ret = NULL;
+        goto cleanup_lscope;
+    }
 
     va_start(args, lit);
     //read the var args
@@ -378,6 +392,13 @@ bool rf_stringx_init_buffv(struct RFstringx* str, uint32_t buffSize,
     char *buff_ptr;
     unsigned int size, buff_index;
     RF_ENTER_LOCAL_SCOPE();
+    RF_ASSERT(str);
+
+    if (!lit) {
+        RF_ERROR("Provided null pointer for the string literal");
+        ret = false;
+        goto cleanup_lscope;
+    }
 
     va_start(args, lit);
     //read the var args
@@ -408,6 +429,11 @@ bool rf_stringx_init_buff(struct RFstringx* str, uint32_t buffSize,
 {
     //check the string literal for valid utf-8 byte sequence
     uint32_t byteLength;
+    RF_ASSERT(str);
+    if (!lit) {
+        RF_WARNING("provided null source string literal");
+        return false;
+    }
     if(!rf_utf8_verify_cstr(lit, &byteLength))
     {
         RF_ERROR("Error at StringX initialization due to invalid UTF-8 "
@@ -428,7 +454,14 @@ bool rf_stringx_init_buff(struct RFstringx* str, uint32_t buffSize,
 bool rf_stringx_assign(struct RFstringx* dst, const void* source)
 {
     bool ret = true;
+
     RF_ENTER_LOCAL_SCOPE();
+    RF_ASSERT(dst);
+    if (!source) {
+        RF_WARNING("provided null source string");
+        ret = false;
+        goto cleanup;
+    }
     rf_stringx_reset(dst);//make sure that the destination's byte index is reset
     //only if the new string value won't fit in the buffer reallocate the buffer
     RF_STRINGX_REALLOC_JMP(dst, rf_string_length_bytes(source), ret=false, cleanup);
@@ -446,6 +479,7 @@ bool rf_stringx_assign(struct RFstringx* dst, const void* source)
 bool rf_stringx_assign_char(struct RFstringx* str, uint32_t codepoint)
 {
     int bytes;
+    RF_ASSERT(str);
     //reset the buffer if needed
     rf_stringx_reset(str);
     //realloc if needed
@@ -479,9 +513,16 @@ struct RFstringx* rf_stringx_from_string_out(const struct RFstring* s)
 bool rf_stringx_from_string_in(struct RFstringx* dst,
                                const struct RFstring* src)
 {
+    RF_ASSERT(dst);
+    if (!src) {
+        RF_WARNING("provided null source string");
+        return false;
+    }
     //allocate the stringX
     dst->bIndex = 0;
-    dst->bSize = rf_string_length_bytes(src) * RF_OPTION_STRINGX_CAPACITY_MULTIPLIER;
+    dst->bSize = (
+        rf_string_length_bytes(src) * RF_OPTION_STRINGX_CAPACITY_MULTIPLIER
+    );
     RF_MALLOC(rf_string_data(dst), dst->bSize, false);
     rf_string_length_bytes(dst) = rf_string_length_bytes(src);
     //copy the bytes from the String
@@ -503,6 +544,11 @@ struct RFstringx* rf_stringx_copy_out(struct RFstringx* s)
 
 bool rf_stringx_copy_in(struct RFstringx* dst, struct RFstringx* src)
 {
+    RF_ASSERT(dst);
+    if (!src) {
+        RF_WARNING("Provided null source string");
+        return false;
+    }
     //assert that the source string is copied from the beginning of its buffer
     rf_string_data(src) -= src->bIndex;
     //copy the bytes
@@ -523,7 +569,9 @@ bool rf_stringx_copy_chars(struct RFstringx* dst, struct RFstringx* src,
                           uint32_t charsN)
 {
     uint32_t i=0,bytePos;
-    rf_stringx_copy_in(dst, src);
+    if (!rf_stringx_copy_in(dst, src)) {
+        return false;
+    }
     //find the byte position and end the string there
     RF_STRING_ITERATE_START(src, i, bytePos)
     if(i == charsN)

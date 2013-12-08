@@ -36,6 +36,8 @@
 /*------------- Outside Module inclusion -------------*/
 #include <rf_options.h>
 #include <Utils/log.h>
+/*------------- libc inclusion --------------*/
+#include <assert.h>
 /*------------- End of includes -------------*/
 
 
@@ -43,7 +45,7 @@
  * These macros checks if some pointers are null and fail if they are
  */
 #if RF_OPTION_DEBUG
-#define i_NULLPTR_CHECK_1(ptr_, argname_, fail_)              \
+#define RF_CHECK_NOT_NULL_DEBUG_1(ptr_, argname_, fail_)      \
     do{                                                       \
         if(!ptr_)                                             \
         {                                                     \
@@ -52,7 +54,7 @@
         }                                                     \
     }while(0)
 
-#define i_NULLPTR_CHECK_2(ptr1_, ptr2_, fail_)  \
+#define RF_CHECK_NOT_NULL_DEBUG_2(ptr1_, ptr2_, fail_)  \
     do{                                         \
         if(!ptr1_ || !ptr2_)                    \
         {                                       \
@@ -62,7 +64,7 @@
     }while(0)
 
 
-#define i_NULLPTR_CHECK_3(ptr1_, ptr2_, ptr3_, fail_) \
+#define RF_CHECK_NOT_NULL_DEBUG_3(ptr1_, ptr2_, ptr3_, fail_) \
     do{                                               \
         if(!ptr1_ || !ptr2_ || !ptr3_)                \
         {                                             \
@@ -71,7 +73,7 @@
         }                                             \
     }while(0)
 
-#define i_NULLPTR_CHECK_4(ptr1_, ptr2_, ptr3_, ptr4_, fail_)  \
+#define RF_CHECK_NOT_NULL_DEBUG_4(ptr1_, ptr2_, ptr3_, ptr4_, fail_)  \
     do{                                                       \
         if(!ptr1_ || !ptr2_ || !ptr3_ || !ptr4_)              \
         {                                                     \
@@ -81,16 +83,16 @@
     }while(0)
 
 #else
-#define i_NULLPTR_CHECK_1(ptr_, argname_, ret_) 
-#define i_NULLPTR_CHECK_2(ptr1_, ptr2_, fail_)      
-#define i_NULLPTR_CHECK_3(ptr1_, ptr2_, ptr3_, fail_)      
-#define i_NULLPTR_CHECK_4(ptr1_, ptr2_, ptr3_, ptr4_, fail_)      
+#define RF_CHECK_NOT_NULL_DEBUG_1(ptr_, argname_, ret_) 
+#define RF_CHECK_NOT_NULL_DEBUG_2(ptr1_, ptr2_, fail_)      
+#define RF_CHECK_NOT_NULL_DEBUG_3(ptr1_, ptr2_, ptr3_, fail_)      
+#define RF_CHECK_NOT_NULL_DEBUG_4(ptr1_, ptr2_, ptr3_, ptr4_, fail_)      
 #endif
 
 
 
 #if RF_OPTION_INSANITY_CHECKS
-#define i_NULLPTR_INSANITY_CHECK_1(ptr_, argname_, fail_)     \
+#define RF_INSANE_CHECK_NOT_NULL_1(ptr_, argname_, fail_)     \
     do{                                                       \
         if(!ptr_)                                             \
         {                                                     \
@@ -99,7 +101,7 @@
         }                                                     \
     }while(0)
 
-#define i_NULLPTR_INSANITY_CHECK_2(ptr1_, ptr2_, fail_) \
+#define RF_INSANE_CHECK_NOT_NULL_2(ptr1_, ptr2_, fail_) \
         do{                                             \
             if(!ptr1_ || !ptr2_)                        \
             {                                           \
@@ -109,7 +111,7 @@
         }while(0)
 
 
-#define i_NULLPTR_INSANITY_CHECK_3(ptr1_, ptr2_, ptr3_, fail_)  \
+#define RF_INSANE_CHECK_NOT_NULL_3(ptr1_, ptr2_, ptr3_, fail_)  \
         do{                                                     \
             if(!ptr1_ || !ptr2_ || !ptr3_)                      \
             {                                                   \
@@ -118,7 +120,7 @@
             }                                                   \
         }while(0)
 
-#define i_NULLPTR_INSANITY_CHECK_4(ptr1_, ptr2_, ptr3_, ptr4_, fail_) \
+#define RF_INSANE_CHECK_NOT_NULL_4(ptr1_, ptr2_, ptr3_, ptr4_, fail_) \
         do{                                                           \
             if(!ptr1_ || !ptr2_ || !ptr3_ || !ptr4_)                  \
             {                                                         \
@@ -128,10 +130,24 @@
         }while(0)
 
 #else
-#define i_NULLPTR_INSANITY_CHECK_1(ptr_, argname_, ret_) 
-#define i_NULLPTR_INSANITY_CHECK_2(ptr1_, ptr2_, fail_)      
-#define i_NULLPTR_INSANITY_CHECK_3(ptr1_, ptr2_, ptr3_, fail_)      
-#define i_NULLPTR_INSANITY_CHECK_4(ptr1_, ptr2_, ptr3_, ptr4_, fail_)      
+#define RF_INSANE_CHECK_NOT_NULL_1(ptr_, argname_, ret_) 
+#define RF_INSANE_CHECK_NOT_NULL_2(ptr1_, ptr2_, fail_)      
+#define RF_INSANE_CHECK_NOT_NULL_3(ptr1_, ptr2_, ptr3_, fail_)      
+#define RF_INSANE_CHECK_NOT_NULL_4(ptr1_, ptr2_, ptr3_, ptr4_, fail_)      
 #endif
 
+
+
+/* just a wrapper over stdlib's assert */
+#ifdef RF_OPTION_DEBUG
+#define RF_ASSERT(condition_)                       \
+        do {                                         \
+            if (!condition_) {                       \
+                RF_CRITICAL("Assertion triggered");  \
+                assert(condition_);                  \
+            }                                        \
+        }while(0)
+#else
+#define RF_ASSERT(condition_)           
+#endif
 #endif /* include guards end */
