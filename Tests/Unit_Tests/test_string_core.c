@@ -4,20 +4,11 @@
 #include <string.h>
 
 #include "test_helpers.h"
+#include "test_string_helpers.h"
 
 #include <refu.h>
 #include <String/rf_str_core.h>
 #include <String/rf_str_corex.h>
-void setup()
-{
-    rf_init("refuclib.log", 0, LOG_DEBUG);
-}
-
-void teardown()
-{
-    rf_deinit();
-}
-
 
 /* --- String Initialization Tests --- START --- */
 
@@ -594,7 +585,9 @@ Suite *string_core_suite_create(void)
     Suite *s = suite_create("String Core");
 
     TCase *string_init = tcase_create("String Initialization");
-    tcase_add_checked_fixture(string_init, setup, teardown);
+    tcase_add_checked_fixture(string_init,
+                              setup_string_tests,
+                              teardown_string_tests);
     tcase_add_test(string_init, test_string_init);
     tcase_add_test(string_init, test_string_initv);
     tcase_add_test(string_init, test_string_init_cp);
@@ -605,24 +598,32 @@ Suite *string_core_suite_create(void)
     tcase_add_test(string_init, test_string_init_unsafe_nnt);
 
     TCase *string_assign = tcase_create("String Assignment");
-    tcase_add_checked_fixture(string_assign, setup, teardown);
+    tcase_add_checked_fixture(string_assign,
+                              setup_string_tests,
+                              teardown_string_tests);
     tcase_add_test(string_assign, test_string_assign);
     tcase_add_test(string_assign, test_string_assign_char);
 
     TCase *string_copy = tcase_create("String Copying");
-    tcase_add_checked_fixture(string_copy, setup, teardown);
+    tcase_add_checked_fixture(string_copy,
+                              setup_string_tests,
+                              teardown_string_tests);
     tcase_add_test(string_copy, test_string_copy_in);
     tcase_add_test(string_copy, test_string_copy_chars);
 
     TCase *string_misc = tcase_create("String Miscellaneous");
-    tcase_add_checked_fixture(string_misc, setup, teardown);
+    tcase_add_checked_fixture(string_misc,
+                              setup_string_tests,
+                              teardown_string_tests);
     tcase_add_test(string_misc, test_string_equal);
     tcase_add_test(string_misc, test_string_bytepos_to_codepoint);
     tcase_add_test(string_misc, test_string_bytepos_to_charpos);
 
 
     TCase *stringx_init = tcase_create("Stringx Initialization");
-    tcase_add_checked_fixture(stringx_init, setup, teardown);
+    tcase_add_checked_fixture(stringx_init,
+                              setup_string_tests,
+                              teardown_string_tests);
     tcase_add_test(stringx_init, test_stringx_init);
     tcase_add_test(stringx_init, test_stringx_initv);
     tcase_add_test(stringx_init, test_stringx_init_unsafe_nnt);
@@ -632,13 +633,17 @@ Suite *string_core_suite_create(void)
     tcase_add_test(stringx_init, test_stringx_init_buff);
 
     TCase *stringx_assign = tcase_create("Stringx Assignment");
-    tcase_add_checked_fixture(stringx_assign, setup, teardown);
+    tcase_add_checked_fixture(stringx_assign,
+                              setup_string_tests,
+                              teardown_string_tests);
     tcase_add_test(stringx_assign, test_stringx_assign);
     tcase_add_test(stringx_assign, test_stringx_assign_char);
     tcase_add_test(stringx_assign, test_stringx_from_string_in);
 
     TCase *stringx_copy = tcase_create("Stringx Copying");
-    tcase_add_checked_fixture(stringx_copy, setup, teardown);
+    tcase_add_checked_fixture(stringx_copy,
+                              setup_string_tests,
+                              teardown_string_tests);
     tcase_add_test(stringx_copy, test_stringx_copy_in);
     tcase_add_test(stringx_copy, test_stringx_copy_chars);
 

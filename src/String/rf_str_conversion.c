@@ -43,6 +43,7 @@
 #include <Utils/localscope.h> //for local scope macros
 #include <Utils/memory.h> //for refu memory allocation
 #include <Utils/math.h> //for rf_math_max
+#include <Utils/sanity.h> //for sanity macros
 #include "../Internal/rf_internal_mod.ph" //for the internal buffer
 /*------------- libc inclusion --------------*/
 #include <errno.h> //for errno
@@ -54,6 +55,11 @@ uint16_t* rf_string_to_utf16(const void* s, uint32_t* length)
 {
     uint32_t* codepoints,charsN;
     uint16_t* utf16;
+    RF_ASSERT(s);
+    if (length == NULL) {
+        RF_WARNING("Did not provide a length argument");
+        return NULL;
+    }
     RF_MALLOC(codepoints, rf_string_length_bytes(s) * 4, NULL);
     //get the unicode codepoints
     if(!rf_utf8_decode(rf_string_data(s), rf_string_length_bytes(s), &charsN,
@@ -81,6 +87,11 @@ uint16_t* rf_string_to_utf16(const void* s, uint32_t* length)
 uint32_t* rf_string_to_utf32(const void* s, uint32_t* length)
 {
     uint32_t* cp;
+    RF_ASSERT(s);
+    if (length == NULL) {
+        RF_WARNING("Did not provide a length argument");
+        return NULL;
+    }
     RF_MALLOC(cp, rf_string_length_bytes(s) * 4, NULL);
     //get the unicode codepoints
     if(!rf_utf8_decode(rf_string_data(s), rf_string_length_bytes(s), length,
@@ -95,6 +106,7 @@ uint32_t* rf_string_to_utf32(const void* s, uint32_t* length)
 char* rf_string_cstr(const void* str)
 {
     char* ret;
+    RF_ASSERT(str);
     RF_MALLOC(ret, rf_string_length_bytes(str) + 1, NULL);
     memcpy(ret, rf_string_data(str), rf_string_length_bytes(str));
     ret[rf_string_length_bytes(str)] = '\0';
@@ -105,15 +117,22 @@ bool rf_string_to_int(const void* str, int32_t* v)
 {
     char buff[MAX_UINT32_STRING_CHAR_SIZE + 1];
     int index;
+    char *end;
+    RF_ASSERT(str);
 
-    index = rf_math_max(MAX_UINT32_STRING_CHAR_SIZE, rf_string_length_bytes(str));
+    if (!v) {
+        RF_WARNING("Provided null pointer for the returned int");
+        return false;
+    }
+
+    index = rf_math_min(MAX_UINT32_STRING_CHAR_SIZE, rf_string_length_bytes(str));
     memcpy(buff, rf_string_data(str), index);
     buff[index] = '\0';
 
     errno = 0;
-    *v = strtol (buff, NULL, 10);
+    *v = strtol (buff, &end, 10);
     
-    if(!*v || errno)
+    if(end - buff == 0 || errno)
     {
         RF_ERROR("Failed to convert %s to int with strtol()"
                  " errno: %d", buff, errno);

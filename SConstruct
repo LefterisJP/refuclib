@@ -107,7 +107,9 @@ def run_tests(target, source, env):
 
 unit_tests_files = [
     'test_main.c',
-    'test_string_core.c'
+    'test_string_helpers.c',
+    'test_string_core.c',
+    'test_string_conversion.c'
 ]
 unit_tests_files = ['Tests/Unit_Tests/' + s for s in unit_tests_files]
 unit_tests_files.extend(['src/' + s for s in orig_sources])

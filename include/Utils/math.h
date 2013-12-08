@@ -49,6 +49,18 @@ i_INLINE_DECL int rf_math_max(int a, int b)
 }
 
 /**
+ ** @brief Returns the minimum of 2 ints
+ **/
+i_INLINE_DECL int rf_math_min(int a, int b)
+{
+    if(a <= b)
+    {
+        return a;
+    }
+    return b;
+}
+
+/**
  ** @brief Calculates the logarithm base 2 of an @c uint32_t
  **
  ** You can read more about this implementation at this page:
