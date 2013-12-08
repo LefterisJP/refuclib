@@ -30,8 +30,10 @@
 #ifndef RF_UTILS_CONSTCMP_H
 #define RF_UTILS_CONSTCMP_H
 
-#include <float.h> //needed for EPSILON if calling the corresponding macros
-
+/*------------- libc inclusion --------------*/
+#include <float.h> //needed for EPSILON
+#include <math.h> //for fabs
+/*------------- End of includes -------------*/
 
 /**
  **  Returns true if float a > float b

@@ -275,6 +275,93 @@ START_TEST(test_string_bytepos_to_charpos) {
 
     rf_string_deinit(&s);
 }END_TEST
+
+#define START_OF_UNICODE_INDEX 99
+START_TEST(test_string_iterate) {
+    struct RFstring s;
+    uint32_t i=0, c;
+
+    static const char *cstr = (
+        "Testing to see if RFstring can correctly iterate"
+        " the characters of a string even if it has unicode "
+        "よる国際試合"
+    );
+    ck_assert(rf_string_init(&s, cstr));
+    
+    rf_string_iterate_start(&s, i, c)
+    if( i >= START_OF_UNICODE_INDEX) {
+        switch(i) {
+        case START_OF_UNICODE_INDEX: /* unicode value of よ */
+            ck_assert_int_eq(c, 12424);
+            break;
+        case START_OF_UNICODE_INDEX + 1: /* unicode value of る */
+            ck_assert_int_eq(c, 12427);
+            break;
+        case START_OF_UNICODE_INDEX + 2: /* unicode value of 国 */
+            ck_assert_int_eq(c, 22269);
+            break;
+        case START_OF_UNICODE_INDEX + 3: /* unicode value of 際 */
+            ck_assert_int_eq(c, 38555);
+            break;
+        case START_OF_UNICODE_INDEX + 4: /* unicode value of 試 */
+            ck_assert_int_eq(c, 35430);
+            break;
+        case START_OF_UNICODE_INDEX + 5: /* unicode value of 合 */
+            ck_assert_int_eq(c, 21512);
+            break;
+        }
+    } else {
+        ck_assert_int_eq(c, cstr[i]);
+    }
+    rf_string_iterate_end(i)
+    
+    rf_string_deinit(&s);
+}END_TEST
+
+ /* Some times fails ... TODO: figure out why */
+START_TEST(test_string_iterate_backwards) {
+    struct RFstring s;
+    uint32_t i=0, c;
+
+    static const char *cstr = (
+        "Testing to see if RFstring can correctly iterate"
+        " the characters of a string even if it has unicode "
+        "よる国際試合"
+    );
+    ck_assert(rf_string_init(&s, cstr));
+    
+    i = rf_string_length_bytes(&s);
+    rf_string_iterate_b_start(&s, i, c)
+    if( i >= START_OF_UNICODE_INDEX) {
+        switch(i) {
+        case START_OF_UNICODE_INDEX: /* unicode value of よ */
+            ck_assert_int_eq(c, 12424);
+            break;
+        case START_OF_UNICODE_INDEX + 1: /* unicode value of る */
+            ck_assert_int_eq(c, 12427);
+            break;
+        case START_OF_UNICODE_INDEX + 2: /* unicode value of 国 */
+            ck_assert_int_eq(c, 22269);
+            break;
+        case START_OF_UNICODE_INDEX + 3: /* unicode value of 際 */
+            ck_assert_int_eq(c, 38555);
+            break;
+        case START_OF_UNICODE_INDEX + 4: /* unicode value of 試 */
+            ck_assert_int_eq(c, 35430);
+            break;
+        case START_OF_UNICODE_INDEX + 5: /* unicode value of 合 */
+            ck_assert_int_eq(c, 21512);
+            break;
+        }
+    } else {
+        ck_assert_int_eq(c, cstr[i]);
+    }
+    rf_string_iterate_b_end(i)
+    
+    rf_string_deinit(&s);
+}END_TEST
+#undef START_OF_UNICODE_INDEX
+
 /* --- String Misc Tests --- END --- */
 
 /* --- Stringx Initialization Tests --- START --- */
@@ -618,6 +705,9 @@ Suite *string_core_suite_create(void)
     tcase_add_test(string_misc, test_string_equal);
     tcase_add_test(string_misc, test_string_bytepos_to_codepoint);
     tcase_add_test(string_misc, test_string_bytepos_to_charpos);
+    tcase_add_test(string_misc, test_string_iterate);
+    tcase_add_test(string_misc, test_string_iterate_backwards);
+    
 
 
     TCase *stringx_init = tcase_create("Stringx Initialization");

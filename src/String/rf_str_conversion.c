@@ -145,15 +145,22 @@ bool rf_string_to_double(const void* str, double* f)
 {
     char buff[MAX_DOUBLE_STRING_CHAR_SIZE + 1];
     int index;
+    char *end;
+    RF_ASSERT(str);
+    
+    if (!f) {
+        RF_WARNING("Provided null pointer for the returned double");
+        return false;
+    }
 
-    index = rf_math_max(MAX_DOUBLE_STRING_CHAR_SIZE, rf_string_length_bytes(str));
+    index = rf_math_min(MAX_DOUBLE_STRING_CHAR_SIZE, rf_string_length_bytes(str));
     memcpy(buff, rf_string_data(str), index);
     buff[index] = '\0';
 
     errno = 0;
-    *f = strtod(buff, NULL);
+    *f = strtod(buff, &end);
     //check the result
-    if(DBLCMP_EQ(*f, 0.0f) || errno)
+    if(end - buff == 0|| errno)
     {
         RF_ERROR("Failed to convert %s to double with strtod()"
                  " errno: %d", buff, errno);
@@ -165,6 +172,8 @@ bool rf_string_to_double(const void* str, double* f)
 void rf_string_to_lower(void* s)
 {
     uint32_t charI,byteI;
+    RF_ASSERT(s);
+    
     RF_STRING_ITERATE_START(s, charI, byteI)
         //if the character is lowercase
         if(rf_string_data(s)[byteI] >= 65 && rf_string_data(s)[byteI] <= 90)
@@ -194,17 +203,33 @@ bool rf_string_tokenize(const void* str, const void* sep,
     uint32_t i, sepLen;
     char *s;
     char *e;
+    bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
+    RF_ASSERT(str);
+    
+    if (!sep) {
+        RF_WARNING("Did not provide a separator string");
+        ret = false;
+        goto cleanup_lscope;
+    }
+
+    if (!tokensN || !tokens) {
+        RF_WARNING("Null pointers detected for the output data");
+        ret = false;
+        goto cleanup_lscope;
+    }
+
     //first find the occurences of the separator, and then the number of tokens
     *tokensN = rf_string_count(str, sep, 0) + 1;
     //error checking
     if(*tokensN == 1)
     {
-        RF_EXIT_LOCAL_SCOPE();
-        return false;
+        ret = false;
+        goto cleanup_lscope;
     }
     //allocate the tokens
-    RF_MALLOC(*tokens, sizeof(struct RFstring) * (*tokensN), false);
+    RF_MALLOC_JMP(*tokens, sizeof(struct RFstring) * (*tokensN),
+              ret = false, cleanup_lscope);
     //find the length of the separator
     sepLen = rf_string_length_bytes(sep);
 
@@ -216,9 +241,9 @@ bool rf_string_tokenize(const void* str, const void* sep,
         e = strstr_nnt(s, e - s,
                        rf_string_data(sep), rf_string_length_bytes(sep));
         rf_string_length_bytes(&(*tokens)[i]) = e - s;
-        RF_MALLOC(rf_string_data(&(*tokens)[i]),
+        RF_MALLOC_JMP(rf_string_data(&(*tokens)[i]),
                   rf_string_length_bytes(&(*tokens)[i]),
-                  false
+                      ret = false,  cleanup_lscope
         );
         //put in the data
         memcpy(rf_string_data(&(*tokens)[i]),
@@ -233,9 +258,9 @@ bool rf_string_tokenize(const void* str, const void* sep,
     rf_string_length_bytes(&(*tokens)[i]) = (
         rf_string_length_bytes(str) - (s - rf_string_data(str))
     );
-    RF_MALLOC(rf_string_data(&(*tokens)[i]),
+    RF_MALLOC_JMP(rf_string_data(&(*tokens)[i]),
               rf_string_length_bytes(&(*tokens)[i]),
-              false
+                  ret = false,  cleanup_lscope
     );
     //put in the data
     memcpy(rf_string_data(&(*tokens)[i]),
@@ -243,7 +268,8 @@ bool rf_string_tokenize(const void* str, const void* sep,
            rf_string_length_bytes(&(*tokens)[i])
     );
 
+cleanup_lscope:
     //success
     RF_EXIT_LOCAL_SCOPE();
-    return true;
+    return ret;
 }
