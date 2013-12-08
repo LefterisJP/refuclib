@@ -47,20 +47,12 @@ setupCompiler(env, targetSystem, temp)
 env.Append(CPPDEFINES={'REFU_COMPILING': None})
 if(temp['__TEST_BUILD']):
     env.Append(CPPDEFINES={'REFU_TEST': None})
-
 env.Append(CPPPATH=os.path.join(refu_dir, 'include'))
 env.Append(CCFLAGS=temp['COMPILER_FLAGS'])
 env.Append(LINKFLAGS=temp['LINKER_SHARED_FLAGS'])
 
-
-#TODO: Fix the "only if actually building sections" that are here
-#  to differentiate when building the library and when building the tests.
-# Find a nice and clean way to have those separate and not
-#  affecting one another
-
-#only if actually building setup the required modules
-# if 'shared' in COMMAND_LINE_TARGETS or 'static' in COMMAND_LINE_TARGETS or 'check' in COMMAND_LINE_TARGETS:
-(modules, sources) = setup_modules(temp, env, targetSystem,
+# setup the required modules
+(modules, orig_sources) = setup_modules(temp, env, targetSystem,
                                    refu_dir, code_gen)
 
 #setup the variables of the configuration file
@@ -70,7 +62,10 @@ setupConfigVars(temp, env)
 compiler = temp['COMPILER']
 systemAttributes = SConscript('scripts/systemcheck/systemcheck.py',
                               exports='compiler')
-#only if actually building create the options file
+
+# only if actually building create the options file
+# This condition is here only so that the old style, deprecated tests,
+# can work 
 if 'shared' in COMMAND_LINE_TARGETS or 'static' in COMMAND_LINE_TARGETS:
     SConscript('build_script/options.py',
                exports='modules env targetSystem systemAttributes refu_dir')
@@ -78,57 +73,74 @@ if 'shared' in COMMAND_LINE_TARGETS or 'static' in COMMAND_LINE_TARGETS:
 outName = temp['OUTPUT_NAME']
 
 #only if actually building set the obj dir and prepend obj dir to all sources
-if 'shared' in COMMAND_LINE_TARGETS or 'static' in COMMAND_LINE_TARGETS:
-    env.VariantDir(temp['OBJ_DIR'], sourceDir, duplicate=0)
-    #a list comprehension prepending the obj dir to all of the sources
-    # (instead of the sourcedir) ... Scons peculiarity
-    sources = [temp['OBJ_DIR']+'/'+s for s in sources]
+env.VariantDir(temp['OBJ_DIR'], sourceDir, duplicate=0)
+# a list comprehension prepending the obj dir to all of the sources
+# (instead of the sourcedir) ... Scons peculiarity
+sources = [temp['OBJ_DIR']+'/'+s for s in orig_sources]
+
+
 
 # -- From here and on check build targets
-# Check if there is no build target given
-if len(COMMAND_LINE_TARGETS) == 0 and not env.GetOption('clean'):
-    print ("**MESSAGE** No build target was specified so the Refu SCons "
-           "Building script has nothing to build. Please specify one of"
-           " the legal build targets \'shared\' and \'static\' "
-           "via command line")
-
-#Check if there is an illegal build target given
-for givenTarget in COMMAND_LINE_TARGETS:
-    if givenTarget not in legalBuildTargets:
-        print ("***ERROR*** Provided build target \"{}\" is not a legal"
-               " target for Refu Library. Quitting Build Script"
-               " ...".format(givenTarget))
-        Exit(-1)
-
 #If clean is specified make sure that we delete all of the generated files
 if env.GetOption('clean'):
     clean_generated_files(refu_dir, code_gen)
 
-# -- Test non-library build --
-# compiles only the test file under src/main.c
-if 'test' in COMMAND_LINE_TARGETS:
-    env.Append(CPPDEFINES={'REFU_TEST': None})
-    #compile with debuggin flags
-    env.Append(CCFLAGS='-g')
-    #add the test source file
-    sources.append('src/main.c')
-    test = env.Program(outName, sources)
-    env.Alias('test', test)
-
 # -- STATIC LIBRARY
-if 'static' in COMMAND_LINE_TARGETS:
-    env.Append(CPPDEFINES={'REFU_STATIC_LIB': None})
-    static = env.StaticLibrary(outName, sources)
-    env.Alias('static', static)
+cppdefines_static = env['CPPDEFINES']
+cppdefines_static['REFU_STATIC_LIB'] = None
+static = env.StaticLibrary(outName, sources, CPPDEFINES=cppdefines_static)
+env.Alias('static', static)
 
 # -- SHARED LIBRARY
-if 'shared' in COMMAND_LINE_TARGETS:
-    env.Append(CPPDEFINES={'REFU_DYNAMIC_LIB': None})
-    shared = env.SharedLibrary(outName, sources)
-    env.Alias('shared', shared)
+cppdefines_shared = env['CPPDEFINES']
+cppdefines_shared['REFU_DYNAMIC_LIB'] = None
+shared = env.SharedLibrary(outName, sources, CPPDEFINES=cppdefines_shared)
+env.Alias('shared', shared)
+
+# -- UNIT TESTS
+def run_tests(target, source, env):
+    """For now this title text is moved in the ./check binary,
+    so unless this can be made to work it will go away
+    """
+    print("\n\n=== Running Refu C library Unit Tests ===")
+    subprocess.call("./check {}".format(env['TESTS_OUTPUT']))
+
+unit_tests_files = [
+    'test_main.c',
+    'test_string_core.c'
+]
+unit_tests_files = ['Tests/Unit_Tests/' + s for s in unit_tests_files]
+unit_tests_files.extend(['src/' + s for s in orig_sources])
+libs_check = env['LIBS']
+libs_check.append('check')
+cppdefines_check = env['CPPDEFINES']
+cppdefines_check['RF_OPTION_DEBUG'] = None
+cppdefines_check['RF_OPTION_INSANITY_CHECKS'] = None
+program = env.Program('check', unit_tests_files, LIBS=libs_check,
+                      CPPDEFINES=cppdefines_check)
+
+test_run = env.Command(
+    target="test_run",
+    source='check',
+    # action=run_tests
+    action="./check {} {}".format(
+        temp['UNIT_TESTS_OUTPUT'],
+        temp['UNIT_TESTS_FORK']
+))
+check_alias = Alias('check', [test_run])
+# Simply required.  Without it, 'check' is never considered out of date.
+AlwaysBuild(check_alias)
 
 
-#-- Unit Testing
+
+#generate help text for the variables
+Help(vars.GenerateHelpText(env))
+Help(args_before.GenerateHelpText(env))
+
+
+
+
+# -- OLD STYLE TESTS -- DEPRECATED
 if 'test_shared' in COMMAND_LINE_TARGETS:
     del env['CPPDEFINES']['REFU_COMPILING']
     env.Append(LIBPATH='./Tests')
@@ -162,45 +174,3 @@ if 'test_static' in COMMAND_LINE_TARGETS:
     test_static = env.Program(os.path.join('Tests', 'test'),
                               test_sources)
     env.Alias('test_static', test_static)
-
-
-
-# Unit Testing
-def run_tests(target, source, env):
-    """For now this title is moved in the ./check binary,
-    so unless this can be made to work it will go away
-    """
-    print("\n\n=== Running Refu C library Unit Tests ===")
-    subprocess.call("./check {}".format(env['TESTS_OUTPUT']))
-
-unit_tests_files = [
-    'test_main.c',
-    'test_string_core.c'
-]
-unit_tests_files = ['Tests/Unit_Tests/' + s for s in unit_tests_files]
-unit_tests_files.extend(['src/' + s for s in sources])
-libs_check = env['LIBS']
-libs_check.append('check')
-cppdefines_check = env['CPPDEFINES']
-cppdefines_check['RF_OPTION_DEBUG'] = None
-cppdefines_check['RF_OPTION_INSANITY_CHECKS'] = None
-program = env.Program('check', unit_tests_files, LIBS=libs_check,
-                      CPPDEFINE=cppdefines_check)
-
-test_run = env.Command(
-    target="test_run",
-    source='check',
-    # action=run_tests
-    action="./check {} {}".format(
-        temp['UNIT_TESTS_OUTPUT'],
-        temp['UNIT_TESTS_FORK']
-))
-check_alias = Alias('check', [test_run])
-# Simply required.  Without it, 'check' is never considered out of date.
-AlwaysBuild(check_alias)
-
-
-
-#generate help text for the variables
-Help(vars.GenerateHelpText(env))
-Help(args_before.GenerateHelpText(env))
