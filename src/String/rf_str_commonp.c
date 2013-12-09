@@ -36,6 +36,7 @@
 #include <String/rf_str_flags.h>
 /*------------- Outside Module inclusion -------------*/
 #include <Utils/bits.h> //for RF_BITFLAG_ON() macro
+#include <Utils/sanity.h> //for the sanity macros
 #include <Definitions/retcodes.h>//for true/false and other retcodes
 /*------------- End of includes -------------*/
 
@@ -102,8 +103,12 @@ int rf_string_find_byte_pos(const void* tstr, const void* sstr, const char optio
             break;                              \
         }                                       \
     }while(0)
-
     const char* found = 0;
+    RF_ASSERT(tstr);
+    if (!sstr) {
+        RF_WARNING("Provided null search string parameter");
+        return RF_FAILURE;
+    }
     //search matching characters
     if(!RF_BITFLAG_ON(options, RF_CASE_IGNORE))
     {

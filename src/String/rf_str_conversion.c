@@ -198,12 +198,13 @@ void rf_string_to_upper(void* s)
 }
 
 bool rf_string_tokenize(const void* str, const void* sep,
-                       uint32_t* tokensN, struct RFstring** tokens)
+                       uint32_t* ret_tokens_num, struct RFstring** tokens)
 {
     uint32_t i, sepLen;
     char *s;
     char *e;
     bool ret = true;
+    int32_t tokens_num;
     RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(str);
     
@@ -213,29 +214,29 @@ bool rf_string_tokenize(const void* str, const void* sep,
         goto cleanup_lscope;
     }
 
-    if (!tokensN || !tokens) {
+    if (!ret_tokens_num || !tokens) {
         RF_WARNING("Null pointers detected for the output data");
         ret = false;
         goto cleanup_lscope;
     }
 
     //first find the occurences of the separator, and then the number of tokens
-    *tokensN = rf_string_count(str, sep, 0) + 1;
+    tokens_num = rf_string_count(str, sep, 0) + 1;
     //error checking
-    if(*tokensN == 1)
+    if(tokens_num <= 1)
     {
         ret = false;
         goto cleanup_lscope;
     }
     //allocate the tokens
-    RF_MALLOC_JMP(*tokens, sizeof(struct RFstring) * (*tokensN),
+    RF_MALLOC_JMP(*tokens, sizeof(struct RFstring) * (tokens_num),
               ret = false, cleanup_lscope);
     //find the length of the separator
     sepLen = rf_string_length_bytes(sep);
 
     s = rf_string_data(str);
     e = rf_string_data(str) + rf_string_length_bytes(str);
-    for(i = 0; i < (*tokensN) - 1; i ++)
+    for(i = 0; i < tokens_num - 1; i ++)
     {
         //find each substring
         e = strstr_nnt(s, e - s,
@@ -259,7 +260,7 @@ bool rf_string_tokenize(const void* str, const void* sep,
         rf_string_length_bytes(str) - (s - rf_string_data(str))
     );
     RF_MALLOC_JMP(rf_string_data(&(*tokens)[i]),
-              rf_string_length_bytes(&(*tokens)[i]),
+                  rf_string_length_bytes(&(*tokens)[i]),
                   ret = false,  cleanup_lscope
     );
     //put in the data
@@ -267,7 +268,8 @@ bool rf_string_tokenize(const void* str, const void* sep,
            s,
            rf_string_length_bytes(&(*tokens)[i])
     );
-
+    
+    *ret_tokens_num = tokens_num;
 cleanup_lscope:
     //success
     RF_EXIT_LOCAL_SCOPE();

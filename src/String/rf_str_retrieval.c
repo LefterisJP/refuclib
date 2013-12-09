@@ -40,7 +40,7 @@
 #include <Utils/bits.h>  //for RF_BITFLAG_ON
 #include <Utils/localscope.h> //for the local scope macros
 #include <Utils/memory.h> //for refu memory allocation
- #include <Utils/sanity.h> //for sanity macros
+#include <Utils/sanity.h> //for sanity macros
 /*------------- libc inclusion --------------*/
 #include <stdarg.h>
 #include <limits.h> //for INT_MAX e.t.c.
@@ -51,6 +51,7 @@
 uint32_t rf_string_length(const void* str)
 {
     uint32_t length,i;
+    RF_ASSERT(str);
     RF_STRING_ITERATE_START(str, length, i)
     RF_STRING_ITERATE_END(length, i);
     return length;
@@ -59,6 +60,11 @@ uint32_t rf_string_length(const void* str)
 bool rf_string_get_char(const void* str, uint32_t c, uint32_t* cp)
 {
     uint32_t length, i;
+    RF_ASSERT(str);
+    if (!cp) {
+        RF_WARNING("provided null pointer for the returned codepoint");
+        return false;
+    }
     RF_STRING_ITERATE_START(str, length, i)
         if(length == c)
         {
@@ -70,21 +76,25 @@ bool rf_string_get_char(const void* str, uint32_t c, uint32_t* cp)
     return false;
 }
 
-bool rf_string_substr(const void* s, uint32_t startPos,
-                     uint32_t charsN, struct RFstring* ret)
+bool rf_string_substr(const void* s, uint32_t start_pos,
+                     uint32_t chars_num, struct RFstring* ret)
 {
     uint32_t charI,byteI,startI,endI;
     bool started = false, ended = false;
     startI = endI = 0;
-    RF_CHECK_NOT_NULL_DEBUG_2(s, ret, return false);
+    RF_ASSERT(s);
+    if (!ret) {
+        RF_WARNING("provided null pointer for the return string");
+        return false;
+    }
 
     RF_STRING_ITERATE_START(s, charI, byteI)
-        if(charI == startPos)
+        if(charI == start_pos)
         {
             startI = byteI;
             started = true;
         }
-        if(charI == startPos+charsN)
+        if(charI == start_pos+chars_num)
         {
             endI = byteI;
             ended = true;
@@ -117,6 +127,7 @@ int32_t rf_string_find(const void* tstr, const void* sstr,
 {
     int32_t ret;
     RF_ENTER_LOCAL_SCOPE();
+    /* sanity checks are performed inside rf_string_find_byte_pos() */
 
     if((ret = rf_string_find_byte_pos(tstr, sstr, options)) == RF_FAILURE)
     {
@@ -132,14 +143,14 @@ int32_t rf_string_find(const void* tstr, const void* sstr,
 
 
 int32_t rf_string_find_i(const void* thisstr, const void* sstr,
-                         uint32_t startPos, uint32_t length,
+                         uint32_t start_pos, uint32_t length,
                          enum RFstring_matching_options options)
 {
     struct RFstring sub;
     int32_t ret = RF_FAILURE;//the return value
     RF_ENTER_LOCAL_SCOPE();
-    //if the substring does not exist fail
-    if(!rf_string_substr(thisstr, startPos, length, &sub))
+    /* sanity checks are performed inside rf_string_substr() */
+    if(!rf_string_substr(thisstr, start_pos, length, &sub))
     {
         goto cleanup1;
     }
@@ -147,7 +158,7 @@ int32_t rf_string_find_i(const void* thisstr, const void* sstr,
     //now search for the sstr substring inside the sub substring defined by length
     if((ret=rf_string_find(&sub, sstr, options)) != RF_FAILURE)
     {
-        ret += startPos;//return the proper position in the original string
+        ret += start_pos;//return the proper position in the original string
     }
     rf_string_deinit(&sub);//free the sub substring and return
 
@@ -156,13 +167,14 @@ cleanup1:
     return ret;
 }
 
-unsigned int rf_string_count(const void* tstr, const void* sstr,
+int rf_string_count(const void* tstr, const void* sstr,
                              enum RFstring_matching_options options)
 {
     int move, index;
     unsigned int n;
     RF_ENTER_LOCAL_SCOPE();
-    RF_CHECK_NOT_NULL_DEBUG_2(tstr, sstr, goto cleanup);
+
+    /* sanity checks are in rf_string_find_byte_pos() */
 
     move = index = n = 0;
     //as long as the substring is found in the string
@@ -181,9 +193,6 @@ unsigned int rf_string_count(const void* tstr, const void* sstr,
     rf_string_data(tstr) -= index;
     rf_string_length_bytes(tstr) += index;
 
-#ifdef RF_OPTION_DEBUG
-  cleanup:
-#endif
     RF_EXIT_LOCAL_SCOPE();
     return n;
 }
@@ -196,7 +205,19 @@ bool rf_string_scanf_after(const void* str, const void* astr,
     const char *found;
     bool ret = false;
     RF_ENTER_LOCAL_SCOPE();
-    RF_CHECK_NOT_NULL_DEBUG_2(str, astr, goto cleanup);
+    RF_ASSERT(str);
+    if (!astr) {
+        RF_WARNING("Provided NULL \'after\' string");
+        goto cleanup;
+    }
+    if (!format) {
+        RF_WARNING("Provided NULL \'format\' c string");
+        goto cleanup;
+    }
+    if (!var) {
+        RF_WARNING("Provided NULL pointer for the return value");
+        goto cleanup;
+    }
 
     found = strstr_nnt(rf_string_data(str), rf_string_length_bytes(str),
                       rf_string_data(astr), rf_string_length_bytes(astr));
@@ -230,7 +251,14 @@ bool rf_string_between(const void* tstr, const void* lstr,
     struct RFstring temp;
     bool ret = false;
     RF_ENTER_LOCAL_SCOPE();
-    RF_CHECK_NOT_NULL_DEBUG_4(tstr, lstr, rstr, result, goto cleanup);
+    RF_ASSERT(tstr);
+    
+    /* null pointer check for lstr and rstr is in rf_string_find_byte_pos() */
+
+    if (!result) {
+        RF_WARNING("Provided null pointer for the result string");
+        goto cleanup;
+    }
 
     //find the left substring
     if((start = rf_string_find_byte_pos(tstr, lstr, options)) == RF_FAILURE)
@@ -242,7 +270,7 @@ bool rf_string_between(const void* tstr, const void* lstr,
     //find the right substring in the remaining part
     if((end = rf_string_find_byte_pos(&temp, rstr, options)) == RF_FAILURE)
     {
-        goto cleanup1;
+        goto cleanup_temp;
     }
 
     //initialize the string to return
@@ -253,7 +281,7 @@ bool rf_string_between(const void* tstr, const void* lstr,
                rf_string_data(tstr) + start + rf_string_length_bytes(lstr),
                end))
         {
-            goto cleanup1; 
+            goto cleanup_temp; 
         }
     }
     else
@@ -263,14 +291,14 @@ bool rf_string_between(const void* tstr, const void* lstr,
                rf_string_data(tstr) + start + rf_string_length_bytes(lstr),
                end))
         {
-            goto cleanup1; 
+            goto cleanup_temp; 
         }
     }
     //success
     ret = true;
 
 
-cleanup1:
+cleanup_temp:
     //free temp string
     rf_string_deinit(&temp);
 cleanup:
@@ -287,7 +315,13 @@ bool rf_string_beforev(const void* thisstr, void* result,
     va_list argList;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    RF_CHECK_NOT_NULL_DEBUG_2(thisstr, result, ret = false; goto cleanup);
+    RF_ASSERT(thisstr);
+    
+    if (!result) {
+        RF_WARNING("Provided null string for the result");
+        ret = false;
+        goto cleanup;
+    }
 
     //get the parameter characters
     va_start(argList, parN);
@@ -295,6 +329,7 @@ bool rf_string_beforev(const void* thisstr, void* result,
     for(i = 0; i < parN; i++)
     {
         s = (const struct RFstring*) va_arg(argList, struct RFstring*);
+        /* null pointer check is in rf_string_find_byte_pos() */
         if((thisPos= rf_string_find_byte_pos(thisstr, s, options))!= RF_FAILURE)
         {
             if(thisPos < minPos)      
@@ -341,7 +376,14 @@ bool rf_string_before(const void* thisstr, const void* sstr,
     int32_t rv;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    RF_CHECK_NOT_NULL_DEBUG_3(thisstr, sstr, result, ret = false; goto cleanup);
+    RF_ASSERT(thisstr);
+    
+    /* null pointer check for sstr is in rf_string_find_byte_pos() */
+    if (!result) {
+        RF_WARNING("Provided NULL pointer for the string to return");
+        ret = false;
+        goto cleanup;
+    }
 
     //find the substring
     if((rv = rf_string_find_byte_pos(thisstr, sstr, options)) == RF_FAILURE)
@@ -379,8 +421,14 @@ bool rf_string_after(const void* thisstr, const void* after,
     int32_t bytePos;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    RF_CHECK_NOT_NULL_DEBUG_3(thisstr, after, result, ret = false;goto cleanup);
+    RF_ASSERT(thisstr);
 
+    if (!result) {
+        RF_WARNING("Null pointer given for the result string ");
+        ret = false;
+        goto cleanup;
+    }
+    /* sanity check for after string is in rf_string_find_byte_pos() */
     //check for substring existence
     if((bytePos = rf_string_find_byte_pos(thisstr, after, options)) == RF_FAILURE)
     {
@@ -430,7 +478,13 @@ bool rf_string_afterv(const void* thisstr, void* result,
     va_list argList;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    RF_CHECK_NOT_NULL_DEBUG_2(thisstr, result, ret = false; goto cleanup);
+    RF_ASSERT(thisstr);
+
+    if (!result) {
+        RF_WARNING("Null pointer given for the result string ");
+        ret = false;
+        goto cleanup;
+    }
 
     //get the parameter characters
     va_start(argList,parN);
@@ -438,6 +492,7 @@ bool rf_string_afterv(const void* thisstr, void* result,
     for(i = 0; i < parN; i++)
     {
         s = (const struct RFstring*) va_arg(argList, struct RFstring*);
+        /* null pointer check is in rf_string_find_byte_pos() */
         if((thisPos= rf_string_find_byte_pos(thisstr, s, options))!= RF_FAILURE)
         {
             if(thisPos < minPos)

@@ -1604,7 +1604,7 @@ int32_t rf_textfile_get_line(struct RFtextfile* t, uint64_t lineN,
 
 bool rf_textfile_write(struct RFtextfile* t, void* s)
 {
-    uint32_t linesN;
+    int32_t linesN;
     char ret = true;
     char allocatedS = false;
     RF_ENTER_LOCAL_SCOPE();
@@ -1686,7 +1686,7 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
     bool lineFound,allocatedS, ret = true;
     RFfile_offset tOff=0;
     FILE* newFile;
-    uint32_t linesCount;
+    int32_t linesCount;
     struct RFstringx buffer;
     //get the function's arguments
     int32_t error;
@@ -2137,7 +2137,7 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
     char lineFound,allocatedS;
     char ret = true;
     FILE* newFile;
-    uint32_t linesCount;
+    int32_t linesCount;
     struct RFstringx buffer;
     RFfile_offset tOff=0;
     int32_t error;

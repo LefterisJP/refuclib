@@ -217,9 +217,11 @@ i_DECLIMEX_ int32_t rf_string_find_i(const void* thisstr, const void* sstr,
  **                      @inhtype{String,StringX} @tmpSTR
  ** @param options       For details @see rf_string_remove()
  ** @return              Returns the number of times cstr exists inside the
- **                      string (0 is returned in case it's not found at all
+ **                      string. In case it is not found at all 0 is returned.
+ **                      Note that 0 is returned also in case of error such as 
+ **                      invalid input(null pointers).
  **/
-i_DECLIMEX_ unsigned int rf_string_count(
+i_DECLIMEX_ int rf_string_count(
     const void* thisstr, const void* sstr,
     enum RFstring_matching_options options
 );

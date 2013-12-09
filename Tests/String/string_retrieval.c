@@ -67,7 +67,7 @@ int main()
     EXPECT(false,rf_string_begins_with(&s6, RFS_("Στο πυρετό"), 0));;
     EXPECT(2, rf_string_count(&s7, RFS_("ニューヨーク"), 0));
     EXPECT(5, rf_string_count(&s7,RFS_("州"), 0));
-    EXPECT(false,rf_string_count(&s7, RFS_("東京"), 0));
+    EXPECT(-1 ,rf_string_count(&s7, RFS_("東京"), 0));
 	
 	//expect the strings to be equal
 	EXPECT(true,

@@ -154,6 +154,8 @@ extern "C"
  ** @internal
  ** Searches a string for a substring
  ** when both are not null terminated
+ **
+ ** No checks are performed on the input
  ** @endinternal
  **/
 char* strstr_nnt(const char* s1, unsigned int s1_len,
@@ -162,6 +164,8 @@ char* strstr_nnt(const char* s1, unsigned int s1_len,
 /**
  ** @internal
  ** Compares two non null terminated strings
+ **
+ ** No checks are performed on the input
  ** @endinternal
 **/
 bool strcmp_nnt(char* s1, unsigned int s1_len,
@@ -193,7 +197,7 @@ bool strcmp_nnt(char* s1, unsigned int s1_len,
  **      For example an exact search for @e "HELLO" in the string
  **      @e "HELLOWORLD" would return a failure. Default search is
  **      to return any found substring.
- ** @return Returns the byte position of the found substring or 
+ ** @return Returns the byte position of the found substring, or 
  ** RF_FAILURE for not found
  ** @endinternal
  **
