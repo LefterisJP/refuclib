@@ -41,7 +41,6 @@ START_TEST(test_string_init_cp) {
     struct RFstring s;
     ck_assert(rf_string_init_cp(&s, 0x2708));
     ck_assert_rf_str_eq_cstr(&s, "✈");
-    ck_assert(!rf_string_initv(NULL, 0));
 
     rf_string_deinit(&s);
 }END_TEST
@@ -93,7 +92,6 @@ START_TEST(test_string_init_utf16) {
     ck_assert(rf_string_init_utf16(&s1, utf16_buffer, utf16b_len));
     ck_assert_rf_str_eq_cstr(&s1, "\xf0\x9d\x84\x9e東");
 
-    ck_assert(!rf_string_init_utf16(NULL, 0, 0));
     ck_assert(!rf_string_init_utf16(&s2, 0, 0));
 
     rf_string_deinit(&s1);

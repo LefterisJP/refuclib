@@ -41,6 +41,7 @@
 #include <Utils/memory.h> //for memory allocation
 #include <IO/rf_file.h> //for rfReadLine family  of functions
 #include <Utils/localscope.h> //for local scope macros
+#include <Utils/sanity.h> //for sanity macros
 /*------------- libc inclusion --------------*/
 #include <stdio.h> //for FILE*
 /*------------- End of includes -------------*/
@@ -70,6 +71,8 @@ bool rf_string_from_file_init(struct RFstring* str, FILE* f, char* eof,
                               unsigned int* ret_buff_size)
 {
     uint32_t buff_size;
+    RF_ASSERT(str);
+    /* sanity checks for the rest of the arguments are performed further down */
     switch(encoding)
     {
         case RF_UTF8:
@@ -102,7 +105,7 @@ bool rf_string_from_file_init(struct RFstring* str, FILE* f, char* eof,
             break;
 #if RF_OPTION_DEBUG
         default:
-            RF_ERROR("Provided an illegal encoding value to function "
+            RF_WARNING("Provided an illegal encoding value to function "
                      "rf_string_init_f()");
             return false;
             break;
@@ -121,6 +124,7 @@ bool rf_string_from_file_assign(struct RFstring* str,
                                 enum RFtext_encoding encoding,
                                 enum RFendianess endianess)
 {
+    RF_ASSERT(str);
     UTF_FILE_READLINE(f, eol, eof, "assign")
     //success
     //assign it to the string
@@ -166,6 +170,7 @@ bool rf_string_fwrite(void* s, FILE* f,
     uint16_t* utf16;
     char ret = true;
     RF_ENTER_LOCAL_SCOPE();
+    RF_ASSERT(s);
 
     //depending on the encoding
     switch(encoding)

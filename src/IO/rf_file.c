@@ -36,6 +36,7 @@
 #include <Utils/memory.h> //for refu memory allocation
 #include <String/rf_str_unicode.h> //for rf_utf8_is_continuationbyte
 #include <Utils/constcmp.h> //for RF_HEXEQ macros
+#include <Utils/sanity.h> //for sanity macros
 /*------------- libc inclusion --------------*/
 #include <string.h>//for memcpy e.t.c.
 #include <assert.h> 
@@ -289,14 +290,16 @@ bool rf_file_read_chars_utf8(char* buff, uint32_t num, FILE* f,
     uint32_t c;
     int32_t bytesN;
     bool eolReached;
+
     //initialization
-    *eof = eolReached = false;
+    eolReached = false;
     *bytes_read = 0;
     //if end of file or end of line is not found, keep reading
     do{
         bytesN = rf_file_read_char_utf8(f, (uint32_t*)(buff + (*bytes_read)),
-                              false, eof);
-        if(*eof == true)
+                                        false, eof);
+
+        if(eof && *eof == true)
         {
             break;//EOF found
         }
@@ -386,16 +389,8 @@ bool rf_file_read_chars_utf16(char* buff, uint32_t num, FILE* f,
     int32_t bytesN;
     char eolReached;
 
-#if RF_OPTION_DEBUG
-    if(endianess != RF_LITTLE_ENDIAN || endianess != RF_BIG_ENDIAN)
-    {
-        RF_ERROR( "Illegal endianess type given");
-        return false;
-    }
-#endif
-
     //initialization
-    *eof = eolReached = false;
+    eolReached = false;
     *bytes_read = 0;
     //if end of file or end of line is not found, keep reading
     do{
@@ -404,7 +399,7 @@ bool rf_file_read_chars_utf16(char* buff, uint32_t num, FILE* f,
         //error check
         if(bytesN < 0)
         {
-            if(*eof)
+            if(eof && *eof)
             {
                 break;//EOF found
             }
@@ -483,24 +478,16 @@ bool rf_file_read_chars_utf32(char* buff, uint32_t num, FILE* f,
 {
     uint32_t c;
     bool eolReached;
+
     //initialization
-    *eof = eolReached = false;
+    eolReached = false;
     *bytes_read = 0;
-
-#if RF_OPTION_DEBUG
-    if(endianess != RF_LITTLE_ENDIAN || endianess != RF_BIG_ENDIAN)
-    {
-        RF_ERROR( "Illegal endianess type given");
-        return false;
-    }
-#endif
-
     //if end of file or end of line is not found, keep reading
     do{
         if(rf_file_read_char_utf32(f, (uint32_t*)(buff + (*bytes_read)),
                          endianess, eof) < 0)
         {
-            if(*eof)
+            if(eof && *eof)
             {
                 break;//EOF found
             }
@@ -594,7 +581,13 @@ int rf_file_read_char_utf8(FILE* f, uint32_t *ret, bool cp, char* eof)
     }while(0)
 
     char c,c2,c3,c4;
+
+    if (!eof) {
+        RF_WARNING("Gave null pointer for the EOF flag");
+        return -1;
+    }
     *eof = false;
+
     if( (c = fgetc(f)) == EOF)
     {
         if(ferror(f) == 0)
@@ -776,14 +769,14 @@ int rf_file_read_char_utf16(FILE* f, uint32_t *c, bool cp,
                             enum RFendianess endianess, char* eof)
 {
     uint16_t v1,v2;
-    *eof = false;
-#if RF_OPTION_DEBUG
-    if(endianess != RF_LITTLE_ENDIAN || endianess != RF_BIG_ENDIAN)
-    {
-        RF_ERROR( "Illegal endianess type given");
+
+    RF_ASSERT(endianess == RF_LITTLE_ENDIAN || endianess == RF_BIG_ENDIAN);
+    if (!eof) {
+        RF_WARNING("Gave null pointer for the EOF flag");
         return -1;
     }
-#endif
+    *eof = false;
+
     //read the first 2 bytes
     if(fread(&v1, 2, 1, f) != 1)
     {
@@ -856,14 +849,13 @@ int rf_file_read_char_utf32(FILE* f, uint32_t *c,
                             enum RFendianess endianess,
                             char* eof)
 {
-    *eof = false;
-#if RF_OPTION_DEBUG
-    if(endianess != RF_LITTLE_ENDIAN || endianess != RF_BIG_ENDIAN)
-    {
-        RF_ERROR( "Illegal endianess type given");
+    RF_ASSERT(endianess == RF_LITTLE_ENDIAN || endianess == RF_BIG_ENDIAN);
+    if (!eof) {
+        RF_WARNING("Gave null pointer for the EOF flag");
         return -1;
     }
-#endif
+    *eof = false;
+
     //read the next 4 bytes
     if(fread(c,4,1,f) != 1)
     {
@@ -963,13 +955,8 @@ int rf_file_move_back_char_utf16(FILE* f, uint32_t *c,
                                  enum RFendianess endianess)
 {
     uint16_t v1,v2;
-#if RF_OPTION_DEBUG
-    if(endianess != RF_LITTLE_ENDIAN || endianess != RF_BIG_ENDIAN)
-    {
-        RF_ERROR( "Illegal endianess type given");
-        return -1;
-    }
-#endif
+    RF_ASSERT(endianess == RF_LITTLE_ENDIAN || endianess == RF_BIG_ENDIAN);
+
     //go back and read the last 2 bytes
     if(rfFseek(f,-2,SEEK_CUR) != 0)
     {
@@ -1063,13 +1050,7 @@ int rf_file_move_back_char_utf16(FILE* f, uint32_t *c,
 int rf_file_move_back_char_utf32(FILE* f, uint32_t *c,
                                  enum RFendianess endianess)
 {
-#if RF_OPTION_DEBUG
-    if(endianess != RF_LITTLE_ENDIAN || endianess != RF_BIG_ENDIAN)
-    {
-        RF_ERROR( "Illegal endianess type given");
-        return -1;
-    }
-#endif
+    RF_ASSERT(endianess == RF_LITTLE_ENDIAN || endianess == RF_BIG_ENDIAN);
 
     //go back and read the last 4 bytes
     if(rfFseek(f, -4, SEEK_CUR) != 0)

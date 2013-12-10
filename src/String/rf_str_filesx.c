@@ -89,6 +89,7 @@ bool rf_stringx_from_file_assign(struct RFstringx* str,
                                  enum RFtext_encoding encoding,
                                  enum RFendianess endianess)
 {
+    RF_ASSERT(str);
     UTF_FILE_READLINE(f, eol, eof, "assign")
     //success
     //assign it to the string
@@ -114,6 +115,7 @@ bool rf_stringx_from_file_append(struct RFstringx* str,
                                  enum RFtext_encoding encoding,
                                  enum RFendianess endianess)
 {
+    RF_ASSERT(str);
     UTF_FILE_READLINE(f, eol, eof, "append")
     //append the utf8 to the given string
     if(!rf_stringx_generic_append(str, utf8, utf8ByteLength))

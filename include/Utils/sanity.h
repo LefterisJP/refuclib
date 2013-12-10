@@ -140,9 +140,9 @@
 
 /* just a wrapper over stdlib's assert */
 #ifdef RF_OPTION_DEBUG
-#define RF_ASSERT(condition_)                       \
+#define RF_ASSERT(condition_)                        \
         do {                                         \
-            if (!condition_) {                       \
+            if (!(condition_)) {                     \
                 RF_CRITICAL("Assertion triggered");  \
                 assert(condition_);                  \
             }                                        \
