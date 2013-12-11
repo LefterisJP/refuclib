@@ -276,7 +276,7 @@ bool rf_string_between(const void* tstr, const void* lstr,
     //initialize the string to return
     if(options & RF_STRINGX_ARGUMENT)
     {
-        if(!rf_stringx_init_unsafe_nnt(
+        if(!rf_stringx_assign_unsafe_nnt(
                result,
                rf_string_data(tstr) + start + rf_string_length_bytes(lstr),
                end))
@@ -286,7 +286,7 @@ bool rf_string_between(const void* tstr, const void* lstr,
     }
     else
     {
-        if(!rf_string_init_unsafe_nnt(
+        if(!rf_string_assign_unsafe_nnt(
                result,
                rf_string_data(tstr) + start + rf_string_length_bytes(lstr),
                end))

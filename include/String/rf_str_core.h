@@ -62,7 +62,7 @@ extern "C"
  ** @lmsFunction
  ** @param s                      The sequence of bytes for the characters
  **                               in UTF-8 (the default).
- ** @param ... \rfoptional{nothing}  Depending on the string literal,
+v ** @param ... \rfoptional{nothing}  Depending on the string literal,
  ** the function may expect a sequence of additional arguments,
  ** each containing one value to be inserted instead of each %-tag
  ** specified in the @c slit parameter, if any. There should be
@@ -125,7 +125,7 @@ i_DECLIMEX_ struct RFstring* rf_string_create_cp(uint32_t code);
  ** @brief Initializes a string by turning a unicode code point 
  **        in a String (encoded in UTF-8).
  **
- ** @notinherited{StringX}
+v ** @notinherited{StringX}
  ** @see rf_string_create_cp()
  ** @see rf_stringx_init_cp()
  **/
@@ -293,6 +293,15 @@ i_DECLIMEX_ bool rf_string_assign(struct RFstring* dest, const void* source);
  ** @see rf_stringx_assign_char()
  **/
 i_DECLIMEX_ bool rf_string_assign_char(struct RFstring* thisstr,uint32_t character);
+
+/**
+ ** @brief Assigns to a string from a non-null terminated char* buffer
+ ** and for the given bytelength
+ ** 
+ ** @notinherited{StringX}
+ **/
+i_DECLIMEX_ bool rf_string_assign_unsafe_nnt(struct RFstring* str, const char* s,
+                                             size_t length);
 
 /**
  ** @brief Nullifies a String

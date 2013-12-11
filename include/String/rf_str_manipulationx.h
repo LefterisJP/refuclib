@@ -76,7 +76,7 @@ i_DECLIMEX_ bool rf_stringx_append(struct RFstringx* thisstr, const void* other)
  **/
 i_DECLIMEX_ bool rf_stringx_append_chars(struct RFstringx* thisstr,
                                         const void* other,
-                                        int chars);
+                                        unsigned int chars);
 
 /**
  ** @brief Appends a single unicode character to this string
@@ -145,7 +145,7 @@ i_DECLIMEX_ bool rf_stringx_insert(struct RFstringx* thisstr, uint32_t pos,
  **/
 i_DECLIMEX_ bool rf_stringx_append_bytes(struct RFstringx* thisstr,
                                         const void* other,
-                                        const int32_t bytes);
+                                        const unsigned int bytes);
 /**
  ** @brief Appends a cstring to this string
  **

@@ -1441,7 +1441,7 @@ int rf_textfile_read_line_chars(struct RFtextfile* t,
     if(characters != 0)//if we need specific characters
     {
         uint32_t charsN = rf_string_length(line);
-        rf_string_prune_end(line,charsN-characters);
+        rf_string_prune_end(line, charsN-characters, NULL);
     }
     //else if the end of line was found make sure it's not included in the returned string
     else if(rf_string_data(line)[rf_string_length_bytes(line) - 1] == '\n')

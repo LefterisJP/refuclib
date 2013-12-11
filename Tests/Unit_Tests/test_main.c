@@ -8,6 +8,7 @@ Suite *string_core_suite_create(void);
 Suite *string_conversion_suite_create(void);
 Suite *string_retrieval_suite_create(void);
 Suite *string_files_suite_create(void);
+Suite *string_manipulation_suite_create(void);
 
 
 static const char *SILENT = "CK_SILENT";
@@ -62,6 +63,7 @@ int main(int argc, char **argv)
     srunner_add_suite(sr, string_conversion_suite_create());
     srunner_add_suite(sr, string_retrieval_suite_create());
     srunner_add_suite(sr, string_files_suite_create());
+    srunner_add_suite(sr, string_manipulation_suite_create());
 
     srunner_set_fork_status (sr, fork_type);
     srunner_run_all(sr, print_type);

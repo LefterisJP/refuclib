@@ -338,7 +338,8 @@ START_TEST(test_string_scanf_after) {
 START_TEST(test_string_between) {
     struct RFstring s, s2;
     struct RFstring p1l, p1r, f1, p2l, p2r;
-    struct RFstring ret, ret2;
+    struct RFstring ret;
+    struct RFstringx retx;
 
     ck_assert(
         rf_string_init(
@@ -356,6 +357,9 @@ START_TEST(test_string_between) {
            rf_string_init(&s2,"I Am A StRinG wItH PecULIAR LeTteRs caSE")
     );
 
+    ck_assert(rf_string_init(&ret, ""));
+    ck_assert(rf_stringx_init_buff(&retx, 512, ""));
+
     ck_assert(rf_string_init(&p1l, "Αντίθετα, "));
     ck_assert(rf_string_init(&p1r, "του ΕΤΑΠ-ΜΜΕ στον ΕΟΠΥΥ."));
     ck_assert(rf_string_init(&f1, "I am not there"));
@@ -368,8 +372,9 @@ START_TEST(test_string_between) {
         "απορρίφθηκε η επίμαχη τροπολογία για την ένταξη ");
 
     /* expect (true), and "PecULIAR" which is the substring */
-    ck_assert(rf_string_between(&s2, &p2l, &p2r, &ret2, RF_CASE_IGNORE));
-    ck_assert_rf_str_eq_cstr(&ret2, "PecULIAR");
+    ck_assert(rf_string_between(&s2, &p2l, &p2r, &retx,
+                                RF_CASE_IGNORE|RF_STRINGX_ARGUMENT));
+    ck_assert_rf_strx_eq_cstr(&retx, "PecULIAR");
 
     /* not found cases */
     ck_assert(!rf_string_between(&s, &p1l, &f1, &ret, 0));
@@ -386,7 +391,7 @@ START_TEST(test_string_between) {
     rf_string_deinit(&p2l);
     rf_string_deinit(&p2r);
     rf_string_deinit(&ret);
-    rf_string_deinit(&ret2);
+    rf_stringx_deinit(&retx);
 }END_TEST
 
 START_TEST(test_string_beforev) {

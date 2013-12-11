@@ -498,6 +498,35 @@ bool rf_stringx_assign_char(struct RFstringx* str, uint32_t codepoint)
     return true;
 }
 
+bool rf_stringx_assign_unsafe_nnt(struct RFstringx* str, const char* s,
+                                 size_t length)
+{
+    bool ret = true;
+    RF_ASSERT(str);
+    if (!s) {
+        RF_WARNING("Provided null pointer for assignment");
+        return false;
+    }
+
+    /* make sure it fits in the string */
+    rf_stringx_reset(str);
+    RF_STRINGX_REALLOC_JMP(
+        str,
+        length,
+        ret=false,
+        cleanup
+    );
+    
+
+    //now copy the value
+    memcpy(rf_string_data(str), s, length);
+    //and fix the lengths
+    rf_string_length_bytes(str) = length;
+
+  cleanup:
+    return ret;
+}
+
 struct RFstringx* rf_stringx_from_string_out(const struct RFstring* s)
 {
     struct RFstringx* ret;

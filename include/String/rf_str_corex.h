@@ -169,6 +169,14 @@ i_DECLIMEX_ bool rf_stringx_assign(struct RFstringx* dest, const void* source);
 i_DECLIMEX_ bool rf_stringx_assign_char(struct RFstringx* thisstr, uint32_t character);
 
 /**
+ ** @brief Assigns to a stringx from a non-null terminated char* buffer
+ ** and for the given bytelength
+ ** 
+ **/
+i_DECLIMEX_ bool rf_stringx_assign_unsafe_nnt(struct RFstringx* str, const char* s,
+                                              size_t length);
+
+/**
  ** @brief Nullifies a string
  ** @warning Use null strings at your own risk. None of the RF_String/X
  ** functions currently test for them

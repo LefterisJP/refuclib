@@ -215,13 +215,15 @@ bool rf_stringx_move_afterv(struct RFstringx* thisstr, void* result,
 }
 
 bool rf_stringx_move_after_pair(struct RFstringx* thisstr, const void* left,
-                                const void* right, void* result,
+                                const void* right, void* resultP,
                                 enum RFstring_matching_options options,
                                 uint32_t occurence)
 {
     uint32_t i,move,start = thisstr->bIndex;
     bool found = false;
     bool ret = true;
+    bool same_separators = false;
+    struct RFstringx string_buff;
     RF_ENTER_LOCAL_SCOPE();
 
     //check the occurence parameter
@@ -230,19 +232,33 @@ bool rf_stringx_move_after_pair(struct RFstringx* thisstr, const void* left,
         occurence = 1;
     }
 
+    if (!rf_stringx_init_buff(&string_buff, 128, "")) {
+        ret = false;
+        goto cleanup;
+    }
+
+    if (rf_string_equal(left, right)) {
+        same_separators = true;
+    }
+
     //get the in between string and if it is null return false
     for(i = 1; i <= occurence; i ++)
     {
         //attempt to get the in between string
-        if(!rf_string_between(thisstr, left, right, result, options))
+        if(!rf_string_between(thisstr, left, right,
+                              &string_buff, options|RF_STRINGX_ARGUMENT))
         {
             ret = false;
             goto cleanup;
         }
 
         //move after this occurence of the pair
-        rf_stringx_move_after(thisstr, left, 0, options);
-        rf_stringx_move_after(thisstr, right, 0, options);
+        rf_stringx_move_after(thisstr, &string_buff, 0, options);
+
+        /* if left == right don't go over the right separator when searching */
+        if (!same_separators) {
+            rf_stringx_move_after(thisstr, right, 0, options);
+        }
 
         //if we found it
         if(i == occurence)
@@ -250,50 +266,33 @@ bool rf_stringx_move_after_pair(struct RFstringx* thisstr, const void* left,
             found = true;
             break;
         }
-        //else depending on the passed parameter type get rid of this result
-        if(options & RF_STRINGX_ARGUMENT)
-        {
-            rf_stringx_deinit(result);
-        }
-        else
-        {
-            rf_string_deinit(result);
-        }
     }
     //if we get here and the result is not found return failure
     if(found == false)
     {
-        if(options & RF_STRINGX_ARGUMENT)
-        {
-            rf_stringx_deinit(result);
-        }
-        else
-        {
-            rf_string_deinit(result);
-        }
         //get the pointer back
         move = thisstr->bIndex - start;
         rf_string_data(thisstr) -= move;
         rf_string_length_bytes(thisstr) += move;
         thisstr->bIndex = start;
         ret = false;
-        goto cleanup;
+        goto cleanup_str_buff;
     }
     //if we don't want to keep the result free it
-    if(result == 0)
-    {
+    if (resultP) {
         if(options & RF_STRINGX_ARGUMENT)
         {
-            rf_stringx_deinit(result);
+            rf_stringx_copy_in(resultP, &string_buff);
         }
         else
         {
-            rf_string_deinit(result);
-        }
+            rf_string_copy_in(resultP, &string_buff);
+        }      
     }
 
-  cleanup:
-    //success
+cleanup_str_buff:
+    rf_stringx_deinit(&string_buff);
+cleanup:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }

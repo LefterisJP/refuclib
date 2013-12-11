@@ -158,6 +158,20 @@ START_TEST(test_string_assign_char) {
     rf_string_deinit(&s);
     rf_string_deinit(&s2);
 }END_TEST
+
+START_TEST(test_string_assign_unsafe_nnt) {
+    struct RFstring s;
+    const char cstr[] = "Assigned string, bigger than the assignee";
+
+    ck_assert(rf_string_init(&s, "Small string"));
+    ck_assert(rf_string_assign_unsafe_nnt(&s, cstr, strlen(cstr)));
+    ck_assert_rf_str_eq_cstr(&s, "Assigned string, bigger than the assignee");
+
+    /* invalid input */
+    ck_assert(!rf_string_assign_unsafe_nnt(&s, NULL, 1));
+    
+    rf_string_deinit(&s);
+}END_TEST
 /* --- String Assignment Tests --- END --- */
 
 /* --- String Copying Tests --- START --- */
@@ -589,6 +603,20 @@ START_TEST(test_stringx_assign_char) {
     rf_stringx_deinit(&s2);
 }END_TEST
 
+START_TEST(test_stringx_assign_unsafe_nnt) {
+    struct RFstringx s;
+    const char cstr[] = "Assigned string, bigger than the assignee";
+
+    ck_assert(rf_stringx_init(&s, "Small string"));
+    ck_assert(rf_stringx_assign_unsafe_nnt(&s, cstr, strlen(cstr)));
+    ck_assert_rf_strx_eq_cstr(&s, "Assigned string, bigger than the assignee");
+
+    /* invalid input */
+    ck_assert(!rf_stringx_assign_unsafe_nnt(&s, NULL, 1));
+    
+    rf_stringx_deinit(&s);
+}END_TEST
+
 START_TEST(test_stringx_from_string_in) {
     struct RFstring s;
     struct RFstringx sx;
@@ -688,6 +716,7 @@ Suite *string_core_suite_create(void)
                               teardown_string_tests);
     tcase_add_test(string_assign, test_string_assign);
     tcase_add_test(string_assign, test_string_assign_char);
+    tcase_add_test(string_assign, test_string_assign_unsafe_nnt);
 
     TCase *string_copy = tcase_create("String Copying");
     tcase_add_checked_fixture(string_copy,
@@ -726,6 +755,7 @@ Suite *string_core_suite_create(void)
                               teardown_string_tests);
     tcase_add_test(stringx_assign, test_stringx_assign);
     tcase_add_test(stringx_assign, test_stringx_assign_char);
+    tcase_add_test(stringx_assign, test_stringx_assign_unsafe_nnt);
     tcase_add_test(stringx_assign, test_stringx_from_string_in);
 
     TCase *stringx_copy = tcase_create("Stringx Copying");

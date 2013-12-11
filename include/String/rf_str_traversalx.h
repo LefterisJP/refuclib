@@ -59,12 +59,14 @@ extern "C"
  ** @param sub         The substring after which to move inside the current
  **                    String. @inhtype{String,StringX} @tmpSTR
  ** @param result      Pass a pointer to a @c String type to be
- **                    initialized with the substring between the start of
+ **                    assigned to with the substring between the start of
  **                    @c thisstr and the end of the moving. If the passed
  **                    pointer is of RFstringx type also pass the 
  **                    @c RF_STRINGX_ARGUMENT bitflag argument in the 
- **                    @c options argument
- **                    If 0 nothing is returned @inhtype{String,StringX}
+ **                    @c options argument. The caller is responsible for
+ **                    initializing the string but the function will assign to it
+ **                    and also reallocate its buffer if needed
+ **                    If 0 nothing is assigned @inhtype{String,StringX}
  ** @param options     @see rf_string_remove() for details of the
  **                    possible options. An additional option that can be given:
  **                    + @c RF_STRINGX_ARGUMENT: Pass this bitflag option if the

@@ -153,9 +153,12 @@ i_DECLIMEX_ bool rf_string_remove(void* thisstr, const void* rstr,
  ** @param thisstr     The string to remove from @inhtype{String,StringX}
  ** @param keepstr     A string all of whose characters will be kept 
  **                    in @c thisstr @inhtype{String,StringX} @tmpSTR
+ ** @param removals    If you want to know the number of removed characters
+ **                    pass an int here . If not just leave as NULL.
  ** @return            Returns @c true in success and @c false otherwise
  **/
-i_DECLIMEX_ bool rf_string_keep_only(void* thisstr, const void* keepstr);
+i_DECLIMEX_ bool rf_string_keep_only(void* thisstr, const void* keepstr,
+                                     int *removals);
 
 
 /**
@@ -165,14 +168,15 @@ i_DECLIMEX_ bool rf_string_keep_only(void* thisstr, const void* keepstr);
  ** @param thisstr    The string to prune from. @inhtype{String,StringX}
  ** @param n          The number of characters to remove. Must be a
  **                   positive integer.
- ** @return           True if n characters got removed and false if there are not 
- **                   enough characters to remove. (in which case the
- **                   string becomes empty) or in error
+ ** @param removals   Pass a variable in which to return the number of
+ **                   pruned characters or NULL if you don't care.
+ ** @return           True if n characters got removed and false in error
  ** @see rf_string_prune_end()
  ** @see rf_string_prune_middle_b()
  ** @see rf_string_prune_middle_f()
  **/
-i_DECLIMEX_ bool rf_string_prune_start(void* thisstr, uint32_t n);
+i_DECLIMEX_ bool rf_string_prune_start(void* thisstr, uint32_t n, 
+                                       unsigned int *removals);
 
 /**
  ** @brief Removes the last n characters from the end of the string
@@ -181,14 +185,15 @@ i_DECLIMEX_ bool rf_string_prune_start(void* thisstr, uint32_t n);
  ** @param thisstr       The string to prune from. @inhtype{String,StringX}
  ** @param n             The number of characters to remove.
  **                      Must be a positive integer.
- ** @return              True if n characters got removed and false if there
- **                      are not enough characters to remove.
- **                     (in which case the string becomes empty) or in error
+ ** @param removals      Pass a variable in which to return the number of
+ **                      pruned characters or NULL if you don't care.
+ ** @return              True if n characters got removed and false in error
  ** @see rf_string_prune_start()
  ** @see rf_string_prune_middle_b()
  ** @see rf_string_prune_middle_f()
  **/
-i_DECLIMEX_ bool rf_string_prune_end(void* thisstr, uint32_t n);
+i_DECLIMEX_ bool rf_string_prune_end(void* thisstr, uint32_t n,
+                                     unsigned int *removals);
 
 /**
  ** @brief Removes characters from one point of the string
@@ -196,40 +201,52 @@ i_DECLIMEX_ bool rf_string_prune_end(void* thisstr, uint32_t n);
  **
  ** @isinherited{StringX}
  ** Removes n characters from the position p (including the character at p)
- ** of the string counting backwards. If there is no space to do so,
- ** nothing is done and returns false.
+ ** of the string counting backwards. If @c p is not found in the string nothing
+ ** is done and @c false is returned. If going backwards for @c n takes us over
+ ** the start of the string, then simply the whole string from p to the beginning
+ ** is pruned.
  ** @param thisstr     The string to prune from. @inhtype{String,StringX}
  ** @param p           The position to remove the characters from.
  **                    Must be a positive integer. Indexing starts from zero.
  ** @param n           The number of characters to remove from the position
  **                    and back.Must be a positive integer.
+ ** @param removals    Pass a variable in which to return the number of
+ **                    pruned characters or NULL if you don't care.
  ** @return            Returns true in case of succesfull removal and
- **                    false in any other case.
+ **                    false in error and the case of giving a @c which is out
+ **                    of bounds for the given string.
  ** @see rf_string_prune_middle_f()
  ** @see rf_string_prune_start()
  ** @see rf_string_prune_end()
  **/
-i_DECLIMEX_ bool rf_string_prune_middle_b(void* thisstr, uint32_t p, uint32_t n);
+i_DECLIMEX_ bool rf_string_prune_middle_b(void* thisstr, uint32_t p,
+                                          uint32_t n, unsigned int *removals);
 /**
  ** @brief Removes characters from one point of the string
  ** to another going forward
  **
  ** @isinherited{StringX}
  ** Removes n characters from the position @c p (including the character at p)
- ** of the string counting forwards. If there is no space, nothing is done
- ** and returns @c false.
+ ** of the string counting forwards. If @c p is not found in the string nothing
+ ** is done and @c false is returned. If going forwards for @c n takes us over
+ ** the end of the string, then simply the whole string from p to the end
+ ** is pruned.
  ** @param thisstr     The string to prune from. @inhtype{String,StringX}
  ** @param p           The position to remove the characters from.
  **                    Must be a positive integer. Indexing starts from zero.
  ** @param n           The number of characters to remove from the
  **                    position and on. Must be a positive integer.
+ ** @param removals    Pass a variable in which to return the number of
+ **                    pruned characters or NULL if you don't care.
  ** @return            Returns true in case of succesfull removal and
- **                    false in any other case.
+ **                    false in error and the case of giving a @c which is out
+ **                    of bounds for the given string.
  ** @see rf_string_prune_middle_b()
  ** @see rf_string_prune_start()
  ** @see rf_string_prune_end()
  **/
-i_DECLIMEX_ bool rf_string_prune_middle_f(void* thisstr, uint32_t p, uint32_t n);
+i_DECLIMEX_ bool rf_string_prune_middle_f(void* thisstr, uint32_t p,
+                                          uint32_t n, unsigned int *removals);
 
 /**
  ** @brief Removes all characters of a substring only from
@@ -243,13 +260,17 @@ i_DECLIMEX_ bool rf_string_prune_middle_f(void* thisstr, uint32_t p, uint32_t n)
  ** @param thisstr    The string to search in. @inhtype{String,StringX}
  ** @param sub        The substring to search for.
  **                   @inhtype{String,StringX} @tmpSTR
- ** @return           Returns true for success and false if none
- **                   of @c sub characters were found inside the given
- **                   String or in error
+ ** @param removals   Pass a variable in which to return the number of
+ **                   trimmed characters or NULL if you don't care.
+ ** @return           Returns true for success irrespective of whether any
+ **                   characters were trimmed. To confirm that characters were
+ **                   trimmed query the @c removals value. Returns @c false on
+ **                   error
  ** @see rf_string_trim()
  ** @see rf_string_trim_end()
  **/
-i_DECLIMEX_ bool rf_string_trim_start(void* thisstr, const void* sub);
+i_DECLIMEX_ bool rf_string_trim_start(void* thisstr, const void* sub,
+                                      unsigned int *removals);
 
 /**
  ** @brief Removes all characters of a substring starting
@@ -263,12 +284,17 @@ i_DECLIMEX_ bool rf_string_trim_start(void* thisstr, const void* sub);
  ** @param thisstr     The string to search in. @inhtype{String,StringX}
  ** @param sub         The substring to search for.
  **                    @inhtype{String,StringX} @tmpSTR
- ** @return            Returns true for success and false if none of @c sub
- **                    characters were found inside the given String or in error
+ ** @param removals    Pass a variable in which to return the number of
+ **                    trimmed characters or NULL if you don't care.
+ ** @return            Returns true for success irrespective of whether any
+ **                    characters were trimmed. To confirm that characters were
+ **                    trimmed query the @c removals value. Returns @c false on
+ **                    error
  ** @see rf_string_trim()
  ** @see rf_string_trim_start()
  **/
-i_DECLIMEX_ bool rf_string_trim_end(void* thisstr, const void* sub);
+i_DECLIMEX_ bool rf_string_trim_end(void* thisstr, const void* sub,
+                                    unsigned int *removals);
 
 /**
  ** @brief Removes all characters of a substring from both ends
@@ -284,12 +310,17 @@ i_DECLIMEX_ bool rf_string_trim_end(void* thisstr, const void* sub);
  **                    @inhtype{String,StringX}
  ** @param sub         The substring to search for.
  **                    @inhtype{String,StringX} @tmpSTR
- ** @return            Returns true for success and false if none
- **                    of @c sub characters were found inside the given String or in error
+ ** @param removals    Pass a variable in which to return the number of
+ **                    trimmed characters or NULL if you don't care.
+ ** @return            Returns true for success irrespective of whether any
+ **                    characters were trimmed. To confirm that characters were
+ **                    trimmed query the @c removals value. Returns @c false on
+ **                    error
  ** @see rf_string_trim_start()
  ** @see rf_string_trim_end()
  **/
-i_DECLIMEX_ bool rf_string_trim(void* thisstr, const void* sub);
+i_DECLIMEX_ bool rf_string_trim(void* thisstr, const void* sub,
+                                unsigned int *removals);
 
 //! @}
 

@@ -432,6 +432,30 @@ bool rf_string_assign_char(struct RFstring* str,uint32_t codepoint)
     return true;
 }
 
+bool rf_string_assign_unsafe_nnt(struct RFstring* str, const char* s,
+                                 size_t length)
+{
+    bool ret = true;
+    RF_ASSERT(str);
+    if (!s) {
+        RF_WARNING("Provided null pointer for assignment");
+        return false;
+    }
+    if(length > rf_string_length_bytes(str))
+    {
+        RF_REALLOC_JMP(rf_string_data(str), char, length,
+                       ret = false, cleanup);
+    }    
+
+    //now copy the value
+    memcpy(rf_string_data(str), s, length);
+    //and fix the lengths
+    rf_string_length_bytes(str) = length;
+
+  cleanup:
+    return ret;
+}
+
 
 /*--- RFstring copying functions ---*/
 

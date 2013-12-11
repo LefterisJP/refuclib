@@ -266,7 +266,11 @@ i_DECLIMEX_ bool rf_string_scanf_after(const void* thisstr, const void* afterstr
  **                            the string between @c lstr and @c rstr.
  **                            If the passed pointer is of RFstringx type
  **                            also pass the @c RF_STRINGX_ARGUMENT bitflag
- **                            argument in the @c options argument.
+ **                            argument in the @c options argument. 
+ **                            The caller is responsible for
+ **                            initializing the string but the function
+ **                            will assign to it
+ **                            and also reallocate its buffer if needed
  **                            This should NOT ever be null.
  **                            @inhtype{String,StringX}
  ** @param options             For details @see rf_stringx_move_after()

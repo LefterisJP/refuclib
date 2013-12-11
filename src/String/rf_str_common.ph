@@ -53,6 +53,7 @@ extern "C"
  ** the beginning of the String. This macro should be used with its end pair.
  ** We take advantage of the fact that an RFstring is always guaranteed
  ** to contain a valid UTF-8 sequence and thus no checks are performed.
+ ** Byte and character position start indexing from zero.
  ** @param i_string_ The string to iterate
  ** @param i_char_ A variable to hold the current character position of the iteration
  ** @param i_index_ A variable to hold the current byte position of the iteration
@@ -78,14 +79,15 @@ extern "C"
  **        position of the iteration
  **
  **/
-#define RF_STRING_ITERATEB_START(i_string_, i_char_, i_index_)     \
-    i_index_ = rf_string_length_bytes(i_string_) - 1;(i_char_)=1;     \
-    do{                                                            \
+#define RF_STRING_ITERATEB_START(i_string_, i_char_, i_index_)        \
+    i_index_ = rf_string_length_bytes(i_string_);(i_char_)=1;         \
+    while((i_index_) != 0){                                           \
+    (i_index_)--;                                                     \
     if(!rf_utf8_is_continuation_byte(                                 \
            rf_string_data(i_string_)[(i_index_)])){
 
 #define RF_STRING_ITERATEB_END(i_char_, i_index_)       \
-    (i_char_)++;}(i_index_)--;}while((i_index_) != 0);
+    (i_char_)++;}}
 
 
 /**

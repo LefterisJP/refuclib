@@ -33,7 +33,7 @@ i_INLINE_DECL bool rf_string_generic_prepend(void* thisstr, const char* other,
 {
     int i;
     //move the old string to the end of the buffer
-    for(i = orig_size; i >=0 ; i--)
+    for(i = orig_size - 1; i >= 0 ; i--)
     {
         rf_string_data(thisstr)[i + other_size] = rf_string_data(thisstr)[i];
     }
