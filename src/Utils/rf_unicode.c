@@ -34,6 +34,7 @@
 #include <Utils/log.h> //for error logging
 #include <Utils/memory.h> //for refu memory allocation
 #include <Utils/endianess.h> 
+#include <Utils/sanity.h> //for sanity macros
 /*------------- libc inclusion --------------*/
 #include <string.h>//memcpy
 /*------------- End of includes -------------*/
@@ -43,6 +44,10 @@ bool rf_utf8_encode(const uint32_t* codepoints, uint32_t charsN,
                    uint32_t* byteLength, char* utf8, uint32_t buffSize)
 {
     uint32_t charN;
+    RF_ASSERT(codepoints);
+    RF_ASSERT(byteLength);
+    RF_ASSERT(utf8);
+
     *byteLength = charN = 0;
     /*Start iterating the codepoints*/
     while(charN < charsN)
@@ -106,14 +111,16 @@ bool rf_utf8_encode(const uint32_t* codepoints, uint32_t charsN,
         }
         charN++;
     }/*end of the iteration loop*/
-    ///success
-    /* (*byteLength)-=1; /\* since we add one byte too many *\/ */
+
     return true;
 }
 //takes a unicode codepoint and turns them into a UTF-8 byte
 int rf_utf8_encode_single(const uint32_t codepoint, char* utf8)
 {
-    int i = 0;
+    int i;
+    RF_ASSERT(utf8);
+    
+    i = 0;
     /*If the code point requires only 1 byte*/
     if(RF_HEXLE_UI(codepoint,0x007f))
     {
@@ -237,6 +244,8 @@ bool rf_utf16_decode(const char* buff, uint32_t in_buff_length,
 {
     uint16_t v1,v2;
     uint32_t byteLength,U;
+    RF_ASSERT(buff);
+    
     *charactersN = 0;
     byteLength = 0;
     //get the value of each character
@@ -306,7 +315,8 @@ bool rf_utf16_decode(const char* buff, uint32_t in_buff_length,
 bool rf_utf16_encode(const uint32_t* codepoints, uint32_t charsN,
                     uint32_t* length, uint16_t* utf16, uint32_t buff_size)
 {
-    uint32_t i,U;
+    uint32_t i, U;
+    RF_ASSERT(codepoints);
     //for all codepoints  (i -> charIndex , length -> byteIndex
     for(i = 0, *length=0; i < charsN; i ++)
     {

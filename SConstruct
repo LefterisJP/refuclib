@@ -112,7 +112,10 @@ unit_tests_files = [
     'test_string_conversion.c',
     'test_string_retrieval.c',
     'test_string_files.c',
-    'test_string_manipulation.c'
+    'test_string_manipulation.c',
+
+
+    'test_utils_unicode.c'
 ]
 unit_tests_files = ['Tests/Unit_Tests/' + s for s in unit_tests_files]
 unit_tests_files.extend(['src/' + s for s in orig_sources])

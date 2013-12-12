@@ -4,6 +4,12 @@
 
 #include <Utils/constcmp.h>
 #include <String/rf_str_common.h>
+#include <string.h>
+
+
+/* non null terminated cstring related macros */
+#define ck_assert_nnt_str_eq_cstr(nnt_, cstr_)                  \
+    ck_assert_msg(0 == strncmp((nnt_), (cstr_), strlen(cstr_)))
 
 /* RFstring/x related macros */
 #define ck_assert_rf_str_eq_cstr(rfstr_, cstr_)                         \
