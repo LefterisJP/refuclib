@@ -33,10 +33,12 @@
 #include <rf_options.h>
 #ifdef RF_MODULE_STRINGS//check if the strings are included as a module
 
+
+/*---------other needed headers-----*/
+#include <Utils/rf_unicode.h>
 /*---------RFstring headers--------*/
 #include <String/rf_str_xdecl.h>
 #include <String/rf_str_common.h>
-#include <String/rf_str_unicode.h>
 #include <String/rf_str_core.h>
 #include <String/rf_str_retrieval.h>
 #include <String/rf_str_conversion.h>

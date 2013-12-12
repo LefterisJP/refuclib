@@ -32,12 +32,12 @@
 
 /*------------- Module related inclusion -------------*/
 #include <String/rf_str_xdecl.h> //for RFstring/X
-#include <String/rf_str_unicode.h>//for RFtext_encoding
 /*------------- Outside Module inclusion -------------*/
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/types.h> //for exact sized types
 #include <Definitions/retcodes.h> //for bool
 #include <Utils/endianess.h> //for RFendianess
+#include <Utils/rf_unicode.h> //for RFtext_encoding
 #include <IO/rf_io_common.h> //for RFeol_mark
 /*------------- libc inclusion --------------*/
 #include <stdio.h> //for FILE

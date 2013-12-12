@@ -166,7 +166,8 @@ modules.append(
     Module("CORE",
            ['refu.c', 'Utils/endianess.c', 'Utils/log.c',
             'Utils/localmem.c', 'Utils/math.c',
-            'Internal/rf_internal_mod.c', 'Utils/buffer.c',
+            'Internal/rf_internal_mod.c', 'Utils/buffer.c', 
+            'Utils/rf_unicode.c',
             'Numeric/Integer/conversion.c'])
 )
 
@@ -180,7 +181,7 @@ modules.append(
             'String/rf_str_filesx.c', 'String/rf_str_module.c',
             'String/rf_str_manipulation.c',
             'String/rf_str_manipulationx.c', 'String/rf_str_retrieval.c',
-            'String/rf_str_traversalx.c', 'String/rf_str_unicode.c'],
+            'String/rf_str_traversalx.c'],
            macro = "RF_MODULE_STRINGS",
            dependencies	= ['IO'])
 )

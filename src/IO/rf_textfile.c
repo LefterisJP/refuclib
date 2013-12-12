@@ -43,7 +43,7 @@
 #include <String/rf_str_filesx.h> //for rfStringX file functions
 #include <String/rf_str_files.h> //for rfStringX file functions
 #include <String/rf_str_traversalx.h> //for rf_stringx_reset()
-#include <String/rf_str_unicode.h> //for rfReadLine family of functions
+#include <Utils/rf_unicode.h> //for rfReadLine family of functions
 #include "../String/rf_str_conversion.ph" //for rf_string_cstr with buffer
 
 #include <Utils/endianess.h> //for the endianess stuff

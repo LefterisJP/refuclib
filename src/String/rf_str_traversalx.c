@@ -35,10 +35,10 @@
 #include <String/rf_str_retrieval.h> //for rf_string_between
 #include <String/rf_str_core.h> //for rf_string_deinit()
 #include <String/rf_str_corex.h> //for rf_stringx_deinit()
-#include <String/rf_str_unicode.h> //for rf_utf8_is_continuation_byte()
 #include "rf_str_common.ph" //for private string functionality
 /*------------- Outside Module inclusion -------------*/
 #include <Definitions/retcodes.h> //for bool
+#include <Utils/rf_unicode.h> //for rf_utf8_is_continuation_byte()
 #include <Utils/localscope.h>//for the local scope macros
 #include <Utils/memory.h> //for refu memory allocation
 /*------------- libc inclusion --------------*/

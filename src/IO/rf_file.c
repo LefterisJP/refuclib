@@ -34,7 +34,7 @@
 /*------------- Outside Module inclusion -------------*/
 #include <Utils/log.h> //for error logging
 #include <Utils/memory.h> //for refu memory allocation
-#include <String/rf_str_unicode.h> //for rf_utf8_is_continuationbyte
+#include <Utils/rf_unicode.h> //for rf_utf8_is_continuationbyte
 #include <Utils/constcmp.h> //for RF_HEXEQ macros
 #include <Utils/sanity.h> //for sanity macros
 /*------------- libc inclusion --------------*/

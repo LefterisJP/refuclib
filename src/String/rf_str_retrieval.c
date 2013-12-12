@@ -32,11 +32,11 @@
 #include <String/rf_str_retrieval.h>
 /*------------- Module related inclusion -------------*/
 #include <String/rf_str_core.h>
-#include <String/rf_str_unicode.h> //rf_utf8_is_continuation_byte()
 #include <String/rf_str_corex.h> //for rf_stringx_init_unsafe()
 #include "rf_str_common.ph" //for required string private macros and functions
 /*------------- Outside Module inclusion -------------*/
 #include <Definitions/retcodes.h> //for bool
+#include <Utils/rf_unicode.h> //rf_utf8_is_continuation_byte()
 #include <Utils/bits.h>  //for RF_BITFLAG_ON
 #include <Utils/localscope.h> //for the local scope macros
 #include <Utils/memory.h> //for refu memory allocation

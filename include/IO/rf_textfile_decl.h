@@ -36,7 +36,7 @@
 #include <Definitions/types.h> //for fixed size types
 #include <Definitions/retcodes.h> //for bool
 #include <String/rf_str_decl.h> //for RFstring
-#include <String/rf_str_unicode.h> //for RFtext_encoding
+#include <Utils/rf_unicode.h> //for RFtext_encoding
 #include <Utils/endianess.h> //for RFendianess
 /*------------- libc inclusion --------------*/
 #include <stdio.h> //for FILE*

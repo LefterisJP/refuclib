@@ -35,7 +35,7 @@
 #include "rf_str_common.ph" //for fill_fmt_buffer()
 /*------------- Outside Module inclusion -------------*/
 #include <Utils/log.h> //for error logging
-#include <String/rf_str_unicode.h> //for rf_utf8_verify_cstr()
+#include <Utils/rf_unicode.h> //for rf_utf8_verify_cstr()
 #include "../Utils/localmem.ph" //for the private local memory macros
 #include "../Internal/rf_internal_mod.ph" //for the internal buffer
 /*------------- libc inclusion --------------*/

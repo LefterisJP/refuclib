@@ -29,7 +29,7 @@
 */
 
 /*------------- Corrensponding Header inclusion -------------*/
-#include <String/rf_str_unicode.h>
+#include <Utils/rf_unicode.h>
 /*------------- Outside Module inclusion -------------*/
 #include <Utils/log.h> //for error logging
 #include <Utils/memory.h> //for refu memory allocation

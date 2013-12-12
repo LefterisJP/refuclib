@@ -33,8 +33,8 @@
 /*------------- Module related inclusion -------------*/
 #include "rf_str_common.ph" //for private string iteration
 #include "rf_str_defines.ph" //for some defines
-#include <String/rf_str_unicode.h> //for unicode functions
 /*------------- Outside Module inclusion -------------*/
+#include <Utils/rf_unicode.h> //for unicode functions
 #include <Definitions/retcodes.h> //for error codes
 #include <Utils/log.h> //for error logging
 #include <Utils/localscope.h>//for local scope macros

@@ -34,10 +34,10 @@
 #include <String/rf_str_core.h> //for rf_string_deinit
 #include <String/rf_str_retrieval.h> //for rf_string_between and others
 #include <String/rf_str_traversalx.h>
-#include <String/rf_str_unicode.h> //for unicode functions
 #include "rf_str_common.ph" //for private string functions and macros
 #include "rf_str_manipulation.ph" //for manipulation only stuff
 /*------------- Outside Module inclusion -------------*/
+#include <Utils/rf_unicode.h> //for unicode functions
 #include <Utils/log.h>
 #include <Utils/memory.h> //for refu memory allocation
 #include <Utils/localscope.h>//for local scope macros
@@ -59,9 +59,8 @@ bool rf_stringx_append(struct RFstringx* thisstr, const void* other)
     ret = rf_stringx_generic_append(thisstr, rf_string_data(other),
                                     rf_string_length_bytes(other));
 
-#ifdef RF_OPTION_DEBUG
+
   cleanup:
-#endif
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
@@ -98,9 +97,7 @@ bool rf_stringx_append_chars(struct RFstringx* thisstr,
     }
     ret = rf_stringx_generic_append(thisstr, rf_string_data(other), end);
 
-#ifdef RF_OPTION_DEBUG
   cleanup:
-#endif
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }

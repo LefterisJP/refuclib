@@ -34,13 +34,13 @@
 #include <String/rf_str_corex.h>
 #include <String/rf_str_core.h> //for string iterations
 #include <String/rf_str_retrieval.h> //for rf_string_length()
-#include <String/rf_str_unicode.h> //for unicode functions
 #include "rf_str_common.ph" //for required string private macros and functions
 #include "rf_str_manipulation.ph" //for manipulation specific common macros
 #include "rf_str_mod.ph" //for the submod initialization
 #include "rf_str_defines.ph" //for some defines
 /*------------- Outside Module inclusion -------------*/
 #include <Utils/log.h>
+#include <Utils/rf_unicode.h> //for unicode functions
 #include <Utils/memory.h> //for refu memory allocation
 #include <Utils/localscope.h> //for local scope macros
 #include <Utils/sanity.h> //for sanity macros

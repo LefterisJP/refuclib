@@ -32,11 +32,11 @@
 
 /*------------- Module related inclusion -------------*/
 #include <String/rf_str_xdecl.h> //for RFstring/X
-#include <String/rf_str_unicode.h>//for rf_utf8_is_continutation_byte
 /*------------- Outside Module inclusion -------------*/
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/types.h> //for exact sized types
 #include <Definitions/retcodes.h> //for bool
+#include <Utils/rf_unicode.h> //for rf_utf8_is_continutation_byte
 /*------------- libc inclusion --------------*/
  #include <string.h> //for size_t
 /*------------- End of includes -------------*/

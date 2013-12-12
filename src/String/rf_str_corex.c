@@ -33,10 +33,10 @@
 /*------------- Module related inclusion -------------*/
 #include <String/rf_str_traversalx.h> //for rf_stringx_reset()
 #include <String/rf_str_core.h> //for some needed RFstring functions
-#include <String/rf_str_unicode.h> //for unicode functions
 #include "rf_str_common.ph" //for RF_STRINGX_REALLOC()
 /*------------- Outside Module inclusion -------------*/
 #include <Utils/endianess.h> //for endianess detection
+#include <Utils/rf_unicode.h> //for unicode functions
 #include <Utils/log.h>
 #include <Definitions/retcodes.h> //for error codes
 #include <Utils/constcmp.h>  //for RF_HEXLE_UI() macro and others
