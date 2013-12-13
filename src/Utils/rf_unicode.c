@@ -70,6 +70,20 @@
      */                                                             \
     RF_HEXEQ_C( ( (~(i_stream_[i] ^ 0xF0))>>3), 0x1F)
 
+#define UTF8_5_BYTES_SHOULD_FOLLOW(i_stream_)                        \
+    /*                                                               \
+     * if the leading bits are in the form of 0b111110xx then range  \
+     * is U+200000 to U+3FFFFFF (5 bytes)                            \
+     */                                                              \
+    RF_HEXEQ_C( ( (~(i_stream_[i] ^ 0xF8))>>2), 0x3F)
+
+#define UTF8_6_BYTES_SHOULD_FOLLOW(i_stream_)                         \
+    /*                                                                \
+     * if the leading bits are in the form of 0b11110xxx then range   \
+     * is U+4000000 to U+7FFFFFF (6 bytes)                            \
+     */                                                               \
+    RF_HEXEQ_C( ( (~(i_stream_[i] ^ 0xFC))>>1), 0x7F)
+
 
 //Takes a buffer of unicode character and turns them into a UTF-8 encoded string
 bool rf_utf8_encode(const uint32_t* codepoints, uint32_t charsN,
@@ -252,16 +266,49 @@ static inline bool utf8_range_byte4_check(const char *bytes, uint32_t i)
      * be encountered. We have to check for them.
      * invalid byte values are from 0xF5 to 0xFF
      */
+#if 0 /* TODO: figure out why this check was here and delete if irrelevant */
     if(RF_HEXGE_C(bytes[i], 0xF5))
     {
         RF_ERROR("While decoding a UTF-8 byte sequence, "
                  "an invalid byte was encountered");
         return false;
     }
+#endif
 
     if(!rf_utf8_is_continuation_byte(bytes[i+1]) ||
        !rf_utf8_is_continuation_byte(bytes[i+2]) ||
        !rf_utf8_is_continuation_byte(bytes[i+3]))
+    {
+        RF_ERROR("While decoding a UTF-8 byte sequence, "
+                 "and expecting a continuation byte, one "
+                 "was not found");
+        return false;
+    }
+    return true;
+}
+
+static inline bool utf8_range_byte5_check(const char *bytes, uint32_t i)
+{
+    if(!rf_utf8_is_continuation_byte(bytes[i+1]) ||
+       !rf_utf8_is_continuation_byte(bytes[i+2]) ||
+       !rf_utf8_is_continuation_byte(bytes[i+3]) ||
+       !rf_utf8_is_continuation_byte(bytes[i+4]))
+    {
+        RF_ERROR("While decoding a UTF-8 byte sequence, "
+                 "and expecting a continuation byte, one "
+                 "was not found");
+        return false;
+    }
+    return true;
+}
+
+static inline bool utf8_range_byte6_check(const char *bytes, uint32_t i)
+{
+    if(!rf_utf8_is_continuation_byte(bytes[i+1]) ||
+       !rf_utf8_is_continuation_byte(bytes[i+2]) ||
+       !rf_utf8_is_continuation_byte(bytes[i+3]) ||
+       !rf_utf8_is_continuation_byte(bytes[i+4]) ||
+       !rf_utf8_is_continuation_byte(bytes[i+5]))
     {
         RF_ERROR("While decoding a UTF-8 byte sequence, "
                  "and expecting a continuation byte, one "
@@ -356,6 +403,23 @@ bool rf_utf8_decode(const char* utf8, uint32_t utf8Length,
             codePoints[*charsN] |= ((utf8[i] & 0x7) << 18);
 
             i+=4;
+        } else if(UTF8_5_BYTES_SHOULD_FOLLOW(utf8)) {
+            if (!utf8_range_byte5_check(utf8, i)) {
+                return false;
+            }
+
+            RF_ASSERT(0); /* TODO */
+
+            i+=5;
+            
+        } else if(UTF8_6_BYTES_SHOULD_FOLLOW(utf8)) {
+            if (!utf8_range_byte6_check(utf8, i)) {
+                return false;
+            }
+
+            RF_ASSERT(0); /* TODO */
+
+            i+=6;
         } else {
            /* Expecting one of the 4 different start bytes and did not find it*/
             RF_ERROR("While decoding a UTF-8 byte sequence, the "
@@ -381,7 +445,6 @@ bool rf_utf8_verify(const char* bytes, uint32_t *returned_byte_length,
         given_byte_length = UINT_MAX;
     }
 
-    /* while((returned_byte_length && bytes[i] == '\0') || i < given_byte_length) */
     while(1)
     {
         if (returned_byte_length) {
@@ -389,7 +452,7 @@ bool rf_utf8_verify(const char* bytes, uint32_t *returned_byte_length,
                 break;
             }
         } else {
-            if (i < given_byte_length) {
+            if (i >= given_byte_length) {
                 break;
             }
         }
@@ -417,6 +480,20 @@ bool rf_utf8_verify(const char* bytes, uint32_t *returned_byte_length,
                 return false;
             }
             i += 4;
+        }
+        else if(UTF8_5_BYTES_SHOULD_FOLLOW(bytes))
+        {
+            if (!utf8_range_byte5_check(bytes, i)) {
+                return false;
+            }
+            i += 5;
+        }
+        else if(UTF8_6_BYTES_SHOULD_FOLLOW(bytes))
+        {
+            if (!utf8_range_byte6_check(bytes, i)) {
+                return false;
+            }
+            i += 6;
         }
         else /* none of the 4 different start byte types found */
         {
