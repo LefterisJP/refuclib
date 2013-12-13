@@ -33,11 +33,43 @@
 /*------------- Outside Module inclusion -------------*/
 #include <Utils/log.h> //for error logging
 #include <Utils/memory.h> //for refu memory allocation
-#include <Utils/endianess.h> 
+#include <Utils/endianess.h>
 #include <Utils/sanity.h> //for sanity macros
 /*------------- libc inclusion --------------*/
 #include <string.h>//memcpy
+#include <limits.h> //for UINT_MAX
 /*------------- End of includes -------------*/
+
+
+#define UTF8_1_BYTE_SHOULD_FOLLOW(i_stream_)             \
+    /*                                                  \
+     * if the lead bit of the byte is 0 then range is : \
+     * U+0000 to U+0007F (1 byte)                       \
+     */                                                 \
+    ((i_stream_[i] & 0x80)>>7) == 0
+
+#define UTF8_2_BYTES_SHOULD_FOLLOW(i_stream_)                           \
+    /*                                                                  \
+     * if the leading bits are in the form of 0b110xxxxx then range is: \
+     *  U+0080 to U+07FF (2 bytes)                                      \
+     */                                                                 \
+    RF_HEXEQ_C(((~(i_stream_[i] ^  0xC0))>>5),0x7)
+
+#define UTF8_3_BYTES_SHOULD_FOLLOW(i_stream_)                           \
+    /*                                                                  \
+     * if the leading bits are in the form of 0b1110xxxx then range is  \
+     * U+0800 to U+FFFF  (3 bytes)                                      \
+     */                                                                 \
+    RF_HEXEQ_C(((~(i_stream_[i] ^ 0xE0))>>4),0xF)
+
+
+#define UTF8_4_BYTES_SHOULD_FOLLOW(i_stream_)                       \
+    /*                                                              \
+     * if the leading bits are in the form of 0b11110xxx then range \
+     * is U+010000 to U+10FFFF (4 bytes)                            \
+     */                                                             \
+    RF_HEXEQ_C( ( (~(i_stream_[i] ^ 0xF0))>>3), 0x1F)
+
 
 //Takes a buffer of unicode character and turns them into a UTF-8 encoded string
 bool rf_utf8_encode(const uint32_t* codepoints, uint32_t charsN,
@@ -119,7 +151,7 @@ int rf_utf8_encode_single(const uint32_t codepoint, char* utf8)
 {
     int i;
     RF_ASSERT(utf8);
-    
+
     i = 0;
     /*If the code point requires only 1 byte*/
     if(RF_HEXLE_UI(codepoint,0x007f))
@@ -173,43 +205,126 @@ int rf_utf8_encode_single(const uint32_t codepoint, char* utf8)
     return i;
 }
 
+
+
+static inline bool utf8_range_byte2_check(const char *bytes, uint32_t i)
+{
+    /*
+     * also remember bytes 0xC0 and 0xC1 are invalid and could possibly
+     * be found in a starting byte of this type so check for them here
+     */
+    if (RF_HEXEQ_C(bytes[i], 0xC0) || RF_HEXEQ_C(bytes[i],0xC1)) {
+        RF_ERROR("While decoding a UTF-8 byte sequence, "
+                 "an invalid byte was encountered");
+        return false;
+    }
+    /* if the next byte is NOT a continuation byte */
+    if (!rf_utf8_is_continuation_byte(bytes[i+1])) {
+        RF_ERROR("While decoding a UTF-8 byte sequence, "
+                 "and expecting a continuation byte, one "
+                 "was not found");
+        return false;
+    }
+    return true;
+}
+
+static inline bool utf8_range_byte3_check(const char *bytes, uint32_t i)
+{
+  /*
+   *if the string has invalid continuation bytes quit. They are in
+   * separate if checks to avoid checking outside of array bounds
+   */
+    if(!rf_utf8_is_continuation_byte(bytes[i+1]) ||
+       !rf_utf8_is_continuation_byte(bytes[i+2]) )
+    {
+        RF_ERROR("While decoding a UTF-8 byte sequence, "
+                 "and expecting a continuation byte, one "
+                 "was not found");
+        return false;
+    }
+    return true;
+}
+
+static inline bool utf8_range_byte4_check(const char *bytes, uint32_t i)
+{
+    /*
+     * in this type of starting byte a number of invalid bytes can
+     * be encountered. We have to check for them.
+     * invalid byte values are from 0xF5 to 0xFF
+     */
+    if(RF_HEXGE_C(bytes[i], 0xF5))
+    {
+        RF_ERROR("While decoding a UTF-8 byte sequence, "
+                 "an invalid byte was encountered");
+        return false;
+    }
+
+    if(!rf_utf8_is_continuation_byte(bytes[i+1]) ||
+       !rf_utf8_is_continuation_byte(bytes[i+2]) ||
+       !rf_utf8_is_continuation_byte(bytes[i+3]))
+    {
+        RF_ERROR("While decoding a UTF-8 byte sequence, "
+                 "and expecting a continuation byte, one "
+                 "was not found");
+        return false;
+    }
+    return true;
+}
+
 //Takes a utf8 buffer and decodes it into unicode codepoints
 bool rf_utf8_decode(const char* utf8, uint32_t utf8Length,
                    uint32_t* charsN, uint32_t* codePoints,
                    uint32_t buff_size)
 {
-    uint32_t i=0;
+    uint32_t i;
+    i = 0;
     *charsN = 0;
     while(i < utf8Length)
     {
         /* buffer size check */
-        if(i >= buff_size)
-        {
+        if (i >= buff_size) {
             RF_ERROR("The provided buffer size for the unicode codepoints "
                      "of %u is not big enough to fit them", buff_size);
             return false;
         }
 
-        //if the lead bit of the byte is 0 then range is : U+0000 to U+0007F (1 byte)
-        if( ((utf8[i] & 0x80)>>7) == 0 )
-        {
+
+        /*
+         * if the lead bit of the byte is 0 then range is :
+         * U+0000 to U+0007F (1 byte)
+         */
+        if (UTF8_1_BYTE_SHOULD_FOLLOW(utf8)) {
             //and the code point is this whole byte only
             codePoints[*charsN] = utf8[i];
             i++;
         }
-        //if the leading bits are in the form of 0b110xxxxx then range is: U+0080 to U+07FF (2 bytes)
-        else if ( RF_HEXEQ_C( ( (~(utf8[i] ^  0xC0))>>5),0x7) )
-        {
+        /*
+         * if the leading bits are in the form of 0b110xxxxx then range is:
+         *  U+0080 to U+07FF (2 bytes)
+         */
+        else if (UTF8_2_BYTES_SHOULD_FOLLOW(utf8)) {
+            if (!utf8_range_byte2_check(utf8, i)) {
+                return false;
+            }
+
             codePoints[*charsN] =0;
             //from the second byte take the first 6 bits
             codePoints[*charsN] = (utf8[i+1] & 0x3F) ;
             //from the first byte take the first 5 bits and put them in the start
             codePoints[*charsN] |= ((utf8[i] & 0x1F) << 6);
-            i+=2;
+
+            i += 2;
         }
-        //if the leading bits are in the form of 0b1110xxxx then range is U+0800 to U+FFFF  (3 bytes)
-        else if( RF_HEXEQ_C( ( (~(utf8[i] ^ 0xE0))>>4),0xF) )
+        /*
+         * if the leading bits are in the form of 0b1110xxxx then range is
+         * U+0800 to U+FFFF  (3 bytes)
+         */
+        else if(UTF8_3_BYTES_SHOULD_FOLLOW(utf8))
         {
+            if (!utf8_range_byte3_check(utf8, i)) {
+                return false;
+            }
+
             codePoints[*charsN] = 0;
             //from the third byte take the first 6 bits
             codePoints[*charsN] = (utf8[i+2] & 0x3F) ;
@@ -217,11 +332,19 @@ bool rf_utf8_decode(const char* utf8, uint32_t utf8Length,
             codePoints[*charsN] |= ((utf8[i+1] & 0x3F) << 6);
             //from the first byte take the first 4 bits and put them to the left of the previous 6 bits
             codePoints[*charsN] |= ((utf8[i] & 0xF) << 12);
+
             i+=3;
         }
-        //if the leading bits are in the form of 0b11110xxx then range is U+010000 to U+10FFFF (4 bytes)
-        else if( RF_HEXEQ_C( ( (~(utf8[i] ^ 0xF0))>>3), 0x1F))
+        /*
+         * if the leading bits are in the form of 0b11110xxx then range
+         * is U+010000 to U+10FFFF (4 bytes)
+         */
+        else if(UTF8_4_BYTES_SHOULD_FOLLOW(utf8))
         {
+            if (!utf8_range_byte4_check(utf8, i)) {
+                return false;
+            }
+
             codePoints[*charsN] = 0;
             //from the fourth byte take the first 6 bits
             codePoints[*charsN] = (utf8[i+3] & 0x3F) ;
@@ -231,21 +354,94 @@ bool rf_utf8_decode(const char* utf8, uint32_t utf8Length,
             codePoints[*charsN] |= ((utf8[i+1] & 0x3F) << 12);
             //from the first byte take the first 3 bits and put them to the left of the previous 6 bits
             codePoints[*charsN] |= ((utf8[i] & 0x7) << 18);
+
             i+=4;
+        } else {
+           /* Expecting one of the 4 different start bytes and did not find it*/
+            RF_ERROR("While decoding a UTF-8 byte sequence, the "
+                     "first byte of a character was not valid "
+                     "UTF-8");
+            return false;
         }
+
         (*charsN) += 1;
     }
     return true;
 }
 
-bool rf_utf16_decode(const char* buff, uint32_t in_buff_length, 
+
+bool rf_utf8_verify(const char* bytes, uint32_t *returned_byte_length,
+                         uint32_t given_byte_length)
+{
+    uint32_t i;
+
+    //i is the byte index
+    i = 0;
+    if (returned_byte_length) {
+        given_byte_length = UINT_MAX;
+    }
+
+    /* while((returned_byte_length && bytes[i] == '\0') || i < given_byte_length) */
+    while(1)
+    {
+        if (returned_byte_length) {
+            if (bytes[i] == '\0') {
+                break;
+            }
+        } else {
+            if (i < given_byte_length) {
+                break;
+            }
+        }
+
+        if(UTF8_1_BYTE_SHOULD_FOLLOW(bytes)) {
+            i = i+1;
+        }
+        else if (UTF8_2_BYTES_SHOULD_FOLLOW(bytes))
+        {
+            if (!utf8_range_byte2_check(bytes, i)) {
+                return false;
+            }
+            i += 2;
+        }
+        else if(UTF8_3_BYTES_SHOULD_FOLLOW(bytes))
+        {
+            if (!utf8_range_byte3_check(bytes, i)) {
+                return false;
+            }
+            i += 3;
+        }
+        else if(UTF8_4_BYTES_SHOULD_FOLLOW(bytes))
+        {
+            if (!utf8_range_byte4_check(bytes, i)) {
+                return false;
+            }
+            i += 4;
+        }
+        else /* none of the 4 different start byte types found */
+        {
+            RF_ERROR("While decoding a UTF-8 byte sequence, the "
+                     "first byte of a character was not valid "
+                     "UTF-8");
+            return false;
+        }
+    }//end of iterating the bytes
+
+    if (returned_byte_length) {
+        *returned_byte_length = i;
+    }
+    return true;
+}
+
+
+bool rf_utf16_decode(const char* buff, uint32_t in_buff_length,
                     uint32_t* charactersN, uint32_t* codepoints,
                     uint32_t buff_size)
 {
     uint16_t v1,v2;
     uint32_t byteLength,U;
     RF_ASSERT(buff);
-    
+
     *charactersN = 0;
     byteLength = 0;
     //get the value of each character
@@ -258,7 +454,7 @@ bool rf_utf16_decode(const char* buff, uint32_t in_buff_length,
         if(byteLength >= buff_size)
         {
             RF_ERROR("The provided buffer size \"%u\" "
-                     "is not enough to fit the decoded codepoints", buff_size);            
+                     "is not enough to fit the decoded codepoints", buff_size);
             return false;
         }
 
@@ -349,87 +545,6 @@ bool rf_utf16_encode(const uint32_t* codepoints, uint32_t charsN,
         utf16[(*length)+1] |= (uint16_t)(U&(uint32_t)0x3FF);
         (*length)+=2;
     }
-    return true;
-}
-
-bool rf_utf8_verify_cstr(const char* bytes, uint32_t * i)
-{
-    //i is the byte index
-    *i=0;
-    while(bytes[*i] != '\0')
-    {
-        //if the lead bit of the byte is 0 then range is : U+0000 to U+0007F (1 byte)
-        if( ((bytes[*i] & 0x80)>>7) == 0 )
-        {
-            *i = *i+1;
-        }
-        //if the leading bits are in the form of 0b110xxxxx then range is: U+0080 to U+07FF (2 bytes)
-        else if ( RF_HEXEQ_C( ( (~(bytes[*i] ^  0xC0))>>5), 0x7) )
-        {
-            //also remember bytes 0xC0 and 0xC1 are invalid and could possibly be found in a starting byte of this type so check for them here
-            if( RF_HEXEQ_C(bytes[*i],0xC0) || RF_HEXEQ_C(bytes[*i],0xC1))
-            {
-                RF_ERROR("While decoding a UTF-8 byte sequence, "
-                         "an invalid byte was encountered");
-                return false;
-            }
-
-            //if the next byte is NOT a continuation byte
-            if( !rf_utf8_is_continuation_byte(bytes[*i+1]))
-            {
-                RF_ERROR("While decoding a UTF-8 byte sequence, "
-                         "and expecting a continuation byte, one "
-                         "was not found");
-                return false;
-            }
-            *i= *i+2;
-        }
-        //if the leading bits are in the form of 0b1110xxxx then range is U+0800 to U+FFFF  (3 bytes)
-        else if( RF_HEXEQ_C( ( (~(bytes[*i] ^ 0xE0))>>4),0xF))
-        {
-            //if the string has invalid continuation bytes quit. They are in separate if checks to avoid checking outside of array bounds
-            if(!rf_utf8_is_continuation_byte(bytes[*i+1]) ||
-               !rf_utf8_is_continuation_byte(bytes[*i+2]) )
-            {
-                RF_ERROR("While decoding a UTF-8 byte sequence, "
-                         "and expecting a continuation byte, one "
-                         "was not found");
-                return false;
-            }
-            *i= *i+3;
-        }
-        //if the leading bits are in the form of 0b11110xxx then range is U+010000 to U+10FFFF (4 bytes)
-        else if(RF_HEXEQ_C( ( (~(bytes[*i] ^ 0xF0))>>3), 0x1F))
-        {
-            //in this type of starting byte a number of invalid bytes can be encountered. We have to check for them.
-            if(RF_HEXGE_C(bytes[*i],0xF5)) //invalid byte value are from 0xF5 to 0xFF
-            {
-                RF_ERROR("While decoding a UTF-8 byte sequence, "
-                         "an invalid byte was encountered");
-                return false;
-            }
-
-            //if the string has invalid continuation bytes quit. They are in separate if checks to avoid checking outside of array bounds
-            if(!rf_utf8_is_continuation_byte(bytes[*i+1]) ||
-               !rf_utf8_is_continuation_byte(bytes[*i+2]) ||
-               !rf_utf8_is_continuation_byte(bytes[*i+3]))
-            {
-                RF_ERROR("While decoding a UTF-8 byte sequence, "
-                         "and expecting a continuation byte, one "
-                         "was not found");
-                return false;
-            }
-            *i=*i+4;
-        }
-        else//we were expecting one of the 4 different start bytes and we did not find it, there is an error
-        {
-            RF_ERROR("While decoding a UTF-8 byte sequence, the "
-                     "first byte of a character was not valid "
-                     "UTF-8");
-            return false;
-        }
-
-    }//end of iterating the bytes
     return true;
 }
 

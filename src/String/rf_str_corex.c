@@ -154,7 +154,7 @@ bool rf_stringx_init(struct RFstringx* str, const char* lit)
         RF_ERROR("Failed to initialize string due to null c string input");
         return false;
     }
-    if(!rf_utf8_verify_cstr(lit ,&byteLength))
+    if(!rf_utf8_verify(lit ,&byteLength, 0))
     {
         RF_ERROR("Error at StringX initialization due to invalid UTF-8 "
                  "byte sequence");
@@ -434,7 +434,7 @@ bool rf_stringx_init_buff(struct RFstringx* str, uint32_t buffSize,
         RF_WARNING("provided null source string literal");
         return false;
     }
-    if(!rf_utf8_verify_cstr(lit, &byteLength))
+    if(!rf_utf8_verify(lit, &byteLength, 0))
     {
         RF_ERROR("Error at StringX initialization due to invalid UTF-8 "
                   "byte sequence");

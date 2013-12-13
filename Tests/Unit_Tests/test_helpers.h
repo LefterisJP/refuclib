@@ -39,5 +39,4 @@
     ck_assert_msg(DBLCMP_EQ(val1_, val2_),            \
                   "double %lf != %lf", val1_, val2_)
 
-
 #endif

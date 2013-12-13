@@ -35,7 +35,7 @@
 #include "rf_str_common.ph" //for fill_fmt_buffer()
 /*------------- Outside Module inclusion -------------*/
 #include <Utils/log.h> //for error logging
-#include <Utils/rf_unicode.h> //for rf_utf8_verify_cstr()
+#include <Utils/rf_unicode.h> //for rf_utf8_verify()
 #include "../Utils/localmem.ph" //for the private local memory macros
 #include "../Internal/rf_internal_mod.ph" //for the internal buffer
 /*------------- libc inclusion --------------*/
@@ -83,7 +83,7 @@ struct RFstring* i_NVrf_string_create_local(const char* s)
     //remember the stack pointer before this macro evaluation
     i_rf_lms_args_eval(return NULL);
     //check for validity of the given sequence and get the character length
-    if(!rf_utf8_verify_cstr(s, &byteLength))
+    if(!rf_utf8_verify(s, &byteLength, 0))
     {
         RF_ERROR("Error at String Allocation due to invalid "
                  "UTF-8 byte sequence");

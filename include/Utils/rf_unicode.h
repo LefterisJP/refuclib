@@ -120,42 +120,55 @@ i_DECLIMEX_ bool rf_utf8_encode(const uint32_t* codepoints,
 i_DECLIMEX_ int rf_utf8_encode_single(const uint32_t codepoint, char* utf8);
 
 /**
- ** @brief Takes a utf8 buffer and decodes it into unicode codepoints
+ ** @brief Takes a utf8 buffer and decodes it into unicode codepoints. It
+ ** also verifies the validity of the utf8 byte stream. If the caller
+ ** simply needs to verify the validity of the stream but not decode it
+ ** then he can use @ref rf_utf8_verify()
  **
- ** Note that the returned decoded codepoints buffer needs to be freed by
- ** the user explicitly after done with its use.
- ** @param[in] utf8            The utf8 buffer
- ** @param[in] utf8BLength     The bytes length of the UTF8 buffer
- ** @param[out] charsN         Pass a reference to an @c uint32_t here to receive
- **                            the number of unicode characters contained in
- **                            the @c utf8 and the returned codepoints buffer
- ** @param[in/out] code_points Pass a buffer of @c uint32_t to receive the code
- **                            points of the decoded utf8 buffer here.
- **                            The buffer has to be allocated and
- **                            be of at least 4 times the length of the utf8
- **                            buffer to be safe that it fits
- **                            the decoded codepoints
- ** @param buff_size The size of the buffer given at @c code_points.
- ** @return Returns @c true for success and @c false otherwise
+ ** 
+ ** @param[in] utf8               The utf8 buffer
+ ** @param[in] utf8_byte_length   The bytes length of the UTF8 buffer
+ ** @param[out] chars_num         Pass a reference to an @c uint32_t here to receive
+ **                               the number of unicode characters contained in
+ **                               the @c utf8 and the returned codepoints buffer
+ ** @param[in/out] code_points    Pass a buffer of @c uint32_t to receive the code
+ **                               points of the decoded utf8 buffer here.
+ **                               The buffer has to be allocated and
+ **                               be of at least 4 times the length of the utf8
+ **                               buffer to be safe that it fits
+ **                               the decoded codepoints.
+ ** @param cp_buff_size           The size of the buffer given at @c code_points.
+ ** @return                       Returns @c true for success and
+ **                               @c false otherwise
+ ** @see rf_utf8_verify()
  **/
-i_DECLIMEX_ bool rf_utf8_decode(const char* utf8, uint32_t utf8BLength,
-                                uint32_t* charsN, uint32_t* code_points,
-                                uint32_t buff_size);
+i_DECLIMEX_ bool rf_utf8_decode(const char* utf8, uint32_t utf8_byte_length,
+                                uint32_t* chars_num, uint32_t* code_points,
+                                uint32_t cp_buff_size);
 
 
 /**
- ** Parses a utf-8 byte sequence represented as a null terminated c-string
- ** and returns the byte length verifying its validity
- ** Caller must always make sure that no NULL byte stream or @c bytelength
- ** is ever provided.
+ ** Parses a utf-8 byte stream and verifies its validity. If it's a null terminated
+ ** c string then you have to provide @c byteLength to get back its size.
+ ** If it's not a null terminated buffer then you can provide its byte length
+ ** in the third argument @c given_byte_length.
+ **
  ** @param[in] bytes        A sequence of bytes encoded in the UTF-8 encoding
- ** @param[out] byteLength  Pass a reference to an uint32_t to obtain the number
- **                         of bytes that make up the sequence
+ ** @param[out] returned_byte_length  
+ **                         Pass a reference to an uint32_t to obtain the number
+ **                         of bytes that make up the sequence. It can be NULL.
+ **                         If this is null then the caller must provide a 
+ **                         relevant value to the @c given_byte_length field
+ ** @param[in] given_byte_length 
+ **                         If you already know the size of @c bytes provide it 
+ **                         here
  ** @return                 Returns @c true for proper utf8 byte sequence
  **                         and @c false otherwise
+ ** @see rf_utf8_decode()
  **/
-i_DECLIMEX_ bool rf_utf8_verify_cstr(const char* bytes,
-                                     uint32_t* byteLength);
+i_DECLIMEX_ bool rf_utf8_verify(const char* bytes,
+                                     uint32_t* returned_byte_length,
+                                     uint32_t given_byte_length);
 
 /**
  ** @brief Decodes a  UTF-16 byte stream into codepoints
