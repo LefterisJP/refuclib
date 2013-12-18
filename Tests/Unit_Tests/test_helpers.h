@@ -6,7 +6,6 @@
 #include <String/rf_str_common.h>
 #include <string.h>
 
-
 /* non null terminated cstring related macros */
 #define ck_assert_nnt_str_eq_cstr(nnt_, cstr_)                  \
     ck_assert_msg(0 == strncmp((nnt_), (cstr_), strlen(cstr_)))

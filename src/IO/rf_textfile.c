@@ -603,22 +603,12 @@ bool rf_textfile_init(struct RFtextfile* t, const void* name,
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
 
-#if RF_OPTION_DEBUG
-    if(name == NULL)
+    if(!name)
     {
         RF_ERROR("Provided a null pointer for the file name");
         ret = false;
         goto cleanup1;
     }
-    
-    if(endianess != RF_LITTLE_ENDIAN || endianess != RF_BIG_ENDIAN ||
-       endianess != RF_ENDIANESS_UNKNOWN)
-    {
-        RF_ERROR("Provided an illegal endianess value");
-        ret = false;
-        goto cleanup1;
-    }
-#endif
 
     //save the name of the file
     if(!rf_string_copy_in(&t->name,name))

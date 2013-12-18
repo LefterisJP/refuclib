@@ -4,21 +4,10 @@
 #include <string.h>
 
 #include "test_helpers.h"
-
+#include "utilities_for_testing.h"
 
 #include <refu.h>
 #include <Utils/rf_unicode.h>
-
-void setup_unicode_tests()
-{
-    rf_init("refuclib.log", 0, LOG_DEBUG);
-}
-
-void teardown_unicode_tests()
-{
-    rf_deinit();
-}
-
 
 /* --- UTF8 encoding Tests --- START --- */
 START_TEST(test_utf8_encode) {
@@ -248,8 +237,8 @@ Suite *utils_unicode_suite_create(void)
 
     TCase *unicode_utf8 = tcase_create("UTF8 encoding");
     tcase_add_checked_fixture(unicode_utf8,
-                              setup_unicode_tests,
-                              teardown_unicode_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(unicode_utf8, test_utf8_encode);
     tcase_add_test(unicode_utf8, test_utf8_encode_single);
     tcase_add_test(unicode_utf8, test_utf8_decode);
@@ -258,8 +247,8 @@ Suite *utils_unicode_suite_create(void)
     TCase *boundary_utf8_encoding = tcase_create("UTF8 encoding "
                                                  "boundary conditions");
     tcase_add_checked_fixture(boundary_utf8_encoding,
-                              setup_unicode_tests,
-                              teardown_unicode_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(
         boundary_utf8_encoding,
         test_boundary_utf8_first_possible_sequence_of_certain_length);
@@ -271,8 +260,8 @@ Suite *utils_unicode_suite_create(void)
     TCase *malformed_utf8_encoding = tcase_create("UTF8 encoding "
                                                   "malformed streams");
     tcase_add_checked_fixture(malformed_utf8_encoding,
-                              setup_unicode_tests,
-                              teardown_unicode_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(
         malformed_utf8_encoding,
         test_malformed_utf8_unexpected_continuation_bytes
@@ -280,8 +269,8 @@ Suite *utils_unicode_suite_create(void)
 
     TCase *unicode_utf16 = tcase_create("UTF16 encoding");
     tcase_add_checked_fixture(unicode_utf16,
-                              setup_unicode_tests,
-                              teardown_unicode_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(unicode_utf16, test_utf16_decode);
     tcase_add_test(unicode_utf16, test_utf16_encode);
 

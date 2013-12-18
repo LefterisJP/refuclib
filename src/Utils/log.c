@@ -144,7 +144,7 @@ static void log_deinit(struct RFlog *log)
 
 #define CHECK_BUFFER(i_log_, add_size)                  \
     do{                                                 \
-        if (add_size <= REM(i_log_))  \
+        if (add_size >= REM(i_log_))  \
         {                                               \
             INCREASE_BUFFER(i_log_);                    \
         }                                               \
