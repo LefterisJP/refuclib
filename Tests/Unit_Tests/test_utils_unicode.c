@@ -186,6 +186,109 @@ START_TEST(test_malformed_utf8_unexpected_continuation_bytes){
    ck_assert_invalid_utf8(cb_all);
 }END_TEST
 
+START_TEST(test_malformed_utf8_lonely_start){
+    /* 
+     * All 32 first bytes of 2-byte sequences (0xc0-0xdf),
+     * each followed by a space character
+    */
+    static const char case1[] = {
+        "À Á Â Ã Ä Å Æ Ç È É Ê Ë Ì Í "
+        "Î Ï Ð Ñ Ò Ó Ô Õ Ö × Ø Ù Ú Û "
+        "Ü Ý Þ ß "
+    };
+    /*
+     * All 16 first bytes of 3-byte sequences (0xe0-0xef),
+     * each followed by a space character
+     */
+    static const char case2[] = {
+        "à á â ã ä å æ ç è é ê ë "
+        "ì í î ï "
+    };
+    /*
+     * All 8 first bytes of 4-byte sequences (0xf0-0xf7),
+     * each followed by a space character
+     */
+    static const char case3[] = {
+        "ð ñ ò ó ô õ ö ÷ "
+    };
+    /*
+     * All 4 first bytes of 5-byte sequences (0xf8-0xfb),
+     * each followed by a space character
+     */
+    static const char case4[] = {"ø ù ú û "};
+    /*
+     * All 2 first bytes of 6-byte sequences (0xfc-0xfd),
+     * each followed by a space character
+     */
+    static const char case5[] = {"ü ý "};
+
+   ck_assert_invalid_utf8(case1);
+   ck_assert_invalid_utf8(case2);
+   ck_assert_invalid_utf8(case3);
+   ck_assert_invalid_utf8(case4);
+   ck_assert_invalid_utf8(case5);
+}END_TEST
+
+START_TEST(test_malformed_utf8_last_continuation_byte_missing){
+    /* 2-byte sequence with last byte missing (U+0000) */
+    static const char case1[] = {"À"};
+    /* 3-byte sequence with last byte missing (U+0000) */
+    static const char case2[] = {"à€"};
+    /* 4-byte sequence with last byte missing (U+0000) */
+    static const char case3[] = {"ð€€"};
+    /* 5-byte sequence with last byte missing (U+0000) */
+    static const char case4[] = {"ø€€€"};
+    /* 6-byte sequence with last byte missing (U+0000) */
+    static const char case5[] = {"ü€€€€"};
+    /* 2-byte sequence with last byte missing (U-000007FF) */
+    static const char case6[] = {"ß"};
+    /* 3-byte sequence with last byte missing (U-0000FFFF) */
+    static const char case7[] = {"ï¿"};
+    /* 4-byte sequence with last byte missing (U-001FFFFF) */
+    static const char case8[] = {"÷¿¿"};
+    /* 5-byte sequence with last byte missing (U-03FFFFFF) */
+    static const char case9[] = {"û¿¿¿"};
+    /* 6-byte sequence with last byte missing (U-7FFFFFFF) */
+    static const char case10[] = {"ý¿¿¿¿"};
+
+
+   ck_assert_invalid_utf8(case1);
+   ck_assert_invalid_utf8(case2);
+   ck_assert_invalid_utf8(case3);
+   ck_assert_invalid_utf8(case4);
+   ck_assert_invalid_utf8(case5);
+   ck_assert_invalid_utf8(case6);
+   ck_assert_invalid_utf8(case7);
+   ck_assert_invalid_utf8(case8);
+   ck_assert_invalid_utf8(case9);
+   ck_assert_invalid_utf8(case10);
+}END_TEST
+
+START_TEST(test_malformed_utf8_incomplete_sequence_concatenation){
+    /* 
+     * All the 10 sequences of 3.3 concatenated, you should see 10 malformed
+     * sequences being signalled
+     */
+    static const char case1[] = {
+        "Àà€ð€€ø€€€ü€€€€"
+        "ßï¿÷¿¿û¿¿¿ý¿¿¿¿"
+    };
+
+   ck_assert_invalid_utf8(case1);
+}END_TEST
+
+START_TEST(test_malformed_utf8_impossible_bytes){
+    /* The following 2 bytes can't appear in a UTF-8 string (reserved for BOM) */
+    static const char fe[] = {"þ"};
+    static const char ff[] = {"ÿ"};
+    static const char fefe_ffff[] = {"þþÿÿ"};
+
+
+   ck_assert_invalid_utf8(fe);
+   ck_assert_invalid_utf8(ff);
+   ck_assert_invalid_utf8(fefe_ffff);
+}END_TEST
+
 
 
 
@@ -265,6 +368,18 @@ Suite *utils_unicode_suite_create(void)
     tcase_add_test(
         malformed_utf8_encoding,
         test_malformed_utf8_unexpected_continuation_bytes
+    );
+    tcase_add_test(
+        malformed_utf8_encoding,
+        test_malformed_utf8_lonely_start
+    );
+    tcase_add_test(
+        malformed_utf8_encoding,
+        test_malformed_utf8_last_continuation_byte_missing
+    );
+    tcase_add_test(
+        malformed_utf8_encoding,
+        test_malformed_utf8_impossible_bytes
     );
 
     TCase *unicode_utf16 = tcase_create("UTF16 encoding");
