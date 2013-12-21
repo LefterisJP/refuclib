@@ -113,6 +113,7 @@ unit_tests_files = [
     'test_string_retrieval.c',
     'test_string_files.c',
     'test_string_manipulation.c',
+    'test_string_traversal.c',
 
     'test_utils_unicode.c',
 

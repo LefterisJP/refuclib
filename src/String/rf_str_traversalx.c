@@ -41,6 +41,7 @@
 #include <Utils/rf_unicode.h> //for rf_utf8_is_continuation_byte()
 #include <Utils/localscope.h>//for the local scope macros
 #include <Utils/memory.h> //for refu memory allocation
+#include <Utils/sanity.h>
 /*------------- libc inclusion --------------*/
 #include <stdarg.h> //for the va_ macros
 #include <limits.h> //for INT_MAX e.t.c.
@@ -93,7 +94,8 @@ int32_t rf_stringx_move_after(struct RFstringx* thisstr, const void* sub,
 {
     int32_t move;
     RF_ENTER_LOCAL_SCOPE();
-
+    /* rf_string_find_byte_pos takes care of invalid input checking */
+    
     //check for substring existence and return failure if not found
     if((move = rf_string_find_byte_pos(thisstr, sub, options)) == RF_FAILURE)
     {
@@ -116,6 +118,7 @@ int32_t rf_stringx_move_after(struct RFstringx* thisstr, const void* sub,
 void rf_stringx_move_back(struct RFstringx* thisstr, uint32_t n)
 {
     uint32_t length;
+    RF_ASSERT(thisstr);
     length = 0;
 
     while(thisstr->bIndex >0)
@@ -139,9 +142,10 @@ void rf_stringx_move_back(struct RFstringx* thisstr, uint32_t n)
 void rf_stringx_move_forward(struct RFstringx* thisstr, uint32_t n)
 {
     uint32_t length;
+    RF_ASSERT(thisstr);
     length = 0;
 
-    while(thisstr->bIndex < thisstr->bSize)
+    while(rf_string_length_bytes(thisstr) != 0)
     {
         if(!rf_utf8_is_continuation_byte(rf_string_data(thisstr)[0]))
         {
@@ -177,6 +181,7 @@ bool rf_stringx_move_afterv(struct RFstringx* thisstr, void* result,
     va_list argList;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
+    /* validity of input is checked for in the following functions */
 
     // will keep the winning parameter length
     paramLen = 0;
@@ -225,7 +230,11 @@ bool rf_stringx_move_after_pair(struct RFstringx* thisstr, const void* left,
     bool same_separators = false;
     struct RFstringx string_buff;
     RF_ENTER_LOCAL_SCOPE();
-
+    if (!left || !right) {
+        RF_WARNING("Provided NULL substring for left or right pair");
+        ret = false;
+        goto cleanup;
+    }
     //check the occurence parameter
     if(occurence == 0)
     {
