@@ -95,56 +95,56 @@
  ** A convenience macro to allow us to compare easily char bytes with hex values for equality.
  **
  **/
-#define RF_HEXEQ_C(c__,h__)    (c__==(char)h__)
+#define RF_HEXEQ_C(c__,h__)    ((c__)==((char)h__))
 /**
  ** A convenience macro to allow us to compare easily unsigned char bytes with hex values for equality.
  **
  **/
-#define RF_HEXEQ_UC(c__,h__)    (c__==(unsigned char)h__)
+#define RF_HEXEQ_UC(c__,h__)    ((c__)==((unsigned char)h__))
 
 /**
  ** A convenience macro to allow us to compare easily char bytes with hex values for greater or equal.
  **
  **/
-#define RF_HEXGE_C(c__,h__)    (c__>=(char)h__)
+#define RF_HEXGE_C(c__,h__)    ((c__) >= ((char)h__))
 /**
  ** A convenience macro to allow us to compare easily unsigned char bytes with hex values for greater or equal.
  **
  **/
-#define RF_HEXGE_UC(c__,h__)    (c__>=(unsigned char)h__)
+#define RF_HEXGE_UC(c__,h__)    ((c__) >=((unsigned char)h__))
 
 /**
  ** A convenience macro to allow us to compare easily char bytes with hex values for less or equal.
  **
  **/
-#define RF_HEXLE_C(c__,h__)    (c__<=(char)h__)
+#define RF_HEXLE_C(c__,h__)    ((c__) <=((char)h__))
 /**
  ** A convenience macro to allow us to compare easily unsigned char bytes with hex values for less or equal.
  **
  **/
-#define RF_HEXLE_UC(c__,h__)    (c__<=(unsigned char)h__)
+#define RF_HEXLE_UC(c__,h__)    ((c__) <= ((unsigned char)h__))
 
 /**
  ** A convenience macro to allow us to compare easily char bytes with hex values for greater.
  **
  **/
-#define RF_HEXG_C(c__,h__)    (c__>(char)h__)
+#define RF_HEXG_C(c__,h__)    ((c__) > ((char)h__))
 /**
  ** A convenience macro to allow us to compare easily unsigned char bytes with hex values for greater.
  **
  **/
-#define RF_HEXG_UC(c__,h__)    (c__>(unsigned char)h__)
+#define RF_HEXG_UC(c__,h__)    ((c__) > ((unsigned char)h__))
 
 /**
  ** A convenience macro to allow us to compare easily char bytes with hex values for less.
  **
  **/
-#define RF_HEXL_C(c__,h__)    (c__<(char)h__)
+#define RF_HEXL_C(c__,h__)    ((c__) < ( (char)h__))
 /**
  ** A convenience macro to allow us to compare easily unsigned char bytes with hex values for less.
  **
  **/
-#define RF_HEXL_UC(c__,h__)    (c__<(unsigned char)h__)
+#define RF_HEXL_UC(c__,h__)    ((c__) < ((unsigned char)h__))
 
 ///shorts
 

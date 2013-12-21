@@ -123,8 +123,9 @@ START_TEST(test_boundary_utf8_first_possible_sequence_of_certain_length) {
     ck_assert_valid_utf8(b2);
     ck_assert_valid_utf8(b3);
     ck_assert_valid_utf8(b4);
-    ck_assert_valid_utf8(b5);
-    ck_assert_valid_utf8(b6);
+    /* 5 and 6 byte encodings are not valid according to RFC 3629 */
+    ck_assert_invalid_utf8(b5);
+    ck_assert_invalid_utf8(b6);
 }END_TEST
 
 START_TEST(test_boundary_utf8_last_possible_sequence_of_certain_length) {
@@ -137,10 +138,12 @@ START_TEST(test_boundary_utf8_last_possible_sequence_of_certain_length) {
 
     ck_assert_valid_utf8(b1);
     ck_assert_valid_utf8(b2);
-    ck_assert_valid_utf8(b3);
-    ck_assert_valid_utf8(b4);
-    ck_assert_valid_utf8(b5);
-    ck_assert_valid_utf8(b6);
+    /* valid but resulting codepoint invalid*/
+    ck_assert_invalid_utf8(b3);
+    /* all the rest could be validly encoded but are greater than the maximum */
+    ck_assert_invalid_utf8(b4);
+    ck_assert_invalid_utf8(b5);
+    ck_assert_invalid_utf8(b6);
 }END_TEST
 
 START_TEST(test_boundary_utf8_other) {
@@ -154,7 +157,8 @@ START_TEST(test_boundary_utf8_other) {
     ck_assert_valid_utf8(b2);
     ck_assert_valid_utf8(b3);
     ck_assert_valid_utf8(b4);
-    ck_assert_valid_utf8(b5);
+    /* validly encoded but greater than the maximum */
+    ck_assert_invalid_utf8(b5);
 }END_TEST
 
 /* UTF8 malformed sequences */
@@ -290,7 +294,118 @@ START_TEST(test_malformed_utf8_impossible_bytes){
 }END_TEST
 
 
+ /* --- UTF8 overlong sequences Tests --- START --- */
+START_TEST(test_overlong_utf8_ascii) {
+    static const char case1[] = {"À¯"};
+    static const char case2[] = {"à€¯"};
+    static const char case3[] = {"ğ€€¯"};
+    static const char case4[] = {"ø€€€¯"};
+    static const char case5[] = {"ü€€€€¯"};
 
+    ck_assert_invalid_utf8(case1);
+    ck_assert_invalid_utf8(case2);
+    ck_assert_invalid_utf8(case3);
+    ck_assert_invalid_utf8(case4);
+    ck_assert_invalid_utf8(case5);
+}END_TEST
+
+START_TEST(test_maximum_overlong_utf8_sequence) {
+    static const char case1[] = {"Á¿"};
+    static const char case2[] = {"àŸ¿"};
+    static const char case3[] = {"ğ¿¿"};
+    static const char case4[] = {"ø‡¿¿¿"};
+    static const char case5[] = {"üƒ¿¿¿¿"};
+
+    ck_assert_invalid_utf8(case1);
+    ck_assert_invalid_utf8(case2);
+    ck_assert_invalid_utf8(case3);
+    ck_assert_invalid_utf8(case4);
+    ck_assert_invalid_utf8(case5);
+}END_TEST
+
+START_TEST(test_utf8_overlong_null) {
+    static const char case1[] = {"À€"};
+    static const char case2[] = {"à€€"};
+    static const char case3[] = {"ğ€€€"};
+    static const char case4[] = {"ø€€€€"};
+    static const char case5[] = {"ü€€€€€"};
+
+    ck_assert_invalid_utf8(case1);
+    ck_assert_invalid_utf8(case2);
+    ck_assert_invalid_utf8(case3);
+    ck_assert_invalid_utf8(case4);
+    ck_assert_invalid_utf8(case5);
+}END_TEST
+
+
+/* --- UTF8 illegal code positions Tests --- START --- */
+/*
+ * The following UTF-8 sequences should be rejected like malformed
+ * sequences, because they never represent valid ISO 10646 characters and
+ * a UTF-8 decoder that accepts them might introduce security problems
+ * comparable to overlong UTF-8 sequences.
+ */
+START_TEST(test_utf8_illegal_single_utf16_surrogate) {
+    static const char case1[] = {"í €"};
+    static const char case2[] = {"í­¿"};
+    static const char case3[] = {"í®€"};
+    static const char case4[] = {"í¯¿"};
+    static const char case5[] = {"í°€"};
+    static const char case6[] = {"í¾€"};
+    static const char case7[] = {"í¿¿"};
+
+
+    ck_assert_invalid_utf8(case1);
+    ck_assert_invalid_utf8(case2);
+    ck_assert_invalid_utf8(case3);
+    ck_assert_invalid_utf8(case4);
+    ck_assert_invalid_utf8(case5);
+    ck_assert_invalid_utf8(case6);
+    ck_assert_invalid_utf8(case7);
+}END_TEST
+
+START_TEST(test_utf8_illegal_paired_utf16_surrogate) {
+    static const char case1[] = {"í €í°€"};
+    static const char case2[] = {"í €í¿¿"};
+    static const char case3[] = {"í­¿í°€"};
+    static const char case4[] = {"í­¿í¿¿"};
+    static const char case5[] = {"í®€í°€"};
+    static const char case6[] = {"í®€í¿¿"};
+    static const char case7[] = {"í¯¿í°€"};
+    static const char case8[] = {"í¯¿í¿¿"};
+
+    ck_assert_invalid_utf8(case1);
+    ck_assert_invalid_utf8(case2);
+    ck_assert_invalid_utf8(case3);
+    ck_assert_invalid_utf8(case4);
+    ck_assert_invalid_utf8(case5);
+    ck_assert_invalid_utf8(case6);
+    ck_assert_invalid_utf8(case7);
+    ck_assert_invalid_utf8(case8);
+}END_TEST
+
+START_TEST(test_utf8_illegal_other) {
+    /* U+FFFE */
+    static const char case1[] = {"ï¿¾"};
+    /* U+FFFF */
+    static const char case2[] = {"ï¿¿"};
+    /* code_point greater than the max codepoint which is: 0x10ffff */
+    static const char case3[] = {"\xf4\x9f\xbf\xbf"};
+    /* codepoint in illegal range 0xfdd0-0xfdef */
+    static const char case4[] = {"\xEF\xB7\x90"};
+    static const char case5[] = {"\xEF\xB7\xAF"};
+    /* codepoint in illegal range 0xfffe-0xffff */
+    static const char case6[] = {"\xEF\xBF\xBE"};
+    static const char case7[] = {"\xEF\xBF\xBF"};
+
+    ck_assert_invalid_utf8(case1);
+    ck_assert_invalid_utf8(case2);
+    ck_assert_invalid_utf8(case3);
+    ck_assert_invalid_utf8(case4);
+    ck_assert_invalid_utf8(case5);
+    ck_assert_invalid_utf8(case6);
+    ck_assert_invalid_utf8(case7);
+}END_TEST
 
 /* --- UTF16 encoding Tests --- START --- */
 START_TEST(test_utf16_decode) {
@@ -379,8 +494,34 @@ Suite *utils_unicode_suite_create(void)
     );
     tcase_add_test(
         malformed_utf8_encoding,
+        test_malformed_utf8_incomplete_sequence_concatenation
+    );
+    tcase_add_test(
+        malformed_utf8_encoding,
         test_malformed_utf8_impossible_bytes
     );
+
+    TCase *overlong_utf8_encoding = tcase_create("UTF8 encoding "
+                                                  "overlong sequences");
+    tcase_add_checked_fixture(overlong_utf8_encoding,
+                              setup_generic_tests,
+                              teardown_generic_tests);
+    tcase_add_test(overlong_utf8_encoding, test_overlong_utf8_ascii);
+    tcase_add_test(overlong_utf8_encoding, test_maximum_overlong_utf8_sequence);
+    tcase_add_test(overlong_utf8_encoding, test_utf8_overlong_null);
+
+    TCase *illegal_code_position_utf8_encoding = tcase_create(
+        "UTF8 encoding "
+        "illegal code positions");
+    tcase_add_checked_fixture(illegal_code_position_utf8_encoding,
+                              setup_generic_tests,
+                              teardown_generic_tests);
+    tcase_add_test(illegal_code_position_utf8_encoding,
+                   test_utf8_illegal_single_utf16_surrogate);
+    tcase_add_test(illegal_code_position_utf8_encoding,
+                   test_utf8_illegal_paired_utf16_surrogate);
+    tcase_add_test(illegal_code_position_utf8_encoding,
+                   test_utf8_illegal_other);
 
     TCase *unicode_utf16 = tcase_create("UTF16 encoding");
     tcase_add_checked_fixture(unicode_utf16,
@@ -389,9 +530,12 @@ Suite *utils_unicode_suite_create(void)
     tcase_add_test(unicode_utf16, test_utf16_decode);
     tcase_add_test(unicode_utf16, test_utf16_encode);
 
+
     suite_add_tcase(s, unicode_utf8);
     suite_add_tcase(s, boundary_utf8_encoding);
     suite_add_tcase(s, malformed_utf8_encoding);
+    suite_add_tcase(s, overlong_utf8_encoding);
+    suite_add_tcase(s, illegal_code_position_utf8_encoding);
 
     suite_add_tcase(s, unicode_utf16);
     return s;

@@ -40,7 +40,6 @@
 #include <limits.h> //for UINT_MAX
 /*------------- End of includes -------------*/
 
-
 #define UTF8_1_BYTE_SHOULD_FOLLOW(i_stream_)             \
     /*                                                  \
      * if the lead bit of the byte is 0 then range is : \
@@ -232,6 +231,11 @@ static inline bool utf8_range_byte2_check(const char *bytes, uint32_t i)
                  "an invalid byte was encountered");
         return false;
     }
+
+    if (RF_HEXEQ_C(bytes[i] & (char)0xfe, 0xc0)) {
+        RF_ERROR("UTF8 2 byte Overlong sequence detected");
+        return false;
+    }
     /* if the next byte is NOT a continuation byte */
     if (!rf_utf8_is_continuation_byte(bytes[i+1])) {
         RF_ERROR("While decoding a UTF-8 byte sequence, "
@@ -256,25 +260,43 @@ static inline bool utf8_range_byte3_check(const char *bytes, uint32_t i)
                  "was not found");
         return false;
     }
+    if(RF_HEXEQ_C(bytes[i], 0xe0) &&
+       RF_HEXEQ_C(bytes[i + 1] & (char)0xe0, 0x80))
+    {
+        RF_ERROR("UTF8 3 byte overlong sequence detected");
+        return false;
+    }
+    /* utf-16 surrogate pairs are not allowed to be encoded in utf8 */
+    if (RF_HEXEQ_C(bytes[i], 0xed) &&
+        RF_HEXEQ_C(bytes[i + 1] & (char)0xe0, 0xa0))
+    {
+        RF_ERROR("UTF-16 surrogate pair detected in a UTF-8 sequence");
+        return false;
+    }
+
+    if (RF_HEXEQ_C(bytes[i], 0xef)) {
+        if (RF_HEXEQ_C(bytes[i + 1], 0xbf) &&
+            RF_HEXEQ_C(bytes[i + 2] & (char)0xfe, 0xbe))
+        {
+            RF_ERROR("Illegal codepoints range 0xfffe-0xffff "
+                     "encoded in utf8 detected");
+            return false;
+        }
+        if (RF_HEXEQ_C(bytes[i + 1], 0xb7) &&
+            /* maybe turn that range check into a mask check like above ?*/
+            RF_HEXGE_C(bytes[i + 2], 0x90) && RF_HEXLE_C(bytes[i + 2], 0xaf))
+        {
+            RF_ERROR("Illegal codepoints range 0xfdd0-0xfdef "
+                     "encoded in utf8 detected");
+            return false;            
+        }
+    }
+
     return true;
 }
 
 static inline bool utf8_range_byte4_check(const char *bytes, uint32_t i)
 {
-    /*
-     * in this type of starting byte a number of invalid bytes can
-     * be encountered. We have to check for them.
-     * invalid byte values are from 0xF5 to 0xFF
-     */
-#if 0 /* TODO: figure out why this check was here and delete if irrelevant */
-    if(RF_HEXGE_C(bytes[i], 0xF5))
-    {
-        RF_ERROR("While decoding a UTF-8 byte sequence, "
-                 "an invalid byte was encountered");
-        return false;
-    }
-#endif
-
     if(!rf_utf8_is_continuation_byte(bytes[i+1]) ||
        !rf_utf8_is_continuation_byte(bytes[i+2]) ||
        !rf_utf8_is_continuation_byte(bytes[i+3]))
@@ -282,6 +304,20 @@ static inline bool utf8_range_byte4_check(const char *bytes, uint32_t i)
         RF_ERROR("While decoding a UTF-8 byte sequence, "
                  "and expecting a continuation byte, one "
                  "was not found");
+        return false;
+    }
+
+    if (RF_HEXEQ_C(bytes[i], 0xf0) &&
+        RF_HEXEQ_C(bytes[i + 1] & (char)0xf0, 0x80))
+    {
+        RF_ERROR("UTF8 4 byte Overlong sequence detected");
+        return false;
+    }
+
+    if ((RF_HEXEQ_C(bytes[i], 0xf4) && RF_HEXG_C(bytes[i + 1], 0x8f)) ||
+        RF_HEXG_C(bytes[i], 0xf4))
+    {
+        RF_ERROR("Codepoint higher than the maximum 0x10ffff detected");
         return false;
     }
     return true;
@@ -297,6 +333,12 @@ static inline bool utf8_range_byte5_check(const char *bytes, uint32_t i)
         RF_ERROR("While decoding a UTF-8 byte sequence, "
                  "and expecting a continuation byte, one "
                  "was not found");
+        return false;
+    }
+
+    if (RF_HEXEQ_C(bytes[i], 0xf8) &&
+        RF_HEXEQ_C(bytes[i + 1] & (char)0xf8, 0x80)) {
+        RF_ERROR("UTF8 5 byte Overlong sequence detected");
         return false;
     }
     return true;
@@ -315,6 +357,13 @@ static inline bool utf8_range_byte6_check(const char *bytes, uint32_t i)
                  "was not found");
         return false;
     }
+
+    if (RF_HEXEQ_C(bytes[i], 0xfc) &&
+        RF_HEXEQ_C(bytes[i + 1] & (char)0xfc, 0x80)) {
+        RF_ERROR("UTF8 6 byte Overlong sequence detected");
+        return false;
+    }
+
     return true;
 }
 
@@ -404,22 +453,27 @@ bool rf_utf8_decode(const char* utf8, uint32_t utf8Length,
 
             i+=4;
         } else if(UTF8_5_BYTES_SHOULD_FOLLOW(utf8)) {
+           /* 
+            * 5 and 6 byte UTF-8 encodings while valid according to the
+            * original UTF-8 standard
+            * exceed the maximum value set by RFC 3629 in 2003
+            *  so we simply reject them
+            */
+            return false;
+#if 0            
             if (!utf8_range_byte5_check(utf8, i)) {
                 return false;
             }
-
-            RF_ASSERT(0); /* TODO */
-
             i+=5;
-            
+#endif
         } else if(UTF8_6_BYTES_SHOULD_FOLLOW(utf8)) {
+            return false;
+#if 0
             if (!utf8_range_byte6_check(utf8, i)) {
                 return false;
             }
-
-            RF_ASSERT(0); /* TODO */
-
             i+=6;
+#endif
         } else {
            /* Expecting one of the 4 different start bytes and did not find it*/
             RF_ERROR("While decoding a UTF-8 byte sequence, the "
@@ -432,7 +486,6 @@ bool rf_utf8_decode(const char* utf8, uint32_t utf8Length,
     }
     return true;
 }
-
 
 bool rf_utf8_verify(const char* bytes, uint32_t *returned_byte_length,
                          uint32_t given_byte_length)
@@ -483,17 +536,29 @@ bool rf_utf8_verify(const char* bytes, uint32_t *returned_byte_length,
         }
         else if(UTF8_5_BYTES_SHOULD_FOLLOW(bytes))
         {
+           /* 
+            * 5 and 6 byte UTF-8 encodings while valid according to the
+            * original UTF-8 standard
+            * exceed the maximum value set by RFC 3629 in 2003
+            *  so we simply reject them
+            */
+            return false;
+#if 0
             if (!utf8_range_byte5_check(bytes, i)) {
                 return false;
             }
             i += 5;
+#endif
         }
         else if(UTF8_6_BYTES_SHOULD_FOLLOW(bytes))
         {
+            return false;
+#if 0
             if (!utf8_range_byte6_check(bytes, i)) {
                 return false;
             }
             i += 6;
+#endif
         }
         else /* none of the 4 different start byte types found */
         {
@@ -509,7 +574,6 @@ bool rf_utf8_verify(const char* bytes, uint32_t *returned_byte_length,
     }
     return true;
 }
-
 
 bool rf_utf16_decode(const char* buff, uint32_t in_buff_length,
                     uint32_t* charactersN, uint32_t* codepoints,
@@ -625,3 +689,62 @@ bool rf_utf16_encode(const uint32_t* codepoints, uint32_t charsN,
     return true;
 }
 
+
+
+/*
+ * UTF8 decoding and verification can also be implemented with a different
+ * technique mainly using lookup tables as shown here:
+ * http://floodyberry.wordpress.com/2007/04/14/utf-8-conversion-tricks/
+ *
+ * TODO: Benchmarks between the 2 techniques and based on the results decide
+ * with which to go
+*/
+#if 0
+/* expected length of a codepoint in UTF8, judging by its first byte */
+static const unsigned char g_utf8_continuation_bytes[256] = {
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+    2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+    3,3,3,3,3,3,3,3,4,4,4,4,5,5,0,0
+};
+
+bool rf_utf8_verify(const char* bytes, uint32_t *returned_byte_length,
+                    uint32_t given_byte_length)
+{
+    uint32_t i;
+    unsigned int rem_bytes;
+
+    //i is the byte index
+    i = 0;
+    if (returned_byte_length) {
+        given_byte_length = UINT_MAX;
+    }
+
+    while(1) {
+        if (returned_byte_length) {
+            if (bytes[i] == '\0') {
+                break;
+            }
+        } else {
+            if (i >= given_byte_length) {
+                break;
+            }
+        }
+
+        rem_bytes = g_utf8_continuation_bytes[bytes[i]];
+
+    }
+}
+#endif
