@@ -61,12 +61,9 @@ static inline bool move_internal_ptr(struct RFstringx* s, int32_t move,
         if(options & RF_STRINGX_ARGUMENT)
         {
             struct RFstringx* result = (struct RFstringx*) resultP;
+            rf_stringx_reset(result);
+            RF_STRINGX_REALLOC(result, move - len, false);
             rf_string_length_bytes(result) = move - len;
-            result->bSize = (
-                rf_string_length_bytes(result) * RF_OPTION_STRINGX_CAPACITY_MULTIPLIER
-            );
-            result->bIndex = 0;
-            RF_MALLOC(rf_string_data(result), result->bSize, false);
             memcpy(
                 rf_string_data(result),
                 rf_string_data(s) - move,
@@ -76,8 +73,11 @@ static inline bool move_internal_ptr(struct RFstringx* s, int32_t move,
         else
         {
             struct RFstring* result = (struct RFstring*) resultP;
+            if (rf_string_length_bytes(result) > move - len) {
+                RF_REALLOC(rf_string_data(result), char,
+                          rf_string_length_bytes(result), false);
+            }
             rf_string_length_bytes(result) = move - len;
-            RF_MALLOC(rf_string_data(result), rf_string_length_bytes(result), false);
             memcpy(
                 rf_string_data(result),
                 rf_string_data(s) - move,
@@ -95,7 +95,7 @@ int32_t rf_stringx_move_after(struct RFstringx* thisstr, const void* sub,
     int32_t move;
     RF_ENTER_LOCAL_SCOPE();
     /* rf_string_find_byte_pos takes care of invalid input checking */
-    
+
     //check for substring existence and return failure if not found
     if((move = rf_string_find_byte_pos(thisstr, sub, options)) == RF_FAILURE)
     {
@@ -170,7 +170,7 @@ void rf_stringx_reset(struct RFstringx* thisstr)
     thisstr->bIndex = 0;
 }
 
-bool rf_stringx_move_afterv(struct RFstringx* thisstr, void* result, 
+bool rf_stringx_move_afterv(struct RFstringx* thisstr, void* result,
                             enum RFstring_matching_options options,
                             const unsigned char parN, ...)
 {
@@ -296,7 +296,7 @@ bool rf_stringx_move_after_pair(struct RFstringx* thisstr, const void* left,
         else
         {
             rf_string_copy_in(resultP, &string_buff);
-        }      
+        }
     }
 
 cleanup_str_buff:

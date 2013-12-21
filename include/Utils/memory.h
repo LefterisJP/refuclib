@@ -48,7 +48,7 @@
  ** @param TYPE_ give the type of the pointer here
  ** @param SIZE_ Give the size parameter of realloc here
  ** @param RETVAL_ This is what the calling function should return
- ** if the memory allocarion fails
+ ** if the memory allocation fails
  **
  **/
 #define RF_REALLOC(REALLOC_RETURN_, TYPE_, SIZE_, RETVAL_)              \
