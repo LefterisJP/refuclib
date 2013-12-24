@@ -161,7 +161,7 @@ i_DECLIMEX_ bool rf_file_read_line_utf8(FILE* f,
  ** @param endianess The endianess of the file. Look @ref RFendianess
  ** for a listing of possible values
  ** @param bytes_read: The number of bytes succesfully read from the file
- ** descriptor
+ ** descriptor. Can be NULL in which case nothing is returned.
  **/
 i_DECLIMEX_ bool rf_file_read_line_utf16(FILE* f, enum RFeol_mark eol,
                                          char** utf8,
@@ -177,7 +177,7 @@ i_DECLIMEX_ bool rf_file_read_line_utf16(FILE* f, enum RFeol_mark eol,
  ** @param endianess The endianess of the file. Look @ref RFendianess
  ** for a listing of possible values
  ** @param bytes_read: The number of bytes succesfully read from the file
- ** descriptor
+ ** descriptor. Can be NULL in which case nothing is returned.
  **/
 i_DECLIMEX_ bool rf_file_read_line_utf32(FILE* f, enum RFeol_mark eol,
                                          char** utf8,
@@ -228,13 +228,13 @@ i_DECLIMEX_ bool rf_file_read_line_utf32(FILE* f, enum RFeol_mark eol,
  ** @param[in] eol The End Of Line type that this file uses.
  **                Look at @ref RFeol_mark for possible value
  ** @param[out] bytes_read Pass a pointer to a uint32_t to get the number of
- ** bytes read from this function. Even if an error occured this number should
- ** contain how many bytes were read until that point.
+ ** bytes read from this function. Can also be NULL in which
+ ** case nothing is returned.
  **
  ** @return Returns @c true for success and @c false for an error occuring.
  ** Even if there is an error the number of bytes read can be trusted
  **/
-i_DECLIMEX_ bool rf_file_read_chars_utf8(char* buff, uint32_t num, FILE* f,
+i_DECLIMEX_ bool rf_file_read_bytes_utf8(char* buff, uint32_t num, FILE* f,
                                          char* eof,
                                          enum RFeol_mark eol,
                                          uint32_t* bytes_read);
@@ -243,12 +243,12 @@ i_DECLIMEX_ bool rf_file_read_chars_utf8(char* buff, uint32_t num, FILE* f,
 /**
  ** @brief Gets a number of bytes from a UTF-16 file descriptor
  **
- ** This function is similar to @ref rf_file_read_chars_utf8() only for UTF16 and as such
+ ** This function is similar to @ref rf_file_read_bytes_utf8() only for UTF16 and as such
  ** has an extra endianess parameter
  ** @param endianess The endianess of the input file. For possible values look 
  **                  at @ref RFendianess
  **/
-i_DECLIMEX_ bool rf_file_read_chars_utf16(char* buff, uint32_t num, FILE* f,
+i_DECLIMEX_ bool rf_file_read_bytes_utf16(char* buff, uint32_t num, FILE* f,
                                           char* eof, enum RFeol_mark eol,
                                           uint32_t* bytes_read,
                                           enum RFendianess endianess);
@@ -256,11 +256,11 @@ i_DECLIMEX_ bool rf_file_read_chars_utf16(char* buff, uint32_t num, FILE* f,
 /**
  ** @brief Gets a number of bytes from a UTF-32 file descriptor
  **
- ** This function is similar to @ref rf_file_read_chars_utf8() only for UTF32
+ ** This function is similar to @ref rf_file_read_bytes_utf8() only for UTF32
  ** @param endianess The endianess of the input file. For possible values look 
  **                  at @ref RFendianess
  **/
-i_DECLIMEX_ bool rf_file_read_chars_utf32(char* buff, uint32_t num, FILE* f,
+i_DECLIMEX_ bool rf_file_read_bytes_utf32(char* buff, uint32_t num, FILE* f,
                                           char* eof, enum RFeol_mark eol,
                                           uint32_t* bytes_read,
                                           enum RFendianess endianess);

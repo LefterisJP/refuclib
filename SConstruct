@@ -117,6 +117,8 @@ unit_tests_files = [
 
     'test_utils_unicode.c',
 
+    'test_io_files.c',
+
     'test_log.c'
 ]
 unit_tests_files = ['Tests/Unit_Tests/' + s for s in unit_tests_files]
