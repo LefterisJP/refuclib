@@ -118,6 +118,7 @@ unit_tests_files = [
     'test_utils_unicode.c',
 
     'test_io_files.c',
+    'test_io_textfile.c',
 
     'test_log.c'
 ]

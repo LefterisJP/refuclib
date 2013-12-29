@@ -602,6 +602,7 @@ bool rf_textfile_init(struct RFtextfile* t, const void* name,
 {
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
+    RF_ASSERT(t);
 
     if(!name)
     {
@@ -756,6 +757,12 @@ struct RFtextfile* rf_textfile_create(const void* name,
 bool rf_textfile_copy_in(struct RFtextfile* dst, struct RFtextfile* src)
 {
     fpos_t pos;
+    RF_ASSERT(dst);
+
+    if (!src) {
+        RF_WARNING("Provided NULL pointer for the source textfile");
+        return false;
+    }
     //get the data
     dst->mode = src->mode;
     dst->encoding = src->encoding;
@@ -763,6 +770,7 @@ bool rf_textfile_copy_in(struct RFtextfile* dst, struct RFtextfile* src)
     dst->eof = src->eof;
     dst->previousOp = src->previousOp;
     dst->hasBom = src->hasBom;
+    dst->eol = src->eol;
     //open the same file with the same mode and at the same position
     if(src->mode == RF_FILE_WRITE)
     {
@@ -1599,14 +1607,11 @@ bool rf_textfile_write(struct RFtextfile* t, void* s)
     char allocatedS = false;
     RF_ENTER_LOCAL_SCOPE();
 
-#if RF_OPTION_DEBUG
-    if(s == NULL)
-    {
-        RF_ERROR("Provided a null pointer for the to-write string");
+    if(!s) {
+        RF_WARNING("Provided a null pointer for the to-write string");
         ret = false;
         goto cleanup1;
     }
-#endif
 
     //if the file mode is not write then turn it to writing
     RF_TEXTFILE_CANWRITE_JMP(t, ret = false, cleanup1);
@@ -1681,7 +1686,12 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
     //get the function's arguments
     int32_t error;
     RF_ENTER_LOCAL_SCOPE();
-    RF_CHECK_NOT_NULL_DEBUG_1(string, "insert_string", ret = false; goto cleanup0);
+
+    if (!string) {
+        RF_WARNING("Provided null pointer for insertion");
+        ret = false;
+        goto cleanup0;
+    }
 
     lineFound = allocatedS = false;
     //determine the target line
@@ -1814,7 +1824,8 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
     //cleanup3 - for the string buffer deinitialization
     
     //read every line of this file from the beginning
-    while((error = rf_textfile_read_line(t, &buffer)) == RF_SUCCESS)
+    error = rf_textfile_read_line(t, &buffer);
+    do
     {
         //write the given line to the other file according to eol
         ret = write_to_file_eol(newFile, t, &buffer.INH_String);
@@ -1854,7 +1865,8 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
                 goto cleanup3;
             }
         }
-    }
+        error = rf_textfile_read_line(t, &buffer);
+    }while(error == RF_SUCCESS);
     //get rid of the no longer needed buffer
     rf_stringx_deinit(&buffer); /// going back to cleanup2
     // if we reached the end of file and the line was not found

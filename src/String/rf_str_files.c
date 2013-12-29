@@ -168,7 +168,7 @@ bool rf_string_fwrite(void* s, FILE* f,
 {
     uint32_t *utf32,length;
     uint16_t* utf16;
-    char ret = true;
+    bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(s);
 

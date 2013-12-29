@@ -40,6 +40,7 @@
 /*------------- libc inclusion --------------*/
 #include <stdio.h> //for vsnprintf
 #include <string.h> //for vsnprintf
+#include <stdarg.h> //for va_list and friends
 /*------------- End of includes -------------*/
 
 
@@ -226,25 +227,35 @@ i_INLINE_DECL bool fill_fmt_buffer(const char *fmt,
                                    unsigned int *bIndex,
                                    va_list args)
 {
-    int ret;
+    int rc;
+    va_list copy_va_list;
     size_t n = rf_buffer_size(TSBUFFA);
     *bIndex = rf_buffer_index(TSBUFFA);
     *buffPtr = rf_buffer_ptr(TSBUFFA);
-    ret = vsnprintf(rf_buffer_ptr(TSBUFFA), n, fmt, args);
-    if(ret < 0)
+    va_copy(copy_va_list, args); /* C99 only */
+    rc = vsnprintf(rf_buffer_ptr(TSBUFFA), n, fmt, copy_va_list);
+    va_end(copy_va_list);
+    if(rc < 0)
     {
         return false;
     }
-    if(ret >= n)
+    if(rc >= n)
     {
-        ret = vsnprintf(rf_buffer_ptr(TSBUFFA), n + ret, fmt, args);
-        if(ret < 0 || ret >= n)
+        if(!rf_buffer_increase(TSBUFFA, rc *2)) {
+            return false;
+        }
+        n = rf_buffer_size(TSBUFFA);
+        *buffPtr = rf_buffer_ptr(TSBUFFA);
+        *bIndex = rf_buffer_index(TSBUFFA);
+        rc = vsnprintf(rf_buffer_ptr(TSBUFFA), n, fmt, args);
+        if(rc < 0 || rc >= n)
         {
             return false;
         }
     }
-    TSBUFFA->index += ret;
-    *size = ret;
+    TSBUFFA->index += rc;
+    *size = rc;
+
     return true;
 }
 

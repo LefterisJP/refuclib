@@ -7,4 +7,7 @@ void teardown_generic_tests();
 void setup_string_tests();
 void teardown_string_tests();
 
+void setup_textfile_tests();
+void teardown_textfile_tests();
+
 #endif
