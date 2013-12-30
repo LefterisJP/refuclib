@@ -118,7 +118,7 @@ bool rf_string_substr(const void* s, uint32_t start_pos,
                                     rf_string_data(s) + startI,
                                     endI - startI
     );
- 
+
 }
 
 
@@ -170,29 +170,31 @@ cleanup1:
 int rf_string_count(const void* tstr, const void* sstr,
                              enum RFstring_matching_options options)
 {
-    int move, index;
     unsigned int n;
+    char *s;
+    char *prs;
+    unsigned int len;
     RF_ENTER_LOCAL_SCOPE();
+    n = 0;
+    if (!sstr) {
+        RF_WARNING("Provided null search string");
+        goto cleanup;
+    }
+    s = rf_string_data(tstr);
+    len = rf_string_length_bytes(tstr);
 
-    /* sanity checks are in rf_string_find_byte_pos() */
-
-    move = index = n = 0;
     //as long as the substring is found in the string
-    while((move = rf_string_find_byte_pos(
-               tstr, sstr, options)) != RF_FAILURE)
-    {
-        move += rf_string_length_bytes(sstr);
-        //proceed searching inside the string and also increase the counter
-        n++;
-        rf_string_data(tstr) += move;
-        index += move;
-        rf_string_length_bytes(tstr) -= move;
+    prs = s;
+    s = strstr_nnt(s, len, rf_string_data(sstr), rf_string_length_bytes(sstr));
+    while(s) {
+        n ++;
+        len -= (prs - s) + rf_string_length_bytes(sstr);
+        s += rf_string_length_bytes(sstr);
+        prs = s;
+        s = strstr_nnt(s, len, rf_string_data(sstr), rf_string_length_bytes(sstr));
     }
 
-    //return string to its original state
-    rf_string_data(tstr) -= index;
-    rf_string_length_bytes(tstr) += index;
-
+cleanup:
     RF_EXIT_LOCAL_SCOPE();
     return n;
 }
@@ -252,7 +254,7 @@ bool rf_string_between(const void* tstr, const void* lstr,
     bool ret = false;
     RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(tstr);
-    
+
     /* null pointer check for lstr and rstr is in rf_string_find_byte_pos() */
 
     if (!result) {
@@ -281,7 +283,7 @@ bool rf_string_between(const void* tstr, const void* lstr,
                rf_string_data(tstr) + start + rf_string_length_bytes(lstr),
                end))
         {
-            goto cleanup_temp; 
+            goto cleanup_temp;
         }
     }
     else
@@ -291,7 +293,7 @@ bool rf_string_between(const void* tstr, const void* lstr,
                rf_string_data(tstr) + start + rf_string_length_bytes(lstr),
                end))
         {
-            goto cleanup_temp; 
+            goto cleanup_temp;
         }
     }
     //success
@@ -316,7 +318,7 @@ bool rf_string_beforev(const void* thisstr, void* result,
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr);
-    
+
     if (!result) {
         RF_WARNING("Provided null string for the result");
         ret = false;
@@ -332,7 +334,7 @@ bool rf_string_beforev(const void* thisstr, void* result,
         /* null pointer check is in rf_string_find_byte_pos() */
         if((thisPos= rf_string_find_byte_pos(thisstr, s, options))!= RF_FAILURE)
         {
-            if(thisPos < minPos)      
+            if(thisPos < minPos)
             {
                minPos = thisPos;
             }
@@ -352,7 +354,7 @@ bool rf_string_beforev(const void* thisstr, void* result,
         if(!rf_stringx_init_unsafe_nnt(result, rf_string_data(thisstr), minPos))
         {
             ret = false;
-            goto cleanup; 
+            goto cleanup;
         }
     }
     else
@@ -360,7 +362,7 @@ bool rf_string_beforev(const void* thisstr, void* result,
         if(!rf_string_init_unsafe_nnt(result, rf_string_data(thisstr), minPos))
         {
             ret = false;
-            goto cleanup; 
+            goto cleanup;
         }
     }
 
@@ -377,7 +379,7 @@ bool rf_string_before(const void* thisstr, const void* sstr,
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr);
-    
+
     /* null pointer check for sstr is in rf_string_find_byte_pos() */
     if (!result) {
         RF_WARNING("Provided NULL pointer for the string to return");
@@ -397,7 +399,7 @@ bool rf_string_before(const void* thisstr, const void* sstr,
         if(!rf_stringx_init_unsafe_nnt(result, rf_string_data(thisstr), rv))
         {
             ret = false;
-            goto cleanup; 
+            goto cleanup;
         }
     }
     else
@@ -405,7 +407,7 @@ bool rf_string_before(const void* thisstr, const void* sstr,
         if(!rf_string_init_unsafe_nnt(result, rf_string_data(thisstr), rv))
         {
             ret = false;
-            goto cleanup; 
+            goto cleanup;
         }
     }
 
@@ -445,7 +447,7 @@ bool rf_string_after(const void* thisstr, const void* after,
            )
         {
             ret = false;
-            goto cleanup; 
+            goto cleanup;
         }
     }
     else
@@ -457,7 +459,7 @@ bool rf_string_after(const void* thisstr, const void* after,
            )
         {
             ret = false;
-            goto cleanup; 
+            goto cleanup;
         }
     }
 
@@ -520,7 +522,7 @@ bool rf_string_afterv(const void* thisstr, void* result,
            )
         {
             ret = false;
-            goto cleanup; 
+            goto cleanup;
         }
     }
     else
@@ -532,7 +534,7 @@ bool rf_string_afterv(const void* thisstr, void* result,
            )
         {
             ret = false;
-            goto cleanup; 
+            goto cleanup;
         }
     }
 

@@ -1675,7 +1675,7 @@ cleanup1:
 
 //Inserts a line into a specific part of the Text File
 bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN, 
-                        void* string, bool after)
+                        const void* stringIN, bool after)
 {
     struct RFstring tempFileName;
     bool lineFound,allocatedS, ret = true;
@@ -1683,11 +1683,12 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
     FILE* newFile;
     int32_t linesCount;
     struct RFstringx buffer;
+    struct RFstring *string;
     //get the function's arguments
     int32_t error;
     RF_ENTER_LOCAL_SCOPE();
 
-    if (!string) {
+    if (!stringIN) {
         RF_WARNING("Provided null pointer for insertion");
         ret = false;
         goto cleanup0;
@@ -1709,14 +1710,14 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
 
     //determine how many lines the given string has
 
-    linesCount = rf_string_count(string, RFS_("\n"), 0) + 1;
+    linesCount = rf_string_count(stringIN, RFS_("\n"), 0) + 1;
     /// cleanup 1 - For the string
     //if we don't have the RFstring default Unix style line ending
     //making a new one since stringP can be on the local stack and we can't use replace since that would act on the local stack
     if(t->eol != RF_EOL_LF && linesCount > 1)
     {
         allocatedS = true;
-        if(!(string = rf_string_copy_out(string)))
+        if(!(string = rf_string_copy_out(stringIN)))
         {
             RF_ERROR("Failure at making a copy of a string");
             ret = false;
@@ -1746,6 +1747,8 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
                 goto cleanup1;
             }
         }
+    } else {
+        string = (struct RFstring *) stringIN;
     }
 
     //go to the beginning of this file

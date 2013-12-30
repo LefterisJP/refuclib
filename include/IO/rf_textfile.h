@@ -556,7 +556,7 @@ i_DECLIMEX_ bool rf_textfile_write(struct RFtextfile* t, void* string);
  ** @return                       Returns @c true for success @c false for error
  **/
 i_DECLIMEX_ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
-                                    void* string, bool after);
+                                    const void* string, bool after);
 
 
 /**
