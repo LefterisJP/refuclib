@@ -37,6 +37,7 @@
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/types.h> //for exact sized types
 #include <Definitions/retcodes.h> //for bool
+#include <Definitions/inline.h> //for inline declarations
 /*------------- End of includes -------------*/
 
 #ifdef __cplusplus
@@ -112,6 +113,18 @@ i_DECLIMEX_ void rf_stringx_move_back(struct RFstringx* thisstr, uint32_t n);
  ** @see rf_stringx_reset()
  **/
 i_DECLIMEX_ void rf_stringx_move_forward(struct RFstringx* thisstr, uint32_t n);
+
+/**
+ ** @brief Moves the internal pointer to the end of the string
+ ** @param s The string to move
+ **/
+i_INLINE_DECL void rf_stringx_move_end(struct RFstringx* s)
+{
+    s->INH_String.data += s->INH_String.length;
+    s->bIndex += s->INH_String.length;
+    s->INH_String.length = 0;
+}
+
 /**
  ** @brief Resets the internal pointer of the StringX
  **

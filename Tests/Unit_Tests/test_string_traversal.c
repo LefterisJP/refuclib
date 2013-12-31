@@ -47,6 +47,23 @@ START_TEST(test_stringx_move_after) {
     rf_stringx_deinit(&str_buff);
 }END_TEST
 
+START_TEST(test_stringx_move_end) {
+    struct RFstringx s;
+    ck_assert(
+        rf_stringx_init(
+            &s,
+            "中国共産党総書記に習近平氏　新指導部の７人発表")
+    );
+    rf_stringx_move_end(&s);
+
+    ck_assert_rf_str_eq_cstr(&s, "");
+    ck_assert(s.bIndex == strlen(
+                  "中国共産党総書記に習近平氏　新指導部の７人発表")
+    );
+    
+    rf_stringx_deinit(&s);
+}END_TEST
+
 START_TEST(test_stringx_move_back) {
     struct RFstringx s;
 
@@ -313,6 +330,7 @@ Suite *string_traversal_suite_create(void)
                               setup_string_tests,
                               teardown_string_tests);
     tcase_add_test(stringx_traversal, test_stringx_move_after);
+    tcase_add_test(stringx_traversal, test_stringx_move_end);
     tcase_add_test(stringx_traversal, test_stringx_move_back);
     tcase_add_test(stringx_traversal, test_stringx_move_forward);
     tcase_add_test(stringx_traversal, test_stringx_reset);

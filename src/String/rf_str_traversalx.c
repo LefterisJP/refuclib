@@ -163,6 +163,8 @@ void rf_stringx_move_forward(struct RFstringx* thisstr, uint32_t n)
     }
 }
 
+i_INLINE_INS void rf_stringx_move_end(struct RFstringx* s);
+
 void rf_stringx_reset(struct RFstringx* thisstr)
 {
     rf_string_data(thisstr) -= thisstr->bIndex;
