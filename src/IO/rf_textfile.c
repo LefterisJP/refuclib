@@ -1967,6 +1967,8 @@ bool rf_textfile_remove(struct RFtextfile* t, uint64_t lineN)
     FILE* newFile;
     struct RFstringx buffer;
     int32_t error;
+    RF_ASSERT(t);
+
     lineFound = false;
     //determine the target line
     if(lineN == 0)
@@ -2204,7 +2206,7 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
     }
 
     //go to the beginning of this file
-    if(goto_filestart(t))
+    if(!goto_filestart(t))
     {
         RF_ERROR(
                  "Failed to move the internal filepointer"
