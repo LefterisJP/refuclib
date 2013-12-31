@@ -101,7 +101,7 @@ static void test_textfile_read_line_chars_generic(const char *filename,
     ck_assert_rf_str_eq_cstr(&g_buff,
                              get_line(encoding, endianess, line_scenario1));
     /* 2nd line partial */
-ck_assert(RF_SUCCESS == rf_textfile_read_line_chars(&f, &g_buff, 22));
+    ck_assert(RF_SUCCESS == rf_textfile_read_line_chars(&f, &g_buff, 22));
     ck_assert_rf_str_eq_cstr(&g_buff,
                              get_line(encoding, endianess, partial_line_scenario2));
 
@@ -460,6 +460,66 @@ START_TEST(test_textfile_insert_before) {
     rf_textfile_deinit(&f);
 }END_TEST
 
+START_TEST(test_textfile_remove) {
+    struct RFtextfile f;
+    static const char *s;
+    ck_assert(rf_stringx_assign_unsafe_nnt(
+                  &g_fname, PATH_TO"temp_file",
+                  strlen(PATH_TO"temp_file")));
+    ck_assert(rf_textfile_init(&f, &g_fname, RF_FILE_NEW,
+                               RF_ENDIANESS_UNKNOWN,
+                               RF_UTF8, RF_EOL_LF));
+
+    /* write line 1 */
+    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario1);
+    ck_assert(rf_stringx_assign_unsafe_nnt(
+                  &g_buff, s,
+                  strlen(s)));
+    ck_assert(rf_textfile_write(&f, &g_buff));
+
+    /* write line 2 */
+    ck_assert(rf_stringx_assign_unsafe_nnt(
+                  &g_buff, SECOND_LINE_UTF8"\n",
+                  strlen(SECOND_LINE_UTF8"\n")));
+    ck_assert(rf_textfile_write(&f, &g_buff));
+
+    /* write line 3 */
+    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario3);
+    ck_assert(rf_stringx_assign_unsafe_nnt(
+                  &g_buff, THIRD_LINE_UTF8"\n",
+                  strlen(THIRD_LINE_UTF8"\n")));
+    ck_assert(rf_textfile_write(&f, &g_buff));
+
+    /* remove the 2nd line */
+    ck_assert(rf_textfile_remove(&f, 2));
+
+    /* go to the starting position and switch to reading */
+    ck_assert(RF_SUCCESS == rf_textfile_go_to_line(&f, 1));
+    ck_assert(rf_textfile_set_mode(&f, RF_FILE_READ));
+
+    /* read 1st line */
+    ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));
+    ck_assert_rf_str_eq_cstr(&g_buff,
+                             get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario1));
+
+    /* read 2nd line */
+    ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));
+    ck_assert_rf_str_eq_cstr(&g_buff,
+                             get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario3));
+
+    /* EOF */
+    ck_assert(RE_FILE_EOF == rf_textfile_read_line(&f, &g_buff));
+
+    /* illegal input */
+    ck_assert(!rf_textfile_remove(&f, 0));
+    ck_assert(!rf_textfile_remove(&f, 9999));
+
+    ck_assert(rf_system_delete_file(&g_fname));
+    rf_textfile_deinit(&f);
+}END_TEST
+
+
+
 Suite *io_textfile_suite_create(void)
 {
     Suite *s = suite_create("Textfile");
@@ -505,6 +565,7 @@ Suite *io_textfile_suite_create(void)
     tcase_add_test(textfile_writting, test_textfile_write);
     tcase_add_test(textfile_writting, test_textfile_insert_after);
     tcase_add_test(textfile_writting, test_textfile_insert_before);
+    tcase_add_test(textfile_writting, test_textfile_remove);
 
     suite_add_tcase(s, textfile_control);
     suite_add_tcase(s, textfile_read_lines);
