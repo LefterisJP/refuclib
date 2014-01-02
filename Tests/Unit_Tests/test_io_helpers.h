@@ -6,6 +6,9 @@
 #include <Utils/endianess.h>
 
 #define PATH_TO "Tests/Unit_Tests/"
+
+#define FIRST_LINE_UTF8 "UTF-8 File"
+
 #define SECOND_LINE_UTF8 \
     "２日の東京外国為替市場では、主要通貨に対して"                      \
     "円が売られている。午前１０時現在、ドルに対する円"                  \

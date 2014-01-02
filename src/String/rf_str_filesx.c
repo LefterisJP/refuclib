@@ -93,13 +93,7 @@ bool rf_stringx_from_file_assign(struct RFstringx* str,
     UTF_FILE_READLINE(f, eol, eof, "assign")
     //success
     //assign it to the string
-    rf_stringx_reset(str);
-    if(str->bSize <= utf8ByteLength)
-    {
-        str->bSize = (utf8ByteLength)*2;
-        RF_REALLOC_JMP(rf_string_data(str), char, str->bSize,
-                                     ret = false, cleanup);
-    }
+    RF_STRINGX_REALLOC_JMP(str, utf8ByteLength, ret = false, cleanup);
     memcpy(rf_string_data(str), utf8, utf8ByteLength);
     rf_string_length_bytes(str) = utf8ByteLength;
 

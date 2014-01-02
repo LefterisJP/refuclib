@@ -100,6 +100,26 @@ i_DECLIMEX_ int32_t rf_stringx_move_after(
  ** @see rf_stringx_reset()
  **/
 i_DECLIMEX_ void rf_stringx_move_back(struct RFstringx* thisstr, uint32_t n);
+
+/**
+ ** @brief Moves the internal pointer to the position denoted
+ ** by @c byte_index
+ **
+ ** This is an unsafe function. No checks are performed.
+ ** Use only if you know that @c byte_index is a valid position
+ **
+ ** @param s The string for which to move
+ ** @param byte_index The byte index to move to
+ **/
+i_INLINE_DECL void rf_stringx_move_to_index(struct RFstringx* s,
+                                             uint32_t byte_index)
+{
+    unsigned int n = s->bIndex - byte_index;
+    s->INH_String.length += n;
+    s->INH_String.data -= n;
+    s->bIndex = byte_index;
+}
+
 /**
  ** @brief Moves the internal pointer n characters forward
  **

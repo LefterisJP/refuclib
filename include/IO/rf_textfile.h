@@ -407,6 +407,19 @@ i_DECLIMEX_ int rf_textfile_read_line_chars(struct RFtextfile* t,
                                             struct RFstringx* line,
                                             uint32_t characters);
 
+/**
+ ** @brief Reads a specific number of lines from the file.
+ **
+ ** @param t The textfile from where to read the lines
+ ** @param lines The number of lines to read from the file, counting from
+ **              the current file position. If @c 0 is given then all lines
+ **              are read.
+ ** @param str   An already initialized @c RFstringx to hold the read lines
+ ** @return Returns the number of lines read or @c -1 for failure
+ */
+i_DECLIMEX_ int rf_textfile_read_lines(struct RFtextfile* t,
+                                       unsigned int lines,
+                                       struct RFstringx* str);
 
 /**
  ** @brief Gets the current byte offset of the file

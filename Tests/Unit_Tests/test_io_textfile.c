@@ -14,6 +14,7 @@
 #include <String/rf_str_core.h>
 #include <String/rf_str_corex.h>
 #include <String/rf_str_manipulation.h>
+#include <String/rf_str_traversalx.h>
 #include <System/rf_system.h>
 #include <IO/rf_textfile.h>
 
@@ -276,7 +277,25 @@ START_TEST(test_textfile_read_line_chars_utf32_be) {
                                   RF_UTF32, RF_BIG_ENDIAN);
 }END_TEST
 
+START_TEST(test_textfile_read_lines) {
+    struct RFtextfile f;
+    static const struct RFstring fname = RF_STRING_STATIC_INIT(
+        PATH_TO"utf8stringfile"
+    );
+    ck_assert(rf_textfile_init(&f, &fname, RF_FILE_READ,
+                               RF_ENDIANESS_UNKNOWN,
+                               RF_UTF8, RF_EOL_LF));
 
+    rf_stringx_reset(&g_buff);
+    /* read all lines */
+    ck_assert(3 == rf_textfile_read_lines(&f, 0, &g_buff));
+    ck_assert_rf_str_eq_cstr(&g_buff,
+                             FIRST_LINE_UTF8"\n"
+                             SECOND_LINE_UTF8"\n"
+                             THIRD_LINE_UTF8"\n"
+    );
+    rf_textfile_deinit(&f);
+}END_TEST
 /* Textfile Writting tests -- START */
 
 START_TEST(test_textfile_write) {
@@ -619,6 +638,7 @@ Suite *io_textfile_suite_create(void)
                    test_textfile_read_line_chars_utf32_le);
     tcase_add_test(textfile_read_lines,
                    test_textfile_read_line_chars_utf32_be);
+    tcase_add_test(textfile_read_lines, test_textfile_read_lines);
 
     TCase *textfile_writting = tcase_create("Textfile Writting");
     tcase_add_checked_fixture(textfile_writting,

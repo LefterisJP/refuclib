@@ -60,7 +60,7 @@ START_TEST(test_stringx_move_end) {
     ck_assert(s.bIndex == strlen(
                   "中国共産党総書記に習近平氏　新指導部の７人発表")
     );
-    
+
     rf_stringx_deinit(&s);
 }END_TEST
 
@@ -125,7 +125,59 @@ START_TEST(test_stringx_move_back) {
         "εκδηλώσεων, θα ισχύσουν έκτακτες "
         "κυκλοφοριακές ρυθμίσεις "
         "έως και το πρωί της Κυριακής.");
-    
+
+    rf_stringx_deinit(&s);
+}END_TEST
+
+START_TEST(test_stringx_move_to_index) {
+    struct RFstringx s;
+    unsigned int pr_index;
+
+    ck_assert(
+        rf_stringx_init(
+            &s,
+            "Με την κεντρική εκδήλωση, μετά τις 2 το "
+            "μεσημέρι, και την "
+            "πορεία προς την αμερικανική πρεσβεία, "
+            "περίπου μία ώρα "
+            "αργότερα, κορυφώνονται το Σάββατο οι "
+            "εκδηλώσεις για την "
+            "39η επέτειο από την Εξέγερση του "
+            "Πολυτεχνείου. Λόγω των "
+            "εκδηλώσεων, θα ισχύσουν έκτακτες "
+            "κυκλοφοριακές ρυθμίσεις "
+            "έως και το πρωί της Κυριακής."
+        )
+    );
+    pr_index = s.bIndex;
+
+
+    rf_stringx_move_forward(&s, 96);
+    ck_assert_rf_str_eq_cstr(
+        &s,
+        "περίπου μία ώρα αργότερα, κορυφώνονται το "
+        "Σάββατο οι "
+        "εκδηλώσεις για την 39η επέτειο από την Εξέγερση "
+        "του Πολυτεχνείου. Λόγω των εκδηλώσεων, θα "
+        "ισχύσουν "
+        "έκτακτες κυκλοφοριακές ρυθμίσεις έως και το πρωί "
+        "της Κυριακής."
+    );
+    rf_stringx_move_to_index(&s, pr_index);
+    ck_assert_rf_str_eq_cstr(
+        &s,
+        "Με την κεντρική εκδήλωση, μετά τις 2 το "
+        "μεσημέρι, και την "
+        "πορεία προς την αμερικανική πρεσβεία, "
+        "περίπου μία ώρα "
+        "αργότερα, κορυφώνονται το Σάββατο οι "
+        "εκδηλώσεις για την "
+        "39η επέτειο από την Εξέγερση του "
+        "Πολυτεχνείου. Λόγω των "
+        "εκδηλώσεων, θα ισχύσουν έκτακτες "
+        "κυκλοφοριακές ρυθμίσεις "
+        "έως και το πρωί της Κυριακής."
+    );
     rf_stringx_deinit(&s);
 }END_TEST
 
@@ -171,7 +223,7 @@ START_TEST(test_stringx_move_forward) {
     /* go forward more than the length */
     rf_stringx_move_forward(&s2, 999);
     ck_assert_rf_str_eq_cstr(&s2, "");
-    
+
     rf_stringx_deinit(&s);
     rf_stringx_deinit(&s2);
 }END_TEST
@@ -193,14 +245,14 @@ START_TEST(test_stringx_reset) {
         "中国共産党総書記に習近平氏　新指導部の７人発表"
     );
 
-    /* move and reset */ 
+    /* move and reset */
     ck_assert(RF_FAILURE != rf_stringx_move_after(&s, &sub1, NULL, 0));
     ck_assert_rf_str_eq_cstr(&s, "習近平氏　新指導部の７人発表");
     rf_stringx_reset(&s);
     ck_assert_rf_str_eq_cstr(
         &s,
         "中国共産党総書記に習近平氏　新指導部の７人発表"
-    );    
+    );
 
     rf_stringx_deinit(&s);
 }END_TEST
@@ -255,7 +307,7 @@ START_TEST(test_stringx_move_afterv) {
         "της Κυριακής."
     );
     ck_assert(rf_stringx_move_afterv(&s, &str_buff, 0, 2, &sub1, &sub2));
-    
+
     ck_assert_rf_str_eq_cstr(
         &s,
         " περίπου μία ώρα αργότερα, κορυφώνονται "
@@ -267,7 +319,7 @@ START_TEST(test_stringx_move_afterv) {
         "το πρωί της Κυριακής."
     );
     ck_assert_rf_str_eq_cstr(
-        &str_buff, 
+        &str_buff,
         "και την πορεία προς την αμερικανική πρεσβεία"
     );
 
@@ -316,7 +368,7 @@ START_TEST(test_stringx_move_after_pair) {
     ck_assert(!rf_stringx_move_after_pair(&s, &sub1, NULL, &str_buff, 0, 2));
 
     rf_stringx_deinit(&s);
-    rf_stringx_deinit(&str_buff);    
+    rf_stringx_deinit(&str_buff);
 }END_TEST
 
 Suite *string_traversal_suite_create(void)
@@ -332,12 +384,11 @@ Suite *string_traversal_suite_create(void)
     tcase_add_test(stringx_traversal, test_stringx_move_after);
     tcase_add_test(stringx_traversal, test_stringx_move_end);
     tcase_add_test(stringx_traversal, test_stringx_move_back);
+    tcase_add_test(stringx_traversal, test_stringx_move_to_index);
     tcase_add_test(stringx_traversal, test_stringx_move_forward);
     tcase_add_test(stringx_traversal, test_stringx_reset);
     tcase_add_test(stringx_traversal, test_stringx_move_afterv);
     tcase_add_test(stringx_traversal, test_stringx_move_after_pair);
-
-
 
     suite_add_tcase(s, stringx_traversal);
     return s;

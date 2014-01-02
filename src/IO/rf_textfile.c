@@ -1344,6 +1344,15 @@ int32_t rf_textfile_go_to_offset(struct RFtextfile* t, RFfile_offset offset,
     return RF_SUCCESS;
 }
 
+static inline void exclude_end_of_line(struct RFstringx *s)
+{
+    if(rf_string_length_bytes(s) > 0 && 
+       rf_string_data(s)[rf_string_length_bytes(s) - 1] == '\n')
+    {
+        rf_string_length_bytes(s)--;
+    }
+}
+
 int rf_textfile_read_line(struct RFtextfile* t, struct RFstringx* line)
 {
     char eof = false;
@@ -1365,8 +1374,6 @@ int rf_textfile_read_line(struct RFtextfile* t, struct RFstringx* line)
     {
         return RE_FILE_EOF;
     }
-    //make sure that the line StringX internal pointer is reset
-    rf_stringx_reset(line);
 
     //Read the file depending on the encoding
     if(!rf_stringx_from_file_assign(line, t->f, &eof, t->eol, t->encoding, t->endianess))
@@ -1385,12 +1392,7 @@ int rf_textfile_read_line(struct RFtextfile* t, struct RFstringx* line)
     //success
     t->line++;
     t->eof = eof;
-    //also if the end of line was found make sure it's not included in the returned string
-    if(rf_string_length_bytes(line) > 0 && 
-       rf_string_data(line)[rf_string_length_bytes(line) - 1] == '\n')
-    {
-        rf_string_length_bytes(line)--;
-    }
+    exclude_end_of_line(line);
     return RF_SUCCESS;
 }
 
@@ -1419,8 +1421,6 @@ int rf_textfile_read_line_chars(struct RFtextfile* t,
     {
         return RE_FILE_EOF;
     }
-    //make sure that the line StringX internal pointer is reset
-    rf_stringx_reset(line);
 
     //Read the file depending on the encoding
     if(!rf_stringx_from_file_assign(line, t->f, &eof, t->eol, t->encoding, t->endianess))
@@ -1440,16 +1440,29 @@ int rf_textfile_read_line_chars(struct RFtextfile* t,
     {
         uint32_t charsN = rf_string_length(line);
         rf_string_prune_end(line, charsN-characters, NULL);
-    }
-    //else if the end of line was found make sure it's not included in the returned string
-    else if(rf_string_data(line)[rf_string_length_bytes(line) - 1] == '\n')
-    {
-        rf_string_length_bytes(line)--;
+    } else { 
+        exclude_end_of_line(line);
     }
     //success
     t->line++;
     t->eof = eof;
     return RF_SUCCESS;
+}
+
+int rf_textfile_read_lines(struct RFtextfile* t,
+                           unsigned int lines,
+                           struct RFstringx* str)
+{
+    unsigned int lines_read = 0;
+    unsigned int pr_index = str->bIndex;
+    while (RF_SUCCESS == rf_textfile_read_line(t, str))
+    {
+        lines_read ++;
+        rf_stringx_append_char(str, (unsigned int)'\n');
+        rf_stringx_move_end(str);
+    }
+    rf_stringx_move_to_index(str, pr_index);
+    return lines_read;
 }
 
 bool rf_textfile_get_offset(struct RFtextfile* t, RFfile_offset* offset)

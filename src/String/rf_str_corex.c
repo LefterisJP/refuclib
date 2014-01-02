@@ -462,7 +462,6 @@ bool rf_stringx_assign(struct RFstringx* dst, const void* source)
         ret = false;
         goto cleanup;
     }
-    rf_stringx_reset(dst);//make sure that the destination's byte index is reset
     //only if the new string value won't fit in the buffer reallocate the buffer
     RF_STRINGX_REALLOC_JMP(dst, rf_string_length_bytes(source), ret=false, cleanup);
     //now copy the value and the bytelength
