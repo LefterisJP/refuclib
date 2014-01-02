@@ -43,6 +43,7 @@
 #include <String/rf_str_filesx.h> //for rfStringX file functions
 #include <String/rf_str_files.h> //for rfStringX file functions
 #include <String/rf_str_traversalx.h> //for rf_stringx_reset()
+#include <String/rf_str_manipulationx.h> //for rf_stringx_append_char()
 #include <Utils/rf_unicode.h> //for rfReadLine family of functions
 #include "../String/rf_str_conversion.ph" //for rf_string_cstr with buffer
 
@@ -1460,6 +1461,9 @@ int rf_textfile_read_lines(struct RFtextfile* t,
         lines_read ++;
         rf_stringx_append_char(str, (unsigned int)'\n');
         rf_stringx_move_end(str);
+        if (lines_read == lines) {
+            break;
+        }
     }
     rf_stringx_move_to_index(str, pr_index);
     return lines_read;

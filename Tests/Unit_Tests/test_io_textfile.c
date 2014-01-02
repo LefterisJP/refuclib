@@ -287,13 +287,39 @@ START_TEST(test_textfile_read_lines) {
                                RF_UTF8, RF_EOL_LF));
 
     rf_stringx_reset(&g_buff);
-    /* read all lines */
+    /* read all lines (3) */
     ck_assert(3 == rf_textfile_read_lines(&f, 0, &g_buff));
     ck_assert_rf_str_eq_cstr(&g_buff,
                              FIRST_LINE_UTF8"\n"
                              SECOND_LINE_UTF8"\n"
                              THIRD_LINE_UTF8"\n"
     );
+
+    ck_assert(RF_SUCCESS == rf_textfile_go_to_line(&f, 1));
+
+    /* read 3 lines */
+    ck_assert(3 == rf_textfile_read_lines(&f, 3, &g_buff));
+    ck_assert_rf_str_eq_cstr(&g_buff,
+                             FIRST_LINE_UTF8"\n"
+                             SECOND_LINE_UTF8"\n"
+                             THIRD_LINE_UTF8"\n"
+    );
+
+    ck_assert(RF_SUCCESS == rf_textfile_go_to_line(&f, 1));
+
+    /* read 2 lines */
+    ck_assert(2 == rf_textfile_read_lines(&f, 2, &g_buff));
+    ck_assert_rf_str_eq_cstr(&g_buff,
+                             FIRST_LINE_UTF8"\n"
+                             SECOND_LINE_UTF8"\n"
+    );
+
+    ck_assert(RF_SUCCESS == rf_textfile_go_to_line(&f, 1));
+
+    /* read 1 line */
+    ck_assert(1 == rf_textfile_read_lines(&f, 1, &g_buff));
+    ck_assert_rf_str_eq_cstr(&g_buff, FIRST_LINE_UTF8"\n");
+
     rf_textfile_deinit(&f);
 }END_TEST
 /* Textfile Writting tests -- START */
