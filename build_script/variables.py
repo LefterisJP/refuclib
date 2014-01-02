@@ -210,7 +210,7 @@ vars.Add(
         'of the tests shall be shown. Since currently we are using Check '
         'as the unit testing framework here is an explanation of the possible '
         'values: http://check.sourceforge.net/doc/check_html/check_8.html#Index',
-        'CK_VERBOSE',
+        'CK_NORMAL',
         allowed_values=(
             'CK_SILENT',
             'CK_MINIMAL',
