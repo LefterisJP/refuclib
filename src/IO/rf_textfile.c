@@ -35,7 +35,6 @@
 #include <IO/rf_file.h> //for all the IO functions
 #include "rf_textfile.ph"//for the private textfile functionality
 /*------------- Outside Module inclusion -------------*/
-#include <String/rf_str_common.h>//for RFS_()
 #include <String/rf_str_core.h> //for rf_string_destroy(),and copying functions
 #include <String/rf_str_corex.h> //for rf_stringx_assign functions
 #include <String/rf_str_retrieval.h> //for rf_string_count() and others
@@ -64,27 +63,27 @@ static const char BOM_UTF16_BE[2] = {0xFE, 0xFF};
 static const char BOM_UTF32_LE[4] = {0xFF, 0xFE, 0, 0};
 static const char BOM_UTF32_BE[4] = {0, 0, 0xFE, 0xFF};
 
+static const struct RFstring g_eol_crlf = RF_STRING_STATIC_INIT("\xD\n");
+static const struct RFstring g_eol_cr = RF_STRING_STATIC_INIT("\xD");
+static const struct RFstring g_eol_lf = RF_STRING_STATIC_INIT("\n");
+
 /**
  ** @brief Writes string to a file appending the proper end of line
  */
 static inline bool write_to_file_eol(FILE* f, struct RFtextfile *t,
                                      struct RFstring* str)
 {
-    char ret;
-    if(t->eol == RF_EOL_CRLF)
-    {
-        ret = rf_string_fwrite(RFS_(RF_STR_PF_FMT"\xD\n", RF_STR_PF_ARG(str)),
-                              f, t->encoding, t->endianess);
+    bool ret;
+    if (!rf_string_fwrite(str, f, t->encoding, t->endianess)) {
+        return false;
     }
-    else if(t->eol == RF_EOL_CR)
-    {
-        ret = rf_string_fwrite(RFS_(RF_STR_PF_FMT"\xD", RF_STR_PF_ARG(str)),
-                              f, t->encoding, t->endianess);
-    }
-    else
-    {
-        ret = rf_string_fwrite(RFS_(RF_STR_PF_FMT"\n", RF_STR_PF_ARG(str)),
-                              f, t->encoding, t->endianess);
+
+    if(t->eol == RF_EOL_CRLF) {
+        ret = rf_string_fwrite(&g_eol_crlf, f, t->encoding, t->endianess);
+    } else if(t->eol == RF_EOL_CR) {
+        ret = rf_string_fwrite(&g_eol_cr, f, t->encoding, t->endianess);
+    } else {
+        ret = rf_string_fwrite(&g_eol_lf, f, t->encoding, t->endianess);
     } 
     return ret;
 }
@@ -1634,7 +1633,7 @@ bool rf_textfile_write(struct RFtextfile* t, void* s)
     RF_TEXTFILE_CANWRITE_JMP(t, ret = false, cleanup1);
     t->previousOp = RF_FILE_WRITE;
     //let's see how many lines it will be adding to the text file
-    linesN = rf_string_count(s,RFS_("\n"),0);
+    linesN = rf_string_count(s, &g_eol_lf, 0);
     //if we don't have the default RFstring Unix style line ending
     if(t->eol != RF_EOL_LF && linesN != 0)
     {
@@ -1644,7 +1643,7 @@ bool rf_textfile_write(struct RFtextfile* t, void* s)
         s = rf_string_copy_out((struct RFstring*)s);
         if(t->eol==RF_EOL_CRLF)
         {
-            if(!rf_string_replace(s, RFS_("\n"), RFS_("\xD\n"),0,0))
+            if(!rf_string_replace(s, &g_eol_lf, &g_eol_crlf, 0, 0))
             {
                 RF_ERROR("Failure at editing the newline character"
                          "while writing string \""RF_STR_PF_FMT"\""
@@ -1656,7 +1655,7 @@ bool rf_textfile_write(struct RFtextfile* t, void* s)
         }
         else
         {
-            if(!rf_string_replace(s, RFS_("\n"), RFS_("\xD"),0,0))
+            if(!rf_string_replace(s, &g_eol_lf, &g_eol_cr, 0, 0))
             {
                 RF_ERROR("Failure at editing the newline character"
                          "while writing string \""RF_STR_PF_FMT"\""
@@ -1727,7 +1726,7 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
 
     //determine how many lines the given string has
 
-    linesCount = rf_string_count(stringIN, RFS_("\n"), 0) + 1;
+    linesCount = rf_string_count(stringIN, &g_eol_lf, 0) + 1;
     /// cleanup 1 - For the string
     //if we don't have the RFstring default Unix style line ending
     //making a new one since stringP can be on the local stack and we can't use replace since that would act on the local stack
@@ -1742,7 +1741,7 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
         }
         if(t->eol == RF_EOL_CRLF)
         {
-            if(!rf_string_replace(string, RFS_("\n"), RFS_("\xD\n"), 0, 0))
+            if(!rf_string_replace(string, &g_eol_lf, &g_eol_crlf, 0, 0))
             {
                 RF_ERROR("Failure at editing the newline character of string "
                          "\""RF_STR_PF_FMT"\" while inserting it into "
@@ -1754,7 +1753,7 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
         }
         else
         {
-            if(!rf_string_replace(string, RFS_("\n"), RFS_("\xD"), 0, 0))
+            if(!rf_string_replace(string, &g_eol_lf, &g_eol_cr, 0, 0))
             {
                 RF_ERROR("Failure at editing the newline character of string "
                          "\""RF_STR_PF_FMT"\" while inserting it into "
@@ -2187,7 +2186,7 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
     }
 
     //determine how many lines the given string has
-    linesCount = rf_string_count(string, RFS_("\n"), 0);
+    linesCount = rf_string_count(string, &g_eol_lf, 0);
     /// cleanup 1 - For this string
     //if we don't have the RFstring default Unix style line ending
     //making a new one since stringP can be on the local stack and we can't use replace since that would act on the local stack
@@ -2202,7 +2201,7 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
         }
         if(t->eol == RF_EOL_CRLF)
         {
-            if(!rf_string_replace(string,RFS_("\n"),RFS_("\xD\n"),0,0))
+            if(!rf_string_replace(string, &g_eol_lf, &g_eol_crlf, 0, 0))
             {
                 RF_ERROR("Editing the newline character for the to-replace "
                          "string failed");
@@ -2212,7 +2211,7 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
         }
         else
         {
-            if(!rf_string_replace(string,RFS_("\n"),RFS_("\xD"),0,0))
+            if(!rf_string_replace(string, &g_eol_lf, &g_eol_cr, 0, 0))
             {
                 RF_ERROR("Editing the newline character for the to-replace "
                          "string failed");

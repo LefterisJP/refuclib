@@ -165,7 +165,7 @@ i_DECLIMEX_ bool rf_string_from_file_append(struct RFstring* str, FILE* f,
  ** encoded in. Look @ref RFendianess for posssible values.
  ** @return            Returns @c true for success and @c false otherwise
  **/
-i_DECLIMEX_ bool rf_string_fwrite(void* s, FILE* f,
+i_DECLIMEX_ bool rf_string_fwrite(const void* s, FILE* f,
                                   enum RFtext_encoding encoding,
                                   enum RFendianess endianess);
 

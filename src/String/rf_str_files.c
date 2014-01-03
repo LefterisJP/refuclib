@@ -162,7 +162,7 @@ cleanup:
 }
 
 //Writes a string to a file in the given encoding
-bool rf_string_fwrite(void* s, FILE* f,
+bool rf_string_fwrite(const void* s, FILE* f,
                       enum RFtext_encoding encoding,
                       enum RFendianess endianess)
 {
