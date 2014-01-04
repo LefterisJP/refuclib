@@ -45,7 +45,14 @@ enum RFstring_matching_options {
                            matche and that it should be separated by 
                            whitespace characters */
     RF_STRINGX_ARGUMENT = 0x4, /*!< At least one of the function's arguments
-                                 are RFstringx instead of a simple RFstring */
+                                 is an RFstringx instead of a simple RFstring */
+    RF_STRING_DEPENDENT = 0x8, /*!< At least one of the function's arguments
+                                 is an RFstring without an initialized buffer.
+                                 The function should make the passed string 
+                                 point to another string and depend on it. 
+                                 The function's documentation should clearly
+                                 state what string would that be */
+                                 
 };
 
 

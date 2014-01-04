@@ -65,14 +65,23 @@ extern "C"
  **                    pointer is of RFstringx type also pass the 
  **                    @c RF_STRINGX_ARGUMENT bitflag argument in the 
  **                    @c options argument. The caller is responsible for
- **                    initializing the string but the function will assign to it
- **                    and also reallocate its buffer if needed
+ **                    initializing  and freeing the string but the function
+ **                    will assign to it
+ **                    and also reallocate its buffer if needed. If 
+ **                    @c RF_STRING_DEPENDENT is passed instead then the
+ **                    string should not be allocated and it will only point
+ **                    to the buffer of @c thisstr. In that case it will only 
+ **                    be valid as long as @c thisstr is.
  **                    If 0 nothing is assigned @inhtype{String,StringX}
  ** @param options     @see rf_string_remove() for details of the
  **                    possible options. An additional option that can be given:
  **                    + @c RF_STRINGX_ARGUMENT: Pass this bitflag option if the
  **                    pointer you gave for initialization at @c result is
  **                    of RFstringx type
+ **                    + @c RF_STRING_DEPENDENT: Pass this bitglag option
+ **                      if the pointer for the return string should not have
+ **                      its own buffer but should depend on the lifetime of
+ **                      @c thisstr
  ** @return            Returns the number of positions (bytes) moved
  **                    or RF_FAILURE if the substring was not found in the String
  ** @see rf_stringx_move_afterv()

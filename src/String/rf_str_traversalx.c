@@ -28,7 +28,6 @@
  *    == END OF REFU LICENSE ==
 */
 
-
 /*------------- Corrensponding Header inclusion -------------*/
 #include <String/rf_str_traversalx.h>
 /*------------- Module related inclusion -------------*/
@@ -58,8 +57,7 @@ static inline bool move_internal_ptr(struct RFstringx* s, int32_t move,
     //also if we want the string returned
     if(resultP != 0)
     {
-        if(options & RF_STRINGX_ARGUMENT)
-        {
+        if(options & RF_STRINGX_ARGUMENT) {
             struct RFstringx* result = (struct RFstringx*) resultP;
             rf_stringx_reset(result);
             RF_STRINGX_REALLOC(result, move - len, false);
@@ -69,9 +67,11 @@ static inline bool move_internal_ptr(struct RFstringx* s, int32_t move,
                 rf_string_data(s) - move,
                 rf_string_length_bytes(result)
             );
-        }
-        else
-        {
+        } else if (options & RF_STRING_DEPENDENT) {
+            struct RFstring *result = (struct RFstring*) resultP;
+            rf_string_length_bytes(result) = move - len;
+            rf_string_data(result) = rf_string_data(s) - move;
+        }else {
             struct RFstring* result = (struct RFstring*) resultP;
             if (rf_string_length_bytes(result) > move - len) {
                 RF_REALLOC(rf_string_data(result), char,

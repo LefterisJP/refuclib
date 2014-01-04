@@ -21,6 +21,7 @@ START_TEST(test_stringx_move_after) {
     static const struct RFstring sub3 = RF_STRING_STATIC_INIT("ain't there");
     struct RFstringx s;
     struct RFstringx str_buff;
+    struct RFstring dependent_s;
     ck_assert(rf_stringx_init_buff(&str_buff, 1024, ""));
     ck_assert(
         rf_stringx_init(
@@ -32,6 +33,13 @@ START_TEST(test_stringx_move_after) {
 
     ck_assert_rf_str_eq_cstr(&s, "習近平氏　新指導部の７人発表");
     ck_assert_rf_str_eq_cstr(&str_buff, "中国共産党総書記");
+
+    /* dependent string */
+    rf_stringx_reset(&s);
+    ck_assert(RF_FAILURE != rf_stringx_move_after(&s, &sub1, &dependent_s,
+                                                  RF_STRING_DEPENDENT));
+    ck_assert_rf_str_eq_cstr(&s, "習近平氏　新指導部の７人発表");
+    ck_assert_rf_str_eq_cstr(&dependent_s, "中国共産党総書記");
 
     /* no result string given */
     ck_assert(RF_FAILURE != rf_stringx_move_after(&s, &sub2, NULL,
@@ -258,8 +266,10 @@ START_TEST(test_stringx_reset) {
 }END_TEST
 
 START_TEST(test_stringx_move_afterv) {
+    unsigned int saved_index;
     struct RFstringx s;
     struct RFstringx str_buff;
+    struct RFstring dependent_s;
     static const struct RFstring sub1 = RF_STRING_STATIC_INIT(",");
     static const struct RFstring sub2 = RF_STRING_STATIC_INIT("39");
     static const struct RFstring sub3 = RF_STRING_STATIC_INIT("eleos");
@@ -306,6 +316,7 @@ START_TEST(test_stringx_move_afterv) {
         "το πρωί "
         "της Κυριακής."
     );
+    saved_index = s.bIndex;
     ck_assert(rf_stringx_move_afterv(&s, &str_buff, 0, 2, &sub1, &sub2));
 
     ck_assert_rf_str_eq_cstr(
@@ -323,6 +334,27 @@ START_TEST(test_stringx_move_afterv) {
         "και την πορεία προς την αμερικανική πρεσβεία"
     );
 
+    /* dependent string */
+    rf_stringx_move_to_index(&s, saved_index);
+    ck_assert(rf_stringx_move_afterv(&s, &dependent_s,
+                                     RF_STRING_DEPENDENT, 2, &sub1, &sub2));
+
+    ck_assert_rf_str_eq_cstr(
+        &s,
+        " περίπου μία ώρα αργότερα, κορυφώνονται "
+        "το Σάββατο οι"
+        " εκδηλώσεις για την 39η επέτειο από "
+        "την Εξέγερση του "
+        "Πολυτεχνείου. Λόγω των εκδηλώσεων, θα ισχύσουν "
+        "έκτακτες κυκλοφοριακές ρυθμίσεις έως και "
+        "το πρωί της Κυριακής."
+    );
+    ck_assert_rf_str_eq_cstr(
+        &dependent_s,
+        "και την πορεία προς την αμερικανική πρεσβεία"
+    );
+
+
     /* non existing substrings and null return */
     ck_assert(!rf_stringx_move_afterv(&s, NULL, 0, 2, &sub3, &sub4));
 
@@ -333,6 +365,7 @@ START_TEST(test_stringx_move_afterv) {
 START_TEST(test_stringx_move_after_pair) {
     struct RFstringx s;
     struct RFstringx str_buff;
+    struct RFstring dependent_s;
     static const struct RFstring sub1 = RF_STRING_STATIC_INIT("「");
     static const struct RFstring sub2 = RF_STRING_STATIC_INIT("」");
     static const struct RFstring sub3 = RF_STRING_STATIC_INIT("eleos");
@@ -359,6 +392,19 @@ START_TEST(test_stringx_move_after_pair) {
     );
     ck_assert_rf_str_eq_cstr(
         &str_buff, "ブラケットの中のテキストは結果になる"
+    );
+
+    /* dependent string */
+    rf_stringx_reset(&s);
+    ck_assert(
+        rf_stringx_move_after_pair(&s, &sub1, &sub2,
+                                   &dependent_s, RF_STRING_DEPENDENT, 2)
+    );
+    ck_assert_rf_str_eq_cstr(
+        &s, "Let's see if the function will work as expected."
+    );
+    ck_assert_rf_str_eq_cstr(
+        &dependent_s, "ブラケットの中のテキストは結果になる"
     );
 
     /* non existing substrings */
