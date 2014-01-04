@@ -18,7 +18,7 @@ typedef struct an_object
     RF_ILNode lh;
 }an_object;
 
-static void test_AddTail(RF_ILHead* l, int* arr, int arr_size)
+static void test_AddTail(RFilist_head* l, int* arr, int arr_size)
 {
     int i;
     an_object* obj;
@@ -40,7 +40,7 @@ static void test_AddTail(RF_ILHead* l, int* arr, int arr_size)
     }
 }
 
-static void test_Add(RF_ILHead* l, int* arr, int arr_size)
+static void test_Add(RFilist_head* l, int* arr, int arr_size)
 {
     int i;
     an_object* obj;
@@ -63,7 +63,7 @@ static void test_Add(RF_ILHead* l, int* arr, int arr_size)
 }
 
 
-static void test_Delete(RF_ILHead* l)
+static void test_Delete(RFilist_head* l)
 {
     an_object* obj, *tmp;
     rf_ilist_for_each_safe(l, obj, tmp, lh)
@@ -74,7 +74,7 @@ static void test_Delete(RF_ILHead* l)
     EXPECT(rf_ilist_is_empty(l), true);
 }
 
-static void test_Pop(RF_ILHead* l, int* arr, int arr_size)
+static void test_Pop(RFilist_head* l, int* arr, int arr_size)
 {
     an_object* obj, *tmp;
     int i = arr_size - 1;
@@ -88,8 +88,8 @@ static void test_Pop(RF_ILHead* l, int* arr, int arr_size)
     EXPECT(rf_ilist_is_empty(l), true);
 }
 
-static void test_List_Append_Prepend(RF_ILHead* l1, RF_ILHead* l2,
-                                     RF_ILHead* l3, int* arr1, int arr1_size,
+static void test_List_Append_Prepend(RFilist_head* l1, RFilist_head* l2,
+                                     RFilist_head* l3, int* arr1, int arr1_size,
                                      int* arr2, int arr2_size, int* arr3,
                                      int arr3_size)
 {
@@ -116,7 +116,7 @@ static void test_List_Append_Prepend(RF_ILHead* l1, RF_ILHead* l2,
 
 int main()
 {
-    RF_ILHead list1, list2, list3;
+    RFilist_head list1, list2, list3;
     DEFAULT_LIB_INIT();
 
     rf_ilist_head_init(&list1);

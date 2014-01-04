@@ -16,8 +16,8 @@
 #include <Data_Structures/intrusive_list.h>
 
 static void *corrupt(const char *abortstr,
-		     const struct RF_ILNode *head,
-		     const struct RF_ILNode *node,
+		     const struct RFilist_node *head,
+		     const struct RFilist_node *node,
 		     unsigned int count)
 {
 	if (abortstr) {
@@ -29,10 +29,10 @@ static void *corrupt(const char *abortstr,
 	return NULL;
 }
 
-struct RF_ILNode *rf_ilist_check_node(const struct RF_ILNode *node,
+struct RFilist_node *rf_ilist_check_node(const struct RFilist_node *node,
                                     const char *abortstr)
 {
-	const struct RF_ILNode *p, *n;
+	const struct RFilist_node *p, *n;
 	int count = 0;
 
 	for (p = node, n = node->next; n != node; p = n, n = n->next) {
@@ -44,12 +44,13 @@ struct RF_ILNode *rf_ilist_check_node(const struct RF_ILNode *node,
 	if (node->prev != p)
 		return corrupt(abortstr, node, node, 0);
 
-	return (struct RF_ILNode *)node;
+	return (struct RFilist_node *)node;
 }
 
-struct RF_ILHead *rf_ilist_check(const struct RF_ILHead *h, const char *abortstr)
+struct RFilist_head *rf_ilist_check(const struct RFilist_head *h,
+                                    const char *abortstr)
 {
 	if (!rf_ilist_check_node(&h->n, abortstr))
 		return NULL;
-	return (struct RF_ILHead *)h;
+	return (struct RFilist_head *)h;
 }

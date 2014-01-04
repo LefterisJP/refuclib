@@ -20,7 +20,7 @@
 #include <Utils/check_type.h>
 
 /**
- * struct RF_ILNode - an entry in a doubly-linked list
+ * struct RFilist_node - an entry in a doubly-linked list
  * @next: next entry (self if empty)
  * @prev: previous entry (self if empty)
  *
@@ -29,37 +29,37 @@
  *	struct child {
  *		const char *name;
  *		// Linked list of all us children.
- *		struct RF_ILNode list;
+ *		struct RFilist_node list;
  *	};
  */
-typedef struct RF_ILNode
+typedef struct RFilist_node
 {
-	struct RF_ILNode *next, *prev;
-}RF_ILNode;
+	struct RFilist_node *next, *prev;
+}RFilist_node;
 
 /**
- * struct RF_ILHead - the head of a doubly-linked list
- * @h: the RF_ILHead (containing next and prev pointers)
+ * struct RFilist_head - the head of a doubly-linked list
+ * @h: the RFilist_head (containing next and prev pointers)
  *
  * This is used as the head of a linked list.
  * Example:
  *	struct parent {
  *		const char *name;
- *		struct RF_ILHead children;
+ *		struct RFilist_head children;
  *		unsigned int num_children;
  *	};
  */
-typedef struct RF_ILHead
+typedef struct RFilist_head
 {
-	struct RF_ILNode n;
-}RF_ILHead;
+	struct RFilist_node n;
+}RFilist_head;
 
 /**
  * rf_ilist_check - check head of a list for consistency
- * @h: the RF_ILHead
+ * @h: the RFilist_head
  * @abortstr: the location to print on aborting, or NULL.
  *
- * Because RF_ILNodes have redundant information, consistency checking between
+ * Because RFilist_nodes have redundant information, consistency checking between
  * the back and forward links can be done.  This is useful as a debugging check.
  * If @abortstr is non-NULL, that will be printed in a diagnostic if the list
  * is inconsistent, and the function will abort.
@@ -80,11 +80,11 @@ typedef struct RF_ILHead
  *		printf(" -> %s\n", c->name);
  *	}
  */
-struct RF_ILHead *rf_ilist_check(const struct RF_ILHead *h, const char *abortstr);
+struct RFilist_head *rf_ilist_check(const struct RFilist_head *h, const char *abortstr);
 
 /**
  * rf_ilist_check_node - check node of a list for consistency
- * @n: the RF_ILNode
+ * @n: the RFilist_node
  * @abortstr: the location to print on aborting, or NULL.
  *
  * Check consistency of the list node is in (it must be in one).
@@ -98,7 +98,7 @@ struct RF_ILHead *rf_ilist_check(const struct RF_ILHead *h, const char *abortstr
  *		printf("%s\n", c->name);
  *	}
  */
-struct RF_ILNode *rf_ilist_check_node(const struct RF_ILNode *n,
+struct RFilist_node *rf_ilist_check_node(const struct RFilist_node *n,
                                      const char *abortstr);
 
 #ifdef RF_OPTION_DEBUG
@@ -110,7 +110,7 @@ struct RF_ILNode *rf_ilist_check_node(const struct RF_ILNode *n,
 #endif
 
 /**
- * RF_ILHEAD_INIT - initializer for an empty RF_ILHead
+ * RF_ILHEAD_INIT - initializer for an empty RFilist_head
  * @name: the name of the list.
  *
  * Explicit initializer for an empty list.
@@ -119,16 +119,16 @@ struct RF_ILNode *rf_ilist_check_node(const struct RF_ILNode *n,
  *	RF_ILHEAD, rf_ilhead_init()
  *
  * Example:
- *	static struct RF_ILHead my_list = RF_ILHEAD_INIT(my_list);
+ *	static struct RFilist_head my_list = RF_ILHEAD_INIT(my_list);
  */
 #define RF_ILHEAD_INIT(name) { { &name.n, &name.n } }
 
 /**
- * RF_ILHEAD - define and initialize an empty RF_ILHead
+ * RF_ILHEAD - define and initialize an empty RFilist_head
  * @name: the name of the list.
  *
- * The RF_ILHEAD macro defines a RF_ILHead and initializes it to an empty
- * list.  It can be prepended by "static" to define a static RF_ILHead.
+ * The RF_ILHEAD macro defines a RFilist_head and initializes it to an empty
+ * list.  It can be prepended by "static" to define a static RFilist_head.
  *
  * See also:
  *	RF_ILHEAD_INIT, rf_ilist_head_init()
@@ -137,11 +137,11 @@ struct RF_ILNode *rf_ilist_check_node(const struct RF_ILNode *n,
  *	static RF_ILHEAD(my_global_list);
  */
 #define RF_ILHEAD(name) \
-	struct RF_ILHead name = RF_ILHEAD_INIT(name)
+	struct RFilist_head name = RF_ILHEAD_INIT(name)
 
 /**
- * rf_ilist_head_init - initialize a RF_ILHead
- * @h: the RF_ILHead to set to the empty list
+ * rf_ilist_head_init - initialize a RFilist_head
+ * @h: the RFilist_head to set to the empty list
  *
  * Example:
  *	...
@@ -150,17 +150,17 @@ struct RF_ILNode *rf_ilist_check_node(const struct RF_ILNode *n,
  *	rf_ilist_head_init(&parent->children);
  *	parent->num_children = 0;
  */
-static inline void rf_ilist_head_init(struct RF_ILHead *h)
+static inline void rf_ilist_head_init(struct RFilist_head *h)
 {
 	h->n.next = h->n.prev = &h->n;
 }
 
 /**
  * rf_ilist_add - add an entry at the start of a linked list.
- * @h: the RF_ILHead to add the node to
- * @n: the RF_ILNode to add to the list.
+ * @h: the RFilist_head to add the node to
+ * @n: the RFilist_node to add to the list.
  *
- * The RF_ILNode does not need to be initialized; it will be overwritten.
+ * The RFilist_node does not need to be initialized; it will be overwritten.
  * Example:
  *	struct child *child = malloc(sizeof(*child));
  *
@@ -168,7 +168,7 @@ static inline void rf_ilist_head_init(struct RF_ILHead *h)
  *	rf_ilist_add(&parent->children, &child->list);
  *	parent->num_children++;
  */
-static inline void rf_ilist_add(struct RF_ILHead *h, struct RF_ILNode *n)
+static inline void rf_ilist_add(struct RFilist_head *h, struct RFilist_node *n)
 {
 	n->next = h->n.next;
 	n->prev = &h->n;
@@ -179,15 +179,15 @@ static inline void rf_ilist_add(struct RF_ILHead *h, struct RF_ILNode *n)
 
 /**
  * rf_ilist_add_tail - add an entry at the end of a linked list.
- * @h: the RF_ILHead to add the node to
- * @n: the RF_ILNode to add to the list.
+ * @h: the RFilist_head to add the node to
+ * @n: the RFilist_node to add to the list.
  *
- * The RF_ILNode does not need to be initialized; it will be overwritten.
+ * The RFilist_node does not need to be initialized; it will be overwritten.
  * Example:
  *	rf_ilist_add_tail(&parent->children, &child->list);
  *	parent->num_children++;
  */
-static inline void rf_ilist_add_tail(struct RF_ILHead *h, struct RF_ILNode *n)
+static inline void rf_ilist_add_tail(struct RFilist_head *h, struct RFilist_node *n)
 {
 	n->next = &h->n;
 	n->prev = h->n.prev;
@@ -198,14 +198,14 @@ static inline void rf_ilist_add_tail(struct RF_ILHead *h, struct RF_ILNode *n)
 
 /**
  * rf_ilist_is_empty - is a list empty?
- * @h: the RF_ILHead
+ * @h: the RFilist_head
  *
  * If the list is empty, returns true.
  *
  * Example:
  *	assert(rf_ilist_is_empty(&parent->children) == (parent->num_children == 0));
  */
-static inline bool rf_ilist_is_empty(const struct RF_ILHead *h)
+static inline bool rf_ilist_is_empty(const struct RFilist_head *h)
 {
 	(void)rf_ilist_debug(h);
 	return h->n.next == &h->n;
@@ -213,7 +213,7 @@ static inline bool rf_ilist_is_empty(const struct RF_ILHead *h)
 
 /**
  * rf_ilist_delete - delete an entry from an (unknown) linked list.
- * @n: the RF_ILNode to delete from the list.
+ * @n: the RFilist_node to delete from the list.
  *
  * Note that this leaves @n in an undefined state; it can be added to
  * another list, but not deleted again.
@@ -225,7 +225,7 @@ static inline bool rf_ilist_is_empty(const struct RF_ILHead *h)
  *	rf_ilist_delete(&child->list);
  *	parent->num_children--;
  */
-static inline void rf_ilist_delete(struct RF_ILNode *n)
+static inline void rf_ilist_delete(struct RFilist_node *n)
 {
 	(void)rf_ilist_debug_node(n);
 	n->next->prev = n->prev;
@@ -238,8 +238,8 @@ static inline void rf_ilist_delete(struct RF_ILNode *n)
 
 /**
  * rf_ilist_delete_from - delete an entry from a known linked list.
- * @h: the RF_ILHead the node is in.
- * @n: the RF_ILNode to delete from the list.
+ * @h: the RFilist_head the node is in.
+ * @n: the RFilist_node to delete from the list.
  *
  * This explicitly indicates which list a node is expected to be in,
  * which is better documentation and can catch more bugs.
@@ -250,12 +250,12 @@ static inline void rf_ilist_delete(struct RF_ILNode *n)
  *	rf_ilist_delete_from(&parent->children, &child->list);
  *	parent->num_children--;
  */
-static inline void rf_ilist_delete_from(struct RF_ILHead *h, struct RF_ILNode *n)
+static inline void rf_ilist_delete_from(struct RFilist_head *h, struct RFilist_node *n)
 {
 #ifdef RF_OPTION_DEBUG
 	{
 		/* Thorough check: make sure it was in list! */
-		struct RF_ILNode *i;
+		struct RFilist_node *i;
 		for (i = h->n.next; i != n; i = i->next)
 			assert(i != &h->n);
 	}
@@ -267,10 +267,10 @@ static inline void rf_ilist_delete_from(struct RF_ILHead *h, struct RF_ILNode *n
 }
 
 /**
- * rf_ilist_entry - convert a RF_ILNode back into the structure containing it.
- * @n: the RF_ILNode
+ * rf_ilist_entry - convert a RFilist_node back into the structure containing it.
+ * @n: the RFilist_node
  * @type: the type of the entry
- * @member: the RF_ILNode member of the type
+ * @member: the RFilist_node member of the type
  *
  * Example:
  *	// First list entry is children.next; convert back to child.
@@ -283,9 +283,9 @@ static inline void rf_ilist_delete_from(struct RF_ILHead *h, struct RF_ILNode *n
 
 /**
  * rf_ilist_top - get the first entry in a list
- * @h: the RF_ILHead
+ * @h: the RFilist_head
  * @type: the type of the entry
- * @member: the RF_ILNode member of the type
+ * @member: the RFilist_node member of the type
  *
  * If the list is empty, returns NULL.
  *
@@ -298,7 +298,7 @@ static inline void rf_ilist_delete_from(struct RF_ILHead *h, struct RF_ILNode *n
 #define rf_ilist_top(h, type, member)					\
 	((type *)rf_ilist_top_((h), rf_ilist_off(type, member)))
 
-static inline const void *rf_ilist_top_(const struct RF_ILHead *h, size_t off)
+static inline const void *rf_ilist_top_(const struct RFilist_head *h, size_t off)
 {
 	if (rf_ilist_is_empty(h))
 		return NULL;
@@ -307,9 +307,9 @@ static inline const void *rf_ilist_top_(const struct RF_ILHead *h, size_t off)
 
 /**
  * rf_ilist_pop - remove the first entry in a list
- * @h: the RF_ILHead
+ * @h: the RFilist_head
  * @type: the type of the entry
- * @member: the RF_ILNode member of the type
+ * @member: the RFilist_node member of the type
  *
  * If the list is empty, returns NULL.
  *
@@ -322,9 +322,9 @@ static inline const void *rf_ilist_top_(const struct RF_ILHead *h, size_t off)
 #define rf_ilist_pop(h, type, member)					\
 	((type *)rf_ilist_pop_((h), rf_ilist_off(type, member)))
 
-static inline const void *rf_ilist_pop_(const struct RF_ILHead *h, size_t off)
+static inline const void *rf_ilist_pop_(const struct RFilist_head *h, size_t off)
 {
-	struct RF_ILNode *n;
+	struct RFilist_node *n;
 
 	if (rf_ilist_is_empty(h))
 		return NULL;
@@ -335,9 +335,9 @@ static inline const void *rf_ilist_pop_(const struct RF_ILHead *h, size_t off)
 
 /**
  * rf_ilist_tail - get the last entry in a list
- * @h: the RF_ILHead
+ * @h: the RFilist_head
  * @type: the type of the entry
- * @member: the RF_ILNode member of the type
+ * @member: the RFilist_node member of the type
  *
  * If the list is empty, returns NULL.
  *
@@ -350,7 +350,7 @@ static inline const void *rf_ilist_pop_(const struct RF_ILHead *h, size_t off)
 #define rf_ilist_tail(h, type, member) \
 	((type *)rf_ilist_tail_((h), rf_ilist_off(type, member)))
 
-static inline const void *rf_ilist_tail_(const struct RF_ILHead *h, size_t off)
+static inline const void *rf_ilist_tail_(const struct RFilist_head *h, size_t off)
 {
 	if (rf_ilist_is_empty(h))
 		return NULL;
@@ -359,9 +359,9 @@ static inline const void *rf_ilist_tail_(const struct RF_ILHead *h, size_t off)
 
 /**
  * rf_ilist_for_each - iterate through a list.
- * @h: the RF_ILHead (warning: evaluated multiple times!)
- * @i: the structure containing the RF_ILNode
- * @member: the RF_ILNode member of the structure
+ * @h: the RFilist_head (warning: evaluated multiple times!)
+ * @i: the structure containing the RFilist_node
+ * @member: the RFilist_node member of the structure
  *
  * This is a convenient wrapper to iterate @i over the entire list.  It's
  * a for loop, so you can break and continue as normal.
@@ -375,9 +375,9 @@ static inline const void *rf_ilist_tail_(const struct RF_ILHead *h, size_t off)
 
 /**
  * rf_ilist_for_each_rev - iterate through a list backwards.
- * @h: the RF_ILHead
- * @i: the structure containing the RF_ILNode
- * @member: the RF_ILNode member of the structure
+ * @h: the RFilist_head
+ * @i: the structure containing the RFilist_node
+ * @member: the RFilist_node member of the structure
  *
  * This is a convenient wrapper to iterate @i over the entire list.  It's
  * a for loop, so you can break and continue as normal.
@@ -393,10 +393,10 @@ static inline const void *rf_ilist_tail_(const struct RF_ILHead *h, size_t off)
 
 /**
  * rf_ilist_for_each_safe - iterate through a list, maybe during deletion
- * @h: the RF_ILHead
- * @i: the structure containing the RF_ILNode
- * @nxt: the structure containing the RF_ILNode
- * @member: the RF_ILNode member of the structure
+ * @h: the RFilist_head
+ * @i: the structure containing the RFilist_node
+ * @nxt: the structure containing the RFilist_node
+ * @member: the RFilist_node member of the structure
  *
  * This is a convenient wrapper to iterate @i over the entire list.  It's
  * a for loop, so you can break and continue as normal.  The extra variable
@@ -421,17 +421,17 @@ static inline const void *rf_ilist_tail_(const struct RF_ILHead *h, size_t off)
  * @to.  After this @from will be empty.
  *
  * Example:
- *	struct RF_ILHead adopter;
+ *	struct RFilist_head adopter;
  *
  *	rf_ilist_append_list(&adopter, &parent->children);
  *	assert(rf_ilist_is_empty(&parent->children));
  *	parent->num_children = 0;
  */
-static inline void rf_ilist_append_list(struct RF_ILHead *to,
-                                       struct RF_ILHead *from)
+static inline void rf_ilist_append_list(struct RFilist_head *to,
+                                       struct RFilist_head *from)
 {
-	struct RF_ILNode *from_tail = rf_ilist_debug(from)->n.prev;
-	struct RF_ILNode *to_tail = rf_ilist_debug(to)->n.prev;
+	struct RFilist_node *from_tail = rf_ilist_debug(from)->n.prev;
+	struct RFilist_node *to_tail = rf_ilist_debug(to)->n.prev;
 
 	/* Sew in head and entire list. */
 	to->n.prev = from_tail;
@@ -457,11 +457,11 @@ static inline void rf_ilist_append_list(struct RF_ILHead *to,
  *	assert(rf_ilist_is_empty(&parent->children));
  *	parent->num_children = 0;
  */
-static inline void rf_ilist_prepend_list(struct RF_ILHead *to,
-                                       struct RF_ILHead *from)
+static inline void rf_ilist_prepend_list(struct RFilist_head *to,
+                                       struct RFilist_head *from)
 {
-	struct RF_ILNode *from_tail = rf_ilist_debug(from)->n.prev;
-	struct RF_ILNode *to_head = rf_ilist_debug(to)->n.next;
+	struct RFilist_node *from_tail = rf_ilist_debug(from)->n.prev;
+	struct RFilist_node *to_head = rf_ilist_debug(to)->n.next;
 
 	/* Sew in head and entire list. */
 	to->n.next = &from->n;
@@ -476,7 +476,7 @@ static inline void rf_ilist_prepend_list(struct RF_ILHead *to,
 
 /**
  * rf_ilist_for_each_off - iterate through a list of memory regions.
- * @h: the RF_ILHead
+ * @h: the RFilist_head
  * @i: the pointer to a memory region wich contains list node data.
  * @off: offset(relative to @i) at which list node data resides.
  *
@@ -494,7 +494,7 @@ static inline void rf_ilist_prepend_list(struct RF_ILHead *to,
  * caveat emptor.
  *
  * It is worth mentioning that one of legitimate use-cases for that wrapper
- * is operation on opaque types with known offset for `struct RF_ILNode'
+ * is operation on opaque types with known offset for `struct RFilist_node'
  * member(preferably 0), because it allows you not to disclose the type of
  * @i.
  *
@@ -512,12 +512,12 @@ static inline void rf_ilist_prepend_list(struct RF_ILHead *to,
 /**
  * rf_ilist_for_each_safe_off - iterate through a list of memory regions, maybe
  * during deletion
- * @h: the RF_ILHead
+ * @h: the RFilist_head
  * @i: the pointer to a memory region wich contains list node data.
- * @nxt: the structure containing the RF_ILNode
+ * @nxt: the structure containing the RFilist_node
  * @off: offset(relative to @i) at which list node data resides.
  *
- * For details see `rfIList_ForEach_off' and `rfIList_ForEach_safe'
+ * For details see `rf_ilist_for_each_off' and `rf_ilist_for_each_safe'
  * descriptions.
  *
  * Example:
@@ -555,22 +555,22 @@ static inline void rf_ilist_prepend_list(struct RF_ILHead *to,
     rf_ilist_delete_from(h, rf_ilist_node_from_off((n), (off)))
 
 /* Offset helper functions so we only single-evaluate. */
-static inline void *rf_ilist_node_to_off(struct RF_ILNode *node, size_t off)
+static inline void *rf_ilist_node_to_off(struct RFilist_node *node, size_t off)
 {
 	return (void *)((char *)node - off);
 }
-static inline struct RF_ILNode *rf_ilist_node_from_off(void *ptr, size_t off)
+static inline struct RFilist_node *rf_ilist_node_from_off(void *ptr, size_t off)
 {
-	return (struct RF_ILNode *)((char *)ptr + off);
+	return (struct RFilist_node *)((char *)ptr + off);
 }
 
-/* Get the offset of the member, but make sure it's a RF_ILNode. */
+/* Get the offset of the member, but make sure it's a RFilist_node. */
 #define rf_ilist_off(type, member)      \
     (container_off(type, member) +                    \
-     check_type(((type *)0)->member, struct RF_ILNode))
+     check_type(((type *)0)->member, struct RFilist_node))
 
 #define rf_ilist_off_var(var, member)           \
     (container_off_var(var, member) +           \
-     check_type(var->member, struct RF_ILNode))
+     check_type(var->member, struct RFilist_node))
 
 #endif // include guards end

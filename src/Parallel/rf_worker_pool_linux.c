@@ -54,7 +54,7 @@ typedef struct WorkerTask {
     //! Pointer to the data passes as argument to the task
     void *task_data;
     //! Node to attach the task to the work queue
-    RF_ILNode ln;
+    RFilist_node ln;
 } RFworker_task;
 
 /* ====== RFworker_task -- End ====== */
@@ -65,11 +65,11 @@ typedef struct WorkerThread {
     //! Posix thread
     pthread_t t;
     //! Work queue
-    RF_ILHead work_queue;
+    RFilist_head work_queue;
     //! Signals that the worker must terminate
     bool must_terminate;
     //! Node to attach the worker to the pool
-    RF_ILNode ln;
+    RFilist_node ln;
 } RFworker_thread;
 
 static void *WorkerLoop(void *t)
@@ -132,7 +132,7 @@ static RFworker_thread *rf_workerthread_create()
 
 typedef struct WorkerPool {
     //! The list of workers
-    RF_ILHead workers_list;
+    RFilist_head workers_list;
     //! The number of worker thread
     int workers_num;
     //! The load of each worker in tasks (always incrementing)
