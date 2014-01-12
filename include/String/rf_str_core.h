@@ -53,6 +53,15 @@ extern "C"
  ** Statically initialize a string
  */
 #define RF_STRING_STATIC_INIT(s_) {s_, sizeof(s_) - 1}
+/**
+ ** Shallow initialization of a string. If the source buffer,
+ ** gets overwritten then the data are lost.
+ **/
+#define RF_STRING_SHALLOW_INIT(i_string, i_buff, i_len)  \
+    do{                                                  \
+        (i_string)->data = i_buff;                       \
+        (i_string)->length = i_len;                      \
+    }while(0)
 
 /**
  ** @brief Allocates and returns a string with the given characters
@@ -62,7 +71,7 @@ extern "C"
  ** @lmsFunction
  ** @param s                      The sequence of bytes for the characters
  **                               in UTF-8 (the default).
-v ** @param ... \rfoptional{nothing}  Depending on the string literal,
+ ** @param ... \rfoptional{nothing}  Depending on the string literal,
  ** the function may expect a sequence of additional arguments,
  ** each containing one value to be inserted instead of each %-tag
  ** specified in the @c slit parameter, if any. There should be
@@ -359,6 +368,15 @@ i_DECLIMEX_ bool rf_string_copy_in(struct RFstring* dst, const void* src);
  **/
 i_DECLIMEX_ bool rf_string_copy_chars(struct RFstring* dst, const void* src,
                                      uint32_t n);
+
+/**
+ ** @brief Shallow initialization of an RFstring from an RFstringx
+ **/
+#define RF_STRING_SHALLOW_COPY(i_dst, i_src)                            \
+    do {                                                                \
+        rf_string_data(i_dst) = rf_string_data(i_src);                  \
+        rf_string_length_bytes(i_dst) = rf_string_length_bytes(i_src);  \
+    }while(0)
 
 //! @}
 

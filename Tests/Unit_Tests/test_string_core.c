@@ -23,7 +23,7 @@ START_TEST(test_string_init) {
 }END_TEST
 
 START_TEST(test_string_initv) {
-    struct RFstring s;
+    struct RFstring s, s2;
     ck_assert(
         rf_string_initv(&s,
                         "%s %d %.3f %u",
@@ -33,6 +33,10 @@ START_TEST(test_string_initv) {
     ck_assert_rf_str_eq_cstr(&s,
                              "Printf style initialization 1337 3.142 912341");
     ck_assert(!rf_string_initv(&s, NULL));
+
+    RF_STRING_SHALLOW_INIT(&s2, rf_string_data(&s), rf_string_length(&s));
+    ck_assert_rf_str_eq_cstr(&s2,
+                             "Printf style initialization 1337 3.142 912341");
 
     rf_string_deinit(&s);
 }END_TEST
@@ -177,7 +181,7 @@ START_TEST(test_string_assign_unsafe_nnt) {
 /* --- String Copying Tests --- START --- */
 
 START_TEST(test_string_copy_in) {
-    struct RFstring s, s2;
+    struct RFstring s, s2, s3;
 
     ck_assert(rf_string_init(
                   &s,
@@ -187,6 +191,9 @@ START_TEST(test_string_copy_in) {
     ck_assert(rf_string_copy_in(&s2, &s));
     ck_assert_rf_str_eq_cstr(
         &s2, "Robot rock, Time of your life, Human after all");
+    RF_STRING_SHALLOW_COPY(&s3, &s);
+    ck_assert_rf_str_eq_cstr(
+        &s3, "Robot rock, Time of your life, Human after all");
 
     ck_assert(!rf_string_copy_in(&s2, NULL));
 
@@ -685,7 +692,6 @@ START_TEST(test_stringx_copy_chars) {
 
 START_TEST(test_stringx_shallow_copies) {
     struct RFstringx s, s2;
-    struct RFstring s3;
 
     ck_assert(rf_stringx_init(
                   &s,
@@ -694,9 +700,6 @@ START_TEST(test_stringx_shallow_copies) {
 
     RF_STRINGX_SHALLOW_COPY(&s2, &s);
     ck_assert_rf_str_eq_cstr(&s2, "Robot rock, Time of your life, Human after all");
-
-    RF_STRING_SHALLOW_INIT_FROM_STRINGX(&s3, &s);
-    ck_assert_rf_str_eq_cstr(&s3, "Robot rock, Time of your life, Human after all");
 
     rf_stringx_deinit(&s);
 }END_TEST
