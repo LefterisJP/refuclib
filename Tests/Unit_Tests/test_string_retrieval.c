@@ -265,9 +265,10 @@ START_TEST(test_string_ends_with) {
 }END_TEST
 
 START_TEST(test_string_count) {
-    struct RFstring s;
+    struct RFstring s, s2;
     struct RFstring f1, f2, f3;
 
+    const struct RFstring f4 = RF_STRING_STATIC_INIT("i");
     ck_assert(rf_string_init(
                   &s,
                   "【ワシントン＝行方史郎】ハリケーン「サンディ」の影響で"
@@ -285,10 +286,13 @@ START_TEST(test_string_count) {
                   "ＮＲＣが定めた４段階の緊急態勢のうち下から２番目の「警"
                   "戒」を宣言して事態を注視している。")
     );
+    ck_assert(rf_string_init(&s2, "Simple ascii count of 'i'"));
 
     ck_assert(rf_string_init(&f1, "ニューヨーク"));
     ck_assert(rf_string_init(&f2, "州"));
     ck_assert(rf_string_init(&f3, "東京"));
+
+    ck_assert_uint_eq(4, rf_string_count(&s2, &f4, 0));
 
     ck_assert_uint_eq(2, rf_string_count(&s, &f1, 0));
     ck_assert_uint_eq(5, rf_string_count(&s, &f2, 0));
@@ -298,6 +302,7 @@ START_TEST(test_string_count) {
     ck_assert_uint_eq(0 ,rf_string_count(&s, NULL, 0));
 
     rf_string_deinit(&s);
+    rf_string_deinit(&s2);
 
     rf_string_deinit(&f1);
     rf_string_deinit(&f2);
@@ -403,12 +408,12 @@ START_TEST(test_string_beforev) {
                   &s,
                   "<meta name=\"application-name\" content=\"BBC News\" />")
     );
-    
+
     ck_assert(rf_string_init(&f1, "/>"));
     ck_assert(rf_string_init(&f2, "\" "));
     ck_assert(rf_string_init(&f3, "not in there"));
     ck_assert(rf_string_init(&f4, "not in there either"));
-    
+
     ck_assert(rf_string_beforev(&s, &ret, 0, 2, &f1, &f2));
     ck_assert_rf_str_eq_cstr(&ret, "<meta name=\"application-name");
 
@@ -424,7 +429,7 @@ START_TEST(test_string_beforev) {
     rf_string_deinit(&f3);
     rf_string_deinit(&f4);
     rf_string_deinit(&ret);
-    
+
 }END_TEST
 
 START_TEST(test_string_before) {
@@ -443,7 +448,7 @@ START_TEST(test_string_before) {
 
     ck_assert(rf_string_init(&f1, "は"));
     ck_assert(rf_string_init(&f2, "東京"));
-   
+
     ck_assert(rf_string_before(&s, &f1 ,&ret, 0));
     ck_assert_rf_str_eq_cstr(&ret, "神奈川県の黒岩知事");
     /* f2 is not a substring */
@@ -481,7 +486,7 @@ START_TEST(test_string_after) {
         "結集を図ろうとしていることについて、「政策なんかどう"
         "でもいいという、ある種の暴論だ」と痛烈に批判した"
     );
-        
+
     /* no spaces so RF_MATCH_WORD leads to failure */
     ck_assert(!rf_string_after(&s ,&f1, &ret, RF_MATCH_WORD));
     /* substring not in main string */
@@ -529,7 +534,7 @@ START_TEST(test_string_afterv) {
     rf_string_deinit(&f3);
     rf_stringx_deinit(&ret);
     rf_string_deinit(&ret2);
-    
+
 }END_TEST
 
 Suite *string_retrieval_suite_create(void)

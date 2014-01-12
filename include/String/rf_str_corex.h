@@ -225,6 +225,26 @@ i_DECLIMEX_ bool rf_stringx_from_string_in(struct RFstringx* dst,
 
 
 /**
+ ** @brief Shallow copy of 2 RFstringx
+ **/
+#define RF_STRINGX_SHALLOW_COPY(i_dst, i_src)                           \
+    do {                                                                \
+        rf_string_data(i_dst) = rf_string_data(i_src);                  \
+        rf_string_length_bytes(i_dst) = rf_string_length_bytes(i_src);  \
+        (i_dst)->bSize = (i_src)->bSize;                                \
+        (i_dst)->bIndex = (i_src)->bIndex;                              \
+    }while(0)
+
+/**
+ ** @brief Shallow initialization of an RFstring from an RFstringx
+ **/
+#define RF_STRING_SHALLOW_INIT_FROM_STRINGX(i_dst, i_src)               \
+    do {                                                                \
+        rf_string_data(i_dst) = rf_string_data(i_src);                  \
+        rf_string_length_bytes(i_dst) = rf_string_length_bytes(i_src);  \
+    }while(0)
+
+/**
  ** @brief Creates a copy of an extended String and returns it
  **
  ** Also note that the source RFstringx is not @c const unlike the

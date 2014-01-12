@@ -169,7 +169,7 @@ START_TEST(test_string_assign_unsafe_nnt) {
 
     /* invalid input */
     ck_assert(!rf_string_assign_unsafe_nnt(&s, NULL, 1));
-    
+
     rf_string_deinit(&s);
 }END_TEST
 /* --- String Assignment Tests --- END --- */
@@ -299,7 +299,7 @@ START_TEST(test_string_iterate) {
         "よる国際試合"
     );
     ck_assert(rf_string_init(&s, cstr));
-    
+
     rf_string_iterate_start(&s, i, c)
     if( i >= START_OF_UNICODE_INDEX) {
         switch(i) {
@@ -326,7 +326,7 @@ START_TEST(test_string_iterate) {
         ck_assert_int_eq(c, cstr[i]);
     }
     rf_string_iterate_end(i)
-    
+
     rf_string_deinit(&s);
 }END_TEST
 
@@ -341,7 +341,7 @@ START_TEST(test_string_iterate_backwards) {
         "よる国際試合"
     );
     ck_assert(rf_string_init(&s, cstr));
-    
+
     i = rf_string_length_bytes(&s);
     rf_string_iterate_b_start(&s, i, c)
     if( i >= START_OF_UNICODE_INDEX) {
@@ -369,7 +369,7 @@ START_TEST(test_string_iterate_backwards) {
         ck_assert_int_eq(c, cstr[i]);
     }
     rf_string_iterate_b_end(i)
-    
+
     rf_string_deinit(&s);
 }END_TEST
 #undef START_OF_UNICODE_INDEX
@@ -613,7 +613,7 @@ START_TEST(test_stringx_assign_unsafe_nnt) {
 
     /* invalid input */
     ck_assert(!rf_stringx_assign_unsafe_nnt(&s, NULL, 1));
-    
+
     rf_stringx_deinit(&s);
 }END_TEST
 
@@ -682,6 +682,24 @@ START_TEST(test_stringx_copy_chars) {
     rf_stringx_deinit(&s2);
     rf_stringx_deinit(&s3);
 }END_TEST
+
+START_TEST(test_stringx_shallow_copies) {
+    struct RFstringx s, s2;
+    struct RFstring s3;
+
+    ck_assert(rf_stringx_init(
+                  &s,
+                  "Robot rock, Time of your life, Human after all")
+    );
+
+    RF_STRINGX_SHALLOW_COPY(&s2, &s);
+    ck_assert_rf_str_eq_cstr(&s2, "Robot rock, Time of your life, Human after all");
+
+    RF_STRING_SHALLOW_INIT_FROM_STRINGX(&s3, &s);
+    ck_assert_rf_str_eq_cstr(&s3, "Robot rock, Time of your life, Human after all");
+
+    rf_stringx_deinit(&s);
+}END_TEST
 /* --- Stringx Copying Tests --- END --- */
 
 
@@ -734,7 +752,7 @@ Suite *string_core_suite_create(void)
     tcase_add_test(string_misc, test_string_bytepos_to_charpos);
     tcase_add_test(string_misc, test_string_iterate);
     tcase_add_test(string_misc, test_string_iterate_backwards);
-    
+
 
 
     TCase *stringx_init = tcase_create("Stringx Initialization");
@@ -764,6 +782,8 @@ Suite *string_core_suite_create(void)
                               teardown_string_tests);
     tcase_add_test(stringx_copy, test_stringx_copy_in);
     tcase_add_test(stringx_copy, test_stringx_copy_chars);
+    tcase_add_test(stringx_copy, test_stringx_shallow_copies);
+
 
     suite_add_tcase(s, string_init);
     suite_add_tcase(s, string_assign);

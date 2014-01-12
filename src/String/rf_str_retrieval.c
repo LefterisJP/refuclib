@@ -188,7 +188,7 @@ int rf_string_count(const void* tstr, const void* sstr,
     s = strstr_nnt(s, len, rf_string_data(sstr), rf_string_length_bytes(sstr));
     while(s) {
         n ++;
-        len -= (prs - s) + rf_string_length_bytes(sstr);
+        len -= (s - prs) + rf_string_length_bytes(sstr);
         s += rf_string_length_bytes(sstr);
         prs = s;
         s = strstr_nnt(s, len, rf_string_data(sstr), rf_string_length_bytes(sstr));
