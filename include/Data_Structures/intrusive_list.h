@@ -18,6 +18,7 @@
 #include <assert.h>
 #include <Utils/container_of.h>
 #include <Utils/check_type.h>
+#include <Definitions/inline.h>
 
 /**
  * struct RFilist_node - an entry in a doubly-linked list
@@ -150,7 +151,7 @@ struct RFilist_node *rf_ilist_check_node(const struct RFilist_node *n,
  *	rf_ilist_head_init(&parent->children);
  *	parent->num_children = 0;
  */
-static inline void rf_ilist_head_init(struct RFilist_head *h)
+i_INLINE_DECL void rf_ilist_head_init(struct RFilist_head *h)
 {
 	h->n.next = h->n.prev = &h->n;
 }
@@ -168,7 +169,7 @@ static inline void rf_ilist_head_init(struct RFilist_head *h)
  *	rf_ilist_add(&parent->children, &child->list);
  *	parent->num_children++;
  */
-static inline void rf_ilist_add(struct RFilist_head *h, struct RFilist_node *n)
+i_INLINE_DECL void rf_ilist_add(struct RFilist_head *h, struct RFilist_node *n)
 {
 	n->next = h->n.next;
 	n->prev = &h->n;
@@ -187,7 +188,7 @@ static inline void rf_ilist_add(struct RFilist_head *h, struct RFilist_node *n)
  *	rf_ilist_add_tail(&parent->children, &child->list);
  *	parent->num_children++;
  */
-static inline void rf_ilist_add_tail(struct RFilist_head *h, struct RFilist_node *n)
+i_INLINE_DECL void rf_ilist_add_tail(struct RFilist_head *h, struct RFilist_node *n)
 {
 	n->next = &h->n;
 	n->prev = h->n.prev;
@@ -205,7 +206,7 @@ static inline void rf_ilist_add_tail(struct RFilist_head *h, struct RFilist_node
  * Example:
  *	assert(rf_ilist_is_empty(&parent->children) == (parent->num_children == 0));
  */
-static inline bool rf_ilist_is_empty(const struct RFilist_head *h)
+i_INLINE_DECL bool rf_ilist_is_empty(const struct RFilist_head *h)
 {
 	(void)rf_ilist_debug(h);
 	return h->n.next == &h->n;
@@ -225,7 +226,7 @@ static inline bool rf_ilist_is_empty(const struct RFilist_head *h)
  *	rf_ilist_delete(&child->list);
  *	parent->num_children--;
  */
-static inline void rf_ilist_delete(struct RFilist_node *n)
+i_INLINE_DECL void rf_ilist_delete(struct RFilist_node *n)
 {
 	(void)rf_ilist_debug_node(n);
 	n->next->prev = n->prev;
@@ -250,7 +251,7 @@ static inline void rf_ilist_delete(struct RFilist_node *n)
  *	rf_ilist_delete_from(&parent->children, &child->list);
  *	parent->num_children--;
  */
-static inline void rf_ilist_delete_from(struct RFilist_head *h, struct RFilist_node *n)
+i_INLINE_DECL void rf_ilist_delete_from(struct RFilist_head *h, struct RFilist_node *n)
 {
 #ifdef RF_OPTION_DEBUG
 	{
@@ -298,7 +299,7 @@ static inline void rf_ilist_delete_from(struct RFilist_head *h, struct RFilist_n
 #define rf_ilist_top(h, type, member)					\
 	((type *)rf_ilist_top_((h), rf_ilist_off(type, member)))
 
-static inline const void *rf_ilist_top_(const struct RFilist_head *h, size_t off)
+i_INLINE_DECL const void *rf_ilist_top_(const struct RFilist_head *h, size_t off)
 {
 	if (rf_ilist_is_empty(h))
 		return NULL;
@@ -322,7 +323,7 @@ static inline const void *rf_ilist_top_(const struct RFilist_head *h, size_t off
 #define rf_ilist_pop(h, type, member)					\
 	((type *)rf_ilist_pop_((h), rf_ilist_off(type, member)))
 
-static inline const void *rf_ilist_pop_(const struct RFilist_head *h, size_t off)
+i_INLINE_DECL const void *rf_ilist_pop_(const struct RFilist_head *h, size_t off)
 {
 	struct RFilist_node *n;
 
@@ -350,7 +351,7 @@ static inline const void *rf_ilist_pop_(const struct RFilist_head *h, size_t off
 #define rf_ilist_tail(h, type, member) \
 	((type *)rf_ilist_tail_((h), rf_ilist_off(type, member)))
 
-static inline const void *rf_ilist_tail_(const struct RFilist_head *h, size_t off)
+i_INLINE_DECL const void *rf_ilist_tail_(const struct RFilist_head *h, size_t off)
 {
 	if (rf_ilist_is_empty(h))
 		return NULL;
@@ -427,7 +428,7 @@ static inline const void *rf_ilist_tail_(const struct RFilist_head *h, size_t of
  *	assert(rf_ilist_is_empty(&parent->children));
  *	parent->num_children = 0;
  */
-static inline void rf_ilist_append_list(struct RFilist_head *to,
+i_INLINE_DECL void rf_ilist_append_list(struct RFilist_head *to,
                                        struct RFilist_head *from)
 {
 	struct RFilist_node *from_tail = rf_ilist_debug(from)->n.prev;
@@ -457,7 +458,7 @@ static inline void rf_ilist_append_list(struct RFilist_head *to,
  *	assert(rf_ilist_is_empty(&parent->children));
  *	parent->num_children = 0;
  */
-static inline void rf_ilist_prepend_list(struct RFilist_head *to,
+i_INLINE_DECL void rf_ilist_prepend_list(struct RFilist_head *to,
                                        struct RFilist_head *from)
 {
 	struct RFilist_node *from_tail = rf_ilist_debug(from)->n.prev;
@@ -555,11 +556,11 @@ static inline void rf_ilist_prepend_list(struct RFilist_head *to,
     rf_ilist_delete_from(h, rf_ilist_node_from_off((n), (off)))
 
 /* Offset helper functions so we only single-evaluate. */
-static inline void *rf_ilist_node_to_off(struct RFilist_node *node, size_t off)
+i_INLINE_DECL void *rf_ilist_node_to_off(struct RFilist_node *node, size_t off)
 {
 	return (void *)((char *)node - off);
 }
-static inline struct RFilist_node *rf_ilist_node_from_off(void *ptr, size_t off)
+i_INLINE_DECL struct RFilist_node *rf_ilist_node_from_off(void *ptr, size_t off)
 {
 	return (struct RFilist_node *)((char *)ptr + off);
 }
