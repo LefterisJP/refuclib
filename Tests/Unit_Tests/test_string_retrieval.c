@@ -243,6 +243,26 @@ START_TEST(test_string_begins_with) {
     rf_string_deinit(&f2);
 }END_TEST
 
+START_TEST(test_string_begins_with_any) {
+    struct RFstring s, s2;
+    static const struct RFstring chars1 = RF_STRING_STATIC_INIT(" \t");
+    static const struct RFstring chars2 = RF_STRING_STATIC_INIT(" π影");
+    unsigned int bytes;
+
+    ck_assert(rf_string_init(&s, " \t    \t eleos"));
+    ck_assert(rf_string_init(&s2, " 影 π π eleos2"));
+
+    ck_assert_int_eq(8, rf_string_begins_with_any(&s, &chars1, 0));
+    ck_assert_int_eq(8, rf_string_begins_with_any(&s, &chars1, &bytes));
+    ck_assert_int_eq(8, bytes);
+
+    ck_assert_int_eq(7, rf_string_begins_with_any(&s2, &chars2, &bytes));
+    ck_assert_int_eq(11, bytes);
+
+    rf_string_deinit(&s);
+    rf_string_deinit(&s2);
+}END_TEST
+
 START_TEST(test_string_ends_with) {
     struct RFstring s;
     struct RFstring f1, f2;
@@ -562,6 +582,7 @@ Suite *string_retrieval_suite_create(void)
     tcase_add_test(string_retrieval, test_string_find);
     tcase_add_test(string_retrieval, test_string_find_i);
     tcase_add_test(string_retrieval, test_string_begins_with);
+    tcase_add_test(string_retrieval, test_string_begins_with_any);
     tcase_add_test(string_retrieval, test_string_ends_with);
     tcase_add_test(string_retrieval, test_string_count);
 

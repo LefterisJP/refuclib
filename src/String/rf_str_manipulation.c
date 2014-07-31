@@ -50,31 +50,6 @@
 #include <stdio.h> // for snprintf
 /*------------- End of includes -------------*/
 
-
-/**
- * A function used to fill in a buffer with characters of a string.
- ** Returns number of unicode characters the array was filled with
-*/
-static inline int fill_codepoints_from_string(const struct RFstring* s)
-{
-    unsigned int i = 0;
-    uint32_t charValue, chars_num;
-    chars_num = rf_string_length(s);
-    if(rf_string_length(s) > rf_buffer_size_u32(TSBUFFA))
-    {
-        if(rf_buffer_increase_u32(TSBUFFA, chars_num * 2))
-        {
-            return -1;
-        }
-
-    }
-    rf_string_iterate_start(s, i, charValue)
-        rf_buffer_ptr_u32(TSBUFFA, i) = charValue;
-    rf_string_iterate_end(i)
-    return chars_num;
-}
-
-
 // Appends the parameter String to this one
 bool rf_string_append(struct RFstring* thisstr, const void* other)
 {
@@ -237,7 +212,7 @@ bool rf_string_keep_only(void* thisstr, const void* keepstr, int *removals)
     }
 
     //get all characters of the string in the array
-    keepLength = fill_codepoints_from_string(keepstr);
+    keepLength = rf_string_fill_codepoints(keepstr);
     if (keepLength < 0 ) {
         return false;
     }
@@ -507,10 +482,9 @@ bool rf_string_prune_middle_f(void* thisstr, uint32_t p,
 bool rf_string_trim_start(void* thisstr, const void* sub, unsigned int *removals)
 {
     bool ret = true;
-    bool iteration_match;
-    uint32_t i = 0, j;
-    uint32_t subLength;
     uint32_t byte_position;
+    unsigned int i;
+    unsigned int matching_chars = 0;
     RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr);
     
@@ -520,41 +494,16 @@ bool rf_string_trim_start(void* thisstr, const void* sub, unsigned int *removals
         goto cleanup;
     }
 
+    matching_chars = rf_string_begins_with_any(thisstr, sub, &byte_position);
+
+
     if (removals) {
-        *removals = 0;
+        *removals = matching_chars;
     }
 
-    //get all the codepoints of the string
-    subLength = fill_codepoints_from_string(sub);
-    if (subLength < 0) {
-        return false;
-    }
-
-    //iterate thisstring from the beginning
-    i = 0;
-    RF_STRING_ITERATE_START(thisstr, i, byte_position)
-        iteration_match = true;
-        //for every substring character
-        for(j = 0; j < subLength; j++) {
-            //if we got a match
-            if(rf_string_bytepos_to_codepoint(thisstr, byte_position) ==
-               rf_buffer_ptr_u32(TSBUFFA, j))
-            {
-                iteration_match = false;
-                if (removals) {
-                    *removals = *removals + 1;
-                }
-                break;
-            }
-        }
-        if (iteration_match) {
-            break;
-        }
-    RF_STRING_ITERATE_END(i, byte_position)
 
     //if we had any match
-    if(ret)
-    {
+    if(matching_chars) {
         //remove the characters
         for(i =0; i < rf_string_length_bytes(thisstr) - byte_position; i++ )
         {
@@ -592,7 +541,7 @@ bool rf_string_trim_end(void* thisstr, const void* sub, unsigned int *removals)
     }
 
     //get all the codepoints of the string
-    subLength = fill_codepoints_from_string(sub);
+    subLength = rf_string_fill_codepoints(sub);
     if (subLength < 0) {
         return false;
     }

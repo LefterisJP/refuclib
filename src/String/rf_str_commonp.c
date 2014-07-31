@@ -223,3 +223,4 @@ i_INLINE_INS bool fill_fmt_buffer(const char* fmt,
 i_INLINE_INS void rf_string_generic_append(void* thisstr,
                                      const char* other,
                                      unsigned int bytes_to_copy);
+i_INLINE_INS int rf_string_fill_codepoints(const struct RFstring* s);

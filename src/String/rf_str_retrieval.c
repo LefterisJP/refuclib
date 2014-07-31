@@ -167,6 +167,52 @@ cleanup1:
     return ret;
 }
 
+unsigned int rf_string_begins_with_any(const void *thisstr,
+                                       const void *chars,
+                                       unsigned int *bytes)
+{
+    bool iteration_match;
+    uint32_t subLength;
+    uint32_t byte_position;
+    unsigned int matching_chars = 0;
+    uint32_t i = 0;
+    uint32_t j = 0;
+
+    RF_ENTER_LOCAL_SCOPE();
+    //get all the codepoints of the string
+    subLength = rf_string_fill_codepoints(chars);
+    if (subLength < 0) {
+        goto cleanup;
+    }
+
+    //iterate this string from the beginning
+    i = 0;
+    RF_STRING_ITERATE_START(thisstr, i, byte_position)
+        iteration_match = true;
+        //for every substring character
+        for(j = 0; j < subLength; j++) {
+            //if we got a match
+            if(rf_string_bytepos_to_codepoint(thisstr, byte_position) ==
+               rf_buffer_ptr_u32(TSBUFFA, j))
+            {
+                iteration_match = false;
+                matching_chars += 1;
+                break;
+            }
+        }
+        if (iteration_match) {
+            break;
+        }
+    RF_STRING_ITERATE_END(i, byte_position)
+
+cleanup:
+    if (bytes) {
+        *bytes = byte_position;
+    }
+    RF_EXIT_LOCAL_SCOPE();
+    return matching_chars;
+}
+
 int rf_string_count(const void* tstr, const void* sstr,
                              enum RFstring_matching_options options)
 {

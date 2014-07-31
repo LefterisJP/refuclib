@@ -55,9 +55,9 @@ static inline bool move_internal_ptr(struct RFstringx* s, int32_t move,
     rf_string_length_bytes(s) -= move;
 
     //also if we want the string returned
-    if(resultP != 0)
+    if (resultP != 0)
     {
-        if(options & RF_STRINGX_ARGUMENT) {
+        if (options & RF_STRINGX_ARGUMENT) {
             struct RFstringx* result = (struct RFstringx*) resultP;
             rf_stringx_reset(result);
             RF_STRINGX_REALLOC(result, move - len, false);
@@ -71,7 +71,7 @@ static inline bool move_internal_ptr(struct RFstringx* s, int32_t move,
             struct RFstring *result = (struct RFstring*) resultP;
             rf_string_length_bytes(result) = move - len;
             rf_string_data(result) = rf_string_data(s) - move;
-        }else {
+        } else {
             struct RFstring* result = (struct RFstring*) resultP;
             if (rf_string_length_bytes(result) > move - len) {
                 RF_REALLOC(rf_string_data(result), char,
@@ -97,8 +97,7 @@ int32_t rf_stringx_move_after(struct RFstringx* thisstr, const void* sub,
     /* rf_string_find_byte_pos takes care of invalid input checking */
 
     //check for substring existence and return failure if not found
-    if((move = rf_string_find_byte_pos(thisstr, sub, options)) == RF_FAILURE)
-    {
+    if((move = rf_string_find_byte_pos(thisstr, sub, options)) == RF_FAILURE) {
         move = RF_FAILURE;
         goto cleanup;
     }
@@ -106,8 +105,7 @@ int32_t rf_stringx_move_after(struct RFstringx* thisstr, const void* sub,
     move += rf_string_length_bytes(sub);
 
     if(!move_internal_ptr(thisstr, move, result,
-                          rf_string_length_bytes(sub), options))
-    {
+                          rf_string_length_bytes(sub), options)) {
         move = RF_FAILURE;
     }
   cleanup:
@@ -121,12 +119,9 @@ void rf_stringx_move_back(struct RFstringx* thisstr, uint32_t n)
     RF_ASSERT(thisstr);
     length = 0;
 
-    while(thisstr->bIndex >0)
-    {
-        if(!rf_utf8_is_continuation_byte(rf_string_data(thisstr)[0]))
-        {
-            if(n == length)
-            {
+    while(thisstr->bIndex >0) {
+        if(!rf_utf8_is_continuation_byte(rf_string_data(thisstr)[0])) {
+            if(n == length) {
                 break;
             }
             length ++;
@@ -167,6 +162,8 @@ void rf_stringx_move_forward(struct RFstringx* thisstr, uint32_t n)
 }
 
 i_INLINE_INS void rf_stringx_move_end(struct RFstringx* s);
+i_INLINE_INS void rf_stringx_move_bytes(struct RFstringx* s,
+                                        int bytes_num);
 
 void rf_stringx_reset(struct RFstringx* thisstr)
 {
@@ -222,6 +219,25 @@ bool rf_stringx_move_afterv(struct RFstringx* thisstr, void* result,
   cleanup:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
+}
+
+unsigned int rf_stringx_skip_chars(struct RFstringx* thisstr,
+                                   const void *chars,
+                                   unsigned int *bytes)
+{
+    uint32_t bytes_to_move;
+    unsigned int chars_skipped;
+
+    chars_skipped = rf_string_begins_with_any(thisstr, chars, &bytes_to_move);
+
+    if (chars_skipped) {
+        rf_stringx_move_bytes(thisstr, bytes_to_move);
+    }
+
+    if (bytes) {
+        *bytes = bytes_to_move;
+    }
+    return chars_skipped;
 }
 
 bool rf_stringx_move_after_pair(struct RFstringx* thisstr, const void* left,

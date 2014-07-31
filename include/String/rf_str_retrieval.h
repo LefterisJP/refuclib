@@ -205,6 +205,26 @@ i_DECLIMEX_ int32_t rf_string_find_i(const void* thisstr, const void* sstr,
         rf_string_find(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_)               \
         == (rf_string_length(i_THISSTR_)-rf_string_length(i_SEARCHSTR_)) )
 
+/**
+ ** @brief Checks if a string begins with any of the specified characters
+ **
+ ** @isinherited{StringX}
+ ** @lmsFunction
+ **
+ ** @param thisstr        This string we want to search in
+ **                       @inhtype{String,StringX}
+ ** @param chars          The string containing all the characters to check
+ **                       @inhtype{String,StringX}
+ ** @param[out] bytes     If given, then bytes will contain the number of bytes
+ **                       of the beginning of the string that are part of the
+ **                       @c chars string
+ ** @return               How many character of the beginning of the string
+ **                       are part of the @c chars string
+ */
+unsigned int rf_string_begins_with_any(const void *thisstr,
+                                       const void *chars,
+                                       unsigned int *bytes);
+
 
 /**
  ** @brief Counts how many times a substring occurs inside the string.
@@ -218,7 +238,7 @@ i_DECLIMEX_ int32_t rf_string_find_i(const void* thisstr, const void* sstr,
  ** @param options       For details @see rf_string_remove()
  ** @return              Returns the number of times cstr exists inside the
  **                      string. In case it is not found at all 0 is returned.
- **                      Note that 0 is returned also in case of error such as 
+ **                      Note that 0 is returned also in case of error such as
  **                      invalid input(null pointers).
  **/
 i_DECLIMEX_ int rf_string_count(
@@ -266,7 +286,7 @@ i_DECLIMEX_ bool rf_string_scanf_after(const void* thisstr, const void* afterstr
  **                            the string between @c lstr and @c rstr.
  **                            If the passed pointer is of RFstringx type
  **                            also pass the @c RF_STRINGX_ARGUMENT bitflag
- **                            argument in the @c options argument. 
+ **                            argument in the @c options argument.
  **                            The caller is responsible for
  **                            initializing the string but the function
  **                            will assign to it

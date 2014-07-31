@@ -32,7 +32,8 @@
 
 
 /*------------- Module related inclusion -------------*/
-#include <String/rf_str_retrieval.h> //for String accessors
+#include <String/rf_str_retrieval.h> // for String accessors
+#include <String/rf_str_core.h>      // for rf_string_iterate
 /*------------- Outside Module inclusion -------------*/
 #include <Definitions/retcodes.h> //for bool
 #include <Definitions/inline.h> //for inline
@@ -270,6 +271,30 @@ i_INLINE_DECL void rf_string_generic_append(void *thisstr, const char* other,
         bytes_to_copy
    );
    rf_string_length_bytes(thisstr) += bytes_to_copy;
+}
+
+/**
+ * A function used to fill in a buffer with characters of a string.
+ * Returns number of unicode characters the array was filled with
+*/
+i_INLINE_DECL int rf_string_fill_codepoints(const struct RFstring* s)
+{
+    unsigned int i = 0;
+    uint32_t charValue, chars_num;
+    chars_num = rf_string_length(s);
+    if(rf_string_length(s) > rf_buffer_size_u32(TSBUFFA))
+    {
+        if(rf_buffer_increase_u32(TSBUFFA, chars_num * 2))
+        {
+            return -1;
+        }
+
+    }
+    rf_string_iterate_start(s, i, charValue)
+        rf_buffer_ptr_u32(TSBUFFA, i) = charValue;
+    rf_string_iterate_end(i)
+
+    return chars_num;
 }
 
 #ifdef __cplusplus

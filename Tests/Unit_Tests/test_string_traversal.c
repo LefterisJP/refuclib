@@ -362,6 +362,30 @@ START_TEST(test_stringx_move_afterv) {
     rf_stringx_deinit(&str_buff);
 }END_TEST
 
+START_TEST(test_stringx_skip_chars) {
+    struct RFstringx s;
+    unsigned int bytes;
+    static const struct RFstring s1 = RF_STRING_STATIC_INIT("   \t  something");
+    static const struct RFstring chars1 = RF_STRING_STATIC_INIT(" \t");
+    static const struct RFstring s2 = RF_STRING_STATIC_INIT(" ブ ブ ラ something_else");
+    static const struct RFstring chars2 = RF_STRING_STATIC_INIT(" ブラ");
+
+
+    ck_assert(rf_stringx_init_buff(&s, 1024, ""));
+    ck_assert(rf_stringx_assign(&s, &s1));
+
+    ck_assert_int_eq(6, rf_stringx_skip_chars(&s, &chars1, &bytes));
+    ck_assert_int_eq(6, bytes);
+    ck_assert_rf_str_eq_cstr(&s, "something");
+
+    ck_assert(rf_stringx_assign(&s, &s2));
+    ck_assert_int_eq(7, rf_stringx_skip_chars(&s, &chars2, &bytes));
+    ck_assert_int_eq(13, bytes);
+    ck_assert_rf_str_eq_cstr(&s, "something_else");
+
+    rf_stringx_deinit(&s);
+}END_TEST
+
 START_TEST(test_stringx_move_after_pair) {
     struct RFstringx s;
     struct RFstringx str_buff;
@@ -434,6 +458,7 @@ Suite *string_traversal_suite_create(void)
     tcase_add_test(stringx_traversal, test_stringx_move_forward);
     tcase_add_test(stringx_traversal, test_stringx_reset);
     tcase_add_test(stringx_traversal, test_stringx_move_afterv);
+    tcase_add_test(stringx_traversal, test_stringx_skip_chars);
     tcase_add_test(stringx_traversal, test_stringx_move_after_pair);
 
     suite_add_tcase(s, stringx_traversal);

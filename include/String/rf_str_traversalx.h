@@ -121,12 +121,30 @@ i_DECLIMEX_ void rf_stringx_move_back(struct RFstringx* thisstr, uint32_t n);
  ** @param byte_index The byte index to move to
  **/
 i_INLINE_DECL void rf_stringx_move_to_index(struct RFstringx* s,
-                                             uint32_t byte_index)
+                                            uint32_t byte_index)
 {
     unsigned int n = s->bIndex - byte_index;
     s->INH_String.length += n;
     s->INH_String.data -= n;
     s->bIndex = byte_index;
+}
+
+/**
+ ** @brief Moves the internal pointer by the given number of bytes
+ **
+ ** This is an unsafe function. No checks are performed.
+ ** Use only if you know that after @c bytes_num the string is still
+ ** valid
+ **
+ ** @param s The string for which to move
+ ** @param byte_num The number of bytes to move
+ **/
+i_INLINE_DECL void rf_stringx_move_bytes(struct RFstringx* s,
+                                         int bytes_num)
+{
+    s->INH_String.length -= bytes_num;
+    s->INH_String.data += bytes_num;
+    s->bIndex += bytes_num;
 }
 
 /**
@@ -192,6 +210,23 @@ i_DECLIMEX_ void rf_stringx_reset(struct RFstringx* thisstr);
 i_DECLIMEX_ bool rf_stringx_move_afterv(struct RFstringx* thisstr, void* result,
                                         enum RFstring_matching_options options,
                                         const unsigned char parN, ...);
+
+/**
+ ** @brief Moves the internal pointer by as much as needed to skip characters
+ **
+ ** Skips all occurences of the given characters from the start of the string
+ ** and until any other character is found. Moves the internal pointer there
+ **
+ ** @lmsFunction
+ ** @param thisstr      The extended string to work on
+ ** @param chars        A string containing all the characters to skip
+ ** @param bytes[out]   If not 0, this will contain the number of bytes of
+ **                     @c thisstr that were skipped
+ ** @return             The number of chars of @thisstr that were skipped
+ **/
+i_DECLIMEX_ unsigned int rf_stringx_skip_chars(struct RFstringx* thisstr,
+                                               const void *chars,
+                                               unsigned int *bytes);
 
 /**
  ** @brief Moves the internal string pointer after the substring formed
