@@ -1451,14 +1451,30 @@ int rf_textfile_read_line_chars(struct RFtextfile* t,
 
 int rf_textfile_read_lines(struct RFtextfile* t,
                            unsigned int lines,
-                           struct RFstringx* str)
+                           struct RFstringx* str,
+                           struct RFbuffer *lines_pos)
 {
+#define add_line_pos(buff_, index_, val_)                               \
+    do {                                                                \
+        if ((buff_) && (buff_)->size > index_) {                        \
+            rf_buffer_atindex_u32(buff_, index_) = val_;                \
+            (buff_)->index += 4;                                        \
+        }                                                               \
+    }while(0)
     unsigned int lines_read = 0;
     unsigned int pr_index = str->bIndex;
-    while (RF_SUCCESS == rf_textfile_read_line(t, str))
-    {
+    unsigned int pr_length = 0;
+
+    add_line_pos(lines_pos, 0, 0);
+
+    while (RF_SUCCESS == rf_textfile_read_line(t, str)) {
         lines_read ++;
         rf_stringx_append_char(str, (unsigned int)'\n');
+
+        add_line_pos(lines_pos, lines_read,
+                     pr_length + rf_string_length_bytes(str) + 1);
+        pr_length += rf_string_length_bytes(str) + 1;
+
         rf_stringx_move_end(str);
         if (lines_read == lines) {
             break;
@@ -1466,6 +1482,8 @@ int rf_textfile_read_lines(struct RFtextfile* t,
     }
     rf_stringx_move_to_index(str, pr_index);
     return lines_read;
+
+#undef add_line_pos
 }
 
 bool rf_textfile_get_offset(struct RFtextfile* t, RFfile_offset* offset)

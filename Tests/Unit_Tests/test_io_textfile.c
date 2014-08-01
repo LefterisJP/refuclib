@@ -282,23 +282,30 @@ START_TEST(test_textfile_read_lines) {
     static const struct RFstring fname = RF_STRING_STATIC_INIT(
         PATH_TO"utf8stringfile"
     );
+    uint32_t buff_arr[64];
+    struct RFbuffer buff = RF_BUFFER_SHALLOW_INIT(buff_arr, 64);
     ck_assert(rf_textfile_init(&f, &fname, RF_FILE_READ,
                                RF_ENDIANESS_UNKNOWN,
                                RF_UTF8, RF_EOL_LF));
 
     rf_stringx_reset(&g_buff);
     /* read all lines (3) */
-    ck_assert(3 == rf_textfile_read_lines(&f, 0, &g_buff));
+    ck_assert(3 == rf_textfile_read_lines(&f, 0, &g_buff, &buff));
     ck_assert_rf_str_eq_cstr(&g_buff,
                              FIRST_LINE_UTF8"\n"
                              SECOND_LINE_UTF8"\n"
                              THIRD_LINE_UTF8"\n"
     );
+    ck_assert_int_eq(buff.index, 16);
+    ck_assert_int_eq(rf_buffer_atindex_u32(&buff, 0), 0);
+    ck_assert_int_eq(rf_buffer_atindex_u32(&buff, 1), 12);
+    ck_assert_int_eq(rf_buffer_atindex_u32(&buff, 2), 368);
+    ck_assert_int_eq(rf_buffer_atindex_u32(&buff, 3), 1169);
 
     ck_assert(RF_SUCCESS == rf_textfile_go_to_line(&f, 1));
 
     /* read 3 lines */
-    ck_assert(3 == rf_textfile_read_lines(&f, 3, &g_buff));
+    ck_assert(3 == rf_textfile_read_lines(&f, 3, &g_buff, 0));
     ck_assert_rf_str_eq_cstr(&g_buff,
                              FIRST_LINE_UTF8"\n"
                              SECOND_LINE_UTF8"\n"
@@ -308,7 +315,7 @@ START_TEST(test_textfile_read_lines) {
     ck_assert(RF_SUCCESS == rf_textfile_go_to_line(&f, 1));
 
     /* read 2 lines */
-    ck_assert(2 == rf_textfile_read_lines(&f, 2, &g_buff));
+    ck_assert(2 == rf_textfile_read_lines(&f, 2, &g_buff, 0));
     ck_assert_rf_str_eq_cstr(&g_buff,
                              FIRST_LINE_UTF8"\n"
                              SECOND_LINE_UTF8"\n"
@@ -317,7 +324,7 @@ START_TEST(test_textfile_read_lines) {
     ck_assert(RF_SUCCESS == rf_textfile_go_to_line(&f, 1));
 
     /* read 1 line */
-    ck_assert(1 == rf_textfile_read_lines(&f, 1, &g_buff));
+    ck_assert(1 == rf_textfile_read_lines(&f, 1, &g_buff, 0));
     ck_assert_rf_str_eq_cstr(&g_buff, FIRST_LINE_UTF8"\n");
 
     rf_textfile_deinit(&f);

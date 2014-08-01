@@ -44,6 +44,9 @@ struct RFbuffer {
     unsigned int index;
 };
 
+#define RF_BUFFER_SHALLOW_INIT(buff_, size_) \
+    {.buff = (char*)buff_, .size = size_, .index = 0 }
+
 i_INLINE_DECL bool rf_buffer_init(struct RFbuffer* b, size_t size)
 {
     b->size = size;
@@ -106,6 +109,9 @@ i_INLINE_DECL unsigned int rf_buffer_index(struct RFbuffer* b)
 
 #define rf_buffer_ptr_u32(i_BUFF_, i_IND_)       \
     ((uint32_t*)rf_buffer_ptr(i_BUFF_))[i_IND_]
+
+#define rf_buffer_atindex_u32(i_BUFF_, i_IND_)       \
+    ((uint32_t*)(i_BUFF_)->buff)[i_IND_]
 
 #define rf_buffer_increase_u32(i_BUFF_, i_SIZE_) \
     rf_buffer_increase(i_BUFF_, (i_SIZE_) * sizeof(uint32_t))
