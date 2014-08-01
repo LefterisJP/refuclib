@@ -223,12 +223,22 @@ bool rf_stringx_move_afterv(struct RFstringx* thisstr, void* result,
 
 unsigned int rf_stringx_skip_chars(struct RFstringx* thisstr,
                                    const void *chars,
-                                   unsigned int *bytes)
+                                   unsigned int *bytes,
+                                   unsigned int *line_count)
 {
     uint32_t bytes_to_move;
     unsigned int chars_skipped;
+    struct RFstring skipped;
+    static const struct RFstring nl = RF_STRING_STATIC_INIT("\n");
 
     chars_skipped = rf_string_begins_with_any(thisstr, chars, &bytes_to_move);
+
+    if (line_count) {
+        RF_STRING_SHALLOW_INIT(&skipped,
+                               rf_string_data(thisstr),
+                               bytes_to_move);
+        *line_count = rf_string_count(&skipped, &nl, 0);
+    }
 
     if (chars_skipped) {
         rf_stringx_move_bytes(thisstr, bytes_to_move);

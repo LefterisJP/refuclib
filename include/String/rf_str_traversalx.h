@@ -218,15 +218,18 @@ i_DECLIMEX_ bool rf_stringx_move_afterv(struct RFstringx* thisstr, void* result,
  ** and until any other character is found. Moves the internal pointer there
  **
  ** @lmsFunction
- ** @param thisstr      The extended string to work on
- ** @param chars        A string containing all the characters to skip
- ** @param bytes[out]   If not 0, this will contain the number of bytes of
- **                     @c thisstr that were skipped
- ** @return             The number of chars of @thisstr that were skipped
+ ** @param thisstr           The extended string to work on
+ ** @param chars             A string containing all the characters to skip
+ ** @param bytes[out]        If not 0, this will contain the number of bytes of
+ **                          @c thisstr that were skipped
+ ** @param line_count[out]   If not 0, this will contain the number of lines
+ **                          that were skipped
+ ** @return                  The number of chars of @thisstr that were skipped
  **/
 i_DECLIMEX_ unsigned int rf_stringx_skip_chars(struct RFstringx* thisstr,
                                                const void *chars,
-                                               unsigned int *bytes);
+                                               unsigned int *bytes,
+                                               unsigned int *line_count);
 
 /**
  ** @brief Moves the internal string pointer after the substring formed

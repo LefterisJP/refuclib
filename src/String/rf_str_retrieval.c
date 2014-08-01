@@ -172,16 +172,16 @@ unsigned int rf_string_begins_with_any(const void *thisstr,
                                        unsigned int *bytes)
 {
     bool iteration_match;
-    uint32_t subLength;
+    int subLength;
     uint32_t byte_position;
     unsigned int matching_chars = 0;
-    uint32_t i = 0;
-    uint32_t j = 0;
+    int i = 0;
+    int j = 0;
 
     RF_ENTER_LOCAL_SCOPE();
     //get all the codepoints of the string
     subLength = rf_string_fill_codepoints(chars);
-    if (subLength < 0) {
+    if (subLength <= 0) {
         goto cleanup;
     }
 
@@ -214,7 +214,7 @@ cleanup:
 }
 
 int rf_string_count(const void* tstr, const void* sstr,
-                             enum RFstring_matching_options options)
+                    enum RFstring_matching_options options)
 {
     unsigned int n;
     char *s;
