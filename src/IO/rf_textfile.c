@@ -1456,9 +1456,11 @@ int rf_textfile_read_lines(struct RFtextfile* t,
 {
 #define add_line_pos(buff_, index_, val_)                               \
     do {                                                                \
-        if ((buff_) && (buff_)->size > index_) {                        \
-            rf_buffer_atindex_u32(buff_, index_) = val_;                \
-            (buff_)->index += 4;                                        \
+        if ((buff_)) {                                                  \
+            if (rf_buffer_remaining_size(buff_, uint32_t) <= 10) {      \
+                rf_buffer_increase_size(buff_, 10, uint32_t);           \
+                }                                                       \
+            rf_buffer_from_current_at(buff_, index_, uint32_t) = val_;  \
         }                                                               \
     }while(0)
     unsigned int lines_read = 0;

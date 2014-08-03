@@ -31,17 +31,18 @@
 i_INLINE_DECL char* rf_string_cstr_ibuff_push(const void* s, unsigned int *index)
 {
     char* ret;
-    ret = rf_buffer_ptr(TSBUFFA);
-    if(index)
-    {
+    ret = rf_buffer_current_ptr(TSBUFFA, char);
+    if(index) {
         *index = TSBUFFA->index;
     }
-    if(!rf_buffer_copy(TSBUFFA, rf_string_data(s), rf_string_length_bytes(s)))
+    if(!rf_buffer_copy_at_current(TSBUFFA,
+                                  rf_string_data(s),
+                                  rf_string_length_bytes(s)))
     {
         return NULL;
     }
-    rf_buffer_ptr(TSBUFFA)[rf_string_length_bytes(s)] = '\0';
-    TSBUFFA->index += rf_string_length_bytes(s) + 1;
+    rf_buffer_from_current_at(TSBUFFA, rf_string_length_bytes(s), char) = '\0';
+    rf_buffer_move_index(TSBUFFA, rf_string_length_bytes(s) + 1, char);
     return ret;
 }
 
@@ -50,7 +51,7 @@ i_INLINE_DECL char* rf_string_cstr_ibuff_push(const void* s, unsigned int *index
  */
 i_INLINE_DECL void rf_string_cstr_ibuff_pop(unsigned int index)
 {
-    rf_buffer_set_index(TSBUFFA, index);
+    rf_buffer_set_index(TSBUFFA, index, char);
 }
 
 

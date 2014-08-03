@@ -230,31 +230,28 @@ i_INLINE_DECL bool fill_fmt_buffer(const char *fmt,
 {
     int rc;
     va_list copy_va_list;
-    size_t n = rf_buffer_size(TSBUFFA);
+    size_t n = rf_buffer_remaining_size(TSBUFFA, char);
     *bIndex = rf_buffer_index(TSBUFFA);
-    *buffPtr = rf_buffer_ptr(TSBUFFA);
+    *buffPtr = rf_buffer_current_ptr(TSBUFFA, char);
     va_copy(copy_va_list, args); /* C99 only */
-    rc = vsnprintf(rf_buffer_ptr(TSBUFFA), n, fmt, copy_va_list);
+    rc = vsnprintf(rf_buffer_current_ptr(TSBUFFA, char), n, fmt, copy_va_list);
     va_end(copy_va_list);
-    if(rc < 0)
-    {
+    if(rc < 0) {
         return false;
     }
-    if(rc >= n)
-    {
-        if(!rf_buffer_increase(TSBUFFA, rc *2)) {
+    if(rc >= n) {
+        if(!rf_buffer_increase_size(TSBUFFA, rc *2, char)) {
             return false;
         }
         n = rf_buffer_size(TSBUFFA);
-        *buffPtr = rf_buffer_ptr(TSBUFFA);
+        *buffPtr = rf_buffer_current_ptr(TSBUFFA, char);
         *bIndex = rf_buffer_index(TSBUFFA);
-        rc = vsnprintf(rf_buffer_ptr(TSBUFFA), n, fmt, args);
-        if(rc < 0 || rc >= n)
-        {
+        rc = vsnprintf(rf_buffer_current_ptr(TSBUFFA, char), n, fmt, args);
+        if (rc < 0 || rc >= n) {
             return false;
         }
     }
-    TSBUFFA->index += rc;
+    rf_buffer_move_index(TSBUFFA, rc, char);
     *size = rc;
 
     return true;
@@ -280,18 +277,18 @@ i_INLINE_DECL void rf_string_generic_append(void *thisstr, const char* other,
 i_INLINE_DECL int rf_string_fill_codepoints(const struct RFstring* s)
 {
     unsigned int i = 0;
-    uint32_t charValue, chars_num;
+    uint32_t charValue;
+    uint32_t chars_num;
+
     chars_num = rf_string_length(s);
-    if(rf_string_length(s) > rf_buffer_size_u32(TSBUFFA))
-    {
-        if(rf_buffer_increase_u32(TSBUFFA, chars_num * 2))
-        {
+    if (chars_num > rf_buffer_remaining_size(TSBUFFA, uint32_t)) {
+
+        if(rf_buffer_increase_size(TSBUFFA, chars_num * 2, uint32_t)) {
             return -1;
         }
-
     }
     rf_string_iterate_start(s, i, charValue)
-        rf_buffer_ptr_u32(TSBUFFA, i) = charValue;
+        rf_buffer_from_current_at(TSBUFFA, i, uint32_t) = charValue;
     rf_string_iterate_end(i)
 
     return chars_num;

@@ -32,9 +32,10 @@
 
 i_INLINE_INS bool rf_buffer_init(struct RFbuffer* b, size_t size);
 i_INLINE_INS void rf_buffer_deinit(struct RFbuffer* b);
-i_INLINE_INS bool rf_buffer_increase(struct RFbuffer* b, size_t size);
-i_INLINE_INS bool rf_buffer_copy(struct RFbuffer* b, const char* src, size_t len);
-i_INLINE_INS char* rf_buffer_ptr(struct RFbuffer* b);
+i_INLINE_INS bool rf_buffer_increase_size_(struct RFbuffer* b, size_t size);
+i_INLINE_INS bool rf_buffer_copy_at_current(struct RFbuffer* b, const char* src, size_t len);
+i_INLINE_INS void* rf_buffer_current_ptr_(struct RFbuffer* b);
+i_INLINE_INS size_t rf_buffer_remaining_size_(struct RFbuffer* b);
 i_INLINE_INS size_t rf_buffer_size(struct RFbuffer* b);
-i_INLINE_INS void rf_buffer_set_index(struct RFbuffer* b, unsigned int index);
+i_INLINE_INS void rf_buffer_set_index_(struct RFbuffer* b, unsigned int index);
 i_INLINE_INS unsigned int rf_buffer_index(struct RFbuffer* b);

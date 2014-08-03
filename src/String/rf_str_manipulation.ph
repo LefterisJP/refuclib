@@ -60,7 +60,7 @@ i_INLINE_DECL bool rf_stringx_generic_append(struct RFstringx* s,
     return true;
 }
 
-i_INLINE_DECL bool replace_intro(void* s, uint32_t* number, 
+i_INLINE_DECL bool replace_intro(void* s, uint32_t* number,
                                  const void* sstr,
                                  enum RFstring_matching_options options)
 {
@@ -70,6 +70,7 @@ i_INLINE_DECL bool replace_intro(void* s, uint32_t* number,
     //if the substring string is not even found return false
     uint32_t foundN = 0;
     bool ret = true;
+    int found_pos;
     if(rf_string_find_byte_pos(s, sstr, options) == RF_FAILURE)
     {
         return false;
@@ -85,34 +86,33 @@ i_INLINE_DECL bool replace_intro(void* s, uint32_t* number,
     {
         return false;
     }
-    while((rf_buffer_ptr_u32(TSBUFFA, foundN) = rf_string_find_byte_pos(
-               &temp, sstr, options))  != RF_FAILURE)
-    {
-        int32_t move = (rf_buffer_ptr_u32(TSBUFFA, foundN) + 
-                        rf_string_length_bytes(sstr)
-        );
-        rf_buffer_ptr_u32(TSBUFFA, foundN) = (
-            rf_buffer_ptr_u32(TSBUFFA, foundN) + temp.bIndex
+
+    found_pos = rf_string_find_byte_pos(&temp, sstr, options);
+    rf_buffer_from_current_at(TSBUFFA, foundN, uint32_t) = found_pos;
+    while (found_pos != RF_FAILURE) {
+        int32_t move = (rf_buffer_from_current_at(TSBUFFA, foundN, uint32_t) +
+                        rf_string_length_bytes(sstr));
+        rf_buffer_from_current_at(TSBUFFA, foundN, uint32_t) = (
+            rf_buffer_from_current_at(TSBUFFA, foundN, uint32_t) + temp.bIndex
         );
         temp.bIndex += move;
         rf_string_data(&temp) += move;
         rf_string_length_bytes(&temp) -= move;
         foundN++;
         //if buffer is in danger of overflow realloc it
-        if(foundN >= rf_buffer_size_u32(TSBUFFA))
-        {
-            if(rf_buffer_increase_u32(TSBUFFA, rf_buffer_size_u32(TSBUFFA) * 2))
-            {
+        if(foundN >= rf_buffer_remaining_size(TSBUFFA, uint32_t)) {
+            if(rf_buffer_increase_size(TSBUFFA, foundN * 2, uint32_t)) {
                 RF_ERROR("Not enough memory to increase internal buffer");
                 ret = false;
                 goto cleanup;
             }
         }
         //if we found the required number of occurences break;
-        if(foundN >= *number)
-        {
+        if(foundN >= *number) {
             break;
         }
+        found_pos = rf_string_find_byte_pos(&temp, sstr, options);
+        rf_buffer_from_current_at(TSBUFFA, foundN, uint32_t) = found_pos;
     }
 
     //don't replace more than possible
@@ -135,13 +135,13 @@ i_INLINE_DECL void replace_greater(void* s, uint32_t number,
     for(i = 0; i < number; i ++)
     {
         memmove(
-            rf_string_data(s) + rf_buffer_ptr_u32(TSBUFFA, i) + rf_string_length_bytes(sstr)+ diff,
-            rf_string_data(s) + rf_buffer_ptr_u32(TSBUFFA, i) + rf_string_length_bytes(sstr),
-            rf_string_length_bytes(s) - (rf_buffer_ptr_u32(TSBUFFA, i) + rf_string_length_bytes(sstr))
+            rf_string_data(s) + rf_buffer_from_current_at(TSBUFFA, i, uint32_t) + rf_string_length_bytes(sstr)+ diff,
+            rf_string_data(s) + rf_buffer_from_current_at(TSBUFFA, i, uint32_t) + rf_string_length_bytes(sstr),
+            rf_string_length_bytes(s) - (rf_buffer_from_current_at(TSBUFFA, i, uint32_t) + rf_string_length_bytes(sstr))
         );
         //copy in the replacement
         memcpy(
-            rf_string_data(s) + rf_buffer_ptr_u32(TSBUFFA, i),
+            rf_string_data(s) + rf_buffer_from_current_at(TSBUFFA, i, uint32_t),
             rf_string_data(rstr),
             rf_string_length_bytes(rstr)
         );
@@ -150,7 +150,7 @@ i_INLINE_DECL void replace_greater(void* s, uint32_t number,
         //also increase all the subsequent found byte positions
         for(j = i + 1; j < number; j ++)
         {
-            rf_buffer_ptr_u32(TSBUFFA, j) = rf_buffer_ptr_u32(TSBUFFA, j) + diff;
+            rf_buffer_from_current_at(TSBUFFA, j, uint32_t) = rf_buffer_from_current_at(TSBUFFA, j, uint32_t) + diff;
         }
     }
 }
@@ -167,22 +167,22 @@ i_INLINE_DECL void replace_lesser(void* s, uint32_t number,
     {
         //copy in the replacement
         memcpy(
-            rf_string_data(s) + rf_buffer_ptr_u32(TSBUFFA, i),
+            rf_string_data(s) + rf_buffer_from_current_at(TSBUFFA, i, uint32_t),
             rf_string_data(rstr),
             rf_string_length_bytes(rstr)
         );
         //move all of the contents of the string to fit the replacement
         memmove(
-            rf_string_data(s) + rf_buffer_ptr_u32(TSBUFFA, i) + rf_string_length_bytes(rstr),
-            rf_string_data(s) + rf_buffer_ptr_u32(TSBUFFA, i) + rf_string_length_bytes(sstr),
-            rf_string_length_bytes(s) - (rf_buffer_ptr_u32(TSBUFFA, i) + rf_string_length_bytes(sstr))
+            rf_string_data(s) + rf_buffer_from_current_at(TSBUFFA, i, uint32_t) + rf_string_length_bytes(rstr),
+            rf_string_data(s) + rf_buffer_from_current_at(TSBUFFA, i, uint32_t) + rf_string_length_bytes(sstr),
+            rf_string_length_bytes(s) - (rf_buffer_from_current_at(TSBUFFA, i, uint32_t) + rf_string_length_bytes(sstr))
         );
         //reduce bytelength
         rf_string_length_bytes(s) -= diff;
         //also decrease all the subsequent found byte positions
         for(j = i + 1; j < number; j ++)
         {
-            rf_buffer_ptr_u32(TSBUFFA, j) = rf_buffer_ptr_u32(TSBUFFA, j) - diff;
+            rf_buffer_from_current_at(TSBUFFA, j, uint32_t) = rf_buffer_from_current_at(TSBUFFA, j, uint32_t) - diff;
         }
     }
 }
@@ -193,7 +193,7 @@ i_INLINE_DECL void replace_equal(void* s, uint32_t number, const void* rstr)
     for(i = 0; i < number; i ++)
     {
         memcpy(
-            rf_string_data(s) + rf_buffer_ptr_u32(TSBUFFA, i),
+            rf_string_data(s) + rf_buffer_from_current_at(TSBUFFA, i, uint32_t),
             rf_string_data(rstr),
             rf_string_length_bytes(rstr)
         );

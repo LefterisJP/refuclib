@@ -193,7 +193,7 @@ unsigned int rf_string_begins_with_any(const void *thisstr,
         for(j = 0; j < subLength; j++) {
             //if we got a match
             if(rf_string_bytepos_to_codepoint(thisstr, byte_position) ==
-               rf_buffer_ptr_u32(TSBUFFA, j))
+               rf_buffer_from_current_at(TSBUFFA, j, uint32_t))
             {
                 iteration_match = false;
                 matching_chars += 1;

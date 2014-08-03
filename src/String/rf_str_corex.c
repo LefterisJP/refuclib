@@ -86,7 +86,7 @@ struct RFstringx* rf_stringx_createv(const char* lit, ...)
 #ifdef RF_OPTION_DEBUG
 cleanup_buffer:
 #endif
-    rf_buffer_set_index(TSBUFFA, buff_index);
+    rf_buffer_set_index(TSBUFFA, buff_index, char);
 cleanup_lscope:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
@@ -138,7 +138,7 @@ bool rf_stringx_initv(struct RFstringx* str, const char* lit, ...)
     }
 
 
-    rf_buffer_set_index(TSBUFFA, buff_index);
+    rf_buffer_set_index(TSBUFFA, buff_index, char);
 cleanup_lscope:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
@@ -366,7 +366,7 @@ struct RFstringx* rf_stringx_create_buffv(uint32_t buffSize, const char* lit, ..
 #ifdef RF_OPTION_DEBUG
 cleanup_buffer:
 #endif
-    rf_buffer_set_index(TSBUFFA, buff_index);
+    rf_buffer_set_index(TSBUFFA, buff_index, char);
 cleanup_lscope:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
@@ -418,7 +418,7 @@ bool rf_stringx_init_buffv(struct RFstringx* str, uint32_t buffSize,
     }
     ret = rf_stringx_init_unsafe_bnnt(str, buff_ptr, size, buffSize);
 
-    rf_buffer_set_index(TSBUFFA, buff_index);
+    rf_buffer_set_index(TSBUFFA, buff_index, char);
 cleanup_lscope:
     RF_EXIT_LOCAL_SCOPE();
     return ret;

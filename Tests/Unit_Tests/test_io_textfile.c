@@ -296,11 +296,11 @@ START_TEST(test_textfile_read_lines) {
                              SECOND_LINE_UTF8"\n"
                              THIRD_LINE_UTF8"\n"
     );
-    ck_assert_int_eq(buff.index, 16);
-    ck_assert_int_eq(rf_buffer_atindex_u32(&buff, 0), 0);
-    ck_assert_int_eq(rf_buffer_atindex_u32(&buff, 1), 12);
-    ck_assert_int_eq(rf_buffer_atindex_u32(&buff, 2), 368);
-    ck_assert_int_eq(rf_buffer_atindex_u32(&buff, 3), 1169);
+
+    ck_assert_int_eq(rf_buffer_from_current_at(&buff, 0, uint32_t), 0);
+    ck_assert_int_eq(rf_buffer_from_current_at(&buff, 1, uint32_t), 12);
+    ck_assert_int_eq(rf_buffer_from_current_at(&buff, 2, uint32_t), 368);
+    ck_assert_int_eq(rf_buffer_from_current_at(&buff, 3, uint32_t), 1169);
 
     ck_assert(RF_SUCCESS == rf_textfile_go_to_line(&f, 1));
 

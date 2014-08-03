@@ -193,9 +193,12 @@ bool rf_string_remove(void* thisstr, const void* rstr, uint32_t number,
 //Removes all of the characters of the string except those specified
 bool rf_string_keep_only(void* thisstr, const void* keepstr, int *removals)
 {
-    uint32_t keepLength,i, j, charValue;
+    uint32_t charValue;
+    uint32_t i;
     char unused[MAX_UTF8C_BYTES];
     int character_byte_length;
+    int keepLength;
+    int j;
     bool exists;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
@@ -222,9 +225,8 @@ bool rf_string_keep_only(void* thisstr, const void* keepstr, int *removals)
     rf_string_iterate_start(thisstr, i, charValue)
         //for every character check if it exists in the keep str
         exists = false;
-        for(j = 0; j < keepLength; j++)
-        {
-            if(rf_buffer_ptr_u32(TSBUFFA, j) == charValue)
+    for (j = 0; j < keepLength; j++) {
+            if (rf_buffer_from_current_at(TSBUFFA, j, uint32_t) == charValue)
             {
                 exists = true;
             }
@@ -523,8 +525,10 @@ bool rf_string_trim_end(void* thisstr, const void* sub, unsigned int *removals)
 {
     bool ret;
     bool iteration_match;
-    uint32_t i, j;
-    uint32_t subLength, byte_position, last_byte_position;
+    uint32_t i;
+    uint32_t byte_position, last_byte_position;
+    int subLength;
+    int j;
     RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr);
     
@@ -555,7 +559,7 @@ bool rf_string_trim_end(void* thisstr, const void* sub, unsigned int *removals)
         {
             //if we got a match
             if(rf_string_bytepos_to_codepoint(thisstr, byte_position) ==
-               rf_buffer_ptr_u32(TSBUFFA, j))
+               rf_buffer_from_current_at(TSBUFFA, j, uint32_t))
             {
                 if (removals) {
                     *removals = *removals + 1;

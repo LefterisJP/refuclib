@@ -419,8 +419,11 @@ i_DECLIMEX_ int rf_textfile_read_line_chars(struct RFtextfile* t,
  **                      read lines
  ** @param lines_pos     If not NULL, a buffer to put the positions in bytes
  **                      of each new line start. Starts counting from the very
- **                      first line. Buffer should be preallocated and its size
- **                      will be used for bounds checking.
+ **                      first line. It will contain:
+ **                      returned_lines number of line positions
+ **                      Check the return value of the function to see how much
+ **                      that would be.
+ **
  ** @return              The number of lines read or @c -1 for failure
  */
 i_DECLIMEX_ int rf_textfile_read_lines(struct RFtextfile* t,

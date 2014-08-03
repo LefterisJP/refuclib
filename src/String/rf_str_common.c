@@ -73,7 +73,7 @@ struct RFstring* i_rf_string_create_local1(const char* s,...)
 
 cleanup_buffer:
     //pop back the buffer
-    rf_buffer_set_index(TSBUFFA, bIndex);
+    rf_buffer_set_index(TSBUFFA, bIndex, char);
     return ret;
 }
 struct RFstring* i_NVrf_string_create_local(const char* s)

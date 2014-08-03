@@ -79,7 +79,7 @@ struct RFstring* rf_string_createv(const char* s, ...)
 #ifdef RF_OPTION_DEBUG
 cleanup_buffer:
 #endif
-    rf_buffer_set_index(TSBUFFA, buff_index);
+    rf_buffer_set_index(TSBUFFA, buff_index, char);
 cleanup_lscope:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
@@ -136,7 +136,7 @@ bool rf_string_initv(struct RFstring* str, const char* s, ...)
 #ifdef RF_OPTION_DEBUG
 cleanup_buffer:
 #endif
-    rf_buffer_set_index(TSBUFFA, buff_index);
+    rf_buffer_set_index(TSBUFFA, buff_index, char);
 cleanup_lscope:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
