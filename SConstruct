@@ -116,6 +116,7 @@ unit_tests_files = [
     'test_string_traversal.c',
 
     'test_utils_unicode.c',
+    'test_utils_array.c',
 
     'test_io_files.c',
     'test_io_textfile.c',
