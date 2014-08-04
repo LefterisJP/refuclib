@@ -45,6 +45,8 @@
 /*------------- End of includes -------------*/
 
 
+#include <stdio.h>
+
 struct RFarray {
     size_t size; /*!< Size of the array in BYTES */
     bool buff_allocated;
@@ -80,9 +82,11 @@ struct RFarray {
  * existing fixed size array on the stack.
  *
  * @param other_ The existing fixed size array to point to
- * @param type_  The type of the array
+ *               Be very careful so that the array IS NOT
+ *               const. If it is the conversion  will be silently accepted
+ *               by gcc but can cause a lot of problems. (undefined behaviour)
  */
-#define RF_ARRAY_SHALLOW_INIT(other_, type_)        \
+#define RF_ARRAY_SHALLOW_INIT(other_)               \
     {.buff = (char*)other_,                         \
         .buff_allocated = false,                    \
         .size = sizeof(other_)}
@@ -90,15 +94,21 @@ struct RFarray {
 /**
  * Initialize an RFarray in the heap
  *
- * @param a     The array to initialize
- * @param size  The size of the array in bytes
+ * @param arr_             The array to initialize
+ * @param elements_num_    The size of the array in elements
+ * @param type_            The type of elements to store
  *
  * @return      True for succes and false for no memory failure.
  */
-i_INLINE_DECL bool rf_array_init(struct RFarray *a, size_t size)
+#define rf_array_init(arr_, elements_num_, type_)             \
+    rf_array_init_(arr_, sizeof(type_), elements_num_)
+
+i_INLINE_DECL bool rf_array_init_(struct RFarray *a,
+                                  size_t element_size,
+                                  size_t size)
 {
-    RF_MALLOC(a->buff, size, false);
-    a->size = size;
+    a->size = size * element_size;
+    RF_MALLOC(a->buff, a->size, false);
     a->buff_allocated = true;
 
     return true;
@@ -110,7 +120,6 @@ i_INLINE_DECL void rf_array_deinit(struct RFarray *a)
         free(a->buff);
     }
 }
-
 
 /**
  * Access an array element in an unsafe way.
@@ -135,8 +144,9 @@ i_INLINE_DECL void rf_array_deinit(struct RFarray *a)
         void *i_temp_val_ = rf_array_at_(arr_, ind_, sizeof(type_));  \
         if (!i_temp_val_) {                                           \
             fail_;                                                    \
+        } else {                                                      \
+            getvar_ = *((type_*)i_temp_val_);                         \
         }                                                             \
-        getvar_ = *((type_*)i_temp_val_);                             \
     } while (0)
 
 
@@ -160,11 +170,12 @@ i_INLINE_DECL void rf_array_deinit(struct RFarray *a)
  */
 #define rf_array_set(arr_, ind_, type_, val_, fail_)                    \
     do {                                                                \
-        void *i_temp_val_ = rf_array_ptrto_index_(arr_, i, sizeof(type_)); \
+        void *i_temp_val_ = rf_array_ptrto_index_(arr_, ind_, sizeof(type_)); \
         if (!i_temp_val_) {                                             \
             fail_;                                                      \
+        } else {                                                        \
+            *((type_*)i_temp_val_) = val_;                              \
         }                                                               \
-        *((type_*)i_temp_val_) = val_;                                  \
     } while(0)
 
 /**
@@ -181,8 +192,9 @@ i_INLINE_DECL void rf_array_deinit(struct RFarray *a)
     do {                                                        \
         if (i_RF_ARRAY_IOB(arr_, ind_, sizeof(type_))) {        \
             fail_;                                              \
+        } else {                                                \
+            ((type_*)(arr_)->buff)[ind_] = val_;                \
         }                                                       \
-        ((type_*)(arr_)->buff)[ind_] = val_;                    \
     } while(0)
 
 i_INLINE_DECL void *rf_array_ptrto_index_(struct RFarray *a,
@@ -194,7 +206,9 @@ i_INLINE_DECL void *rf_array_ptrto_index_(struct RFarray *a,
         if (a->buff_allocated) {
             RF_REALLOC(a->buff, char, a->size * 2, NULL);
         } else {
+            char *old_buffer = a->buff;
             RF_MALLOC(a->buff, a->size * 2, NULL);
+            memcpy(a->buff, old_buffer, a->size);
             a->buff_allocated = true;
         }
         a->size *= 2;
