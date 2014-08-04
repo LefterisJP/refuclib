@@ -39,7 +39,7 @@
 #include <Definitions/defarg.h> //for enabling default arguments
 #include <Definitions/retcodes.h> //for bool
 #include <String/rf_str_xdecl.h> //for stringx 
-#include <Utils/buffer.h>       //for RFbuffer
+#include <Utils/array.h>       //for RFbuffer
 /*------------- libc inclusion --------------*/
 #include <stdio.h> //for FILE*
 /*------------- End of includes -------------*/
@@ -417,19 +417,19 @@ i_DECLIMEX_ int rf_textfile_read_line_chars(struct RFtextfile* t,
  **                      all lines are read.
  ** @param str           An already initialized @c RFstringx to hold the
  **                      read lines
- ** @param lines_pos     If not NULL, a buffer to put the positions in bytes
+ ** @param lines_pos     If not NULL, an array to put the positions in bytes
  **                      of each new line start. Starts counting from the very
- **                      first line. It will contain:
- **                      returned_lines number of line positions
- **                      Check the return value of the function to see how much
- **                      that would be.
+ **                      first line, element 0 is always 0. 
+ **                      Check the return value of the function to see how many
+ **                      uint32_t elements would be end up inside the passed
+ **                      RFarray
  **
  ** @return              The number of lines read or @c -1 for failure
  */
 i_DECLIMEX_ int rf_textfile_read_lines(struct RFtextfile* t,
                                        unsigned int lines,
                                        struct RFstringx *str,
-                                       struct RFbuffer *lines_pos);
+                                       struct RFarray *lines_pos);
 
 /**
  ** @brief Gets the current byte offset of the file

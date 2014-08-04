@@ -1452,15 +1452,12 @@ int rf_textfile_read_line_chars(struct RFtextfile* t,
 int rf_textfile_read_lines(struct RFtextfile* t,
                            unsigned int lines,
                            struct RFstringx* str,
-                           struct RFbuffer *lines_pos)
+                           struct RFarray *lines_pos)
 {
-#define add_line_pos(buff_, index_, val_)                               \
+#define add_line_pos(arr_, index_, val_)                                \
     do {                                                                \
-        if ((buff_)) {                                                  \
-            if (rf_buffer_remaining_size(buff_, uint32_t) <= 10) {      \
-                rf_buffer_increase_size(buff_, 10, uint32_t);           \
-                }                                                       \
-            rf_buffer_from_current_at(buff_, index_, uint32_t) = val_;  \
+        if ((arr_)) {                                                   \
+            rf_array_set(lines_pos, index_, uint32_t, val_, return -1); \
         }                                                               \
     }while(0)
     unsigned int lines_read = 0;

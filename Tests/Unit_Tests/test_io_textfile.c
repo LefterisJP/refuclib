@@ -17,6 +17,7 @@
 #include <String/rf_str_traversalx.h>
 #include <System/rf_system.h>
 #include <IO/rf_textfile.h>
+#include <Utils/array.h>
 
 
 #define PARTIAL_SECOND_LINE_UTF8                    \
@@ -283,24 +284,24 @@ START_TEST(test_textfile_read_lines) {
         PATH_TO"utf8stringfile"
     );
     uint32_t buff_arr[64];
-    struct RFbuffer buff = RF_BUFFER_SHALLOW_INIT(buff_arr, 64);
+    struct RFarray line_arr = RF_ARRAY_SHALLOW_INIT(buff_arr);
     ck_assert(rf_textfile_init(&f, &fname, RF_FILE_READ,
                                RF_ENDIANESS_UNKNOWN,
                                RF_UTF8, RF_EOL_LF));
 
     rf_stringx_reset(&g_buff);
     /* read all lines (3) */
-    ck_assert(3 == rf_textfile_read_lines(&f, 0, &g_buff, &buff));
+    ck_assert(3 == rf_textfile_read_lines(&f, 0, &g_buff, &line_arr));
     ck_assert_rf_str_eq_cstr(&g_buff,
                              FIRST_LINE_UTF8"\n"
                              SECOND_LINE_UTF8"\n"
                              THIRD_LINE_UTF8"\n"
     );
 
-    ck_assert_int_eq(rf_buffer_from_current_at(&buff, 0, uint32_t), 0);
-    ck_assert_int_eq(rf_buffer_from_current_at(&buff, 1, uint32_t), 12);
-    ck_assert_int_eq(rf_buffer_from_current_at(&buff, 2, uint32_t), 368);
-    ck_assert_int_eq(rf_buffer_from_current_at(&buff, 3, uint32_t), 1169);
+    ck_assert_int_eq(rf_array_at_unsafe(&line_arr, 0, uint32_t), 0);
+    ck_assert_int_eq(rf_array_at_unsafe(&line_arr, 1, uint32_t), 12);
+    ck_assert_int_eq(rf_array_at_unsafe(&line_arr, 2, uint32_t), 368);
+    ck_assert_int_eq(rf_array_at_unsafe(&line_arr, 3, uint32_t), 1169);
 
     ck_assert(RF_SUCCESS == rf_textfile_go_to_line(&f, 1));
 
