@@ -166,7 +166,8 @@ modules.append(
     Module("CORE",
            ['refu.c', 'Utils/endianess.c', 'Utils/log.c',
             'Utils/localmem.c', 'Utils/math.c',
-            'Internal/rf_internal_mod.c', 'Utils/buffer.c', 
+            'Internal/rf_internal_mod.c', 'Utils/buffer.c',
+            'Utils/array.c',
             'Utils/rf_unicode.c',
             'Numeric/Integer/conversion.c'])
 )
