@@ -57,10 +57,10 @@ extern "C"
  ** Shallow initialization of a string. If the source buffer,
  ** gets overwritten then the data are lost.
  **/
-#define RF_STRING_SHALLOW_INIT(i_string, i_buff, i_len)  \
-    do{                                                  \
-        (i_string)->data = i_buff;                       \
-        (i_string)->length = i_len;                      \
+#define RF_STRING_SHALLOW_INIT(i_string, i_buff, i_len) \
+    do{                                                 \
+        (i_string)->data = (i_buff);                    \
+        (i_string)->length = (i_len);                   \
     }while(0)
 
 /**
