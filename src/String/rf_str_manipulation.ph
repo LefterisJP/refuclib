@@ -49,8 +49,8 @@ i_INLINE_DECL bool rf_string_generic_prepend(void* thisstr, const char* other,
 
 /* checks if adding a string will need buffer reallocation */
 i_INLINE_DECL bool rf_stringx_generic_append(struct RFstringx* s,
-                                       const char* other,
-                                       unsigned int bytes_to_copy)
+                                             const char* other,
+                                             unsigned int bytes_to_copy)
 {
     //if it does not fit inside the remaining size, reallocate the buffer
     RF_STRINGX_REALLOC(s,

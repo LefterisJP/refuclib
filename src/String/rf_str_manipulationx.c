@@ -175,8 +175,7 @@ bool rf_stringx_insert(struct RFstringx* thisstr, uint32_t pos,
         cleanup);
     //iterate this string to find the byte position of the character position
     RF_STRING_ITERATE_START(thisstr, length, i)
-        if(length == pos)
-        {
+        if (length == pos) {
             //found the position. Is saved in bytePos
             bytePos = i;
             found = true;
@@ -207,6 +206,7 @@ bool rf_stringx_insert(struct RFstringx* thisstr, uint32_t pos,
 bool rf_stringx_append_bytes(struct RFstringx* thisstr, const void* other,
                              const unsigned int bytes)
 {
+    unsigned int add_bytes;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr);
@@ -216,14 +216,18 @@ bool rf_stringx_append_bytes(struct RFstringx* thisstr, const void* other,
         ret = false;
         goto cleanup;
     }
-
+    
+    add_bytes = rf_string_length_bytes(other);
+    if (bytes < add_bytes) {
+        add_bytes = bytes;
+    }
     //if it does not fit inside the remaining size, reallocate the buffer
     RF_STRINGX_REALLOC_JMP(
         thisstr,
-        rf_string_length_bytes(thisstr) + bytes,
+        rf_string_length_bytes(thisstr) + add_bytes,
         ret = false,
         cleanup);
-    ret = rf_stringx_generic_append(thisstr, rf_string_data(other), bytes);
+    ret = rf_stringx_generic_append(thisstr, rf_string_data(other), add_bytes);
 
   cleanup:
     RF_EXIT_LOCAL_SCOPE();
@@ -300,6 +304,7 @@ bool rf_stringx_replace(struct RFstringx* thisstr, const void* sstr,
     return ret;
 }
 
+//TODO: I really don't like this temporary string_buff. Try to get rid of it
 bool rf_stringx_replace_between(struct RFstringx* thisstr, const void* left,
                                 const void* right, const void* rstr,
                                 enum RFstring_matching_options options,
@@ -351,9 +356,8 @@ bool rf_stringx_replace_between(struct RFstringx* thisstr, const void* left,
              * below fail since the while condition is true
              */
             rf_stringx_move_after(thisstr, left, 0, options);
-            if(rf_stringx_replace(thisstr, &string_buff, rstr, 1, options))
-            {
-                goto cleanup;
+            if (rf_stringx_replace(thisstr, &string_buff, rstr, 1, options)) {
+                goto cleanup2;
             }
             
             /* if left == right don't go over the right separator when searching */
@@ -367,8 +371,8 @@ bool rf_stringx_replace_between(struct RFstringx* thisstr, const void* left,
             rf_string_length_bytes(thisstr) -= move;
         }
 
-        if(found)//if we replaced at least 1 occurence
-        {
+        //if we replaced at least 1 occurence
+        if (found) {
             move = thisstr->bIndex - start;
             rf_string_data(thisstr) -= move;
             thisstr->bIndex = start;
@@ -376,15 +380,13 @@ bool rf_stringx_replace_between(struct RFstringx* thisstr, const void* left,
             //success
             ret = true;
         }
-        goto cleanup;
+        goto cleanup2;
     }
 
     ///if we check for a specific instance
-    for(j = 1; j < i; j++)
-    {
+    for (j = 1; j < i; j++) {
         //move after the pair of the 'j' inbetween substrings
-        if(!rf_stringx_move_after_pair(thisstr, left, right,
-                                       &string_buff, options, 0))
+        if (!rf_stringx_move_after_pair(thisstr, left, right, 0, options, 0))
         {
             //and if the occurence does not exist
             move = thisstr->bIndex - start;
@@ -392,31 +394,28 @@ bool rf_stringx_replace_between(struct RFstringx* thisstr, const void* left,
             thisstr->bIndex = start;
             //and increase its bytelength
             rf_string_length_bytes(thisstr) += move;
-            goto cleanup;//falure
+            goto cleanup2;//falure
         }
     }
     //move after the pair of the inbetween substrings we actually want
-    if(!rf_string_between(thisstr, left, right, &string_buff, options))
-    {
+    if (!rf_string_between(thisstr, left, right, &string_buff, options)) {
         //and if the occurence does not exist
         move = thisstr->bIndex-start;
         rf_string_data(thisstr) -= move;
         thisstr->bIndex = start;
         //and increase its bytelength
         rf_string_length_bytes(thisstr) += move;
-        goto cleanup;//falure
+        goto cleanup2;//falure
     }
     ///success
     //move after the left part of the pair
     rf_stringx_move_after(thisstr, left, 0, options);
     //and then replace the occurence
-    if(!rf_stringx_replace(thisstr, &string_buff, rstr, 1, options))
-    {
+    if (!rf_stringx_replace(thisstr, &string_buff, rstr, 1, options)) {
         //failure
-        goto cleanup;
+        goto cleanup2;
     }
     //now we are done and should go back
-    rf_stringx_deinit(&string_buff);
     move = thisstr->bIndex - start;
     rf_string_data(thisstr) -= move;
     thisstr->bIndex = start;
@@ -424,6 +423,8 @@ bool rf_stringx_replace_between(struct RFstringx* thisstr, const void* left,
 
     //if we get here success
     ret = true;
+cleanup2:
+    rf_stringx_deinit(&string_buff);
 cleanup:
     RF_EXIT_LOCAL_SCOPE();
     return ret;

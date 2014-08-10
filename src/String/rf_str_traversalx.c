@@ -250,6 +250,7 @@ unsigned int rf_stringx_skip_chars(struct RFstringx* thisstr,
     return chars_skipped;
 }
 
+//TODO: replace this ugly string_buff with something else
 bool rf_stringx_move_after_pair(struct RFstringx* thisstr, const void* left,
                                 const void* right, void* resultP,
                                 enum RFstring_matching_options options,
@@ -267,8 +268,7 @@ bool rf_stringx_move_after_pair(struct RFstringx* thisstr, const void* left,
         goto cleanup;
     }
     //check the occurence parameter
-    if(occurence == 0)
-    {
+    if (occurence == 0) {
         occurence = 1;
     }
 
@@ -282,14 +282,14 @@ bool rf_stringx_move_after_pair(struct RFstringx* thisstr, const void* left,
     }
 
     //get the in between string and if it is null return false
-    for(i = 1; i <= occurence; i ++)
-    {
+    for (i = 1; i <= occurence; i ++) {
+
         //attempt to get the in between string
         if(!rf_string_between(thisstr, left, right,
                               &string_buff, options|RF_STRINGX_ARGUMENT))
         {
             ret = false;
-            goto cleanup;
+            goto cleanup_str_buff;
         }
 
         //move after this occurence of the pair
@@ -301,15 +301,13 @@ bool rf_stringx_move_after_pair(struct RFstringx* thisstr, const void* left,
         }
 
         //if we found it
-        if(i == occurence)
-        {
+        if (i == occurence) {
             found = true;
             break;
         }
     }
     //if we get here and the result is not found return failure
-    if(found == false)
-    {
+    if (!found) {
         //get the pointer back
         move = thisstr->bIndex - start;
         rf_string_data(thisstr) -= move;
@@ -320,12 +318,9 @@ bool rf_stringx_move_after_pair(struct RFstringx* thisstr, const void* left,
     }
     //if we don't want to keep the result free it
     if (resultP) {
-        if(options & RF_STRINGX_ARGUMENT)
-        {
+        if (options & RF_STRINGX_ARGUMENT) {
             rf_stringx_copy_in(resultP, &string_buff);
-        }
-        else
-        {
+        } else {
             rf_string_copy_in(resultP, &string_buff);
         }
     }

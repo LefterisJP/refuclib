@@ -672,6 +672,7 @@ START_TEST(test_stringx_prepend) {
 
     rf_stringx_deinit(&s);        
     rf_stringx_deinit(&s2);            
+    rf_stringx_deinit(&s3);            
 }END_TEST
 
 START_TEST(test_stringx_insert) {
@@ -955,6 +956,7 @@ Suite *string_manipulation_suite_create(void)
     suite_add_tcase(s, string_replacing);
 
     suite_add_tcase(s, stringx_appending);
+    suite_add_tcase(s, stringx_unsafe_appending);
     suite_add_tcase(s, stringx_replacing);
     return s;
 }

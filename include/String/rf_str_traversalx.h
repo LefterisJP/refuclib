@@ -247,6 +247,9 @@ i_DECLIMEX_ unsigned int rf_stringx_skip_chars(struct RFstringx* thisstr,
  ** @param right         The right substring that will define the new substring.
  **                      @inhtype{String,StringX} @tmpSTR
  ** @param result        For details @see rf_stringx_move_after()
+ **                      The string is copied to using copy_in, so provide a
+ **                      non initialized string, or free it before passing it
+ **                      to the function.
  ** @param options       For details @see rf_stringx_move_after()
  ** @param occurence     If this is not 0 then the function
  **                      will search for the number of occurence given in this

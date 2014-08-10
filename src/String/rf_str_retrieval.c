@@ -251,7 +251,10 @@ bool rf_string_scanf_after(const void* str, const void* astr,
 {
     char *s;
     const char *found;
+    unsigned int sub_length;
+    unsigned int buff_size;
     bool ret = false;
+
     RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(str);
     if (!astr) {
@@ -269,18 +272,27 @@ bool rf_string_scanf_after(const void* str, const void* astr,
 
     found = strstr_nnt(rf_string_data(str), rf_string_length_bytes(str),
                       rf_string_data(astr), rf_string_length_bytes(astr));
-    if(!found)
-    {
+    if (!found) {
         goto cleanup;
     }
     //get a pointer to the start of the position where sscanf will be used
     s = rf_string_data(str) + (
-        found - rf_string_data(str) + rf_string_length_bytes(astr)
+        (found - rf_string_data(str)) + rf_string_length_bytes(astr)
     );
 
-    //use sscanf
-    if(sscanf(s, format, var) <= 0)
-    {
+
+    // copy it into a temporary buffer to null terminate it for sscanf
+    sub_length = (rf_string_data(str) + rf_string_length_bytes(str)) - s + 1;
+    buff_size = rf_buffer_remaining_size(TSBUFFA, char);
+    if (buff_size <= sub_length) {
+        rf_buffer_increase_size(TSBUFFA, buff_size * 2, char);
+    }
+    memcpy(rf_buffer_current_ptr(TSBUFFA, char), s, sub_length - 1);
+    rf_buffer_from_current_at(TSBUFFA, sub_length, char) = '\0';
+    
+
+    //use sscanf (!!!) strings are not null terminated
+    if (sscanf(rf_buffer_current_ptr(TSBUFFA, char), format, var) <= 0) {
         goto cleanup;
     }
     //success

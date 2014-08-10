@@ -120,7 +120,8 @@ i_INLINE_DECL bool rf_buffer_init(struct RFbuffer* b, size_t size)
 {
     b->size = size;
     b->index = 0;
-    RF_MALLOC(b->buff, size, false);
+    RF_CALLOC(b->buff, size, 1, false);
+    /* RF_MALLOC(b->buff, size, false); */
     return true;
 }
 

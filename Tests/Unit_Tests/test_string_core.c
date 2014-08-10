@@ -10,8 +10,20 @@
 #include <String/rf_str_core.h>
 #include <String/rf_str_corex.h>
 
-/* --- String Initialization Tests --- START --- */
 
+bool test_accept_vargs(struct RFstring *s, const char *fmt, ...)
+{
+    bool ret;
+    va_list args;
+
+    va_start(args, fmt);
+    ret = rf_string_initvl(s, fmt, args);
+    va_end(args);
+
+    return ret;
+}
+
+/* --- String Initialization Tests --- START --- */
 START_TEST(test_string_init) {
     struct RFstring s;
     ck_assert(rf_string_init(&s, "This is the test of String initialization"));
@@ -29,6 +41,25 @@ START_TEST(test_string_initv) {
                         "%s %d %.3f %u",
                         "Printf style initialization",
                         1337, 3.141592, 912341)
+    );
+    ck_assert_rf_str_eq_cstr(&s,
+                             "Printf style initialization 1337 3.142 912341");
+    ck_assert(!rf_string_initv(&s, NULL));
+
+    RF_STRING_SHALLOW_INIT(&s2, rf_string_data(&s), rf_string_length(&s));
+    ck_assert_rf_str_eq_cstr(&s2,
+                             "Printf style initialization 1337 3.142 912341");
+
+    rf_string_deinit(&s);
+}END_TEST
+
+START_TEST(test_string_initvl) {
+    struct RFstring s, s2;
+    ck_assert(
+        test_accept_vargs(&s,
+                        "%s %d %.3f %u",
+                        "Printf style initialization",
+                          1337, 3.141592, 912341)
     );
     ck_assert_rf_str_eq_cstr(&s,
                              "Printf style initialization 1337 3.142 912341");
@@ -349,9 +380,10 @@ START_TEST(test_string_iterate_backwards) {
     );
     ck_assert(rf_string_init(&s, cstr));
 
-    i = rf_string_length_bytes(&s);
+
+    i = rf_string_length(&s) - 1; /* start from last character */
     rf_string_iterate_b_start(&s, i, c)
-    if( i >= START_OF_UNICODE_INDEX) {
+    if (i >= START_OF_UNICODE_INDEX) {
         switch(i) {
         case START_OF_UNICODE_INDEX: /* unicode value of よ */
             ck_assert_int_eq(c, 12424);
@@ -724,6 +756,7 @@ Suite *string_core_suite_create(void)
                               teardown_string_tests);
     tcase_add_test(string_init, test_string_init);
     tcase_add_test(string_init, test_string_initv);
+    tcase_add_test(string_init, test_string_initvl);
     tcase_add_test(string_init, test_string_init_cp);
     tcase_add_test(string_init, test_string_init_int);
     tcase_add_test(string_init, test_string_init_double);

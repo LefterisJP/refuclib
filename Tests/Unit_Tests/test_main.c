@@ -76,11 +76,11 @@ int main(int argc, char **argv)
     srunner_add_suite(sr, string_manipulation_suite_create());
     srunner_add_suite(sr, string_traversal_suite_create());
 
-    srunner_add_suite(sr, utils_unicode_suite_create());
-    srunner_add_suite(sr, utils_array_suite_create());
+    /* srunner_add_suite(sr, utils_unicode_suite_create()); */
+    /* srunner_add_suite(sr, utils_array_suite_create()); */
 
-    srunner_add_suite(sr, io_files_suite_create());
-    srunner_add_suite(sr, io_textfile_suite_create());
+    /* srunner_add_suite(sr, io_files_suite_create()); */
+    /* srunner_add_suite(sr, io_textfile_suite_create()); */
 
     srunner_set_fork_status (sr, fork_type);
     srunner_run_all(sr, print_type);

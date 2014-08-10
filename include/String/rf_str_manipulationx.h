@@ -140,6 +140,8 @@ i_DECLIMEX_ bool rf_stringx_insert(struct RFstringx* thisstr, uint32_t pos,
  ** @param other        The string to add to this string.
  **                     @inhtype{String,StringX} @tmpSTR
  ** @param bytes        The number of bytes of @c other to append to @c thisstr
+ **                     If more than the total number of bytes of the string
+ **                     then all of the bytes are added
  ** @return             Returns @c true in success and @c false otherwise
  ** @see rf_stringx_append()
  **/

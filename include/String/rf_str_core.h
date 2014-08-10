@@ -38,7 +38,8 @@
 #include <Definitions/retcodes.h> //for bool
 #include <Utils/rf_unicode.h> //for rf_utf8_is_continutation_byte
 /*------------- libc inclusion --------------*/
- #include <string.h> //for size_t
+#include <string.h> //for size_t
+#include <stdarg.h> //for va_XXX stuff
 /*------------- End of includes -------------*/
 #ifdef __cplusplus
 extern "C"
@@ -97,6 +98,7 @@ i_DECLIMEX_ struct RFstring* rf_string_create(const char* s);
  ** @see rf_string_init()
  **/
 i_DECLIMEX_ struct RFstring* rf_string_createv(const char* s, ...);
+i_DECLIMEX_ struct RFstring* rf_string_createvl(const char* s, va_list args);
 
 
 /**
@@ -117,6 +119,7 @@ i_DECLIMEX_ bool rf_string_init(struct RFstring* str,const char* s);
  **
  **/
 i_DECLIMEX_ bool rf_string_initv(struct RFstring* str, const char* s, ...);
+i_DECLIMEX_ bool rf_string_initvl(struct RFstring* str, const char* s, va_list args);
 
 /**
  ** @brief Allocates a String by turning a unicode code point
@@ -615,39 +618,44 @@ i_DECLIMEX_ uint32_t rf_string_bytepos_to_charpos(const void* thisstr,
 ** @see rf_string_iterate_b_end()
 ** @see rf_string_iterate_start()
 **/
-#define rf_string_iterate_b_start(string_,characterPos_,\
-                                characterUnicodeValue_)     {           \
+#define rf_string_iterate_b_start(string_,                              \
+                                  characterPos_,                        \
+                                  characterUnicodeValue_)     {         \
     /* b index is the byte index and j the character index*/            \
-    uint32_t b_index_ = 0;uint32_t j_=0;                                \
+    uint32_t b_index_ = 0;                                              \
+    uint32_t j_=0;                                                      \
     /*                                                                  \
-       c index sec is another signed copy of the character index        \
-       (and is int64_t so that it can cater for any situation). Reason  \
-       is cause going backwards we gotta have -1 too                    \
-    */                                                                  \
+     * c index sec is another signed copy of the character index       \
+     * (and is int64_t so that it can cater for any situation). Reason \
+     * is cause going backwards we gotta have -1 too                   \
+     */                                                                 \
     int64_t c_index_ = characterPos_;                                   \
     /*                                                                  \
-      iterate until we find the character position requested and        \
-      its equivalent byte position                                      \
-    */                                                                  \
-    while(j_ != characterPos_)                                          \
-    {                                                                   \
+     * iterate until we find the character position requested and       \
+     * its equivalent byte position                                     \
+     */                                                                 \
+    while (b_index_ < rf_string_length_bytes(string_) && j_ != characterPos_) { \
         if(!rf_utf8_is_continuation_byte(rf_string_data(string_)[b_index_])) \
         {                                                               \
             j_++;                                                       \
         }                                                               \
         b_index_++;                                                     \
     }                                                                   \
+    /* make sure that we don't stop at continuation byte */             \
+    while (b_index_ < rf_string_length_bytes(string_) &&                \
+           rf_utf8_is_continuation_byte(rf_string_data(string_)[b_index_])) { \
+        b_index_++;                                                     \
+    }                                                                   \
     /*                                                                  \
-      now start the requested iteration - notice that the               \
-      end condition is to reach the first character position            \
-    */                                                                  \
-    while(c_index_ != -1)                                               \
-    {                                                                   \
+     * now start the requested iteration - notice that the              \
+     * end condition is to reach the first character position           \
+     */                                                                 \
+    while (c_index_ != -1)                                             { \
         /*if it's a character*/                                         \
         if(!rf_utf8_is_continuation_byte(rf_string_data(string_)[b_index_])) \
         {/*Give the character value to the user*/                       \
             characterUnicodeValue_ = rf_string_bytepos_to_codepoint((string_), \
-                                                                 b_index_);
+                                                                    b_index_);
 
 /**
  ** @cppignore

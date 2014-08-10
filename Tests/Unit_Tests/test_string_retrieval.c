@@ -411,6 +411,8 @@ START_TEST(test_string_between) {
 
 
     rf_string_deinit(&s);
+    rf_string_deinit(&s2);
+    rf_string_deinit(&f1);
     rf_string_deinit(&p1l);
     rf_string_deinit(&p1r);
     rf_string_deinit(&p2l);

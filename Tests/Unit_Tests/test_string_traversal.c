@@ -398,14 +398,14 @@ START_TEST(test_stringx_skip_chars) {
 
 START_TEST(test_stringx_move_after_pair) {
     struct RFstringx s;
-    struct RFstringx str_buff;
+    struct RFstring res_str_good;
+    struct RFstring res_str_bad;
     struct RFstring dependent_s;
     static const struct RFstring sub1 = RF_STRING_STATIC_INIT("「");
     static const struct RFstring sub2 = RF_STRING_STATIC_INIT("」");
     static const struct RFstring sub3 = RF_STRING_STATIC_INIT("eleos");
     static const struct RFstring sub4 = RF_STRING_STATIC_INIT("notthere");
 
-    ck_assert(rf_stringx_init_buff(&str_buff, 1024, ""));
     ck_assert(
         rf_stringx_init(
             &s,
@@ -419,13 +419,13 @@ START_TEST(test_stringx_move_after_pair) {
 
 
     ck_assert(
-        rf_stringx_move_after_pair(&s, &sub1, &sub2, &str_buff, 0, 2)
+        rf_stringx_move_after_pair(&s, &sub1, &sub2, &res_str_good, 0, 2)
     );
     ck_assert_rf_str_eq_cstr(
         &s, "Let's see if the function will work as expected."
     );
     ck_assert_rf_str_eq_cstr(
-        &str_buff, "ブラケットの中のテキストは結果になる"
+        &res_str_good, "ブラケットの中のテキストは結果になる"
     );
 
     /* dependent string */
@@ -442,13 +442,14 @@ START_TEST(test_stringx_move_after_pair) {
     );
 
     /* non existing substrings */
-    ck_assert(!rf_stringx_move_after_pair(&s, &sub3, &sub4, &str_buff, 0, 2));
+    ck_assert(!rf_stringx_move_after_pair(&s, &sub3, &sub4, &res_str_bad, 0, 2));
     /* invalid input */
-    ck_assert(!rf_stringx_move_after_pair(&s, NULL, &sub2, &str_buff, 0, 2));
-    ck_assert(!rf_stringx_move_after_pair(&s, &sub1, NULL, &str_buff, 0, 2));
+    ck_assert(!rf_stringx_move_after_pair(&s, NULL, &sub2, &res_str_bad, 0, 2));
+    ck_assert(!rf_stringx_move_after_pair(&s, &sub1, NULL, &res_str_bad, 0, 2));
 
     rf_stringx_deinit(&s);
-    rf_stringx_deinit(&str_buff);
+    rf_string_deinit(&res_str_good);
+    rf_string_deinit(&dependent_s);
 }END_TEST
 
 Suite *string_traversal_suite_create(void)

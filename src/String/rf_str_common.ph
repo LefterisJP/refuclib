@@ -236,16 +236,17 @@ i_INLINE_DECL bool fill_fmt_buffer(const char *fmt,
     va_copy(copy_va_list, args); /* C99 only */
     rc = vsnprintf(rf_buffer_current_ptr(TSBUFFA, char), n, fmt, copy_va_list);
     va_end(copy_va_list);
-    if(rc < 0) {
+    if (rc < 0) {
         return false;
     }
-    if(rc >= n) {
+    if (rc >= n) {
         if(!rf_buffer_increase_size(TSBUFFA, rc *2, char)) {
             return false;
         }
         n = rf_buffer_size(TSBUFFA);
         *buffPtr = rf_buffer_current_ptr(TSBUFFA, char);
         *bIndex = rf_buffer_index(TSBUFFA);
+        
         rc = vsnprintf(rf_buffer_current_ptr(TSBUFFA, char), n, fmt, args);
         if (rc < 0 || rc >= n) {
             return false;
@@ -268,6 +269,7 @@ i_INLINE_DECL void rf_string_generic_append(void *thisstr, const char* other,
         bytes_to_copy
    );
    rf_string_length_bytes(thisstr) += bytes_to_copy;
+   
 }
 
 /**

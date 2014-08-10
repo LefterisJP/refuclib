@@ -326,7 +326,8 @@ static void test_rf_string_fwrite_generic(const char* filename, int encoding,
     FILE *out;
     struct RFstring s, s2;
     char eof;
-    struct RFstring out_name = RF_STRING_STATIC_INIT(PATH_TO"outputfile");
+    static struct RFstring out_name = RF_STRING_STATIC_INIT(PATH_TO"outputfile");
+    static struct RFstring nl = RF_STRING_STATIC_INIT("\n");
 
     ck_assert((f = fopen(filename, "rb")) != NULL);
     ck_assert(
@@ -348,7 +349,7 @@ static void test_rf_string_fwrite_generic(const char* filename, int encoding,
     ck_assert(eof == true);
 
     /* remove all newlines since we want to read it one-off */
-    ck_assert(rf_string_remove(&s, RFS_("\n"), 0, 0));
+    ck_assert(rf_string_remove(&s, &nl, 0, 0));
     /* open an output file and write the string there */
     ck_assert((out = fopen(PATH_TO"outputfile","w+b")) != NULL);
     ck_assert(rf_string_fwrite(&s, out, encoding, endianess));

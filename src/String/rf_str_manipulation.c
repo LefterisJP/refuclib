@@ -134,7 +134,7 @@ bool rf_string_prepend(struct RFstring* thisstr, const void* other)
 bool rf_string_remove(void* thisstr, const void* rstr, uint32_t number,
                       enum RFstring_matching_options options)
 {
-    uint32_t i,count,occurences=0;
+    uint32_t i, count, occurences=0;
     int32_t bytePos;
     char found = false, ret = true;
     RF_ENTER_LOCAL_SCOPE();
@@ -146,30 +146,26 @@ bool rf_string_remove(void* thisstr, const void* rstr, uint32_t number,
     }
 
     //as long as we keep finding rstr in the string keep removing it
-    do
-    {
+    do {
         bytePos = rf_string_find_byte_pos(thisstr, rstr, options);
         //if the substring is not found
-        if(bytePos == RF_FAILURE)
-        {
+        if (bytePos == RF_FAILURE) {
             //if we have not even found it once , we fail
-            if(!found)
-            {
+            if (!found) {
                 ret = false;
                 goto cleanup;
-            }
-            else
-            {
+            } else {
                 //else we are done
                 break;
             }
         }
         //substring found
         found = true;
-        //move all of the string a position back
+        //move all of the string after the found position back
         count = 0;
-        for(i = bytePos; i <= rf_string_length_bytes(thisstr); i ++)
-        {
+        for (i = bytePos;
+             i < rf_string_length_bytes(thisstr) - rf_string_length_bytes(rstr);
+             i ++) {
             rf_string_data(thisstr)[i] = (
                 rf_string_data(thisstr)[i + rf_string_length_bytes(rstr)]
             );
@@ -179,11 +175,10 @@ bool rf_string_remove(void* thisstr, const void* rstr, uint32_t number,
         rf_string_length_bytes(thisstr) -= rf_string_length_bytes(rstr);
         //count number of occurences, if we reached the required, stop
         occurences++;
-        if(occurences == number)
-        {
+        if (occurences == number) {
             break;
         }
-    }while(bytePos != RF_FAILURE);
+    } while(bytePos != RF_FAILURE);
 
   cleanup:
     RF_EXIT_LOCAL_SCOPE();
@@ -470,9 +465,9 @@ bool rf_string_prune_middle_f(void* thisstr, uint32_t p,
     }
 
     //move the bytes in the buffer to remove the requested characters
-    for(i=previous_byte_pos, j=0;
-        j<= rf_string_length_bytes(thisstr) - new_byte_pos;
-        i ++,j++)
+    for(i = previous_byte_pos, j = 0;
+        j < rf_string_length_bytes(thisstr) - new_byte_pos;
+        i ++, j++)
     {
         rf_string_data(thisstr)[i] = rf_string_data(thisstr)[new_byte_pos + j];
     }
