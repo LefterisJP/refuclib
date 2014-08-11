@@ -61,11 +61,13 @@ extern "C"
  ** @param i_index_ A variable to hold the current byte position of the iteration
  **
  **/
-#define RF_STRING_ITERATE_START(i_string_, i_char_, i_index_)         \
-    i_index_ = 0;i_char_ = 0;                                         \
-    while( i_index_ < rf_string_length_bytes(i_string_)){                \
-    if(!rf_utf8_is_continuation_byte(                                    \
-       rf_string_data(i_string_)[(i_index_)])){
+#define RF_STRING_ITERATE_START(i_string_, i_char_, i_index_) \
+    i_index_ = 0;                                             \
+    i_char_ = 0;                                              \
+    while ( i_index_ < rf_string_length_bytes(i_string_)) {   \
+    fflush(stdout);                                           \
+    if (!rf_utf8_is_continuation_byte(                        \
+            rf_string_data(i_string_)[(i_index_)])) {
 
 #define RF_STRING_ITERATE_END(i_char_, i_index_)  (i_char_)++;}(i_index_)++;}
 
@@ -141,16 +143,16 @@ extern "C"
             /*create the new size*/                                     \
             (STR_)->bSize = (REQSIZE_+ (STR_)->bIndex) * RF_OPTION_STRINGX_CAPACITY_MULTIPLIER; \
             /*Reallocate the buffer depending on whether its internal pointer has a value or not*/ \
-            if((STR_)->bIndex == 0)                                       \
-                RF_REALLOC_JMP(rf_string_data(STR_), char,               \
-                               (STR_)->bSize, STMT_, GOTOFLAG_);          \
-                else                                                    \
-                {                                                       \
-                    rf_string_data(STR_) -= (STR_)->bIndex;              \
-                    RF_REALLOC_JMP(rf_string_data(STR_), char,           \
-                                   (STR_)->bSize, STMT_, GOTOFLAG_);      \
-                    rf_string_data(STR_) += (STR_)->bIndex;                \
-                }                                                       \
+            if((STR_)->bIndex == 0)                                     \
+                RF_REALLOC_JMP(rf_string_data(STR_), char,              \
+                               (STR_)->bSize, STMT_, GOTOFLAG_);        \
+            else                                                        \
+            {                                                           \
+                rf_string_data(STR_) -= (STR_)->bIndex;                 \
+                RF_REALLOC_JMP(rf_string_data(STR_), char,              \
+                               (STR_)->bSize, STMT_, GOTOFLAG_);        \
+                rf_string_data(STR_) += (STR_)->bIndex;                 \
+            }                                                           \
         }}while(0)
 
 

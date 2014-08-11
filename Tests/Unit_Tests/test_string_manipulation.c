@@ -713,7 +713,6 @@ START_TEST(test_stringx_insert) {
         "taking him past the 270 margin."
     );
 
-
     /* insert after string end */
     ck_assert(rf_stringx_init(&s2, "I am a small string"));
     ck_assert(!rf_stringx_insert(&s2, 999, &ins2));

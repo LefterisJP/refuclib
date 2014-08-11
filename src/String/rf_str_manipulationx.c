@@ -49,13 +49,13 @@ bool rf_stringx_append(struct RFstringx* thisstr, const void* other)
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr);
-    
+
     if (!other) {
         RF_WARNING("Provided null string for appending");
         ret = false;
         goto cleanup;
     }
-    
+
     ret = rf_stringx_generic_append(thisstr, rf_string_data(other),
                                     rf_string_length_bytes(other));
 
@@ -75,7 +75,7 @@ bool rf_stringx_append_chars(struct RFstringx* thisstr,
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr);
-    
+
     if (!other) {
         RF_WARNING("Provided null string for appending");
         ret = false;
@@ -152,7 +152,10 @@ bool rf_stringx_prepend(struct RFstringx* thisstr, const void* other)
 bool rf_stringx_insert(struct RFstringx* thisstr, uint32_t pos,
                       const void* other)
 {
-    uint32_t length, bytePos, size, i;
+    uint32_t length;
+    uint32_t bytePos;
+    uint32_t size;
+    uint32_t i;
     bool found = false, ret = false;
     RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr);
@@ -162,7 +165,22 @@ bool rf_stringx_insert(struct RFstringx* thisstr, uint32_t pos,
         ret = false;
         goto cleanup;
     }
-    
+
+    //iterate this string to find the byte position of the character position
+    RF_STRING_ITERATE_START(thisstr, length, i)
+        if (length == pos) {
+            //found the position. Is saved in bytePos
+            bytePos = i;
+            found = true;
+            break;
+        }
+    RF_STRING_ITERATE_END(length, i);
+    if (!found) {
+        goto cleanup;
+    }
+
+
+    ret = true;
     //keep the original byte length here
     size = rf_string_length_bytes(thisstr);
     //get the new byte length
@@ -173,28 +191,15 @@ bool rf_stringx_insert(struct RFstringx* thisstr, uint32_t pos,
         rf_string_length_bytes(thisstr),
         ;,
         cleanup);
-    //iterate this string to find the byte position of the character position
-    RF_STRING_ITERATE_START(thisstr, length, i)
-        if (length == pos) {
-            //found the position. Is saved in bytePos
-            bytePos = i;
-            found = true;
-            break;
-        }
-    RF_STRING_ITERATE_END(length, i);
-    //if the position is found in the string then insert
-    if(found)
-    {
-        ret = true;
-        //move the string's contents to make room for the extra string insertion
-        memmove(
-            rf_string_data(thisstr) + rf_string_length_bytes(other) + bytePos,
-            rf_string_data(thisstr) + bytePos, size - bytePos);
-        //now insert the new string
-        memcpy(rf_string_data(thisstr) + bytePos,
-               rf_string_data(other),
-               rf_string_length_bytes(other));
-    }
+
+    //move the string's contents to make room for the extra string insertion
+    memmove(
+        rf_string_data(thisstr) + rf_string_length_bytes(other) + bytePos,
+        rf_string_data(thisstr) + bytePos, size - bytePos);
+    //now insert the new string
+    memcpy(rf_string_data(thisstr) + bytePos,
+           rf_string_data(other),
+           rf_string_length_bytes(other));
 
   cleanup:
     RF_EXIT_LOCAL_SCOPE();
@@ -216,7 +221,7 @@ bool rf_stringx_append_bytes(struct RFstringx* thisstr, const void* other,
         ret = false;
         goto cleanup;
     }
-    
+
     add_bytes = rf_string_length_bytes(other);
     if (bytes < add_bytes) {
         add_bytes = bytes;
@@ -249,7 +254,7 @@ bool rf_stringx_append_cstr(struct RFstringx* thisstr, const char* cstr)
         thisstr,
         rf_string_length_bytes(thisstr) + len,
         false);
-    
+
     return rf_stringx_generic_append(thisstr, cstr, len);
 }
 
@@ -337,13 +342,13 @@ bool rf_stringx_replace_between(struct RFstringx* thisstr, const void* left,
     if (rf_string_equal(left, right)) {
         same_separators = true;
     }
-    
+
     if (!rf_stringx_init_buff(&string_buff, 128, "")) {
         ret = false;
         RF_ERROR("No memory");
         goto cleanup;
     }
-    
+
     if(i == 0)//if we want all occurences replaced
     {
         //while we have occurences of the pair
@@ -359,7 +364,7 @@ bool rf_stringx_replace_between(struct RFstringx* thisstr, const void* left,
             if (rf_stringx_replace(thisstr, &string_buff, rstr, 1, options)) {
                 goto cleanup2;
             }
-            
+
             /* if left == right don't go over the right separator when searching */
             if (!same_separators) {
                 move = rf_string_length_bytes(rstr) + rf_string_length_bytes(right);

@@ -139,6 +139,7 @@ START_TEST(test_textfile_init) {
     ck_assert(!rf_textfile_init(&f, &g_fname, RF_FILE_NEW,
                                RF_ENDIANESS_UNKNOWN,
                                RF_UTF8, 9999));
+    rf_textfile_deinit(&f);
 
     ck_assert(rf_system_delete_file(&g_fname));
 }END_TEST
