@@ -5,7 +5,7 @@ from time import gmtime, strftime
 
 from utils import build_msg
 
-Import('systemAttributes refu_dir')
+Import('system_attributes refu_dir')
 Import('modules env targetSystem')
 # this is a list of macro defines (Except the modules and the OS define) that
 # should actually go to rf_options.h
@@ -105,11 +105,11 @@ f.write("#endif //closing the if compiling ifndef\n")
 f.write("#ifdef RF_DTOA_ONLY//some definitions only used in dtoa.c\n")
 
 # define long as int if we got 64 bit longs
-if systemAttributes['longsize'] == 8:
+if system_attributes['longsize'] == 8:
     f.write("\t#define Long int\n")
 f.write("#endif//end of dtoa.c only definitions\n")
 # also give the detected endianess definition for the system at compile time
-if systemAttributes['endianess'] == 'BIG':
+if system_attributes['endianess'] == 'BIG':
     writeDef(f, 'RF_BIG_ENDIAN_COMPILE')
 else:
     writeDef(f, 'RF_LITTLE_ENDIAN_COMPILE')
