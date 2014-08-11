@@ -510,8 +510,8 @@ START_TEST(test_textfile_insert_before) {
     /* EOF */
     ck_assert(RE_FILE_EOF == rf_textfile_read_line(&f, &g_buff));
 
-    ck_assert(rf_system_delete_file(&g_fname));
     rf_textfile_deinit(&f);
+    ck_assert(rf_system_delete_file(&g_fname));
 }END_TEST
 
 START_TEST(test_textfile_remove) {
@@ -568,8 +568,8 @@ START_TEST(test_textfile_remove) {
     ck_assert(!rf_textfile_remove(&f, 0));
     ck_assert(!rf_textfile_remove(&f, 9999));
 
-    ck_assert(rf_system_delete_file(&g_fname));
     rf_textfile_deinit(&f);
+    ck_assert(rf_system_delete_file(&g_fname));
 }END_TEST
 
 START_TEST(test_textfile_replace) {

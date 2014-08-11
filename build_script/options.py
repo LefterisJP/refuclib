@@ -7,8 +7,8 @@ from utils import build_msg
 
 Import('systemAttributes refu_dir')
 Import('modules env targetSystem')
-#this is a list of macro defines (Except the modules and the OS define) that
-#should actually go to rf_options.h
+# this is a list of macro defines (Except the modules and the OS define) that
+# should actually go to rf_options.h
 optionsList = ['_FILE_OFFSET_BITS',
                'RF_OPTION_THREADX_MSGQUEUE_SIZE',
                'RF_OPTION_FGETS_READ_BYTESN',
@@ -74,10 +74,10 @@ f.write(
     "//defines should be ignored as they are given by the build"
     "system\n".format(strftime("%Y-%m-%d %H:%M:%S", gmtime())))
 
-#depending on the OS write the proper macro
-if(targetSystem == 'Windows'):
+# depending on the OS write the proper macro
+if targetSystem == 'Windows':
     writeDef(f, "REFU_WIN32_VERSION")
-elif(targetSystem == 'Linux'):
+elif targetSystem == 'Linux':
     writeDef(f, "REFU_LINUX_VERSION")
 else:
     build_msg("Unsupported Operating system detected during creating "
@@ -89,27 +89,27 @@ else:
 for mod in modules[1:]:
     writeDef(f, mod.macro)
     if mod.extra_generated is True:
-        #if extra sources were generated for a module we need to know
+        # if extra sources were generated for a module we need to know
         writeDef(f, mod.macro + "_EXTRA")
 
-#also write all the defines which should go in the options file
+# also write all the defines which should go in the options file
 for o in optionsList:
     writeDefVal(f, o, env['CPPDEFINES'])
 
 
-#-- UP TO HERE WE HAVE THE DEFINES WHICH SHOULD NOT BE
-#-- VISIBLE AT COMPILE TIME
+# -- UP TO HERE WE HAVE THE DEFINES WHICH SHOULD NOT BE
+# -- VISIBLE AT COMPILE TIME
 f.write("#endif //closing the if compiling ifndef\n")
 
-#also write the system attributes used in dtoa.c
+# also write the system attributes used in dtoa.c
 f.write("#ifdef RF_DTOA_ONLY//some definitions only used in dtoa.c\n")
 
-#define long as int if we got 64 bit longs
-if(systemAttributes['longsize'] == 8):
+# define long as int if we got 64 bit longs
+if systemAttributes['longsize'] == 8:
     f.write("\t#define Long int\n")
 f.write("#endif//end of dtoa.c only definitions\n")
-#also give the detected endianess definition for the system at compile time
-if(systemAttributes['endianess'] == 'BIG'):
+# also give the detected endianess definition for the system at compile time
+if systemAttributes['endianess'] == 'BIG':
     writeDef(f, 'RF_BIG_ENDIAN_COMPILE')
 else:
     writeDef(f, 'RF_LITTLE_ENDIAN_COMPILE')
@@ -121,7 +121,7 @@ newF = open(temp_options_fname)
 try:
     oldF = open(options_fname)
 except:
-    #if the old options.h does not exist then simply rename the temporary
+    # if the old options.h does not exist then simply rename the temporary
     os.rename(temp_options_fname, options_fname)
     newF.close()
     build_msg("rf_options.h file was created because it did not already"
@@ -132,11 +132,11 @@ ratio = s.ratio()
 newF.close()
 oldF.close()
 
-#TODO: Perhaps this way is not safe and actual line by line comparison
+# TODO: Perhaps this way is not safe and actual line by line comparison
 # would be safer. Will consider it for the future
 
-#due to the timestamp changing we will consider them to be the same
-#if there is a ratio greater than 0.99
+# due to the timestamp changing we will consider them to be the same
+# if there is a ratio greater than 0.99
 if ratio < 0.99:
     build_msg("new rf_options.h file has a {} similarity with the old file"
               " and as such WILL be replaced".format(str(ratio)),

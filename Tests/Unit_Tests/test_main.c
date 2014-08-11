@@ -86,5 +86,10 @@ int main(int argc, char **argv)
     srunner_run_all(sr, print_type);
     number_failed = srunner_ntests_failed(sr);
     srunner_free(sr);
+
+    /* close standard streams to silence valgrind */
+    fclose(stdin);
+    fclose(stdout);
+    fclose(stderr);
     return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

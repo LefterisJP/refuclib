@@ -26,16 +26,18 @@ class Compiler:
         self.coptions = coptions
         self.debug_flags = debug_flags
 
-#Defining the compilers
+# Defining the compilers
 compilers = {}
-#GCC
+# GCC
 compilers['gcc'] = Compiler(
     name='gcc',
-    coptions={'all': ['-static-libgcc',
-                      '-std=gnu99' #gnu99 for c99 + gcc extensions (e.g: typeof)
-                      ], 
-              'Windows': [],
-              'Linux': []},
+    coptions={
+        'all': [
+            '-static-libgcc',
+            '-std=gnu99'  # gnu99 for c99 + gcc extensions (e.g: typeof)
+        ],
+        'Windows': [],
+        'Linux': []},
     cflags={'all': {}, 'Windows': {}, 'Linux': {'_GNU_SOURCE': None}},
     lflags={'all': [], 'Windows': [], 'Linux': []},
     libs={'all': [], 'Windows': [], 'Linux': ['rt', 'pthread', 'm']},
@@ -77,11 +79,11 @@ def setupCompiler(env, os, arg_env):
     """
     compilerdir = arg_env['COMPILER_DIR']
     compiler_name = arg_env['COMPILER']
-    #add general options and defines for the refu project
-    if(os == 'Windows'):
+    # add general options and defines for the refu project
+    if os == 'Windows':
         env.Append(CPPDEFINES={'REFU_WIN32_VERSION': None})
         env.Append(CPPDEFINES={'_WIN32_WINNT': '0x501'})
-    elif(os == 'Linux'):
+    elif os == 'Linux':
         env.Append(CPPDEFINES={'REFU_LINUX_VERSION': None})
         env.Append(CPPDEFINES={'_LARGEFILE64_SOURCE': None})
     else:
@@ -90,7 +92,7 @@ def setupCompiler(env, os, arg_env):
         Exit(1)
     env.Append(CPPDEFINES={'_FILE_OFFSET_BITS': 64})
 
-    #add debug symbols to the compiler if Debug is not 0
+    # add debug symbols to the compiler if Debug is not 0
     if arg_env['DEBUG'] != 0:
         add_compiler_field(env, os, compiler_name, 'CCFLAGS', 'debug_flags')
         env.Append(CPPDEFINES={'RF_OPTION_DEBUG': None})
@@ -106,7 +108,7 @@ def setupCompiler(env, os, arg_env):
                   "".format(compilerdir), 'Info', env)
         env.Replace(ENV={'PATH': compilerdir})
 
-    #set compiler defines, and compile and link options
+    # set compiler defines, and compile and link options
     add_compiler_field(env, os, compiler_name, 'CCFLAGS', 'coptions')
     add_compiler_field(env, os, compiler_name, 'CPPDEFINES', 'cflags')
     # it is possible that env['LIBS'] does not exist yet here and since

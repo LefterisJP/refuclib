@@ -62,10 +62,6 @@ setupConfigVars(temp, env)
 compiler = temp['COMPILER']
 system_attributes = SConscript('scripts/systemcheck/systemcheck.py',
                                exports='compiler')
-if system_attributes['has_valgrind']:
-    print("HAVE VALGRIND")
-else:
-    print("NO VALGRIND")
 
 # only if actually building create the options file
 # This condition is here only so that the old style, deprecated tests,

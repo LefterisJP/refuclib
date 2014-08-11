@@ -6,6 +6,7 @@ from utils import build_msg
 store_type_values = ['all', 'shallow', 'deep']
 extra_dict_required_keys = ['name', 'source_name', 'headers']
 
+
 def validate_extra_objects(extra_dict):
     """
     Checks that the EXTRA_OBJECTS list of dictionaries of objects
@@ -15,18 +16,17 @@ def validate_extra_objects(extra_dict):
         if not all(key in obj for key in extra_dict_required_keys):
             build_msg("The dictionary of an extra object must contain at least"
                       " the following keys: {}".format(', '.join(
-                          extra_dict_required_keys)
-            ))
+                          extra_dict_required_keys)))
             Exit(-1)
         if ("store_type" in obj.keys() and
-            obj["store_type"] not in store_type_values):
-            build_msg("Illegal value given for extra object \"store_type\" key."
+                obj["store_type"] not in store_type_values):
+            build_msg("Illegal value given for extra object \"store_type\" key"
                       "Legal values are: [{}]".format(', '.join(
-                          store_type_values
-            )))
+                          store_type_values)))
             Exit(-1)
 
     return extra_dict
+
 
 def extraobjects_to_dict(s):
     """
@@ -73,10 +73,10 @@ args_before.Add(
 
 args_before.Add(
     'EXTRA_OBJECTS',
-    'With this option you can provide extra object types to the template system'
-    ' so that they can be added as possible specialization options for data '
-    'structures and other modules that may use them. The syntax to achieve '
-    'this is the following:'
+    'With this option you can provide extra object types to the template '
+    'system so that they can be added as possible specialization options for'
+    'data structures and other modules that may use them. The syntax to '
+    'achieve this is the following:'
     ' EXTRA_OBJECTS=\"[{name:test_object,'
     'source_name:test_obj,'
     'headers:[Tests/ExtraObjects/test.h,<include/something.h>, ...],'
@@ -94,9 +94,7 @@ args_before.Add(
     '',
     converter=extraobjects_to_dict)
 
-                
-
-#return the variables, and make sure the paths are absolute
+# return the variables, and make sure the paths are absolute
 temp = Environment(variables=args_before)
 config_file = os.path.abspath(temp['CONFIG_FILE'])
 extra_objects = temp['EXTRA_OBJECTS']
