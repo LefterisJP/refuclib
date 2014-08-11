@@ -11,13 +11,25 @@
 #include <String/rf_str_corex.h>
 
 
-bool test_accept_vargs(struct RFstring *s, const char *fmt, ...)
+static bool test_accept_vargs(struct RFstring *s, const char *fmt, ...)
 {
     bool ret;
     va_list args;
 
     va_start(args, fmt);
     ret = rf_string_initvl(s, fmt, args);
+    va_end(args);
+
+    return ret;
+}
+
+static bool test_acceptx_vargs(struct RFstringx *s, const char *fmt, ...)
+{
+    bool ret;
+    va_list args;
+
+    va_start(args, fmt);
+    ret = rf_stringx_initvl(s, fmt, args);
     va_end(args);
 
     return ret;
@@ -445,6 +457,22 @@ START_TEST(test_stringx_initv) {
     rf_stringx_deinit(&sx);
 }END_TEST
 
+START_TEST(test_stringx_initvl) {
+    struct RFstringx sx;
+    ck_assert(
+        test_acceptx_vargs(&sx,
+                           "%s %d %.3f %u",
+                           "Printf style initialization",
+                           1337, 3.141592, 912341)
+    );
+    ck_assert_rf_strx_eq_cstr(&sx,
+                              "Printf style initialization 1337 3.142 912341");
+
+    ck_assert(!rf_stringx_initv(&sx, NULL));
+
+    rf_stringx_deinit(&sx);
+}END_TEST
+
 START_TEST(test_stringx_init_unsafe_nnt) {
     struct RFstringx s;
 
@@ -797,6 +825,7 @@ Suite *string_core_suite_create(void)
                               teardown_string_tests);
     tcase_add_test(stringx_init, test_stringx_init);
     tcase_add_test(stringx_init, test_stringx_initv);
+    tcase_add_test(stringx_init, test_stringx_initvl);
     tcase_add_test(stringx_init, test_stringx_init_unsafe_nnt);
     tcase_add_test(stringx_init, test_stringx_init_unsafe_bnnt);
     tcase_add_test(stringx_init, test_stringx_create_buffv);

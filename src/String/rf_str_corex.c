@@ -92,6 +92,41 @@ cleanup_lscope:
     return ret;
 }
 
+struct RFstringx* rf_stringx_createvl(const char* lit, va_list args)
+{
+    struct RFstringx* ret;
+    char *buff_ptr;
+    unsigned int size, buff_index;
+    RF_ENTER_LOCAL_SCOPE();
+    if (!lit) {
+        RF_ERROR("String initialization failed due to null pointer input");
+        ret = NULL;
+        goto cleanup_lscope;
+    }
+
+    //read the var args
+    if (!fill_fmt_buffer(lit, &size, &buff_ptr, &buff_index, args)) {
+        RF_ERROR("StringX creation failure due to failing at reading the "
+                  "formatted string");
+        ret = NULL;
+        goto cleanup_lscope;
+    }
+
+    RF_MALLOC_JMP(ret, sizeof(*ret), ret = NULL, cleanup_buffer);
+    if (!rf_stringx_init_unsafe_nnt(ret, buff_ptr, size)) {
+        free(ret);
+        ret = NULL;
+    }
+
+#ifdef RF_OPTION_DEBUG
+cleanup_buffer:
+#endif
+    rf_buffer_set_index(TSBUFFA, buff_index, char);
+cleanup_lscope:
+    RF_EXIT_LOCAL_SCOPE();
+    return ret;
+}
+
 struct RFstringx* rf_stringx_create(const char* lit)
 {
     struct RFstringx* ret;
@@ -134,6 +169,42 @@ bool rf_stringx_initv(struct RFstringx* str, const char* lit, ...)
                                   (const char*)buff_ptr,
                                   size))
     {
+        ret = false;
+    }
+
+
+    rf_buffer_set_index(TSBUFFA, buff_index, char);
+cleanup_lscope:
+    RF_EXIT_LOCAL_SCOPE();
+    return ret;
+}
+
+bool rf_stringx_initvl(struct RFstringx* str, const char* lit, va_list args)
+{
+    bool ret = true;
+    char *buff_ptr;
+    unsigned int size, buff_index;
+    RF_ENTER_LOCAL_SCOPE();
+    RF_ASSERT(str);
+
+    if (!lit) {
+        RF_ERROR("String initialization failed due to null pointer input");
+        ret = false;
+        goto cleanup_lscope;
+    }
+
+    //read the var args
+    if (!fill_fmt_buffer(lit, &size, &buff_ptr, &buff_index, args)) {
+        RF_ERROR("StringX creation failure due to failing at reading the "
+                  "formatted string");
+        ret = false;
+        goto cleanup_lscope;
+    }
+    //initialize the string
+    if (!rf_stringx_init_unsafe_nnt(str,
+                                   (const char*)buff_ptr,
+                                   size)) {
+
         ret = false;
     }
 

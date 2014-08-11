@@ -37,7 +37,8 @@
 #include <Definitions/types.h> //for exact sized types
 #include <Definitions/retcodes.h> //for bool
 /*------------- libc inclusion --------------*/
- #include <string.h> //for size_t
+#include <string.h> //for size_t
+#include <stdarg.h>  //for va_XXX stuff
 /*------------- End of includes -------------*/
 
 #ifdef __cplusplus
@@ -52,9 +53,14 @@ extern "C"
 
 i_DECLIMEX_ struct RFstringx* rf_stringx_create(const char* lit);
 i_DECLIMEX_ struct RFstringx* rf_stringx_createv(const char* lit,...);
+i_DECLIMEX_ struct RFstringx* rf_stringx_createvl(const char* lit,
+                                                 va_list args);
 
 i_DECLIMEX_ bool rf_stringx_init(struct RFstringx* str,const char* lit);
 i_DECLIMEX_ bool rf_stringx_initv(struct RFstringx* str,const char* lit,...);
+i_DECLIMEX_ bool rf_stringx_initvl(struct RFstringx* str,
+                                   const char* lit,
+                                   va_list args);
 
 
 

@@ -119,7 +119,9 @@ i_DECLIMEX_ bool rf_string_init(struct RFstring* str,const char* s);
  **
  **/
 i_DECLIMEX_ bool rf_string_initv(struct RFstring* str, const char* s, ...);
-i_DECLIMEX_ bool rf_string_initvl(struct RFstring* str, const char* s, va_list args);
+i_DECLIMEX_ bool rf_string_initvl(struct RFstring* str,
+                                  const char* s,
+                                  va_list args);
 
 /**
  ** @brief Allocates a String by turning a unicode code point
