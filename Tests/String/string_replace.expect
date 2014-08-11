@@ -1,1 +1,0 @@
-gcc -c -I../../includes -Wall -O2 tocompile.c -o ./obj/tocompile.o

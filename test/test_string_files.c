@@ -6,7 +6,6 @@
 #include "test_helpers.h"
 #include "utilities_for_testing.h"
 
-
 #include <refu.h>
 #include <String/rf_str_files.h>
 #include <String/rf_str_filesx.h>
@@ -15,8 +14,11 @@
 #include <String/rf_str_manipulation.h>
 #include <System/rf_system.h>
 
+// TODO: Work on replacing all these defines with the same
+// from test_io_helpers.h    ... there are some minor differences
+// that can be addressed
 
-#define PATH_TO "Tests/Unit_Tests/"
+#define PATH_TO "test/"
 #define SECOND_LINE_UTF8 \
     "２日の東京外国為替市場では、主要通貨に対して"                      \
     "円が売られている。午前１０時現在、ドルに対する円"                  \

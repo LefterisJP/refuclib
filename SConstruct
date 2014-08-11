@@ -18,8 +18,6 @@ allowedCompilers = ['gcc', 'tcc', 'msvc']
 legalBuildTargets = [
     'shared',
     'static',
-    'test_shared',
-    'test_static',
     'test',
     'check']
 
@@ -116,7 +114,7 @@ unit_tests_files = [
 
     'test_log.c'
 ]
-unit_tests_files = ['Tests/Unit_Tests/' + s for s in unit_tests_files]
+unit_tests_files = ['test/' + s for s in unit_tests_files]
 unit_tests_files.extend(['src/' + s for s in orig_sources])
 libs_check = env['LIBS']
 libs_check.append('check')
@@ -159,43 +157,6 @@ if system_attributes['has_valgrind']:
     # Simply required.  Without it, 'check' is never considered out of date.
     AlwaysBuild(check_alias_val)
 
-
 # generate help text for the variables
 Help(vars.GenerateHelpText(env))
 Help(args_before.GenerateHelpText(env))
-
-
-# -- OLD STYLE TESTS -- DEPRECATED
-if 'test_shared' in COMMAND_LINE_TARGETS:
-    del env['CPPDEFINES']['REFU_COMPILING']
-    env.Append(LIBPATH='./Tests')
-    env.Append(LIBS=outName)
-    # add debugging symbols to the tests
-    env.Append(CCFLAGS='-g')
-    # set the rpath for GCC
-    # TODO: For other compilers in Linux do something similar
-    env.Append(LINKFLAGS="-Wl,-rpath="+os.path.join(os.getcwd(),
-                                                    'Tests'))
-    test_sources = []
-    for f in temp['__TEST_SOURCES']:
-        f = os.path.join('Tests', f)
-        test_sources.append(f)
-    test_shared = env.Program(os.path.join('Tests', 'test'),
-                              test_sources)
-    env.Alias('test_shared', test_shared)
-
-if 'test_static' in COMMAND_LINE_TARGETS:
-    del env['CPPDEFINES']['REFU_COMPILING']
-    env.Append(CPPDEFINES={'REFU_TEST': None})
-    # add debugging symbols to the tests
-    env.Append(CCFLAGS='-g')
-    outName = env['LIBPREFIX']+outName+env['LIBSUFFIX']
-    env.Append(LIBS=File(os.path.join('Tests', outName)))
-
-    test_sources = []
-    for f in temp['__TEST_SOURCES']:
-        f = os.path.join('Tests', f)
-        test_sources.append(f)
-    test_static = env.Program(os.path.join('Tests', 'test'),
-                              test_sources)
-    env.Alias('test_static', test_static)
