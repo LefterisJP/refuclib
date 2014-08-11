@@ -42,7 +42,6 @@
 #include <Utils/sanity.h> //for the sanity check macros
 #include "../Internal/rf_internal_mod.ph" //for the internal buffer
 /*------------- libc inclusion --------------*/
-#include <stdarg.h> //for va_args
 #include <stdio.h> // for snprintf
 /*------------- End of includes -------------*/
 
@@ -50,72 +49,24 @@
 
 struct RFstring* rf_string_createv(const char* s, ...)
 {
-    struct RFstring* ret;
+    struct RFstring *ret;
     va_list args;
-    char *buff_ptr;
-    unsigned int size, buff_index;
-    RF_ENTER_LOCAL_SCOPE();
-    RF_CHECK_NOT_NULL_DEBUG_1(s, "string literal",
-                              ret = NULL; goto cleanup_lscope);
-    va_start(args,s);
-    //read the var args
-    if(!fill_fmt_buffer(s, &size, &buff_ptr, &buff_index, args))
-    {
-        RF_ERROR("String creation failure due to failing at reading the "
-                 "formatted string");
-        ret = NULL;
-        goto cleanup_lscope;
-    }
+
+    va_start(args, s);
+    ret = rf_string_createvl(s, args);
     va_end(args);
-    RF_MALLOC_JMP(ret, sizeof(*ret), ret = NULL, cleanup_buffer);
-
-    //get length
-    rf_string_length_bytes(ret) = size;
-    //now that we know the length we can allocate the buffer and copy the bytes
-    RF_MALLOC_JMP(rf_string_data(ret), rf_string_length_bytes(ret),
-                  ret = NULL, cleanup_buffer);
-    memcpy(rf_string_data(ret), buff_ptr, rf_string_length_bytes(ret));
-
-#ifdef RF_OPTION_DEBUG
-cleanup_buffer:
-#endif
-    rf_buffer_set_index(TSBUFFA, buff_index, char);
-cleanup_lscope:
-    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
 struct RFstring *rf_string_createvl(const char* s, va_list args)
 {
     struct RFstring* ret;
-    char *buff_ptr;
-    unsigned int size, buff_index;
-    RF_ENTER_LOCAL_SCOPE();
-    RF_CHECK_NOT_NULL_DEBUG_1(s, "string literal",
-                              ret = NULL; goto cleanup_lscope);
 
-    if(!fill_fmt_buffer(s, &size, &buff_ptr, &buff_index, args))
-    {
-        RF_ERROR("String creation failure due to failing at reading the "
-                 "formatted string");
-        ret = NULL;
-        goto cleanup_lscope;
+    RF_MALLOC(ret, sizeof(*ret), NULL);
+    if (!rf_string_initvl(ret, s, args)) {
+        free(ret);
+        return NULL;
     }
-    RF_MALLOC_JMP(ret, sizeof(*ret), ret = NULL, cleanup_buffer);
-
-    //get length
-    rf_string_length_bytes(ret) = size;
-    //now that we know the length we can allocate the buffer and copy the bytes
-    RF_MALLOC_JMP(rf_string_data(ret), rf_string_length_bytes(ret),
-                  ret = NULL, cleanup_buffer);
-    memcpy(rf_string_data(ret), buff_ptr, rf_string_length_bytes(ret));
-
-#ifdef RF_OPTION_DEBUG
-cleanup_buffer:
-#endif
-    rf_buffer_set_index(TSBUFFA, buff_index, char);
-cleanup_lscope:
-    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -123,56 +74,21 @@ struct RFstring* rf_string_create(const char* s)
 {
     struct RFstring* ret;
     RF_MALLOC(ret, sizeof(*ret), NULL);
-    if(!rf_string_init(ret, s))
-    {
+    if (!rf_string_init(ret, s)) {
         free(ret);
         return NULL;
     }
     return ret;
 }
 
-
-
-
 bool rf_string_initv(struct RFstring* str, const char* s, ...)
 {
     va_list args;
-    unsigned int size, buff_index;
-    bool ret = true;
-    char *buff_ptr;
-    RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(str);
-
-    if (!s) {
-        RF_ERROR("String initialization failed due to null pointer input");
-        ret = false;
-        goto cleanup_lscope;
-    }
+    bool ret;
 
     va_start(args, s);
-    //read the var args
-    if(!fill_fmt_buffer(s, &size, &buff_ptr, &buff_index, args))
-    {
-        RF_ERROR("String creation failure due to failing at reading the "
-                 "formatted string");
-        ret = false;
-        goto cleanup_lscope;
-    }
+    ret = rf_string_initvl(str, s, args);
     va_end(args);
-
-    //get length
-    rf_string_length_bytes(str) = size;
-    //now that we know the length we can allocate the buffer and copy the bytes
-    RF_MALLOC_JMP(rf_string_data(str), rf_string_length_bytes(str),
-                  ret = false, cleanup_buffer);
-    memcpy(rf_string_data(str), buff_ptr, rf_string_length_bytes(str));
-
-#ifdef RF_OPTION_DEBUG
-cleanup_buffer:
-#endif
-    rf_buffer_set_index(TSBUFFA, buff_index, char);
-cleanup_lscope:
-    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 

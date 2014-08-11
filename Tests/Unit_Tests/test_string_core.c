@@ -11,24 +11,36 @@
 #include <String/rf_str_corex.h>
 
 
-static bool test_accept_vargs(struct RFstring *s, const char *fmt, ...)
+static bool test_accept_vargs(struct RFstring *s,
+                              struct RFstring **alloc_s,
+                              const char *fmt, ...)
 {
     bool ret;
     va_list args;
+    va_list copy_list;
 
     va_start(args, fmt);
+    va_copy(copy_list, args);
+    *alloc_s = rf_string_createvl(fmt, copy_list);
+    va_end(copy_list);
     ret = rf_string_initvl(s, fmt, args);
     va_end(args);
 
     return ret;
 }
 
-static bool test_acceptx_vargs(struct RFstringx *s, const char *fmt, ...)
+static bool test_acceptx_vargs(struct RFstringx *s,
+                               struct RFstringx **alloc_s,
+                               const char *fmt, ...)
 {
     bool ret;
     va_list args;
+    va_list copy_list;
 
     va_start(args, fmt);
+    va_copy(copy_list, args);
+    *alloc_s = rf_stringx_createvl(fmt, copy_list);
+    va_end(copy_list);
     ret = rf_stringx_initvl(s, fmt, args);
     va_end(args);
 
@@ -67,13 +79,17 @@ START_TEST(test_string_initv) {
 
 START_TEST(test_string_initvl) {
     struct RFstring s, s2;
+    struct RFstring *s1;
     ck_assert(
         test_accept_vargs(&s,
-                        "%s %d %.3f %u",
-                        "Printf style initialization",
+                          &s1,
+                          "%s %d %.3f %u",
+                          "Printf style initialization",
                           1337, 3.141592, 912341)
     );
     ck_assert_rf_str_eq_cstr(&s,
+                             "Printf style initialization 1337 3.142 912341");
+    ck_assert_rf_str_eq_cstr(s1,
                              "Printf style initialization 1337 3.142 912341");
     ck_assert(!rf_string_initv(&s, NULL));
 
@@ -82,6 +98,7 @@ START_TEST(test_string_initvl) {
                              "Printf style initialization 1337 3.142 912341");
 
     rf_string_deinit(&s);
+    rf_string_destroy(s1);
 }END_TEST
 
 START_TEST(test_string_init_cp) {
@@ -459,18 +476,23 @@ START_TEST(test_stringx_initv) {
 
 START_TEST(test_stringx_initvl) {
     struct RFstringx sx;
+    struct RFstringx *sx_alloc;
     ck_assert(
         test_acceptx_vargs(&sx,
+                           &sx_alloc,
                            "%s %d %.3f %u",
                            "Printf style initialization",
                            1337, 3.141592, 912341)
     );
     ck_assert_rf_strx_eq_cstr(&sx,
                               "Printf style initialization 1337 3.142 912341");
+    ck_assert_rf_strx_eq_cstr(sx_alloc,
+                              "Printf style initialization 1337 3.142 912341");
 
     ck_assert(!rf_stringx_initv(&sx, NULL));
 
     rf_stringx_deinit(&sx);
+    rf_stringx_destroy(sx_alloc);
 }END_TEST
 
 START_TEST(test_stringx_init_unsafe_nnt) {
