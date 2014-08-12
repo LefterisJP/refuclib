@@ -40,6 +40,8 @@ temp = Environment(variables=vars)
 # create the building environment and setup the compiler
 env = Environment()
 setupCompiler(env, targetSystem, temp)
+# configure the environment
+env = SConscript('build_script/config.py', exports='env')
 
 # setting needed flags, paths and defines
 env.Append(CPPDEFINES={'REFU_COMPILING': None})

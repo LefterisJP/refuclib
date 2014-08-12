@@ -1,7 +1,7 @@
 
 #ignore thumbnails created by windows
 Thumbs.db
-#Ignore files build by Visual Studio
+#Ignore files built by Visual Studio
 *.obj
 *.pdb
 *.user
@@ -43,6 +43,7 @@ Examples/Doxygen_Html
 Tests/TestsLog
 *.o
 .sconsign.dblite
+.sconf_temp
 TAGS
 scripts/systemcheck/systemcheck
 librefu.a
