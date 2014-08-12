@@ -1,12 +1,10 @@
 import subprocess
 from subprocess import CalledProcessError
 from time import sleep
-from scripts.utils import which
 
 Import('compiler')
 system_attributes = {'endianess': 'BIG',
-                     'longsize': 4,
-                     'has_valgrind': False}
+                     'longsize': 4}
 
 # TODO: Alter the compiler call according to the compiler
 compileCall = compiler+" -I../../include systemcheck.c -o systemcheck"
@@ -69,11 +67,6 @@ try:
 except CalledProcessError as err:
     print("*ERROR*:There was an error while invoking the system check program")
     Exit(1)
-
-
-# now try to see if the system has valgrind
-system_attributes['has_valgrind'] = (False if which('valgrind') is None
-                                     else True)
 
 # finally return the figured out system attributes
 Return('system_attributes')

@@ -37,6 +37,7 @@ vars = SConscript('build_script/variables.py',
                   exports='allowedCompilers config_file code_gen')
 temp = Environment(variables=vars)
 
+
 # create the building environment and setup the compiler
 env = Environment()
 setupCompiler(env, targetSystem, temp)
@@ -141,7 +142,7 @@ check_alias = Alias('check', [test_run])
 AlwaysBuild(check_alias)
 
 # If we have valgrind also run the unit tests through valgrind
-if system_attributes['has_valgrind']:
+if env['has_valgrind']:
     valgrind_cmd = ("valgrind --tool=memcheck "
                     "--leak-check=yes "
                     "--track-origins=yes "
