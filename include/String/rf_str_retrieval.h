@@ -235,6 +235,8 @@ unsigned int rf_string_begins_with_any(const void *thisstr,
  **                      @inhtype{String,StringX}
  ** @param sstr          The substring for which to search.
  **                      @inhtype{String,StringX} @tmpSTR
+ ** @param bytes         If not 0, then this is the number of bytes into
+ **                      the string to search for the substring
  ** @param options       For details @see rf_string_remove()
  ** @return              Returns the number of times cstr exists inside the
  **                      string. In case it is not found at all 0 is returned.
@@ -243,6 +245,7 @@ unsigned int rf_string_begins_with_any(const void *thisstr,
  **/
 i_DECLIMEX_ int rf_string_count(
     const void* thisstr, const void* sstr,
+    unsigned int bytes,
     enum RFstring_matching_options options
 );
 

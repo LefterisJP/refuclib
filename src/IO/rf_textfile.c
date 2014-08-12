@@ -1650,18 +1650,15 @@ bool rf_textfile_write(struct RFtextfile* t, void* s)
     RF_TEXTFILE_CANWRITE_JMP(t, ret = false, cleanup1);
     t->previousOp = RF_FILE_WRITE;
     //let's see how many lines it will be adding to the text file
-    linesN = rf_string_count(s, &g_eol_lf, 0);
+    linesN = rf_string_count(s, &g_eol_lf, 0, 0);
     //if we don't have the default RFstring Unix style line ending
-    if(t->eol != RF_EOL_LF && linesN != 0)
-    {
+    if (t->eol != RF_EOL_LF && linesN != 0) {
         allocatedS = true;
         //making a new one since stringP can be on the local stack and we
         //can't use replace since that would act on the local stack
         s = rf_string_copy_out((struct RFstring*)s);
-        if(t->eol==RF_EOL_CRLF)
-        {
-            if(!rf_string_replace(s, &g_eol_lf, &g_eol_crlf, 0, 0))
-            {
+        if (t->eol==RF_EOL_CRLF) {
+            if (!rf_string_replace(s, &g_eol_lf, &g_eol_crlf, 0, 0)) {
                 RF_ERROR("Failure at editing the newline character"
                          "while writing string \""RF_STR_PF_FMT"\""
                          " to Textfile \""RF_STR_PF_FMT"\"",
@@ -1669,11 +1666,8 @@ bool rf_textfile_write(struct RFtextfile* t, void* s)
                 ret = false;
                 goto cleanup1;
             }
-        }
-        else
-        {
-            if(!rf_string_replace(s, &g_eol_lf, &g_eol_cr, 0, 0))
-            {
+        } else {
+            if (!rf_string_replace(s, &g_eol_lf, &g_eol_cr, 0, 0)) {
                 RF_ERROR("Failure at editing the newline character"
                          "while writing string \""RF_STR_PF_FMT"\""
                          " to Textfile \""RF_STR_PF_FMT"\"",
@@ -1684,16 +1678,14 @@ bool rf_textfile_write(struct RFtextfile* t, void* s)
         }
     }
     //depending on the encoding of the file
-    if(!rf_string_fwrite(s, t->f, t->encoding, t->endianess))
-    {
+    if (!rf_string_fwrite(s, t->f, t->encoding, t->endianess)) {
         RF_ERROR(
                  "There was a file write error while writting string"
                  " \""RF_STR_PF_FMT"\" "
                  "to Text File \""RF_STR_PF_FMT"\"",
                  RF_STR_PF_ARG(s), RF_STR_PF_ARG(&t->name));
         ret = false;
-        if(allocatedS == true)
-        {
+        if (allocatedS == true) {
             rf_string_destroy(s);
         }
         goto cleanup1;
@@ -1743,7 +1735,7 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
 
     //determine how many lines the given string has
 
-    linesCount = rf_string_count(stringIN, &g_eol_lf, 0) + 1;
+    linesCount = rf_string_count(stringIN, &g_eol_lf, 0, 0) + 1;
     /// cleanup 1 - For the string
     //if we don't have the RFstring default Unix style line ending
     //making a new one since stringP can be on the local stack and we can't use replace since that would act on the local stack
@@ -2203,7 +2195,7 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
     }
 
     //determine how many lines the given string has
-    linesCount = rf_string_count(string, &g_eol_lf, 0);
+    linesCount = rf_string_count(string, &g_eol_lf, 0, 0);
     /// cleanup 1 - For this string
     //if we don't have the RFstring default Unix style line ending
     //making a new one since stringP can be on the local stack and we can't use replace since that would act on the local stack

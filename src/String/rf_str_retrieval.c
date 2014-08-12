@@ -214,6 +214,7 @@ cleanup:
 }
 
 int rf_string_count(const void* tstr, const void* sstr,
+                    unsigned int bytes,
                     enum RFstring_matching_options options)
 {
     unsigned int n;
@@ -227,7 +228,11 @@ int rf_string_count(const void* tstr, const void* sstr,
         goto cleanup;
     }
     s = rf_string_data(tstr);
+
     len = rf_string_length_bytes(tstr);
+    if (bytes != 0) {
+        len = bytes;
+    }
 
     //as long as the substring is found in the string
     prs = s;

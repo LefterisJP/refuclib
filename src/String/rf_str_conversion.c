@@ -221,10 +221,9 @@ bool rf_string_tokenize(const void* str, const void* sep,
     }
 
     //first find the occurences of the separator, and then the number of tokens
-    tokens_num = rf_string_count(str, sep, 0) + 1;
+    tokens_num = rf_string_count(str, sep, 0, 0) + 1;
     //error checking
-    if(tokens_num <= 1)
-    {
+    if (tokens_num <= 1) {
         ret = false;
         goto cleanup_lscope;
     }
@@ -236,8 +235,7 @@ bool rf_string_tokenize(const void* str, const void* sep,
 
     s = rf_string_data(str);
     e = rf_string_data(str) + rf_string_length_bytes(str);
-    for(i = 0; i < tokens_num - 1; i ++)
-    {
+    for (i = 0; i < tokens_num - 1; i ++) {
         //find each substring
         e = strstr_nnt(s, e - s,
                        rf_string_data(sep), rf_string_length_bytes(sep));

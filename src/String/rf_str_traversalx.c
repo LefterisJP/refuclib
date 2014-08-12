@@ -228,16 +228,12 @@ unsigned int rf_stringx_skip_chars(struct RFstringx* thisstr,
 {
     uint32_t bytes_to_move;
     unsigned int chars_skipped;
-    struct RFstring skipped;
     static const struct RFstring nl = RF_STRING_STATIC_INIT("\n");
 
     chars_skipped = rf_string_begins_with_any(thisstr, chars, &bytes_to_move);
 
     if (line_count) {
-        RF_STRING_SHALLOW_INIT(&skipped,
-                               rf_string_data(thisstr),
-                               bytes_to_move);
-        *line_count = rf_string_count(&skipped, &nl, 0);
+        *line_count = rf_string_count(thisstr, &nl, bytes_to_move, 0);
     }
 
     if (chars_skipped) {

@@ -312,14 +312,17 @@ START_TEST(test_string_count) {
     ck_assert(rf_string_init(&f2, "州"));
     ck_assert(rf_string_init(&f3, "東京"));
 
-    ck_assert_uint_eq(4, rf_string_count(&s2, &f4, 0));
+    ck_assert_uint_eq(4, rf_string_count(&s2, &f4, 0, 0));
 
-    ck_assert_uint_eq(2, rf_string_count(&s, &f1, 0));
-    ck_assert_uint_eq(5, rf_string_count(&s, &f2, 0));
-    ck_assert_uint_eq(0 ,rf_string_count(&s, &f3, 0));
+    ck_assert_uint_eq(2, rf_string_count(&s, &f1, 0, 0));
+    ck_assert_uint_eq(5, rf_string_count(&s, &f2, 0, 0));
+    ck_assert_uint_eq(0 ,rf_string_count(&s, &f3, 0, 0));
+
+    /* search specific bytelength */
+    ck_assert_uint_eq(2, rf_string_count(&s2, &f4, 11, 0));
 
     /* no search string is an error */
-    ck_assert_uint_eq(0 ,rf_string_count(&s, NULL, 0));
+    ck_assert_uint_eq(0 ,rf_string_count(&s, NULL, 0, 0));
 
     rf_string_deinit(&s);
     rf_string_deinit(&s2);
