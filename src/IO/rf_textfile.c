@@ -1471,8 +1471,8 @@ int rf_textfile_read_lines(struct RFtextfile* t,
         rf_stringx_append_char(str, (unsigned int)'\n');
 
         add_line_pos(lines_pos, lines_read,
-                     pr_length + rf_string_length_bytes(str) + 1);
-        pr_length += rf_string_length_bytes(str) + 1;
+                     pr_length + rf_string_length_bytes(str));
+        pr_length += rf_string_length_bytes(str);
 
         rf_stringx_move_end(str);
         if (lines_read == lines) {

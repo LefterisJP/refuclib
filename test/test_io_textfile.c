@@ -300,9 +300,9 @@ START_TEST(test_textfile_read_lines) {
     );
 
     ck_assert_int_eq(rf_array_at_unsafe(&line_arr, 0, uint32_t), 0);
-    ck_assert_int_eq(rf_array_at_unsafe(&line_arr, 1, uint32_t), 12);
-    ck_assert_int_eq(rf_array_at_unsafe(&line_arr, 2, uint32_t), 368);
-    ck_assert_int_eq(rf_array_at_unsafe(&line_arr, 3, uint32_t), 1169);
+    ck_assert_int_eq(rf_array_at_unsafe(&line_arr, 1, uint32_t), 11);
+    ck_assert_int_eq(rf_array_at_unsafe(&line_arr, 2, uint32_t), 366);
+    ck_assert_int_eq(rf_array_at_unsafe(&line_arr, 3, uint32_t), 1166);
 
     ck_assert(RF_SUCCESS == rf_textfile_go_to_line(&f, 1));
 
