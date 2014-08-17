@@ -220,6 +220,10 @@ i_DECLIMEX_ bool rf_stringx_move_afterv(struct RFstringx* thisstr, void* result,
  ** @lmsFunction
  ** @param thisstr           The extended string to work on
  ** @param chars             A string containing all the characters to skip
+ ** @param limit             If not NULL, a pointer to a position inside
+ **                          @c thisstr after which to stop skipping chars.
+ **                          Characters will be skipped up to and including
+ **                          @c limit.
  ** @param bytes[out]        If not 0, this will contain the number of bytes of
  **                          @c thisstr that were skipped
  ** @param line_count[out]   If not 0, this will contain the number of lines
@@ -228,6 +232,7 @@ i_DECLIMEX_ bool rf_stringx_move_afterv(struct RFstringx* thisstr, void* result,
  **/
 i_DECLIMEX_ unsigned int rf_stringx_skip_chars(struct RFstringx* thisstr,
                                                const void *chars,
+                                               const char *limit,
                                                unsigned int *bytes,
                                                unsigned int *line_count);
 

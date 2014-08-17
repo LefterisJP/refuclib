@@ -491,7 +491,7 @@ bool rf_string_trim_start(void* thisstr, const void* sub, unsigned int *removals
         goto cleanup;
     }
 
-    matching_chars = rf_string_begins_with_any(thisstr, sub, &byte_position);
+    matching_chars = rf_string_begins_with_any(thisstr, sub, 0, &byte_position);
 
 
     if (removals) {

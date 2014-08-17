@@ -252,12 +252,19 @@ START_TEST(test_string_begins_with_any) {
     ck_assert(rf_string_init(&s, " \t    \t eleos"));
     ck_assert(rf_string_init(&s2, " 影 π π eleos2"));
 
-    ck_assert_int_eq(8, rf_string_begins_with_any(&s, &chars1, 0));
-    ck_assert_int_eq(8, rf_string_begins_with_any(&s, &chars1, &bytes));
+    ck_assert_int_eq(8, rf_string_begins_with_any(&s, &chars1, 0, 0));
+    ck_assert_int_eq(8, rf_string_begins_with_any(&s, &chars1, 0, &bytes));
     ck_assert_int_eq(8, bytes);
 
-    ck_assert_int_eq(7, rf_string_begins_with_any(&s2, &chars2, &bytes));
+    ck_assert_int_eq(7, rf_string_begins_with_any(&s2, &chars2, 0, &bytes));
     ck_assert_int_eq(11, bytes);
+
+    ck_assert_int_eq(3,
+                     rf_string_begins_with_any(&s2,
+                                               &chars2,
+                                               rf_string_data(&s2) + 4,
+                                               &bytes));
+    ck_assert_int_eq(5, bytes);
 
     rf_string_deinit(&s);
     rf_string_deinit(&s2);

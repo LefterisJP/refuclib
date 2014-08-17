@@ -169,6 +169,7 @@ cleanup1:
 
 unsigned int rf_string_begins_with_any(const void *thisstr,
                                        const void *chars,
+                                       const char *limit,
                                        unsigned int *bytes)
 {
     bool iteration_match;
@@ -200,9 +201,15 @@ unsigned int rf_string_begins_with_any(const void *thisstr,
                 break;
             }
         }
+        if (limit &&
+            (limit - (rf_string_data(thisstr) + byte_position)) <= 0) {
+            byte_position ++; /* gotta remember it's the next byte */
+            break;
+        }
         if (iteration_match) {
             break;
         }
+
     RF_STRING_ITERATE_END(i, byte_position)
 
 cleanup:

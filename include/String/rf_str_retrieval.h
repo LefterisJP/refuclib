@@ -215,6 +215,9 @@ i_DECLIMEX_ int32_t rf_string_find_i(const void* thisstr, const void* sstr,
  **                       @inhtype{String,StringX}
  ** @param chars          The string containing all the characters to check
  **                       @inhtype{String,StringX}
+ ** @param limit          If not NULL, a pointer to a position inside
+ **                       @c thisstr after which to stop checking. This
+ **                       position will be included in the search.
  ** @param[out] bytes     If given, then bytes will contain the number of bytes
  **                       of the beginning of the string that are part of the
  **                       @c chars string
@@ -223,6 +226,7 @@ i_DECLIMEX_ int32_t rf_string_find_i(const void* thisstr, const void* sstr,
  */
 unsigned int rf_string_begins_with_any(const void *thisstr,
                                        const void *chars,
+                                       const char *limit,
                                        unsigned int *bytes);
 
 

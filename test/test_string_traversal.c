@@ -368,7 +368,8 @@ START_TEST(test_stringx_skip_chars) {
     unsigned int line_count;
     static const struct RFstring s1 = RF_STRING_STATIC_INIT("   \t  something");
     static const struct RFstring chars1 = RF_STRING_STATIC_INIT(" \t");
-    static const struct RFstring s2 = RF_STRING_STATIC_INIT(" ブ ブ ラ something_else");
+    static const struct RFstring s2 = RF_STRING_STATIC_INIT(
+        " ブ ブ ラ something_else");
     static const struct RFstring chars2 = RF_STRING_STATIC_INIT(" ブラ");
     static const struct RFstring s3 = RF_STRING_STATIC_INIT(
         " \n  \n \t foo");
@@ -378,20 +379,37 @@ START_TEST(test_stringx_skip_chars) {
     ck_assert(rf_stringx_init_buff(&s, 1024, ""));
     ck_assert(rf_stringx_assign(&s, &s1));
 
-    ck_assert_int_eq(6, rf_stringx_skip_chars(&s, &chars1, &bytes, 0));
+    ck_assert_int_eq(6, rf_stringx_skip_chars(&s, &chars1, 0, &bytes, 0));
     ck_assert_int_eq(6, bytes);
     ck_assert_rf_str_eq_cstr(&s, "something");
 
     ck_assert(rf_stringx_assign(&s, &s2));
-    ck_assert_int_eq(7, rf_stringx_skip_chars(&s, &chars2, &bytes, 0));
+    ck_assert_int_eq(7, rf_stringx_skip_chars(&s, &chars2, 0, &bytes, 0));
     ck_assert_int_eq(13, bytes);
     ck_assert_rf_str_eq_cstr(&s, "something_else");
 
     ck_assert(rf_stringx_assign(&s, &s3));
-    ck_assert_int_eq(8, rf_stringx_skip_chars(&s, &chars3, &bytes, &line_count));
+    ck_assert_int_eq(8, rf_stringx_skip_chars(&s, &chars3, 0,
+                                              &bytes, &line_count));
     ck_assert_int_eq(8, bytes);
     ck_assert_int_eq(2, line_count);
     ck_assert_rf_str_eq_cstr(&s, "foo");
+
+    ck_assert(rf_stringx_assign(&s, &s3));
+    ck_assert_int_eq(3, rf_stringx_skip_chars(&s, &chars3,
+                                              rf_string_data(&s) + 2,
+                                              &bytes, &line_count));
+    ck_assert_int_eq(3, bytes);
+    ck_assert_int_eq(1, line_count);
+    ck_assert_rf_str_eq_cstr(&s," \n \t foo");
+
+    ck_assert(rf_stringx_assign(&s, &s3));
+    ck_assert_int_eq(1, rf_stringx_skip_chars(&s, &chars3,
+                                              rf_string_data(&s),
+                                              &bytes, &line_count));
+    ck_assert_int_eq(1, bytes);
+    ck_assert_int_eq(0, line_count);
+    ck_assert_rf_str_eq_cstr(&s,"\n  \n \t foo");
 
     rf_stringx_deinit(&s);
 }END_TEST
