@@ -44,6 +44,7 @@ extern "C"
 {///opening bracket for calling from C++
 #endif
 
+struct RFarray;
 
 //! @name String accessors
 //! @{
@@ -241,15 +242,20 @@ unsigned int rf_string_begins_with_any(const void *thisstr,
  **                      @inhtype{String,StringX} @tmpSTR
  ** @param bytes         If not 0, then this is the number of bytes into
  **                      the string to search for the substring
- ** @param options       For details @see rf_string_remove()
+ ** @param positions     If not NULL then this will contain the byte positions
+ **                      of the occurences of @c sstr. User will need to take
+ **                      care of the freeing later.
+ ** @param options       Reserved for future use. Not used at the moment in
+ **                      function
  ** @return              Returns the number of times cstr exists inside the
  **                      string. In case it is not found at all 0 is returned.
- **                      Note that 0 is returned also in case of error such as
+ **                      Note that -1 is returned  in case of error such as
  **                      invalid input(null pointers).
  **/
 i_DECLIMEX_ int rf_string_count(
     const void* thisstr, const void* sstr,
     unsigned int bytes,
+    struct RFarray *positions,
     enum RFstring_matching_options options
 );
 

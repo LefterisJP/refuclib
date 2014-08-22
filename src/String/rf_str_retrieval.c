@@ -41,6 +41,7 @@
 #include <Utils/localscope.h> //for the local scope macros
 #include <Utils/memory.h> //for refu memory allocation
 #include <Utils/sanity.h> //for sanity macros
+#include <Utils/array.h> //for RFarray
 /*------------- libc inclusion --------------*/
 #include <stdarg.h>
 #include <limits.h> //for INT_MAX e.t.c.
@@ -220,8 +221,10 @@ cleanup:
     return matching_chars;
 }
 
-int rf_string_count(const void* tstr, const void* sstr,
+int rf_string_count(const void* tstr,
+                    const void* sstr,
                     unsigned int bytes,
+                    struct RFarray *positions,
                     enum RFstring_matching_options options)
 {
     unsigned int n;
@@ -232,7 +235,7 @@ int rf_string_count(const void* tstr, const void* sstr,
     n = 0;
     if (!sstr) {
         RF_WARNING("Provided null search string");
-        goto cleanup;
+        goto fail;
     }
     s = rf_string_data(tstr);
 
@@ -245,16 +248,23 @@ int rf_string_count(const void* tstr, const void* sstr,
     prs = s;
     s = strstr_nnt(s, len, rf_string_data(sstr), rf_string_length_bytes(sstr));
     while(s) {
+        if (positions) {
+            rf_array_set(positions, n, uint32_t,
+                         s - rf_string_data(tstr), goto fail);
+        }
         n ++;
         len -= (s - prs) + rf_string_length_bytes(sstr);
         s += rf_string_length_bytes(sstr);
         prs = s;
-        s = strstr_nnt(s, len, rf_string_data(sstr), rf_string_length_bytes(sstr));
+        s = strstr_nnt(s, len,
+                       rf_string_data(sstr), rf_string_length_bytes(sstr));
     }
 
-cleanup:
     RF_EXIT_LOCAL_SCOPE();
     return n;
+fail:
+    RF_EXIT_LOCAL_SCOPE();
+    return -1;
 }
 
 

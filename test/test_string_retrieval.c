@@ -12,6 +12,7 @@
 #include <String/rf_str_core.h>
 #include <String/rf_str_corex.h>
 
+#include <Utils/array.h>
 
 /* --- String Acessors Tests --- START --- */
 START_TEST(test_string_length) {
@@ -319,17 +320,17 @@ START_TEST(test_string_count) {
     ck_assert(rf_string_init(&f2, "州"));
     ck_assert(rf_string_init(&f3, "東京"));
 
-    ck_assert_uint_eq(4, rf_string_count(&s2, &f4, 0, 0));
+    ck_assert_int_eq(4, rf_string_count(&s2, &f4, 0, 0, 0));
 
-    ck_assert_uint_eq(2, rf_string_count(&s, &f1, 0, 0));
-    ck_assert_uint_eq(5, rf_string_count(&s, &f2, 0, 0));
-    ck_assert_uint_eq(0 ,rf_string_count(&s, &f3, 0, 0));
+    ck_assert_int_eq(2, rf_string_count(&s, &f1, 0, 0, 0));
+    ck_assert_int_eq(5, rf_string_count(&s, &f2, 0, 0, 0));
+    ck_assert_int_eq(0 ,rf_string_count(&s, &f3, 0, 0, 0));
 
     /* search specific bytelength */
-    ck_assert_uint_eq(2, rf_string_count(&s2, &f4, 11, 0));
+    ck_assert_int_eq(2, rf_string_count(&s2, &f4, 11, 0, 0));
 
     /* no search string is an error */
-    ck_assert_uint_eq(0 ,rf_string_count(&s, NULL, 0, 0));
+    ck_assert_int_eq(-1 ,rf_string_count(&s, NULL, 0, 0, 0));
 
     rf_string_deinit(&s);
     rf_string_deinit(&s2);
@@ -337,6 +338,38 @@ START_TEST(test_string_count) {
     rf_string_deinit(&f1);
     rf_string_deinit(&f2);
     rf_string_deinit(&f3);
+}END_TEST
+
+START_TEST(test_string_count_positions) {
+    static const struct RFstring s = RF_STRING_STATIC_INIT(
+        "This is a test sentence"
+    );
+    static const struct RFstring space = RF_STRING_STATIC_INIT(" ");
+    static const struct RFstring s2 = RF_STRING_STATIC_INIT(
+        "repeat is nice when you repeat and repeat and repeat"
+    );
+    static const struct RFstring rep = RF_STRING_STATIC_INIT("repeat");
+    struct RFarray arr1;
+    RF_ARRAY_TEMP_INIT(&arr1, uint32_t, 4);
+    uint32_t arr2_buff[2];
+    struct RFarray arr2 = RF_ARRAY_SHALLOW_INIT(arr2_buff);
+
+    /* test counting positions with array of enough space */
+    ck_assert_int_eq(4, rf_string_count(&s, &space, 0, &arr1, 0));
+    ck_assert_uint_eq(4, rf_array_at_unsafe(&arr1, 0, uint32_t));
+    ck_assert_uint_eq(7, rf_array_at_unsafe(&arr1, 1, uint32_t));
+    ck_assert_uint_eq(9, rf_array_at_unsafe(&arr1, 2, uint32_t));
+    ck_assert_uint_eq(14, rf_array_at_unsafe(&arr1, 3, uint32_t));
+
+    /* test counting positions with smaller array */
+    ck_assert_int_eq(4, rf_string_count(&s2, &rep, 0, &arr2, RF_CASE_IGNORE));
+    ck_assert_uint_eq(0, rf_array_at_unsafe(&arr2, 0, uint32_t));
+    ck_assert_uint_eq(24, rf_array_at_unsafe(&arr2, 1, uint32_t));
+    ck_assert_uint_eq(35, rf_array_at_unsafe(&arr2, 2, uint32_t));
+    ck_assert_uint_eq(46, rf_array_at_unsafe(&arr2, 3, uint32_t));
+
+    rf_array_deinit(&arr1);
+    rf_array_deinit(&arr2);
 }END_TEST
 
 
@@ -597,6 +630,7 @@ Suite *string_retrieval_suite_create(void)
     tcase_add_test(string_retrieval, test_string_begins_with_any);
     tcase_add_test(string_retrieval, test_string_ends_with);
     tcase_add_test(string_retrieval, test_string_count);
+    tcase_add_test(string_retrieval, test_string_count_positions);
 
     TCase *string_positional_retrieval = tcase_create(
         "String Positional Retrieval"

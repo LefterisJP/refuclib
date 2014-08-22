@@ -236,7 +236,7 @@ unsigned int rf_stringx_skip_chars(struct RFstringx* thisstr,
                                               &bytes_to_move);
 
     if (line_count) {
-        *line_count = rf_string_count(thisstr, &nl, bytes_to_move, 0);
+        *line_count = rf_string_count(thisstr, &nl, bytes_to_move, 0, 0);
     }
 
     if (chars_skipped) {

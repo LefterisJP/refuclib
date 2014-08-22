@@ -1650,7 +1650,7 @@ bool rf_textfile_write(struct RFtextfile* t, void* s)
     RF_TEXTFILE_CANWRITE_JMP(t, ret = false, cleanup1);
     t->previousOp = RF_FILE_WRITE;
     //let's see how many lines it will be adding to the text file
-    linesN = rf_string_count(s, &g_eol_lf, 0, 0);
+    linesN = rf_string_count(s, &g_eol_lf, 0, 0, 0);
     //if we don't have the default RFstring Unix style line ending
     if (t->eol != RF_EOL_LF && linesN != 0) {
         allocatedS = true;
@@ -1735,7 +1735,7 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
 
     //determine how many lines the given string has
 
-    linesCount = rf_string_count(stringIN, &g_eol_lf, 0, 0) + 1;
+    linesCount = rf_string_count(stringIN, &g_eol_lf, 0, 0, 0) + 1;
     /// cleanup 1 - For the string
     //if we don't have the RFstring default Unix style line ending
     //making a new one since stringP can be on the local stack and we can't use replace since that would act on the local stack
@@ -2195,7 +2195,7 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
     }
 
     //determine how many lines the given string has
-    linesCount = rf_string_count(string, &g_eol_lf, 0, 0);
+    linesCount = rf_string_count(string, &g_eol_lf, 0, 0, 0);
     /// cleanup 1 - For this string
     //if we don't have the RFstring default Unix style line ending
     //making a new one since stringP can be on the local stack and we can't use replace since that would act on the local stack

@@ -221,7 +221,7 @@ bool rf_string_tokenize(const void* str, const void* sep,
     }
 
     //first find the occurences of the separator, and then the number of tokens
-    tokens_num = rf_string_count(str, sep, 0, 0) + 1;
+    tokens_num = rf_string_count(str, sep, 0, 0, 0) + 1;
     //error checking
     if (tokens_num <= 1) {
         ret = false;
