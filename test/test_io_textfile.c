@@ -116,16 +116,16 @@ START_TEST(test_textfile_init) {
 
     /* open existing file for reading */
     ck_assert(rf_stringx_assign_unsafe_nnt(
-                  &g_fname, PATH_TO"utf8stringfile",
-                  strlen(PATH_TO"utf8stringfile")));
+                  &g_fname, CLIB_TESTS_PATH"utf8stringfile",
+                  strlen(CLIB_TESTS_PATH"utf8stringfile")));
     ck_assert(rf_textfile_init(&f, &g_fname, RF_FILE_READ, RF_ENDIANESS_UNKNOWN,
                                RF_UTF8, RF_EOL_LF));
     rf_textfile_deinit(&f);
 
     /* open new file for writting */
     ck_assert(rf_stringx_assign_unsafe_nnt(
-                  &g_fname, PATH_TO"temp_file",
-                  strlen(PATH_TO"temp_file")));
+                  &g_fname, CLIB_TESTS_PATH"temp_file",
+                  strlen(CLIB_TESTS_PATH"temp_file")));
     ck_assert(rf_textfile_init(&f, &g_fname, RF_FILE_NEW,
                                RF_ENDIANESS_UNKNOWN,
                                RF_UTF8, RF_EOL_LF));
@@ -148,8 +148,8 @@ START_TEST(test_textfile_copy) {
     struct RFtextfile f;
     struct RFtextfile copy_f;
     ck_assert(rf_stringx_assign_unsafe_nnt(
-                  &g_fname, PATH_TO"utf8stringfile",
-                  strlen(PATH_TO"utf8stringfile")));
+                  &g_fname, CLIB_TESTS_PATH"utf8stringfile",
+                  strlen(CLIB_TESTS_PATH"utf8stringfile")));
     ck_assert(rf_textfile_init(&f, &g_fname, RF_FILE_READ,
                                RF_ENDIANESS_UNKNOWN,
                                RF_UTF8, RF_EOL_LF));
@@ -177,8 +177,8 @@ START_TEST(test_textfile_set_mode) {
     struct RFtextfile f;
     static const char *s;
     ck_assert(rf_stringx_assign_unsafe_nnt(
-                  &g_fname, PATH_TO"temp_file",
-                  strlen(PATH_TO"temp_file")));
+                  &g_fname, CLIB_TESTS_PATH"temp_file",
+                  strlen(CLIB_TESTS_PATH"temp_file")));
     ck_assert(rf_textfile_init(&f, &g_fname, RF_FILE_NEW,
                                RF_ENDIANESS_UNKNOWN,
                                RF_UTF8, RF_EOL_LF));
@@ -230,59 +230,59 @@ START_TEST(test_textfile_set_mode) {
 
 /* Textfile Read Line tests -- START */
 START_TEST(test_textfile_read_line_utf8) {
-    test_textfile_read_line_generic(PATH_TO"utf8stringfile",
+    test_textfile_read_line_generic(CLIB_TESTS_PATH"utf8stringfile",
                                 RF_UTF8, RF_ENDIANESS_UNKNOWN);
 }END_TEST
 
 START_TEST(test_textfile_read_line_utf16_le) {
-    test_textfile_read_line_generic(PATH_TO"utf16lestringfile",
+    test_textfile_read_line_generic(CLIB_TESTS_PATH"utf16lestringfile",
                                 RF_UTF16, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_textfile_read_line_utf16_be) {
-    test_textfile_read_line_generic(PATH_TO"utf16bestringfile",
+    test_textfile_read_line_generic(CLIB_TESTS_PATH"utf16bestringfile",
                                   RF_UTF16, RF_BIG_ENDIAN);
 }END_TEST
 
 START_TEST(test_textfile_read_line_utf32_le) {
-    test_textfile_read_line_generic(PATH_TO"utf32lestringfile",
+    test_textfile_read_line_generic(CLIB_TESTS_PATH"utf32lestringfile",
                                   RF_UTF32, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_textfile_read_line_utf32_be) {
-    test_textfile_read_line_generic(PATH_TO"utf32bestringfile",
+    test_textfile_read_line_generic(CLIB_TESTS_PATH"utf32bestringfile",
                                   RF_UTF32, RF_BIG_ENDIAN);
 }END_TEST
 
 START_TEST(test_textfile_read_line_chars_utf8) {
-    test_textfile_read_line_chars_generic(PATH_TO"utf8stringfile",
+    test_textfile_read_line_chars_generic(CLIB_TESTS_PATH"utf8stringfile",
                                 RF_UTF8, RF_ENDIANESS_UNKNOWN);
 }END_TEST
 
 START_TEST(test_textfile_read_line_chars_utf16_le) {
-    test_textfile_read_line_chars_generic(PATH_TO"utf16lestringfile",
+    test_textfile_read_line_chars_generic(CLIB_TESTS_PATH"utf16lestringfile",
                                 RF_UTF16, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_textfile_read_line_chars_utf16_be) {
-    test_textfile_read_line_chars_generic(PATH_TO"utf16bestringfile",
+    test_textfile_read_line_chars_generic(CLIB_TESTS_PATH"utf16bestringfile",
                                   RF_UTF16, RF_BIG_ENDIAN);
 }END_TEST
 
 START_TEST(test_textfile_read_line_chars_utf32_le) {
-    test_textfile_read_line_chars_generic(PATH_TO"utf32lestringfile",
+    test_textfile_read_line_chars_generic(CLIB_TESTS_PATH"utf32lestringfile",
                                   RF_UTF32, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_textfile_read_line_chars_utf32_be) {
-    test_textfile_read_line_chars_generic(PATH_TO"utf32bestringfile",
+    test_textfile_read_line_chars_generic(CLIB_TESTS_PATH"utf32bestringfile",
                                   RF_UTF32, RF_BIG_ENDIAN);
 }END_TEST
 
 START_TEST(test_textfile_read_lines) {
     struct RFtextfile f;
     static const struct RFstring fname = RF_STRING_STATIC_INIT(
-        PATH_TO"utf8stringfile"
+        CLIB_TESTS_PATH"utf8stringfile"
     );
     uint32_t buff_arr[64];
     struct RFarray line_arr = RF_ARRAY_SHALLOW_INIT(buff_arr);
@@ -339,8 +339,8 @@ START_TEST(test_textfile_write) {
 
     static const char *s;
     ck_assert(rf_stringx_assign_unsafe_nnt(
-                  &g_fname, PATH_TO"temp_file",
-                  strlen(PATH_TO"temp_file")));
+                  &g_fname, CLIB_TESTS_PATH"temp_file",
+                  strlen(CLIB_TESTS_PATH"temp_file")));
     ck_assert(rf_textfile_init(&f, &g_fname, RF_FILE_NEW,
                                RF_ENDIANESS_UNKNOWN,
                                RF_UTF8, RF_EOL_LF));
@@ -400,8 +400,8 @@ START_TEST(test_textfile_insert_after) {
     static const char *s;
     static const struct RFstring str = RF_STRING_STATIC_INIT("placeholder");
     ck_assert(rf_stringx_assign_unsafe_nnt(
-                  &g_fname, PATH_TO"temp_file",
-                  strlen(PATH_TO"temp_file")));
+                  &g_fname, CLIB_TESTS_PATH"temp_file",
+                  strlen(CLIB_TESTS_PATH"temp_file")));
     ck_assert(rf_textfile_init(&f, &g_fname, RF_FILE_NEW,
                                RF_ENDIANESS_UNKNOWN,
                                RF_UTF8, RF_EOL_LF));
@@ -462,8 +462,8 @@ START_TEST(test_textfile_insert_before) {
     struct RFtextfile f;
     static const char *s;
     ck_assert(rf_stringx_assign_unsafe_nnt(
-                  &g_fname, PATH_TO"temp_file",
-                  strlen(PATH_TO"temp_file")));
+                  &g_fname, CLIB_TESTS_PATH"temp_file",
+                  strlen(CLIB_TESTS_PATH"temp_file")));
     ck_assert(rf_textfile_init(&f, &g_fname, RF_FILE_NEW,
                                RF_ENDIANESS_UNKNOWN,
                                RF_UTF8, RF_EOL_LF));
@@ -518,8 +518,8 @@ START_TEST(test_textfile_remove) {
     struct RFtextfile f;
     static const char *s;
     ck_assert(rf_stringx_assign_unsafe_nnt(
-                  &g_fname, PATH_TO"temp_file",
-                  strlen(PATH_TO"temp_file")));
+                  &g_fname, CLIB_TESTS_PATH"temp_file",
+                  strlen(CLIB_TESTS_PATH"temp_file")));
     ck_assert(rf_textfile_init(&f, &g_fname, RF_FILE_NEW,
                                RF_ENDIANESS_UNKNOWN,
                                RF_UTF8, RF_EOL_LF));
@@ -577,8 +577,8 @@ START_TEST(test_textfile_replace) {
     static const char *s;
     static struct RFstring str = RF_STRING_STATIC_INIT("Line Replacement");
     ck_assert(rf_stringx_assign_unsafe_nnt(
-                  &g_fname, PATH_TO"temp_file",
-                  strlen(PATH_TO"temp_file")));
+                  &g_fname, CLIB_TESTS_PATH"temp_file",
+                  strlen(CLIB_TESTS_PATH"temp_file")));
     ck_assert(rf_textfile_init(&f, &g_fname, RF_FILE_NEW,
                                RF_ENDIANESS_UNKNOWN,
                                RF_UTF8, RF_EOL_LF));

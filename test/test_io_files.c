@@ -323,81 +323,81 @@ static void test_file_move_back_char_generic(const char* filename, int encoding,
 /* IO Read Line tests -- START */
 
 START_TEST(test_file_read_line_utf8) {
-    test_file_read_line_generic(PATH_TO"utf8stringfile",
+    test_file_read_line_generic(CLIB_TESTS_PATH"utf8stringfile",
                                 RF_UTF8, RF_ENDIANESS_UNKNOWN);
 }END_TEST
 
 START_TEST(test_file_read_line_utf16_le) {
-    test_file_read_line_generic(PATH_TO"utf16lestringfile",
+    test_file_read_line_generic(CLIB_TESTS_PATH"utf16lestringfile",
                                 RF_UTF16, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_file_read_line_utf16_be) {
-    test_file_read_line_generic(PATH_TO"utf16bestringfile",
+    test_file_read_line_generic(CLIB_TESTS_PATH"utf16bestringfile",
                                   RF_UTF16, RF_BIG_ENDIAN);
 }END_TEST
 
 START_TEST(test_file_read_line_utf32_le) {
-    test_file_read_line_generic(PATH_TO"utf32lestringfile",
+    test_file_read_line_generic(CLIB_TESTS_PATH"utf32lestringfile",
                                   RF_UTF32, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_file_read_line_utf32_be) {
-    test_file_read_line_generic(PATH_TO"utf32bestringfile",
+    test_file_read_line_generic(CLIB_TESTS_PATH"utf32bestringfile",
                                   RF_UTF32, RF_BIG_ENDIAN);
 }END_TEST
 
 /* IO Read bytes tests -- START */
 
 START_TEST(test_file_read_bytes_utf8) {
-    test_file_read_bytes_generic(PATH_TO"utf8stringfile",
+    test_file_read_bytes_generic(CLIB_TESTS_PATH"utf8stringfile",
                                 RF_UTF8, RF_ENDIANESS_UNKNOWN);
 }END_TEST
 
 START_TEST(test_file_read_bytes_utf16_le) {
-    test_file_read_bytes_generic(PATH_TO"utf16lestringfile",
+    test_file_read_bytes_generic(CLIB_TESTS_PATH"utf16lestringfile",
                                 RF_UTF16, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_file_read_bytes_utf16_be) {
-    test_file_read_bytes_generic(PATH_TO"utf16bestringfile",
+    test_file_read_bytes_generic(CLIB_TESTS_PATH"utf16bestringfile",
                                   RF_UTF16, RF_BIG_ENDIAN);
 }END_TEST
 
 START_TEST(test_file_read_bytes_utf32_le) {
-    test_file_read_bytes_generic(PATH_TO"utf32lestringfile",
+    test_file_read_bytes_generic(CLIB_TESTS_PATH"utf32lestringfile",
                                   RF_UTF32, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_file_read_bytes_utf32_be) {
-    test_file_read_bytes_generic(PATH_TO"utf32bestringfile",
+    test_file_read_bytes_generic(CLIB_TESTS_PATH"utf32bestringfile",
                                   RF_UTF32, RF_BIG_ENDIAN);
 }END_TEST
 
 /* IO Read char tests -- START */
 
 START_TEST(test_file_read_char_utf8) {
-    test_file_read_char_generic(PATH_TO"utf8stringfile", RF_UTF8,
+    test_file_read_char_generic(CLIB_TESTS_PATH"utf8stringfile", RF_UTF8,
                                 RF_ENDIANESS_UNKNOWN);
 }END_TEST
 
 START_TEST(test_file_read_char_utf16_le) {
-    test_file_read_char_generic(PATH_TO"utf16lestringfile",
+    test_file_read_char_generic(CLIB_TESTS_PATH"utf16lestringfile",
                                 RF_UTF16, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_file_read_char_utf16_be) {
-    test_file_read_char_generic(PATH_TO"utf16bestringfile",
+    test_file_read_char_generic(CLIB_TESTS_PATH"utf16bestringfile",
                                   RF_UTF16, RF_BIG_ENDIAN);
 }END_TEST
 
 START_TEST(test_file_read_char_utf32_le) {
-    test_file_read_char_generic(PATH_TO"utf32lestringfile",
+    test_file_read_char_generic(CLIB_TESTS_PATH"utf32lestringfile",
                                   RF_UTF32, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_file_read_char_utf32_be) {
-    test_file_read_char_generic(PATH_TO"utf32bestringfile",
+    test_file_read_char_generic(CLIB_TESTS_PATH"utf32bestringfile",
                                   RF_UTF32, RF_BIG_ENDIAN);
 }END_TEST
 
@@ -405,27 +405,27 @@ START_TEST(test_file_read_char_utf32_be) {
 /* IO move back char tests -- START */
 
 START_TEST(test_file_move_back_char_utf8) {
-    test_file_move_back_char_generic(PATH_TO"utf8stringfile", RF_UTF8,
+    test_file_move_back_char_generic(CLIB_TESTS_PATH"utf8stringfile", RF_UTF8,
                                 RF_ENDIANESS_UNKNOWN);
 }END_TEST
 
 START_TEST(test_file_move_back_char_utf16_le) {
-    test_file_move_back_char_generic(PATH_TO"utf16lestringfile",
+    test_file_move_back_char_generic(CLIB_TESTS_PATH"utf16lestringfile",
                                 RF_UTF16, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_file_move_back_char_utf16_be) {
-    test_file_move_back_char_generic(PATH_TO"utf16bestringfile",
+    test_file_move_back_char_generic(CLIB_TESTS_PATH"utf16bestringfile",
                                   RF_UTF16, RF_BIG_ENDIAN);
 }END_TEST
 
 START_TEST(test_file_move_back_char_utf32_le) {
-    test_file_move_back_char_generic(PATH_TO"utf32lestringfile",
+    test_file_move_back_char_generic(CLIB_TESTS_PATH"utf32lestringfile",
                                   RF_UTF32, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_file_move_back_char_utf32_be) {
-    test_file_move_back_char_generic(PATH_TO"utf32bestringfile",
+    test_file_move_back_char_generic(CLIB_TESTS_PATH"utf32bestringfile",
                                   RF_UTF32, RF_BIG_ENDIAN);
 }END_TEST
 

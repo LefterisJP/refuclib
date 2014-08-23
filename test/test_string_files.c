@@ -18,7 +18,6 @@
 // from test_io_helpers.h    ... there are some minor differences
 // that can be addressed
 
-#define PATH_TO "test/"
 #define SECOND_LINE_UTF8 \
     "２日の東京外国為替市場では、主要通貨に対して"                      \
     "円が売られている。午前１０時現在、ドルに対する円"                  \
@@ -328,7 +327,7 @@ static void test_rf_string_fwrite_generic(const char* filename, int encoding,
     FILE *out;
     struct RFstring s, s2;
     char eof;
-    static struct RFstring out_name = RF_STRING_STATIC_INIT(PATH_TO"outputfile");
+    static struct RFstring out_name = RF_STRING_STATIC_INIT(CLIB_TESTS_PATH"outputfile");
     static struct RFstring nl = RF_STRING_STATIC_INIT("\n");
 
     ck_assert((f = fopen(filename, "rb")) != NULL);
@@ -353,7 +352,7 @@ static void test_rf_string_fwrite_generic(const char* filename, int encoding,
     /* remove all newlines since we want to read it one-off */
     ck_assert(rf_string_remove(&s, &nl, 0, 0));
     /* open an output file and write the string there */
-    ck_assert((out = fopen(PATH_TO"outputfile","w+b")) != NULL);
+    ck_assert((out = fopen(CLIB_TESTS_PATH"outputfile","w+b")) != NULL);
     ck_assert(rf_string_fwrite(&s, out, encoding, endianess));
     
     /* Read the string from the same file and compare*/
@@ -388,27 +387,27 @@ static void test_rf_string_fwrite_generic(const char* filename, int encoding,
 
 /* String init from file tests -- START */
 START_TEST(test_string_from_file_init_utf8) {
-    test_rf_string_init_generic(PATH_TO"utf8stringfile",
+    test_rf_string_init_generic(CLIB_TESTS_PATH"utf8stringfile",
                                 RF_UTF8, RF_ENDIANESS_UNKNOWN);
 }END_TEST
 
 START_TEST(test_string_from_file_init_utf16_le) {
-    test_rf_string_init_generic(PATH_TO"utf16lestringfile",
+    test_rf_string_init_generic(CLIB_TESTS_PATH"utf16lestringfile",
                                 RF_UTF16, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_string_from_file_init_utf16_be) {
-    test_rf_string_init_generic(PATH_TO"utf16bestringfile",
+    test_rf_string_init_generic(CLIB_TESTS_PATH"utf16bestringfile",
                                  RF_UTF16, RF_BIG_ENDIAN);
 }END_TEST
 
 START_TEST(test_string_from_file_init_utf32_le) {
-    test_rf_string_init_generic(PATH_TO"utf32lestringfile",
+    test_rf_string_init_generic(CLIB_TESTS_PATH"utf32lestringfile",
                                  RF_UTF32, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_string_from_file_init_utf32_be) {
-    test_rf_string_init_generic(PATH_TO"utf32bestringfile",
+    test_rf_string_init_generic(CLIB_TESTS_PATH"utf32bestringfile",
                                  RF_UTF32, RF_BIG_ENDIAN);
 }END_TEST
 
@@ -417,27 +416,27 @@ START_TEST(test_string_from_file_init_utf32_be) {
 /* String assign from file tests -- START */
 
 START_TEST(test_string_from_file_assign_utf8) {
-    test_rf_string_assign_generic(PATH_TO"utf8stringfile",
+    test_rf_string_assign_generic(CLIB_TESTS_PATH"utf8stringfile",
                                 RF_UTF8, RF_ENDIANESS_UNKNOWN);
 }END_TEST
 
 START_TEST(test_string_from_file_assign_utf16_le) {
-    test_rf_string_assign_generic(PATH_TO"utf16lestringfile",
+    test_rf_string_assign_generic(CLIB_TESTS_PATH"utf16lestringfile",
                                 RF_UTF16, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_string_from_file_assign_utf16_be) {
-    test_rf_string_assign_generic(PATH_TO"utf16bestringfile",
+    test_rf_string_assign_generic(CLIB_TESTS_PATH"utf16bestringfile",
                                 RF_UTF16, RF_BIG_ENDIAN);
 }END_TEST
 
 START_TEST(test_string_from_file_assign_utf32_le) {
-    test_rf_string_assign_generic(PATH_TO"utf32lestringfile",
+    test_rf_string_assign_generic(CLIB_TESTS_PATH"utf32lestringfile",
                                 RF_UTF32, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_string_from_file_assign_utf32_be) {
-    test_rf_string_assign_generic(PATH_TO"utf32bestringfile",
+    test_rf_string_assign_generic(CLIB_TESTS_PATH"utf32bestringfile",
                                 RF_UTF32, RF_BIG_ENDIAN);
 }END_TEST
 
@@ -445,54 +444,54 @@ START_TEST(test_string_from_file_assign_utf32_be) {
 /* String append from file tests -- START */
 
 START_TEST(test_string_from_file_append_utf8) {
-    test_rf_string_append_generic(PATH_TO"utf8stringfile",
+    test_rf_string_append_generic(CLIB_TESTS_PATH"utf8stringfile",
                                 RF_UTF8, RF_ENDIANESS_UNKNOWN);
 }END_TEST
 
 START_TEST(test_string_from_file_append_utf16_le) {
-    test_rf_string_append_generic(PATH_TO"utf16lestringfile",
+    test_rf_string_append_generic(CLIB_TESTS_PATH"utf16lestringfile",
                                 RF_UTF16, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_string_from_file_append_utf16_be) {
-    test_rf_string_append_generic(PATH_TO"utf16bestringfile",
+    test_rf_string_append_generic(CLIB_TESTS_PATH"utf16bestringfile",
                                   RF_UTF16, RF_BIG_ENDIAN);
 }END_TEST
 
 START_TEST(test_string_from_file_append_utf32_le) {
-    test_rf_string_append_generic(PATH_TO"utf32lestringfile",
+    test_rf_string_append_generic(CLIB_TESTS_PATH"utf32lestringfile",
                                   RF_UTF32, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_string_from_file_append_utf32_be) {
-    test_rf_string_append_generic(PATH_TO"utf32bestringfile",
+    test_rf_string_append_generic(CLIB_TESTS_PATH"utf32bestringfile",
                                   RF_UTF32, RF_BIG_ENDIAN);
 }END_TEST
 
 
 /* String fwrite tests -- START -- they also check for proper EOF setting */
 START_TEST(test_string_fwrite_utf8) {
-    test_rf_string_fwrite_generic(PATH_TO"utf8stringfile",
+    test_rf_string_fwrite_generic(CLIB_TESTS_PATH"utf8stringfile",
                                   RF_UTF8, RF_ENDIANESS_UNKNOWN);
 }END_TEST
 
 START_TEST(test_string_fwrite_utf16_le) {
-    test_rf_string_fwrite_generic(PATH_TO"utf16lestringfile",
+    test_rf_string_fwrite_generic(CLIB_TESTS_PATH"utf16lestringfile",
                                 RF_UTF16, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_string_fwrite_utf16_be) {
-    test_rf_string_fwrite_generic(PATH_TO"utf16bestringfile",
+    test_rf_string_fwrite_generic(CLIB_TESTS_PATH"utf16bestringfile",
                                   RF_UTF16, RF_BIG_ENDIAN);
 }END_TEST
 
 START_TEST(test_string_fwrite_utf32_le) {
-    test_rf_string_fwrite_generic(PATH_TO"utf32lestringfile",
+    test_rf_string_fwrite_generic(CLIB_TESTS_PATH"utf32lestringfile",
                                   RF_UTF32, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_string_fwrite_utf32_be) {
-    test_rf_string_fwrite_generic(PATH_TO"utf32bestringfile",
+    test_rf_string_fwrite_generic(CLIB_TESTS_PATH"utf32bestringfile",
                                   RF_UTF32, RF_BIG_ENDIAN);
 }END_TEST
 
@@ -500,27 +499,27 @@ START_TEST(test_string_fwrite_utf32_be) {
 /* Stringx assign from file tests -- START */
 
 START_TEST(test_stringx_from_file_assign_utf8) {
-    test_rf_stringx_assign_generic(PATH_TO"utf8stringfile",
+    test_rf_stringx_assign_generic(CLIB_TESTS_PATH"utf8stringfile",
                                 RF_UTF8, RF_ENDIANESS_UNKNOWN);
 }END_TEST
 
 START_TEST(test_stringx_from_file_assign_utf16_le) {
-    test_rf_stringx_assign_generic(PATH_TO"utf16lestringfile",
+    test_rf_stringx_assign_generic(CLIB_TESTS_PATH"utf16lestringfile",
                                 RF_UTF16, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_stringx_from_file_assign_utf16_be) {
-    test_rf_stringx_assign_generic(PATH_TO"utf16bestringfile",
+    test_rf_stringx_assign_generic(CLIB_TESTS_PATH"utf16bestringfile",
                                 RF_UTF16, RF_BIG_ENDIAN);
 }END_TEST
 
 START_TEST(test_stringx_from_file_assign_utf32_le) {
-    test_rf_stringx_assign_generic(PATH_TO"utf32lestringfile",
+    test_rf_stringx_assign_generic(CLIB_TESTS_PATH"utf32lestringfile",
                                 RF_UTF32, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_stringx_from_file_assign_utf32_be) {
-    test_rf_stringx_assign_generic(PATH_TO"utf32bestringfile",
+    test_rf_stringx_assign_generic(CLIB_TESTS_PATH"utf32bestringfile",
                                 RF_UTF32, RF_BIG_ENDIAN);
 }END_TEST
 
@@ -528,27 +527,27 @@ START_TEST(test_stringx_from_file_assign_utf32_be) {
 /* Stringx append from file tests -- START */
 
 START_TEST(test_stringx_from_file_append_utf8) {
-    test_rf_stringx_append_generic(PATH_TO"utf8stringfile",
+    test_rf_stringx_append_generic(CLIB_TESTS_PATH"utf8stringfile",
                                 RF_UTF8, RF_ENDIANESS_UNKNOWN);
 }END_TEST
 
 START_TEST(test_stringx_from_file_append_utf16_le) {
-    test_rf_stringx_append_generic(PATH_TO"utf16lestringfile",
+    test_rf_stringx_append_generic(CLIB_TESTS_PATH"utf16lestringfile",
                                 RF_UTF16, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_stringx_from_file_append_utf16_be) {
-    test_rf_stringx_append_generic(PATH_TO"utf16bestringfile",
+    test_rf_stringx_append_generic(CLIB_TESTS_PATH"utf16bestringfile",
                                   RF_UTF16, RF_BIG_ENDIAN);
 }END_TEST
 
 START_TEST(test_stringx_from_file_append_utf32_le) {
-    test_rf_stringx_append_generic(PATH_TO"utf32lestringfile",
+    test_rf_stringx_append_generic(CLIB_TESTS_PATH"utf32lestringfile",
                                   RF_UTF32, RF_LITTLE_ENDIAN);
 }END_TEST
 
 START_TEST(test_stringx_from_file_append_utf32_be) {
-    test_rf_stringx_append_generic(PATH_TO"utf32bestringfile",
+    test_rf_stringx_append_generic(CLIB_TESTS_PATH"utf32bestringfile",
                                   RF_UTF32, RF_BIG_ENDIAN);
 }END_TEST
 

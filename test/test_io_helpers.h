@@ -5,8 +5,6 @@
 #include <Utils/rf_unicode.h>
 #include <Utils/endianess.h>
 
-#define PATH_TO "test/"
-
 #define FIRST_LINE_UTF8 "UTF-8 File"
 
 #define SECOND_LINE_UTF8 \
