@@ -58,7 +58,11 @@ unit_tests_files = [
 ]
 unit_tests_files = ['test/' + s for s in unit_tests_files]
 unit_tests_files.extend(['src/' + s for s in orig_sources])
+local_env.SetDefault(CLIB=clib_static)
 clib_tests = local_env.Check(
     target="clib_tests",
     source=unit_tests_files)
 local_env.Alias('clib_tests', clib_tests)
+
+# Return the built static library so that the compiler can link against it
+Return('clib_static')
