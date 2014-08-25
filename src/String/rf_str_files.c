@@ -103,16 +103,13 @@ bool rf_string_from_file_init(struct RFstring* str, FILE* f, char* eof,
                 return false;
             }
             break;
-#if RF_OPTION_DEBUG
         default:
             RF_WARNING("Provided an illegal encoding value to function "
                      "rf_string_init_f()");
             return false;
             break;
-#endif
     }
-    if(ret_buff_size)
-    {
+    if (ret_buff_size) {
         *ret_buff_size = buff_size;
     }
     return true;

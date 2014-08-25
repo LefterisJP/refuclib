@@ -42,100 +42,30 @@
 
 
 /**
- * These macros checks if some pointers are null and fail if they are
+ * Macros to check for NULL pointers. Should be active most of the time.
+ * Some tests rely on them to be active so that some functions can be tested
+ * even with invalid input
  */
-#if RF_OPTION_DEBUG
-#define RF_CHECK_NOT_NULL_DEBUG_1(ptr_, argname_, fail_)      \
+#if RF_OPTION_NULLPTR_CHECKS
+#define RF_NULLCHECK1(ptr_, argname_, fail_)                  \
     do{                                                       \
-        if(!ptr_)                                             \
-        {                                                     \
+        if (!(ptr_)) {                                        \
             RF_ERROR("Provided a NULL pointer for "argname_); \
             fail_;                                            \
         }                                                     \
     }while(0)
 
-#define RF_CHECK_NOT_NULL_DEBUG_2(ptr1_, ptr2_, fail_)  \
-    do{                                         \
-        if(!ptr1_ || !ptr2_)                    \
-        {                                       \
-            RF_ERROR("NULL pointer detected") ; \
-            fail_;                              \
-        }                                       \
-    }while(0)
-
-
-#define RF_CHECK_NOT_NULL_DEBUG_3(ptr1_, ptr2_, ptr3_, fail_) \
-    do{                                               \
-        if(!ptr1_ || !ptr2_ || !ptr3_)                \
-        {                                             \
-            RF_ERROR("NULL pointer detected") ;       \
-            fail_;                                    \
-        }                                             \
-    }while(0)
-
-#define RF_CHECK_NOT_NULL_DEBUG_4(ptr1_, ptr2_, ptr3_, ptr4_, fail_)  \
-    do{                                                       \
-        if(!ptr1_ || !ptr2_ || !ptr3_ || !ptr4_)              \
-        {                                                     \
-            RF_ERROR("NULL pointer detected") ;               \
-            fail_;                                            \
-        }                                                     \
-    }while(0)
-
+#define RF_NULLCHECK2(ptr1_, ptr2_, fail_)          \
+        do{                                         \
+            if (!(ptr1_) || !(ptr2_)) {             \
+                RF_ERROR("NULL pointer detected") ; \
+                fail_;                              \
+            }                                       \
+        }while(0)
 #else
-#define RF_CHECK_NOT_NULL_DEBUG_1(ptr_, argname_, ret_) 
-#define RF_CHECK_NOT_NULL_DEBUG_2(ptr1_, ptr2_, fail_)      
-#define RF_CHECK_NOT_NULL_DEBUG_3(ptr1_, ptr2_, ptr3_, fail_)      
-#define RF_CHECK_NOT_NULL_DEBUG_4(ptr1_, ptr2_, ptr3_, ptr4_, fail_)      
+#define RF_NULLCHECK1(ptr_, argname_, fail_)
+#define RF_NULLCHECK2(ptr1_, ptr2_, fail_)
 #endif
-
-
-
-#if RF_OPTION_INSANITY_CHECKS
-#define RF_INSANE_CHECK_NOT_NULL_1(ptr_, argname_, fail_)     \
-    do{                                                       \
-        if(!ptr_)                                             \
-        {                                                     \
-            RF_ERROR("Provided a NULL pointer for "argname_); \
-            fail_;                                            \
-        }                                                     \
-    }while(0)
-
-#define RF_INSANE_CHECK_NOT_NULL_2(ptr1_, ptr2_, fail_) \
-        do{                                             \
-            if(!ptr1_ || !ptr2_)                        \
-            {                                           \
-                RF_ERROR("NULL pointer detected") ;     \
-                fail_;                                  \
-            }                                           \
-        }while(0)
-
-
-#define RF_INSANE_CHECK_NOT_NULL_3(ptr1_, ptr2_, ptr3_, fail_)  \
-        do{                                                     \
-            if(!ptr1_ || !ptr2_ || !ptr3_)                      \
-            {                                                   \
-                RF_ERROR("NULL pointer detected") ;             \
-                fail_;                                          \
-            }                                                   \
-        }while(0)
-
-#define RF_INSANE_CHECK_NOT_NULL_4(ptr1_, ptr2_, ptr3_, ptr4_, fail_) \
-        do{                                                           \
-            if(!ptr1_ || !ptr2_ || !ptr3_ || !ptr4_)                  \
-            {                                                         \
-                RF_ERROR("NULL pointer detected") ;                   \
-                fail_;                                                \
-            }                                                         \
-        }while(0)
-
-#else
-#define RF_INSANE_CHECK_NOT_NULL_1(ptr_, argname_, ret_) 
-#define RF_INSANE_CHECK_NOT_NULL_2(ptr1_, ptr2_, fail_)      
-#define RF_INSANE_CHECK_NOT_NULL_3(ptr1_, ptr2_, ptr3_, fail_)      
-#define RF_INSANE_CHECK_NOT_NULL_4(ptr1_, ptr2_, ptr3_, ptr4_, fail_)      
-#endif
-
 
 
 /* just a wrapper over stdlib's assert */

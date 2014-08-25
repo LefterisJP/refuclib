@@ -57,17 +57,15 @@ bool rf_system_make_dir(void* dirname, int mode)
     unsigned int index;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    RF_CHECK_NOT_NULL_DEBUG_1(dirname, "directory name", ret = false; goto cleanup);
+    RF_NULLCHECK1(dirname, "directory name", ret = false; goto cleanup);
 
-    if(!(cs = rf_string_cstr_ibuff_push(dirname, &index)))
-    {
+    if(!(cs = rf_string_cstr_ibuff_push(dirname, &index))) {
         ret = false;
         goto cleanup;
     }
     
     //make the directory
-    if(mkdir(cs, mode) != 0)
-    {
+    if(mkdir(cs, mode) != 0) {
         RF_ERROR("Creating a directory failed due to mkdir() "
                  "errno %d", errno);
         ret = false;
@@ -90,24 +88,21 @@ bool rf_system_remove_dir(void* dirname)
     unsigned int index;
     struct RFstringx path;
     RF_ENTER_LOCAL_SCOPE();
-    RF_CHECK_NOT_NULL_DEBUG_1(dirname, "directory name",
-                      ret = false; goto cleanup_local);
+    RF_NULLCHECK1(dirname, "directory name",
+                   ret = false; goto cleanup_local);
 
-    if(!(cs = rf_string_cstr_ibuff_push(dirname, &index)))
-    {
+    if(!(cs = rf_string_cstr_ibuff_push(dirname, &index))) {
         ret = false;
         goto cleanup_local;
     }
 
-    if(!rf_stringx_init_buff(&path, 1024, ""))
-    {
+    if(!rf_stringx_init_buff(&path, 1024, "")) {
         RF_ERROR("Failed to initialize a stringX buffer");
         ret = false;
         goto cleanup_cstr_buff;
     }
     //open the directory
-    if(!(dir = opendir(cs)))
-    {
+    if(!(dir = opendir(cs))) {
         RF_ERROR("Failed to open the given directory due to "
                  "opendir() errno %d", errno);
         ret = false;
@@ -197,7 +192,7 @@ bool rf_system_delete_file(void* name)
     char *cs;
     unsigned int index;
     RF_ENTER_LOCAL_SCOPE();
-    RF_CHECK_NOT_NULL_DEBUG_1(name, "file name", ret = false; goto cleanup);
+    RF_NULLCHECK1(name, "file name", ret = false; goto cleanup);
     if(!(cs = rf_string_cstr_ibuff_push(name, &index)))
     {
         ret = false; goto cleanup;
@@ -226,7 +221,7 @@ bool rf_system_rename_file(void* name, void* newName)
     char *cs_new_name;
     unsigned int index;
     RF_ENTER_LOCAL_SCOPE();
-    RF_CHECK_NOT_NULL_DEBUG_2(name, newName, ret = false; goto cleanup);
+    RF_NULLCHECK2(name, newName, ret = false; goto cleanup);
 
     if(!(cs_name = rf_string_cstr_ibuff_push(name, &index)))
     {
@@ -303,15 +298,12 @@ FILE* rf_popen(void* command, const char* mode)
     char *cs;
     RF_ENTER_LOCAL_SCOPE();
 
-#if RF_OPTION_DEBUG
-    if( strcmp(mode,"r") != 0 && strcmp(mode,"w") != 0)
-    {
+    if (strcmp(mode,"r") != 0 && strcmp(mode,"w") != 0) {
         RF_ERROR("Invalid mode argument provided to rf_popen()");
         goto cleanup;
     }
-#endif
-    if(!(cs = rf_string_cstr_ibuff_push(command, &index)))
-    {
+
+    if(!(cs = rf_string_cstr_ibuff_push(command, &index))) {
         goto cleanup;
     }
 

@@ -107,8 +107,7 @@ bool rf_string_initvl(struct RFstring* str, const char* s, va_list args)
     }
 
     //read the var args
-    if(!fill_fmt_buffer(s, &size, &buff_ptr, &buff_index, args))
-    {
+    if (!fill_fmt_buffer(s, &size, &buff_ptr, &buff_index, args)) {
         RF_ERROR("String creation failure due to failing at reading the "
                  "formatted string");
         ret = false;

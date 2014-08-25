@@ -36,6 +36,7 @@
 #include <String/rf_str_core.h> //for static RFstring init
 #include <String/rf_str_retrieval.h> //for string accessors
 #include <Parallel/rf_threading.h> //for thread id and RFmutex
+#include <Utils/sanity.h> //for RF_ASSERT
 /*------------- libc inclusion -------------*/
 #include <stdio.h> //for printf
 #include <string.h> //for memcpy
@@ -81,8 +82,8 @@ static const struct RFstring severity_level_string[] = {
 #define OCCUPIED(i_log_) ((i_log_)->index - (i_log_)->buffer)
 
 static bool log_init(struct RFlog *log,
-                        enum RFlog_level level,
-                        char *log_file_name)
+                     enum RFlog_level level,
+                     char *log_file_name)
 {
     log->buff_size = RF_OPTION_LOG_BUFFER_SIZE;
     log->buffer = malloc(RF_OPTION_LOG_BUFFER_SIZE);
@@ -98,7 +99,7 @@ static bool log_init(struct RFlog *log,
     }
     log->file = fopen(log_file_name, "wb+");
     if (!log->file) {
-        assert(0);
+        RF_ASSERT(0);
         return false;
     }
     return true;
@@ -253,7 +254,7 @@ static void log_add(struct RFlog *log, enum RFlog_level level,
     if(!format_log_message(log, level, file, func, line, msg))
     {
         //TODO: how to handle this?
-        assert(0);
+        RF_ASSERT(0);
     }
     rf_mutex_unlock(&log->lock);
     RF_EXIT_LOCAL_SCOPE();

@@ -2175,14 +2175,11 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
     int32_t error;
     RF_ENTER_LOCAL_SCOPE();
 
-#ifdef RF_OPTION_DEBUG
-    if(string == NULL)
-    {
+    if (!string) {
         RF_ERROR("The replace string argument given is NULL");
         ret = false;
         goto cleanup0;
     }
-#endif
 
     lineFound = allocatedS = false;
     //determine the target line
