@@ -129,18 +129,16 @@ bool rf_stringx_prepend(struct RFstringx* thisstr, const void* other)
     }
 
     //if the new string does not fit inside the buffer reallocate it
-    RF_STRINGX_REALLOC_JMP(
+    RF_STRINGX_REALLOC(
         thisstr,
         rf_string_length_bytes(thisstr) + rf_string_length_bytes(other),
-        ret = false,
-        cleanup
+        ret = false; goto cleanup
     );
 
-    if(!rf_string_generic_prepend(thisstr,
-                            rf_string_data(other),
-                            rf_string_length_bytes(thisstr),
-                            rf_string_length_bytes(other)))
-    {
+    if (!rf_string_generic_prepend(thisstr,
+                                   rf_string_data(other),
+                                   rf_string_length_bytes(thisstr),
+                                   rf_string_length_bytes(other))) {
         ret = false;
     }
 
@@ -186,11 +184,7 @@ bool rf_stringx_insert(struct RFstringx* thisstr, uint32_t pos,
     //get the new byte length
     rf_string_length_bytes(thisstr) += rf_string_length_bytes(other);
     //check if the new string fits in the buffer and if not reallocate it
-    RF_STRINGX_REALLOC_JMP(
-        thisstr,
-        rf_string_length_bytes(thisstr),
-        ;,
-        cleanup);
+    RF_STRINGX_REALLOC(thisstr, rf_string_length_bytes(thisstr), goto cleanup);
 
     //move the string's contents to make room for the extra string insertion
     memmove(
@@ -227,11 +221,10 @@ bool rf_stringx_append_bytes(struct RFstringx* thisstr, const void* other,
         add_bytes = bytes;
     }
     //if it does not fit inside the remaining size, reallocate the buffer
-    RF_STRINGX_REALLOC_JMP(
+    RF_STRINGX_REALLOC(
         thisstr,
         rf_string_length_bytes(thisstr) + add_bytes,
-        ret = false,
-        cleanup);
+        ret = false; goto cleanup);
     ret = rf_stringx_generic_append(thisstr, rf_string_data(other), add_bytes);
 
   cleanup:
@@ -253,7 +246,7 @@ bool rf_stringx_append_cstr(struct RFstringx* thisstr, const char* cstr)
     RF_STRINGX_REALLOC(
         thisstr,
         rf_string_length_bytes(thisstr) + len,
-        false);
+        return false);
 
     return rf_stringx_generic_append(thisstr, cstr, len);
 }
@@ -286,12 +279,12 @@ bool rf_stringx_replace(struct RFstringx* thisstr, const void* sstr,
     if(rf_string_length_bytes(rstr)> rf_string_length_bytes(sstr))
     {
         //reallocate the string if needed
-        RF_STRINGX_REALLOC_JMP(
+        RF_STRINGX_REALLOC(
             thisstr,
             rf_string_length_bytes(thisstr) + number * (
                 rf_string_length_bytes(rstr) - rf_string_length_bytes(sstr)
             ),
-            ret = false, cleanup
+            ret = false; goto cleanup
         );
         replace_greater(thisstr, number, sstr, rstr);
     }

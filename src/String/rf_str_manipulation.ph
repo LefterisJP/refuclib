@@ -55,7 +55,7 @@ i_INLINE_DECL bool rf_stringx_generic_append(struct RFstringx* s,
     //if it does not fit inside the remaining size, reallocate the buffer
     RF_STRINGX_REALLOC(s,
                        rf_string_length_bytes(s) + bytes_to_copy,
-                       false);
+                       return false);
     rf_string_generic_append(s, other, bytes_to_copy);
     return true;
 }

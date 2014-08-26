@@ -60,7 +60,7 @@ uint16_t* rf_string_to_utf16(const void* s, uint32_t* length)
         RF_WARNING("Did not provide a length argument");
         return NULL;
     }
-    RF_MALLOC(codepoints, rf_string_length_bytes(s) * 4, NULL);
+    RF_MALLOC(codepoints, rf_string_length_bytes(s) * 4, return NULL);
     //get the unicode codepoints
     if(!rf_utf8_decode(rf_string_data(s), rf_string_length_bytes(s), &charsN,
                       codepoints, rf_string_length_bytes(s) * 4))
@@ -71,7 +71,7 @@ uint16_t* rf_string_to_utf16(const void* s, uint32_t* length)
     }
     //encode them in UTF-16, no check here since it comes from an RFstring
     // which is always guaranteed to have valid UTF-8 and as such valid codepoints
-    RF_MALLOC(utf16, rf_string_length_bytes(s) * 4, NULL);  
+    RF_MALLOC(utf16, rf_string_length_bytes(s) * 4, return NULL);
     if(!rf_utf16_encode(codepoints, charsN, length,
                        utf16, rf_string_length_bytes(s) * 4))
     {
@@ -92,7 +92,7 @@ uint32_t* rf_string_to_utf32(const void* s, uint32_t* length)
         RF_WARNING("Did not provide a length argument");
         return NULL;
     }
-    RF_MALLOC(cp, rf_string_length_bytes(s) * 4, NULL);
+    RF_MALLOC(cp, rf_string_length_bytes(s) * 4, return NULL);
     //get the unicode codepoints
     if(!rf_utf8_decode(rf_string_data(s), rf_string_length_bytes(s), length,
                       cp, rf_string_length_bytes(s) * 4))
@@ -107,7 +107,7 @@ char* rf_string_cstr(const void* str)
 {
     char* ret;
     RF_ASSERT(str);
-    RF_MALLOC(ret, rf_string_length_bytes(str) + 1, NULL);
+    RF_MALLOC(ret, rf_string_length_bytes(str) + 1, return NULL);
     memcpy(ret, rf_string_data(str), rf_string_length_bytes(str));
     ret[rf_string_length_bytes(str)] = '\0';
     return ret;
@@ -131,7 +131,7 @@ bool rf_string_to_int(const void* str, int32_t* v)
 
     errno = 0;
     *v = strtol (buff, &end, 10);
-    
+
     if(end - buff == 0 || errno)
     {
         RF_ERROR("Failed to convert %s to int with strtol()"
@@ -147,7 +147,7 @@ bool rf_string_to_double(const void* str, double* f)
     int index;
     char *end;
     RF_ASSERT(str);
-    
+
     if (!f) {
         RF_WARNING("Provided null pointer for the returned double");
         return false;
@@ -164,7 +164,7 @@ bool rf_string_to_double(const void* str, double* f)
     {
         RF_ERROR("Failed to convert %s to double with strtod()"
                  " errno: %d", buff, errno);
-        return false;        
+        return false;
     }
     return true;
 }
@@ -173,7 +173,7 @@ void rf_string_to_lower(void* s)
 {
     uint32_t charI,byteI;
     RF_ASSERT(s);
-    
+
     RF_STRING_ITERATE_START(s, charI, byteI)
         //if the character is lowercase
         if(rf_string_data(s)[byteI] >= 65 && rf_string_data(s)[byteI] <= 90)
@@ -207,7 +207,7 @@ bool rf_string_tokenize(const void* str, const void* sep,
     int32_t tokens_num;
     RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(str);
-    
+
     if (!sep) {
         RF_WARNING("Did not provide a separator string");
         ret = false;
@@ -228,8 +228,8 @@ bool rf_string_tokenize(const void* str, const void* sep,
         goto cleanup_lscope;
     }
     //allocate the tokens
-    RF_MALLOC_JMP(*tokens, sizeof(struct RFstring) * (tokens_num),
-              ret = false, cleanup_lscope);
+    RF_MALLOC(*tokens, sizeof(struct RFstring) * (tokens_num),
+              ret = false; goto cleanup_lscope);
     //find the length of the separator
     sepLen = rf_string_length_bytes(sep);
 
@@ -240,9 +240,9 @@ bool rf_string_tokenize(const void* str, const void* sep,
         e = strstr_nnt(s, e - s,
                        rf_string_data(sep), rf_string_length_bytes(sep));
         rf_string_length_bytes(&(*tokens)[i]) = e - s;
-        RF_MALLOC_JMP(rf_string_data(&(*tokens)[i]),
+        RF_MALLOC(rf_string_data(&(*tokens)[i]),
                   rf_string_length_bytes(&(*tokens)[i]),
-                      ret = false,  cleanup_lscope
+                      ret = false; goto cleanup_lscope
         );
         //put in the data
         memcpy(rf_string_data(&(*tokens)[i]),
@@ -257,16 +257,16 @@ bool rf_string_tokenize(const void* str, const void* sep,
     rf_string_length_bytes(&(*tokens)[i]) = (
         rf_string_length_bytes(str) - (s - rf_string_data(str))
     );
-    RF_MALLOC_JMP(rf_string_data(&(*tokens)[i]),
-                  rf_string_length_bytes(&(*tokens)[i]),
-                  ret = false,  cleanup_lscope
+    RF_MALLOC(rf_string_data(&(*tokens)[i]),
+              rf_string_length_bytes(&(*tokens)[i]),
+              ret = false; goto cleanup_lscope
     );
     //put in the data
     memcpy(rf_string_data(&(*tokens)[i]),
            s,
            rf_string_length_bytes(&(*tokens)[i])
     );
-    
+
     *ret_tokens_num = tokens_num;
 cleanup_lscope:
     //success

@@ -62,7 +62,7 @@ struct RFstring *rf_string_createvl(const char* s, va_list args)
 {
     struct RFstring* ret;
 
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if (!rf_string_initvl(ret, s, args)) {
         free(ret);
         return NULL;
@@ -73,7 +73,7 @@ struct RFstring *rf_string_createvl(const char* s, va_list args)
 struct RFstring* rf_string_create(const char* s)
 {
     struct RFstring* ret;
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if (!rf_string_init(ret, s)) {
         free(ret);
         return NULL;
@@ -117,8 +117,8 @@ bool rf_string_initvl(struct RFstring* str, const char* s, va_list args)
     //get length
     rf_string_length_bytes(str) = size;
     //now that we know the length we can allocate the buffer and copy the bytes
-    RF_MALLOC_JMP(rf_string_data(str), rf_string_length_bytes(str),
-                  ret = false, cleanup_buffer);
+    RF_MALLOC(rf_string_data(str), rf_string_length_bytes(str),
+              ret = false; goto cleanup_buffer);
     memcpy(rf_string_data(str), buff_ptr, rf_string_length_bytes(str));
 
 #ifdef RF_OPTION_DEBUG
@@ -150,7 +150,7 @@ bool rf_string_init(struct RFstring* str, const char* s)
     //get length
     rf_string_length_bytes(str) = byteLength;
     //now that we know the length we can allocate the buffer and copy the bytes
-    RF_MALLOC(rf_string_data(str), rf_string_length_bytes(str), false);
+    RF_MALLOC(rf_string_data(str), rf_string_length_bytes(str), return false);
     memcpy(rf_string_data(str), s, rf_string_length_bytes(str));
 
     return true;
@@ -161,7 +161,7 @@ bool rf_string_init(struct RFstring* str, const char* s)
 struct RFstring* rf_string_create_cp(uint32_t codepoint)
 {
     struct RFstring* ret;
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if(rf_string_init_cp(ret, codepoint))
     {
         return ret;
@@ -176,7 +176,7 @@ bool rf_string_init_cp(struct RFstring* str, uint32_t codepoint)
 {
     RF_ASSERT(str);
     //alloc enough for a utf8 character
-    RF_MALLOC(rf_string_data(str), MAX_UTF8C_BYTES, false);
+    RF_MALLOC(rf_string_data(str), MAX_UTF8C_BYTES, return false);
     rf_string_length_bytes(str) = rf_utf8_encode_single(
         codepoint, rf_string_data(str)
     );
@@ -191,7 +191,7 @@ struct RFstring* rf_string_create_int(int i)
 {
     //initialize the string and return it
     struct RFstring* ret;
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if(!rf_string_init_int(ret, i))
     {
         free(ret);
@@ -216,7 +216,7 @@ bool rf_string_init_int(struct RFstring* str, int i)
         return false;
     }
     rf_string_length_bytes(str) = len;
-    RF_MALLOC(rf_string_data(str), len, false);
+    RF_MALLOC(rf_string_data(str), len, return false);
     memcpy(rf_string_data(str), buff, len);
 
     return true;
@@ -225,7 +225,7 @@ bool rf_string_init_int(struct RFstring* str, int i)
 struct RFstring* rf_string_create_double(double f)
 {
     struct RFstring* ret;
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if(rf_string_init_double(ret, f) == false)
     {
         free(ret);
@@ -249,7 +249,7 @@ bool rf_string_init_double(struct RFstring* str, double f)
     }
 
     rf_string_length_bytes(str) = len;
-    RF_MALLOC(rf_string_data(str), len, false);
+    RF_MALLOC(rf_string_data(str), len, return false);
     memcpy(rf_string_data(str), buff, len);
 
     //success
@@ -259,7 +259,7 @@ bool rf_string_init_double(struct RFstring* str, double f)
 struct RFstring* rf_string_create_utf16(const uint16_t* s, unsigned int len)
 {
     struct RFstring* ret;
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if(!rf_string_init_utf16(ret, s, len))
     {
         free(ret);
@@ -281,7 +281,7 @@ bool rf_string_init_utf16(struct RFstring* str, const uint16_t* s, unsigned int 
         return false;
     }
 
-    RF_MALLOC(codepoints, len * 2, false); //allocate the codepoints
+    RF_MALLOC(codepoints, len * 2, return false); //allocate the codepoints
     //parse the given byte stream normally since it has to be in the
     //endianess of the system
     if(!rf_utf16_decode((const char*)s, len, &characterLength, codepoints,
@@ -293,7 +293,7 @@ bool rf_string_init_utf16(struct RFstring* str, const uint16_t* s, unsigned int 
         return false;
     }
     //now encode these codepoints into UTF8
-    RF_MALLOC(utf8, characterLength * 4, false);
+    RF_MALLOC(utf8, characterLength * 4, return false);
     if(!rf_utf8_encode(codepoints, characterLength,
                       &utf8ByteLength, utf8, characterLength * 4))
     {
@@ -312,7 +312,7 @@ bool rf_string_init_utf16(struct RFstring* str, const uint16_t* s, unsigned int 
 struct RFstring* rf_string_create_utf32(const uint32_t* s, unsigned int len)
 {
     struct RFstring* ret;
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if(rf_string_init_utf32(ret, s, len) == false)
     {
         free(ret);
@@ -335,7 +335,7 @@ bool rf_string_init_utf32(struct RFstring* str, const uint32_t* codeBuffer,
     }
 
     //turn the codepoints into a utf-8 encoded buffer
-    RF_MALLOC(utf8, length * 4, false);
+    RF_MALLOC(utf8, length * 4, return false);
     if(!rf_utf8_encode(codeBuffer, length, &utf8ByteLength, utf8, length * 4))
     {
         RF_ERROR("Could not properly encode a UTF32 buffer into UTF8");
@@ -351,7 +351,7 @@ bool rf_string_init_utf32(struct RFstring* str, const uint32_t* codeBuffer,
 struct RFstring* rf_string_create_unsafe(const char* s)
 {
     struct RFstring* ret;
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if(!rf_string_init_unsafe(ret, s))
     {
         free(ret);
@@ -369,7 +369,7 @@ bool rf_string_init_unsafe(struct RFstring* str, const char* s)
 bool rf_string_init_unsafe_nnt(struct RFstring* str, const char* s, size_t length)
 {
     RF_ASSERT(str);
-    RF_MALLOC(rf_string_data(str), length, false);
+    RF_MALLOC(rf_string_data(str), length, return false);
     memcpy(rf_string_data(str), s, length);
     rf_string_length_bytes(str) = length;
     return true;
@@ -391,8 +391,8 @@ bool rf_string_assign(struct RFstring* dst, const void* src)
     //only if new string value won't fit in the buffer reallocate
     if(rf_string_length_bytes(src) > rf_string_length_bytes(dst))
     {
-        RF_REALLOC_JMP(rf_string_data(dst), char, rf_string_length_bytes(src),
-                       ret = false, cleanup);
+        RF_REALLOC(rf_string_data(dst), char, rf_string_length_bytes(src),
+                   ret = false; goto cleanup);
     }
     //now copy the value
     memcpy(rf_string_data(dst), rf_string_data(src), rf_string_length_bytes(src));
@@ -408,9 +408,8 @@ bool rf_string_assign_char(struct RFstring* str,uint32_t codepoint)
 {
     RF_ASSERT(str);
     //realloc if needed
-    if(str->length <5)
-    {
-        RF_REALLOC(rf_string_data(str), char, 5, false);
+    if (str->length < 5) {
+        RF_REALLOC(rf_string_data(str), char, 5, return false);
     }
     rf_string_length_bytes(str) = rf_utf8_encode_single(codepoint,
                                                     rf_string_data(str));
@@ -432,8 +431,8 @@ bool rf_string_assign_unsafe_nnt(struct RFstring* str, const char* s,
     }
     if(length > rf_string_length_bytes(str))
     {
-        RF_REALLOC_JMP(rf_string_data(str), char, length,
-                       ret = false, cleanup);
+        RF_REALLOC(rf_string_data(str), char, length,
+                   ret = false; goto cleanup);
     }    
 
     //now copy the value
@@ -452,7 +451,7 @@ struct RFstring* rf_string_copy_out(const void* src)
 {
     struct RFstring* ret;
     //create the new string
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if(!rf_string_copy_in(ret, src))
     {
         free(ret);

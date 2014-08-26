@@ -118,7 +118,7 @@ static bool rf_workerthread_init(RFworker_thread *thread)
 static RFworker_thread *rf_workerthread_create()
 {
     RFworker_thread *ret;
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     
     if (!rf_workerthread_init(ret)) {
         free(ret);
@@ -189,7 +189,7 @@ bool rf_workerpool_init(RFworker_pool *p, int initial_workers_num)
 RFworker_pool *rf_workerpool_create(int initial_workers_num)
 {
     RFworker_pool *ret;
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     
     if (!rf_workerpool_init(ret, initial_workers_num)) {
         free(ret);
@@ -229,7 +229,7 @@ bool rf_workerpool_add_task(RFworker_pool *p,
     RFworker_thread *worker;
     int worker_index, i;
 
-    RF_MALLOC(task, sizeof(*task), false);
+    RF_MALLOC(task, sizeof(*task), return false);
     task->task_ptr = task_ptr;
     task->task_data = data;
 

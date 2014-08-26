@@ -65,8 +65,8 @@ bool rf_string_append(struct RFstring* thisstr, const void* other)
 
     newLen = rf_string_length_bytes(thisstr) + rf_string_length_bytes(other);
     //reallocate this string to fit the new addition
-    RF_REALLOC_JMP(rf_string_data(thisstr), char, newLen ,
-                   ret = false, cleanup);
+    RF_REALLOC(rf_string_data(thisstr), char, newLen ,
+               ret = false; goto cleanup);
     rf_string_generic_append(thisstr,
                              rf_string_data(other),
                              rf_string_length_bytes(other));
@@ -82,7 +82,7 @@ bool rf_string_append_int(struct RFstring* thisstr, const int32_t i)
     //reallocate this string to fit the new addition
     RF_REALLOC(rf_string_data(thisstr), char,
                rf_string_length_bytes(thisstr) + MAX_UINT32_STRING_CHAR_SIZE ,
-               false
+               return false
     );
     ADD_TYPE_TO_STRING(thisstr, "int", MAX_UINT32_STRING_CHAR_SIZE,
                        "%i", rc, i);
@@ -94,8 +94,8 @@ bool rf_string_append_double(struct RFstring* thisstr, const double d)
     int rc;
     RF_ASSERT(thisstr);
     RF_REALLOC(rf_string_data(thisstr), char,
-                   rf_string_length_bytes(thisstr) + MAX_DOUBLE_STRING_CHAR_SIZE ,
-                   false
+               rf_string_length_bytes(thisstr) + MAX_DOUBLE_STRING_CHAR_SIZE ,
+               return false
     );
     ADD_TYPE_TO_STRING(thisstr, "double", MAX_DOUBLE_STRING_CHAR_SIZE,
                        "%f", rc, d);
@@ -114,9 +114,9 @@ bool rf_string_prepend(struct RFstring* thisstr, const void* other)
     }
 
     //reallocate this string to fit the new addition
-    RF_REALLOC_JMP(rf_string_data(thisstr), char,
-                   rf_string_length_bytes(thisstr) + rf_string_length_bytes(other),
-                   ret = false, cleanup);
+    RF_REALLOC(rf_string_data(thisstr), char,
+               rf_string_length_bytes(thisstr) + rf_string_length_bytes(other),
+               ret = false; goto cleanup);
 
     if(!rf_string_generic_prepend(thisstr,
                             rf_string_data(other),
@@ -626,12 +626,12 @@ bool rf_string_replace(struct RFstring* thisstr, const void* sstr,
     //act depending on the size difference of rstr and sstr
     if(rf_string_length_bytes(rstr)> rf_string_length_bytes(sstr))
     {
-        RF_REALLOC_JMP(
+        RF_REALLOC(
             rf_string_data(thisstr), char,
             rf_string_length_bytes(thisstr) + number * (
                 rf_string_length_bytes(rstr) - rf_string_length_bytes(sstr)
             ),
-            ret = false, cleanup
+            ret = false; goto cleanup
         );
         replace_greater(thisstr, number, sstr, rstr);
     }

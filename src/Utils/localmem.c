@@ -52,7 +52,7 @@ bool rf_lms_init(struct RFlocal_memory_stack* lms, uint64_t size)
 {
     lms->stackPtr = 0;
     lms->macroEvalsI = 0;
-    RF_MALLOC(lms->stack, size, false);
+    RF_MALLOC(lms->stack, size, return false);
     memset(lms->macroEvals,0,4*RF_MAX_FUNC_ARGS);
     //also make the thread specific pointer point to this local memory stack
     RF_LMS = lms;
@@ -125,7 +125,7 @@ bool rf_lms_activate(uint64_t size, bool is_main)
         RF_LMS = &g_main_thread_stack;
     } else {
         struct RFlocal_memory_stack *lms;
-        RF_MALLOC(lms, sizeof(*lms), false);
+        RF_MALLOC(lms, sizeof(*lms), return false);
         ret = rf_lms_init(lms, size);
         RF_LMS = lms;
     }

@@ -58,7 +58,7 @@ struct RFstringx* rf_stringx_from_file_create(
 )
 {
     struct RFstringx* ret;
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if(!rf_stringx_from_file_init(ret, f, eof, eol, encoding, endianess))
     {
         free(ret);
@@ -93,7 +93,7 @@ bool rf_stringx_from_file_assign(struct RFstringx* str,
     UTF_FILE_READLINE(f, eol, eof, "assign")
     //success
     //assign it to the string
-    RF_STRINGX_REALLOC_JMP(str, utf8ByteLength, ret = false, cleanup);
+    RF_STRINGX_REALLOC(str, utf8ByteLength, ret = false; goto cleanup);
     memcpy(rf_string_data(str), utf8, utf8ByteLength);
     rf_string_length_bytes(str) = utf8ByteLength;
 

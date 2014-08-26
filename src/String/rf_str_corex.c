@@ -67,7 +67,7 @@ struct RFstringx* rf_stringx_createvl(const char* lit, va_list args)
 {
     struct RFstringx* ret;
 
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if (!rf_stringx_initvl(ret, lit, args)) {
         free(ret);
         return NULL;
@@ -78,7 +78,7 @@ struct RFstringx* rf_stringx_createvl(const char* lit, va_list args)
 struct RFstringx* rf_stringx_create(const char* lit)
 {
     struct RFstringx* ret;
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if(!rf_stringx_init(ret, lit))
     {
         free(ret);
@@ -157,7 +157,7 @@ bool rf_stringx_init(struct RFstringx* str, const char* lit)
 struct RFstringx* rf_stringx_create_cp(uint32_t codepoint)
 {
     struct RFstringx* ret;
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if(!rf_stringx_init_cp(ret, codepoint))
     {
         free(ret);
@@ -203,7 +203,7 @@ bool rf_stringx_init_int(struct RFstringx* str, int i)
 struct RFstringx* rf_stringx_create_double(double d)
 {
     struct RFstringx* ret;
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if(!rf_stringx_init_double(ret, d))
     {
         free(ret);
@@ -225,7 +225,7 @@ bool rf_stringx_init_double(struct RFstringx* str, double d)
 struct RFstringx* rf_stringx_create_utf16(const uint16_t* s, unsigned int len)
 {
     struct RFstringx* ret;
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if(!rf_stringx_init_utf16(ret, s, len))
     {
         free(ret);
@@ -249,7 +249,7 @@ bool rf_stringx_init_utf16(struct RFstringx* str,
 struct RFstringx* rf_stringx_create_utf32(const uint32_t* s, unsigned int len)
 {
     struct RFstringx* ret;
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if(!rf_stringx_init_utf32(ret, s, len))
     {
         free(ret);
@@ -272,7 +272,7 @@ bool rf_stringx_init_utf32(struct RFstringx* str, const uint32_t* codeBuffer,
 struct RFstringx* rf_stringx_create_unsafe(const char* lit)
 {
     struct RFstringx* ret;
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if(!rf_stringx_init_unsafe(ret, lit))
     {
         free(ret);
@@ -295,7 +295,7 @@ bool rf_stringx_init_unsafe_nnt(struct RFstringx* str, const char* s,
 {
     RF_ASSERT(str);
     str->bSize = length * RF_OPTION_STRINGX_CAPACITY_MULTIPLIER;
-    RF_MALLOC(rf_string_data(str), str->bSize, false);
+    RF_MALLOC(rf_string_data(str), str->bSize, return false);
     memcpy(rf_string_data(str), s, length);
     rf_string_length_bytes(str) = length;
     str->bIndex = 0;
@@ -307,7 +307,7 @@ bool rf_stringx_init_unsafe_bnnt(struct RFstringx* str, const char* s,
 {
     RF_ASSERT(str);
     str->bSize = buff_size;
-    RF_MALLOC(rf_string_data(str), str->bSize, false);
+    RF_MALLOC(rf_string_data(str), str->bSize, return false);
     memcpy(rf_string_data(str), s, length);
     rf_string_length_bytes(str) = length;
     str->bIndex = 0;
@@ -346,7 +346,7 @@ struct RFstringx* rf_stringx_create_buffv(uint32_t buffSize, const char* lit, ..
     {
         buffSize = size;
     }
-    RF_MALLOC_JMP(ret, sizeof(*ret), ret = NULL, cleanup_buffer);
+    RF_MALLOC(ret, sizeof(*ret), ret = NULL; goto cleanup_buffer);
     if(!rf_stringx_init_unsafe_bnnt(ret, buff_ptr, size, buffSize))
     {
         free(ret);
@@ -364,7 +364,7 @@ cleanup_lscope:
 struct RFstringx* rf_stringx_create_buff(uint32_t buffSize,const char* lit)
 {
     struct RFstringx* ret;
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if(!rf_stringx_init_buff(ret, buffSize, lit))
     {
         free(ret);
@@ -453,7 +453,9 @@ bool rf_stringx_assign(struct RFstringx* dst, const void* source)
         goto cleanup;
     }
     //only if the new string value won't fit in the buffer reallocate the buffer
-    RF_STRINGX_REALLOC_JMP(dst, rf_string_length_bytes(source), ret=false, cleanup);
+    RF_STRINGX_REALLOC(dst,
+                       rf_string_length_bytes(source),
+                       ret=false; goto cleanup);
     //now copy the value and the bytelength
     memcpy(rf_string_data(dst),
            rf_string_data(source),
@@ -472,10 +474,9 @@ bool rf_stringx_assign_char(struct RFstringx* str, uint32_t codepoint)
     //reset the buffer if needed
     rf_stringx_reset(str);
     //realloc if needed
-    if(str->bSize <5)
-    {
+    if (str->bSize < 5) {
         RF_REALLOC(rf_string_data(str), char,
-                   5 * RF_OPTION_STRINGX_CAPACITY_MULTIPLIER, false);
+                   5 * RF_OPTION_STRINGX_CAPACITY_MULTIPLIER, return false);
     }
     if((bytes=rf_utf8_encode_single(codepoint, rf_string_data(str))) <= 0)
     {
@@ -499,14 +500,7 @@ bool rf_stringx_assign_unsafe_nnt(struct RFstringx* str, const char* s,
 
     /* make sure it fits in the string */
     rf_stringx_reset(str);
-    RF_STRINGX_REALLOC_JMP(
-        str,
-        length,
-        ret=false,
-        cleanup
-    );
-
-
+    RF_STRINGX_REALLOC(str, length, ret=false; goto cleanup);
     //now copy the value
     memcpy(rf_string_data(str), s, length);
     //and fix the lengths
@@ -519,7 +513,7 @@ bool rf_stringx_assign_unsafe_nnt(struct RFstringx* str, const char* s,
 struct RFstringx* rf_stringx_from_string_out(const struct RFstring* s)
 {
     struct RFstringx* ret;
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if(!rf_stringx_from_string_in(ret, s))
     {
         free(ret);
@@ -541,7 +535,7 @@ bool rf_stringx_from_string_in(struct RFstringx* dst,
     dst->bSize = (
         rf_string_length_bytes(src) * RF_OPTION_STRINGX_CAPACITY_MULTIPLIER
     );
-    RF_MALLOC(rf_string_data(dst), dst->bSize, false);
+    RF_MALLOC(rf_string_data(dst), dst->bSize, return false);
     rf_string_length_bytes(dst) = rf_string_length_bytes(src);
     //copy the bytes from the String
     memcpy(rf_string_data(dst), rf_string_data(src), rf_string_length_bytes(src));
@@ -551,7 +545,7 @@ bool rf_stringx_from_string_in(struct RFstringx* dst,
 struct RFstringx* rf_stringx_copy_out(struct RFstringx* s)
 {
     struct RFstringx* ret;
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if(!rf_stringx_copy_in(ret, s))
     {
         free(ret);
@@ -570,7 +564,7 @@ bool rf_stringx_copy_in(struct RFstringx* dst, struct RFstringx* src)
     //assert that the source string is copied from the beginning of its buffer
     rf_string_data(src) -= src->bIndex;
     //copy the bytes
-    RF_MALLOC(rf_string_data(dst), src->bSize, false);
+    RF_MALLOC(rf_string_data(dst), src->bSize, return false);
     memcpy(rf_string_data(dst), rf_string_data(src), src->bSize);
     //push the source bytes back and also the new copied bytes
     //buffer to the same index

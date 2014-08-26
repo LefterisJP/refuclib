@@ -36,7 +36,7 @@
 RFbinary_array* rf_binaryarray_create(uint32_t size)
 {
     RFbinary_array* ret;
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if(rf_binaryarray_init(ret, size) == false)
     {
         free(ret);
@@ -48,7 +48,7 @@ RFbinary_array* rf_binaryarray_create(uint32_t size)
 bool rf_binaryarray_init(RFbinary_array* arr,uint32_t size)
 {
     //callocate enough bytes to encompass all of the values.
-    RF_CALLOC(arr->data, size/8+1, 1, false);
+    RF_CALLOC(arr->data, size/8 + 1, 1, return false);
     arr->size = size;
     return true;
 }
@@ -57,15 +57,15 @@ bool rf_binaryarray_init(RFbinary_array* arr,uint32_t size)
 bool rf_binaryarray_copy_in(RFbinary_array* dst, RFbinary_array* src)
 {
     dst->size = src->size;
-    RF_CALLOC(dst->data, dst->size/8+1, 1, false);
-    memcpy(dst->data, src->data, dst->size/8+1);
+    RF_CALLOC(dst->data, dst->size/8 + 1, 1, return false);
+    memcpy(dst->data, src->data, dst->size/8 + 1);
     return true;
 }
 //Creates and returns an allocated copy of the given RFbinarry_array
 RFbinary_array* rf_binaryarray_copy_out(RFbinary_array* src)
 {
     RFbinary_array* dst;
-    RF_MALLOC(dst, sizeof(*dst), NULL);
+    RF_MALLOC(dst, sizeof(*dst), return NULL);
     if(rf_binaryarray_copy_in(dst, src) == false)
     {
         free(dst);
@@ -159,7 +159,7 @@ void rf_binaryarray_set_n_c(RFbinary_array* a, uint32_t i, char val)
 bool rf_binaryarray_reallocate(RFbinary_array* a, uint32_t newSize)
 {
     //attempt to realloc
-    RF_REALLOC(a->data, char, newSize/8 + 1, false);
+    RF_REALLOC(a->data, char, newSize/8 + 1, return false);
     //check to see if the array got reallocated upwards
     if(newSize > a->size)
     {

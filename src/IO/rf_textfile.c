@@ -738,7 +738,7 @@ struct RFtextfile* rf_textfile_create(const void* name,
 {
     struct RFtextfile* ret;
     RF_ENTER_LOCAL_SCOPE();
-    RF_MALLOC_JMP(ret, sizeof(*ret), ret = NULL, cleanup);
+    RF_MALLOC(ret, sizeof(*ret), ret = NULL; goto cleanup);
     if(!rf_textfile_init(ret, name, mode, endianess, encoding, eol))
     {
         free(ret);
@@ -834,7 +834,7 @@ bool rf_textfile_copy_in(struct RFtextfile* dst, struct RFtextfile* src)
 struct RFtextfile* rf_textfile_copy_out(struct RFtextfile* src)
 {
     struct RFtextfile* dst;
-    RF_MALLOC(dst, sizeof(*dst), NULL);
+    RF_MALLOC(dst, sizeof(*dst), return NULL);
     if(!rf_textfile_copy_in(dst, src))
     {
         free(dst);

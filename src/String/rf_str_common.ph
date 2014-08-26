@@ -98,63 +98,33 @@ extern "C"
  ** A macro to easily reallocate a StringX's buffer using RF_REALOC
  ** @param STR_         The StringX whose buffer to reallocate
  ** @param REQSIZE_     The new required size the buffer should have
- ** @param RETVALUE_    What to return in realloc failure
+ ** @param STMT_        What to do in realloc failure
  **
  ** @note No need to take the bIndex into account when giving the REQSIZE_
  ** the macro takes care of it.
  **/
-#define RF_STRINGX_REALLOC(STR_, REQSIZE_, RETVALUE_)                   \
-    do{                                                                 \
-        /*If the buffer size is not enough for the required size*/      \
-        if(REQSIZE_ + (STR_)->bIndex >= (STR_)->bSize)                  \
-        {                                                               \
-            /*create the new size*/                                     \
-            (STR_)->bSize = (REQSIZE_ + (STR_)->bIndex) * RF_OPTION_STRINGX_CAPACITY_MULTIPLIER; \
-            /*Reallocate the buffer depending on whether its internal pointer has a value or not*/ \
-            if(STR_->bIndex == 0)                                       \
-            {                                                           \
-                RF_REALLOC(rf_string_data(STR_), char,                   \
-                           (STR_)->bSize, RETVALUE_);                     \
-            }                                                           \
-            else                                                        \
-            {                                                           \
-                rf_string_data(STR_) -= (STR_)->bIndex;                  \
-                RF_REALLOC(rf_string_data(STR_), char,                   \
-                           (STR_)->bSize, RETVALUE_);                     \
-                rf_string_data(STR_) += (STR_)->bIndex;                    \
-            }                                                           \
-        }}while(0)
-
-/**
- ** A macro to easily reallocate a StringX's buffer using RF_REALLOC_JMP
- ** @param STR_         The StringX whose buffer to reallocate
- ** @param REQSIZE_     The new required size the buffer should have
- ** @param STMT_    What to return in realloc failure
- ** @param GOTOFLAG_ Where to jump to in realloc failure
- **
- ** @note No need to take the bIndex into account when giving the REQSIZE_
- ** the macro takes care of it.
- **/
-#define RF_STRINGX_REALLOC_JMP(STR_, REQSIZE_, STMT_, GOTOFLAG_)        \
-    do{                                                                 \
-        /*If the buffer size is not enough for the required size*/      \
-        if(REQSIZE_ + (STR_)->bIndex >= (STR_)->bSize)                  \
-        {                                                               \
-            /*create the new size*/                                     \
-            (STR_)->bSize = (REQSIZE_+ (STR_)->bIndex) * RF_OPTION_STRINGX_CAPACITY_MULTIPLIER; \
-            /*Reallocate the buffer depending on whether its internal pointer has a value or not*/ \
-            if((STR_)->bIndex == 0)                                     \
-                RF_REALLOC_JMP(rf_string_data(STR_), char,              \
-                               (STR_)->bSize, STMT_, GOTOFLAG_);        \
-            else                                                        \
-            {                                                           \
-                rf_string_data(STR_) -= (STR_)->bIndex;                 \
-                RF_REALLOC_JMP(rf_string_data(STR_), char,              \
-                               (STR_)->bSize, STMT_, GOTOFLAG_);        \
-                rf_string_data(STR_) += (STR_)->bIndex;                 \
-            }                                                           \
-        }}while(0)
-
+#define RF_STRINGX_REALLOC(STR_, REQSIZE_, STMT_)                   \
+    do{                                                             \
+        /*If the buffer size is not enough for the required size*/  \
+        if (REQSIZE_ + (STR_)->bIndex >= (STR_)->bSize) {           \
+            /*create the new size*/                                 \
+            (STR_)->bSize = (REQSIZE_ + (STR_)->bIndex) *           \
+            RF_OPTION_STRINGX_CAPACITY_MULTIPLIER;                  \
+            /*                                                      \
+             *Reallocate the buffer depending on whether its        \
+             * internal pointer has a value or not                  \
+             */                                                     \
+            if (STR_->bIndex == 0) {                                \
+                RF_REALLOC(rf_string_data(STR_), char,              \
+                           (STR_)->bSize, STMT_);                   \
+            } else {                                                \
+                rf_string_data(STR_) -= (STR_)->bIndex;             \
+                RF_REALLOC(rf_string_data(STR_), char,              \
+                           (STR_)->bSize, STMT_);                   \
+                rf_string_data(STR_) += (STR_)->bIndex;             \
+            }                                                       \
+        }                                                           \
+    }while(0)
 
 /**
  ** @internal

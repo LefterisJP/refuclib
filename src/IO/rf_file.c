@@ -58,7 +58,7 @@ bool rf_file_read_line_utf8(FILE* f,
     }
     //allocate the utf8 buffer
     *buffer_size = RF_OPTION_FGETS_READ_BYTESN+4;
-    RF_MALLOC(*utf8, *buffer_size, RE_MALLOC_FAILURE);
+    RF_MALLOC(*utf8, *buffer_size, return RE_MALLOC_FAILURE);
     *byte_length = 0;
     //read the start
     if(!rf_file_read_bytes_utf8(*utf8, RF_OPTION_FGETS_READ_BYTESN, f,
@@ -85,9 +85,9 @@ bool rf_file_read_line_utf8(FILE* f,
             if(*byte_length+RF_OPTION_FGETS_READ_BYTESN+4 >= *buffer_size)
             {
                 *buffer_size = (*byte_length + 
-                            RF_OPTION_FGETS_READ_BYTESN+4)*2;
-                 RF_REALLOC(*utf8, char, *buffer_size,
-                            false);
+                                RF_OPTION_FGETS_READ_BYTESN+4)*2;
+                RF_REALLOC(*utf8, char, *buffer_size,
+                           return false);
             }
             bIndex += bytesN;
             if(!rf_file_read_bytes_utf8((*utf8)+bIndex,
@@ -146,7 +146,7 @@ bool rf_file_read_line_utf16(FILE* f, enum RFeol_mark eol, char** utf8,
     {
         //allocate the temporary buffer and move the previous buffer's content inside it
         buffSize = buffSize * 2 + 5;
-        RF_MALLOC(tempBuff, buffSize, false);
+        RF_MALLOC(tempBuff, buffSize, return false);
         memcpy(tempBuff ,buff ,bytesN);
         buffAllocated = true;
         //keep reading until we have read all until newline or EOF
@@ -167,7 +167,7 @@ bool rf_file_read_line_utf16(FILE* f, enum RFeol_mark eol, char** utf8,
             if(bytes_read + RF_OPTION_FGETS_READ_BYTESN + 5 >= buffSize)
             {
                 buffSize=(bytes_read + RF_OPTION_FGETS_READ_BYTESN + 5) * 2;
-                RF_REALLOC(tempBuff, char, buffSize, false);
+                RF_REALLOC(tempBuff, char, buffSize, return false);
             }
             //if the last character was newline break off the loop
             if( *(uint16_t*)(tempBuff + bytes_read - 2) == (uint16_t)RF_LF)
@@ -178,8 +178,7 @@ bool rf_file_read_line_utf16(FILE* f, enum RFeol_mark eol, char** utf8,
     }//end of size not fitting the initial buffer case
 
     //allocate the codepoints
-    RF_MALLOC_JMP(codepoints, (bytes_read + 5) * 2, ret = false,
-                  cleanup2);
+    RF_MALLOC(codepoints, (bytes_read + 5) * 2, ret = false; goto cleanup2);
     //decode it into codepoints
     if(!rf_utf16_decode(tempBuff, bytes_read, &charsN,
                        codepoints, (bytes_read+5) * 2))
@@ -190,7 +189,7 @@ bool rf_file_read_line_utf16(FILE* f, enum RFeol_mark eol, char** utf8,
         goto cleanup1;
     }
     //now encode these codepoints into UTF8
-    RF_MALLOC_JMP(*utf8, charsN*4, ret = false, cleanup1);
+    RF_MALLOC(*utf8, charsN*4, ret = false; goto cleanup1);
     if(!rf_utf8_encode(codepoints, charsN, byte_length, *utf8, charsN*4))
     {
         RF_ERROR("Failed to encode the File Descriptor's UTF-16 "
@@ -248,7 +247,7 @@ bool rf_file_read_line_utf32(FILE* f, enum RFeol_mark eol,
     {
         //allocate the temporary buffer and move the previous buffer's content inside it
         buffSize = (buffSize * 2) + 7;
-        RF_MALLOC(tempBuff, buffSize, false);
+        RF_MALLOC(tempBuff, buffSize, return false);
         memcpy(tempBuff, buff, bytesN);
         bytes_read = bytesN;
         buffAllocated = true;
@@ -270,7 +269,7 @@ bool rf_file_read_line_utf32(FILE* f, enum RFeol_mark eol,
             if(bytes_read + RF_OPTION_FGETS_READ_BYTESN + 7 >= buffSize)
             {
                 buffSize = (bytes_read + RF_OPTION_FGETS_READ_BYTESN + 7) * 2;
-                RF_REALLOC(tempBuff, char, buffSize, false);
+                RF_REALLOC(tempBuff, char, buffSize, return false);
             }
             //if the last character was newline break off the loop
             if( (*(uint32_t*)(tempBuff + bytes_read - 4)) == (uint32_t)RF_LF)
@@ -283,7 +282,7 @@ bool rf_file_read_line_utf32(FILE* f, enum RFeol_mark eol,
     //utf-32 is actually codepoints
     codepoints = (uint32_t*)tempBuff;
     //now encode these codepoints into UTF8
-    RF_MALLOC_JMP(*utf8, bytes_read, ret = false, cleanup);
+    RF_MALLOC(*utf8, bytes_read, ret = false; goto cleanup);
     if(!rf_utf8_encode(codepoints, bytes_read/4, byte_length, *utf8, bytes_read))
     {
         RF_ERROR("Failed to encode the File Descriptor's UTF-32 "

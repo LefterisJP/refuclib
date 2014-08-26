@@ -60,7 +60,7 @@ static inline bool move_internal_ptr(struct RFstringx* s, int32_t move,
         if (options & RF_STRINGX_ARGUMENT) {
             struct RFstringx* result = (struct RFstringx*) resultP;
             rf_stringx_reset(result);
-            RF_STRINGX_REALLOC(result, move - len, false);
+            RF_STRINGX_REALLOC(result, move - len, return false);
             rf_string_length_bytes(result) = move - len;
             memcpy(
                 rf_string_data(result),
@@ -75,7 +75,7 @@ static inline bool move_internal_ptr(struct RFstringx* s, int32_t move,
             struct RFstring* result = (struct RFstring*) resultP;
             if (rf_string_length_bytes(result) > move - len) {
                 RF_REALLOC(rf_string_data(result), char,
-                          rf_string_length_bytes(result), false);
+                          rf_string_length_bytes(result), return false);
             }
             rf_string_length_bytes(result) = move - len;
             memcpy(

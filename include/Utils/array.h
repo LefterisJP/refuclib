@@ -108,7 +108,7 @@ i_INLINE_DECL bool rf_array_init_(struct RFarray *a,
                                   size_t size)
 {
     a->size = size * element_size;
-    RF_MALLOC(a->buff, a->size, false);
+    RF_MALLOC(a->buff, a->size, return false);
     a->buff_allocated = true;
 
     return true;
@@ -204,10 +204,10 @@ i_INLINE_DECL void *rf_array_ptrto_index_(struct RFarray *a,
     size_t index = i * typesize;
     if (i_RF_ARRAY_IOB(a, i, typesize)) {
         if (a->buff_allocated) {
-            RF_REALLOC(a->buff, char, a->size * 2, NULL);
+            RF_REALLOC(a->buff, char, a->size * 2, return NULL);
         } else {
             char *old_buffer = a->buff;
-            RF_MALLOC(a->buff, a->size * 2, NULL);
+            RF_MALLOC(a->buff, a->size * 2, return NULL);
             memcpy(a->buff, old_buffer, a->size);
             a->buff_allocated = true;
         }

@@ -55,7 +55,7 @@ struct RFstring* rf_string_from_file_create(FILE* f, char* eof,
                                             unsigned int* buff_size)
 {
     struct RFstring* ret;
-    RF_MALLOC(ret, sizeof(*ret), NULL);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if(!rf_string_from_file_init(ret, f, eof, eol, encoding, endianess, buff_size))
     {
         free(ret);
@@ -125,10 +125,9 @@ bool rf_string_from_file_assign(struct RFstring* str,
     UTF_FILE_READLINE(f, eol, eof, "assign")
     //success
     //assign it to the string
-    if(rf_string_length_bytes(str) <= utf8ByteLength)
-    {
-        RF_REALLOC_JMP(rf_string_data(str), char, utf8ByteLength,
-                       ret = false, cleanup);
+    if (rf_string_length_bytes(str) <= utf8ByteLength) {
+        RF_REALLOC(rf_string_data(str), char, utf8ByteLength,
+                   ret = false; goto cleanup);
     }
     memcpy(rf_string_data(str), utf8, utf8ByteLength);
     rf_string_length_bytes(str) = utf8ByteLength;
@@ -146,9 +145,9 @@ bool rf_string_from_file_append(struct RFstring* str, FILE* f,
                                 enum RFendianess endianess)
 {
     UTF_FILE_READLINE(f, eol, eof, "append")
-    RF_REALLOC_JMP(rf_string_data(str), char,
-                   rf_string_length_bytes(str) + utf8ByteLength,
-                   ret = false, cleanup
+    RF_REALLOC(rf_string_data(str), char,
+               rf_string_length_bytes(str) + utf8ByteLength,
+               ret = false; goto cleanup
     );
     rf_string_generic_append(str, utf8, utf8ByteLength);
 
