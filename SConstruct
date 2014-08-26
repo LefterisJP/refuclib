@@ -58,17 +58,12 @@ unit_test_files = [
 ]
 
 test_env = local_env.Clone()
-test_env.VariantDir("build_test/test", "test", duplicate=1)
-test_env.VariantDir("build_test/src", "src", duplicate=1)
-test_sources = [os.path.join("build_test/test", s) for s in unit_test_files]
-test_sources.extend([os.path.join("build_test/src", s) for s in orig_sources])
+test_sources = [os.path.join("test", s) for s in unit_test_files]
+test_sources.extend([os.path.join("src", s) for s in orig_sources])
 clib_tests = test_env.Check(
     target="clib_tests",
     source=test_sources)
 local_env.Alias('clib_tests', clib_tests)
-# sure way to clean the test variant dir. TODO: better way
-local_env.Clean('clib_tests', "build_test")
-local_env.Clean('clib_tests', "#check")
 
 # Return the built static library so that the compiler can link against it
 Return('clib_static')
