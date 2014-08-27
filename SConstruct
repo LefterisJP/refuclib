@@ -20,7 +20,6 @@ static_env.VariantDir("build_static", "src", duplicate=0)
 static_sources = [os.path.join("build_static", s) for s in orig_sources]
 clib_static = static_env.StaticLibrary(
     local_env['CLIB_OUT_NAME'],
-    # source=[static_env.Object(s) for s in static_sources])
     source=static_sources)
 Depends(clib_static, options_header)
 local_env.Alias('clib_static', clib_static)
@@ -58,6 +57,12 @@ unit_test_files = [
 ]
 
 test_env = local_env.Clone()
+test_env.Append(CHECK_EXTRA_DEFINES={
+    'CLIB_TESTS_PATH':
+    "\\\"" + os.path.abspath(
+        os.path.join(test_env['CLIB_DIR'], 'test')
+    ) + "/\\\""
+})
 test_sources = [os.path.join("test", s) for s in unit_test_files]
 test_sources.extend([os.path.join("src", s) for s in orig_sources])
 clib_tests = test_env.Check(
