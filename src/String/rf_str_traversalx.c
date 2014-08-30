@@ -228,25 +228,25 @@ unsigned int rf_stringx_skip_chars(struct RFstringx* thisstr,
                                    unsigned int *line_count)
 {
     uint32_t bytes_to_move;
-    unsigned int chars_skipped;
+    unsigned int chars_to_skip;
     static const struct RFstring nl = RF_STRING_STATIC_INIT("\n");
 
-    chars_skipped = rf_string_begins_with_any(thisstr,
+    chars_to_skip = rf_string_begins_with_any(thisstr,
                                               chars, limit,
                                               &bytes_to_move);
 
-    if (line_count) {
+    if (chars_to_skip && line_count) {
         *line_count = rf_string_count(thisstr, &nl, bytes_to_move, 0, 0);
     }
 
-    if (chars_skipped) {
+    if (chars_to_skip) {
         rf_stringx_move_bytes(thisstr, bytes_to_move);
     }
 
     if (bytes) {
         *bytes = bytes_to_move;
     }
-    return chars_skipped;
+    return chars_to_skip;
 }
 
 //TODO: replace this ugly string_buff with something else

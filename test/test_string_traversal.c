@@ -374,6 +374,8 @@ START_TEST(test_stringx_skip_chars) {
     static const struct RFstring s3 = RF_STRING_STATIC_INIT(
         " \n  \n \t foo");
     static const struct RFstring chars3 = RF_STRING_STATIC_INIT(" \t\n");
+    static const struct RFstring s4 = RF_STRING_STATIC_INIT(
+        "not skipping \t \n \n");
 
 
     ck_assert(rf_stringx_init_buff(&s, 1024, ""));
@@ -410,6 +412,12 @@ START_TEST(test_stringx_skip_chars) {
     ck_assert_int_eq(1, bytes);
     ck_assert_int_eq(0, line_count);
     ck_assert_rf_str_eq_cstr(&s,"\n  \n \t foo");
+
+    ck_assert(rf_stringx_assign(&s, &s4));
+    ck_assert_int_eq(0, rf_stringx_skip_chars(&s, &chars3,
+                                              0, &bytes, &line_count));
+    ck_assert_int_eq(0, bytes);
+    ck_assert_int_eq(0, line_count);
 
     rf_stringx_deinit(&s);
 }END_TEST

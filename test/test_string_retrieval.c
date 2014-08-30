@@ -245,13 +245,13 @@ START_TEST(test_string_begins_with) {
 }END_TEST
 
 START_TEST(test_string_begins_with_any) {
-    struct RFstring s, s2;
+    const struct RFstring s = RF_STRING_STATIC_INIT(" \t    \t eleos");
+    const struct RFstring s2 = RF_STRING_STATIC_INIT(" 影 π π eleos2");
+    const struct RFstring s3 = RF_STRING_STATIC_INIT("not starting with stuff");
+    const struct RFstring s4 = RF_STRING_STATIC_INIT("no start but have \t ");
     static const struct RFstring chars1 = RF_STRING_STATIC_INIT(" \t");
     static const struct RFstring chars2 = RF_STRING_STATIC_INIT(" π影");
     unsigned int bytes;
-
-    ck_assert(rf_string_init(&s, " \t    \t eleos"));
-    ck_assert(rf_string_init(&s2, " 影 π π eleos2"));
 
     ck_assert_int_eq(8, rf_string_begins_with_any(&s, &chars1, 0, 0));
     ck_assert_int_eq(8, rf_string_begins_with_any(&s, &chars1, 0, &bytes));
@@ -267,8 +267,10 @@ START_TEST(test_string_begins_with_any) {
                                                &bytes));
     ck_assert_int_eq(5, bytes);
 
-    rf_string_deinit(&s);
-    rf_string_deinit(&s2);
+    bytes = 0;
+    ck_assert_int_eq(0,
+                     rf_string_begins_with_any(&s3, &chars1, 0, &bytes));
+    ck_assert_int_eq(0, bytes);
 }END_TEST
 
 START_TEST(test_string_ends_with) {

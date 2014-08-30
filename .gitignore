@@ -50,6 +50,7 @@ temp_build_data.json
 
 # the ./check binary generated for the unit tests
 check
+check_exec
 
 # malinka/rtags compile commands database
 compile_commands.json
