@@ -294,6 +294,17 @@ i_DECLIMEX_ bool rf_string_init_utf32(struct RFstring* str, const uint32_t* s,
  **/
 i_DECLIMEX_ bool rf_string_assign(struct RFstring* dest, const void* source);
 
+/**
+ ** @brief Assigns to a string with the given format (varargs)
+ **
+ ** @notinherited{StringX}
+ ** @lmsFunction
+ **
+ **/
+i_DECLIMEX_ bool rf_string_assignv(struct RFstring* str, const char* s, ...);
+i_DECLIMEX_ bool rf_string_assignvl(struct RFstring* str,
+                                    const char* s,
+                                    va_list args);
 
 /**
  ** @brief Assigns the value of a unicode character to the string

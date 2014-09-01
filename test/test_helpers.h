@@ -11,9 +11,20 @@
     ck_assert_msg(0 == strncmp((nnt_), (cstr_), strlen(cstr_)))
 
 /* RFstring/x related macros */
-#define ck_assert_rf_str_eq_cstr(rfstr_, cstr_)                         \
-    ck_assert_msg(0 == memcmp(rf_string_data(rfstr_), cstr_, strlen(cstr_)), \
-                  "\""RF_STR_PF_FMT"\" != \"%s\"", RF_STR_PF_ARG((rfstr_)), (cstr_))
+#define ck_assert_rf_str_eq_cstr(rfstr_, cstr_)                       \
+    do {                                                              \
+        ck_assert_msg(                                                \
+            0 == memcmp(rf_string_data(rfstr_),                       \
+                        cstr_, strlen(cstr_)),                        \
+            "\""RF_STR_PF_FMT"\" != \"%s\"",                          \
+            RF_STR_PF_ARG(rfstr_), (cstr_));                          \
+        ck_assert_msg(                                                \
+            rf_string_length_bytes(rfstr_) == strlen(cstr_),          \
+            "len of RFstring \""RF_STR_PF_FMT"\"(%u) != "             \
+            "len of cstr \"%s\"(%u)", RF_STR_PF_ARG(rfstr_),          \
+            rf_string_length_bytes(rfstr_), (cstr_), strlen(cstr_));  \
+    } while(0)
+
 
 #define ck_assert_rf_strx_eq_cstr(str_, lit_)                           \
     do{                                                                 \

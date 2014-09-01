@@ -9,6 +9,7 @@
 #include <refu.h>
 #include <String/rf_str_core.h>
 #include <String/rf_str_corex.h>
+#include <String/rf_str_traversalx.h>
 
 
 static bool test_accept_vargs(struct RFstring *s,
@@ -204,6 +205,25 @@ START_TEST(test_string_assign) {
 
     ck_assert(!rf_string_assign(&s2, NULL));
 
+    rf_string_deinit(&s);
+    rf_string_deinit(&s2);
+}END_TEST
+
+START_TEST(test_string_assignv) {
+    struct RFstring s, s2;
+    static const struct RFstring big = RF_STRING_STATIC_INIT(
+        "this is a big string, oder?");
+    ck_assert(rf_string_init(&s, "Nana this is an apple"));
+    ck_assert(rf_string_init(&s2,  "small"));
+
+    ck_assert(rf_string_assignv(&s, "number: %d", 1337));
+    ck_assert_rf_str_eq_cstr(&s, "number: 1337");
+
+    // see if reallocation happens correctly
+    ck_assert(rf_string_assignv(&s2, "number: %d and string: \""
+                                RF_STR_PF_FMT"\"", 1337, RF_STR_PF_ARG(&big)));
+    ck_assert_rf_str_eq_cstr(&s2, "number: 1337 and string: \"this is a big "
+                             "string, oder?\"");
     rf_string_deinit(&s);
     rf_string_deinit(&s2);
 }END_TEST
@@ -677,6 +697,33 @@ START_TEST(test_stringx_assign) {
     rf_stringx_deinit(&s2);
 }END_TEST
 
+START_TEST(test_stringx_assignv) {
+    struct RFstringx s1, s2, s3;
+    static const struct RFstring ss = RF_STRING_STATIC_INIT("other");
+
+    ck_assert(rf_stringx_init(&s1, "Simple rf_stringx assignment"));
+    ck_assert(rf_stringx_assignv(&s1, "number: %u", 42));
+    ck_assert_rf_str_eq_cstr(&s1, "number: 42");
+
+    // test assigning to a moved string
+    ck_assert(rf_stringx_init(&s2, "Moved rf_stringx assignment"));
+    rf_stringx_move_forward(&s2, 6);
+    ck_assert(rf_stringx_assignv(&s2, "number: %u str: \""RF_STR_PF_FMT"\"",
+                                 42, RF_STR_PF_ARG(&ss)));
+    ck_assert_rf_str_eq_cstr(&s2, "number: 42 str: \"other\"");
+    rf_stringx_reset(&s2);
+    ck_assert_rf_str_eq_cstr(&s2, "Moved number: 42 str: \"other\"");
+
+    // test reallocation
+    ck_assert(rf_stringx_init_buff(&s3, 2, ""));
+    ck_assert(rf_stringx_assignv(&s3, "bigger string than original buffer"));
+    ck_assert_rf_str_eq_cstr(&s3, "bigger string than original buffer");
+
+    rf_stringx_deinit(&s1);
+    rf_stringx_deinit(&s2);
+    rf_stringx_deinit(&s3);
+}END_TEST
+
 START_TEST(test_stringx_assign_char) {
     struct RFstringx s, s2;
 
@@ -819,6 +866,7 @@ Suite *string_core_suite_create(void)
                               setup_string_tests,
                               teardown_string_tests);
     tcase_add_test(string_assign, test_string_assign);
+    tcase_add_test(string_assign, test_string_assignv);
     tcase_add_test(string_assign, test_string_assign_char);
     tcase_add_test(string_assign, test_string_assign_unsafe_nnt);
 
@@ -859,6 +907,7 @@ Suite *string_core_suite_create(void)
                               setup_string_tests,
                               teardown_string_tests);
     tcase_add_test(stringx_assign, test_stringx_assign);
+    tcase_add_test(stringx_assign, test_stringx_assignv);
     tcase_add_test(stringx_assign, test_stringx_assign_char);
     tcase_add_test(stringx_assign, test_stringx_assign_unsafe_nnt);
     tcase_add_test(stringx_assign, test_stringx_from_string_in);

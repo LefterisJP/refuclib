@@ -386,7 +386,7 @@ bool rf_string_assign(struct RFstring* dst, const void* src)
     RF_ASSERT(dst);
 
     if (!src) {
-        return false; 
+        return false;
     }
     //only if new string value won't fit in the buffer reallocate
     if(rf_string_length_bytes(src) > rf_string_length_bytes(dst))
@@ -399,6 +399,53 @@ bool rf_string_assign(struct RFstring* dst, const void* src)
     //and fix the lengths
     rf_string_length_bytes(dst) = rf_string_length_bytes(src);
   cleanup:
+    RF_EXIT_LOCAL_SCOPE();
+    return ret;
+}
+
+bool rf_string_assignv(struct RFstring* str, const char* s, ...)
+{
+    va_list args;
+    bool ret;
+
+    va_start(args, s);
+    ret = rf_string_assignvl(str, s, args);
+    va_end(args);
+    return ret;
+}
+bool rf_string_assignvl(struct RFstring* str,
+                        const char* s,
+                        va_list args)
+{
+    unsigned int size, buff_index;
+    bool ret = true;
+    char *buff_ptr;
+    RF_ENTER_LOCAL_SCOPE();
+    RF_ASSERT(str);
+
+    if (!s) {
+        RF_ERROR("String assignment failed due to null pointer input");
+        ret = false;
+        goto cleanup;
+    }
+    //read the var args
+    if (!fill_fmt_buffer(s, &size, &buff_ptr, &buff_index, args)) {
+        RF_ERROR("String assignment failure due to failing at reading the "
+                 "formatted string");
+        ret = false;
+        goto cleanup;
+    }
+
+
+    rf_buffer_set_index(TSBUFFA, buff_index, char);
+
+    if (rf_string_length_bytes(str) < size) {
+        RF_REALLOC(rf_string_data(str), char, size, ret=false;goto cleanup);
+    }
+    //get length
+    rf_string_length_bytes(str) = size;
+    memcpy(rf_string_data(str), buff_ptr, rf_string_length_bytes(str));
+cleanup:
     RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
@@ -433,7 +480,7 @@ bool rf_string_assign_unsafe_nnt(struct RFstring* str, const char* s,
     {
         RF_REALLOC(rf_string_data(str), char, length,
                    ret = false; goto cleanup);
-    }    
+    }
 
     //now copy the value
     memcpy(rf_string_data(str), s, length);
@@ -443,7 +490,6 @@ bool rf_string_assign_unsafe_nnt(struct RFstring* str, const char* s,
   cleanup:
     return ret;
 }
-
 
 /*--- RFstring copying functions ---*/
 

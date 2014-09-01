@@ -164,6 +164,18 @@ i_DECLIMEX_ bool rf_stringx_init_buffv(struct RFstringx* str,
 i_DECLIMEX_ bool rf_stringx_assign(struct RFstringx* dest, const void* source);
 
 /**
+ ** @brief Assigns to a stringx with the given format (varargs)
+ ** Assigns to the current stringx position.
+ **
+ ** @lmsFunction
+ **
+ **/
+i_DECLIMEX_ bool rf_stringx_assignv(struct RFstringx* str, const char* s, ...);
+i_DECLIMEX_ bool rf_stringx_assignvl(struct RFstringx* str,
+                                     const char* s,
+                                     va_list args);
+
+/**
  ** @brief Assigns the value of a unicode character to the string
  **
  ** @param thisstr The string to assign to
@@ -177,7 +189,7 @@ i_DECLIMEX_ bool rf_stringx_assign_char(struct RFstringx* thisstr, uint32_t char
 /**
  ** @brief Assigns to a stringx from a non-null terminated char* buffer
  ** and for the given bytelength
- ** 
+ **
  **/
 i_DECLIMEX_ bool rf_stringx_assign_unsafe_nnt(struct RFstringx* str, const char* s,
                                               size_t length);
@@ -275,7 +287,7 @@ i_DECLIMEX_ bool rf_stringx_copy_in(struct RFstringx* dst, struct RFstringx* src
  ** @param  dst The String to copy in.
  ** @param  src The String to copy from
  ** @param n  The number of characters to copy from the @c src string.
- ** If the value is bigger than the maximum number of characters then 
+ ** If the value is bigger than the maximum number of characters then
  **still all characters are copied.
  ** @return Returns @c true for success and @c false otherwise
  ** @see rf_stringx_copy_out()
