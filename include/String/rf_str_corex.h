@@ -49,8 +49,14 @@ extern "C"
 //! @name RFstringx Creation
 //! @{
 
-/* --- Functions that already exist for RFstring - START --- */
 
+
+/* --- Functions that already exist for RFstring - START --- */
+#define RF_STRINGX_STATIC_INIT(s_) {            \
+        {RF_STRING_STATIC_INIT(s_)},            \
+        .bIndex=0,                              \
+         .bSize=sizeof(s_) - 1                  \
+         }
 i_DECLIMEX_ struct RFstringx* rf_stringx_create(const char* lit);
 i_DECLIMEX_ struct RFstringx* rf_stringx_createv(const char* lit,...);
 i_DECLIMEX_ struct RFstringx* rf_stringx_createvl(const char* lit,
