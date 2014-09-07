@@ -351,6 +351,8 @@ START_TEST(test_string_count_positions) {
         "repeat is nice when you repeat and repeat and repeat"
     );
     static const struct RFstring rep = RF_STRING_STATIC_INIT("repeat");
+    static const struct RFstring s3 = RF_STRING_STATIC_INIT("end in newline\n");
+    static const struct RFstring nl = RF_STRING_STATIC_INIT("\n");
     struct RFarray arr1;
     RF_ARRAY_TEMP_INIT(&arr1, uint32_t, 4);
     uint32_t arr2_buff[2];
@@ -362,6 +364,9 @@ START_TEST(test_string_count_positions) {
     ck_assert_uint_eq(7, rf_array_at_unsafe(&arr1, 1, uint32_t));
     ck_assert_uint_eq(9, rf_array_at_unsafe(&arr1, 2, uint32_t));
     ck_assert_uint_eq(14, rf_array_at_unsafe(&arr1, 3, uint32_t));
+    /* test for newlines at end of string */
+    ck_assert_uint_eq(1, rf_string_count(&s3, &nl, 0, &arr1, 0));
+    ck_assert_uint_eq(14, rf_array_at_unsafe(&arr1, 0, uint32_t));
 
     /* test counting positions with smaller array */
     ck_assert_int_eq(4, rf_string_count(&s2, &rep, 0, &arr2, RF_CASE_IGNORE));
