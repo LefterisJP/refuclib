@@ -52,14 +52,14 @@
  *		 ((encl_type *)						\
  *		  ((char *)(mbr_ptr) - offsetof(enclosing_type, mbr))))
  */
-#if __GNUC__
+#if RF_HAVE_TYPEOF
 #define check_type(expr, type)			\
 	((__typeof__(expr) *)0 != (type *)0)
 
 #define check_types_match(expr1, expr2)		\
 	((__typeof__(expr1) *)0 != (__typeof__(expr2) *)0)
 
-#else //not gcc speficic
+#else
 
 #include <Utils/build_assert.h>
 /* Without typeof, we can only test the sizes. */
@@ -69,6 +69,6 @@
 #define check_types_match(expr1, expr2)				\
 	BUILD_ASSERT_OR_ZERO(sizeof(expr1) == sizeof(expr2))
 
-#endif //end of gcc specific code
+#endif
 
 #endif //include guards end
