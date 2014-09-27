@@ -31,9 +31,9 @@
 /*------------- Corrensponding Header inclusion -------------*/
 #include <String/rf_str_conversion.h>
 /*------------- Module related inclusion -------------*/
-#include <String/rf_str_core.h>//for rf_string_equal
 #include <String/rf_str_retrieval.h> //for rf_string_count
 #include <String/rf_str_common.h> //for RFS_()
+#include "rf_str_conversion.ph" //for rf_string_cstr_ibuff_push()
 #include "rf_str_common.ph" //for required string private macros and functions
 #include "rf_str_defines.ph" //for some defines
 /*------------- Outside Module inclusion -------------*/
@@ -113,60 +113,108 @@ char* rf_string_cstr(const void* str)
     return ret;
 }
 
-bool rf_string_to_int(const void* str, int32_t* v)
+bool rf_string_to_int(const void* str, int64_t* v, size_t *len)
 {
-    char buff[MAX_UINT32_STRING_CHAR_SIZE + 1];
-    int index;
+    char *cstr;
+    unsigned int index;
     char *end;
+    size_t length;
+    bool ret = true;
     RF_ASSERT(str);
-
     if (!v) {
         RF_WARNING("Provided null pointer for the returned int");
         return false;
     }
 
-    index = rf_math_min(MAX_UINT32_STRING_CHAR_SIZE, rf_string_length_bytes(str));
-    memcpy(buff, rf_string_data(str), index);
-    buff[index] = '\0';
-
+    cstr = rf_string_cstr_ibuff_push(str, &index);
     errno = 0;
-    *v = strtol (buff, &end, 10);
-
-    if(end - buff == 0 || errno)
-    {
-        RF_ERROR("Failed to convert %s to int with strtol()"
-                 " errno: %d", buff, errno);
-        return false;
+    *v = strtoull (cstr, &end, 10);
+    length = end - cstr;
+    if(length == 0 || errno) {
+        ret = false;
     }
-    return true;
+
+    if (len) {
+        *len = length - 1;
+    }
+
+    rf_string_cstr_ibuff_pop(index);
+    return ret;
 }
 
-bool rf_string_to_double(const void* str, double* f)
+bool rf_string_to_uint(const void* str,
+                       size_t off,
+                       uint64_t* v,
+                       size_t *len,
+                       int base)
 {
-    char buff[MAX_DOUBLE_STRING_CHAR_SIZE + 1];
-    int index;
+    char *cstr;
+    unsigned int index;
     char *end;
+    bool ret = true;
+    size_t length;
     RF_ASSERT(str);
+    if (!v) {
+        RF_WARNING("Provided null pointer for the returned uint");
+        return false;
+    }
 
+    cstr = rf_string_cstr_ibuff_push(str, &index);
+    errno = 0;
+    *v = strtoull (cstr + off, &end, base);
+    length = end - cstr;
+    if(length == 0 || errno) {
+        ret = false;
+    }
+
+    if (len) {
+        *len = length - 1;
+    }
+
+    rf_string_cstr_ibuff_pop(index);
+    return ret;
+}
+
+i_INLINE_INS bool rf_string_to_uint_dec(const void* thisstr,
+                                        uint64_t* v,
+                                        size_t *len);
+i_INLINE_INS bool rf_string_to_uint_hex(const void* thisstr,
+                                        uint64_t* v,
+                                        size_t *len);
+i_INLINE_INS bool rf_string_to_uint_bin(const void* thisstr,
+                                        uint64_t* v,
+                                        size_t *len);
+i_INLINE_INS bool rf_string_to_uint_oct(const void* thisstr,
+                                        uint64_t* v,
+                                        size_t *len);
+
+bool rf_string_to_double(const void* str, double* f, size_t *len)
+{
+    char *cstr;
+    unsigned int index;
+    char *end;
+    bool ret = true;
+    size_t length;
+    RF_ASSERT(str);
     if (!f) {
         RF_WARNING("Provided null pointer for the returned double");
         return false;
     }
 
-    index = rf_math_min(MAX_DOUBLE_STRING_CHAR_SIZE, rf_string_length_bytes(str));
-    memcpy(buff, rf_string_data(str), index);
-    buff[index] = '\0';
-
+    cstr = rf_string_cstr_ibuff_push(str, &index);
     errno = 0;
-    *f = strtod(buff, &end);
-    //check the result
-    if(end - buff == 0|| errno)
-    {
-        RF_ERROR("Failed to convert %s to double with strtod()"
-                 " errno: %d", buff, errno);
-        return false;
+    *f = strtod (cstr, &end);
+    length = end - cstr;
+    if (length == 0 || errno) {
+        ret = false;
     }
-    return true;
+
+    if (len) {
+        *len = length - 1;
+    }
+
+    rf_string_cstr_ibuff_pop(index);
+    return ret;
 }
 
 void rf_string_to_lower(void* s)

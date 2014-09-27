@@ -2,6 +2,9 @@ import os
 Import('env')
 
 local_env = env.Clone()
+# for now, do add debug symbols. Need them for the tests
+# TODO: Figure out a way to have them only for tests
+local_env.Append(CCFLAGS=['-g'])
 
 # setup the required modules
 (modules, orig_sources) = SConscript(

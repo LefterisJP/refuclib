@@ -32,10 +32,12 @@
 
 /*------------- Module related inclusion -------------*/
 #include <String/rf_str_xdecl.h> //for RFstring/X
+#include <String/rf_str_retrieval.h>//for rf_string_data()
 /*------------- Outside Module inclusion -------------*/
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/types.h> //for exact sized types
 #include <Definitions/retcodes.h> //for bool
+#include <Definitions/inline.h> //for inline
 #include <Utils/rf_unicode.h> //for rf_utf8_is_continutation_byte
 /*------------- libc inclusion --------------*/
  #include <string.h> //for size_t
@@ -113,31 +115,76 @@ i_DECLIMEX_ char* rf_string_cstr(const void* s);
 /**
  ** @brief Returns the integer value of a String
  **
+ ** The parameter string must start with a number in any form.
  ** @isinherited{StringX}
- ** The parameter string must start with a number.
- ** @param thisstr The string whose integer value to return.
- **                @inhtype{String,StringX}
- ** @param[out] v A refence to an integer that will return the float value
- ** @return Returns true in case of succesfull conversion or false if no
- **         integer was represented by the string
+ ** @param thisstr     The string whose integer value to return.
+ **                    @inhtype{String,StringX}
+ ** @param off         The offset of the string at which to start
+ **                    the conversion attempt. This is needed since some
+ **                    bases, like octal and binary may start with 0b or 0
+ **                    and are not understoof by strtol().
+ ** @param[out] v      Will hold the return value
+ ** @param[out] len    Optional. Will hold length of the number in bytes
+ **                    counting from the start of the string
+ ** @return            True in case of succesfull conversion or false if no
+ **                    integer was represented by the string
  ** @see rf_string_to_double()
  **/
-i_DECLIMEX_ bool rf_string_to_int(const void* thisstr, int32_t* v);
+i_DECLIMEX_ bool rf_string_to_int(const void* thisstr, int64_t* v, size_t *len);
+i_DECLIMEX_ bool rf_string_to_uint(const void* thisstr,
+                                   size_t off,
+                                   uint64_t* v,
+                                   size_t *len,
+                                   int base);
+
+i_INLINE_DECL bool rf_string_to_uint_dec(const void* thisstr,
+                                        uint64_t* v,
+                                        size_t *len)
+{
+    return rf_string_to_uint(thisstr, 0, v, len, 10);
+}
+
+i_INLINE_DECL bool rf_string_to_uint_hex(const void* thisstr,
+                                        uint64_t* v,
+                                        size_t *len)
+{
+    return rf_string_to_uint(thisstr, 0, v, len, 16);
+}
+
+i_INLINE_DECL bool rf_string_to_uint_bin(const void* thisstr,
+                                        uint64_t* v,
+                                        size_t *len)
+{
+    char *s = rf_string_data(thisstr);
+
+    if (rf_string_length_bytes(thisstr) > 2 && *s == '0' && *(s + 1) == 'b') {
+        return rf_string_to_uint(thisstr, 2, v, len, 2);
+    }
+    return rf_string_to_uint(thisstr, 0, v, len, 2);
+}
+
+i_INLINE_DECL bool rf_string_to_uint_oct(const void* thisstr,
+                                        uint64_t* v,
+                                        size_t *len)
+{
+    return rf_string_to_uint(thisstr, 0, v, len, 0);
+}
 
 /**
  ** @brief Returns the double value of a String
  **
  ** @isinherited{StringX}
  ** The parameter string must start with a floating point number
- ** @param thisstr The string whose floating point value to return.
- **                @inhtype{String,StringX}
- ** @param[out] f A refence to a double that will return the
- **               floating point number value
- ** @return Returns @c true if the conversion was succesfull and @c false
- **        otherwise
+ ** @param thisstr     The string whose floating point value to return.
+ **                    @inhtype{String,StringX}
+ ** @param[out] f      Will hold the return float value
+ ** @param[out] len    Optional. Will hold length of the number in bytes
+ **                    counting from the start of the string
+ ** @return            True in case of succesfull conversion or false if no
+ **                    double was represented by the string
  ** @see rf_string_to_int()
  **/
-i_DECLIMEX_ bool rf_string_to_double(const void* thisstr, double* f);
+i_DECLIMEX_ bool rf_string_to_double(const void* thisstr, double* f, size_t *len);
 
 /**
  ** @brief Turns any uppercase characters of the string into lower case

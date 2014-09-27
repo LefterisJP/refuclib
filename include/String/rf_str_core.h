@@ -54,6 +54,7 @@ extern "C"
  ** Statically initialize a string
  */
 #define RF_STRING_STATIC_INIT(s_) {s_, sizeof(s_) - 1}
+
 /**
  ** Shallow initialization of a string. If the source buffer,
  ** gets overwritten then the data are lost.
@@ -63,6 +64,12 @@ extern "C"
         (i_string)->data = (i_buff);                    \
         (i_string)->length = (i_len);                   \
     }while(0)
+
+/**
+ ** Shallow initialization of a string from a cstring
+ **/
+#define RF_STRING_SHALLOW_INIT_CSTR(s_) {s_, strlen(s_)}
+
 
 /**
  ** @brief Allocates and returns a string with the given characters
@@ -485,7 +492,7 @@ i_DECLIMEX_ bool rf_string_equal(const void* s1, const void* s2);
  ** @endinternal
  **/
 i_DECLIMEX_ uint32_t rf_string_bytepos_to_codepoint(const void* thisstr,
-                                                 uint32_t bytepos);
+                                                    uint32_t bytepos);
 /**
  ** @internal
  ** @brief Retrieves character position of a byte position
@@ -511,8 +518,8 @@ i_DECLIMEX_ uint32_t rf_string_bytepos_to_codepoint(const void* thisstr,
  ** @endinternal
  **/
 i_DECLIMEX_ uint32_t rf_string_bytepos_to_charpos(const void* thisstr,
-                                               uint32_t bytepos,
-                                               bool before);
+                                                  uint32_t bytepos,
+                                                  bool before);
 
 
 // Checks if a given byte is a continuation byte
