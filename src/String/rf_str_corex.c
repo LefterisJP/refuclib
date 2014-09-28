@@ -181,8 +181,7 @@ struct RFstringx* rf_stringx_create_int(int i)
 {
     struct RFstringx* ret;
     RF_MALLOC(ret, sizeof(*ret), NULL);
-    if(!rf_stringx_init_int(ret, i))
-    {
+    if (!rf_stringx_init_int(ret, i)) {
         free(ret);
         return NULL;
     }
@@ -191,8 +190,7 @@ struct RFstringx* rf_stringx_create_int(int i)
 bool rf_stringx_init_int(struct RFstringx* str, int i)
 {
     RF_ASSERT(str);
-    if(!rf_string_init_int(&str->INH_String, i))
-    {
+    if (!rf_string_init_int(&str->INH_String, i)) {
         return false;
     }
 
@@ -200,22 +198,22 @@ bool rf_stringx_init_int(struct RFstringx* str, int i)
     str->bIndex = 0;
     return true;
 }
-struct RFstringx* rf_stringx_create_double(double d)
+struct RFstringx* rf_stringx_create_double(double d, unsigned int precision)
 {
     struct RFstringx* ret;
     RF_MALLOC(ret, sizeof(*ret), return NULL);
-    if(!rf_stringx_init_double(ret, d))
-    {
+    if (!rf_stringx_init_double(ret, d, precision)) {
         free(ret);
         return NULL;
     }
     return ret;
 }
-bool rf_stringx_init_double(struct RFstringx* str, double d)
+bool rf_stringx_init_double(struct RFstringx* str,
+                            double d,
+                            unsigned int precision)
 {
     RF_ASSERT(str);
-    if(!rf_string_init_double(&str->INH_String, d))
-    {
+    if (!rf_string_init_double(&str->INH_String, d, precision)) {
         return false;
     }
     str->bSize = rf_string_length_bytes(str);
@@ -226,8 +224,7 @@ struct RFstringx* rf_stringx_create_utf16(const uint16_t* s, unsigned int len)
 {
     struct RFstringx* ret;
     RF_MALLOC(ret, sizeof(*ret), return NULL);
-    if(!rf_stringx_init_utf16(ret, s, len))
-    {
+    if (!rf_stringx_init_utf16(ret, s, len)) {
         free(ret);
         return NULL;
     }
@@ -238,8 +235,7 @@ bool rf_stringx_init_utf16(struct RFstringx* str,
                            unsigned int len)
 {
     RF_ASSERT(str);
-    if(!rf_string_init_utf16(&str->INH_String, s, len))
-    {
+    if (!rf_string_init_utf16(&str->INH_String, s, len)) {
         return false;
     }
     str->bIndex = 0;

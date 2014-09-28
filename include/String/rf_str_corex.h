@@ -86,8 +86,11 @@ i_DECLIMEX_ bool rf_stringx_init_unsafe_bnnt(
 i_DECLIMEX_ struct RFstringx* rf_stringx_create_int(int i);
 i_DECLIMEX_ bool rf_stringx_init_int(struct RFstringx* str, int i);
 
-i_DECLIMEX_ struct RFstringx* rf_stringx_create_double(double d);
-i_DECLIMEX_ bool rf_stringx_init_double(struct RFstringx* str, double d);
+i_DECLIMEX_ struct RFstringx* rf_stringx_create_double(double d,
+                                                       unsigned int precision);
+i_DECLIMEX_ bool rf_stringx_init_double(struct RFstringx* str,
+                                        double d,
+                                        unsigned int precision);
 
 i_DECLIMEX_ struct RFstringx* rf_stringx_create_utf16(const uint16_t* s,
                                                unsigned int len);

@@ -83,11 +83,15 @@ i_DECLIMEX_ bool rf_string_append_int(struct RFstring* thisstr, const int32_t i)
  ** @notinherited{StringX}
  ** @param thisstr       The string to append to
  ** @param d             The double
+ ** @param precision     The number of digits the number should have after
+ **                      the decimal point.
  ** @return              Returns @c true for success and @c false otherwise
  ** @see rf_string_append()
  ** @see rf_string_append_int()
  **/
-i_DECLIMEX_ bool rf_string_append_double(struct RFstring* thisstr, const double d);
+i_DECLIMEX_ bool rf_string_append_double(struct RFstring* thisstr,
+                                         double d,
+                                         unsigned int precision);
 
 /**
  ** @brief Prepends the parameter String to this string
@@ -127,7 +131,7 @@ i_DECLIMEX_ bool rf_string_prepend(struct RFstring* thisstr, const void* other);
  **                   all occurences get replaced.
  ** @param options    Bitflag options for the function. All possible values
  **                   can be seen at @ref RFstring_matching_options.
- **                   Give 0 for the defaults. 
+ **                   Give 0 for the defaults.
  **                   For this function only the following are legal:
  **                   + @c RF_CASE_IGNORE
  **                   + @c RF_MATCH_WORD
@@ -151,7 +155,7 @@ i_DECLIMEX_ bool rf_string_remove(void* thisstr, const void* rstr,
  ** @isinherited{StringX}
  ** @lmsFunction
  ** @param thisstr     The string to remove from @inhtype{String,StringX}
- ** @param keepstr     A string all of whose characters will be kept 
+ ** @param keepstr     A string all of whose characters will be kept
  **                    in @c thisstr @inhtype{String,StringX} @tmpSTR
  ** @param removals    If you want to know the number of removed characters
  **                    pass an int here . If not just leave as NULL.
@@ -175,7 +179,7 @@ i_DECLIMEX_ bool rf_string_keep_only(void* thisstr, const void* keepstr,
  ** @see rf_string_prune_middle_b()
  ** @see rf_string_prune_middle_f()
  **/
-i_DECLIMEX_ bool rf_string_prune_start(void* thisstr, uint32_t n, 
+i_DECLIMEX_ bool rf_string_prune_start(void* thisstr, uint32_t n,
                                        unsigned int *removals);
 
 /**
@@ -346,7 +350,7 @@ i_DECLIMEX_ bool rf_string_trim(void* thisstr, const void* sub,
  **                         get replaced.
  ** @param options    Bitflag options for the function. All possible values
  **                   can be seen at @ref RFstring_matching_options.
- **                   Give 0 for the defaults. 
+ **                   Give 0 for the defaults.
  **                   For this function only the following are legal:
  **                   + @c RF_CASE_IGNORE
  **                   + @c RF_MATCH_WORD
@@ -354,7 +358,7 @@ i_DECLIMEX_ bool rf_string_trim(void* thisstr, const void* sub,
  **                           the substring was not even found inside the string
  ** @see rf_stringx_replace()
  **/
-i_DECLIMEX_ bool rf_string_replace(struct RFstring* thisstr, const void* sstr, 
+i_DECLIMEX_ bool rf_string_replace(struct RFstring* thisstr, const void* sstr,
                                    const void* rstr, const uint32_t number,
                                    enum RFstring_matching_options options);
 //! @}

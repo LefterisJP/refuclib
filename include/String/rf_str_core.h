@@ -211,18 +211,23 @@ i_DECLIMEX_ bool rf_string_init_int(struct RFstring* str,int i);
  ** @brief Allocates and returns a string with the given double.
  **
  ** @notinherited{StringX}
- ** @param f The double to turn into a string
+ ** @param f           The double to turn into a string
+ ** @param precision   The precision of the float. The number of characters
+ **                    to add after the decimal point
  ** @return Returns the initialized RF_string
  ** @see rf_string_init_double()
  **/
-i_DECLIMEX_ struct RFstring* rf_string_create_double(double f);
+i_DECLIMEX_ struct RFstring* rf_string_create_double(double f,
+                                                     unsigned int precision);
 /**
  ** @brief Initializes a string with the given double.
  **
  ** @notinherited{StringX}
  ** @see rf_string_create_double()
  **/
-i_DECLIMEX_ bool rf_string_init_double(struct RFstring* str,double f);
+i_DECLIMEX_ bool rf_string_init_double(struct RFstring* str,
+                                       double f,
+                                       unsigned int precision);
 
 /**
  ** @brief Allocates and returns a string with the given UTF-16 byte sequence.

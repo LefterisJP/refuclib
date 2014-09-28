@@ -131,13 +131,13 @@ START_TEST(test_string_init_int) {
 START_TEST(test_string_init_double) {
     struct RFstring s1, s2, s3;
 
-    ck_assert(rf_string_init_double(&s1, 0));
+    ck_assert(rf_string_init_double(&s1, 0, 1));
     ck_assert_rf_str_eq_cstr(&s1, "0.0");
 
-    ck_assert(rf_string_init_double(&s2, 54.12452));
-    ck_assert_rf_str_eq_cstr(&s2, "54.12452");
+    ck_assert(rf_string_init_double(&s2, 54.12452, 6));
+    ck_assert_rf_str_eq_cstr(&s2, "54.124520");
 
-    ck_assert(rf_string_init_double(&s3, -0.00192));
+    ck_assert(rf_string_init_double(&s3, -0.00192, 5));
     ck_assert_rf_str_eq_cstr(&s3, "-0.00192");
 
 

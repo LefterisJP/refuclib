@@ -89,7 +89,9 @@ bool rf_string_append_int(struct RFstring* thisstr, const int32_t i)
     return true;
 }
 
-bool rf_string_append_double(struct RFstring* thisstr, const double d)
+bool rf_string_append_double(struct RFstring* thisstr,
+                             double d,
+                             unsigned int precision)
 {
     int rc;
     RF_ASSERT(thisstr);
@@ -98,7 +100,7 @@ bool rf_string_append_double(struct RFstring* thisstr, const double d)
                return false
     );
     ADD_TYPE_TO_STRING(thisstr, "double", MAX_DOUBLE_STRING_CHAR_SIZE,
-                       "%f", rc, d);
+                       "%.*f", rc, precision, d);
     return true;
 }
 
@@ -414,7 +416,7 @@ bool rf_string_prune_middle_f(void* thisstr, uint32_t p,
     uint32_t byte_position;
     uint32_t character_position;
     int previous_byte_pos = -1;
-    int new_byte_pos = 0;
+    int new_byte_pos = -1;
     bool character_reached = false;
     RF_ASSERT(thisstr);
 
@@ -427,8 +429,7 @@ bool rf_string_prune_middle_f(void* thisstr, uint32_t p,
 
     RF_STRING_ITERATE_START(thisstr, character_position, byte_position)
         //if we reach the number of characters passed as a parameter, note it
-        if(character_position == p)
-        {
+        if (character_position == p) {
             previous_byte_pos = byte_position;
             character_reached = true;
         }
@@ -437,8 +438,7 @@ bool rf_string_prune_middle_f(void* thisstr, uint32_t p,
             *removals = *removals + 1;
         }
 
-        if(character_position == p + n)
-        {
+        if (character_position == p + n) {
             new_byte_pos = byte_position;
             break;//since we got all the data we needed
         }
@@ -456,8 +456,7 @@ bool rf_string_prune_middle_f(void* thisstr, uint32_t p,
      * if we did not find the byte position of p+n then we remove
      * everything from previous_byte_pos until the end of the string
      */
-    if(new_byte_pos == -1)
-    {
+    if (new_byte_pos == -1) {
         rf_string_length_bytes(thisstr) -= (
             rf_string_length_bytes(thisstr) - previous_byte_pos
         );
@@ -516,7 +515,7 @@ bool rf_string_trim_start(void* thisstr, const void* sub, unsigned int *removals
     return ret;
 }
 
-bool rf_string_trim_end(void* thisstr, const void* sub, unsigned int *removals)
+bool rf_string_trim_end(void* thisstr, const void* sub, unsigned int *rem)
 {
     bool ret;
     bool iteration_match;
@@ -524,6 +523,7 @@ bool rf_string_trim_end(void* thisstr, const void* sub, unsigned int *removals)
     uint32_t byte_position, last_byte_position;
     int subLength;
     int j;
+    unsigned int removals = 0;
     RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr);
     
@@ -535,9 +535,6 @@ bool rf_string_trim_end(void* thisstr, const void* sub, unsigned int *removals)
     
     ret = true;
     last_byte_position = 0;
-    if (removals) {
-        *removals = 0;
-    }
 
     //get all the codepoints of the string
     subLength = rf_string_fill_codepoints(sub);
@@ -556,9 +553,7 @@ bool rf_string_trim_end(void* thisstr, const void* sub, unsigned int *removals)
             if(rf_string_bytepos_to_codepoint(thisstr, byte_position) ==
                rf_buffer_from_current_at(TSBUFFA, j, uint32_t))
             {
-                if (removals) {
-                    *removals = *removals + 1;
-                }
+                removals += 1;
                 iteration_match = false;
                 last_byte_position = byte_position;
                 break;
@@ -570,11 +565,14 @@ bool rf_string_trim_end(void* thisstr, const void* sub, unsigned int *removals)
     RF_STRING_ITERATEB_END(i, byte_position)
 
     //if we had any match
-    if(ret)
-    {
+    if (removals != 0) {
         rf_string_length_bytes(thisstr) -= (
             rf_string_length_bytes(thisstr) - last_byte_position
         );
+    }
+
+    if (rem) {
+        *rem = removals;
     }
 
   cleanup:

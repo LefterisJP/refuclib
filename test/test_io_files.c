@@ -21,6 +21,17 @@
 static const uint32_t line_scenario4_bytes[] = {18, 12, 12, 24, 20};
 /* each line is encoded in its own encoding */
 static const char *line_scenario4[] = {
+    "２日の東京外\n",
+
+    "\x9A\x3\xB1\x3\xBD\x3\xAD\x3\xBD\x3\xB1\x3\n",
+    "\x9A\x3\xB1\x3\xBD\x3\xAD\x3\xBD\x3\xB1\x3\n",
+
+    /* It's actually opposite, file has wrong string inside  */
+    "\x7E\x30\0\0\5F\x30\0\0\x73\x7c\0\0\x75\x51\0\0\x4c\x30\0\0\x96\x6C\0\0\n",
+    /* It's actually opposite, file has wrong string inside  */
+    "\x97\x3\0\0\xC7\x3\0\0\xCE\x3\0\0\xC1\x3\0\0\xB1\x3\0\0\n",
+
+
     "２日の東京外",
 
     "\x9A\x3\xB1\x3\xBD\x3\xAD\x3\xBD\x3\xB1\x3",
@@ -95,7 +106,7 @@ static void test_file_read_line_generic(const char* filename, int encoding,
 
     ck_assert_nnt_str_eq_cstr(
         utf8 + 3, /* skip the bom */
-        get_line(encoding, endianess, line_scenario1)
+        get_line(encoding, endianess, false, line_scenario1)
     );
     free(utf8);
 
@@ -106,7 +117,7 @@ static void test_file_read_line_generic(const char* filename, int encoding,
     );
     ck_assert_nnt_str_eq_cstr(
         utf8,
-        get_line(encoding, endianess, line_scenario2)
+        get_line(encoding, endianess, false, line_scenario2)
     );
     free(utf8);
 
@@ -117,7 +128,7 @@ static void test_file_read_line_generic(const char* filename, int encoding,
     );
     ck_assert_nnt_str_eq_cstr(
         utf8,
-        get_line(encoding, endianess, line_scenario3)
+        get_line(encoding, endianess, false, line_scenario3)
     );
 
     /* invalid input */
@@ -169,7 +180,8 @@ static void test_file_read_bytes_generic(const char* filename, int encoding,
     /* read first line */
     ck_assert(
         choose_read_line(
-            encoding, f, RF_EOL_LF, &utf8, &byte_length, &buffer_size, &eof, endianess
+            encoding, f, RF_EOL_LF, &utf8,
+            &byte_length, &buffer_size, &eof, endianess
         )
     );
     free(utf8);
@@ -180,7 +192,9 @@ static void test_file_read_bytes_generic(const char* filename, int encoding,
         )
     );
 
-    ck_assert_nnt_str_eq_cstr(buff, get_line(encoding, endianess, line_scenario4));
+    ck_assert_nnt_str_eq_cstr(
+        buff,
+        get_line(encoding, endianess, false, line_scenario4));
 
     /* invalid input */
     ck_assert(

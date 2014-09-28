@@ -15,16 +15,16 @@
 /*------------- End of includes -------------*/
 
 
-#define ADD_TYPE_TO_STRING(str_, type_, typemax_, typefs_, rc_, val_)   \
-    rc_ = snprintf(rf_string_data(str_) + rf_string_length_bytes(str_),     \
+#define ADD_TYPE_TO_STRING(str_, type_, typemax_, typefs_, rc_, ...)    \
+    rc_ = snprintf(rf_string_data(str_) + rf_string_length_bytes(str_), \
                    typemax_,                                            \
-                   typefs_, val_);                                      \
+                   typefs_, __VA_ARGS__);                               \
     if(rc_ < 0 || rc_ >= typemax_)                                      \
     {                                                                   \
         RF_ERROR("During appending "type_" to a string snprintf failed"); \
         return false;                                                   \
     }                                                                   \
-    rf_string_length_bytes(str_) += rc_;                                   \
+    rf_string_length_bytes(str_) += rc_;                                \
 
 
 i_INLINE_DECL bool rf_string_generic_prepend(void* thisstr, const char* other,

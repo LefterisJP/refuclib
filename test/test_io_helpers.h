@@ -19,11 +19,11 @@
     " το οποίο ξεκαθαρίζει πως οι αλλαγές στα εργασιακά αποτελούν " \
     "αναπόσπαστο κομμάτι της συμφωνίας Ελλάδας και τρόικας."        \
 
-#define SECOND_LINE_UTF32_BE                                         \
-    "また米兵が沖縄の人の暮らしを脅かした。２日未明、酔った米"       \
-    "兵が民家に押し入り、中学生を殴ったとされる事件。半月前"         \
-    "の米兵による集団強姦（ごうかん）事件を受けて在日米軍に出た"     \
-    "外出禁止令を破る振る舞いに、「米兵には綱紀も何もない」"         \
+#define SECOND_LINE_UTF32_BE                                      \
+    "また米兵が沖縄の人の暮らしを脅かした。２日未明、酔った米"    \
+    "兵が民家に押し入り、中学生を殴ったとされる事件。半月前"      \
+    "の米兵による集団強姦（ごうかん）事件を受けて在日米軍に出た"  \
+    "外出禁止令を破る振る舞いに、「米兵には綱紀も何もない」"      \
     "と憤りの声が上がった。"
 
 #define SECOND_LINE_UTF32_LE                                              \
@@ -63,53 +63,76 @@ static const char *line_scenario1[] = {
     /* It's actually opposite, file has wrong string inside  */
     "Little Endian UTF-32 string file\n",
     /* It's actually opposite, file has wrong string inside  */
-    "Big Endian UTF-32 string file\n"
+    "Big Endian UTF-32 string file\n",
+
+
+    "UTF-8 File",
+    "Little Endian UTF-16 file",
+    "Big Endian UTF-16 file",
+    /* It's actually opposite, file has wrong string inside  */
+    "Little Endian UTF-32 string file",
+    /* It's actually opposite, file has wrong string inside  */
+    "Big Endian UTF-32 string file"
 };
 
 static const char *line_scenario2[] = {
+    SECOND_LINE_UTF8"\n",
+    SECOND_LINE_UTF16"\n",
+    SECOND_LINE_UTF16"\n",
+    /* It's actually opposite, file has wrong string inside  */
+    SECOND_LINE_UTF32_BE"\n",
+    /* It's actually opposite, file has wrong string inside  */
+    SECOND_LINE_UTF32_LE"\n",
+
+
     SECOND_LINE_UTF8,
-
     SECOND_LINE_UTF16,
-
     SECOND_LINE_UTF16,
-
     /* It's actually opposite, file has wrong string inside  */
     SECOND_LINE_UTF32_BE,
     /* It's actually opposite, file has wrong string inside  */
-    SECOND_LINE_UTF32_LE
+    SECOND_LINE_UTF32_LE,
 };
 
 static const char *line_scenario3[] = {
+    THIRD_LINE_UTF8"\n",
+    THIRD_LINE_UTF16"\n",
+    THIRD_LINE_UTF16"\n",
+    /* It's actually opposite, file has wrong string inside  */
+    THIRD_LINE_UTF32_BE"\n",
+    /* It's actually opposite, file has wrong string inside  */
+    THIRD_LINE_UTF32_LE"\n",
+
+
     THIRD_LINE_UTF8,
-
     THIRD_LINE_UTF16,
-
     THIRD_LINE_UTF16,
-
     /* It's actually opposite, file has wrong string inside  */
     THIRD_LINE_UTF32_BE,
-
     /* It's actually opposite, file has wrong string inside  */
     THIRD_LINE_UTF32_LE,
 };
 
-inline static const char *get_line(int encoding, int endianess, const char* scenario[])
+inline static const char *get_line(int encoding,
+                                   int endianess,
+                                   bool with_newline,
+                                   const char* scenario[])
 {
     if (encoding == RF_UTF8) {
-        return scenario[0];
+        return with_newline ? scenario[0] : scenario[5];
     } else if (encoding == RF_UTF16 && endianess == RF_LITTLE_ENDIAN) {
-        return scenario[1];
+        return with_newline ? scenario[1] : scenario[6];
     } else if (encoding == RF_UTF16 && endianess == RF_BIG_ENDIAN) {
-        return scenario[2];
+        return with_newline ? scenario[2] : scenario[7];
     } else if (encoding == RF_UTF32 && endianess == RF_LITTLE_ENDIAN) {
-        return scenario[4];
+        return with_newline ? scenario[4] : scenario[9];
     }
 
-    return scenario[3];
+    return with_newline ? scenario[3] : scenario[8];
 }
 
 inline static const uint32_t get_uint32_array(int encoding, int endianess,
-                                       const uint32_t* arr)
+                                              const uint32_t* arr)
 {
     if (encoding == RF_UTF8) {
         return arr[0];

@@ -33,12 +33,18 @@
     "Η χώρα κρέμεται πάλι α"
 
 static const char *partial_line_scenario2[] = {
+    PARTIAL_SECOND_LINE_UTF8"\n",
+    PARTIAL_SECOND_LINE_UTF16"\n",
+    PARTIAL_SECOND_LINE_UTF16"\n",
+    /* It's actually opposite"\n", file has wrong string inside  */
+    PARTIAL_SECOND_LINE_UTF32_BE"\n",
+    /* It's actually opposite, file has wrong string inside  */
+    PARTIAL_SECOND_LINE_UTF32_LE"\n",
+
+
     PARTIAL_SECOND_LINE_UTF8,
-
     PARTIAL_SECOND_LINE_UTF16,
-
     PARTIAL_SECOND_LINE_UTF16,
-
     /* It's actually opposite, file has wrong string inside  */
     PARTIAL_SECOND_LINE_UTF32_BE,
     /* It's actually opposite, file has wrong string inside  */
@@ -72,16 +78,19 @@ static void test_textfile_read_line_generic(const char *filename,
 
     /* 1st line */
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));
-    ck_assert_rf_str_eq_cstr(&g_buff,
-                             get_line(encoding, endianess, line_scenario1));
+    ck_assert_rf_str_eq_cstr(
+        &g_buff,
+        get_line(encoding, endianess, false, line_scenario1));
     /* 2nd line */
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));
-    ck_assert_rf_str_eq_cstr(&g_buff,
-                             get_line(encoding, endianess, line_scenario2));
+    ck_assert_rf_str_eq_cstr(
+        &g_buff,
+        get_line(encoding, endianess, false, line_scenario2));
     /* 3rd line */
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));
-    ck_assert_rf_str_eq_cstr(&g_buff,
-                             get_line(encoding, endianess, line_scenario3));
+    ck_assert_rf_str_eq_cstr(
+        &g_buff,
+        get_line(encoding, endianess, false, line_scenario3));
     /* EOF */
     ck_assert(RE_FILE_EOF == rf_textfile_read_line(&f, &g_buff));
 
@@ -89,8 +98,8 @@ static void test_textfile_read_line_generic(const char *filename,
 }
 
 static void test_textfile_read_line_chars_generic(const char *filename,
-                                            enum RFtext_encoding encoding,
-                                            enum RFendianess endianess)
+                                                  enum RFtext_encoding encoding,
+                                                  enum RFendianess endianess)
 {
     struct RFtextfile f;
     ck_assert(rf_stringx_assign_unsafe_nnt(
@@ -100,12 +109,14 @@ static void test_textfile_read_line_chars_generic(const char *filename,
 
     /* 1st line */
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));
-    ck_assert_rf_str_eq_cstr(&g_buff,
-                             get_line(encoding, endianess, line_scenario1));
+    ck_assert_rf_str_eq_cstr(
+        &g_buff,
+        get_line(encoding, endianess, false, line_scenario1));
     /* 2nd line partial */
     ck_assert(RF_SUCCESS == rf_textfile_read_line_chars(&f, &g_buff, 22));
-    ck_assert_rf_str_eq_cstr(&g_buff,
-                             get_line(encoding, endianess, partial_line_scenario2));
+    ck_assert_rf_str_eq_cstr(
+        &g_buff,
+        get_line(encoding, endianess, false, partial_line_scenario2));
 
     rf_textfile_deinit(&f);
 }
@@ -156,15 +167,17 @@ START_TEST(test_textfile_copy) {
 
     /* 1st line */
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));
-    ck_assert_rf_str_eq_cstr(&g_buff,
-                             get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario1));
+    ck_assert_rf_str_eq_cstr(
+        &g_buff,
+        get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario1));
 
     /* make a copy */
     ck_assert(rf_textfile_copy_in(&copy_f, &f));
     /* 2nd line from copy */
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&copy_f, &g_buff));
-    ck_assert_rf_str_eq_cstr(&g_buff,
-                             get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario2));
+    ck_assert_rf_str_eq_cstr(
+        &g_buff,
+        get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario2));
 
     /* illegal input */
     ck_assert(!rf_textfile_copy_in(&copy_f, NULL));
@@ -184,21 +197,21 @@ START_TEST(test_textfile_set_mode) {
                                RF_UTF8, RF_EOL_LF));
 
     /* write line 1 */
-    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario1);
+    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario1);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
     ck_assert(rf_textfile_write(&f, &g_buff));
 
     /* write line 2 */
-    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario2);
+    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario2);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
     ck_assert(rf_textfile_write(&f, &g_buff));
 
     /* write line 3 */
-    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario3);
+    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario3);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
@@ -210,18 +223,24 @@ START_TEST(test_textfile_set_mode) {
 
     /* read 1st line */
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));
-    ck_assert_rf_str_eq_cstr(&g_buff,
-                             get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario1));
+    ck_assert_rf_str_eq_cstr(
+        &g_buff,
+        get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario1));
 
     /* read 2nd line */
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));
-    ck_assert_rf_str_eq_cstr(&g_buff,
-                             get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario2));
+    ck_assert_rf_str_eq_cstr(
+        &g_buff,
+        get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario2));
 
     /* read 3rd line */
+    ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));
+    ck_assert_rf_str_eq_cstr(
+        &g_buff,
+        get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario3));
+
+    /* check for EOF */
     ck_assert(RE_FILE_EOF == rf_textfile_read_line(&f, &g_buff));
-    ck_assert_rf_str_eq_cstr(&g_buff,
-                             get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario2));
 
     ck_assert(rf_system_delete_file(&g_fname));
 
@@ -346,21 +365,21 @@ START_TEST(test_textfile_write) {
                                RF_UTF8, RF_EOL_LF));
 
     /* write line 1 */
-    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario1);
+    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario1);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
     ck_assert(rf_textfile_write(&f, &g_buff));
 
     /* write line 2 */
-    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario2);
+    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario2);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
     ck_assert(rf_textfile_write(&f, &g_buff));
 
     /* write line 3 */
-    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario3);
+    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario3);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
@@ -377,18 +396,24 @@ START_TEST(test_textfile_write) {
                                RF_UTF8, RF_EOL_LF));
     /* read 1st line */
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&rf, &g_buff));
-    ck_assert_rf_str_eq_cstr(&g_buff,
-                             get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario1));
+    ck_assert_rf_str_eq_cstr(
+        &g_buff,
+        get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario1));
 
     /* read 2nd line */
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&rf, &g_buff));
-    ck_assert_rf_str_eq_cstr(&g_buff,
-                             get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario2));
+    ck_assert_rf_str_eq_cstr(
+        &g_buff,
+        get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario2));
 
     /* read 3rd line */
+    ck_assert(RF_SUCCESS == rf_textfile_read_line(&rf, &g_buff));
+    ck_assert_rf_str_eq_cstr(
+        &g_buff,
+        get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario3));
+
+    /* check for EOF */
     ck_assert(RE_FILE_EOF == rf_textfile_read_line(&rf, &g_buff));
-    ck_assert_rf_str_eq_cstr(&g_buff,
-                             get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario2));
 
     ck_assert(rf_system_delete_file(&g_fname));
 
@@ -407,21 +432,21 @@ START_TEST(test_textfile_insert_after) {
                                RF_UTF8, RF_EOL_LF));
 
     /* write line 1 */
-    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario1);
+    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario1);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
     ck_assert(rf_textfile_write(&f, &g_buff));
 
     /* write line 3 */
-    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario3);
+    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario3);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
     ck_assert(rf_textfile_write(&f, &g_buff));
 
     /* now insert line in between */
-    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario2);
+    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario2);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
@@ -433,18 +458,21 @@ START_TEST(test_textfile_insert_after) {
 
     /* read 1st line */
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));
-    ck_assert_rf_str_eq_cstr(&g_buff,
-                             get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario1));
+    ck_assert_rf_str_eq_cstr(
+        &g_buff,
+        get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario1));
 
     /* read 2nd line */
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));
-    ck_assert_rf_str_eq_cstr(&g_buff,
-                             get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario2));
+    ck_assert_rf_str_eq_cstr(
+        &g_buff,
+        get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario2));
 
     /* read 3rd line */
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));
-    ck_assert_rf_str_eq_cstr(&g_buff,
-                             get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario3));
+    ck_assert_rf_str_eq_cstr(
+        &g_buff,
+        get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario3));
     /* EOF */
     ck_assert(RE_FILE_EOF == rf_textfile_read_line(&f, &g_buff));
 
@@ -469,21 +497,21 @@ START_TEST(test_textfile_insert_before) {
                                RF_UTF8, RF_EOL_LF));
 
     /* write line 1 */
-    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario1);
+    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario1);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
     ck_assert(rf_textfile_write(&f, &g_buff));
 
     /* write line 3 */
-    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario3);
+    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario3);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
     ck_assert(rf_textfile_write(&f, &g_buff));
 
     /* now insert line before 1st */
-    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario2);
+    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario2);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
@@ -495,18 +523,21 @@ START_TEST(test_textfile_insert_before) {
 
     /* read 1st line */
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));
-    ck_assert_rf_str_eq_cstr(&g_buff,
-                             get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario2));
+    ck_assert_rf_str_eq_cstr(
+        &g_buff,
+        get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario2));
 
     /* read 2nd line */
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));
-    ck_assert_rf_str_eq_cstr(&g_buff,
-                             get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario1));
+    ck_assert_rf_str_eq_cstr(
+        &g_buff,
+        get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario1));
 
     /* read 3rd line */
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));
-    ck_assert_rf_str_eq_cstr(&g_buff,
-                             get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario3));
+    ck_assert_rf_str_eq_cstr(
+        &g_buff,
+        get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario3));
     /* EOF */
     ck_assert(RE_FILE_EOF == rf_textfile_read_line(&f, &g_buff));
 
@@ -525,7 +556,7 @@ START_TEST(test_textfile_remove) {
                                RF_UTF8, RF_EOL_LF));
 
     /* write line 1 */
-    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario1);
+    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario1);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
@@ -538,7 +569,7 @@ START_TEST(test_textfile_remove) {
     ck_assert(rf_textfile_write(&f, &g_buff));
 
     /* write line 3 */
-    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario3);
+    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario3);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, THIRD_LINE_UTF8"\n",
                   strlen(THIRD_LINE_UTF8"\n")));
@@ -553,13 +584,15 @@ START_TEST(test_textfile_remove) {
 
     /* read 1st line */
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));
-    ck_assert_rf_str_eq_cstr(&g_buff,
-                             get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario1));
+    ck_assert_rf_str_eq_cstr(
+        &g_buff,
+        get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario1));
 
     /* read 2nd line */
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));
-    ck_assert_rf_str_eq_cstr(&g_buff,
-                             get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario3));
+    ck_assert_rf_str_eq_cstr(
+        &g_buff,
+        get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario3));
 
     /* EOF */
     ck_assert(RE_FILE_EOF == rf_textfile_read_line(&f, &g_buff));
@@ -584,7 +617,7 @@ START_TEST(test_textfile_replace) {
                                RF_UTF8, RF_EOL_LF));
 
     /* write line 1 */
-    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario1);
+    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario1);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
@@ -597,7 +630,7 @@ START_TEST(test_textfile_replace) {
     ck_assert(rf_textfile_write(&f, &g_buff));
 
     /* write line 3 */
-    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario3);
+    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario3);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, THIRD_LINE_UTF8"\n",
                   strlen(THIRD_LINE_UTF8"\n")));
@@ -612,8 +645,9 @@ START_TEST(test_textfile_replace) {
 
     /* read 1st line */
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));
-    ck_assert_rf_str_eq_cstr(&g_buff,
-                             get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, line_scenario1));
+    ck_assert_rf_str_eq_cstr(
+        &g_buff,
+        get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario1));
 
     /* read 2nd line */
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));

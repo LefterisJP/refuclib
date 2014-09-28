@@ -74,13 +74,13 @@ START_TEST(test_string_append_double) {
     ck_assert(rf_string_init(&s2, "My favorite floating point number is "));
     ck_assert(rf_string_init(&s3, "My favorite floating point number is "));
 
-    ck_assert(rf_string_append_double(&s, 0.00341));
+    ck_assert(rf_string_append_double(&s, 0.00341, 5));
     ck_assert_rf_str_eq_cstr(&s, "My favorite floating point number is 0.00341");
 
-    ck_assert(rf_string_append_double(&s2, -123.193));
-    ck_assert_rf_str_eq_cstr(&s2, "My favorite floating point number is -123.193");
+    ck_assert(rf_string_append_double(&s2, -123.193, 2));
+    ck_assert_rf_str_eq_cstr(&s2, "My favorite floating point number is -123.19");
 
-    ck_assert(rf_string_append_double(&s3, 0.0));
+    ck_assert(rf_string_append_double(&s3, 0.0, 1));
     ck_assert_rf_str_eq_cstr(&s3, "My favorite floating point number is 0.0");
 
     rf_string_deinit(&s);
@@ -411,7 +411,7 @@ START_TEST(test_string_trim_end) {
         "りるれろたちつてとだでどまみむめもなにぬねのはひふへ"
         "ほぱぴぷぺぽをわっ。"
     );
-    struct RFstring sub2 = RF_STRING_STATIC_INIT("\t\n\r");
+    struct RFstring sub2 = RF_STRING_STATIC_INIT(" \t\n\r");
 
     ck_assert(rf_string_init(&s, "警視庁への取材でわかった。"));
     ck_assert(rf_string_trim_end(&s, &sub1, &removals));
@@ -595,35 +595,35 @@ START_TEST(test_stringx_append_chars) {
         "研究室"
     );
 
-    /* no chars */
+    /* all chars */
     ck_assert(rf_stringx_append_chars(&s, &add1, 0));
     ck_assert_rf_str_eq_cstr(
         &s,
         "the train from Kita Senju to Kashiwa station."
-        "研究室"
+        "研究室研究室に行ってきます。"
     );
 
-    /* more chars than the to add string */
+    /* more chars than available to add to the string */
     ck_assert(rf_stringx_init(&s2, "S"));
     ck_assert(rf_stringx_append_chars(&s2, &add2, 999));
     ck_assert_rf_str_eq_cstr(&s2, "SΔεύτερη θητεία");
-        
+
 
     /* invalid input */
     ck_assert(!rf_stringx_append_chars(&s, NULL, 0));
 
-    rf_stringx_deinit(&s);        
-    rf_stringx_deinit(&s2);        
+    rf_stringx_deinit(&s);
+    rf_stringx_deinit(&s2);
 }END_TEST
 
 START_TEST(test_stringx_append_char) {
     struct RFstringx s;
-    
+
     ck_assert(rf_stringx_init(&s, "Testing appending a cha"));
     ck_assert(rf_stringx_append_char(&s, (uint32_t)'r'));
     ck_assert_rf_str_eq_cstr(&s, "Testing appending a char");
 
-    rf_stringx_deinit(&s);        
+    rf_stringx_deinit(&s);
 }END_TEST
 
 START_TEST(test_stringx_prepend) {
@@ -665,14 +665,14 @@ START_TEST(test_stringx_prepend) {
         "winning the crucial battleground of Ohio, taking him "
         "past the 270 margin."
     );
-    
+
 
     /* invalid input */
     ck_assert(!rf_stringx_prepend(&s2, NULL));
 
-    rf_stringx_deinit(&s);        
-    rf_stringx_deinit(&s2);            
-    rf_stringx_deinit(&s3);            
+    rf_stringx_deinit(&s);
+    rf_stringx_deinit(&s2);
+    rf_stringx_deinit(&s3);
 }END_TEST
 
 START_TEST(test_stringx_insert) {
@@ -725,8 +725,8 @@ START_TEST(test_stringx_insert) {
     /* invalid input */
     ck_assert(!rf_stringx_insert(&s2, 0, NULL));
 
-    rf_stringx_deinit(&s);        
-    rf_stringx_deinit(&s2);            
+    rf_stringx_deinit(&s);
+    rf_stringx_deinit(&s2);
 }END_TEST
 
 /* --- Stringx Unsafe Appending Tests --- START --- */
@@ -739,7 +739,7 @@ START_TEST(test_stringx_append_bytes) {
     ck_assert(rf_stringx_init(&s, "I know how to use "));
     ck_assert(rf_stringx_append_bytes(&s, &add1, 999));
     ck_assert_rf_strx_eq_cstr(&s, "I know how to use unsafe operations ");
-    
+
     /* bytes of a string with UTF-8 characters*/
     ck_assert(rf_stringx_append_bytes(&s, &add2, 8));
     ck_assert_rf_strx_eq_cstr(
@@ -752,11 +752,11 @@ START_TEST(test_stringx_append_bytes) {
     ck_assert_rf_strx_eq_cstr(
         &s,
         "I know how to use unsafe operations στην"
-    );    
+    );
 
     /* invalid input */
     ck_assert(!rf_stringx_append_bytes(&s, NULL, 8));
-    
+
     rf_stringx_deinit(&s);
 }END_TEST
 
@@ -880,7 +880,7 @@ START_TEST(test_stringx_replace_between) {
     ck_assert(rf_stringx_replace_between(&s2, &right, &right, &rep2, 0, 4));
     ck_assert_rf_strx_eq_cstr(&s2, "These are simply space tokenized words");
 
-    
+
     /* invalid input */
     ck_assert(!rf_stringx_replace_between(&s, NULL, &right, &rep1, 0, 1));
     ck_assert(!rf_stringx_replace_between(&s, &left, NULL, &rep1, 0, 1));

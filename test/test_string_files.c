@@ -74,25 +74,49 @@ static const char *line_scenario1[] = {
     /* It's actually opposite, file has wrong string inside  */
     "Little Endian UTF-32 string file",
     /* It's actually opposite, file has wrong string inside  */
-    "Big Endian UTF-32 string file"
+    "Big Endian UTF-32 string file",
+
+    "UTF-8 File\n",
+    "Little Endian UTF-16 file\n",
+    "Big Endian UTF-16 file\n",
+    /* It's actually opposite, file has wrong string inside  */
+    "Little Endian UTF-32 string file\n",
+    /* It's actually opposite, file has wrong string inside  */
+    "Big Endian UTF-32 string file\n"
 };
 
 static const char *line_scenario2[] = {
-    "UTF-8 File\n"
+    "UTF-8 File"
     SECOND_LINE_UTF8,
 
-    "Little Endian UTF-16 file\n"
+    "Little Endian UTF-16 file"
     SECOND_LINE_UTF16,
 
-    "Big Endian UTF-16 file\n"
+    "Big Endian UTF-16 file"
     SECOND_LINE_UTF16,
+
+    /* It's actually opposite, file has wrong string inside  */
+    "Little Endian UTF-32 string file"
+    SECOND_LINE_UTF32_BE,
+    /* It's actually opposite, file has wrong string inside  */
+    "Big Endian UTF-32 string file"
+    SECOND_LINE_UTF32_LE,
+
+    "UTF-8 File\n"
+    SECOND_LINE_UTF8"\n",
+
+    "Little Endian UTF-16 file\n"
+    SECOND_LINE_UTF16"\n",
+
+    "Big Endian UTF-16 file\n"
+    SECOND_LINE_UTF16"\n",
 
     /* It's actually opposite, file has wrong string inside  */
     "Little Endian UTF-32 string file\n"
-    SECOND_LINE_UTF32_BE,
+    SECOND_LINE_UTF32_BE"\n",
     /* It's actually opposite, file has wrong string inside  */
     "Big Endian UTF-32 string file\n"
-    SECOND_LINE_UTF32_LE
+    SECOND_LINE_UTF32_LE"\n"
 };
 
 static const char *line_scenario3[] = {
@@ -117,23 +141,49 @@ static const char *line_scenario3[] = {
     "Big Endian UTF-32 string file"
     SECOND_LINE_UTF32_LE
     THIRD_LINE_UTF32_LE,
+
+
+    "UTF-8 File\n"
+    SECOND_LINE_UTF8"\n"
+    THIRD_LINE_UTF8"\n",
+
+    "Little Endian UTF-16 file\n"
+    SECOND_LINE_UTF16"\n"
+    THIRD_LINE_UTF16"\n",
+
+    "Big Endian UTF-16 file\n"
+    SECOND_LINE_UTF16"\n"
+    THIRD_LINE_UTF16"\n",
+
+    /* It's actually opposite, file has wrong string inside  */
+    "Little Endian UTF-32 string file\n"
+    SECOND_LINE_UTF32_BE"\n"
+    THIRD_LINE_UTF32_BE"\n",
+
+    /* It's actually opposite, file has wrong string inside  */
+    "Big Endian UTF-32 string file\n"
+    SECOND_LINE_UTF32_LE"\n"
+    THIRD_LINE_UTF32_LE"\n"
 };
 
 
 
-static const char *get_line(int encoding, int endianess, const char* scenario[])
+static const char *get_line(int encoding,
+                            int endianess,
+                            bool with_newlines,
+                            const char* scenario[])
 {
     if (encoding == RF_UTF8) {
-        return scenario[0];
+        return with_newlines ? scenario[5] : scenario[0];
     } else if (encoding == RF_UTF16 && endianess == RF_LITTLE_ENDIAN) {
-        return scenario[1];
+        return with_newlines ? scenario[6] : scenario[1];
     } else if (encoding == RF_UTF16 && endianess == RF_BIG_ENDIAN) {
-        return scenario[2];
+        return with_newlines ? scenario[7] : scenario[2];
     } else if (encoding == RF_UTF32 && endianess == RF_LITTLE_ENDIAN) {
-        return scenario[4];
+        return with_newlines ? scenario[9] : scenario[4];
     }
 
-    return scenario[3];
+    return with_newlines ? scenario[8] : scenario[3];
 }
 
 static void test_rf_string_init_generic(const char* filename, int encoding,
@@ -153,7 +203,9 @@ static void test_rf_string_init_generic(const char* filename, int encoding,
     /* get rid of the BOM and check for the right string */
     ck_assert(rf_string_prune_start(&s, 1, NULL));
     ck_assert_rf_str_eq_cstr(&s, get_line(encoding,
-                                                endianess, line_scenario1));
+                                          endianess,
+                                          true,
+                                          line_scenario1));
 
     /* invalid input */
     ck_assert(
@@ -187,7 +239,9 @@ static void test_rf_string_assign_generic(const char* filename, int encoding,
     /* get rid of the BOM and check for the right string */
     ck_assert(rf_string_prune_start(&s, 1, NULL));
     ck_assert_rf_str_eq_cstr(&s, get_line(encoding,
-                                                endianess, line_scenario1));
+                                          endianess,
+                                          true,
+                                          line_scenario1));
 
     /* invalid input */
     ck_assert(
@@ -220,7 +274,9 @@ static void test_rf_stringx_assign_generic(const char* filename, int encoding,
     /* get rid of the BOM and check for the right string */
     ck_assert(rf_string_prune_start(&s, 1, NULL));
     ck_assert_rf_strx_eq_cstr(&s, get_line(encoding,
-                                           endianess, line_scenario1));
+                                           endianess,
+                                           true,
+                                           line_scenario1));
 
     /* invalid input */
     ck_assert(
@@ -254,14 +310,17 @@ static void test_rf_string_append_generic(const char* filename, int encoding,
     /* get rid of the BOM and check for the right string */
     ck_assert(rf_string_prune_start(&s, 1, NULL));
     ck_assert_rf_str_eq_cstr(&s, get_line(encoding,
-                                                endianess, line_scenario1));
+                                          endianess,
+                                          true,
+                                          line_scenario1));
 
     ck_assert(rf_string_from_file_append(&s, f, &eof, RF_EOL_LF,
                                          encoding, endianess));
 
-    ck_assert_rf_str_eq_cstr(&s, get_line
-                             (encoding,
-                              endianess, line_scenario2)
+    ck_assert_rf_str_eq_cstr(&s, get_line(encoding,
+                                          endianess,
+                                          true,
+                                          line_scenario2)
     );
 
     /* invalid input */
@@ -295,14 +354,17 @@ static void test_rf_stringx_append_generic(const char* filename, int encoding,
     /* get rid of the BOM and check for the right string */
     ck_assert(rf_string_prune_start(&s, 1, NULL));
     ck_assert_rf_strx_eq_cstr(&s, get_line(encoding,
-                                           endianess, line_scenario1));
+                                           endianess,
+                                           true,
+                                           line_scenario1));
 
     ck_assert(rf_stringx_from_file_append(&s, f, &eof, RF_EOL_LF,
                                           encoding, endianess));
 
-    ck_assert_rf_strx_eq_cstr(&s, get_line
-                              (encoding,
-                              endianess, line_scenario2)
+    ck_assert_rf_strx_eq_cstr(&s, get_line(encoding,
+                                           endianess,
+                                           true,
+                                           line_scenario2)
     );
 
     /* invalid input */
@@ -354,7 +416,7 @@ static void test_rf_string_fwrite_generic(const char* filename, int encoding,
     /* open an output file and write the string there */
     ck_assert((out = fopen(CLIB_TESTS_PATH"outputfile","w+b")) != NULL);
     ck_assert(rf_string_fwrite(&s, out, encoding, endianess));
-    
+
     /* Read the string from the same file and compare*/
     ck_assert_int_eq(0, fseek(out, 0, SEEK_SET));
 
@@ -362,10 +424,11 @@ static void test_rf_string_fwrite_generic(const char* filename, int encoding,
                                        encoding, endianess, NULL));
 
 
-    ck_assert_rf_str_eq_cstr(&s, get_line
-                             (encoding,
-                              endianess, line_scenario3)
-    );    
+    ck_assert_rf_str_eq_cstr(&s2, get_line(encoding,
+                                           endianess,
+                                           false,
+                                           line_scenario3)
+    );
 
     rf_string_deinit(&s);
     rf_string_deinit(&s2);

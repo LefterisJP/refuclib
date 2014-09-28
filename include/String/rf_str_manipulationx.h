@@ -71,6 +71,7 @@ i_DECLIMEX_ bool rf_stringx_append(struct RFstringx* thisstr, const void* other)
  ** @param other        The string to add to this string.
  **                     @inhtype{String,StringX} @tmpSTR
  ** @param chars        The number of chars of @c other to append to @c thisstr
+ **                     If 0 is given then all chars are appended
  ** @return             Returns @c true in success and @c false otherwise
  ** @see rf_stringx_prepend()
  **/
@@ -189,7 +190,7 @@ i_DECLIMEX_ bool rf_stringx_replace(struct RFstringx* thisstr, const void* sstr,
  ** @param rstr        The string to act as replacement.
  **                    @inhtype{String,StringX} @tmpSTR
  ** @param options     @see rf_string_replace()
- ** @param i           \rfoptional{0}. The specific between occurence to 
+ ** @param i           \rfoptional{0}. The specific between occurence to
  **                    replace. Should range between 1 and infinity. If 0 all
  **                    occurences will be replaced
  ** @return            Returns true if the replacing happened and false if

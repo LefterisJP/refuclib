@@ -222,11 +222,11 @@ bool rf_string_init_int(struct RFstring* str, int i)
     return true;
 }
 
-struct RFstring* rf_string_create_double(double f)
+struct RFstring* rf_string_create_double(double f, unsigned int precision)
 {
     struct RFstring* ret;
     RF_MALLOC(ret, sizeof(*ret), return NULL);
-    if(rf_string_init_double(ret, f) == false)
+    if(rf_string_init_double(ret, f, precision) == false)
     {
         free(ret);
         return NULL;
@@ -234,13 +234,15 @@ struct RFstring* rf_string_create_double(double f)
     return ret;
 }
 
-bool rf_string_init_double(struct RFstring* str, double f)
+bool rf_string_init_double(struct RFstring* str,
+                           double f,
+                           unsigned int precision)
 {
     char buff[MAX_DOUBLE_STRING_CHAR_SIZE];
     int len;
     RF_ASSERT(str);
 
-    len = snprintf(buff, MAX_DOUBLE_STRING_CHAR_SIZE, "%f", f);
+    len = snprintf(buff, MAX_DOUBLE_STRING_CHAR_SIZE, "%.*f", precision, f);
     if(len < 0 || len >= MAX_DOUBLE_STRING_CHAR_SIZE)
     {
         RF_ERROR("String initialization from float failed due to snprintf() "
@@ -665,6 +667,7 @@ bool rf_string_get_iter(const void *thisstr,
     ret->sp = ret->p;
     ret->ep = ret->sp + rf_string_length_bytes(thisstr);
     ret->character_pos = 0;
+    return true;
 }
 
 bool rf_string_iterator_next(struct RFstring_iterator *it,
