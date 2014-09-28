@@ -656,3 +656,42 @@ uint32_t rf_string_bytepos_to_charpos(const void* str, uint32_t bytepos,
     return charPos;
 }
 
+/* -- iteration related -- */
+bool rf_string_get_iter(const void *thisstr,
+                        struct RFstring_iterator *ret)
+{
+    RF_ASSERT(thisstr);
+    ret->p = rf_string_data(thisstr);
+    ret->sp = ret->p;
+    ret->ep = ret->sp + rf_string_length_bytes(thisstr);
+    ret->character_pos = 0;
+}
+
+bool rf_string_iterator_next(struct RFstring_iterator *it,
+                             uint32_t *value)
+{
+    uint32_t index;
+    if (it->p > it->ep) {
+        return false;
+    }
+
+    while (rf_utf8_is_continuation_byte(*it->p)) {
+        it->p = it->p + 1;
+        if (it->p > it->ep) {
+            RF_ERROR("String ending with continuation byte during iteration");
+            return false;
+        }
+    }
+
+    if (!rf_utf8_decode_single(it->p, it->ep, &index, value)) {
+        RF_ERROR("Error at utf-8 decoding during string iteration");
+        return false;
+    }
+
+    if (it->p != it->sp) { /* increase character pos unless it's the 1st one */
+        it->character_pos += 1;
+    }
+    it->p = it->p + index;
+    return true;
+}
+

@@ -288,7 +288,7 @@ static inline bool utf8_range_byte3_check(const char *bytes, uint32_t i)
         {
             RF_ERROR("Illegal codepoints range 0xfdd0-0xfdef "
                      "encoded in utf8 detected");
-            return false;            
+            return false;
         }
     }
 
@@ -364,6 +364,63 @@ static inline bool utf8_range_byte6_check(const char *bytes, uint32_t i)
         return false;
     }
 
+    return true;
+}
+
+bool rf_utf8_decode_single(const char *s,
+                           const char *lim,
+                           uint32_t *index,
+                           uint32_t *cp)
+{
+    uint32_t code_point=0;
+
+    //if the lead bit of the byte is 0 then range is : U+0000 to U+0007F (1 byte)
+    if( ((s[0] & 0x80)>>7) == 0 )
+    {
+        //and the code point is this whole byte only
+        code_point = s[0];
+        *index = 1;
+    }
+    //if the leading bits are in the form of 0b110xxxxx then range is: U+0080 to U+07FF (2 bytes)
+    else if ( RF_HEXEQ_C( ( (~(s[0] ^  0xC0))>>5),0x7) )
+    {
+        code_point =0;
+        //from the second byte take the first 6 bits
+        code_point = (s[1] & 0x3F) ;
+        //from the first byte take the first 5 bits and put them in the start
+        code_point |= ((s[0] & 0x1F) << 6);
+        *index = 2;
+    }
+    //if the leading bits are in the form of 0b1110xxxx then range is U+0800 to U+FFFF  (3 bytes)
+    else if( RF_HEXEQ_C( ( (~(s[0] ^ 0xE0))>>4),0xF) )
+    {
+        code_point = 0;
+        //from the third byte take the first 6 bits
+        code_point = (s[2] & 0x3F) ;
+        //from the second byte take the first 6 bits and put them to the left of the previous 6 bits
+        code_point |= ((s[1] & 0x3F) << 6);
+        //from the first byte take the first 4 bits and put them to the left of the previous 6 bits
+        code_point |= ((s[0] & 0xF) << 12);
+        *index = 3;
+    }
+    //if the leading bits are in the form of 0b11110xxx then range is U+010000 to U+10FFFF (4 bytes)
+    else if( RF_HEXEQ_C( ( (~(s[0] ^ 0xF0))>>3), 0x1F))
+    {
+        code_point = 0;
+        //from the fourth byte take the first 6 bits
+        code_point = (s[3] & 0x3F) ;
+        //from the third byte take the first 6 bits and put them to the left of the previous 6 bits
+        code_point |= ((s[2] & 0x3F) << 6);
+        //from the second byte take the first 6 bits and put them to the left of the previous 6 bits
+        code_point |= ((s[1] & 0x3F) << 12);
+        //from the first byte take the first 3 bits and put them to the left of the previous 6 bits
+        code_point |= ((s[0] & 0x7) << 18);
+        *index = 3;
+    } else {
+        return false;
+    }
+
+    *cp = code_point;
     return true;
 }
 
@@ -453,14 +510,14 @@ bool rf_utf8_decode(const char* utf8, uint32_t utf8Length,
 
             i+=4;
         } else if(UTF8_5_BYTES_SHOULD_FOLLOW(utf8)) {
-           /* 
+           /*
             * 5 and 6 byte UTF-8 encodings while valid according to the
             * original UTF-8 standard
             * exceed the maximum value set by RFC 3629 in 2003
             *  so we simply reject them
             */
             return false;
-#if 0            
+#if 0
             if (!utf8_range_byte5_check(utf8, i)) {
                 return false;
             }
@@ -536,7 +593,7 @@ bool rf_utf8_verify(const char* bytes, uint32_t *returned_byte_length,
         }
         else if(UTF8_5_BYTES_SHOULD_FOLLOW(bytes))
         {
-           /* 
+           /*
             * 5 and 6 byte UTF-8 encodings while valid according to the
             * original UTF-8 standard
             * exceed the maximum value set by RFC 3629 in 2003

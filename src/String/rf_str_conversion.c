@@ -113,7 +113,7 @@ char* rf_string_cstr(const void* str)
     return ret;
 }
 
-bool rf_string_to_int(const void* str, int64_t* v, size_t *len)
+bool rf_string_to_int(const void* str, int64_t* v, size_t *off)
 {
     char *cstr;
     unsigned int index;
@@ -134,8 +134,8 @@ bool rf_string_to_int(const void* str, int64_t* v, size_t *len)
         ret = false;
     }
 
-    if (len) {
-        *len = length - 1;
+    if (off) {
+        *off = length - 1;
     }
 
     rf_string_cstr_ibuff_pop(index);
@@ -143,9 +143,9 @@ bool rf_string_to_int(const void* str, int64_t* v, size_t *len)
 }
 
 bool rf_string_to_uint(const void* str,
-                       size_t off,
+                       size_t start_off,
                        uint64_t* v,
-                       size_t *len,
+                       size_t *off,
                        int base)
 {
     char *cstr;
@@ -161,14 +161,14 @@ bool rf_string_to_uint(const void* str,
 
     cstr = rf_string_cstr_ibuff_push(str, &index);
     errno = 0;
-    *v = strtoull (cstr + off, &end, base);
+    *v = strtoull (cstr + start_off, &end, base);
     length = end - cstr;
-    if(length == 0 || errno) {
+    if(length - start_off == 0 || errno) {
         ret = false;
-    }
-
-    if (len) {
-        *len = length - 1;
+    } else {
+        if (off) {
+            *off = length - 1;
+        }
     }
 
     rf_string_cstr_ibuff_pop(index);
@@ -177,18 +177,18 @@ bool rf_string_to_uint(const void* str,
 
 i_INLINE_INS bool rf_string_to_uint_dec(const void* thisstr,
                                         uint64_t* v,
-                                        size_t *len);
+                                        size_t *off);
 i_INLINE_INS bool rf_string_to_uint_hex(const void* thisstr,
                                         uint64_t* v,
-                                        size_t *len);
+                                        size_t *off);
 i_INLINE_INS bool rf_string_to_uint_bin(const void* thisstr,
                                         uint64_t* v,
-                                        size_t *len);
+                                        size_t *off);
 i_INLINE_INS bool rf_string_to_uint_oct(const void* thisstr,
                                         uint64_t* v,
-                                        size_t *len);
+                                        size_t *off);
 
-bool rf_string_to_double(const void* str, double* f, size_t *len)
+bool rf_string_to_double(const void* str, double* f, size_t *off)
 {
     char *cstr;
     unsigned int index;
@@ -209,8 +209,8 @@ bool rf_string_to_double(const void* str, double* f, size_t *len)
         ret = false;
     }
 
-    if (len) {
-        *len = length - 1;
+    if (off) {
+        *off = length - 1;
     }
 
     rf_string_cstr_ibuff_pop(index);

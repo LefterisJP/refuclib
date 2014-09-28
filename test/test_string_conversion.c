@@ -23,14 +23,14 @@ START_TEST(test_string_to_utf16) {
     ck_assert(rf_string_init(&s,"足立区\xf0\x9d\x84\x9e"));
     buff = rf_string_to_utf16(&s, &length);
     ck_assert_not_nullptr(buff);
-    
+
     ck_assert_int_eq(length, 5);
     ck_assert_msg(buff[0] == 0x8DB3, "First converted word does not match");
     ck_assert_msg(buff[1] == 0x7ACB, "Second converted word does not match");
     ck_assert_msg(buff[2] == 0x533A, "Third converted word does not match");
     ck_assert_msg(buff[3] == 0xD834, "Fourth converted word does not match");
     ck_assert_msg(buff[4] == 0xDD1E, "Fifth converted word does not match");
-    
+
     ck_assert(!rf_string_to_utf16(&s, NULL));
 
     free(buff);
@@ -45,13 +45,13 @@ START_TEST(test_string_to_utf32) {
     ck_assert(rf_string_init(&s,"足立区\xf0\x9d\x84\x9e"));
     buff = rf_string_to_utf32(&s, &length);
     ck_assert_not_nullptr(buff);
-    
+
     ck_assert_int_eq(length, 4);
     ck_assert_msg(buff[0] == 0x8DB3, "First converted word does not match");
     ck_assert_msg(buff[1] == 0x7ACB, "Second converted word does not match");
     ck_assert_msg(buff[2] == 0x533A, "Third converted word does not match");
     ck_assert_msg(buff[3] == 0x1D11E, "Fourth converted word does not match");
-    
+
     ck_assert(!rf_string_to_utf32(&s, NULL));
 
     free(buff);
@@ -78,27 +78,30 @@ START_TEST(test_string_to_int) {
     struct RFstringx sx;
     struct RFstring s, s2;
     struct RFstring ns, ns2;
-    int32_t num;
+    int64_t num;
+    size_t off;
     ck_assert(rf_stringx_init(&sx, "45687"));
     ck_assert(rf_string_init(&s, "-123442"));
     ck_assert(rf_string_init(&s2, "0"));
 
-    ck_assert(rf_string_to_int(&sx, &num));
+    ck_assert(rf_string_to_int(&sx, &num, NULL));
     ck_assert_int_eq(num, 45687);
 
-    ck_assert(rf_string_to_int(&s, &num));
+    ck_assert(rf_string_to_int(&s, &num, &off));
     ck_assert_int_eq(num, -123442);
+    ck_assert_uint_eq(off, 6);
 
-    ck_assert(rf_string_to_int(&s2, &num));
+    ck_assert(rf_string_to_int(&s2, &num, &off));
     ck_assert_int_eq(num, 0);
+    ck_assert_uint_eq(off, 0);
 
-    ck_assert(!rf_string_to_int(&s2, NULL));
+    ck_assert(!rf_string_to_int(&s2, NULL, NULL));
 
     ck_assert(rf_string_init(&ns, "Not a number"));
-    ck_assert(!rf_string_to_int(&ns, &num));
+    ck_assert(!rf_string_to_int(&ns, &num, NULL));
 
     ck_assert(rf_string_init(&ns2, ""));
-    ck_assert(!rf_string_to_int(&ns2, &num));
+    ck_assert(!rf_string_to_int(&ns2, &num, NULL));
 
     rf_string_deinit(&s);
     rf_string_deinit(&s2);
@@ -107,31 +110,67 @@ START_TEST(test_string_to_int) {
     rf_stringx_deinit(&sx);
 }END_TEST
 
+START_TEST(test_string_to_uint) {
+    uint64_t num;
+    size_t off;
+
+    static struct RFstring s1 = RF_STRING_STATIC_INIT("45632");
+    static struct RFstring s2 = RF_STRING_STATIC_INIT("0xFEAC23");
+    static struct RFstring s3 = RF_STRING_STATIC_INIT("074572");
+    static struct RFstring s4 = RF_STRING_STATIC_INIT("0b110101");
+
+    static struct RFstring sf2 = RF_STRING_STATIC_INIT("0xGFAC2Y");
+    static struct RFstring sf3 = RF_STRING_STATIC_INIT("09289");
+    static struct RFstring sf4 = RF_STRING_STATIC_INIT("0b3012310");
+
+    ck_assert(rf_string_to_uint_dec(&s1, &num, NULL));
+    ck_assert_uint_eq(45632, num);
+
+    ck_assert(rf_string_to_uint_hex(&s2, &num, &off));
+    ck_assert_uint_eq(16690211, num);
+    ck_assert_uint_eq(7, off);
+    ck_assert(!rf_string_to_uint_hex(&sf2, &num, &off));
+
+    ck_assert(rf_string_to_uint_oct(&s3, &num, &off));
+    ck_assert_uint_eq(31098, num);
+    ck_assert_uint_eq(5, off);
+    ck_assert(!rf_string_to_uint_oct(&sf3, &num, &off));
+
+    ck_assert(rf_string_to_uint_bin(&s4, &num, &off));
+    ck_assert_uint_eq(53, num);
+    ck_assert_uint_eq(7, off);
+    ck_assert(!rf_string_to_uint_bin(&sf4, &num, NULL));
+
+}END_TEST
+
 START_TEST(test_string_to_double) {
     struct RFstringx sx;
     struct RFstring s, s2;
     struct RFstring ns, ns2;
     double num;
+    size_t off;
     ck_assert(rf_stringx_init(&sx, "245.9310"));
     ck_assert(rf_string_init(&s, "-0.02341"));
     ck_assert(rf_string_init(&s2, "0.0"));
 
-    ck_assert(rf_string_to_double(&sx, &num));
+    ck_assert(rf_string_to_double(&sx, &num, NULL));
     ck_assert_double_eq(num, 245.9310);
 
-    ck_assert(rf_string_to_double(&s, &num));
+    ck_assert(rf_string_to_double(&s, &num, &off));
     ck_assert_double_eq(num, -0.02341);
+    ck_assert_uint_eq(off, 7);
 
-    ck_assert(rf_string_to_double(&s2, &num));
+    ck_assert(rf_string_to_double(&s2, &num, &off));
     ck_assert_double_eq(num, 0.0f);
+    ck_assert_uint_eq(off, 2);
 
-    ck_assert(!rf_string_to_int(&s2, NULL));
+    ck_assert(!rf_string_to_double(&s2, NULL, NULL));
 
     ck_assert(rf_string_init(&ns, "Not a number"));
-    ck_assert(!rf_string_to_double(&ns, &num));
+    ck_assert(!rf_string_to_double(&ns, &num, NULL));
 
     ck_assert(rf_string_init(&ns2, ""));
-    ck_assert(!rf_string_to_double(&ns2, &num));
+    ck_assert(!rf_string_to_double(&ns2, &num, NULL));
 
     rf_string_deinit(&s);
     rf_string_deinit(&s2);
@@ -149,7 +188,7 @@ START_TEST(test_string_to_lower) {
 
     ck_assert(rf_string_init(&s, ""));
     rf_string_to_lower(&s); /* make sure nothing bad happens in this case */
-    
+
     rf_stringx_deinit(&sx);
     rf_string_deinit(&s);
 }END_TEST
@@ -163,7 +202,7 @@ START_TEST(test_string_to_upper) {
 
     ck_assert(rf_string_init(&s, ""));
     rf_string_to_upper(&s); /* make sure nothing bad happens in this case */
-    
+
     rf_stringx_deinit(&sx);
     rf_string_deinit(&s);
 }END_TEST
@@ -189,7 +228,7 @@ START_TEST(test_string_tokenize) {
     );
     ck_assert(rf_string_init(&tok_space, " "));
     ck_assert(rf_string_init(&tok_comma, ","));
-    
+
     ck_assert(rf_string_tokenize(&sx, &tok_space, &words_num, &words));
     ck_assert_int_eq(words_num, sizeof(words_arr)/sizeof(char*));
     for(i = 0; i < words_num; i++) {
@@ -210,7 +249,7 @@ START_TEST(test_string_tokenize) {
 
     rf_stringx_deinit(&sx);
     rf_string_deinit(&tok_space);
-    rf_string_deinit(&tok_comma);    
+    rf_string_deinit(&tok_comma);
 }END_TEST
 
 START_TEST(test_string_tokenize_unicode) {
@@ -244,7 +283,7 @@ START_TEST(test_string_tokenize_unicode) {
             "県愛知県青森")
     );
     ck_assert(rf_string_init(&tok, "県"));
-    
+
     ck_assert(rf_string_tokenize(&s, &tok, &words_num, &words));
     ck_assert_int_eq(words_num, sizeof(words_arr)/sizeof(char*));
     for(i = 0; i < words_num; i++) {
@@ -283,6 +322,7 @@ Suite *string_conversion_suite_create(void)
                                   setup_string_tests,
                                   teardown_string_tests);
     tcase_add_test(string_other_conversions, test_string_to_int);
+    tcase_add_test(string_other_conversions, test_string_to_uint);
     tcase_add_test(string_other_conversions, test_string_to_double);
     tcase_add_test(string_other_conversions, test_string_to_lower);
     tcase_add_test(string_other_conversions, test_string_to_upper);

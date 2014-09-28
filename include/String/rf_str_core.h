@@ -525,6 +525,29 @@ i_DECLIMEX_ uint32_t rf_string_bytepos_to_charpos(const void* thisstr,
 // Checks if a given byte is a continuation byte
 #define rf_utf8_is_continuation_byte2(b__)  ( b__ >= 0x80 && b__<= 0xBF )
 
+/**
+ * An iterator allowing iteration over an RFstring
+ */
+struct RFstring_iterator {
+    char *sp;
+    char *ep;
+    char *p;
+    uint32_t character_pos;
+};
+
+/**
+ ** Returns an iterator for the given string
+ */
+i_DECLIMEX_ bool rf_string_get_iter(const void *thisstr,
+                                    struct RFstring_iterator *ret);
+
+/**
+ ** Iterates the characters of a string
+ */
+bool rf_string_iterator_next(struct RFstring_iterator *it,
+                             uint32_t *value);
+
+
 /*
   Two macros to accomplish iteration of an RFstring from any given
   character going forwards. This macro should be used with its end pair.

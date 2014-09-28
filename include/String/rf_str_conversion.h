@@ -60,7 +60,7 @@ extern "C"
  ** is that of the system. The returned buffer needs to be freed by the user
  ** later.
  ** @param[in]  s      The string in question. @inhtype{String,StringX}
- ** @param[out] length Give a reference to a uint32_t in 
+ ** @param[out] length Give a reference to a uint32_t in
  **             this argument to receive the length of
  **             the returned UTF-16 buffer in 16-bit words
  ** @return Returns an allocated UTF-16 buffer. Needs to be freed by the user later.
@@ -119,55 +119,74 @@ i_DECLIMEX_ char* rf_string_cstr(const void* s);
  ** @isinherited{StringX}
  ** @param thisstr     The string whose integer value to return.
  **                    @inhtype{String,StringX}
- ** @param off         The offset of the string at which to start
+ ** @param start_off  The offset of the string at which to start
  **                    the conversion attempt. This is needed since some
  **                    bases, like octal and binary may start with 0b or 0
  **                    and are not understoof by strtol().
  ** @param[out] v      Will hold the return value
- ** @param[out] len    Optional. Will hold length of the number in bytes
- **                    counting from the start of the string
+ ** @param[out] off    Will hold the offset from the beginning of
+ **                    the string up to which a conversion happened.
+ **                    Is absolutely needed for hex and octal versions.
  ** @return            True in case of succesfull conversion or false if no
  **                    integer was represented by the string
  ** @see rf_string_to_double()
  **/
-i_DECLIMEX_ bool rf_string_to_int(const void* thisstr, int64_t* v, size_t *len);
+i_DECLIMEX_ bool rf_string_to_int(const void* thisstr, int64_t* v, size_t *off);
 i_DECLIMEX_ bool rf_string_to_uint(const void* thisstr,
-                                   size_t off,
+                                   size_t start_off,
                                    uint64_t* v,
-                                   size_t *len,
+                                   size_t *off,
                                    int base);
 
 i_INLINE_DECL bool rf_string_to_uint_dec(const void* thisstr,
                                         uint64_t* v,
-                                        size_t *len)
+                                        size_t *off)
 {
-    return rf_string_to_uint(thisstr, 0, v, len, 10);
+    return rf_string_to_uint(thisstr, 0, v, off, 10);
 }
 
 i_INLINE_DECL bool rf_string_to_uint_hex(const void* thisstr,
-                                        uint64_t* v,
-                                        size_t *len)
+                                         uint64_t* v,
+                                         size_t *off)
 {
-    return rf_string_to_uint(thisstr, 0, v, len, 16);
+    const char *c = rf_string_data(thisstr);
+    if (!rf_string_to_uint(thisstr, 0, v, off, 16)) {
+        return false;
+    }
+
+    if (c[0] == '0' && (c[1] == 'x' || c[1] == 'X') && *off <= 1) {
+        return false;
+    }
+
+    return true;
 }
 
 i_INLINE_DECL bool rf_string_to_uint_bin(const void* thisstr,
                                         uint64_t* v,
-                                        size_t *len)
+                                        size_t *off)
 {
     char *s = rf_string_data(thisstr);
 
     if (rf_string_length_bytes(thisstr) > 2 && *s == '0' && *(s + 1) == 'b') {
-        return rf_string_to_uint(thisstr, 2, v, len, 2);
+        return rf_string_to_uint(thisstr, 2, v, off, 2);
     }
-    return rf_string_to_uint(thisstr, 0, v, len, 2);
+    return rf_string_to_uint(thisstr, 0, v, off, 2);
 }
 
 i_INLINE_DECL bool rf_string_to_uint_oct(const void* thisstr,
                                         uint64_t* v,
-                                        size_t *len)
+                                        size_t *off)
 {
-    return rf_string_to_uint(thisstr, 0, v, len, 0);
+    const char *c = rf_string_data(thisstr);
+    if (!rf_string_to_uint(thisstr, 0, v, off, 0)) {
+        return false;
+    }
+
+    if (c[0] == '0' && *off <= 1) {
+        return false;
+    }
+
+    return true;
 }
 
 /**
@@ -178,13 +197,15 @@ i_INLINE_DECL bool rf_string_to_uint_oct(const void* thisstr,
  ** @param thisstr     The string whose floating point value to return.
  **                    @inhtype{String,StringX}
  ** @param[out] f      Will hold the return float value
- ** @param[out] len    Optional. Will hold length of the number in bytes
- **                    counting from the start of the string
+ ** @param[out] off    Optional. Will hold the offset from the beginning of
+ **                    the string up to which a conversion happened.
  ** @return            True in case of succesfull conversion or false if no
  **                    double was represented by the string
  ** @see rf_string_to_int()
  **/
-i_DECLIMEX_ bool rf_string_to_double(const void* thisstr, double* f, size_t *len);
+i_DECLIMEX_ bool rf_string_to_double(const void* thisstr,
+                                     double* f,
+                                     size_t *off);
 
 /**
  ** @brief Turns any uppercase characters of the string into lower case
