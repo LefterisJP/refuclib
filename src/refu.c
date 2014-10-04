@@ -74,6 +74,7 @@ cleanup:
 
 void rf_deinit()
 {
+    rf_log_flush();
     rf_system_deactivate();
     rf_internal_deactivate();
     rf_string_deactivate();

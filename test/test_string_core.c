@@ -470,7 +470,7 @@ START_TEST(test_string_iterator) {
     );
     struct RFstring_iterator it;
 
-    ck_assert(rf_string_get_iter(&s, &it));
+    rf_string_get_iter(&s, &it);
 
     while (rf_string_iterator_next(&it, &value)) {
         if (it.character_pos >= START_OF_UNICODE_INDEX) {

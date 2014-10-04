@@ -106,6 +106,7 @@ i_DECLIMEX_ bool rf_log_flush();
 #define RF_DEBUG(...)
 #endif
 
+#define RF_ERRNOMEM() RF_CRITICAL("We are out of memory!")
 
 #ifdef REFU_WIN32_VERSION
 /**

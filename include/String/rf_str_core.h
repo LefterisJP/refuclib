@@ -543,7 +543,7 @@ struct RFstring_iterator {
 /**
  ** Returns an iterator for the given string
  */
-i_DECLIMEX_ bool rf_string_get_iter(const void *thisstr,
+i_DECLIMEX_ void rf_string_get_iter(const void *thisstr,
                                     struct RFstring_iterator *ret);
 
 /**

@@ -659,7 +659,7 @@ uint32_t rf_string_bytepos_to_charpos(const void* str, uint32_t bytepos,
 }
 
 /* -- iteration related -- */
-bool rf_string_get_iter(const void *thisstr,
+void rf_string_get_iter(const void *thisstr,
                         struct RFstring_iterator *ret)
 {
     RF_ASSERT(thisstr);
@@ -667,7 +667,6 @@ bool rf_string_get_iter(const void *thisstr,
     ret->sp = ret->p;
     ret->ep = ret->sp + rf_string_length_bytes(thisstr);
     ret->character_pos = 0;
-    return true;
 }
 
 bool rf_string_iterator_next(struct RFstring_iterator *it,
