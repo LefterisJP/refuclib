@@ -67,16 +67,19 @@ enum RFlog_level{
     LOG_LEVELS
 };
 
+struct RFlog;
 
 
+i_DECLIMEX_ struct RFlog *rf_log_create(enum RFlog_level level,
+                                        char *log_file_name);
 
-i_DECLIMEX_ bool rf_log_activate(enum RFlog_level level, char *log_file_name);
-i_DECLIMEX_ void rf_log_deactivate();
+i_DECLIMEX_ void rf_log_destroy(struct RFlog *log);
+
+i_DECLIMEX_ bool rf_log_flush(struct RFlog *log);
+
 i_DECLIMEX_ void rf_log(enum RFlog_level level, const char* file,
                         const char* func,
                         int line, struct RFstring* msg);
-
-i_DECLIMEX_ bool rf_log_flush();
 
 
 /*--- Logging macros --- */

@@ -37,6 +37,8 @@
 #include <String/rf_str_retrieval.h> //for string accessors
 #include <Parallel/rf_threading.h> //for thread id and RFmutex
 #include <Utils/sanity.h> //for RF_ASSERT
+#include <Utils/memory.h> //for RF_MALLOC
+#include <refu.h>         //for refu_clib_get_log()
 /*------------- libc inclusion -------------*/
 #include <stdio.h> //for printf
 #include <string.h> //for memcpy
@@ -81,9 +83,9 @@ static const struct RFstring severity_level_string[] = {
 /* The buffer position we write at */
 #define OCCUPIED(i_log_) ((i_log_)->index - (i_log_)->buffer)
 
-static bool log_init(struct RFlog *log,
-                     enum RFlog_level level,
-                     char *log_file_name)
+static bool rf_log_init(struct RFlog *log,
+                        enum RFlog_level level,
+                        char *log_file_name)
 {
     log->buff_size = RF_OPTION_LOG_BUFFER_SIZE;
     log->buffer = malloc(RF_OPTION_LOG_BUFFER_SIZE);
@@ -105,10 +107,43 @@ static bool log_init(struct RFlog *log,
     return true;
 }
 
-static bool log_flush(struct RFlog *log)
+static void rf_log_deinit(struct RFlog *log)
+{
+    fclose(log->file);
+    rf_mutex_deinit(&log->lock);
+    free(log->buffer);
+}
+
+struct RFlog *rf_log_create(enum RFlog_level level,
+                            char *log_file_name)
+{
+    struct RFlog *ret;
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
+
+    if (!rf_log_init(ret, level, log_file_name)) {
+        free(ret);
+        return NULL;
+    }
+
+    return ret;
+}
+
+void rf_log_destroy(struct RFlog *log)
+{
+    rf_log_deinit(log);
+    free(log);
+}
+
+bool rf_log_flush(struct RFlog *log)
 {
     size_t rc;
     bool ret = true;
+
+    if (!log) {
+        // if log has already been freed, e.g.: in an at_exit() of
+        return false;
+    }
+
     rf_mutex_lock(&log->lock);
     rc = fwrite(log->buffer, 1, OCCUPIED(log), log->file);
     if (rc != OCCUPIED(log)) {
@@ -118,13 +153,6 @@ static bool log_flush(struct RFlog *log)
     log->index = log->buffer;
     rf_mutex_unlock(&log->lock);
     return ret;
-}
-
-static void log_deinit(struct RFlog *log)
-{
-    fclose(log->file);
-    rf_mutex_deinit(&log->lock);
-    free(log->buffer);
 }
 
 /* TODO: handle no memory case a bit better */
@@ -159,10 +187,10 @@ static inline bool rf_log_add_location(
     int line)
 {
     int file_len, func_len, ret, max;
-    
+
     file_len = strlen(file);
     func_len = strlen(func);
-    
+
     /* the maximum amount of bytes for location. +100 is for the rest and '/0' */
     max = file_len + func_len + 100;
     CHECK_BUFFER(log, max);
@@ -174,7 +202,7 @@ static inline bool rf_log_add_location(
     if(ret < 0 || ret >= max) {
         return false;
     }
-    
+
     log->index += ret;
     return true;
 }
@@ -232,14 +260,14 @@ static bool format_log_message(struct RFlog *log,
     log->index += rf_string_length_bytes(msg);
     *log->index = '\n';
     log->index++;
-           
+
     return true;
 }
 
 
 static void log_add(struct RFlog *log, enum RFlog_level level,
-                       const char* file, const char* func,
-                       int line, struct RFstring* msg)
+                    const char* file, const char* func,
+                    int line, struct RFstring* msg)
 {
     RF_ENTER_LOCAL_SCOPE();
     if(log->level < level)
@@ -263,24 +291,11 @@ static void log_add(struct RFlog *log, enum RFlog_level level,
 
 
 
-bool rf_log_activate(enum RFlog_level level, char *log_file_name)
-{
-    return log_init(&_log, level, log_file_name);
-}
-
-void rf_log_deactivate()
-{
-    log_deinit(&_log);
-}
 void rf_log(enum RFlog_level level,
             const char* file,
             const char* func,
             int line, struct RFstring* msg)
 {
-    log_add(&_log, level, file, func, line, msg);
+    log_add(refu_clib_get_log(), level, file, func, line, msg);
 }
 
-bool rf_log_flush()
-{
-    return log_flush(&_log);
-}

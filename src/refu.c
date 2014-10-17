@@ -39,17 +39,47 @@
 #include "String/rf_str_mod.ph"
 /*------------- libc includes -------------*/
 #include <string.h> //for strcmp
-#include <stdlib.h> //for exit()
+#include <stdlib.h> //for exit() and at_exit()
 /*------------- End of includes -------------*/
+
+struct refu_clibctx {
+    struct RFlog *log;
+};
+static struct refu_clibctx i_refu_clibctx;
+
+static bool refu_clibctx_init(struct refu_clibctx *ctx,
+                              enum RFlog_level level,
+                              char *logfilename)
+{
+    ctx->log = rf_log_create(level, logfilename);
+    if (!ctx->log) {
+        return false;
+    }
+    return true;
+}
+
+static void refu_clibctx_deinit(struct refu_clibctx *ctx)
+{
+    rf_log_destroy(ctx->log);
+    ctx->log = NULL;
+}
+
+
+static void rf_atexit()
+{
+    rf_log_flush(i_refu_clibctx.log);
+}
 
 //Initializes the Refu library
 bool rf_init(char *logstr, uint64_t lmsSize, enum RFlog_level level)
 {
     bool ret = false;
-    /* activate all modules */
-    if (!rf_log_activate(level, logstr)) {
-        goto cleanup;
+    /* create the refuclib ctx */
+    if (!refu_clibctx_init(&i_refu_clibctx, level, logstr)) {
+        return false;
     }
+
+    /* activate all modules */
     if (!rf_lms_activate(lmsSize, true)) {
         RF_ERROR("Failed to initialize the local memory stack");
         goto cleanup;
@@ -66,18 +96,41 @@ bool rf_init(char *logstr, uint64_t lmsSize, enum RFlog_level level)
         RF_ERROR("Failed to initialize the system module");
         goto cleanup;
     }
-    ret = true;
 
+
+    /* register a function to exeute at exit() */
+    if (atexit(rf_atexit) != 0) {
+        RF_ERROR("Failed to register the refu library exit function");
+        goto cleanup;
+    }
+
+    ret = true;
 cleanup:
     return ret;
 }
 
 void rf_deinit()
 {
-    rf_log_flush();
+    /* before deinitializing anything make sure log is flushed */
+    rf_log_flush(i_refu_clibctx.log);
+
+    /* stop all modules */
     rf_system_deactivate();
     rf_internal_deactivate();
     rf_string_deactivate();
     rf_lms_deactivate(true);
-    rf_log_deactivate();
+
+    /* destroy the refuclib context */
+    refu_clibctx_deinit(&i_refu_clibctx);
+}
+
+/* Methods to get specific handlers of the library */
+struct refu_clibctx *refu_clib_get_ctx()
+{
+    return &i_refu_clibctx;
+}
+
+struct RFlog *refu_clib_get_log()
+{
+    return i_refu_clibctx.log;
 }

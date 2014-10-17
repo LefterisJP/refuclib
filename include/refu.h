@@ -39,6 +39,9 @@
 extern "C" {
 #endif
 
+struct refu_clibctx;
+struct RFlog;
+
 /**
 ** @defgroup RFgeneral_g_r_p Initialization function
 ** @addtogroup RFgeneral_g_r_p
@@ -69,6 +72,13 @@ i_DECLIMEX_ bool rf_init(char *logstr, uint64_t size, enum RFlog_level level);
  ** Deinitializes the library. Frees the constructs of all the modules
  **/
 i_DECLIMEX_ void rf_deinit();
+
+
+
+/* Methods to get specific handlers of the library */
+i_DECLIMEX_ struct refu_clibctx *refu_clib_get_ctx();
+
+i_DECLIMEX_ struct RFlog *refu_clib_get_log();
 
 //! @}
 //closing RFgeneral_g_r_p doxygen group
