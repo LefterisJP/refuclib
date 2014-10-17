@@ -99,7 +99,7 @@ static bool log_init(struct RFlog *log,
     }
     log->file = fopen(log_file_name, "wb+");
     if (!log->file) {
-        RF_ASSERT(0);
+        RF_ASSERT(0, "Log file could not be initialized");
         return false;
     }
     return true;
@@ -254,7 +254,7 @@ static void log_add(struct RFlog *log, enum RFlog_level level,
     if(!format_log_message(log, level, file, func, line, msg))
     {
         //TODO: how to handle this?
-        RF_ASSERT(0);
+        RF_ASSERT(0, "Could not add a log message");
     }
     rf_mutex_unlock(&log->lock);
     RF_EXIT_LOCAL_SCOPE();

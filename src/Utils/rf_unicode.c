@@ -89,9 +89,9 @@ bool rf_utf8_encode(const uint32_t* codepoints, uint32_t charsN,
                    uint32_t* byteLength, char* utf8, uint32_t buffSize)
 {
     uint32_t charN;
-    RF_ASSERT(codepoints);
-    RF_ASSERT(byteLength);
-    RF_ASSERT(utf8);
+    RF_ASSERT(codepoints, "got  NULL codepoints");
+    RF_ASSERT(byteLength, "got NULL bytelength");
+    RF_ASSERT(utf8, "got NULL utf8");
 
     *byteLength = charN = 0;
     /*Start iterating the codepoints*/
@@ -163,7 +163,7 @@ bool rf_utf8_encode(const uint32_t* codepoints, uint32_t charsN,
 int rf_utf8_encode_single(const uint32_t codepoint, char* utf8)
 {
     int i;
-    RF_ASSERT(utf8);
+    RF_ASSERT(utf8, "got NULL utf8");
 
     i = 0;
     /*If the code point requires only 1 byte*/
@@ -638,7 +638,7 @@ bool rf_utf16_decode(const char* buff, uint32_t in_buff_length,
 {
     uint16_t v1,v2;
     uint32_t byteLength,U;
-    RF_ASSERT(buff);
+    RF_ASSERT(buff, "got NULL buffer");
 
     *charactersN = 0;
     byteLength = 0;
@@ -710,7 +710,8 @@ bool rf_utf16_encode(const uint32_t* codepoints, uint32_t charsN,
                     uint32_t* length, uint16_t* utf16, uint32_t buff_size)
 {
     uint32_t i, U;
-    RF_ASSERT(codepoints);
+    RF_ASSERT(codepoints, "got NULL codepoints");
+
     //for all codepoints  (i -> charIndex , length -> byteIndex
     for(i = 0, *length=0; i < charsN; i ++)
     {

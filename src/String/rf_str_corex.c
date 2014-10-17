@@ -104,7 +104,7 @@ bool rf_stringx_initvl(struct RFstringx* str, const char* lit, va_list args)
     char *buff_ptr;
     unsigned int size, buff_index;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got NULL string in function");
 
     if (!lit) {
         RF_ERROR("String initialization failed due to null pointer input");
@@ -138,7 +138,7 @@ bool rf_stringx_init(struct RFstringx* str, const char* lit)
 {
     //check the string literal for valid utf-8 byte sequence
     uint32_t byteLength;
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got NULL string in function");
 
     if (!lit) {
         RF_ERROR("Failed to initialize string due to null c string input");
@@ -167,7 +167,7 @@ struct RFstringx* rf_stringx_create_cp(uint32_t codepoint)
 }
 bool rf_stringx_init_cp(struct RFstringx* str, uint32_t codepoint)
 {
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got NULL string in function");
     if(!rf_string_init_cp(&str->INH_String, codepoint))
     {
         return false;
@@ -189,7 +189,7 @@ struct RFstringx* rf_stringx_create_int(int i)
 }
 bool rf_stringx_init_int(struct RFstringx* str, int i)
 {
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got NULL string in function");
     if (!rf_string_init_int(&str->INH_String, i)) {
         return false;
     }
@@ -212,7 +212,7 @@ bool rf_stringx_init_double(struct RFstringx* str,
                             double d,
                             unsigned int precision)
 {
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got NULL string in function");
     if (!rf_string_init_double(&str->INH_String, d, precision)) {
         return false;
     }
@@ -234,7 +234,7 @@ bool rf_stringx_init_utf16(struct RFstringx* str,
                            const uint16_t* s,
                            unsigned int len)
 {
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got NULL string in function");
     if (!rf_string_init_utf16(&str->INH_String, s, len)) {
         return false;
     }
@@ -256,7 +256,7 @@ struct RFstringx* rf_stringx_create_utf32(const uint32_t* s, unsigned int len)
 bool rf_stringx_init_utf32(struct RFstringx* str, const uint32_t* codeBuffer,
                           unsigned int len)
 {
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got NULL string in function");
     if(!rf_string_init_utf32(&str->INH_String, codeBuffer, len))
     {
         return false;
@@ -289,7 +289,7 @@ bool rf_stringx_init_unsafe(struct RFstringx* str, const char* lit)
 bool rf_stringx_init_unsafe_nnt(struct RFstringx* str, const char* s,
                                size_t length)
 {
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got NULL string in function");
     str->bSize = length * RF_OPTION_STRINGX_CAPACITY_MULTIPLIER;
     RF_MALLOC(rf_string_data(str), str->bSize, return false);
     memcpy(rf_string_data(str), s, length);
@@ -301,7 +301,7 @@ bool rf_stringx_init_unsafe_nnt(struct RFstringx* str, const char* s,
 bool rf_stringx_init_unsafe_bnnt(struct RFstringx* str, const char* s,
                                 size_t length, size_t buff_size)
 {
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got NULL string in function");
     str->bSize = buff_size;
     RF_MALLOC(rf_string_data(str), str->bSize, return false);
     memcpy(rf_string_data(str), s, length);
@@ -378,7 +378,7 @@ bool rf_stringx_init_buffv(struct RFstringx* str, uint32_t buffSize,
     char *buff_ptr;
     unsigned int size, buff_index;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got NULL string in function");
 
     if (!lit) {
         RF_ERROR("Provided null pointer for the string literal");
@@ -415,7 +415,7 @@ bool rf_stringx_init_buff(struct RFstringx* str, uint32_t buffSize,
 {
     //check the string literal for valid utf-8 byte sequence
     uint32_t byteLength;
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got NULL string in function");
     if (!lit) {
         RF_WARNING("provided null source string literal");
         return false;
@@ -442,7 +442,7 @@ bool rf_stringx_assign(struct RFstringx* dst, const void* source)
     bool ret = true;
 
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(dst);
+    RF_ASSERT(dst, "got NULL string in function");
     if (!source) {
         RF_WARNING("provided null source string");
         ret = false;
@@ -481,7 +481,7 @@ i_DECLIMEX_ bool rf_stringx_assignvl(struct RFstringx* str,
     bool ret = true;
     char *buff_ptr;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got NULL string in function");
 
     if (!s) {
         RF_ERROR("Stringx assignment failed due to null pointer input");
@@ -509,7 +509,7 @@ cleanup:
 bool rf_stringx_assign_char(struct RFstringx* str, uint32_t codepoint)
 {
     int bytes;
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got NULL string in function");
     //reset the buffer if needed
     rf_stringx_reset(str);
     //realloc if needed
@@ -531,7 +531,7 @@ bool rf_stringx_assign_unsafe_nnt(struct RFstringx* str, const char* s,
                                  size_t length)
 {
     bool ret = true;
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got NULL string in function");
     if (!s) {
         RF_WARNING("Provided null pointer for assignment");
         return false;
@@ -564,7 +564,7 @@ struct RFstringx* rf_stringx_from_string_out(const struct RFstring* s)
 bool rf_stringx_from_string_in(struct RFstringx* dst,
                                const struct RFstring* src)
 {
-    RF_ASSERT(dst);
+    RF_ASSERT(dst, "got NULL string in function");
     if (!src) {
         RF_WARNING("provided null source string");
         return false;
@@ -595,7 +595,7 @@ struct RFstringx* rf_stringx_copy_out(struct RFstringx* s)
 
 bool rf_stringx_copy_in(struct RFstringx* dst, struct RFstringx* src)
 {
-    RF_ASSERT(dst);
+    RF_ASSERT(dst, "got NULL string in function");
     if (!src) {
         RF_WARNING("Provided null source string");
         return false;

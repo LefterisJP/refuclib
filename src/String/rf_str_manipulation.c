@@ -56,7 +56,7 @@ bool rf_string_append(struct RFstring* thisstr, const void* other)
     unsigned int newLen;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got null string in function");
     if (!other) {
         RF_WARNING("Provided null append string");
         ret = false;
@@ -78,7 +78,7 @@ cleanup:
 bool rf_string_append_int(struct RFstring* thisstr, const int32_t i)
 {
     int rc;
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got null string in function");
     //reallocate this string to fit the new addition
     RF_REALLOC(rf_string_data(thisstr), char,
                rf_string_length_bytes(thisstr) + MAX_UINT32_STRING_CHAR_SIZE ,
@@ -94,7 +94,7 @@ bool rf_string_append_double(struct RFstring* thisstr,
                              unsigned int precision)
 {
     int rc;
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got null string in function");
     RF_REALLOC(rf_string_data(thisstr), char,
                rf_string_length_bytes(thisstr) + MAX_DOUBLE_STRING_CHAR_SIZE ,
                return false
@@ -108,7 +108,7 @@ bool rf_string_prepend(struct RFstring* thisstr, const void* other)
 {
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got null string in function");
     if (!other) {
         RF_WARNING("Provided null string for prepending");
         ret = false;
@@ -140,7 +140,7 @@ bool rf_string_remove(void* thisstr, const void* rstr, uint32_t number,
     int32_t bytePos;
     char found = false, ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got null string in function");
     if (!rstr) {
         RF_WARNING("Gave NULL substring to remove");
         ret = false;
@@ -199,7 +199,7 @@ bool rf_string_keep_only(void* thisstr, const void* keepstr, int *removals)
     bool exists;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got null string in function");
 
     if (!keepstr) {
         RF_WARNING("Provided null string");
@@ -276,7 +276,7 @@ bool rf_string_prune_start(void* thisstr, uint32_t n, unsigned int *removals)
     uint32_t length = 0;
     unsigned new_byte_pos = 0;
     char found = false;
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got null string in function");
 
     if (removals) {
         *removals = 0;
@@ -320,7 +320,7 @@ bool rf_string_prune_end(void* thisstr, uint32_t n, unsigned int *removals)
     int32_t new_byte_pos = -1;
     uint32_t character_position;
     uint32_t byte_position;
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got null string in function");
 
     if (removals) {
         *removals = 0;
@@ -360,7 +360,7 @@ bool rf_string_prune_middle_b(void* thisstr, uint32_t p,
     uint32_t character_position;
     int previous_byte_pos = -1;
     int new_byte_pos = 0;
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got null string in function");
 
     if (removals) {
         *removals = 0;
@@ -418,7 +418,7 @@ bool rf_string_prune_middle_f(void* thisstr, uint32_t p,
     int previous_byte_pos = -1;
     int new_byte_pos = -1;
     bool character_reached = false;
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got null string in function");
 
     if (removals) {
         *removals = 0;
@@ -482,7 +482,7 @@ bool rf_string_trim_start(void* thisstr, const void* sub, unsigned int *removals
     unsigned int i;
     unsigned int matching_chars = 0;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got null string in function");
     
     if (!sub) {
         RF_WARNING("Provided null pointer for substring");
@@ -525,7 +525,7 @@ bool rf_string_trim_end(void* thisstr, const void* sub, unsigned int *rem)
     int j;
     unsigned int removals = 0;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got null string in function");
     
     if (!sub) {
         RF_WARNING("Provided null substring for trimming");
@@ -607,7 +607,7 @@ bool rf_string_replace(struct RFstring* thisstr, const void* sstr,
     uint32_t number = num;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got null string in function");
 
     /* sstr existence is checked for inside replace_intro() function */
     if (!rstr) {

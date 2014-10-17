@@ -806,7 +806,8 @@ int rf_file_read_char_utf16(FILE* f, uint32_t *c, bool cp,
 {
     uint16_t v1,v2;
 
-    RF_ASSERT(endianess == RF_LITTLE_ENDIAN || endianess == RF_BIG_ENDIAN);
+    RF_ASSERT(endianess == RF_LITTLE_ENDIAN || endianess == RF_BIG_ENDIAN,
+              "illegal endianess value provided");
     if (!eof) {
         RF_WARNING("Gave null pointer for the EOF flag");
         return -1;
@@ -885,7 +886,8 @@ int rf_file_read_char_utf32(FILE* f, uint32_t *c,
                             enum RFendianess endianess,
                             char* eof)
 {
-    RF_ASSERT(endianess == RF_LITTLE_ENDIAN || endianess == RF_BIG_ENDIAN);
+    RF_ASSERT(endianess == RF_LITTLE_ENDIAN || endianess == RF_BIG_ENDIAN,
+              "illegal endianess value provided");
     if (!eof) {
         RF_WARNING("Gave null pointer for the EOF flag");
         return -1;
@@ -991,7 +993,8 @@ int rf_file_move_back_char_utf16(FILE* f, uint32_t *c,
                                  enum RFendianess endianess)
 {
     uint16_t v1,v2;
-    RF_ASSERT(endianess == RF_LITTLE_ENDIAN || endianess == RF_BIG_ENDIAN);
+    RF_ASSERT(endianess == RF_LITTLE_ENDIAN || endianess == RF_BIG_ENDIAN,
+              "illegal endianess value provided");
 
     //go back and read the last 2 bytes
     if(rfFseek(f,-2,SEEK_CUR) != 0)
@@ -1086,7 +1089,8 @@ int rf_file_move_back_char_utf16(FILE* f, uint32_t *c,
 int rf_file_move_back_char_utf32(FILE* f, uint32_t *c,
                                  enum RFendianess endianess)
 {
-    RF_ASSERT(endianess == RF_LITTLE_ENDIAN || endianess == RF_BIG_ENDIAN);
+    RF_ASSERT(endianess == RF_LITTLE_ENDIAN || endianess == RF_BIG_ENDIAN,
+              "illegal endianess value provided");
 
     //go back and read the last 4 bytes
     if(rfFseek(f, -4, SEEK_CUR) != 0)

@@ -602,7 +602,7 @@ bool rf_textfile_init(struct RFtextfile* t, const void* name,
 {
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(t);
+    RF_ASSERT(t, "got NULL textfile in function");
 
     if(!name)
     {
@@ -757,7 +757,8 @@ struct RFtextfile* rf_textfile_create(const void* name,
 bool rf_textfile_copy_in(struct RFtextfile* dst, struct RFtextfile* src)
 {
     fpos_t pos;
-    RF_ASSERT(dst);
+    RF_ASSERT(src, "got NULL src textfile in function");
+    RF_ASSERT(dst, "got NULL dst textfile in function");
 
     if (!src) {
         RF_WARNING("Provided NULL pointer for the source textfile");
@@ -1992,7 +1993,7 @@ bool rf_textfile_remove(struct RFtextfile* t, uint64_t lineN)
     FILE* newFile;
     struct RFstringx buffer;
     int32_t error;
-    RF_ASSERT(t);
+    RF_ASSERT(t, "got NULL textfile in function");
 
     lineFound = false;
     //determine the target line

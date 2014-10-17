@@ -52,7 +52,7 @@
 uint32_t rf_string_length(const void* str)
 {
     uint32_t length,i;
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got null string in function");
     RF_STRING_ITERATE_START(str, length, i)
     RF_STRING_ITERATE_END(length, i);
     return length;
@@ -61,7 +61,7 @@ uint32_t rf_string_length(const void* str)
 bool rf_string_get_char(const void* str, uint32_t c, uint32_t* cp)
 {
     uint32_t length, i;
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got null string in function");
     if (!cp) {
         RF_WARNING("provided null pointer for the returned codepoint");
         return false;
@@ -83,7 +83,7 @@ bool rf_string_substr(const void* s, uint32_t start_pos,
     uint32_t charI,byteI,startI,endI;
     bool started = false, ended = false;
     startI = endI = 0;
-    RF_ASSERT(s);
+    RF_ASSERT(s, "got null string in function");
     if (!ret) {
         RF_WARNING("provided null pointer for the return string");
         return false;
@@ -278,7 +278,7 @@ bool rf_string_scanf_after(const void* str, const void* astr,
     bool ret = false;
 
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got null string in function");
     if (!astr) {
         RF_WARNING("Provided NULL \'after\' string");
         goto cleanup;
@@ -333,7 +333,7 @@ bool rf_string_between(const void* tstr, const void* lstr,
     struct RFstring temp;
     bool ret = false;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(tstr);
+    RF_ASSERT(tstr, "got null string in function");
 
     /* null pointer check for lstr and rstr is in rf_string_find_byte_pos() */
 
@@ -397,7 +397,7 @@ bool rf_string_beforev(const void* thisstr, void* result,
     va_list argList;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got null string in function");
 
     if (!result) {
         RF_WARNING("Provided null string for the result");
@@ -458,7 +458,7 @@ bool rf_string_before(const void* thisstr, const void* sstr,
     int32_t rv;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got null string in function");
 
     /* null pointer check for sstr is in rf_string_find_byte_pos() */
     if (!result) {
@@ -503,7 +503,7 @@ bool rf_string_after(const void* thisstr, const void* after,
     int32_t bytePos;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got null string in function");
 
     if (!result) {
         RF_WARNING("Null pointer given for the result string ");
@@ -560,7 +560,7 @@ bool rf_string_afterv(const void* thisstr, void* result,
     va_list argList;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got null string in function");
 
     if (!result) {
         RF_WARNING("Null pointer given for the result string ");

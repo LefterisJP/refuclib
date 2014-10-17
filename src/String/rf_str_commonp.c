@@ -104,7 +104,7 @@ int rf_string_find_byte_pos(const void* tstr, const void* sstr, const char optio
         }                                       \
     }while(0)
     const char* found = 0;
-    RF_ASSERT(tstr);
+    RF_ASSERT(tstr, "got null string in function");
     if (!sstr) {
         RF_WARNING("Provided null search string parameter");
         return RF_FAILURE;

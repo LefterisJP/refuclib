@@ -48,7 +48,7 @@ bool rf_stringx_append(struct RFstringx* thisstr, const void* other)
 {
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got NULL string in function");
 
     if (!other) {
         RF_WARNING("Provided null string for appending");
@@ -74,7 +74,7 @@ bool rf_stringx_append_chars(struct RFstringx* thisstr,
     unsigned end = 0;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got NULL string in function");
 
     if (!other) {
         RF_WARNING("Provided null string for appending");
@@ -106,7 +106,7 @@ bool rf_stringx_append_char(struct RFstringx* thisstr, uint32_t unichar)
 {
     char utf8[MAX_UTF8C_BYTES];
     int length;
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got NULL string in function");
     if((length = rf_utf8_encode_single(unichar,utf8)) <= 0)
     {
         RF_ERROR("Encoding the given unicode codepoint to UTF8 failed");
@@ -120,7 +120,7 @@ bool rf_stringx_prepend(struct RFstringx* thisstr, const void* other)
 {
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got NULL string in function");
 
     if (!other) {
         RF_WARNING("Provided null string for prepending");
@@ -156,7 +156,7 @@ bool rf_stringx_insert(struct RFstringx* thisstr, uint32_t pos,
     uint32_t i;
     bool found = false, ret = false;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got NULL string in function");
 
     if (!other) {
         RF_WARNING("Provided null string for inserting");
@@ -208,7 +208,7 @@ bool rf_stringx_append_bytes(struct RFstringx* thisstr, const void* other,
     unsigned int add_bytes;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got NULL string in function");
 
     if (!other) {
         RF_WARNING("Provided null string for byte appending");
@@ -235,7 +235,7 @@ bool rf_stringx_append_bytes(struct RFstringx* thisstr, const void* other,
 bool rf_stringx_append_cstr(struct RFstringx* thisstr, const char* cstr)
 {
     size_t len;
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got NULL string in function");
 
     if (!cstr) {
         RF_WARNING("Provided null c string for appending");
@@ -261,7 +261,7 @@ bool rf_stringx_replace(struct RFstringx* thisstr, const void* sstr,
     uint32_t number = num;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got NULL string in function");
 
     /* sstr existence is checked for inside replace_intro() function */
     if (!rstr) {
@@ -314,7 +314,7 @@ bool rf_stringx_replace_between(struct RFstringx* thisstr, const void* left,
     bool same_separators = false;
     struct RFstringx string_buff;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got NULL string in function");
 
     if (!left) {
         RF_WARNING("Provided null pointer for the left string");

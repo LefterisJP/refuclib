@@ -55,7 +55,7 @@ uint16_t* rf_string_to_utf16(const void* s, uint32_t* length)
 {
     uint32_t* codepoints,charsN;
     uint16_t* utf16;
-    RF_ASSERT(s);
+    RF_ASSERT(s, "got null string in function");
     if (length == NULL) {
         RF_WARNING("Did not provide a length argument");
         return NULL;
@@ -87,7 +87,7 @@ uint16_t* rf_string_to_utf16(const void* s, uint32_t* length)
 uint32_t* rf_string_to_utf32(const void* s, uint32_t* length)
 {
     uint32_t* cp;
-    RF_ASSERT(s);
+    RF_ASSERT(s, "got null string in function");
     if (length == NULL) {
         RF_WARNING("Did not provide a length argument");
         return NULL;
@@ -106,7 +106,7 @@ uint32_t* rf_string_to_utf32(const void* s, uint32_t* length)
 char* rf_string_cstr(const void* str)
 {
     char* ret;
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got null string in function");
     RF_MALLOC(ret, rf_string_length_bytes(str) + 1, return NULL);
     memcpy(ret, rf_string_data(str), rf_string_length_bytes(str));
     ret[rf_string_length_bytes(str)] = '\0';
@@ -120,7 +120,7 @@ bool rf_string_to_int(const void* str, int64_t* v, size_t *off)
     char *end;
     size_t length;
     bool ret = true;
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got null string in function");
     if (!v) {
         RF_WARNING("Provided null pointer for the returned int");
         return false;
@@ -153,7 +153,7 @@ bool rf_string_to_uint(const void* str,
     char *end;
     bool ret = true;
     size_t length;
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got null string in function");
     if (!v) {
         RF_WARNING("Provided null pointer for the returned uint");
         return false;
@@ -195,7 +195,7 @@ bool rf_string_to_double(const void* str, double* f, size_t *off)
     char *end;
     bool ret = true;
     size_t length;
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got null string in function");
     if (!f) {
         RF_WARNING("Provided null pointer for the returned double");
         return false;
@@ -220,7 +220,7 @@ bool rf_string_to_double(const void* str, double* f, size_t *off)
 void rf_string_to_lower(void* s)
 {
     uint32_t charI,byteI;
-    RF_ASSERT(s);
+    RF_ASSERT(s, "got null string in function");
 
     RF_STRING_ITERATE_START(s, charI, byteI)
         //if the character is lowercase
@@ -254,7 +254,7 @@ bool rf_string_tokenize(const void* str, const void* sep,
     bool ret = true;
     int32_t tokens_num;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got null string in function");
 
     if (!sep) {
         RF_WARNING("Did not provide a separator string");

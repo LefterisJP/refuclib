@@ -274,3 +274,12 @@ void htable_delval(struct htable *ht, struct htable_iter *i)
 	ht->table[i->off] = HTABLE_DELETED;
 	ht->deleted++;
 }
+
+void htable_iterate_values(struct htable *ht, htable_iter_cb cb)
+{
+    struct htable_iter i;
+    void *c;
+    for (c = htable_first(ht, &i); c; c = htable_next(ht, &i)) {
+        cb(c);
+    }
+}

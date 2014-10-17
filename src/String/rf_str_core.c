@@ -98,7 +98,7 @@ bool rf_string_initvl(struct RFstring* str, const char* s, va_list args)
     bool ret = true;
     char *buff_ptr;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got null string in function");
 
     if (!s) {
         RF_ERROR("String initialization failed due to null pointer input");
@@ -134,7 +134,7 @@ bool rf_string_init(struct RFstring* str, const char* s)
 {
     //check for validity of the given sequence and get the character length
     uint32_t byteLength;
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got null string in function");
 
     if (!s) {
         RF_ERROR("Attempted to initialize string with a null c string");
@@ -174,7 +174,7 @@ struct RFstring* rf_string_create_cp(uint32_t codepoint)
 //Turns a unicode code point in a String (encoded in UTF-8).
 bool rf_string_init_cp(struct RFstring* str, uint32_t codepoint)
 {
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got null string in function");
     //alloc enough for a utf8 character
     RF_MALLOC(rf_string_data(str), MAX_UTF8C_BYTES, return false);
     rf_string_length_bytes(str) = rf_utf8_encode_single(
@@ -206,7 +206,7 @@ bool rf_string_init_int(struct RFstring* str, int i)
     int len;
     //put the int32_t into a buffer and turn it in a char*
     char buff[MAX_UINT32_STRING_CHAR_SIZE];
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got null string in function");
 
     len = snprintf(buff, MAX_UINT32_STRING_CHAR_SIZE, "%d", i);
     if(len < 0 || len >= MAX_UINT32_STRING_CHAR_SIZE)
@@ -240,7 +240,7 @@ bool rf_string_init_double(struct RFstring* str,
 {
     char buff[MAX_DOUBLE_STRING_CHAR_SIZE];
     int len;
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got null string in function");
 
     len = snprintf(buff, MAX_DOUBLE_STRING_CHAR_SIZE, "%.*f", precision, f);
     if(len < 0 || len >= MAX_DOUBLE_STRING_CHAR_SIZE)
@@ -276,7 +276,7 @@ bool rf_string_init_utf16(struct RFstring* str, const uint16_t* s, unsigned int 
     uint32_t* codepoints;
     uint32_t characterLength, utf8ByteLength;
     char* utf8;
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got null string in function");
 
     if (!s) {
         RF_ERROR("Provided NULL UTF-16 byte sequence");
@@ -329,7 +329,7 @@ bool rf_string_init_utf32(struct RFstring* str, const uint32_t* codeBuffer,
     //find the length of the utf32 buffer in characters
     uint32_t utf8ByteLength;
     char *utf8;
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got null string in function");
 
     if (!codeBuffer) {
         RF_ERROR("Provided null pointer for the input byte stream");
@@ -370,7 +370,7 @@ bool rf_string_init_unsafe(struct RFstring* str, const char* s)
 
 bool rf_string_init_unsafe_nnt(struct RFstring* str, const char* s, size_t length)
 {
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got null string in function");
     RF_MALLOC(rf_string_data(str), length, return false);
     memcpy(rf_string_data(str), s, length);
     rf_string_length_bytes(str) = length;
@@ -385,7 +385,7 @@ bool rf_string_assign(struct RFstring* dst, const void* src)
 {
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(dst);
+    RF_ASSERT(dst, "got null string in function");
 
     if (!src) {
         return false;
@@ -423,7 +423,7 @@ bool rf_string_assignvl(struct RFstring* str,
     bool ret = true;
     char *buff_ptr;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got null string in function");
 
     if (!s) {
         RF_ERROR("String assignment failed due to null pointer input");
@@ -455,7 +455,7 @@ cleanup:
 //Assigns the value of a unicode character to the string
 bool rf_string_assign_char(struct RFstring* str,uint32_t codepoint)
 {
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got null string in function");
     //realloc if needed
     if (str->length < 5) {
         RF_REALLOC(rf_string_data(str), char, 5, return false);
@@ -473,7 +473,7 @@ bool rf_string_assign_unsafe_nnt(struct RFstring* str, const char* s,
                                  size_t length)
 {
     bool ret = true;
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got null string in function");
     if (!s) {
         RF_WARNING("Provided null pointer for assignment");
         return false;
@@ -560,8 +560,8 @@ void rf_string_deinit(struct RFstring* s)
 bool rf_string_equal(const void* s1, const void* s2)
 {
     bool ret;
-    RF_ASSERT(s1);
-    RF_ASSERT(s2);
+    RF_ASSERT(s1, "got null 1st string in function");
+    RF_ASSERT(s2, "got null 2nd string in function");
     RF_ENTER_LOCAL_SCOPE();
     ret = strcmp_nnt(rf_string_data(s1), rf_string_length_bytes(s1),
                      rf_string_data(s2), rf_string_length_bytes(s2));
@@ -662,7 +662,7 @@ uint32_t rf_string_bytepos_to_charpos(const void* str, uint32_t bytepos,
 void rf_string_get_iter(const void *thisstr,
                         struct RFstring_iterator *ret)
 {
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got null string in function");
     ret->p = rf_string_data(thisstr);
     ret->sp = ret->p;
     ret->ep = ret->sp + rf_string_length_bytes(thisstr);

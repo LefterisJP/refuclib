@@ -71,7 +71,7 @@ bool rf_string_from_file_init(struct RFstring* str, FILE* f, char* eof,
                               unsigned int* ret_buff_size)
 {
     uint32_t buff_size;
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got null string in function");
     /* sanity checks for the rest of the arguments are performed further down */
     switch(encoding)
     {
@@ -121,7 +121,7 @@ bool rf_string_from_file_assign(struct RFstring* str,
                                 enum RFtext_encoding encoding,
                                 enum RFendianess endianess)
 {
-    RF_ASSERT(str);
+    RF_ASSERT(str, "got null string in function");
     UTF_FILE_READLINE(f, eol, eof, "assign")
     //success
     //assign it to the string
@@ -166,7 +166,7 @@ bool rf_string_fwrite(const void* s, FILE* f,
     uint16_t* utf16;
     bool ret = true;
     RF_ENTER_LOCAL_SCOPE();
-    RF_ASSERT(s);
+    RF_ASSERT(s, "got null string in function");
 
     //depending on the encoding
     switch(encoding)

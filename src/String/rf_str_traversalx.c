@@ -116,7 +116,7 @@ int32_t rf_stringx_move_after(struct RFstringx* thisstr, const void* sub,
 void rf_stringx_move_back(struct RFstringx* thisstr, uint32_t n)
 {
     uint32_t length;
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got null string in function");
     length = 0;
 
     while(thisstr->bIndex >0) {
@@ -140,7 +140,7 @@ i_INLINE_INS void rf_stringx_move_to_index(struct RFstringx* thisstr,
 void rf_stringx_move_forward(struct RFstringx* thisstr, uint32_t n)
 {
     uint32_t length;
-    RF_ASSERT(thisstr);
+    RF_ASSERT(thisstr, "got null string in function");
     length = 0;
 
     while(rf_string_length_bytes(thisstr) != 0)

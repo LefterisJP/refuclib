@@ -70,14 +70,62 @@
 
 /* just a wrapper over stdlib's assert */
 #ifdef RF_OPTION_DEBUG
-#define RF_ASSERT(condition_)                        \
+#define RF_ASSERT(condition_, ...)                   \
         do {                                         \
             if (!(condition_)) {                     \
-                RF_CRITICAL("Assertion triggered");  \
+                RF_CRITICAL(__VA_ARGS__);            \
                 assert(condition_);                  \
             }                                        \
         }while(0)
 #else
-#define RF_ASSERT(condition_)           
+#define RF_ASSERT(condition_, ...)
 #endif
+
+/* same as RF_ASSERT but in non debug mode it will log a critical error */
+#ifdef RF_OPTION_DEBUG
+#define RF_ASSERT_OR_CRITICAL(condition_, ...)       \
+    RF_ASSERT(condition_, __VA_ARGS__)
+#else
+#define RF_ASSERT_OR_CRITICAL(condition_, ...)       \
+    do {                                             \
+        if (!(condition_)) {                         \
+            RF_CRITICAL(__VA_ARGS__);                \
+        }                                            \
+    }while(0)
+#endif
+
+
+/* Checks if a condition that should never happen, does happen
+ * and exits the program while also loggin an error
+ */
+#define RF_CONDITIONAL_EXIT(condition_, ...)          \
+    do {                                              \
+        if ((condition_)) {                          \
+            RF_CRITICAL(__VA_ARGS__);                 \
+            exit(1);                                  \
+        }                                             \
+    }while(0)
+
+
+#define i_RF_CRITICAL_TEST(line, condition_, ...) \
+    ({                                            \
+        int i_return_val_ ## line = 0;            \
+        if ((condition_)) {                       \
+            RF_CRITICAL(__VA_ARGS__);             \
+            i_return_val_ ## line = 1;            \
+        }                                         \
+        i_return_val_ ## line;                    \
+    })                                            \
+
+/**
+ * Checks if a Critical condition occurs, and if it does then it logs
+ * a critical error and returns true
+ *
+ * Possible TODO: Introduce different behaviour if the critical test comes
+ *                back positive. Or even have this behaviour configurable
+ *
+ */
+#define RF_CRITICAL_TEST(condition_, ...)                     \
+        i_RF_CRITICAL_TEST(__LINE__, condition_, __VA_ARGS__)
+
 #endif /* include guards end */
