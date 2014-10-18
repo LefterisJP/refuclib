@@ -44,7 +44,7 @@ START_TEST(test_log_flush_and_check) {
     RF_ERROR("Error9");
     RF_ERROR("Error10");
 
-    ck_assert(rf_log_flush());
+    ck_assert(RF_LOG_FLUSH());
 
     ck_assert(rf_textfile_init(&log_file,
                                RFS_("refuclib.log"), RF_FILE_READ,
@@ -86,7 +86,7 @@ START_TEST(test_log_a_lot) {
                 "again and again and again and again and again!");
     }
     
-    ck_assert(rf_log_flush());
+    ck_assert(RF_LOG_FLUSH());
 
     ck_assert(rf_textfile_init(&log_file,
                                RFS_("refuclib.log"), RF_FILE_READ,

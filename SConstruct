@@ -52,6 +52,7 @@ unit_test_files = [
 
     'test_utils_unicode.c',
     'test_utils_array.c',
+    'test_utils_memory_pools.c',
 
     'test_io_files.c',
     'test_io_textfile.c',

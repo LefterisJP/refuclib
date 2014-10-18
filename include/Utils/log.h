@@ -76,6 +76,8 @@ i_DECLIMEX_ struct RFlog *rf_log_create(enum RFlog_level level,
 i_DECLIMEX_ void rf_log_destroy(struct RFlog *log);
 
 i_DECLIMEX_ bool rf_log_flush(struct RFlog *log);
+//convenience macro (used only in tests)
+#define RF_LOG_FLUSH() rf_log_flush(refu_clib_get_log())
 
 i_DECLIMEX_ void rf_log(enum RFlog_level level, const char* file,
                         const char* func,
