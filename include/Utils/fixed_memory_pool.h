@@ -1,3 +1,8 @@
+/**
+ * An implementation of a fixed size memory pool.
+ * Algorithm inspired by the paper: Fast Efficient Fixed-Size Memory Pool
+ * by Ben Kenwright
+ */
 #ifndef RF_FIXED_MEMORY_POOL_H
 #define RF_FIXED_MEMORY_POOL_H
 
@@ -5,12 +10,18 @@
 #include <stdint.h>
 #include <string.h>
 
+struct rf_fixed_memorypool_chunk {
+    uint8_t *blocks;
+    uint32_t next;
+    uint32_t free_blocks;
+};
 
 struct rf_fixed_memorypool {
     size_t element_size;
-    uint8_t *blocks;
-    uint32_t next;
-    uint32_t buffer_size;
+    size_t chunk_size;
+    size_t chunks_num;
+    struct rf_fixed_memorypool_chunk *active_chunk;
+    struct rf_fixed_memorypool_chunk **chunks;
 };
 
 
