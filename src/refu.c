@@ -40,6 +40,7 @@
 /*------------- libc includes -------------*/
 #include <string.h> //for strcmp
 #include <stdlib.h> //for exit() and at_exit()
+#include <time.h>
 /*------------- End of includes -------------*/
 
 struct refu_clibctx {
@@ -96,6 +97,9 @@ bool rf_init(char *logstr, uint64_t lmsSize, enum RFlog_level level)
         RF_ERROR("Failed to initialize the system module");
         goto cleanup;
     }
+
+    /* initialize random seed: */
+    srand(time(NULL));
 
 
     /* register a function to exeute at exit() */

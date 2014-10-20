@@ -36,6 +36,6 @@ void rf_fixed_memorypool_deinit(struct rf_fixed_memorypool *pool);
 void rf_fixed_memorypool_destroy(struct rf_fixed_memorypool *pool);
 
 void *rf_fixed_memorypool_alloc_element(struct rf_fixed_memorypool *pool);
-void rf_fixed_memorypool_free_element(struct rf_fixed_memorypool *pool,
+bool rf_fixed_memorypool_free_element(struct rf_fixed_memorypool *pool,
                                       void *element);
 #endif

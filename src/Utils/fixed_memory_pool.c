@@ -14,15 +14,29 @@ struct rf_fixed_memorypool_meta {
 
 
 /* -- pool chunk functions start -- */
+static inline void rf_fixed_memorypool_chunk_meta_set_idx(
+    struct rf_fixed_memorypool_chunk *chunk,
+    uint32_t element_size,
+    uint32_t block_idx,
+    uint32_t next_idx);
 
 static inline bool rf_fixed_memorypool_chunk_init(
     struct rf_fixed_memorypool_chunk *c,
     size_t chunk_size,
     size_t element_size)
 {
+    unsigned int i;
     RF_MALLOC(c->blocks, chunk_size, return false);
     c->next = 0;
     c->free_blocks = chunk_size / element_size;
+
+    /* create the linked list of unused blocks */
+    for (i = 0; i < c->free_blocks; ++i) {
+        rf_fixed_memorypool_chunk_meta_set_idx(c,
+                                               element_size,
+                                               i,
+                                               i + 1);
+    }
     return true;
 }
 
@@ -180,12 +194,6 @@ void *rf_fixed_memorypool_alloc_element(struct rf_fixed_memorypool *pool)
             pool->active_chunk = pool->chunks[pool->chunks_num - 1];
         }
     }
-
-    /* set the index of the next block since we will be neededing it */
-    rf_fixed_memorypool_chunk_meta_set_idx(pool->active_chunk,
-                                           pool->element_size,
-                                           pool->active_chunk->next,
-                                           pool->active_chunk->next + 1);
     pool->active_chunk->free_blocks -= 1;
 
     /* get this block's element to return and also set pool's next index */
@@ -204,7 +212,7 @@ void *rf_fixed_memorypool_alloc_element(struct rf_fixed_memorypool *pool)
     return NULL;
 }
 
-void rf_fixed_memorypool_free_element(struct rf_fixed_memorypool *pool,
+bool rf_fixed_memorypool_free_element(struct rf_fixed_memorypool *pool,
                                       void *element)
 {
     unsigned int i;
@@ -212,16 +220,17 @@ void rf_fixed_memorypool_free_element(struct rf_fixed_memorypool *pool,
 
     /* find which chunk it belongs to */
     for (i = 0; i < pool->chunks_num; i++) {
-        if ((uint8_t*)element > pool->chunks[i]->blocks &&
+        if ((uint8_t*)element >= pool->chunks[i]->blocks &&
             (uint8_t*)element < pool->chunks[i]->blocks + pool->chunk_size) {
             chunk_idx = i;
             break;
         }
     }
+
     if (RF_CRITICAL_TEST(chunk_idx == -1,
                          "Attempted to free an element which does not belong "
                          "to any of the pool's chunks")) {
-        return;
+        return false;
     }
 
     pool->active_chunk = pool->chunks[chunk_idx];
@@ -230,6 +239,10 @@ void rf_fixed_memorypool_free_element(struct rf_fixed_memorypool *pool,
     uint32_t idx = rf_fixed_memorypool_chunk_index_from_addr(pool->active_chunk,
                                                              pool->element_size,
                                                              element);
+
+    // just a sanity check
+    RF_ASSERT(idx != previous_next);
+
     /*
      * chunk->next should point to it and also set the (now) unused block's index
      * to point to the previous next thus adding to the linked list
@@ -241,4 +254,6 @@ void rf_fixed_memorypool_free_element(struct rf_fixed_memorypool *pool,
         pool->active_chunk->next,
         previous_next);
     pool->active_chunk->free_blocks += 1;
+
+    return true;
 }
