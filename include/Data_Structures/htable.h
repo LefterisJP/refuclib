@@ -177,12 +177,14 @@ void *htable_next(const struct htable *htable, struct htable_iter *i);
  */
 void htable_delval(struct htable *ht, struct htable_iter *i);
 
-typedef void (*htable_iter_cb)(void *record);
+
+typedef void (*htable_iter_cb)(void *record, void *user_arg);
 /**
  * Added by Lefteris
  * htable_iterate_value - Perform an action for all records of the htable
  * @ht: the htable
  * @cb: the callback to execute for each record
+ * @user_arg: the optional user argument to the callback
  */
-void htable_iterate_values(struct htable *ht, htable_iter_cb cb);
+void htable_iterate_values(struct htable *ht, htable_iter_cb cb, void *user_arg);
 #endif

@@ -1,10 +1,13 @@
+from build_extra.config import set_debug_mode
 import os
+
 Import('env')
 
 local_env = env.Clone()
-# for now, do add debug symbols. Need them for the tests
-# TODO: Figure out a way to have them only for tests
-local_env.Append(CCFLAGS=['-g'])
+
+# for now, library compiles always in debug mode.
+# TODO: Figure out a better way
+set_debug_mode(local_env, True)
 
 # setup the required modules
 (modules, orig_sources) = SConscript(

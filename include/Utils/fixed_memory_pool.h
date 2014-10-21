@@ -27,10 +27,10 @@ struct rf_fixed_memorypool {
 
 bool rf_fixed_memorypool_init(struct rf_fixed_memorypool *pool,
                               size_t element_size,
-                              size_t initial_capacity);
+                              size_t chunk_size);
 
 struct rf_fixed_memorypool *rf_fixed_memorypool_create(size_t element_size,
-                                                       size_t initial_capacity);
+                                                       size_t chunk_size);
 
 void rf_fixed_memorypool_deinit(struct rf_fixed_memorypool *pool);
 void rf_fixed_memorypool_destroy(struct rf_fixed_memorypool *pool);

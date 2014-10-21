@@ -241,7 +241,8 @@ bool rf_fixed_memorypool_free_element(struct rf_fixed_memorypool *pool,
                                                              element);
 
     // just a sanity check
-    RF_ASSERT(idx != previous_next);
+    RF_ASSERT(idx != previous_next, "Attempted to free an element at which the"
+              " chunk's next pointer was pointing to");
 
     /*
      * chunk->next should point to it and also set the (now) unused block's index
