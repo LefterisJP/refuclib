@@ -82,7 +82,7 @@
 #endif
 
 /* same as RF_ASSERT but in non debug mode it will log a critical error */
-#ifdef RF_OPTION_DEBUG
+#if defined(RF_OPTION_DEBUG) && !defined(RF_UNIT_TESTS)
 #define RF_ASSERT_OR_CRITICAL(condition_, ...)       \
     RF_ASSERT(condition_, __VA_ARGS__)
 #else
