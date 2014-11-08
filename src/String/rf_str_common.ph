@@ -37,7 +37,7 @@
 /*------------- Outside Module inclusion -------------*/
 #include <Definitions/retcodes.h> //for bool
 #include <Definitions/inline.h> //for inline
-#include "../Internal/rf_internal_mod.ph" //for the internal buffer
+#include <Persistent/buffers.h> //for the internal persistent buffer
 /*------------- libc inclusion --------------*/
 #include <stdio.h> //for vsnprintf
 #include <string.h> //for vsnprintf

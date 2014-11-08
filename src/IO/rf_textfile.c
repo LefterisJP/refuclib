@@ -757,11 +757,9 @@ struct RFtextfile* rf_textfile_create(const void* name,
 bool rf_textfile_copy_in(struct RFtextfile* dst, struct RFtextfile* src)
 {
     fpos_t pos;
-    RF_ASSERT(src, "got NULL src textfile in function");
-    RF_ASSERT(dst, "got NULL dst textfile in function");
 
-    if (!src) {
-        RF_WARNING("Provided NULL pointer for the source textfile");
+    if (!src || !dst) {
+        RF_WARNING("Provided NULL pointer for either source or dst textfile");
         return false;
     }
     //get the data

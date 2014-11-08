@@ -40,7 +40,7 @@
 #include <Utils/localscope.h>//for local scope macros
 #include <Utils/memory.h> //for refu memory allocation
 #include <Utils/sanity.h> //for the sanity check macros
-#include "../Internal/rf_internal_mod.ph" //for the internal buffer
+#include <Persistent/buffers.h> //for the internal persistent buffer
 /*------------- libc inclusion --------------*/
 #include <stdio.h> // for snprintf
 /*------------- End of includes -------------*/

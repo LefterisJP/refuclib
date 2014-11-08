@@ -34,7 +34,7 @@
 #include <Utils/localmem.h> // local memory stack
 #include <Utils/log.h> // logging system
 #include <System/rf_system.h> // for rf_system_activate()
-#include "Internal/rf_internal_mod.ph" // internal data initialization
+#include "Persistent/buffers.h" // persistent buffers initialization
 /*------------- Modules activation/deactivation -------------*/
 #include "String/rf_str_mod.ph"
 /*------------- libc includes -------------*/
@@ -89,8 +89,8 @@ bool rf_init(char *logstr, uint64_t lmsSize, enum RFlog_level level)
         RF_ERROR("Failed to initialize the string module");
         goto cleanup;
     }
-    if (!rf_internal_activate()) {
-        RF_ERROR("Failed to initialize the internal module");
+    if (!rf_persistent_buffers_activate()) {
+        RF_ERROR("Failed to initialize the persisten data");
         goto cleanup;
     }
     if (!rf_system_activate()) {
@@ -120,7 +120,7 @@ void rf_deinit()
 
     /* stop all modules */
     rf_system_deactivate();
-    rf_internal_deactivate();
+    rf_persistent_buffers_deactivate();
     rf_string_deactivate();
     rf_lms_deactivate(true);
 

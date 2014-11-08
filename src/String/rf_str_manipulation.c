@@ -44,7 +44,7 @@
 #include <Utils/memory.h> //for refu memory allocation
 #include <Utils/localscope.h> //for local scope macros
 #include <Utils/sanity.h> //for sanity macros
-#include "../Internal/rf_internal_mod.ph" //for internal thread specific buffer
+#include <Persistent/buffers.h> //for the internal persistent buffer
 /*------------- libc inclusion --------------*/
 #include <limits.h> //for UINT_MAX e.t.c.
 #include <stdio.h> // for snprintf

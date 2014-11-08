@@ -37,7 +37,7 @@
 #include <Utils/log.h> //for error logging
 #include <Utils/rf_unicode.h> //for rf_utf8_verify()
 #include "../Utils/localmem.ph" //for the private local memory macros
-#include "../Internal/rf_internal_mod.ph" //for the internal buffer
+#include <Persistent/buffers.h> //for the internal persistent buffer
 /*------------- libc inclusion --------------*/
 #include <stdarg.h> //for va_list
 #include <stdlib.h> //for exit()

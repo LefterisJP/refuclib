@@ -32,14 +32,14 @@
 /*------------- Outside Module inclusion -------------*/
 #include <Utils/log.h>
 #include <Utils/localmem.h>
-#include "../Internal/rf_internal_mod.ph"
+#include <Persistent/buffers.h>
 /*------------- End of includes -------------*/
 
 
 bool rf_init_thread_specific()
 {
-    if (!rf_internal_activate_ts()) {
-        RF_ERROR("Could not activate the internal module for thread %#010x",
+    if (!rf_persistent_buffers_activate_ts()) {
+        RF_ERROR("Could not activate the persistent data for thread %#010x",
                  rf_thread_get_id());
         return false;
     }
@@ -56,5 +56,5 @@ bool rf_init_thread_specific()
 void rf_deinit_thread_specific()
 {
     rf_lms_deactivate(false);
-    rf_internal_deactivate_ts();
+    rf_persistent_buffers_deactivate_ts();
 }

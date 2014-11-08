@@ -115,6 +115,13 @@ struct RFbuffer {
 #define rf_buffer_increase_size(i_BUFF_, i_ELEMENTS_, type_)      \
     rf_buffer_increase_size_(i_BUFF_, (i_ELEMENTS_) * sizeof(type_))
 
+/*
+ * If remaining size of buffer does not fit the requested size in
+ * bytes then we increase the buffer
+ */
+#define rf_bufffer_try_increase_size(i_BUFF_, i_SIZE_BYTES_)    \
+    rf_buffer_increase_size_(i_BUFF_, i_SIZE_BYTES_)
+
 
 i_INLINE_DECL bool rf_buffer_init(struct RFbuffer* b, size_t size)
 {

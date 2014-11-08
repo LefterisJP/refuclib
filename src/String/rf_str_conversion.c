@@ -44,7 +44,7 @@
 #include <Utils/memory.h> //for refu memory allocation
 #include <Utils/math.h> //for rf_math_max
 #include <Utils/sanity.h> //for sanity macros
-#include "../Internal/rf_internal_mod.ph" //for the internal buffer
+#include <Persistent/buffers.h> //for the internal persistent buffer
 /*------------- libc inclusion --------------*/
 #include <errno.h> //for errno
 #include <math.h> //for HUGE_VAL
