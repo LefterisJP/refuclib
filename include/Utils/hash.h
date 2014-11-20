@@ -19,7 +19,7 @@
  */
 
 /**
- * hash - fast hash of an array for internal use
+ * rf_hash_internal - fast hash of an array for internal use
  * @p: the array or pointer to first element
  * @num: the number of elements to hash
  * @base: the base number to roll into the hash (usually 0)
@@ -51,13 +51,13 @@
  *		if (argc != 3)
  *			err(1, "Usage: %s <string1> <string2>", argv[0]);
  *
- *		hash1 = hash(argv[1], strlen(argv[1]), 0);
- *		hash2 = hash(argv[2], strlen(argv[2]), 0);
+ *		hash1 = rf_hash_internal(argv[1], strlen(argv[1]), 0);
+ *		hash2 = rf_hash_internal(argv[2], strlen(argv[2]), 0);
  *		printf("Hash is %s\n", hash1 == hash2 ? "same" : "different");
  *		return 0;
  *	}
  */
-#define hash(p, num, base) hash_any((p), (num)*sizeof(*(p)), (base))
+#define rf_hash_internal(p, num, base) hash_any((p), (num)*sizeof(*(p)), (base))
 
 /**
  * rf_hash_str - fast hash of an RFString for internal use
@@ -150,7 +150,7 @@
  * @base: the base number to roll into the hash (usually 0)
  *
  * The array of uint32_t pointed to by @key is combined with the base
- * to form a 32-bit hash.  This is 2-3 times faster than hash() on small
+ * to form a 32-bit hash.  This is 2-3 times faster than rf_hash_internal() on small
  * arrays, but the advantage vanishes over large hashes.
  *
  * This hash will have different results on different machines, so is
@@ -217,13 +217,13 @@ static inline uint32_t hash_string(const char *string)
  *		if (argc != 3)
  *			err(1, "Usage: %s <string1> <string2>", argv[0]);
  *
- *		hash1 = hash64(argv[1], strlen(argv[1]), 0);
- *		hash2 = hash64(argv[2], strlen(argv[2]), 0);
+ *		hash1 = rf_hash64_internal(argv[1], strlen(argv[1]), 0);
+ *		hash2 = rf_hash64_internal(argv[2], strlen(argv[2]), 0);
  *		printf("Hash is %s\n", hash1 == hash2 ? "same" : "different");
  *		return 0;
  *	}
  */
-#define hash64(p, num, base) hash64_any((p), (num)*sizeof(*(p)), (base))
+#define rf_hash64_internal(p, num, base) hash64_any((p), (num)*sizeof(*(p)), (base))
 
 /**
  * hash64_stable - 64 bit hash of an array for external use
@@ -279,13 +279,13 @@ static inline uint32_t hash_string(const char *string)
  * @num: the number of elements to hash
  * @base: the base number to roll into the hash (usually 0)
  *
- * This is either hash() or hash64(), on 32/64 bit long machines.
+ * This is either rf_hash_internal() or rf_hash64_internal(), on 32/64 bit long machines.
  */
 #define hashl(p, num, base)						\
 	(BUILD_ASSERT_OR_ZERO(sizeof(long) == sizeof(uint32_t)		\
 			      || sizeof(long) == sizeof(uint64_t)) +	\
 	(sizeof(long) == sizeof(uint64_t)				\
-	 ? hash64((p), (num), (base)) : hash((p), (num), (base))))
+	 ? rf_hash64_internal((p), (num), (base)) : rf_hash_internal((p), (num), (base))))
 
 /* Our underlying operations. */
 uint32_t hash_any(const void *key, size_t length, uint32_t base);
@@ -352,6 +352,6 @@ static inline uint32_t hash_pointer(const void *p, uint32_t base)
 		u.p = p;
 		return hash_u32(u.a, sizeof(p) / sizeof(uint32_t), base);
 	} else
-		return hash(&p, 1, base);
+		return rf_hash_internal(&p, 1, base);
 }
 #endif

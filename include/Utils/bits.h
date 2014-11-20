@@ -40,7 +40,7 @@
  ** Checks if the bitflag @c FLAG_ is set in the variable @c VAR_
  **
  **/
-#define RF_BITFLAG_ON(VAR_,FLAG_)    (((VAR_) & (FLAG_))!=0)
+#define RF_BITFLAG_ON(VAR_,FLAG_)    (((VAR_) & (FLAG_)) != 0)
 /**
  ** Sets the bitflag @c FLAG_ in the variable @c VAR_
  **
