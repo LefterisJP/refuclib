@@ -10,7 +10,10 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+
 #include <Utils/build_assert.h>
+
+#include <String/rf_str_retrieval.h> // for rf_string_data()
 
 
 /* Taken mostly from: lookup3.c, by Bob Jenkins, May 2006, Public Domain.
