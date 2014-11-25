@@ -31,7 +31,9 @@
 #define RF_TYPES_H
 
 #ifndef _MSC_VER
-    #define __STDC_FORMAT_MACROS //also request the printf format macros
+    #ifndef __STDC_FORMAT_MACROS
+        #define __STDC_FORMAT_MACROS //also request the printf format macros
+    #endif
     #include <inttypes.h>
 #else//msvc does not have the C99 standard header so we gotta define them explicitly here, since they do have some similar types
     typedef unsigned __int8 uint8_t;

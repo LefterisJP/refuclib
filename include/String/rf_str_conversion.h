@@ -101,6 +101,7 @@ i_DECLIMEX_ uint32_t* rf_string_to_utf32(const void* s,uint32_t*length);
  **
  ** @internal
  ** You can also use the internal @ref rf_string_cstr_ibuff_push()
+ ** or its external API function @ref rf_string_cstr_ibuff()
  ** which combined with popping allows you to avoid mallocs
  ** @endinternal
  **
@@ -111,6 +112,13 @@ i_DECLIMEX_ uint32_t* rf_string_to_utf32(const void* s,uint32_t*length);
  ** @return        Returns the pointer to the allocated c string
  **/
 i_DECLIMEX_ char* rf_string_cstr(const void* s);
+
+/**
+ ** Turns the given string into a null terminated c string.
+ ** Make sure to call @ref RFS_push() before use and @ref RFS_pop()
+ ** after use
+ **/
+i_DECLIMEX_ char* rf_string_cstr_from_buff(const void* s);
 
 /**
  ** @brief Returns the integer value of a String

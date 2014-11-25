@@ -99,4 +99,3 @@ struct RFstring* i_NVrf_string_create_local(const char* s)
 
     return ret;
 }
-

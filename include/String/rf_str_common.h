@@ -45,7 +45,7 @@ extern "C" {
 
 #define RF_STR_PF_FMT "%.*s"
 #define RF_STR_PF_ARG(i_str_) \
-    rf_string_length_bytes(i_str_), rf_string_data(i_str_) 
+    rf_string_length_bytes(i_str_), rf_string_data(i_str_)
 #if 0 /* TODO: Using this I get address always evaluates to true in some cases,
          think how we can get rid of that warning */
 
@@ -55,7 +55,7 @@ extern "C" {
         (i_str_) ? rf_string_data(i_str_) : ""
 #else
 #define RF_STR_PF_ARG(i_str_) \
-    rf_string_length_bytes(i_str_), rf_string_data(i_str_) 
+    rf_string_length_bytes(i_str_), rf_string_data(i_str_)
 #endif
 #endif
 /**
@@ -79,12 +79,12 @@ extern "C" {
  ** not interpreted as a formatted
  ** string and is instead printed as is.
  ** @warning
- ** + This macro can not be called recursively with extra arguments and doing 
+ ** + This macro can not be called recursively with extra arguments and doing
  ** so is undefined behaviour.
  ** @param s                The formatted string that will constitute the
  **                         RF_String. Must be in the same encoding as that of
  **                         the source file. Default is UTF-8.
- ** @param ...              \rfoptional{nothing}  Depending on the string 
+ ** @param ...              \rfoptional{nothing}  Depending on the string
  **                         literal, the function may expect a sequence of
  **                         additional arguments, each containing one value to
  **                         be inserted instead of each %-tag
@@ -107,6 +107,13 @@ i_DECLIMEX_ struct RFstring* i_NVrf_string_create_local(const char* s);
 #define i_SELECT_RF_STRING_CREATELOCAL1(...) i_NVrf_string_create_local(__VA_ARGS__)
 #define i_SELECT_RF_STRING_CREATELOCAL0(...) i_rf_string_create_local1(__VA_ARGS__)
 
+
+/// Since RFS_() macro uses the internal buffer we need to push and pop the
+/// internal buffer for strings wherever RFS_() is used.
+/// Note: All users need to include Persistent/buffers.h
+/// TODO: fix this nasty inclusion requirement ...
+#define RFS_buffer_push() uint32_t i_buffer_index_ ## __FILE__ = rf_buffer_index(TSBUFFA)
+#define RFS_buffer_pop() rf_buffer_set_index_(TSBUFFA, i_buffer_index_ ## __FILE__)
 
 #ifdef __cplusplus
 }//closing bracket for calling from C++

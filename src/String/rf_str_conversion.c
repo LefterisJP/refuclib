@@ -113,6 +113,11 @@ char* rf_string_cstr(const void* str)
     return ret;
 }
 
+char* rf_string_cstr_from_buff(const void* s)
+{
+    return rf_string_cstr_ibuff_push(s, NULL);
+}
+
 bool rf_string_to_int(const void* str, int64_t* v, size_t *off)
 {
     char *cstr;
