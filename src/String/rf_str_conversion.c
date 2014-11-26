@@ -256,33 +256,28 @@ bool rf_string_tokenize(const void* str, const void* sep,
     uint32_t i, sepLen;
     char *s;
     char *e;
-    bool ret = true;
     int32_t tokens_num;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(str, "got null string in function");
 
     if (!sep) {
         RF_WARNING("Did not provide a separator string");
-        ret = false;
-        goto cleanup_lscope;
+        return false;
     }
 
     if (!ret_tokens_num || !tokens) {
         RF_WARNING("Null pointers detected for the output data");
-        ret = false;
-        goto cleanup_lscope;
+        return false;
     }
 
     //first find the occurences of the separator, and then the number of tokens
     tokens_num = rf_string_count(str, sep, 0, 0, 0) + 1;
     //error checking
     if (tokens_num <= 1) {
-        ret = false;
-        goto cleanup_lscope;
+        return false;
     }
     //allocate the tokens
     RF_MALLOC(*tokens, sizeof(struct RFstring) * (tokens_num),
-              ret = false; goto cleanup_lscope);
+              return false);
     //find the length of the separator
     sepLen = rf_string_length_bytes(sep);
 
@@ -295,7 +290,7 @@ bool rf_string_tokenize(const void* str, const void* sep,
         rf_string_length_bytes(&(*tokens)[i]) = e - s;
         RF_MALLOC(rf_string_data(&(*tokens)[i]),
                   rf_string_length_bytes(&(*tokens)[i]),
-                      ret = false; goto cleanup_lscope
+                      return false
         );
         //put in the data
         memcpy(rf_string_data(&(*tokens)[i]),
@@ -312,7 +307,7 @@ bool rf_string_tokenize(const void* str, const void* sep,
     );
     RF_MALLOC(rf_string_data(&(*tokens)[i]),
               rf_string_length_bytes(&(*tokens)[i]),
-              ret = false; goto cleanup_lscope
+              return false
     );
     //put in the data
     memcpy(rf_string_data(&(*tokens)[i]),
@@ -321,8 +316,6 @@ bool rf_string_tokenize(const void* str, const void* sep,
     );
 
     *ret_tokens_num = tokens_num;
-cleanup_lscope:
-    //success
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+
+    return true;
 }

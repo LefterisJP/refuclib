@@ -212,7 +212,7 @@ i_INLINE_DECL bool fill_fmt_buffer(const char *fmt,
         return false;
     }
     if (rc >= n) {
-        if(!rf_buffer_increase_size(TSBUFFA, rc *2, char)) {
+        if(!rf_buffer_increase_size(TSBUFFA, rc * 2, char)) {
             return false;
         }
         n = rf_buffer_size(TSBUFFA);

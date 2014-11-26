@@ -119,26 +119,31 @@ struct RFbuffer {
  * If remaining size of buffer does not fit the requested size in
  * bytes then we increase the buffer
  */
-#define rf_bufffer_try_increase_size(i_BUFF_, i_SIZE_BYTES_)    \
+#define rf_buffer_try_increase_size(i_BUFF_, i_SIZE_BYTES_)    \
     rf_buffer_increase_size_(i_BUFF_, i_SIZE_BYTES_)
 
+i_INLINE_DECL unsigned int rf_buffer_index(struct RFbuffer* b)
+{
+    return b->index;
+}
 
 i_INLINE_DECL bool rf_buffer_init(struct RFbuffer* b, size_t size)
 {
     b->size = size;
     b->index = 0;
-    RF_CALLOC(b->buff, size, 1, return false);
+    /* RF_CALLOC(b->buff, size, 1, return false); */
+    // we don't use RF_CALLOC here since it logs an error and there is a
+    // nasty include dependency error here. TODO: fix
+    b->buff = calloc(size, 1);
+    if (!b->buff) {
+        return false;
+    }
     return true;
 }
 
 i_INLINE_DECL void rf_buffer_deinit(struct RFbuffer* b)
 {
     free(b->buff);
-}
-
-i_INLINE_DECL unsigned int rf_buffer_index(struct RFbuffer* b)
-{
-    return b->index;
 }
 
 i_INLINE_DECL size_t rf_buffer_size(struct RFbuffer* b)
@@ -167,7 +172,15 @@ i_INLINE_DECL bool rf_buffer_increase_size_(struct RFbuffer* b,
         return true;
     }
 
-    RF_REALLOC(b->buff, char, b->size + added_size, return false);
+    /* RF_REALLOC(b->buff, char, b->size + added_size, return false); */
+    // we don't use RF_REALLOC here since it logs an error and there is a
+    // nasty include dependency error here. TODO: fix    
+    char *tmp = realloc(b->buff, b->size + added_size);
+    if (!tmp) {
+        return false;
+    }
+    b->buff = tmp;
+    
     b->size += added_size;
     return true;
 }
@@ -181,7 +194,7 @@ i_INLINE_DECL void rf_buffer_set_index_(struct RFbuffer* b, unsigned int index)
  * Buffer internal functions end
  */
 
-/*
+/**
  * Copies @c len bytes from @c src into the current position
  * of buffer. If there is not enough size in the buffer, it
  * reallocates
@@ -190,12 +203,26 @@ i_INLINE_DECL bool rf_buffer_copy_at_current(struct RFbuffer* b,
                                              const char* src,
                                              size_t len)
 {
-    if(!rf_buffer_increase_size(b, len, char))
-    {
+    if (!rf_buffer_increase_size(b, len, char)) {
         return false;
     }
 
     memcpy(rf_buffer_current_ptr(b, char), src, len);
     return true;
+}
+
+/**
+ * Allocates @c len_bytes from @c buffer b
+ */
+i_INLINE_DECL void *rf_buffer_malloc(struct RFbuffer *b, size_t len_bytes)
+{
+    char *ret;
+    if (!rf_buffer_try_increase_size(b, len_bytes)) {
+        return NULL;
+    }
+    
+    ret = rf_buffer_current_ptr(b, char);
+    rf_buffer_move_index(b, len_bytes, char);
+    return ret;
 }
 #endif

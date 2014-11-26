@@ -97,21 +97,18 @@ bool rf_string_initvl(struct RFstring* str, const char* s, va_list args)
     unsigned int size, buff_index;
     bool ret = true;
     char *buff_ptr;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(str, "got null string in function");
 
     if (!s) {
         RF_ERROR("String initialization failed due to null pointer input");
-        ret = false;
-        goto cleanup_lscope;
+        return false;
     }
 
     //read the var args
     if (!fill_fmt_buffer(s, &size, &buff_ptr, &buff_index, args)) {
         RF_ERROR("String creation failure due to failing at reading the "
                  "formatted string");
-        ret = false;
-        goto cleanup_lscope;
+        return false;
     }
 
     //get length
@@ -125,8 +122,7 @@ bool rf_string_initvl(struct RFstring* str, const char* s, va_list args)
 cleanup_buffer:
 #endif
     rf_buffer_set_index(TSBUFFA, buff_index, char);
-cleanup_lscope:
-    RF_EXIT_LOCAL_SCOPE();
+
     return ret;
 }
 
@@ -383,8 +379,6 @@ bool rf_string_init_unsafe_nnt(struct RFstring* str, const char* s, size_t lengt
 
 bool rf_string_assign(struct RFstring* dst, const void* src)
 {
-    bool ret = true;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(dst, "got null string in function");
 
     if (!src) {
@@ -394,15 +388,14 @@ bool rf_string_assign(struct RFstring* dst, const void* src)
     if(rf_string_length_bytes(src) > rf_string_length_bytes(dst))
     {
         RF_REALLOC(rf_string_data(dst), char, rf_string_length_bytes(src),
-                   ret = false; goto cleanup);
+                   return false);
     }
     //now copy the value
     memcpy(rf_string_data(dst), rf_string_data(src), rf_string_length_bytes(src));
     //and fix the lengths
     rf_string_length_bytes(dst) = rf_string_length_bytes(src);
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+
+    return true;
 }
 
 bool rf_string_assignv(struct RFstring* str, const char* s, ...)
@@ -420,36 +413,30 @@ bool rf_string_assignvl(struct RFstring* str,
                         va_list args)
 {
     unsigned int size, buff_index;
-    bool ret = true;
     char *buff_ptr;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(str, "got null string in function");
 
     if (!s) {
         RF_ERROR("String assignment failed due to null pointer input");
-        ret = false;
-        goto cleanup;
+        return false;
     }
     //read the var args
     if (!fill_fmt_buffer(s, &size, &buff_ptr, &buff_index, args)) {
         RF_ERROR("String assignment failure due to failing at reading the "
                  "formatted string");
-        ret = false;
-        goto cleanup;
+        return false;
     }
-
 
     rf_buffer_set_index(TSBUFFA, buff_index, char);
 
     if (rf_string_length_bytes(str) < size) {
-        RF_REALLOC(rf_string_data(str), char, size, ret=false;goto cleanup);
+        RF_REALLOC(rf_string_data(str), char, size, return false);
     }
     //get length
     rf_string_length_bytes(str) = size;
     memcpy(rf_string_data(str), buff_ptr, rf_string_length_bytes(str));
-cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    
+    return true;
 }
 
 //Assigns the value of a unicode character to the string
@@ -562,10 +549,8 @@ bool rf_string_equal(const void* s1, const void* s2)
     bool ret;
     RF_ASSERT(s1, "got null 1st string in function");
     RF_ASSERT(s2, "got null 2nd string in function");
-    RF_ENTER_LOCAL_SCOPE();
     ret = strcmp_nnt(rf_string_data(s1), rf_string_length_bytes(s1),
                      rf_string_data(s2), rf_string_length_bytes(s2));
-    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 

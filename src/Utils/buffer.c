@@ -39,3 +39,4 @@ i_INLINE_INS size_t rf_buffer_remaining_size_(struct RFbuffer* b);
 i_INLINE_INS size_t rf_buffer_size(struct RFbuffer* b);
 i_INLINE_INS void rf_buffer_set_index_(struct RFbuffer* b, unsigned int index);
 i_INLINE_INS unsigned int rf_buffer_index(struct RFbuffer* b);
+i_INLINE_INS void *rf_buffer_malloc(struct RFbuffer *b, size_t len_bytes);

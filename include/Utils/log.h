@@ -39,6 +39,7 @@
 #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
 #include <String/rf_str_decl.h> //for RFstring
 #include <String/rf_str_common.h> //for RFS_() macro
+#include <Persistent/buffers.h> // for TSBUFFA
 /*------------- libc inclusion -------------*/
 #include <errno.h>  // for std library function error reporting
 /*------------- End of includes -------------*/
@@ -80,33 +81,63 @@ i_DECLIMEX_ bool rf_log_flush(struct RFlog *log);
 #define RF_LOG_FLUSH() rf_log_flush(refu_clib_get_log())
 
 i_DECLIMEX_ void rf_log(enum RFlog_level level, const char* file,
-                        const char* func,
-                        int line, struct RFstring* msg);
+                        const char* func, int line,
+                        struct RFstring* msg);
 
 
 /*--- Logging macros --- */
 
-#define RF_ALERT(...) rf_log(LOG_ALERT, __FILE__, __func__,       \
-                             __LINE__,                            \
-                             RFS_(__VA_ARGS__))
 
-#define RF_CRITICAL(...) rf_log(LOG_CRITICAL, __FILE__, __func__, \
-                                __LINE__,                         \
-                                RFS_(__VA_ARGS__))
+#define RF_ALERT(...) do {                      \
+        RFS_buffer_push();                      \
+        rf_log(LOG_ALERT, __FILE__, __func__,   \
+               __LINE__,                        \
+               RFS_(__VA_ARGS__));              \
+        RFS_buffer_pop();                       \
+    } while (0)
 
-#define RF_ERROR(...) rf_log(LOG_ERROR, __FILE__, __func__, \
-                             __LINE__,                      \
-                             RFS_(__VA_ARGS__))
-#define RF_INFO(...) rf_log(LOG_INFO, __FILE__, __func__, \
-                            __LINE__,                     \
-                            RFS_(__VA_ARGS__))
-#define RF_WARNING(...)  rf_log(LOG_WARNING, __FILE__, __func__,  \
-                                __LINE__,                         \
-                                RFS_(__VA_ARGS__))
+#define RF_CRITICAL(...) do {                       \
+        RFS_buffer_push();                          \
+        rf_log(LOG_CRITICAL, __FILE__, __func__,    \
+               __LINE__,                            \
+               RFS_(__VA_ARGS__));                  \
+        RFS_buffer_pop();                           \
+    } while (0)
+
+#define RF_ERROR(...) do {                      \
+        RFS_buffer_push();                      \
+        rf_log(LOG_ERROR, __FILE__, __func__,   \
+               __LINE__,                        \
+               RFS_(__VA_ARGS__));              \
+        RFS_buffer_pop();                       \
+    } while (0)
+
+#define RF_WARNING(...) do {                    \
+        RFS_buffer_push();                      \
+        rf_log(LOG_WARNING, __FILE__, __func__, \
+               __LINE__,                        \
+               RFS_(__VA_ARGS__));              \
+        RFS_buffer_pop();                       \
+    } while (0)
+
+#define RF_INFO(...) do {                       \
+        RFS_buffer_push();                      \
+        rf_log(LOG_INFO, __FILE__, __func__,    \
+               __LINE__,                        \
+               RFS_(__VA_ARGS__));              \
+        RFS_buffer_pop();                       \
+    } while (0)
+
+
 
 #ifdef RF_OPTION_DEBUG
-#define RF_DEBUG(...)  rf_log(LOG_DEBUG, __FILE__, __func__,  \
-                              __LINE__, RFS_(__VA_ARGS__))
+#define RF_DEBUG(...) do {                      \
+        RFS_buffer_push();                      \
+        rf_log(LOG_DEBUG, __FILE__, __func__,   \
+               __LINE__,                        \
+               RFS_(__VA_ARGS__));              \
+        RFS_buffer_pop();                       \
+    } while (0)
 #else
 #define RF_DEBUG(...)
 #endif

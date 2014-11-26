@@ -49,8 +49,6 @@ struct RFstring* i_rf_string_create_local1(const char* s,...)
     va_list args;
     unsigned int size, bIndex;
     char *buffPtr;
-    //remember the stack pointer before this macro evaluation
-    i_rf_lms_args_eval(return NULL);
 
     //read the var args
     va_start(args, s);
@@ -63,19 +61,18 @@ struct RFstring* i_rf_string_create_local1(const char* s,...)
     va_end(args);
 
     //allocate the string in the local memory stack
-    i_rf_lms_push(ret, sizeof(*ret), ret = NULL; goto cleanup_buffer);
-    //get length
+    ret = rf_buffer_malloc(TSBUFFA, sizeof(*ret));
+    if (!ret) {
+        //pop back the buffer
+        rf_buffer_set_index(TSBUFFA, bIndex, char);
+        return NULL;
+    }
+    rf_string_data(ret) = buffPtr;
     rf_string_length_bytes(ret) = size;
-    //now that we know the length we can allocate the buffer and copy the bytes
-    i_rf_lms_push(rf_string_data(ret), ret->length,
-                 ret = NULL; goto cleanup_buffer);
-    memcpy(rf_string_data(ret), buffPtr, rf_string_length_bytes(ret));
 
-cleanup_buffer:
-    //pop back the buffer
-    rf_buffer_set_index(TSBUFFA, bIndex, char);
     return ret;
 }
+
 struct RFstring* i_NVrf_string_create_local(const char* s)
 {
     struct RFstring* ret;
@@ -90,12 +87,14 @@ struct RFstring* i_NVrf_string_create_local(const char* s)
         return NULL;
     }
 
-    //allocate the string in the local memory stack
-    i_rf_lms_push(ret, sizeof(*ret), return NULL);
-    //get length
-    rf_string_length_bytes(ret) = byteLength;
-    i_rf_lms_push(rf_string_data(ret), byteLength, return NULL);
+    //allocate the string and its buffer in the local memory stack
+    ret = rf_buffer_malloc(TSBUFFA, sizeof(*ret) + byteLength);
+    if (!ret) {
+        return NULL;
+    }
+    rf_string_data(ret) = (char*)ret + sizeof(*ret);
     memcpy(rf_string_data(ret), s, byteLength);
+    rf_string_length_bytes(ret) = byteLength;
 
     return ret;
 }

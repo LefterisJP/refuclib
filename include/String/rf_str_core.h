@@ -461,8 +461,8 @@ i_DECLIMEX_ bool rf_string_equal(const void* s1, const void* s2);
  ** @isinherited{StringX}
  ** @brief Checks that a string is empty. 
  **/
-#define rf_string_is_empty(i_STRING)              \
-    (rf_string_equal((i_STRING), RFS_("")))
+#define rf_string_is_empty(i_STRING)            \
+    (rf_string_length_bytes(i_STRING) == 0)
 
 //! @}
 

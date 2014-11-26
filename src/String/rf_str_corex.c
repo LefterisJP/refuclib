@@ -103,7 +103,6 @@ bool rf_stringx_initvl(struct RFstringx* str, const char* lit, va_list args)
     bool ret = true;
     char *buff_ptr;
     unsigned int size, buff_index;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(str, "got NULL string in function");
 
     if (!lit) {
@@ -130,7 +129,6 @@ bool rf_stringx_initvl(struct RFstringx* str, const char* lit, va_list args)
 
     rf_buffer_set_index(TSBUFFA, buff_index, char);
 cleanup_lscope:
-    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -318,33 +316,27 @@ struct RFstringx* rf_stringx_create_buffv(uint32_t buffSize, const char* lit, ..
     va_list args;
     char *buff_ptr;
     unsigned int size, buff_index;
-    RF_ENTER_LOCAL_SCOPE();
 
     if (!lit) {
         RF_ERROR("Provided null pointer for the string literal");
-        ret = NULL;
-        goto cleanup_lscope;
+        return NULL;
     }
 
     va_start(args, lit);
     //read the var args
-    if(!fill_fmt_buffer(lit, &size, &buff_ptr, &buff_index, args))
-    {
+    if (!fill_fmt_buffer(lit, &size, &buff_ptr, &buff_index, args)) {
         RF_ERROR("StringX creation failure due to failing at reading the "
                   "formatted string");
-        ret = NULL;
-        goto cleanup_lscope;
+        return NULL;
     }
     va_end(args);
 
     //Make sure that the buff size fits the string
-    if(buffSize < size)
-    {
+    if (buffSize < size) {
         buffSize = size;
     }
     RF_MALLOC(ret, sizeof(*ret), ret = NULL; goto cleanup_buffer);
-    if(!rf_stringx_init_unsafe_bnnt(ret, buff_ptr, size, buffSize))
-    {
+    if (!rf_stringx_init_unsafe_bnnt(ret, buff_ptr, size, buffSize)) {
         free(ret);
         ret = NULL;
     }
@@ -353,8 +345,6 @@ struct RFstringx* rf_stringx_create_buffv(uint32_t buffSize, const char* lit, ..
 cleanup_buffer:
 #endif
     rf_buffer_set_index(TSBUFFA, buff_index, char);
-cleanup_lscope:
-    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 struct RFstringx* rf_stringx_create_buff(uint32_t buffSize,const char* lit)
@@ -377,13 +367,11 @@ bool rf_stringx_init_buffv(struct RFstringx* str, uint32_t buffSize,
     va_list args;
     char *buff_ptr;
     unsigned int size, buff_index;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(str, "got NULL string in function");
 
     if (!lit) {
         RF_ERROR("Provided null pointer for the string literal");
-        ret = false;
-        goto cleanup_lscope;
+        return false;
     }
 
     va_start(args, lit);
@@ -392,8 +380,7 @@ bool rf_stringx_init_buffv(struct RFstringx* str, uint32_t buffSize,
     {
         RF_ERROR("StringX creation failure due to failing at reading the "
                   "formatted string");
-        ret = false;
-        goto cleanup_lscope;
+        return false;
     }
     va_end(args);
 
@@ -403,10 +390,8 @@ bool rf_stringx_init_buffv(struct RFstringx* str, uint32_t buffSize,
         buffSize = size;
     }
     ret = rf_stringx_init_unsafe_bnnt(str, buff_ptr, size, buffSize);
-
     rf_buffer_set_index(TSBUFFA, buff_index, char);
-cleanup_lscope:
-    RF_EXIT_LOCAL_SCOPE();
+
     return ret;
 }
 
@@ -439,28 +424,22 @@ bool rf_stringx_init_buff(struct RFstringx* str, uint32_t buffSize,
 
 bool rf_stringx_assign(struct RFstringx* dst, const void* source)
 {
-    bool ret = true;
-
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(dst, "got NULL string in function");
     if (!source) {
         RF_WARNING("provided null source string");
-        ret = false;
-        goto cleanup;
+        return false;
     }
     //only if the new string value won't fit in the buffer reallocate the buffer
     RF_STRINGX_REALLOC(dst,
                        rf_string_length_bytes(source),
-                       ret=false; goto cleanup);
+                       return false);
     //now copy the value and the bytelength
     memcpy(rf_string_data(dst),
            rf_string_data(source),
            rf_string_length_bytes(source));
     rf_string_length_bytes(dst) = rf_string_length_bytes(source);
 
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return true;
 }
 
 i_DECLIMEX_ bool rf_stringx_assignv(struct RFstringx* str, const char* s, ...)
@@ -478,32 +457,27 @@ i_DECLIMEX_ bool rf_stringx_assignvl(struct RFstringx* str,
                                      va_list args)
 {
     unsigned int size, buff_index;
-    bool ret = true;
     char *buff_ptr;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(str, "got NULL string in function");
 
     if (!s) {
         RF_ERROR("Stringx assignment failed due to null pointer input");
-        ret = false;
-        goto cleanup;
+        return false;
     }
     //read the var args
     if (!fill_fmt_buffer(s, &size, &buff_ptr, &buff_index, args)) {
         RF_ERROR("Stringx assignment failure due to failing at reading the "
                  "formatted string");
-        ret = false;
-        goto cleanup;
+        return false;
     }
     rf_buffer_set_index(TSBUFFA, buff_index, char);
 
-    RF_STRINGX_REALLOC(str, size, ret=false;goto cleanup);
+    RF_STRINGX_REALLOC(str, size, return false);
     //get length
     rf_string_length_bytes(str) = size;
     memcpy(rf_string_data(str), buff_ptr, rf_string_length_bytes(str));
-cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+
+    return true;
 }
 
 bool rf_stringx_assign_char(struct RFstringx* str, uint32_t codepoint)

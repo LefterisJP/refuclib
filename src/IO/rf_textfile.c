@@ -600,30 +600,23 @@ bool rf_textfile_init(struct RFtextfile* t, const void* name,
                       enum RFtext_encoding encoding,
                       enum RFeol_mark eol)
 {
-    bool ret = true;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(t, "got NULL textfile in function");
 
-    if(!name)
-    {
+    if (!name) {
         RF_ERROR("Provided a null pointer for the file name");
-        ret = false;
-        goto cleanup1;
+        return false;
     }
 
     //save the name of the file
-    if(!rf_string_copy_in(&t->name,name))
-    {
-        ret = false;
+    if (!rf_string_copy_in(&t->name,name)) {
         RF_ERROR("Could not copy the file's \""RF_STR_PF_FMT"\" filename",
                  RF_STR_PF_ARG(&name));
-        goto cleanup1;
+        return false;
     }
     t->hasBom = false;
 
     //depending on the mode open the file
-    switch(mode)
-    {
+    switch (mode) {
         case RF_FILE_WRITE:
             t->mode = RF_FILE_READWRITE;
             t->f = rf_fopen(name, "a"i_PLUSB_WIN32"+");
@@ -648,49 +641,38 @@ bool rf_textfile_init(struct RFtextfile* t, const void* name,
             RF_ERROR("Attempted to initialize textfile \""RF_STR_PF_FMT"\" with "
                      "illegal mode", RF_STR_PF_ARG(name));
             rf_string_deinit(&t->name);
-            ret = false;
-            goto cleanup1;
+            return false;
         break;
     }//end of opening mode switch
     //if the file failed to open read errno
-    if(!t->f)
-    {
+    if (!t->f) {
         RF_ERROR("Failed to open a textfile due to fopen() "
                  "with errno %d", errno);
-        ret = false;
-        goto cleanup1;
+        return false;
     }
 
 
     //for an existing file
-    if(mode == RF_FILE_READ || mode == RF_FILE_READWRITE)
-    {
+    if (mode == RF_FILE_READ || mode == RF_FILE_READWRITE) {
         //scan the file for BOM to determine endianess if needed
-        if(!determine_endianess(t, encoding, endianess))
-        {
+        if (!determine_endianess(t, encoding, endianess)) {
             RF_ERROR("Error while trying to determine the endianess of "
                      "text file \""RF_STR_PF_FMT"\"", RF_STR_PF_ARG(&t->name));
-            ret = false;
-            goto cleanup1;
+            return false;
         }
         //finally handle the line encoding for the existingfile case
-        if(!handle_EOL(t, eol))
-        {
+        if (!handle_EOL(t, eol)) {
             RF_ERROR(
                      "During initializing TextFile \""RF_STR_PF_FMT"\" "
                      "auto-detecting the "
                      "End Of Line Pattern failed. Considering default of "
                      "Unix-Style LF Endings", RF_STR_PF_ARG(&t->name));
-            ret = false;
-            goto cleanup1;
+            return false;
         }
 
-    }//end of existing file case
-    else//new file case
-    {
+    } else { //new file case
         //check the eol argument
-        switch(eol)
-        {
+        switch (eol) {
             case RF_EOL_LF:
             case RF_EOL_CR:
             case RF_EOL_CRLF:
@@ -704,13 +686,12 @@ bool rf_textfile_init(struct RFtextfile* t, const void* name,
                          "An illegal eol value has been given to the "
                          "initialization of TextFile \""RF_STR_PF_FMT"\"",
                          RF_STR_PF_ARG(&t->name));
-                ret = false;
-                goto cleanup1;
+                return false;
             break;
         }
+        
         t->encoding = encoding;
-        if(endianess == RF_ENDIANESS_UNKNOWN)
-        {
+        if (endianess == RF_ENDIANESS_UNKNOWN) {
             endianess = rf_system_get_endianess();
         }
         t->endianess = endianess;
@@ -726,9 +707,7 @@ bool rf_textfile_init(struct RFtextfile* t, const void* name,
     t->line = 1;
     t->previousOp = 0;
 
-cleanup1:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return true;
 }
 struct RFtextfile* rf_textfile_create(const void* name,
                                       enum RFtextfile_mode mode,
@@ -737,18 +716,13 @@ struct RFtextfile* rf_textfile_create(const void* name,
                                       enum RFeol_mark eol)
 {
     struct RFtextfile* ret;
-    RF_ENTER_LOCAL_SCOPE();
-    RF_MALLOC(ret, sizeof(*ret), ret = NULL; goto cleanup);
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
     if(!rf_textfile_init(ret, name, mode, endianess, encoding, eol))
     {
         free(ret);
         ret = NULL;
     }
 
-#if defined(RF_OPTION_SAFE_MEMORY_ALLOCATION) || defined(RF_OPTION_DEBUG)
-  cleanup:
-#endif
-    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -957,7 +931,7 @@ int32_t rf_textfile_move_lines(struct RFtextfile* t,
         if(success == false)
         {
             //get back to the file position before function call
-            TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, -1);
+            TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, return -1);
             //else there was an error at line reading
             if(error != RE_FILE_EOF)
             {
@@ -1010,7 +984,7 @@ int32_t rf_textfile_move_lines(struct RFtextfile* t,
             if((error = rf_textfile_read_line(t,&buffer)) != RF_SUCCESS)
             {
                 //there was an error at line reading
-                TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, -1);
+                TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, return -1);
                 RF_ERROR(
                          "While reading Text File's lines forward "
                          "\""RF_STR_PF_FMT"\" "
@@ -1275,7 +1249,7 @@ int32_t rf_textfile_go_to_offset(struct RFtextfile* t, RFfile_offset offset,
             {//keep going forward
                 if(!rf_textfile_move_chars_f(t,1))
                 {
-                    TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, -1);
+                    TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, return -1);
 
                     RF_ERROR(
                              "Moving forward in TextFile \""RF_STR_PF_FMT"\""
@@ -1311,7 +1285,7 @@ int32_t rf_textfile_go_to_offset(struct RFtextfile* t, RFfile_offset offset,
             {//keep going backwards
                 if(!rf_textfile_move_chars_b(t,1))
                 {
-                    TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, -1);
+                    TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, return -1);
                     RF_ERROR(
                              "Moving backwards in TextFile \""RF_STR_PF_FMT"\""
                              " failed ",
@@ -1562,7 +1536,7 @@ int32_t rf_textfile_get_line_begin(struct RFtextfile* t, uint64_t lineN,
     {
         if(error == RE_FILE_EOF)
         {
-            TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, -1);
+            TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, return -1);
             RF_ERROR(
                      "While searching for line [%llu] in Text File"
                      " \""RF_STR_PF_FMT"\" the"
@@ -1571,7 +1545,7 @@ int32_t rf_textfile_get_line_begin(struct RFtextfile* t, uint64_t lineN,
             return RE_FILE_EOF;
         }
         //else there was an error at line reading
-        TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, -1);
+        TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, return -1);
         RF_ERROR(
                  "While reading Text File's lines "
                  "\""RF_STR_PF_FMT"\" there was an error "
@@ -1583,7 +1557,7 @@ int32_t rf_textfile_get_line_begin(struct RFtextfile* t, uint64_t lineN,
     //now we are done so we can return the line number and the file pointer to
     //their original positions, also free stuff
     rf_stringx_deinit(&buffer);
-    TEXTFILE_RESETPTR(t, prLine, prEof, prOff, -1);
+    TEXTFILE_RESETPTR(t, prLine, prEof, prOff, return -1);
     return RF_SUCCESS;
 }
 
@@ -1606,7 +1580,7 @@ int32_t rf_textfile_get_line(struct RFtextfile* t, uint64_t lineN,
     //move to the beginning of the line and get it. If there was an error reset everything back
     if((error=rf_textfile_move_lines(t,lineN-t->line)) != RF_SUCCESS)
     {
-        TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff,-1);
+        TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, return -1);
         if(error == RE_FILE_EOF)
         {
             RF_ERROR("Tried to move beyond the end of file for Textfile "
@@ -1626,7 +1600,7 @@ int32_t rf_textfile_get_line(struct RFtextfile* t, uint64_t lineN,
         return -1;
     }
     //success, so we can return the line number and the file pointer to their original positions
-    TEXTFILE_RESETPTR(t, prLine, prEof, prOff, -1);
+    TEXTFILE_RESETPTR(t, prLine, prEof, prOff, return -1);
     return RF_SUCCESS;
 }
 
@@ -1635,18 +1609,15 @@ int32_t rf_textfile_get_line(struct RFtextfile* t, uint64_t lineN,
 bool rf_textfile_write(struct RFtextfile* t, void* s)
 {
     int32_t linesN;
-    char ret = true;
     char allocatedS = false;
-    RF_ENTER_LOCAL_SCOPE();
 
-    if(!s) {
+    if (!s) {
         RF_WARNING("Provided a null pointer for the to-write string");
-        ret = false;
-        goto cleanup1;
+        return false;
     }
 
     //if the file mode is not write then turn it to writing
-    RF_TEXTFILE_CANWRITE_JMP(t, ret = false, cleanup1);
+    RF_TEXTFILE_CANWRITE(t, return false);
     t->previousOp = RF_FILE_WRITE;
     //let's see how many lines it will be adding to the text file
     linesN = rf_string_count(s, &g_eol_lf, 0, 0, 0);
@@ -1662,8 +1633,7 @@ bool rf_textfile_write(struct RFtextfile* t, void* s)
                          "while writing string \""RF_STR_PF_FMT"\""
                          " to Textfile \""RF_STR_PF_FMT"\"",
                          RF_STR_PF_ARG(s), RF_STR_PF_ARG(&t->name));
-                ret = false;
-                goto cleanup1;
+                return false;
             }
         } else {
             if (!rf_string_replace(s, &g_eol_lf, &g_eol_cr, 0, 0)) {
@@ -1671,8 +1641,7 @@ bool rf_textfile_write(struct RFtextfile* t, void* s)
                          "while writing string \""RF_STR_PF_FMT"\""
                          " to Textfile \""RF_STR_PF_FMT"\"",
                          RF_STR_PF_ARG(s), RF_STR_PF_ARG(&t->name));
-                ret = false;
-                goto cleanup1;
+                return false;
             }
         }
     }
@@ -1683,17 +1652,14 @@ bool rf_textfile_write(struct RFtextfile* t, void* s)
                  " \""RF_STR_PF_FMT"\" "
                  "to Text File \""RF_STR_PF_FMT"\"",
                  RF_STR_PF_ARG(s), RF_STR_PF_ARG(&t->name));
-        ret = false;
         if (allocatedS == true) {
             rf_string_destroy(s);
         }
-        goto cleanup1;
+        return false;
     }
     t->line += linesN;//also add as many lines as were inside the string
 
-cleanup1:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return true;
 }
 
 
@@ -1710,25 +1676,21 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
     struct RFstring *string;
     //get the function's arguments
     int32_t error;
-    RF_ENTER_LOCAL_SCOPE();
 
     if (!stringIN) {
         RF_WARNING("Provided null pointer for insertion");
-        ret = false;
-        goto cleanup0;
+        return false;
     }
 
     lineFound = allocatedS = false;
     //determine the target line
-    if(lineN == 0)
-    {
+    if (lineN == 0) {
         RF_ERROR("Illegal value of 0 was given for the line argument. Line "
                  "indexing starts from 1");
-        ret = false;
-        goto cleanup0;//failure
+        return false;
     }
-    if(!after)
-    {
+    
+    if (!after) {
         lineN-=1;
     }
 
@@ -1738,19 +1700,16 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
     /// cleanup 1 - For the string
     //if we don't have the RFstring default Unix style line ending
     //making a new one since stringP can be on the local stack and we can't use replace since that would act on the local stack
-    if(t->eol != RF_EOL_LF && linesCount > 1)
-    {
+    if (t->eol != RF_EOL_LF && linesCount > 1) {
         allocatedS = true;
-        if(!(string = rf_string_copy_out(stringIN)))
-        {
+        if (!(string = rf_string_copy_out(stringIN))) {
             RF_ERROR("Failure at making a copy of a string");
-            ret = false;
-            goto cleanup0;
+            return false;
         }
-        if(t->eol == RF_EOL_CRLF)
-        {
-            if(!rf_string_replace(string, &g_eol_lf, &g_eol_crlf, 0, 0))
-            {
+
+        if (t->eol == RF_EOL_CRLF) {
+
+            if (!rf_string_replace(string, &g_eol_lf, &g_eol_crlf, 0, 0)) {
                 RF_ERROR("Failure at editing the newline character of string "
                          "\""RF_STR_PF_FMT"\" while inserting it into "
                          "Textfile \""RF_STR_PF_FMT"\"",
@@ -1758,11 +1717,9 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
                 ret = false;
                 goto cleanup1;
             }
-        }
-        else
-        {
-            if(!rf_string_replace(string, &g_eol_lf, &g_eol_cr, 0, 0))
-            {
+        } else {
+
+            if (!rf_string_replace(string, &g_eol_lf, &g_eol_cr, 0, 0)) {
                 RF_ERROR("Failure at editing the newline character of string "
                          "\""RF_STR_PF_FMT"\" while inserting it into "
                          "Textfile \""RF_STR_PF_FMT"\"",
@@ -1776,8 +1733,7 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
     }
 
     //go to the beginning of this file
-    if(!goto_filestart(t))
-    {
+    if (!goto_filestart(t)) {
         RF_ERROR(
                  "Failed to move the internal filepointer"
                  " of TextFile \""RF_STR_PF_FMT"\" to the beginning",
@@ -1790,24 +1746,23 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
     t->previousOp = RF_FILE_READ;
     //now open another temporary file
     ///cleanup2 - is for temporary file Deletion
-    if(!rf_string_initv(&tempFileName, RF_STR_PF_FMT"_temp",
-                      RF_STR_PF_ARG(&t->name)))
-    {
+    if (!rf_string_initv(&tempFileName, RF_STR_PF_FMT"_temp",
+                      RF_STR_PF_ARG(&t->name))) {
+
         RF_ERROR("Failure at string initialization for the temporary file");
         ret = false;
         goto cleanup1;
     }
-    if(!(newFile = rf_fopen(&tempFileName, "w"i_PLUSB_WIN32)))
-    {
+
+    if (!(newFile = rf_fopen(&tempFileName, "w"i_PLUSB_WIN32))) {
         RF_ERROR("Opening a temporary file failed due to fopen() with "
                  "errno %d", errno);
         ret = false;
         goto cleanup1;
     }
-    if(t->hasBom)
-    {
-        if(!add_BOM(newFile, t->encoding, t->endianess))
-        {
+
+    if (t->hasBom) {
+        if (!add_BOM(newFile, t->encoding, t->endianess)) {
             RF_ERROR(
                      "Failed to add BOM to the newly created temporary file");
             ret = false;
@@ -1815,12 +1770,10 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
         }
     }
     //special case
-    if(lineN==0)
-    {
+    if (lineN == 0) {
         lineFound = true;
         //get the file offset that we are going to come back to in success
-        if((tOff = rfFtell(newFile))== (RFfile_offset)-1)
-        {
+        if ((tOff = rfFtell(newFile))== (RFfile_offset) - 1) {
             RF_ERROR("Reading the file position failed due to ftell() "
                      "with errno %d", errno);
             ret = false;
@@ -1830,8 +1783,7 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
         //write the given line to the other file according to eol
         ret = write_to_file_eol(newFile, t, string);
         //and check for errors
-        if(!ret)
-        {
+        if (!ret) {
             RF_ERROR("There was a file write error while inserting "
                      "string \""RF_STR_PF_FMT"\" at the beginning"
                      " of Text File "
@@ -1842,8 +1794,7 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
     }
 
     //initialize a string reading buffer
-    if(!rf_stringx_init_buff(&buffer, RF_OPTION_FGETS_READ_BYTESN+1, ""))
-    {
+    if (!rf_stringx_init_buff(&buffer, RF_OPTION_FGETS_READ_BYTESN+1, "")) {
         RF_ERROR("Failure at string buffer initialization");
         ret = false;
         goto cleanup2;
@@ -1857,22 +1808,20 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
         //write the given line to the other file according to eol
         ret = write_to_file_eol(newFile, t, &buffer.INH_String);
         //and check for errors
-        if(!ret)
-        {
+        if (!ret) {
             RF_ERROR("There was a file write error while inserting "
                      "string \""RF_STR_PF_FMT"\" at line [%llu] "
                      "inside Text File \""RF_STR_PF_FMT"\"",
                      RF_STR_PF_ARG(string), lineN, RF_STR_PF_ARG(&t->name));
             goto cleanup3;
         }
+
         //also if this is the place to put the line, do it
-        if(t->line - 1 == lineN)
+        if (t->line - 1 == lineN) {
         //-1 is since right after the ReadLine function
         // the current line changes
-        {
             lineFound = true;
-            if((tOff = rfFtell(newFile)) == (RFfile_offset)-1)
-            {
+            if ((tOff = rfFtell(newFile)) == (RFfile_offset) - 1) {
                 //get the file offset that we are going to
                 //come back to in success
                 RF_ERROR("Reading the file position failed due to ftell() "
@@ -1883,8 +1832,7 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
             //write the given line to the other file according to eol
             ret = write_to_file_eol(newFile, t, string);
             //and check for errors
-            if(!ret)
-            {
+            if (!ret) {
                 RF_ERROR("There was a file write error while inserting "
                          "string \""RF_STR_PF_FMT"\" at line [%llu] "
                          "inside Text File \""RF_STR_PF_FMT"\"",
@@ -1893,22 +1841,19 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
             }
         }
         error = rf_textfile_read_line(t, &buffer);
-    }while(error == RF_SUCCESS);
+    } while (error == RF_SUCCESS);
     //get rid of the no longer needed buffer
     rf_stringx_deinit(&buffer); /// going back to cleanup2
+
     // if we reached the end of file and the line was not found
-    if(!lineFound)
-    {
-        if(error == RE_FILE_EOF)
-        {
+    if (!lineFound) {
+        if (error == RE_FILE_EOF) {
             RF_ERROR("While attempting to find line [%llu] of TextFile "
                      "\""RF_STR_PF_FMT"\" premature End Of File was encountered",
                      lineN, RF_STR_PF_ARG(&t->name));
             ret = false;
             goto cleanup2;
-        }//or else if there was an error
-        else
-        {
+        } else { //or else if there was an error
             RF_ERROR("While attempting to find line [%llu] of TextFile "
                      "\""RF_STR_PF_FMT"\" a file reading error was encountered",
                      lineN, RF_STR_PF_ARG(&t->name));
@@ -1918,17 +1863,16 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
     }
     //delete the old file
     fclose(t->f);
-    if(!rf_system_delete_file(&t->name))
-    {
+    if (!rf_system_delete_file(&t->name)) {
         ret = false;
         RF_ERROR("After the insertion operation the temporary file used"
                  " could not be deleted");
         goto cleanup1;
     }
+
     //rename the temp file to be the new file
     fclose(newFile);
-    if(!rf_system_rename_file(&tempFileName, &t->name))
-    {
+    if (!rf_system_rename_file(&tempFileName, &t->name)) {
         ret = false;
         RF_ERROR("After the insertion operation the temporary file used"
                  ", could not be renamed to the original file");
@@ -1936,8 +1880,8 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
     }
     //after renaming we no longer need the string
     rf_string_deinit(&tempFileName);
-    if(!(t->f = rf_fopen(&t->name, "r"i_PLUSB_WIN32"+")))
-    {
+
+    if (!(t->f = rf_fopen(&t->name, "r"i_PLUSB_WIN32"+"))) {
         RF_ERROR("Failed to open the edited file after insertion "
                  "due to fopen() with errno %d", errno);
         ret = false;
@@ -1945,18 +1889,18 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
     }
     //if the line was inserted before this line then this line should be
     // + the number of lines the string has
-    if(lineN<t->line)
-    {
+    if (lineN<t->line) {
         t->line += linesCount;
     }
-    if(allocatedS)
-    {
+
+    if (allocatedS) {
         rf_string_destroy(string);
     }
     //go to the beginning of the inserted lines
-    TEXTFILE_RESETPTR_JMP(t, lineN, false, tOff, ret = false, cleanup0);
-    ///success, ret should be true
-    goto cleanup0;
+    TEXTFILE_RESETPTR(t, lineN, false, tOff, return false);
+
+    // success
+    return true;
 
     ///cleanup code
 cleanup3:
@@ -1975,8 +1919,6 @@ cleanup1:
     {
         rf_string_destroy(string);
     }
-cleanup0:
-    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -1995,8 +1937,7 @@ bool rf_textfile_remove(struct RFtextfile* t, uint64_t lineN)
 
     lineFound = false;
     //determine the target line
-    if(lineN == 0)
-    {
+    if (lineN == 0) {
         RF_ERROR("Illegal line number given. Line indexing starts from "
                  "zero.");
         return false;
@@ -2004,15 +1945,13 @@ bool rf_textfile_remove(struct RFtextfile* t, uint64_t lineN)
     //in the very beginning keep the previous file position and line number
     prLine = t->line;
     prEof = t->eof;
-    if((prOff = rfFtell(t->f)) == (RFfile_offset)-1)
-    {
+    if ((prOff = rfFtell(t->f)) == (RFfile_offset) - 1) {
         RF_ERROR("Querying current file pointer at function start failed "
                  "due to ftell() with errno %d", errno);
         return false;
     }
     //go to the beginning of this file
-    if(!goto_filestart(t))///Go back to the staring file position -- cleanup1
-    {
+    if (!goto_filestart(t)) { ///Go back to the staring file position -- cleanup1
         RF_ERROR(
                  "Failed to move the internal filepointer of "
                  "TextFile \""RF_STR_PF_FMT"\" "
@@ -2023,26 +1962,24 @@ bool rf_textfile_remove(struct RFtextfile* t, uint64_t lineN)
     RF_TEXTFILE_CANREAD_JMP(t, ret = false, cleanup1);
     t->previousOp = RF_FILE_READ;
     //now open another temporary file
-    if(!rf_string_initv(&tempFileName, RF_STR_PF_FMT"_temp",
-                      RF_STR_PF_ARG(&t->name)))
-    {
+    if (!rf_string_initv(&tempFileName, RF_STR_PF_FMT"_temp",
+                      RF_STR_PF_ARG(&t->name))) {
+
         RF_ERROR("Failed to initialize the string for the name of the "
                  "temporary file");
         ret = false;
         goto cleanup1;
     }
-    if((newFile = rf_fopen(&tempFileName, "w"i_PLUSB_WIN32)) == NULL)
-    {    ///need to cleanup the temporary file -- cleanup2
+    if ((newFile = rf_fopen(&tempFileName, "w"i_PLUSB_WIN32)) == NULL) {
+        ///need to cleanup the temporary file -- cleanup2
         RF_ERROR("Failed to open a temporary file during text file line"
                  " removal due to fopen() with errno %d", errno);
         ret = false;
         goto cleanup1;
     }
 
-    if(t->hasBom)
-    {
-        if(!add_BOM(newFile,t->encoding, t->endianess))
-        {
+    if (t->hasBom) {
+        if (!add_BOM(newFile,t->encoding, t->endianess)) {
             RF_ERROR(
                      "Failed to add a BOM to the newly created temporary file");
             ret = false;
@@ -2050,18 +1987,18 @@ bool rf_textfile_remove(struct RFtextfile* t, uint64_t lineN)
         }
     }
     //initialize a string reading buffer
-    if(!rf_stringx_init_buff(&buffer, RF_OPTION_FGETS_READ_BYTESN+1, ""))
-    { ///Need to clean the buff string -- cleanup3
+    if (!rf_stringx_init_buff(&buffer, RF_OPTION_FGETS_READ_BYTESN+1, "")) {
+        ///Need to clean the buff string -- cleanup3
         RF_ERROR("Failed to initialize a string buffer");
         ret = false;
         goto cleanup2;
     }
+
     //read every line of this file from the beginning
-    while((error =rf_textfile_read_line(t,&buffer)) == RF_SUCCESS)
-    {
+    while ((error =rf_textfile_read_line(t,&buffer)) == RF_SUCCESS) {
+
         //only if this line is not the one to remove write the line to the temporary file
-        if(t->line-1 != lineN)//-1 is since right after the ReadLine function the current line changes
-        {
+        if(t->line-1 != lineN) {//-1 is since right after the ReadLine function the current line changes
             //write the given line to the other file according to eol
             ret = write_to_file_eol(newFile, t, &buffer.INH_String);
             //and check for errors
@@ -2073,28 +2010,21 @@ bool rf_textfile_remove(struct RFtextfile* t, uint64_t lineN)
                     lineN, RF_STR_PF_ARG(&t->name));
                 goto cleanup3;
             }
-        }
-        else//found the line for removal, don't copy in the new file. Keep its size in bytes
-        {
+        } else {//found the line for removal, don't copy in the new file. Keep its size in bytes
             lineFound = true;
         }
-
     }
     //get rid of the no longer needed buffer
     rf_stringx_deinit(&buffer); ///no need to clean this up anymore later, back to cleanup2
     // if we reached the end of file and the line was not found
-    if(lineFound==false)
-    {
-        if(error == RE_FILE_EOF)
-        {
+    if (lineFound==false) {
+        if (error == RE_FILE_EOF) {
             RF_ERROR(
                      "While attempting to find line [%llu]"
                      " of TextFile \""RF_STR_PF_FMT"\""
                      " for removal premature End Of File was encountered",
                      lineN, RF_STR_PF_ARG(&t->name));
-        }//or else if there was an error
-        else
-        {
+        } else { //or else if there was an error
             RF_ERROR(
                      "While attempting to find line [%llu]"
                      " of TextFile \""RF_STR_PF_FMT"\""
@@ -2106,8 +2036,7 @@ bool rf_textfile_remove(struct RFtextfile* t, uint64_t lineN)
     }
     //delete the old file
     fclose(t->f);
-    if(!rf_system_delete_file(&t->name))
-    {
+    if (!rf_system_delete_file(&t->name)) {
         RF_ERROR(
                  "After the removal operation the temporary file used, could "
                  "not be deleted");
@@ -2116,8 +2045,7 @@ bool rf_textfile_remove(struct RFtextfile* t, uint64_t lineN)
     }
     //rename the temp file to be the new file
     fclose(newFile); /// no need to clean this up anymore, back to cleanup1
-    if(!rf_system_rename_file(&tempFileName,&t->name))
-    {
+    if (!rf_system_rename_file(&tempFileName,&t->name)) {
         RF_ERROR(
                  "After the removal operation the temporary file used, could "
                  "not be renamed to the original file");
@@ -2126,8 +2054,7 @@ bool rf_textfile_remove(struct RFtextfile* t, uint64_t lineN)
     }
     //after renaming we no longer need the string
     rf_string_deinit(&tempFileName);
-    if((t->f = rf_fopen(&t->name, "r"i_PLUSB_WIN32"+")) == NULL)
-    {
+    if ((t->f = rf_fopen(&t->name, "r"i_PLUSB_WIN32"+")) == NULL) {
         RF_ERROR("Error at opening the renamed file after the textfile "
                  "removal operation");
         ret = false;
@@ -2136,12 +2063,11 @@ bool rf_textfile_remove(struct RFtextfile* t, uint64_t lineN)
     //if the line was removed before this line then we should reduce the current line count
     t->line = prLine;
     t->eof = prEof;
-    if(lineN<t->line)
-    {
+    if (lineN<t->line) {
         t->line--;
     }
     //get the file position to the proper place
-    TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, false);
+    TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, return false);
     ///success
     return true;
 
@@ -2158,7 +2084,7 @@ cleanup2:
     }
     rf_string_deinit(&tempFileName);
 cleanup1:
-    TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, false);
+    TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, return false);
     return ret;
 }
 //Replaces a line of the textfile with the given string
@@ -2172,22 +2098,18 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
     struct RFstringx buffer;
     RFfile_offset tOff=0;
     int32_t error;
-    RF_ENTER_LOCAL_SCOPE();
 
     if (!string) {
         RF_ERROR("The replace string argument given is NULL");
-        ret = false;
-        goto cleanup0;
+        return false;
     }
 
     lineFound = allocatedS = false;
     //determine the target line
-    if(lineN == 0)
-    {
+    if (lineN == 0) {
         RF_ERROR("The line number argument given is invalid. Indexing starts "
                  "from one");
-        ret = false;
-        goto cleanup0;//failure
+        return false;
     }
 
     //determine how many lines the given string has
@@ -2195,29 +2117,22 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
     /// cleanup 1 - For this string
     //if we don't have the RFstring default Unix style line ending
     //making a new one since stringP can be on the local stack and we can't use replace since that would act on the local stack
-    if(t->eol != RF_EOL_LF && linesCount>0)
-    {
+    if (t->eol != RF_EOL_LF && linesCount>0) {
         allocatedS = true;
-        if((string = rf_string_copy_out((struct RFstring*)string)) == NULL)
-        {
+        if ((string = rf_string_copy_out((struct RFstring*)string)) == NULL) {
             RF_ERROR("String copying failed");
             ret = false;
             goto cleanup1;
         }
-        if(t->eol == RF_EOL_CRLF)
-        {
-            if(!rf_string_replace(string, &g_eol_lf, &g_eol_crlf, 0, 0))
-            {
+        if (t->eol == RF_EOL_CRLF) {
+            if (!rf_string_replace(string, &g_eol_lf, &g_eol_crlf, 0, 0)) {
                 RF_ERROR("Editing the newline character for the to-replace "
                          "string failed");
                 ret = false;
                 goto cleanup1;
             }
-        }
-        else
-        {
-            if(!rf_string_replace(string, &g_eol_lf, &g_eol_cr, 0, 0))
-            {
+        } else {
+            if (!rf_string_replace(string, &g_eol_lf, &g_eol_cr, 0, 0)) {
                 RF_ERROR("Editing the newline character for the to-replace "
                          "string failed");
                 ret = false;
@@ -2227,8 +2142,7 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
     }
 
     //go to the beginning of this file
-    if(!goto_filestart(t))
-    {
+    if (!goto_filestart(t)) {
         RF_ERROR(
                  "Failed to move the internal filepointer"
                  " of TextFile \""RF_STR_PF_FMT"\" "
@@ -2240,23 +2154,20 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
     RF_TEXTFILE_CANREAD_JMP(t, ret = false, cleanup1);
     t->previousOp = RF_FILE_READ;
     //now open another temporary file
-    if(!rf_string_initv(&tempFileName, RF_STR_PF_FMT"_temp",
-                      RF_STR_PF_ARG(&t->name)))
-    {///cleanup2 - For the removal and deallocation of the temporary file
+    if (!rf_string_initv(&tempFileName, RF_STR_PF_FMT"_temp",
+                      RF_STR_PF_ARG(&t->name))) {
+        ///cleanup2 - For the removal and deallocation of the temporary file
         RF_ERROR("Failed to initialize a temporary file name");
         ret = false;
         goto cleanup1;
     }
-    if((newFile = rf_fopen(&tempFileName, "w"i_PLUSB_WIN32)) == NULL)
-    {
+    if ((newFile = rf_fopen(&tempFileName, "w"i_PLUSB_WIN32)) == NULL) {
         RF_ERROR("Failed to open a temporary file during line replacing");
         ret = false;
         goto cleanup2;
     }
-    if(t->hasBom)
-    {
-        if(!add_BOM(newFile, t->endianess, t->encoding))
-        {
+    if (t->hasBom) {
+        if (!add_BOM(newFile, t->endianess, t->encoding)) {
             RF_ERROR(
                      "Failed to add BOM to the newly created temporary file");
             ret = false;
@@ -2264,36 +2175,30 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
         }
     }
     //initialize a string reading buffer
-    if(!rf_stringx_init_buff(&buffer,RF_OPTION_FGETS_READ_BYTESN+1,""))
-    {///cleanup3- For the deinit of the string buffer
+    if (!rf_stringx_init_buff(&buffer,RF_OPTION_FGETS_READ_BYTESN+1,"")) {
+        ///cleanup3- For the deinit of the string buffer
         RF_ERROR("Failure to initialize a StringX buffer during textfile"
                  "line replacing");
         ret = false;
         goto cleanup2;
     }
     //read every line of this file from the beginning;
-    while((error =rf_textfile_read_line(t,&buffer)) == RF_SUCCESS)
-    {
+    while ((error =rf_textfile_read_line(t,&buffer)) == RF_SUCCESS) {
         //write the read line to the other file if this is not the line to replace
-        if(t->line-1 != lineN)//-1 is since right after the ReadLine function the current line changes
-        {
+        if(t->line-1 != lineN) {//-1 is since right after the ReadLine function the current line changes
             //write the given line to the other file according to eol
             ret = write_to_file_eol(newFile, t, &buffer.INH_String);
             //and check for errors
-            if(!ret)
-            {
+            if (!ret) {
                 RF_ERROR(
                          "While attempting to replace line [%llu] of TextFile"
                          " \""RF_STR_PF_FMT"\" a write error occured",
                          lineN, RF_STR_PF_ARG(&t->name));
                 goto cleanup3;
             }
-        }
-        else//else this is the line to replace so..
-        {
+        } else {//else this is the line to replace so..
             lineFound = true;
-            if((tOff = rfFtell(newFile))== (RFfile_offset)-1)//get the file offset that we are going to come back to in success
-            {
+            if ((tOff = rfFtell(newFile)) == (RFfile_offset) - 1) {//get the file offset that we are going to come back to in success
                 RF_ERROR("Reading the file position failed due to ftell() "
                          "with errno %d", errno);
                 ret = false;
@@ -2302,8 +2207,7 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
             //write the given line to the other file according to eol
             ret = write_to_file_eol(newFile, t, string);
             //and check for errors
-            if(!ret)
-            {
+            if (!ret) {
                 RF_ERROR(
                          "While attempting to replace line [%llu] of TextFile"
                          " \""RF_STR_PF_FMT"\" a write error occured",
@@ -2315,17 +2219,13 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
     //get rid of the no longer needed buffer
     rf_stringx_deinit(&buffer);///back to cleanup 2
     // if we reached the end of file and the line was not found
-    if(lineFound == false)
-    {
-        if(error == RE_FILE_EOF)
-        {
+    if (lineFound == false) {
+        if (error == RE_FILE_EOF) {
             RF_ERROR("While attempting to find line [%llu] "
                      "of TextFile \""RF_STR_PF_FMT"\" for replacement,"
                      "premature End Of File was "
                      "encountered", lineN, RF_STR_PF_ARG(&t->name));
-        }//or else if there was an error
-        else
-        {
+        } else { //or else if there was an errors
             RF_ERROR("While attempting to find line [%llu] "
                      "of TextFile \""RF_STR_PF_FMT"\" for replacement,"
                      " a file reading error was "
@@ -2336,8 +2236,7 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
     }
     //delete the old file
     fclose(t->f);
-    if(!rf_system_delete_file(&t->name)) ///back to cleanup2
-    {
+    if (!rf_system_delete_file(&t->name)) {///back to cleanup2
         RF_ERROR("After the replacement operation the temporary file "
                  "used, could not be deleted");
         ret = false;
@@ -2345,8 +2244,7 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
     }
     //rename the temp file to be the new file
     fclose(newFile);
-    if(!rf_system_rename_file(&tempFileName,&t->name))
-    {
+    if (!rf_system_rename_file(&tempFileName,&t->name)) {
         RF_ERROR("After the replacement operation the temporary file "
                  "used, could not be renamed to the original file");
         ret = false;
@@ -2354,23 +2252,21 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
     }
     //after renaming the file we no longer need the string
     rf_string_deinit(&tempFileName);
-    if((t->f = rf_fopen(&t->name, "r"i_PLUSB_WIN32"+")) == NULL)
-    {
+    if ((t->f = rf_fopen(&t->name, "r"i_PLUSB_WIN32"+")) == NULL) {
         RF_ERROR("Failed to open the edited file after textfile line "
                  "replacing due to fopen() with errno %d", errno);
         ret = false;
         goto cleanup1;
     }
-    if(allocatedS == true)
-    {
+    if (allocatedS == true) {
         rf_string_destroy(string);
     }
     //get the file pointer to the beginning of the newly replaced line
-    TEXTFILE_RESETPTR_FROMSTART_JMP(t, lineN, false, tOff, ret = false, cleanup0);
+    TEXTFILE_RESETPTR_FROMSTART(t, lineN, false, tOff, return false);
 
     ///success
-    RF_EXIT_LOCAL_SCOPE();
     return true;
+    
     ///cleanup code
 cleanup3:
     rf_stringx_deinit(&buffer);
@@ -2388,8 +2284,6 @@ cleanup1:
     {
         rf_string_destroy(string);
     }
-cleanup0:
-    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 

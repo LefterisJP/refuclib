@@ -55,27 +55,21 @@ bool rf_system_make_dir(void* dirname, int mode)
 {
     char* cs;
     unsigned int index;
-    bool ret = true;
-    RF_ENTER_LOCAL_SCOPE();
-    RF_NULLCHECK1(dirname, "directory name", ret = false; goto cleanup);
+    RF_NULLCHECK1(dirname, "directory name", return false);
 
-    if(!(cs = rf_string_cstr_ibuff_push(dirname, &index))) {
-        ret = false;
-        goto cleanup;
+    if (!(cs = rf_string_cstr_ibuff_push(dirname, &index))) {
+        return false;
     }
     
     //make the directory
-    if(mkdir(cs, mode) != 0) {
+    if (mkdir(cs, mode) != 0) {
         RF_ERROR("Creating a directory failed due to mkdir() "
                  "errno %d", errno);
-        ret = false;
+        return false;
     }
 
-
     rf_string_cstr_ibuff_pop(index);
-cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return true;
 }
 
 //Removes a directory and all its files
@@ -87,22 +81,19 @@ bool rf_system_remove_dir(void* dirname)
     char *cs;
     unsigned int index;
     struct RFstringx path;
-    RF_ENTER_LOCAL_SCOPE();
-    RF_NULLCHECK1(dirname, "directory name",
-                   ret = false; goto cleanup_local);
+    RF_NULLCHECK1(dirname, "directory name", return false);
 
-    if(!(cs = rf_string_cstr_ibuff_push(dirname, &index))) {
-        ret = false;
-        goto cleanup_local;
+    if (!(cs = rf_string_cstr_ibuff_push(dirname, &index))) {
+        return false;
     }
 
-    if(!rf_stringx_init_buff(&path, 1024, "")) {
+    if (!rf_stringx_init_buff(&path, 1024, "")) {
         RF_ERROR("Failed to initialize a stringX buffer");
         ret = false;
         goto cleanup_cstr_buff;
     }
     //open the directory
-    if(!(dir = opendir(cs))) {
+    if (!(dir = opendir(cs))) {
         RF_ERROR("Failed to open the given directory due to "
                  "opendir() errno %d", errno);
         ret = false;
@@ -111,27 +102,29 @@ bool rf_system_remove_dir(void* dirname)
 
     //keep the previous errno for  comparison
     int prErrno = errno;
-    while((entry = readdir(dir)) != NULL)
-    {
+    while ((entry = readdir(dir)) != NULL) {
+        
         //skip this and the parent dir
-        if (strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
-        {
+        if (strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..")) {
+            
             //create the full entry name
-            if(!rf_stringx_assign(
-                   &path,
-                   RFS_(RF_STR_PF_FMT RF_DIRSEP "%s",
-                        RF_STR_PF_ARG(dirname), entry->d_name)))
-            {
+            RFS_buffer_push();
+            if (!rf_stringx_assign(
+                    &path,
+                    RFS_(RF_STR_PF_FMT RF_DIRSEP "%s",
+                         RF_STR_PF_ARG(dirname), entry->d_name))) {
+
                 RF_ERROR("Failure at assigning the directory name to the "
                          "path string");
                 ret = false;
+                RFS_buffer_pop();
                 goto cleanup_path;
             }
+            RFS_buffer_pop();
+            
             //if this directory entry is a directory itself, call the function recursively
-            if (entry->d_type == DT_DIR)
-            {
-                if(!rf_system_remove_dir(&path))
-                {
+            if (entry->d_type == DT_DIR) {
+                if (!rf_system_remove_dir(&path)) {
                     RF_ERROR("Calling rf_system_remove_dir on directory "
                              "\""RF_STR_PF_FMT"\" failed",
                              RF_STR_PF_ARG(&path));
@@ -141,9 +134,9 @@ bool rf_system_remove_dir(void* dirname)
                 //else we deleted that directory and we should go to the next entry of this directory
                 continue;
             }
+            
             //if we get here this means it's a file that needs deletion
-            if(!rf_system_delete_file(&path))
-            {
+            if (!rf_system_delete_file(&path)) {
                 RF_ERROR("Failed to remove file \""RF_STR_PF_FMT"\""
                          " due to unlink() "
                          "errno %d", RF_STR_PF_ARG(&path), errno);
@@ -152,23 +145,22 @@ bool rf_system_remove_dir(void* dirname)
             }//end of check of succesful file removal
         }//end of the current and parent dir check
     }//end of directory entries iteration
+    
     //check for readdir error
-    if(errno != prErrno) //is this the best way to check?
-    {
+    if (errno != prErrno) { //is this the best way to check?
         RF_ERROR("Failure in reading the contents of a directory "
                  "due to readdir() errno %d", errno);
         ret = false;
         goto cleanup_path;
     }
-    if(closedir(dir) != 0)
-    {
+    
+    if (closedir(dir) != 0) {
         RF_ERROR("Failure in closing a directory", "closedir");
         ret = false;
         goto cleanup_path;
     }
     //finally delete the directory itself
-    if(!rf_system_remove_dir(dirname))
-    {
+    if (!rf_system_remove_dir(dirname)) {
         RF_ERROR("Failed to remove directory \""RF_STR_PF_FMT"\" "
                  "due to rmdir() errno %d",
                  RF_STR_PF_ARG(dirname), errno);
@@ -180,37 +172,29 @@ cleanup_path:
     rf_stringx_deinit(&path);
 cleanup_cstr_buff:
     rf_string_cstr_ibuff_pop(index);
-cleanup_local:
-    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
 //Deletes a file
 bool rf_system_delete_file(void* name)
 {
-    bool ret = true;
     char *cs;
     unsigned int index;
-    RF_ENTER_LOCAL_SCOPE();
-    RF_NULLCHECK1(name, "file name", ret = false; goto cleanup);
-    if(!(cs = rf_string_cstr_ibuff_push(name, &index)))
-    {
-        ret = false; goto cleanup;
+    RF_NULLCHECK1(name, "file name", return false);
+    if (!(cs = rf_string_cstr_ibuff_push(name, &index))) {
+        return false;
     }        
 
     //if we get here this means it's a file that needs deletion
-    if(unlink(cs) != 0)
-    {
+    if (unlink(cs) != 0) {
         RF_ERROR("Removing file \""RF_STR_PF_FMT"\" failed due"
                  " to unlink() errno %d",
                  RF_STR_PF_ARG(name), errno);
-        ret = false;
+        return false;
     }//end of check of succesful file removal
 
     rf_string_cstr_ibuff_pop(index);
- cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return true;
 }
 
 // Renames a file
@@ -220,20 +204,16 @@ bool rf_system_rename_file(void* name, void* newName)
     char *cs_name;
     char *cs_new_name;
     unsigned int index;
-    RF_ENTER_LOCAL_SCOPE();
-    RF_NULLCHECK2(name, newName, ret = false; goto cleanup);
+    RF_NULLCHECK2(name, newName, return false);
 
-    if(!(cs_name = rf_string_cstr_ibuff_push(name, &index)))
-    {
-        ret = false; goto cleanup;
+    if (!(cs_name = rf_string_cstr_ibuff_push(name, &index))) {
+        return false;
     }    
-    if(!(cs_new_name = rf_string_cstr_ibuff_push(newName, NULL)))
-    {
+    if (!(cs_new_name = rf_string_cstr_ibuff_push(newName, NULL))) {
         ret = false; goto cleanup1;
     }
 
-    if(rename(cs_name, cs_new_name) != 0)
-    {
+    if (rename(cs_name, cs_new_name) != 0) {
         RF_ERROR("Renaming file \""RF_STR_PF_FMT"\" to "
                  "\""RF_STR_PF_FMT"\" failed due to rename() "
                  "errno %d", RF_STR_PF_ARG(name), RF_STR_PF_ARG(newName),
@@ -244,8 +224,6 @@ bool rf_system_rename_file(void* name, void* newName)
 
   cleanup1:
     rf_string_cstr_ibuff_pop(index);
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -296,24 +274,20 @@ FILE* rf_popen(void* command, const char* mode)
     FILE* ret = NULL;
     unsigned int index;
     char *cs;
-    RF_ENTER_LOCAL_SCOPE();
+
 
     if (strcmp(mode,"r") != 0 && strcmp(mode,"w") != 0) {
         RF_ERROR("Invalid mode argument provided to rf_popen()");
-        goto cleanup;
+        return NULL;
     }
 
     if(!(cs = rf_string_cstr_ibuff_push(command, &index))) {
-        goto cleanup;
+        return NULL;
     }
 
     ret = popen(cs, mode);
 
     rf_string_cstr_ibuff_pop(index);
-
-
-cleanup:
-    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 

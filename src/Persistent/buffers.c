@@ -35,7 +35,7 @@ const struct RFstring *rf_persistent_buffer_create_str_from_str(
     struct RFstring *ret;
     uint32_t other_length = rf_string_length_bytes(other);
     size_t required_size = sizeof(struct RFstring) + other_length;
-    rf_bufffer_try_increase_size(b, required_size);
+    rf_buffer_try_increase_size(b, required_size);
 
     // point the string itself to the buffer
     ret = rf_buffer_current_ptr(b, struct RFstring);

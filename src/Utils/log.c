@@ -35,6 +35,7 @@
 #include <Utils/localscope.h> //for the local scope macros
 #include <String/rf_str_core.h> //for static RFstring init
 #include <String/rf_str_retrieval.h> //for string accessors
+#include <Persistent/buffers.h> // for TSBUFFA
 #include <Parallel/rf_threading.h> //for thread id and RFmutex
 #include <Utils/sanity.h> //for RF_ASSERT
 #include <Utils/memory.h> //for RF_MALLOC
@@ -216,6 +217,7 @@ static bool format_log_message(struct RFlog *log,
     struct tm *now_tm;
     size_t s;
     int ret;
+
     gettimeofday(&tv, NULL);
     now_tm = localtime(&tv.tv_sec);
 
@@ -264,28 +266,25 @@ static bool format_log_message(struct RFlog *log,
     return true;
 }
 
-
 static void log_add(struct RFlog *log, enum RFlog_level level,
                     const char* file, const char* func,
                     int line, struct RFstring* msg)
 {
-    RF_ENTER_LOCAL_SCOPE();
-    if(log->level < level)
-    {
-        RF_EXIT_LOCAL_SCOPE();
+    RFS_buffer_push();
+    if (log->level < level) {
+        RFS_buffer_pop();
         return;
     }
 
 
     /* TODO: Maybe use different synchronization strategy here? */
     rf_mutex_lock(&log->lock);
-    if(!format_log_message(log, level, file, func, line, msg))
-    {
+    if (!format_log_message(log, level, file, func, line, msg)) {
         //TODO: how to handle this?
         RF_ASSERT(0, "Could not add a log message");
     }
     rf_mutex_unlock(&log->lock);
-    RF_EXIT_LOCAL_SCOPE();
+    RFS_buffer_pop();
     return;
 }
 

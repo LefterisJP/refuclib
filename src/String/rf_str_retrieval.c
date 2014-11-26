@@ -126,20 +126,13 @@ bool rf_string_substr(const void* s, uint32_t start_pos,
 int32_t rf_string_find(const void* tstr, const void* sstr,
                        enum RFstring_matching_options options)
 {
-    int32_t ret;
-    RF_ENTER_LOCAL_SCOPE();
     /* sanity checks are performed inside rf_string_find_byte_pos() */
-
-    if((ret = rf_string_find_byte_pos(tstr, sstr, options)) == RF_FAILURE)
-    {
-        ret = RF_FAILURE;
-        goto cleanup;
+    int32_t ret;
+    if ((ret = rf_string_find_byte_pos(tstr, sstr, options)) == RF_FAILURE) {
+        return RF_FAILURE;
     }
 
-    ret = rf_string_bytepos_to_charpos(tstr, ret, false);
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return rf_string_bytepos_to_charpos(tstr, ret, false);
 }
 
 
@@ -149,22 +142,17 @@ int32_t rf_string_find_i(const void* thisstr, const void* sstr,
 {
     struct RFstring sub;
     int32_t ret = RF_FAILURE;//the return value
-    RF_ENTER_LOCAL_SCOPE();
     /* sanity checks are performed inside rf_string_substr() */
-    if(!rf_string_substr(thisstr, start_pos, length, &sub))
-    {
-        goto cleanup1;
+    if (!rf_string_substr(thisstr, start_pos, length, &sub)) {
+        return RF_FAILURE;
     }
 
     //now search for the sstr substring inside the sub substring defined by length
-    if((ret=rf_string_find(&sub, sstr, options)) != RF_FAILURE)
-    {
+    if ((ret = rf_string_find(&sub, sstr, options)) != RF_FAILURE) {
         ret += start_pos;//return the proper position in the original string
     }
     rf_string_deinit(&sub);//free the sub substring and return
 
-cleanup1:
-    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -180,7 +168,6 @@ unsigned int rf_string_begins_with_any(const void *thisstr,
     int i = 0;
     int j = 0;
 
-    RF_ENTER_LOCAL_SCOPE();
     //get all the codepoints of the string
     subLength = rf_string_fill_codepoints(chars);
     if (subLength <= 0) {
@@ -217,7 +204,6 @@ cleanup:
     if (bytes) {
         *bytes = byte_position;
     }
-    RF_EXIT_LOCAL_SCOPE();
     return matching_chars;
 }
 
@@ -231,11 +217,11 @@ int rf_string_count(const void* tstr,
     char *s;
     char *prs;
     unsigned int len;
-    RF_ENTER_LOCAL_SCOPE();
+
     n = 0;
     if (!sstr) {
         RF_WARNING("Provided null search string");
-        goto fail;
+        return -1;
     }
     s = rf_string_data(tstr);
 
@@ -250,7 +236,7 @@ int rf_string_count(const void* tstr,
     while(s) {
         if (positions) {
             rf_array_set(positions, n, uint32_t,
-                         s - rf_string_data(tstr), goto fail);
+                         s - rf_string_data(tstr), return -1);
         }
         n ++;
         len -= (s - prs) + rf_string_length_bytes(sstr);
@@ -260,11 +246,8 @@ int rf_string_count(const void* tstr,
                        rf_string_data(sstr), rf_string_length_bytes(sstr));
     }
 
-    RF_EXIT_LOCAL_SCOPE();
+
     return n;
-fail:
-    RF_EXIT_LOCAL_SCOPE();
-    return -1;
 }
 
 
@@ -275,27 +258,25 @@ bool rf_string_scanf_after(const void* str, const void* astr,
     const char *found;
     unsigned int sub_length;
     unsigned int buff_size;
-    bool ret = false;
 
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(str, "got null string in function");
     if (!astr) {
         RF_WARNING("Provided NULL \'after\' string");
-        goto cleanup;
+        return false;
     }
     if (!format) {
         RF_WARNING("Provided NULL \'format\' c string");
-        goto cleanup;
+        return false;
     }
     if (!var) {
         RF_WARNING("Provided NULL pointer for the return value");
-        goto cleanup;
+        return false;
     }
 
     found = strstr_nnt(rf_string_data(str), rf_string_length_bytes(str),
                       rf_string_data(astr), rf_string_length_bytes(astr));
     if (!found) {
-        goto cleanup;
+        return false;
     }
     //get a pointer to the start of the position where sscanf will be used
     s = rf_string_data(str) + (
@@ -315,13 +296,11 @@ bool rf_string_scanf_after(const void* str, const void* astr,
 
     //use sscanf (!!!) strings are not null terminated
     if (sscanf(rf_buffer_current_ptr(TSBUFFA, char), format, var) <= 0) {
-        goto cleanup;
+        return false;
     }
+    
     //success
-    ret = true;
-cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return true;
 }
 
 
@@ -332,20 +311,18 @@ bool rf_string_between(const void* tstr, const void* lstr,
     int start, end;
     struct RFstring temp;
     bool ret = false;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(tstr, "got null string in function");
 
     /* null pointer check for lstr and rstr is in rf_string_find_byte_pos() */
 
     if (!result) {
         RF_WARNING("Provided null pointer for the result string");
-        goto cleanup;
+        return false;
     }
 
     //find the left substring
-    if((start = rf_string_find_byte_pos(tstr, lstr, options)) == RF_FAILURE)
-    {
-        goto cleanup;
+    if ((start = rf_string_find_byte_pos(tstr, lstr, options)) == RF_FAILURE) {
+        return false;
     }
     //get what is after it, no check since we already found it
     rf_string_after(tstr, lstr, &temp, options);
@@ -358,33 +335,29 @@ bool rf_string_between(const void* tstr, const void* lstr,
     //initialize the string to return
     if(options & RF_STRINGX_ARGUMENT)
     {
-        if(!rf_stringx_assign_unsafe_nnt(
+        if (!rf_stringx_assign_unsafe_nnt(
                result,
                rf_string_data(tstr) + start + rf_string_length_bytes(lstr),
-               end))
-        {
+               end)) {
+            
             goto cleanup_temp;
         }
     }
     else
     {
-        if(!rf_string_assign_unsafe_nnt(
-               result,
-               rf_string_data(tstr) + start + rf_string_length_bytes(lstr),
-               end))
-        {
+        if (!rf_string_assign_unsafe_nnt(
+                result,
+                rf_string_data(tstr) + start + rf_string_length_bytes(lstr),
+                end)) {
             goto cleanup_temp;
         }
     }
     //success
     ret = true;
 
-
 cleanup_temp:
     //free temp string
     rf_string_deinit(&temp);
-cleanup:
-    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 
@@ -395,27 +368,21 @@ bool rf_string_beforev(const void* thisstr, void* result,
     const struct RFstring* s;
     int32_t i,minPos,thisPos;
     va_list argList;
-    bool ret = true;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr, "got null string in function");
 
     if (!result) {
         RF_WARNING("Provided null string for the result");
-        ret = false;
-        goto cleanup;
+        return false;
     }
 
     //get the parameter characters
     va_start(argList, parN);
     minPos = INT_MAX;
-    for(i = 0; i < parN; i++)
-    {
+    for (i = 0; i < parN; i++) {
         s = (const struct RFstring*) va_arg(argList, struct RFstring*);
         /* null pointer check is in rf_string_find_byte_pos() */
-        if((thisPos= rf_string_find_byte_pos(thisstr, s, options))!= RF_FAILURE)
-        {
-            if(thisPos < minPos)
-            {
+        if ((thisPos= rf_string_find_byte_pos(thisstr, s, options))!= RF_FAILURE) {
+            if (thisPos < minPos) {
                minPos = thisPos;
             }
         }
@@ -423,32 +390,21 @@ bool rf_string_beforev(const void* thisstr, void* result,
     va_end(argList);
 
     //if it is not found
-    if(minPos == INT_MAX)
-    {
-        ret = false;
-        goto cleanup;
+    if (minPos == INT_MAX) {
+        return false;
     }
     //if it is found initialize the substring for return
-    if(options & RF_STRINGX_ARGUMENT)
-    {
-        if(!rf_stringx_init_unsafe_nnt(result, rf_string_data(thisstr), minPos))
-        {
-            ret = false;
-            goto cleanup;
+    if (options & RF_STRINGX_ARGUMENT) {
+        if (!rf_stringx_init_unsafe_nnt(result, rf_string_data(thisstr), minPos)) {
+            return false;
         }
-    }
-    else
-    {
-        if(!rf_string_init_unsafe_nnt(result, rf_string_data(thisstr), minPos))
-        {
-            ret = false;
-            goto cleanup;
+    } else {
+        if (!rf_string_init_unsafe_nnt(result, rf_string_data(thisstr), minPos)) {
+            return false;
         }
     }
 
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return true;
 }
 
 bool rf_string_before(const void* thisstr, const void* sstr,
@@ -456,44 +412,32 @@ bool rf_string_before(const void* thisstr, const void* sstr,
                       enum RFstring_matching_options options)
 {
     int32_t rv;
-    bool ret = true;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr, "got null string in function");
 
     /* null pointer check for sstr is in rf_string_find_byte_pos() */
     if (!result) {
         RF_WARNING("Provided NULL pointer for the string to return");
-        ret = false;
-        goto cleanup;
+        return false;
     }
 
     //find the substring
-    if((rv = rf_string_find_byte_pos(thisstr, sstr, options)) == RF_FAILURE)
-    {
-        ret = false;
-        goto cleanup;
+    if ((rv = rf_string_find_byte_pos(thisstr, sstr, options)) == RF_FAILURE) {
+        return false;
     }
     //if it is found initialize the substring for return
-    if(options & RF_STRINGX_ARGUMENT)
-    {
-        if(!rf_stringx_init_unsafe_nnt(result, rf_string_data(thisstr), rv))
-        {
-            ret = false;
-            goto cleanup;
+    if (options & RF_STRINGX_ARGUMENT) {
+        if (!rf_stringx_init_unsafe_nnt(result, rf_string_data(thisstr), rv)) {
+            return false;
         }
-    }
-    else
-    {
-        if(!rf_string_init_unsafe_nnt(result, rf_string_data(thisstr), rv))
-        {
-            ret = false;
-            goto cleanup;
+        
+    } else{
+        if (!rf_string_init_unsafe_nnt(result, rf_string_data(thisstr), rv)) {
+            return false;
         }
+        
     }
 
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return true;
 }
 
 bool rf_string_after(const void* thisstr, const void* after,
@@ -501,51 +445,37 @@ bool rf_string_after(const void* thisstr, const void* after,
                      enum RFstring_matching_options options)
 {
     int32_t bytePos;
-    bool ret = true;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr, "got null string in function");
 
     if (!result) {
         RF_WARNING("Null pointer given for the result string ");
-        ret = false;
-        goto cleanup;
+        return false;
     }
     /* sanity check for after string is in rf_string_find_byte_pos() */
     //check for substring existence
-    if((bytePos = rf_string_find_byte_pos(thisstr, after, options)) == RF_FAILURE)
-    {
-        ret = false;
-        goto cleanup;
+    if ((bytePos = rf_string_find_byte_pos(thisstr, after, options)) == RF_FAILURE) {
+        return false;
     }
     bytePos += rf_string_length_bytes(after);
-    if(options & RF_STRINGX_ARGUMENT)
-    {
+    if (options & RF_STRINGX_ARGUMENT) {
         if(!rf_stringx_init_unsafe_nnt(
                result,
                rf_string_data(thisstr) + bytePos,
-               rf_string_length_bytes(thisstr) - bytePos)
-           )
-        {
-            ret = false;
-            goto cleanup;
+               rf_string_length_bytes(thisstr) - bytePos)) {
+            
+            return false;
         }
-    }
-    else
-    {
+    } else {
         if(!rf_string_init_unsafe_nnt(
                result,
                rf_string_data(thisstr) + bytePos,
-               rf_string_length_bytes(thisstr) - bytePos)
-           )
-        {
-            ret = false;
-            goto cleanup;
+               rf_string_length_bytes(thisstr) - bytePos)) {
+            
+            return false;
         }
     }
 
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return true;
 }
 
 
@@ -558,27 +488,21 @@ bool rf_string_afterv(const void* thisstr, void* result,
     uint32_t minPosLength=0;
     //will keep the argument list
     va_list argList;
-    bool ret = true;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr, "got null string in function");
 
     if (!result) {
         RF_WARNING("Null pointer given for the result string ");
-        ret = false;
-        goto cleanup;
+        return false;
     }
 
     //get the parameter characters
     va_start(argList,parN);
     minPos = INT_MAX;
-    for(i = 0; i < parN; i++)
-    {
+    for (i = 0; i < parN; i++) {
         s = (const struct RFstring*) va_arg(argList, struct RFstring*);
         /* null pointer check is in rf_string_find_byte_pos() */
-        if((thisPos= rf_string_find_byte_pos(thisstr, s, options))!= RF_FAILURE)
-        {
-            if(thisPos < minPos)
-            {
+        if( (thisPos= rf_string_find_byte_pos(thisstr, s, options))!= RF_FAILURE) {
+            if (thisPos < minPos) {
                 minPos = thisPos;
                 minPosLength = rf_string_length_bytes(s);
             }
@@ -586,39 +510,28 @@ bool rf_string_afterv(const void* thisstr, void* result,
     }
     va_end(argList);
     //if it is not found
-    if(minPos == INT_MAX)
-    {
-        ret = false;
-        goto cleanup;
+    if (minPos == INT_MAX) {
+        return false;
     }
     //if it is found initialize the substring
     minPos += minPosLength;//go after the found substring
-    if(options & RF_STRINGX_ARGUMENT)
-    {
-        if(!rf_stringx_init_unsafe_nnt(
-               result,
-               rf_string_data(thisstr) + minPos,
-               rf_string_length_bytes(thisstr) - minPos)
-           )
-        {
-            ret = false;
-            goto cleanup;
+    if (options & RF_STRINGX_ARGUMENT) {
+        if (!rf_stringx_init_unsafe_nnt(
+                result,
+                rf_string_data(thisstr) + minPos,
+                rf_string_length_bytes(thisstr) - minPos)) {
+            
+            return false;
         }
-    }
-    else
-    {
-        if(!rf_string_init_unsafe_nnt(
-               result,
-               rf_string_data(thisstr) + minPos,
-               rf_string_length_bytes(thisstr) - minPos)
-           )
-        {
-            ret = false;
-            goto cleanup;
+    } else {
+        if (!rf_string_init_unsafe_nnt(
+                result,
+                rf_string_data(thisstr) + minPos,
+                rf_string_length_bytes(thisstr) - minPos)) {
+            
+            return false;
         }
     }
 
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return true;
 }

@@ -165,7 +165,6 @@ bool rf_string_fwrite(const void* s, FILE* f,
     uint32_t *utf32,length;
     uint16_t* utf16;
     bool ret = true;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(s, "got null string in function");
 
     //depending on the encoding
@@ -224,6 +223,5 @@ bool rf_string_fwrite(const void* s, FILE* f,
     ret = false;
 
 cleanup1:
-    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }

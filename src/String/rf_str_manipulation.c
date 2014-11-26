@@ -54,25 +54,20 @@
 bool rf_string_append(struct RFstring* thisstr, const void* other)
 {
     unsigned int newLen;
-    bool ret = true;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr, "got null string in function");
     if (!other) {
         RF_WARNING("Provided null append string");
-        ret = false;
-        goto cleanup;
+        return false;
     }
 
     newLen = rf_string_length_bytes(thisstr) + rf_string_length_bytes(other);
     //reallocate this string to fit the new addition
-    RF_REALLOC(rf_string_data(thisstr), char, newLen ,
-               ret = false; goto cleanup);
+    RF_REALLOC(rf_string_data(thisstr), char, newLen , return false);
     rf_string_generic_append(thisstr,
                              rf_string_data(other),
                              rf_string_length_bytes(other));
-cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+
+    return true;
 }
 
 bool rf_string_append_int(struct RFstring* thisstr, const int32_t i)
@@ -106,31 +101,26 @@ bool rf_string_append_double(struct RFstring* thisstr,
 
 bool rf_string_prepend(struct RFstring* thisstr, const void* other)
 {
-    bool ret = true;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr, "got null string in function");
     if (!other) {
         RF_WARNING("Provided null string for prepending");
-        ret = false;
-        goto cleanup;
+        return false;
     }
 
     //reallocate this string to fit the new addition
     RF_REALLOC(rf_string_data(thisstr), char,
                rf_string_length_bytes(thisstr) + rf_string_length_bytes(other),
-               ret = false; goto cleanup);
+               return false);
 
-    if(!rf_string_generic_prepend(thisstr,
+    if (!rf_string_generic_prepend(thisstr,
                             rf_string_data(other),
                             rf_string_length_bytes(thisstr),
-                            rf_string_length_bytes(other)))
-    {
-        ret = false;
+                                  rf_string_length_bytes(other))) {
+        
+        return false;
     }
 
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return true;
 }
 
 bool rf_string_remove(void* thisstr, const void* rstr, uint32_t number,
@@ -138,13 +128,11 @@ bool rf_string_remove(void* thisstr, const void* rstr, uint32_t number,
 {
     uint32_t i, count, occurences=0;
     int32_t bytePos;
-    char found = false, ret = true;
-    RF_ENTER_LOCAL_SCOPE();
+    char found = false;
     RF_ASSERT(thisstr, "got null string in function");
     if (!rstr) {
         RF_WARNING("Gave NULL substring to remove");
-        ret = false;
-        goto cleanup;
+        return false;
     }
 
     //as long as we keep finding rstr in the string keep removing it
@@ -154,8 +142,7 @@ bool rf_string_remove(void* thisstr, const void* rstr, uint32_t number,
         if (bytePos == RF_FAILURE) {
             //if we have not even found it once , we fail
             if (!found) {
-                ret = false;
-                goto cleanup;
+                return false;
             } else {
                 //else we are done
                 break;
@@ -168,6 +155,7 @@ bool rf_string_remove(void* thisstr, const void* rstr, uint32_t number,
         for (i = bytePos;
              i < rf_string_length_bytes(thisstr) - rf_string_length_bytes(rstr);
              i ++) {
+            
             rf_string_data(thisstr)[i] = (
                 rf_string_data(thisstr)[i + rf_string_length_bytes(rstr)]
             );
@@ -182,9 +170,7 @@ bool rf_string_remove(void* thisstr, const void* rstr, uint32_t number,
         }
     } while(bytePos != RF_FAILURE);
 
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return true;
 }
 
 //Removes all of the characters of the string except those specified
@@ -197,14 +183,11 @@ bool rf_string_keep_only(void* thisstr, const void* keepstr, int *removals)
     int keepLength;
     int j;
     bool exists;
-    bool ret = true;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr, "got null string in function");
 
     if (!keepstr) {
         RF_WARNING("Provided null string");
-        ret = false;
-        goto cleanup;
+        return false;
     }
 
     if (removals) {
@@ -223,20 +206,17 @@ bool rf_string_keep_only(void* thisstr, const void* keepstr, int *removals)
         //for every character check if it exists in the keep str
         exists = false;
     for (j = 0; j < keepLength; j++) {
-            if (rf_buffer_from_current_at(TSBUFFA, j, uint32_t) == charValue)
-            {
-                exists = true;
-            }
+        if (rf_buffer_from_current_at(TSBUFFA, j, uint32_t) == charValue) {
+            exists = true;
         }
+    }
 
-        if(!exists)
-        {
+    if (!exists) {
             /* move the string back to cover and delete the character */
             character_byte_length = rf_utf8_encode_single(charValue, unused);
             if(character_byte_length < 0) {
                 RF_ERROR("Could not decode a codepoint into UTF-8");
-                ret = false;
-                goto cleanup;
+                return false;
             }
 
             if (removals) {
@@ -260,13 +240,10 @@ bool rf_string_keep_only(void* thisstr, const void* keepstr, int *removals)
             }
             rf_string_length_bytes(thisstr) -= character_byte_length;
             continue;//by contiuing here we make sure that the current string position won't be moved to assure that we also check the newly moved characters
-        }
+    }
     rf_string_iterate_end(i)
 
-cleanup:
-
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return true;
 }
 
 bool rf_string_prune_start(void* thisstr, uint32_t n, unsigned int *removals)
@@ -477,17 +454,14 @@ bool rf_string_prune_middle_f(void* thisstr, uint32_t p,
 
 bool rf_string_trim_start(void* thisstr, const void* sub, unsigned int *removals)
 {
-    bool ret = true;
     uint32_t byte_position;
     unsigned int i;
     unsigned int matching_chars = 0;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr, "got null string in function");
     
     if (!sub) {
         RF_WARNING("Provided null pointer for substring");
-        ret = false;
-        goto cleanup;
+        return false;
     }
 
     matching_chars = rf_string_begins_with_any(thisstr, sub, 0, &byte_position);
@@ -497,43 +471,34 @@ bool rf_string_trim_start(void* thisstr, const void* sub, unsigned int *removals
         *removals = matching_chars;
     }
 
-
     //if we had any match
     if(matching_chars) {
         //remove the characters
-        for(i =0; i < rf_string_length_bytes(thisstr) - byte_position; i++ )
-        {
+        for (i =0; i < rf_string_length_bytes(thisstr) - byte_position; i++ ) {
             rf_string_data(thisstr)[i] = rf_string_data(thisstr)[i + byte_position];
         }
         //also change bytelength
         rf_string_length_bytes(thisstr) -= byte_position;
     }
 
-
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return true;
 }
 
 bool rf_string_trim_end(void* thisstr, const void* sub, unsigned int *rem)
 {
-    bool ret;
     bool iteration_match;
     uint32_t i;
     uint32_t byte_position, last_byte_position;
     int subLength;
     int j;
     unsigned int removals = 0;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr, "got null string in function");
     
     if (!sub) {
         RF_WARNING("Provided null substring for trimming");
-        ret = false;
-        goto cleanup;
+        return false;
     }
     
-    ret = true;
     last_byte_position = 0;
 
     //get all the codepoints of the string
@@ -547,12 +512,11 @@ bool rf_string_trim_end(void* thisstr, const void* sub, unsigned int *rem)
     RF_STRING_ITERATEB_START(thisstr, i, byte_position)
         iteration_match = true;
         //for every substring character
-        for(j = 0; j < subLength; j++)
-        {
-            //if we got a match
-            if(rf_string_bytepos_to_codepoint(thisstr, byte_position) ==
-               rf_buffer_from_current_at(TSBUFFA, j, uint32_t))
-            {
+        for (j = 0; j < subLength; j++) {
+        //if we got a match
+            if (rf_string_bytepos_to_codepoint(thisstr, byte_position) ==
+               rf_buffer_from_current_at(TSBUFFA, j, uint32_t)) {
+                
                 removals += 1;
                 iteration_match = false;
                 last_byte_position = byte_position;
@@ -575,16 +539,13 @@ bool rf_string_trim_end(void* thisstr, const void* sub, unsigned int *rem)
         *rem = removals;
     }
 
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return true;
 }
 
 bool rf_string_trim(void* thisstrP, const void* subP, unsigned int *removals)
 {
     unsigned int local_removals = 0;
     bool res1, res2;
-    RF_ENTER_LOCAL_SCOPE();
     if (removals) {
         res1 = rf_string_trim_start(thisstrP, subP, &local_removals);
         *removals = local_removals;
@@ -594,7 +555,6 @@ bool rf_string_trim(void* thisstrP, const void* subP, unsigned int *removals)
         res1 = rf_string_trim_start(thisstrP, subP, NULL);
         res2 = rf_string_trim_end(thisstrP, subP, NULL);        
     }
-    RF_EXIT_LOCAL_SCOPE();
     return res1|res2;
 }
 
@@ -605,45 +565,38 @@ bool rf_string_replace(struct RFstring* thisstr, const void* sstr,
 {
     //will keep the number of given instances to find
     uint32_t number = num;
-    bool ret = true;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr, "got null string in function");
 
     /* sstr existence is checked for inside replace_intro() function */
     if (!rstr) {
         RF_WARNING("Gave null pointer for the substring to replace");
-        ret = false;
-        goto cleanup;
+        return false;
     }
 
     if(!replace_intro(thisstr, &number, sstr, options)) {
-        ret = false;
-        goto cleanup;
+        return false;
     }
 
     //act depending on the size difference of rstr and sstr
-    if(rf_string_length_bytes(rstr)> rf_string_length_bytes(sstr))
-    {
+    if (rf_string_length_bytes(rstr)> rf_string_length_bytes(sstr)) {
+        
         RF_REALLOC(
             rf_string_data(thisstr), char,
             rf_string_length_bytes(thisstr) + number * (
                 rf_string_length_bytes(rstr) - rf_string_length_bytes(sstr)
             ),
-            ret = false; goto cleanup
+            return false
         );
         replace_greater(thisstr, number, sstr, rstr);
-    }
-    else if(rf_string_length_bytes(rstr) < rf_string_length_bytes(sstr))
-    {
+    } else if (rf_string_length_bytes(rstr) < rf_string_length_bytes(sstr)) {
+        
         replace_lesser(thisstr, number, sstr, rstr);
-    }
-    else //replace and remove strings are equal
-    {
+    } else { //replace and remove strings are equal
+
         replace_equal(thisstr, number, rstr);
     }
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+
+    return true;
 }
 
 

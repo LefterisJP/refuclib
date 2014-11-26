@@ -40,29 +40,20 @@
 #include <Utils/rf_unicode.h> //for unicode functions
 #include <Utils/log.h>
 #include <Utils/memory.h> //for refu memory allocation
-#include <Utils/localscope.h>//for local scope macros
 #include <Utils/sanity.h> //for sanity macros
 /*------------- End of includes -------------*/
 
 bool rf_stringx_append(struct RFstringx* thisstr, const void* other)
 {
-    bool ret = true;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr, "got NULL string in function");
 
     if (!other) {
         RF_WARNING("Provided null string for appending");
-        ret = false;
-        goto cleanup;
+        return false;
     }
-
-    ret = rf_stringx_generic_append(thisstr, rf_string_data(other),
-                                    rf_string_length_bytes(other));
-
-
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    
+    return rf_stringx_generic_append(thisstr, rf_string_data(other),
+                                     rf_string_length_bytes(other));
 }
 
 bool rf_stringx_append_chars(struct RFstringx* thisstr,
@@ -72,34 +63,25 @@ bool rf_stringx_append_chars(struct RFstringx* thisstr,
     uint32_t i;
     uint32_t length = 0;
     unsigned end = 0;
-    bool ret = true;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr, "got NULL string in function");
 
     if (!other) {
         RF_WARNING("Provided null string for appending");
-        ret = false;
-        goto cleanup;
+        return false;
     }
 
     //find out the bytelength of the requested char position
     RF_STRING_ITERATE_START(other, length, i);
-        if(length == chars)
-        {
+        if (length == chars) {
             end = i;
             break;
         }
     RF_STRING_ITERATE_END(length, i)
     //if the end is not found
-    if(!end)
-    {
+    if (!end) {
         end = rf_string_length_bytes(other);
     }
-    ret = rf_stringx_generic_append(thisstr, rf_string_data(other), end);
-
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return rf_stringx_generic_append(thisstr, rf_string_data(other), end);
 }
 
 bool rf_stringx_append_char(struct RFstringx* thisstr, uint32_t unichar)
@@ -118,33 +100,28 @@ bool rf_stringx_append_char(struct RFstringx* thisstr, uint32_t unichar)
 
 bool rf_stringx_prepend(struct RFstringx* thisstr, const void* other)
 {
-    bool ret = true;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr, "got NULL string in function");
 
     if (!other) {
         RF_WARNING("Provided null string for prepending");
-        ret = false;
-        goto cleanup;
+        return false;
     }
 
     //if the new string does not fit inside the buffer reallocate it
     RF_STRINGX_REALLOC(
         thisstr,
         rf_string_length_bytes(thisstr) + rf_string_length_bytes(other),
-        ret = false; goto cleanup
+        return false
     );
 
     if (!rf_string_generic_prepend(thisstr,
                                    rf_string_data(other),
                                    rf_string_length_bytes(thisstr),
                                    rf_string_length_bytes(other))) {
-        ret = false;
+        return false;
     }
 
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return true;
 }
 
 bool rf_stringx_insert(struct RFstringx* thisstr, uint32_t pos,
@@ -154,14 +131,12 @@ bool rf_stringx_insert(struct RFstringx* thisstr, uint32_t pos,
     uint32_t bytePos;
     uint32_t size;
     uint32_t i;
-    bool found = false, ret = false;
-    RF_ENTER_LOCAL_SCOPE();
+    bool found = false;
     RF_ASSERT(thisstr, "got NULL string in function");
 
     if (!other) {
         RF_WARNING("Provided null string for inserting");
-        ret = false;
-        goto cleanup;
+        return false;
     }
 
     //iterate this string to find the byte position of the character position
@@ -174,17 +149,16 @@ bool rf_stringx_insert(struct RFstringx* thisstr, uint32_t pos,
         }
     RF_STRING_ITERATE_END(length, i);
     if (!found) {
-        goto cleanup;
+        return false;
     }
 
 
-    ret = true;
     //keep the original byte length here
     size = rf_string_length_bytes(thisstr);
     //get the new byte length
     rf_string_length_bytes(thisstr) += rf_string_length_bytes(other);
     //check if the new string fits in the buffer and if not reallocate it
-    RF_STRINGX_REALLOC(thisstr, rf_string_length_bytes(thisstr), goto cleanup);
+    RF_STRINGX_REALLOC(thisstr, rf_string_length_bytes(thisstr), return false);
 
     //move the string's contents to make room for the extra string insertion
     memmove(
@@ -195,9 +169,7 @@ bool rf_stringx_insert(struct RFstringx* thisstr, uint32_t pos,
            rf_string_data(other),
            rf_string_length_bytes(other));
 
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return true;
 }
 
 /*--- RFstringx unsafe appending functions---*/
@@ -206,14 +178,11 @@ bool rf_stringx_append_bytes(struct RFstringx* thisstr, const void* other,
                              const unsigned int bytes)
 {
     unsigned int add_bytes;
-    bool ret = true;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr, "got NULL string in function");
 
     if (!other) {
         RF_WARNING("Provided null string for byte appending");
-        ret = false;
-        goto cleanup;
+        return false;
     }
 
     add_bytes = rf_string_length_bytes(other);
@@ -224,12 +193,9 @@ bool rf_stringx_append_bytes(struct RFstringx* thisstr, const void* other,
     RF_STRINGX_REALLOC(
         thisstr,
         rf_string_length_bytes(thisstr) + add_bytes,
-        ret = false; goto cleanup);
-    ret = rf_stringx_generic_append(thisstr, rf_string_data(other), add_bytes);
-
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+        return false);
+    
+    return rf_stringx_generic_append(thisstr, rf_string_data(other), add_bytes);
 }
 
 bool rf_stringx_append_cstr(struct RFstringx* thisstr, const char* cstr)
@@ -259,47 +225,36 @@ bool rf_stringx_replace(struct RFstringx* thisstr, const void* sstr,
 {
     //will keep the number of given instances to find
     uint32_t number = num;
-    bool ret = true;
-    RF_ENTER_LOCAL_SCOPE();
+
     RF_ASSERT(thisstr, "got NULL string in function");
 
     /* sstr existence is checked for inside replace_intro() function */
     if (!rstr) {
         RF_WARNING("Gave null pointer for the substring to replace");
-        ret = false;
-        goto cleanup;
+        return false;
     }
-    if(!replace_intro(thisstr, &number, sstr, options))
-    {
-        ret = false;
-        goto cleanup;
+    if (!replace_intro(thisstr, &number, sstr, options)) {
+        return false;
     }
 
     //act depending on the size difference of rstr and sstr
-    if(rf_string_length_bytes(rstr)> rf_string_length_bytes(sstr))
-    {
+    if (rf_string_length_bytes(rstr)> rf_string_length_bytes(sstr)) {
         //reallocate the string if needed
         RF_STRINGX_REALLOC(
             thisstr,
             rf_string_length_bytes(thisstr) + number * (
                 rf_string_length_bytes(rstr) - rf_string_length_bytes(sstr)
             ),
-            ret = false; goto cleanup
+            return false
         );
         replace_greater(thisstr, number, sstr, rstr);
-    }
-    else if(rf_string_length_bytes(rstr) < rf_string_length_bytes(sstr))
-    {
+    } else if (rf_string_length_bytes(rstr) < rf_string_length_bytes(sstr)) {
         replace_lesser(thisstr, number, sstr, rstr);
-    }
-    else //replace and remove strings are equal
-    {
+    } else { //replace and remove strings are equal
         replace_equal(thisstr, number, rstr);
     }
 
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return true;
 }
 
 //TODO: I really don't like this temporary string_buff. Try to get rid of it
@@ -310,26 +265,22 @@ bool rf_stringx_replace_between(struct RFstringx* thisstr, const void* left,
 {
     uint32_t j,move,start = thisstr->bIndex;
     bool found = false;
-    bool ret=false;
+    bool ret = false;
     bool same_separators = false;
     struct RFstringx string_buff;
-    RF_ENTER_LOCAL_SCOPE();
     RF_ASSERT(thisstr, "got NULL string in function");
 
     if (!left) {
         RF_WARNING("Provided null pointer for the left string");
-        ret = false;
-        goto cleanup;
+        return false;
     }
     if (!right) {
         RF_WARNING("Provided null pointer for the right string");
-        ret = false;
-        goto cleanup;
+        return false;
     }
     if (!rstr) {
         RF_WARNING("Provided null pointer for the replace string");
-        ret = false;
-        goto cleanup;
+        return false;
     }
 
     if (rf_string_equal(left, right)) {
@@ -337,16 +288,14 @@ bool rf_stringx_replace_between(struct RFstringx* thisstr, const void* left,
     }
 
     if (!rf_stringx_init_buff(&string_buff, 128, "")) {
-        ret = false;
         RF_ERROR("No memory");
-        goto cleanup;
+        return false;
     }
 
-    if(i == 0)//if we want all occurences replaced
-    {
+    if (i == 0) { //if we want all occurences replaced
+        
         //while we have occurences of the pair
-        while(!rf_string_between(thisstr, left, right, &string_buff, options))
-        {
+        while (!rf_string_between(thisstr, left, right, &string_buff, options)) {
             found = true;
             /*
              * move the internal pointer right after the left part of the pair
@@ -384,8 +333,7 @@ bool rf_stringx_replace_between(struct RFstringx* thisstr, const void* left,
     ///if we check for a specific instance
     for (j = 1; j < i; j++) {
         //move after the pair of the 'j' inbetween substrings
-        if (!rf_stringx_move_after_pair(thisstr, left, right, 0, options, 0))
-        {
+        if (!rf_stringx_move_after_pair(thisstr, left, right, 0, options, 0)) {
             //and if the occurence does not exist
             move = thisstr->bIndex - start;
             rf_string_data(thisstr) -= move;
@@ -423,8 +371,6 @@ bool rf_stringx_replace_between(struct RFstringx* thisstr, const void* left,
     ret = true;
 cleanup2:
     rf_stringx_deinit(&string_buff);
-cleanup:
-    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
 

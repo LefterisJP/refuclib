@@ -93,13 +93,11 @@ int32_t rf_stringx_move_after(struct RFstringx* thisstr, const void* sub,
                               enum RFstring_matching_options options)
 {
     int32_t move;
-    RF_ENTER_LOCAL_SCOPE();
     /* rf_string_find_byte_pos takes care of invalid input checking */
 
     //check for substring existence and return failure if not found
     if((move = rf_string_find_byte_pos(thisstr, sub, options)) == RF_FAILURE) {
-        move = RF_FAILURE;
-        goto cleanup;
+        return RF_FAILURE;
     }
     //if found, move the internal pointer
     move += rf_string_length_bytes(sub);
@@ -108,8 +106,7 @@ int32_t rf_stringx_move_after(struct RFstringx* thisstr, const void* sub,
                           rf_string_length_bytes(sub), options)) {
         move = RF_FAILURE;
     }
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
+
     return move;
 }
 
@@ -181,8 +178,6 @@ bool rf_stringx_move_afterv(struct RFstringx* thisstr, void* result,
     int32_t thisPos;
     //will keep the argument list
     va_list argList;
-    bool ret = true;
-    RF_ENTER_LOCAL_SCOPE();
     /* validity of input is checked for in the following functions */
 
     // will keep the winning parameter length
@@ -208,17 +203,11 @@ bool rf_stringx_move_afterv(struct RFstringx* thisstr, void* result,
     va_end(argList);
 
     //if it is not found
-    if(minPos == INT_MAX)
-    {
-        ret = false;
-        goto cleanup;
+    if (minPos == INT_MAX) {
+        return false;
     }
     //move the internal pointer after the substring
-    ret = move_internal_ptr(thisstr, minPos + paramLen, result, paramLen, options);
-
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return move_internal_ptr(thisstr, minPos + paramLen, result, paramLen, options);
 }
 
 unsigned int rf_stringx_skip_chars(struct RFstringx* thisstr,
@@ -260,11 +249,9 @@ bool rf_stringx_move_after_pair(struct RFstringx* thisstr, const void* left,
     bool ret = true;
     bool same_separators = false;
     struct RFstringx string_buff;
-    RF_ENTER_LOCAL_SCOPE();
     if (!left || !right) {
         RF_WARNING("Provided NULL substring for left or right pair");
-        ret = false;
-        goto cleanup;
+        return false;
     }
     //check the occurence parameter
     if (occurence == 0) {
@@ -272,8 +259,7 @@ bool rf_stringx_move_after_pair(struct RFstringx* thisstr, const void* left,
     }
 
     if (!rf_stringx_init_buff(&string_buff, 128, "")) {
-        ret = false;
-        goto cleanup;
+        return false;
     }
 
     if (rf_string_equal(left, right)) {
@@ -326,7 +312,5 @@ bool rf_stringx_move_after_pair(struct RFstringx* thisstr, const void* left,
 
 cleanup_str_buff:
     rf_stringx_deinit(&string_buff);
-cleanup:
-    RF_EXIT_LOCAL_SCOPE();
     return ret;
 }
