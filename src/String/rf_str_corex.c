@@ -40,7 +40,6 @@
 #include <Utils/log.h>
 #include <Definitions/retcodes.h> //for error codes
 #include <Utils/constcmp.h>  //for RF_HEXLE_UI() macro and others
-#include <Utils/localscope.h>//for local scope macros
 #include <Utils/memory.h> //for refu memory allocation
 #include <Utils/sanity.h> //for the sanity check macros
 #include <Persistent/buffers.h> //for the internal persistent buffer

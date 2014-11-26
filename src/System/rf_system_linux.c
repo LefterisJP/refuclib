@@ -38,7 +38,6 @@
 #include "../String/rf_str_conversion.ph" //for the buffer Cstr() conversion
 #include <Utils/log.h> //for error logging
 #include <Utils/memory.h> //for refu memory allocation
-#include <Utils/localscope.h> //for local scope macros
 #include <IO/rf_file.h> //rfStat() definition
 #include <Utils/sanity.h> //for Sanity macros
 /*------------- libc inclusion --------------*/

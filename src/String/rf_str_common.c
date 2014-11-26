@@ -36,7 +36,6 @@
 /*------------- Outside Module inclusion -------------*/
 #include <Utils/log.h> //for error logging
 #include <Utils/rf_unicode.h> //for rf_utf8_verify()
-#include "../Utils/localmem.ph" //for the private local memory macros
 #include <Persistent/buffers.h> //for the internal persistent buffer
 /*------------- libc inclusion --------------*/
 #include <stdarg.h> //for va_list
@@ -77,8 +76,7 @@ struct RFstring* i_NVrf_string_create_local(const char* s)
 {
     struct RFstring* ret;
     uint32_t byteLength;
-    //remember the stack pointer before this macro evaluation
-    i_rf_lms_args_eval(return NULL);
+
     //check for validity of the given sequence and get the character length
     if(!rf_utf8_verify(s, &byteLength, 0))
     {

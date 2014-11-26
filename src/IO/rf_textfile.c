@@ -51,7 +51,6 @@
 #include <Utils/memory.h> //for refu memory allocation
 #include <System/rf_system.h> //for System functions
 #include <Utils/constcmp.h> //for RF_HEXEQ_I() macro and others
-#include <Utils/localscope.h> //for the local scope macros
 #include <Utils/sanity.h> //for the sanity check macros
 /*------------- libc inclusion --------------*/
 #include <errno.h>

@@ -32,7 +32,6 @@
 /*------------- Corrensponding Header inclusion -------------*/
 #include <Utils/log.h>
 /*------------- Outside Module inclusion -------------*/
-#include <Utils/localscope.h> //for the local scope macros
 #include <String/rf_str_core.h> //for static RFstring init
 #include <String/rf_str_retrieval.h> //for string accessors
 #include <Persistent/buffers.h> // for TSBUFFA

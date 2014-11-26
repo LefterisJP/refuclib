@@ -38,7 +38,6 @@
 /*------------- Outside Module inclusion -------------*/
 #include <Definitions/retcodes.h> //for bool
 #include <Utils/rf_unicode.h> //for rf_utf8_is_continuation_byte()
-#include <Utils/localscope.h>//for the local scope macros
 #include <Utils/memory.h> //for refu memory allocation
 #include <Utils/sanity.h>
 /*------------- libc inclusion --------------*/

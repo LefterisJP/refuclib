@@ -38,7 +38,6 @@
 #include <Definitions/retcodes.h> //for bool
 #include <Utils/rf_unicode.h> //rf_utf8_is_continuation_byte()
 #include <Utils/bits.h>  //for RF_BITFLAG_ON
-#include <Utils/localscope.h> //for the local scope macros
 #include <Utils/memory.h> //for refu memory allocation
 #include <Utils/sanity.h> //for sanity macros
 #include <Utils/array.h> //for RFarray

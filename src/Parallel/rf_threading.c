@@ -31,7 +31,6 @@
 #include <Parallel/rf_threading.h>
 /*------------- Outside Module inclusion -------------*/
 #include <Utils/log.h>
-#include <Utils/localmem.h>
 #include <Persistent/buffers.h>
 /*------------- End of includes -------------*/
 
@@ -43,18 +42,12 @@ bool rf_init_thread_specific()
                  rf_thread_get_id());
         return false;
     }
-    if (!rf_lms_activate(0, false)) {
-        RF_ERROR("Could not activate the local memory stack "
-                 "module for thread %#010x",
-                 rf_thread_get_id());
-        return false;
-    }
+
     return true;
 }
 
 
 void rf_deinit_thread_specific()
 {
-    rf_lms_deactivate(false);
     rf_persistent_buffers_deactivate_ts();
 }

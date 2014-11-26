@@ -31,7 +31,6 @@
 /*------------- Corrensponding Header inclusion -------------*/
 #include <refu.h>
 /*------------- Outside Module inclusion -------------*/
-#include <Utils/localmem.h> // local memory stack
 #include <Utils/log.h> // logging system
 #include <System/rf_system.h> // for rf_system_activate()
 #include "Persistent/buffers.h" // persistent buffers initialization
@@ -81,10 +80,6 @@ bool rf_init(char *logstr, uint64_t lmsSize, enum RFlog_level level)
     }
 
     /* activate all modules */
-    if (!rf_lms_activate(lmsSize, true)) {
-        RF_ERROR("Failed to initialize the local memory stack");
-        goto cleanup;
-    }
     if (!rf_string_activate()) {
         RF_ERROR("Failed to initialize the string module");
         goto cleanup;
@@ -122,7 +117,6 @@ void rf_deinit()
     rf_system_deactivate();
     rf_persistent_buffers_deactivate();
     rf_string_deactivate();
-    rf_lms_deactivate(true);
 
     /* destroy the refuclib context */
     refu_clibctx_deinit(&i_refu_clibctx);

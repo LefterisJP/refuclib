@@ -39,7 +39,6 @@
 /*------------- Outside Module inclusion -------------*/
 #include <Definitions/retcodes.h> //for error codes
 #include <Utils/log.h>
-#include <Utils/localscope.h> //for local scope macros
 #include <Utils/rf_unicode.h> //for unicode functions
 #include <Utils/memory.h> //for refu memory allocation
 #include <Utils/math.h> //for rf_math_max

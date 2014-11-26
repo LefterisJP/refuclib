@@ -35,7 +35,6 @@
 #include <String/corex.h> //for rf_stringx_init_buff() and others
 #include <Utils/log.h> //for error logging
 #include <Utils/memory.h> //for refu memory allocation
-#include <Utils/localscope.h> //for local scope macros
 /*------------- system includes -------------*/
 #include <windows.h>
 /*------------- libc inclusion --------------*/
@@ -51,14 +50,11 @@ int32_t rf_system_make_dir(void* dirnameP,int mode)
 {
     RFstring* dirname = (RFstring*)dirnameP;
     int32_t error = RF_SUCCESS;
-    RF_ENTER_LOCAL_SCOPE();
 
     //make the directory
-    if(_mkdir(dirname->bytes)!=0)
-    {
+    if(_mkdir(dirname->bytes) != 0) {
         //if we got an error
-        switch(errno)
-        {
+        switch (errno) {
             case EEXIST:
                 error = RE_DIRECTORY_EXISTS;
             break;
@@ -71,7 +67,6 @@ int32_t rf_system_make_dir(void* dirnameP,int mode)
         }
     }
 
-    RF_EXIT_LOCAL_SCOPE();
     return error;
 }
 
@@ -83,48 +78,41 @@ int32_t rf_system_remove_dir(void* dirnameP)
     struct dirent *entry;
     RFstringx path;
     struct stat s;
-    int32_t ret = RF_SUCCESS;
-    RF_ENTER_LOCAL_SCOPE();
 
     rf_stringx_init_buff(&path,1024,"");
     //open the directory
     dir = opendir(dirname->bytes);
-    if(!dir)
-    {
+    if (!dir) {
         RF_ERROR("Failed to access directory "RF_STR_PF_FMT" due to opendir() "
                  "errno %d", RF_STR_PF_ARG(dirname), errno);
-        ret = errno;
-        ret = RFlast_error;
-        goto cleanup1;
+        return errno;
     }
     //keep the previous errno for  comparison
     int prErrno = errno;
-    while((entry = readdir(dir)) != NULL)
-    {
+    while ((entry = readdir(dir)) != NULL) {
+
         //skip this and the parent dir
-        if (strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
-        {
+        if (strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..")) {
+
             //create the full entry name
-            if(!rf_stringx_assign(
+            if (!rf_stringx_assign(
                    &path,
                    RFS_(RF_STR_PF_FMT RF_DIRSEP "%s",
-                        RF_STR_PF_ARG(dirname), entry->d_name)))
-            {
-                ret = RE_STRING_ASSIGN;
-                goto cleanup1;
+                        RF_STR_PF_ARG(dirname), entry->d_name))) {
+
+                return RE_STRING_ASSIGN;
             }
             //if this directory entry is a directory itself, call the function recursively
             stat(path.INH_String.bytes, &s);
-            if (s.st_mode & S_IFDIR)
-            {
-                if( (ret = rf_system_remove_dir(&path)) != RF_SUCCESS)
-                    goto cleanup1;
+            if (s.st_mode & S_IFDIR) {
+                if ((ret = rf_system_remove_dir(&path)) != RF_SUCCESS) {
+                    return ret;
+                }
                 //else we deleted that directory and we should go to the next entry of this directory
                 continue;
             }
             //if we get here this means it's a file that needs deletion
-            if(DeleteFile(path.INH_String.bytes)==0)
-            {
+            if (DeleteFile(path.INH_String.bytes) == 0) {
                 RF_WIN32_GETSYSERROR(strBuff)
                 RF_ERROR("Recursive directory deletion of directory "
                          "\""RF_STR_PF_FMT"\" failed because of inability to "
@@ -134,24 +122,20 @@ int32_t rf_system_remove_dir(void* dirnameP)
                          i_ERROR_CODE,
                          strBuff)
                 LocalFree(strBuff);
-                ret = RE_FILE_DELETE;
-                goto cleanup1;
+                return RE_FILE_DELETE;
             }
         }
-
     }
     closedir(dir);
     //free the path string
     rf_stringx_deinit(&path);
     //check if we finished iterating succesfully
-    if(errno != prErrno)
-    {
-        ret = RFlast_error;
-        goto cleanup1;
+    if (errno != prErrno) {
+        return RFlast_error;
     }
+
     //finally delete the directory itself
-    if(RemoveDirectory(dirname->bytes)==0)
-    {
+    if (RemoveDirectory(dirname->bytes) == 0) {
         RF_WIN32_GETSYSERROR(strBuff)
                 RF_ERROR("Recursive directory deletion of directory "
                          "\""RF_STR_PF_FMT"\" failed because of inability to "
@@ -161,74 +145,61 @@ int32_t rf_system_remove_dir(void* dirnameP)
                          i_ERROR_CODE,
                          strBuff);
         LocalFree(strBuff);
-        ret = RE_DIRECTORY_DELETE;//no need to jump with goto here since it's right after
+
+        return RE_DIRECTORY_DELETE;
     }
 
-cleanup1:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return RF_SUCCESS;
 }
 
 //Deletes a file
 int32_t rf_system_delete_file(void* nameP)
 {
     RFstring* name = (RFstring*)nameP;
-    int32_t ret = RF_SUCCESS;
-    RF_ENTER_LOCAL_SCOPE();
 
-    if(DeleteFile(name->bytes)==0)
-    {
+    if (DeleteFile(name->bytes) == 0) {
         RF_WIN32_GETSYSERROR(strBuff)
         RF_ERROR("Failed to delete file \""RF_STR_PF_FMT"\" because of "
                   "Windows error(%lu):\n%s",
                   RF_STR_PF_ARG(name), i_ERROR_CODE, strBuff)
         LocalFree(strBuff);
-        ret = RE_FILE_DELETE;
+        return RE_FILE_DELETE;
     }
 
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+
+    return RF_SUCCESS;
 }
 // Renames a file
 int32_t rf_system_rename_file(void* nameP,void* newNameP)
 {
     RFstring* name = (RFstring*)nameP;
     RFstring* newName = (RFstring*)newNameP;
-    int32_t ret = RF_SUCCESS;
-    RF_ENTER_LOCAL_SCOPE();
 
-    if(MoveFile(name->bytes,newName->bytes) ==0)
-    {
+
+    if (MoveFile(name->bytes,newName->bytes) == 0) {
         RF_WIN32_GETSYSERROR(strBuff)
         RF_ERROR("Failed to rename file \""RF_STR_PF_FMT"\" to "
                  "\""RF_STR_PF_FMT"\" because of Windows error(%lu):\n:%s",
                  RF_STR_PF_ARG(name) ,RF_STR_PF_ARG(newName), i_ERROR_CODE,
                  strBuff);
         LocalFree(strBuff);
-        ret = RE_FILE_RENAME;
+        return RE_FILE_RENAME;
     }
 
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return RF_SUCCESS;
 }
 
 //Opens another process as a pipe
 FILE* rf_popen(void* commandP,const char* mode)
 {
-    FILE* ret = 0;
     RFstring* command = (RFstring*)commandP;
-    RF_ENTER_LOCAL_SCOPE();
 
     if (strcmp(mode,"r") != 0 && strcmp(mode,"w") != 0) {
         RF_ERROR("Invalid mode argument provided to rf_popen()");
-        goto cleanup;
+        return NULL;
     }
 
-    ret = _popen(command->bytes,mode);
-
-  cleanup:
-    RF_EXIT_LOCAL_SCOPE();
-    return ret;
+    return _popen(command->bytes,mode);
 }
 
 //Closes a pipe

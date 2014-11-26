@@ -37,7 +37,6 @@
 #include <Utils/rf_unicode.h> //for unicode functions
 #include <Definitions/retcodes.h> //for error codes
 #include <Utils/log.h> //for error logging
-#include <Utils/localscope.h>//for local scope macros
 #include <Utils/memory.h> //for refu memory allocation
 #include <Utils/sanity.h> //for the sanity check macros
 #include <Persistent/buffers.h> //for the internal persistent buffer

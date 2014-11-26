@@ -42,7 +42,6 @@
 #include <Utils/log.h>
 #include <Utils/rf_unicode.h> //for unicode functions
 #include <Utils/memory.h> //for refu memory allocation
-#include <Utils/localscope.h> //for local scope macros
 #include <Utils/sanity.h> //for sanity macros
 #include <Persistent/buffers.h> //for the internal persistent buffer
 /*------------- libc inclusion --------------*/
