@@ -19,6 +19,7 @@
 
 /* --- Simple Log Tests --- START --- */
 START_TEST(test_log_flush_and_check) {
+    static const struct RFstring log_name = RF_STRING_STATIC_INIT("refuclib.log");
     struct RFtextfile log_file;
     struct RFstringx buff;
     static const struct RFstring s1 = RF_STRING_STATIC_INIT("Error1");
@@ -47,7 +48,7 @@ START_TEST(test_log_flush_and_check) {
     ck_assert(RF_LOG_FLUSH());
 
     ck_assert(rf_textfile_init(&log_file,
-                               RFS_("refuclib.log"), RF_FILE_READ,
+                               &log_name, RF_FILE_READ,
                                RF_LITTLE_ENDIAN, RF_UTF8, RF_EOL_LF));
     ck_assert(rf_stringx_init_buff(&buff, 1024, ""));
 
@@ -74,13 +75,15 @@ START_TEST(test_log_flush_and_check) {
 
     rf_stringx_deinit(&buff);
     rf_textfile_deinit(&log_file);
-    rf_system_delete_file(RFS_("refuclib.log"));
+    rf_system_delete_file(&log_name);
 }END_TEST
 
 START_TEST(test_log_a_lot) {
     unsigned i;
     struct RFtextfile log_file;
     struct RFstringx buff;
+    static const struct RFstring log_name = RF_STRING_STATIC_INIT("refuclib.log");
+
     for (i = 0; i < 1000; i ++) {
         RF_INFO("This information message will be brought to you again and "
                 "again and again and again and again and again!");
@@ -89,7 +92,7 @@ START_TEST(test_log_a_lot) {
     ck_assert(RF_LOG_FLUSH());
 
     ck_assert(rf_textfile_init(&log_file,
-                               RFS_("refuclib.log"), RF_FILE_READ,
+                               &log_name, RF_FILE_READ,
                                RF_LITTLE_ENDIAN, RF_UTF8, RF_EOL_LF));
     ck_assert(rf_stringx_init_buff(&buff, 1024, ""));
     
@@ -99,7 +102,7 @@ START_TEST(test_log_a_lot) {
 
     rf_stringx_deinit(&buff);
     rf_textfile_deinit(&log_file);
-    rf_system_delete_file(RFS_("refuclib.log"));
+    rf_system_delete_file(&log_name);
 }END_TEST
 
 Suite *log_suite_create(void)

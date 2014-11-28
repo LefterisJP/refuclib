@@ -205,7 +205,7 @@ i_DECLIMEX_ bool rf_system_remove_dir(void* dirname);
  ** @inhtype{String,StringX} @tmpSTR
  ** @return Returns @c true for success and @c false for failure
  **/
-i_DECLIMEX_ bool rf_system_delete_file(void* name);
+i_DECLIMEX_ bool rf_system_delete_file(const void* name);
 
 
 /**

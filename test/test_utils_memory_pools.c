@@ -83,7 +83,7 @@ static bool foo_equals(struct foo *f, int x, int y, int z, char *s)
 #define ck_assert_create_foo(foo_, pool_, x_, y_, z_, cstr_)  \
     do {                                                      \
         foo_ = foo_create(pool_, x_, y_, z_, cstr_);          \
-        ck_assert(foo_);                                      \
+        ck_assert(foo_ != NULL);                              \
         ck_assert(foo_equals(foo_, x_, y_, z_, cstr_));       \
     } while(0)
 

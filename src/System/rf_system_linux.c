@@ -175,7 +175,7 @@ cleanup_cstr_buff:
 }
 
 //Deletes a file
-bool rf_system_delete_file(void* name)
+bool rf_system_delete_file(const void* name)
 {
     char *cs;
     unsigned int index;
