@@ -291,13 +291,13 @@ bool rf_string_scanf_after(const void* str, const void* astr,
     }
     memcpy(rf_buffer_current_ptr(TSBUFFA, char), s, sub_length - 1);
     rf_buffer_from_current_at(TSBUFFA, sub_length, char) = '\0';
-    
+
 
     //use sscanf (!!!) strings are not null terminated
     if (sscanf(rf_buffer_current_ptr(TSBUFFA, char), format, var) <= 0) {
         return false;
     }
-    
+
     //success
     return true;
 }
@@ -310,8 +310,9 @@ bool rf_string_between(const void* tstr, const void* lstr,
     int start, end;
     struct RFstring temp;
     bool ret = false;
+    enum RFstring_matching_options new_options = options & RF_CASE_IGNORE
+                                               ? RF_CASE_IGNORE : 0;
     RF_ASSERT(tstr, "got null string in function");
-
     /* null pointer check for lstr and rstr is in rf_string_find_byte_pos() */
 
     if (!result) {
@@ -320,30 +321,26 @@ bool rf_string_between(const void* tstr, const void* lstr,
     }
 
     //find the left substring
-    if ((start = rf_string_find_byte_pos(tstr, lstr, options)) == RF_FAILURE) {
+    if ((start = rf_string_find_byte_pos(tstr, lstr, new_options)) == RF_FAILURE) {
         return false;
     }
     //get what is after it, no check since we already found it
-    rf_string_after(tstr, lstr, &temp, options);
+    rf_string_after(tstr, lstr, &temp, new_options);
     //find the right substring in the remaining part
-    if((end = rf_string_find_byte_pos(&temp, rstr, options)) == RF_FAILURE)
-    {
+    if((end = rf_string_find_byte_pos(&temp, rstr, new_options)) == RF_FAILURE) {
         goto cleanup_temp;
     }
 
     //initialize the string to return
-    if(options & RF_STRINGX_ARGUMENT)
-    {
+    if (options & RF_STRINGX_ARGUMENT) {
         if (!rf_stringx_assign_unsafe_nnt(
                result,
                rf_string_data(tstr) + start + rf_string_length_bytes(lstr),
                end)) {
-            
+
             goto cleanup_temp;
         }
-    }
-    else
-    {
+    } else {
         if (!rf_string_assign_unsafe_nnt(
                 result,
                 rf_string_data(tstr) + start + rf_string_length_bytes(lstr),
@@ -428,12 +425,12 @@ bool rf_string_before(const void* thisstr, const void* sstr,
         if (!rf_stringx_init_unsafe_nnt(result, rf_string_data(thisstr), rv)) {
             return false;
         }
-        
+
     } else{
         if (!rf_string_init_unsafe_nnt(result, rf_string_data(thisstr), rv)) {
             return false;
         }
-        
+
     }
 
     return true;
@@ -461,7 +458,7 @@ bool rf_string_after(const void* thisstr, const void* after,
                result,
                rf_string_data(thisstr) + bytePos,
                rf_string_length_bytes(thisstr) - bytePos)) {
-            
+
             return false;
         }
     } else {
@@ -469,7 +466,7 @@ bool rf_string_after(const void* thisstr, const void* after,
                result,
                rf_string_data(thisstr) + bytePos,
                rf_string_length_bytes(thisstr) - bytePos)) {
-            
+
             return false;
         }
     }
@@ -519,7 +516,7 @@ bool rf_string_afterv(const void* thisstr, void* result,
                 result,
                 rf_string_data(thisstr) + minPos,
                 rf_string_length_bytes(thisstr) - minPos)) {
-            
+
             return false;
         }
     } else {
@@ -527,7 +524,7 @@ bool rf_string_afterv(const void* thisstr, void* result,
                 result,
                 rf_string_data(thisstr) + minPos,
                 rf_string_length_bytes(thisstr) - minPos)) {
-            
+
             return false;
         }
     }

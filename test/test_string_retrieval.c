@@ -411,8 +411,13 @@ START_TEST(test_string_scanf_after) {
 }END_TEST
 
 START_TEST(test_string_between) {
+    static const struct RFstring p1l = RF_STRING_STATIC_INIT("Αντίθετα, ");
+    static const struct RFstring p1r = RF_STRING_STATIC_INIT("του ΕΤΑΠ-ΜΜΕ στον ΕΟΠΥΥ.");
+    static const struct RFstring f1 = RF_STRING_STATIC_INIT("I am not there");
+    static const struct RFstring p2l = RF_STRING_STATIC_INIT("I am a string with ");
+    static const struct RFstring p2r = RF_STRING_STATIC_INIT(" Letters");
+
     struct RFstring s, s2;
-    struct RFstring p1l, p1r, f1, p2l, p2r;
     struct RFstring ret;
     struct RFstringx retx;
 
@@ -435,12 +440,6 @@ START_TEST(test_string_between) {
     ck_assert(rf_string_init(&ret, ""));
     ck_assert(rf_stringx_init_buff(&retx, 512, ""));
 
-    ck_assert(rf_string_init(&p1l, "Αντίθετα, "));
-    ck_assert(rf_string_init(&p1r, "του ΕΤΑΠ-ΜΜΕ στον ΕΟΠΥΥ."));
-    ck_assert(rf_string_init(&f1, "I am not there"));
-    ck_assert(rf_string_init(&p2l, "I am a string with "));
-    ck_assert(rf_string_init(&p2r, " Letters"));
-
     ck_assert(rf_string_between(&s, &p1l, &p1r, &ret, 0));
     ck_assert_rf_str_eq_cstr(
         &ret,
@@ -459,14 +458,8 @@ START_TEST(test_string_between) {
     ck_assert(!rf_string_between(&s, &p1l, NULL, &ret, 0));
     ck_assert(!rf_string_between(&s, &p1l, &f1, NULL, 0));
 
-
     rf_string_deinit(&s);
     rf_string_deinit(&s2);
-    rf_string_deinit(&f1);
-    rf_string_deinit(&p1l);
-    rf_string_deinit(&p1r);
-    rf_string_deinit(&p2l);
-    rf_string_deinit(&p2r);
     rf_string_deinit(&ret);
     rf_stringx_deinit(&retx);
 }END_TEST
