@@ -107,4 +107,16 @@
     CALLOC_RETURN_ = calloc( (CALLOC_NUM_), (CALLOC_SIZE_) )
 #endif
 
+
+
+/**
+ * Initialize all members of a structure to zero
+ *
+ * Note: A nice way would be to do something like:
+ * struct a = (const struct a) {0};
+ * but in GCC this induces a warning which is a known bug.
+ * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
+ */
+#define RF_STRUCT_ZERO(i_struct_) memset((i_struct_), 0, sizeof(*(i_struct_)))
+
 #endif//include guards end
