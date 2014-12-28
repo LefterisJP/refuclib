@@ -34,6 +34,7 @@
 /*------------- Outside Module inclusion -------------*/
 #include <rf_options.h> //for the logging level defines
 #include <Definitions/retcodes.h> //for bool
+#include <Definitions/inline.h> //for inline
 #include <Definitions/imex.h> //for import export macro
 #include <Definitions/types.h> //for fixed size types
 #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
@@ -50,12 +51,33 @@
 ** @{
 **/
 
+/* -- RFlog_target -- */
+
+enum RFlog_target_type {
+    LOG_TARGET_FILE = 0,
+    LOG_TARGET_STDOUT,
+    LOG_TARGET_STDERR,
+};
+
+struct RFlog_target {
+    enum RFlog_target_type type;
+    struct RFstring file_name;
+};
+
+bool rflog_target_init(struct RFlog_target *t,
+                       enum RFlog_target_type type,
+                       const char *file_name);
+
+void rflog_target_deinit(struct RFlog_target *t);
+
+/* -- RFlog -- */
+
 /**
  * The logging system levels. They follow
  * the syslog protocol as defined in RFC 5424
  * http://tools.ietf.org/html/rfc5424
  */
-enum RFlog_level{
+enum RFlog_level {
     LOG_EMERGENCY = 0,
     LOG_ALERT,
     LOG_CRITICAL,
@@ -71,8 +93,9 @@ enum RFlog_level{
 struct RFlog;
 
 
-i_DECLIMEX_ struct RFlog *rf_log_create(enum RFlog_level level,
-                                        char *log_file_name);
+i_DECLIMEX_ struct RFlog *rf_log_create(enum RFlog_target_type type,
+                                        const char *log_file_name,
+                                        enum RFlog_level level);
 
 i_DECLIMEX_ void rf_log_destroy(struct RFlog *log);
 

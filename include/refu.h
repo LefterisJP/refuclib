@@ -54,19 +54,18 @@ struct RFlog;
  ** This function needs to be called in the very beginning of any program
  ** using the library.
  **
- ** @param errstr           A c string literal with the filename of the log
- **                         to create. If NULL then the value is "refuclib.log"
- ** @param lmsSize          The size of the main thread's local memory stack.
- **                         This will be the size by which the main thread's
- **                         local memory stack will be initialized. It allows
- **                         the usage of macros for temporary object creation.
- **                         If 0 then the compile time constant
- **                         RF_OPTION_LOCALSTACK_MEMORY_SIZE is used.
+ ** @param log_type         The type of target for all logging functionality.
+ **                         Choose between a file, stdout or stderr.
+ **                         For more details: @ref RFlog_target_type
+ ** @param log_file_name    A c string literal with the filename of the log
+ **                         to create.
  ** @param level            The level of the logging system. Possible values
  **                         are enumerated by @ref RFlog_level
  ** @return                 Returns @c true in success
  **/
-i_DECLIMEX_ bool rf_init(char *logstr, uint64_t size, enum RFlog_level level);
+i_DECLIMEX_ bool rf_init(enum RFlog_target_type log_type,
+                         const char *log_file_name,
+                         enum RFlog_level level);
 
 /**
  ** Deinitializes the library. Frees the constructs of all the modules

@@ -270,7 +270,7 @@ i_DECLIMEX_ FILE* rf_freopen(const void* name, const char* mode, FILE* f);
  ** If there was an error @c 0 is returned and an error is logged.
  **
  **/
-i_DECLIMEX_ FILE* rf_popen(void* command, const char* mode);
+i_DECLIMEX_ FILE* rf_popen(const void *command, const char* mode);
 
 
 /**

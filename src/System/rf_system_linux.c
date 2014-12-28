@@ -268,7 +268,7 @@ FILE* rf_freopen(const void* name, const char* mode, FILE* f)
     return ret;
 }
 
-FILE* rf_popen(void* command, const char* mode)
+FILE* rf_popen(const void *command, const char* mode)
 {
     FILE* ret = NULL;
     unsigned int index;

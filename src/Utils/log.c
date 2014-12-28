@@ -34,6 +34,7 @@
 /*------------- Outside Module inclusion -------------*/
 #include <String/rf_str_core.h> //for static RFstring init
 #include <String/rf_str_retrieval.h> //for string accessors
+#include <String/rf_str_conversion.h> //for rf_string_cstr_from_buff()
 #include <Persistent/buffers.h> // for TSBUFFA
 #include <Parallel/rf_threading.h> //for thread id and RFmutex
 #include <Utils/sanity.h> //for RF_ASSERT
@@ -48,6 +49,37 @@
 #include <assert.h>
 /*------------- End of includes -------------*/
 
+/* -- RFlog_target functionality -- */
+bool rflog_target_init(struct RFlog_target *t,
+                       enum RFlog_target_type type,
+                       const char *file_name)
+{
+    t->type = type;
+    if (type == LOG_TARGET_FILE) {
+        if (!file_name) {
+            return false;
+        }
+
+        if (!rf_string_init(&t->file_name, file_name)) {
+            return false;
+        }
+
+        // create a new file for the log
+        FILE *f = fopen(file_name, "w");
+        fclose(f);
+    }
+    return true;
+}
+
+void rflog_target_deinit(struct RFlog_target *t)
+{
+    if (t->type == LOG_TARGET_FILE) {
+        rf_string_deinit(&t->file_name);
+    }
+}
+
+/* -- RFlog functionality -- */
+
 struct RFlog {
     //! The buffer where the log will be kept
     char* buffer;
@@ -57,12 +89,13 @@ struct RFlog {
     uint64_t buff_size;
     //! The log level that we have to keep
     enum RFlog_level level;
-    //! The file to which the log is written
-    FILE *file;
+    //! Description of the log target
+    struct RFlog_target target;
     //! Mutex to protect the buffer when writting from multiple threads
     //! TODO: Maybe figure out a better synchronization method?
     struct RFmutex lock;
 };
+
 static struct RFlog _log;
 
 static const struct RFstring severity_level_string[] = {
@@ -84,8 +117,9 @@ static const struct RFstring severity_level_string[] = {
 #define OCCUPIED(i_log_) ((i_log_)->index - (i_log_)->buffer)
 
 static bool rf_log_init(struct RFlog *log,
-                        enum RFlog_level level,
-                        char *log_file_name)
+                        enum RFlog_target_type type,
+                        const char *log_file_name,
+                        enum RFlog_level level)
 {
     log->buff_size = RF_OPTION_LOG_BUFFER_SIZE;
     log->buffer = malloc(RF_OPTION_LOG_BUFFER_SIZE);
@@ -95,32 +129,35 @@ static bool rf_log_init(struct RFlog *log,
     }
     log->index = log->buffer;
     log->level = level;
+
+    if (!rflog_target_init(&log->target, type, log_file_name)) {
+        assert(0);
+        return false;
+    }
+
     if (!rf_mutex_init(&log->lock)) {
         assert(0);
         return false;
     }
-    log->file = fopen(log_file_name, "wb+");
-    if (!log->file) {
-        RF_ASSERT(0, "Log file could not be initialized");
-        return false;
-    }
+
     return true;
 }
 
 static void rf_log_deinit(struct RFlog *log)
 {
-    fclose(log->file);
+    rflog_target_deinit(&log->target);
     rf_mutex_deinit(&log->lock);
     free(log->buffer);
 }
 
-struct RFlog *rf_log_create(enum RFlog_level level,
-                            char *log_file_name)
+struct RFlog *rf_log_create(enum RFlog_target_type type,
+                            const char *log_file_name,
+                            enum RFlog_level level)
 {
     struct RFlog *ret;
     RF_MALLOC(ret, sizeof(*ret), return NULL);
 
-    if (!rf_log_init(ret, level, log_file_name)) {
+    if (!rf_log_init(ret, type, log_file_name, level)) {
         free(ret);
         return NULL;
     }
@@ -134,9 +171,51 @@ void rf_log_destroy(struct RFlog *log)
     free(log);
 }
 
+// called only on a log that has a file target and only after holding log mutex
+static bool rf_log_flush_file(struct RFlog *log)
+{
+    int rc;
+    FILE *f;
+
+    RFS_buffer_push();
+    f = fopen(rf_string_cstr_from_buff(&log->target.file_name), "ab");
+    RFS_buffer_pop();
+    if (!f) {
+        return false;
+    }
+
+    rc = fwrite(log->buffer, 1, OCCUPIED(log), f);
+    if (rc != OCCUPIED(log)) {
+        fclose(f);
+        return false;
+    }
+
+    fclose(f);
+    return true;
+}
+
+// called only on a log that has an std stream target and only after holding log mutex
+static bool rf_log_flush_stdstream(struct RFlog *log)
+{
+    int rc;
+    if (log->target.type == LOG_TARGET_STDOUT) {
+        rc = fwrite(log->buffer, 1, OCCUPIED(log), stdout);
+        fflush(stdout);
+    } else {
+        RF_ASSERT(LOG_TARGET_STDERR, "at this point log target should only be stderr");
+        rc = fwrite(log->buffer, 1, OCCUPIED(log), stderr);
+        fflush(stderr);
+    }
+
+    if (rc != OCCUPIED(log)) {
+        return false;
+    }
+
+    return true;
+}
+
 bool rf_log_flush(struct RFlog *log)
 {
-    size_t rc;
     bool ret = true;
 
     if (!log) {
@@ -145,12 +224,16 @@ bool rf_log_flush(struct RFlog *log)
     }
 
     rf_mutex_lock(&log->lock);
-    rc = fwrite(log->buffer, 1, OCCUPIED(log), log->file);
-    if (rc != OCCUPIED(log)) {
-        ret = false;
+
+    if (log->target.type == LOG_TARGET_FILE) {
+        ret = rf_log_flush_file(log);
+    } else {
+        ret = rf_log_flush_stdstream(log);
     }
-    fflush(log->file);
+
+    // reset buffer index
     log->index = log->buffer;
+
     rf_mutex_unlock(&log->lock);
     return ret;
 }

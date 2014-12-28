@@ -48,10 +48,11 @@ struct refu_clibctx {
 static struct refu_clibctx i_refu_clibctx;
 
 static bool refu_clibctx_init(struct refu_clibctx *ctx,
-                              enum RFlog_level level,
-                              char *logfilename)
+                              enum RFlog_target_type type,
+                              const char *log_file_name,
+                              enum RFlog_level level)
 {
-    ctx->log = rf_log_create(level, logfilename);
+    ctx->log = rf_log_create(type, log_file_name, level);
     if (!ctx->log) {
         return false;
     }
@@ -71,11 +72,13 @@ static void rf_atexit()
 }
 
 //Initializes the Refu library
-bool rf_init(char *logstr, uint64_t lmsSize, enum RFlog_level level)
+bool rf_init(enum RFlog_target_type log_type,
+             const char *log_file_name,
+             enum RFlog_level level)
 {
     bool ret = false;
     /* create the refuclib ctx */
-    if (!refu_clibctx_init(&i_refu_clibctx, level, logstr)) {
+    if (!refu_clibctx_init(&i_refu_clibctx, log_type, log_file_name, level)) {
         return false;
     }
 

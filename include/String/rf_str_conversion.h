@@ -246,7 +246,7 @@ i_DECLIMEX_ void rf_string_to_upper(void* thisstr);
  **
  ** @isinherited{StringX}
  ** Separates it into @c tokensN depending on how many substrings
- ** can be created from the @c sep separatior and stores them
+ ** can be created from the @c sep separator and stores them
  ** into the Array of RFstring* that should be passed to the
  ** function. The array gets initialized inside the function and
  ** <b>has to be freed explicitly</b> later by thg user.
@@ -264,7 +264,7 @@ i_DECLIMEX_ void rf_string_to_upper(void* thisstr);
  ** separating character has not been found
  **/
 i_DECLIMEX_ bool rf_string_tokenize(const void* thisstr, const void* sep,
-                                   uint32_t* tokensN, struct RFstring** tokens);
+                                    uint32_t* tokensN, struct RFstring** tokens);
 
 //! @}
 

@@ -3,7 +3,7 @@
 
 void setup_string_tests()
 {
-    rf_init("refuclib.log", 0, LOG_DEBUG);
+    rf_init(LOG_TARGET_FILE, "refuclib.log", LOG_DEBUG);
 }
 
 void teardown_string_tests()
@@ -14,7 +14,7 @@ void teardown_string_tests()
 
 void setup_generic_tests()
 {
-    rf_init("refuclib.log", 0, LOG_DEBUG);
+    rf_init(LOG_TARGET_FILE, "refuclib.log", LOG_DEBUG);
 }
 
 void teardown_generic_tests()
