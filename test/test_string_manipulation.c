@@ -38,9 +38,6 @@ START_TEST(test_string_append) {
                              "and its value is 1.6180. Unicode string "
                              "研究室に行ってきます。");
 
-    /* invalid input */
-    ck_assert(!rf_string_append(&s, NULL));
-
     rf_string_deinit(&s);
     rf_string_deinit(&s2);
     rf_string_deinit(&s3);
@@ -108,11 +105,18 @@ START_TEST(test_string_prepend) {
         "ちなみに今日は26日です。"
     );
 
-    /* invalid input */
+    rf_string_deinit(&s);
+    rf_string_deinit(&s2);
+}END_TEST
+
+START_TEST(test_invalid_string_append) {
+    struct RFstring s;
+    ck_assert(rf_string_init(&s, "The meaning of life"));
+
+    ck_assert(!rf_string_append(&s, NULL));
     ck_assert(!rf_string_prepend(&s, NULL));
 
     rf_string_deinit(&s);
-    rf_string_deinit(&s2);
 }END_TEST
 
 
@@ -157,12 +161,8 @@ START_TEST(test_string_remove) {
     ck_assert(rf_string_remove(&s3, &r4, 4, RF_CASE_IGNORE));
     ck_assert_rf_str_eq_cstr(&s3, "This   is  the remaining  sentence AbC");
 
-
     /* non existing substring */
     ck_assert(!rf_string_remove(&s2, &r3, 0, 0 ));
-    /* invalid input */
-    ck_assert(!rf_string_remove(&s2, NULL, 0, 0 ));
-
 
     rf_string_deinit(&s);
     rf_string_deinit(&s2);
@@ -198,9 +198,6 @@ START_TEST(test_string_keep_only) {
     ck_assert(rf_string_init(&s3, "Eleos re paidia"));
     ck_assert(rf_string_keep_only(&s3, &k3, 0));
     ck_assert_rf_str_eq_cstr(&s3, "");
-
-    /* invalid input*/
-    ck_assert(!rf_string_keep_only(&s3, NULL, NULL));
 
     rf_string_deinit(&s);
     rf_string_deinit(&s2);
@@ -396,9 +393,6 @@ START_TEST(test_string_trim_start) {
     ck_assert_rf_str_eq_cstr(&s, "This is the 3rd bullet point of something");
     ck_assert_uint_eq(removals, 0);
 
-    /* invalid input */
-    ck_assert(!rf_string_trim_start(&s, NULL, NULL));
-
     rf_string_deinit(&s);
     rf_string_deinit(&s2);
 }END_TEST
@@ -431,9 +425,6 @@ START_TEST(test_string_trim_end) {
     ck_assert(rf_string_trim_end(&s, &sub2, &removals));
     ck_assert_rf_str_eq_cstr(&s, "警視庁への取材");
     ck_assert_uint_eq(removals, 0);
-
-    /* invalid input */
-    ck_assert(!rf_string_trim_start(&s, NULL, NULL));
 
     rf_string_deinit(&s);
     rf_string_deinit(&s2);
@@ -476,11 +467,26 @@ START_TEST(test_string_trim) {
     ck_assert_rf_str_eq_cstr(&s2, "中の1人に突然顔を殴");
     ck_assert_uint_eq(removals, 0);
 
-    /* invalid input */
+    rf_string_deinit(&s);
+    rf_string_deinit(&s2);
+}END_TEST
+
+START_TEST(test_invalid_string_removals) {
+    struct RFstring s;
+
+    ck_assert(
+        rf_string_init(
+            &s,
+            "If remove\r\ndoes not work correctly here\r\nthe test will"
+            " surely\r\nfail!\r\n")
+    );
+
+    ck_assert(!rf_string_remove(&s, NULL, 0, 0 ));
+    ck_assert(!rf_string_keep_only(&s, NULL, NULL));
+    ck_assert(!rf_string_trim_start(&s, NULL, NULL));
     ck_assert(!rf_string_trim(&s, NULL, NULL));
 
     rf_string_deinit(&s);
-    rf_string_deinit(&s2);
 }END_TEST
 
 
@@ -548,16 +554,26 @@ START_TEST(test_string_replace) {
         "used for exportingになるとの見方を伝えている。"
     );
 
-
-    /* invalid input */
-    ck_assert(!rf_string_replace(&s, NULL, &rb1, 0, 0));
-    ck_assert(!rf_string_replace(&s, &sa1, NULL, 0, 0));
-
     rf_string_deinit(&s);
     rf_string_deinit(&s2);
 }END_TEST
 
+START_TEST(test_invalid_string_replace) {
+    struct RFstring s;
+    struct RFstring sa1 = RF_STRING_STATIC_INIT("$INCLUDES");
+    struct RFstring rb1 = RF_STRING_STATIC_INIT("Chinese media");
+    ck_assert(
+        rf_string_init(
+            &s,
+            "gcc -c -I$INCLUDES $FLAGS $FILE.c -o ./$OBJDIRNAME/$FILE.o"
+        )
+    );
 
+    ck_assert(!rf_string_replace(&s, NULL, &rb1, 0, 0));
+    ck_assert(!rf_string_replace(&s, &sa1, NULL, 0, 0));
+
+    rf_string_deinit(&s);
+}END_TEST
 
 
 /* --- Stringx appending Tests --- START --- */
@@ -575,8 +591,6 @@ START_TEST(test_stringx_append) {
         "研究室に行ってきます。"
     );
 
-    /* invalid input */
-    ck_assert(!rf_stringx_append(&s, NULL));
     rf_stringx_deinit(&s);
 }END_TEST
 
@@ -607,10 +621,6 @@ START_TEST(test_stringx_append_chars) {
     ck_assert(rf_stringx_init(&s2, "S"));
     ck_assert(rf_stringx_append_chars(&s2, &add2, 999));
     ck_assert_rf_str_eq_cstr(&s2, "SΔεύτερη θητεία");
-
-
-    /* invalid input */
-    ck_assert(!rf_stringx_append_chars(&s, NULL, 0));
 
     rf_stringx_deinit(&s);
     rf_stringx_deinit(&s2);
@@ -666,10 +676,6 @@ START_TEST(test_stringx_prepend) {
         "past the 270 margin."
     );
 
-
-    /* invalid input */
-    ck_assert(!rf_stringx_prepend(&s2, NULL));
-
     rf_stringx_deinit(&s);
     rf_stringx_deinit(&s2);
     rf_stringx_deinit(&s3);
@@ -722,9 +728,6 @@ START_TEST(test_stringx_insert) {
     ck_assert(rf_stringx_insert(&s2, 0, &ins2));
     ck_assert_rf_strx_eq_cstr(&s2, "123 - I am a small string");
 
-    /* invalid input */
-    ck_assert(!rf_stringx_insert(&s2, 0, NULL));
-
     rf_stringx_deinit(&s);
     rf_stringx_deinit(&s2);
 }END_TEST
@@ -754,9 +757,6 @@ START_TEST(test_stringx_append_bytes) {
         "I know how to use unsafe operations στην"
     );
 
-    /* invalid input */
-    ck_assert(!rf_stringx_append_bytes(&s, NULL, 8));
-
     rf_stringx_deinit(&s);
 }END_TEST
 
@@ -768,7 +768,19 @@ START_TEST(test_stringx_append_cstr) {
     ck_assert(rf_stringx_append_cstr(&s, cstr));
     ck_assert_rf_strx_eq_cstr(&s, "I know how to use unsafe operations");
 
-    /* invalid input */
+    rf_stringx_deinit(&s);
+}END_TEST
+
+START_TEST(test_invalid_stringx_additions) {
+    struct RFstringx s;
+    ck_assert(rf_stringx_init(
+                  &s, "I am on the train from Kita Senju to Kashiwa station."));
+
+    ck_assert(!rf_stringx_append(&s, NULL));
+    ck_assert(!rf_stringx_append_chars(&s, NULL, 0));
+    ck_assert(!rf_stringx_prepend(&s, NULL));
+    ck_assert(!rf_stringx_insert(&s, 0, NULL));
+    ck_assert(!rf_stringx_append_bytes(&s, NULL, 8));
     ck_assert(!rf_stringx_append_cstr(&s, NULL));
 
     rf_stringx_deinit(&s);
@@ -833,10 +845,6 @@ START_TEST(test_stringx_replace) {
         "シー運転手殴った疑いで逮捕 ||"
     );
 
-    /* invalid input */
-    ck_assert(!rf_stringx_replace(&s, NULL, &rb1, 0, 0));
-    ck_assert(!rf_stringx_replace(&s, &sa1, NULL, 0, 0));
-
     rf_stringx_deinit(&s);
     rf_stringx_deinit(&s2);
 }END_TEST
@@ -880,14 +888,37 @@ START_TEST(test_stringx_replace_between) {
     ck_assert(rf_stringx_replace_between(&s2, &right, &right, &rep2, 0, 4));
     ck_assert_rf_strx_eq_cstr(&s2, "These are simply space tokenized words");
 
+    rf_stringx_deinit(&s);
+    rf_stringx_deinit(&s2);
+}END_TEST
 
-    /* invalid input */
+START_TEST(test_invalid_stringx_replace) {
+    struct RFstringx s;
+    struct RFstring sa1 = RF_STRING_STATIC_INIT("Journalist");
+    struct RFstring rb1 = RF_STRING_STATIC_INIT(
+        " || 投稿動画を参考に捜査…タクシー運転手殴った疑いで"
+        "逮捕 ||"
+    );
+    struct RFstring left = RF_STRING_STATIC_INIT("||");
+    struct RFstring right = RF_STRING_STATIC_INIT(" ");
+    struct RFstring rep1 = RF_STRING_STATIC_INIT("το");
+
+    ck_assert(
+        rf_stringx_init(
+            &s,
+            "Journalist Costas Vaxevanis has gone on trial in Athens "
+            "for breach of privacy after publishing the names of 2,000 "
+            "Greeks with Swiss bank accounts"
+        )
+    );
+
+    ck_assert(!rf_stringx_replace(&s, NULL, &rb1, 0, 0));
+    ck_assert(!rf_stringx_replace(&s, &sa1, NULL, 0, 0));
     ck_assert(!rf_stringx_replace_between(&s, NULL, &right, &rep1, 0, 1));
     ck_assert(!rf_stringx_replace_between(&s, &left, NULL, &rep1, 0, 1));
     ck_assert(!rf_stringx_replace_between(&s, &left, &right, NULL, 0, 1));
 
     rf_stringx_deinit(&s);
-    rf_stringx_deinit(&s2);
 }END_TEST
 
 Suite *string_manipulation_suite_create(void)
@@ -949,6 +980,15 @@ Suite *string_manipulation_suite_create(void)
     tcase_add_test(stringx_replacing, test_stringx_replace);
     tcase_add_test(stringx_replacing, test_stringx_replace_between);
 
+    TCase *string_invalid_manipulation = tcase_create("String Invalid Manipulation");
+    tcase_add_checked_fixture(string_invalid_manipulation,
+                              setup_invalid_args_tests,
+                              teardown_invalid_args_tests);
+    tcase_add_test(string_invalid_manipulation, test_invalid_string_append);
+    tcase_add_test(string_invalid_manipulation, test_invalid_string_removals);
+    tcase_add_test(string_invalid_manipulation, test_invalid_string_replace);
+    tcase_add_test(string_invalid_manipulation, test_invalid_stringx_additions);
+    tcase_add_test(string_invalid_manipulation, test_invalid_stringx_replace);
 
     suite_add_tcase(s, string_appending);
     suite_add_tcase(s, string_removing);
@@ -957,5 +997,7 @@ Suite *string_manipulation_suite_create(void)
     suite_add_tcase(s, stringx_appending);
     suite_add_tcase(s, stringx_unsafe_appending);
     suite_add_tcase(s, stringx_replacing);
+
+    suite_add_tcase(s, string_invalid_manipulation);
     return s;
 }
