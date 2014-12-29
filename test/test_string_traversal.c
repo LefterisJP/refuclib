@@ -45,11 +45,6 @@ START_TEST(test_stringx_move_after) {
     ck_assert(RF_FAILURE != rf_stringx_move_after(&s, &sub2, NULL,
                                                   RF_STRINGX_ARGUMENT));
     ck_assert_rf_str_eq_cstr(&s, "新指導部の７人発表");
-    /* invalid input */
-    ck_assert(RF_FAILURE == rf_stringx_move_after(&s, NULL, &str_buff,
-                                                  RF_STRINGX_ARGUMENT));
-    ck_assert(RF_FAILURE == rf_stringx_move_after(&s, &sub3, &str_buff,
-                                                  RF_STRINGX_ARGUMENT));
 
     rf_stringx_deinit(&s);
     rf_stringx_deinit(&str_buff);
@@ -354,10 +349,6 @@ START_TEST(test_stringx_move_afterv) {
         "και την πορεία προς την αμερικανική πρεσβεία"
     );
 
-
-    /* non existing substrings and null return */
-    ck_assert(!rf_stringx_move_afterv(&s, NULL, 0, 2, &sub3, &sub4));
-
     rf_stringx_deinit(&s);
     rf_stringx_deinit(&str_buff);
 }END_TEST
@@ -469,13 +460,35 @@ START_TEST(test_stringx_move_after_pair) {
 
     /* non existing substrings */
     ck_assert(!rf_stringx_move_after_pair(&s, &sub3, &sub4, &res_str_bad, 0, 2));
-    /* invalid input */
-    ck_assert(!rf_stringx_move_after_pair(&s, NULL, &sub2, &res_str_bad, 0, 2));
-    ck_assert(!rf_stringx_move_after_pair(&s, &sub1, NULL, &res_str_bad, 0, 2));
 
     rf_stringx_deinit(&s);
     rf_string_deinit(&res_str_good);
     rf_string_deinit(&dependent_s);
+}END_TEST
+
+START_TEST(test_invalid_stringx_traversal) {
+    static const struct RFstring sub3 = RF_STRING_STATIC_INIT("ain't there");
+    static const struct RFstring sub4 = RF_STRING_STATIC_INIT("notthere");
+    struct RFstringx s;
+    struct RFstringx str_buff;
+    struct RFstring res_str_bad;
+    ck_assert(rf_stringx_init_buff(&str_buff, 1024, ""));
+    ck_assert(
+        rf_stringx_init(
+            &s,
+            "中国共産党総書記に習近平氏　新指導部の７人発表")
+    );
+
+    ck_assert(RF_FAILURE == rf_stringx_move_after(&s, NULL, &str_buff,
+                                                  RF_STRINGX_ARGUMENT));
+    ck_assert(RF_FAILURE == rf_stringx_move_after(&s, &sub3, &str_buff,
+                                                  RF_STRINGX_ARGUMENT));
+    ck_assert(!rf_stringx_move_afterv(&s, NULL, 0, 2, &sub3, &sub4));
+    ck_assert(!rf_stringx_move_after_pair(&s, NULL, &sub3, &res_str_bad, 0, 2));
+    ck_assert(!rf_stringx_move_after_pair(&s, &sub4, NULL, &res_str_bad, 0, 2));
+
+    rf_stringx_deinit(&s);
+    rf_stringx_deinit(&str_buff);
 }END_TEST
 
 Suite *string_traversal_suite_create(void)
@@ -498,6 +511,15 @@ Suite *string_traversal_suite_create(void)
     tcase_add_test(stringx_traversal, test_stringx_skip_chars);
     tcase_add_test(stringx_traversal, test_stringx_move_after_pair);
 
+    TCase *invalid_stringx_traversal = tcase_create(
+        "Invalid Argument String Traversal Tests"
+    );
+    tcase_add_checked_fixture(invalid_stringx_traversal,
+                              setup_invalid_args_tests,
+                              teardown_invalid_args_tests);
+    tcase_add_test(invalid_stringx_traversal, test_invalid_stringx_traversal);
+
     suite_add_tcase(s, stringx_traversal);
+    suite_add_tcase(s, invalid_stringx_traversal);
     return s;
 }
