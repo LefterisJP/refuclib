@@ -207,16 +207,6 @@ static void test_rf_string_init_generic(const char* filename, int encoding,
                                           true,
                                           line_scenario1));
 
-    /* invalid input */
-    ck_assert(
-        !rf_string_from_file_init(
-            &s2, f, NULL, RF_EOL_LF, encoding, endianess, NULL)
-    );
-    ck_assert(
-        !rf_string_from_file_init(
-            &s2, f, &eof, RF_EOL_LF, 999, endianess, NULL)
-    );
-
     rf_string_deinit(&s);
     fclose(f);
 }
@@ -243,16 +233,6 @@ static void test_rf_string_assign_generic(const char* filename, int encoding,
                                           true,
                                           line_scenario1));
 
-    /* invalid input */
-    ck_assert(
-        !rf_string_from_file_assign(
-            &s2, f, NULL, RF_EOL_LF, encoding, endianess)
-    );
-    ck_assert(
-        !rf_string_from_file_assign(
-            &s2, f, &eof, RF_EOL_LF, 999, endianess)
-    );
-
     rf_string_deinit(&s);
     fclose(f);
 }
@@ -277,16 +257,6 @@ static void test_rf_stringx_assign_generic(const char* filename, int encoding,
                                            endianess,
                                            true,
                                            line_scenario1));
-
-    /* invalid input */
-    ck_assert(
-        !rf_stringx_from_file_assign(
-            &s2, f, NULL, RF_EOL_LF, encoding, endianess)
-    );
-    ck_assert(
-        !rf_stringx_from_file_assign(
-            &s2, f, &eof, RF_EOL_LF, 999, endianess)
-    );
 
     rf_stringx_deinit(&s);
     fclose(f);
@@ -323,16 +293,6 @@ static void test_rf_string_append_generic(const char* filename, int encoding,
                                           line_scenario2)
     );
 
-    /* invalid input */
-    ck_assert(
-        !rf_string_from_file_append(
-            &s2, f, NULL, RF_EOL_LF, encoding, endianess)
-    );
-    ck_assert(
-        !rf_string_from_file_append(
-            &s2, f, &eof, RF_EOL_LF, 999, endianess)
-    );
-
     rf_string_deinit(&s);
     fclose(f);
 }
@@ -365,16 +325,6 @@ static void test_rf_stringx_append_generic(const char* filename, int encoding,
                                            endianess,
                                            true,
                                            line_scenario2)
-    );
-
-    /* invalid input */
-    ck_assert(
-        !rf_stringx_from_file_append(
-            &s2, f, NULL, RF_EOL_LF, encoding, endianess)
-    );
-    ck_assert(
-        !rf_stringx_from_file_append(
-            &s2, f, &eof, RF_EOL_LF, 999, endianess)
     );
 
     rf_stringx_deinit(&s);
@@ -434,9 +384,6 @@ static void test_rf_string_fwrite_generic(const char* filename, int encoding,
     rf_string_deinit(&s2);
     fclose(f);
     fclose(out);
-
-    /* invalid encoding input */
-    ck_assert(!rf_string_fwrite(&s, out, 999, endianess));
 
     /* also delete the outfile */
     ck_assert(rf_system_delete_file(&out_name));
@@ -615,6 +562,54 @@ START_TEST(test_stringx_from_file_append_utf32_be) {
 }END_TEST
 
 
+START_TEST (test_invalid_string_from_file) {
+    FILE *f;
+    struct RFstring s2;
+    char eof;
+    static struct RFstring out_name = RF_STRING_STATIC_INIT(CLIB_TESTS_PATH"outputfile");
+
+    ck_assert((f = fopen(CLIB_TESTS_PATH"utf8stringfile", "rb")) != NULL);
+
+    /* invalid input for init */
+    ck_assert(
+        !rf_string_from_file_init(
+            &s2, f, NULL, RF_EOL_LF, RF_UTF8, RF_LITTLE_ENDIAN, NULL)
+    );
+    ck_assert(
+        !rf_string_from_file_init(
+            &s2, f, &eof, RF_EOL_LF, 999, RF_LITTLE_ENDIAN, NULL)
+    );
+
+    /* invalid input for assign */
+    ck_assert(
+        !rf_string_from_file_assign(
+            &s2, f, NULL, RF_EOL_LF, RF_UTF8, RF_LITTLE_ENDIAN)
+    );
+    ck_assert(
+        !rf_string_from_file_assign(
+            &s2, f, &eof, RF_EOL_LF, 999, RF_LITTLE_ENDIAN)
+    );
+
+    /* invalid input for append */
+    ck_assert(
+        !rf_string_from_file_append(
+            &s2, f, NULL, RF_EOL_LF, RF_UTF8, RF_LITTLE_ENDIAN)
+    );
+    ck_assert(
+        !rf_string_from_file_append(
+            &s2, f, &eof, RF_EOL_LF, 999, RF_LITTLE_ENDIAN)
+    );
+
+    /* invalid encoding input for fwrite */
+    FILE *out;
+    ck_assert((out = fopen(CLIB_TESTS_PATH"outputfile","w+b")) != NULL);
+    ck_assert(!rf_string_fwrite(&s2, out, 999, RF_LITTLE_ENDIAN));
+    fclose(out);
+
+    fclose(f);
+    /* also delete the outfile */
+    ck_assert(rf_system_delete_file(&out_name));
+} END_TEST
 
 Suite *string_files_suite_create(void)
 {
@@ -683,6 +678,12 @@ Suite *string_files_suite_create(void)
     tcase_add_test(stringx_files_append, test_stringx_from_file_append_utf32_le);
     tcase_add_test(stringx_files_append, test_stringx_from_file_append_utf32_be);
 
+    TCase *string_files_invalid_args = tcase_create("string_files_invalid_args");
+    tcase_add_checked_fixture(string_files_invalid_args,
+                              setup_invalid_args_tests,
+                              teardown_invalid_args_tests);
+    tcase_add_test(string_files_invalid_args, test_invalid_string_from_file);
+
 
     suite_add_tcase(s, string_files_init);
     suite_add_tcase(s, string_files_assign);
@@ -691,5 +692,7 @@ Suite *string_files_suite_create(void)
 
     suite_add_tcase(s, stringx_files_assign);
     suite_add_tcase(s, stringx_files_append);
+
+    suite_add_tcase(s, string_files_invalid_args);
     return s;
 }
