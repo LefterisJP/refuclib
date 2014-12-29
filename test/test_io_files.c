@@ -131,14 +131,6 @@ static void test_file_read_line_generic(const char* filename, int encoding,
         get_line(encoding, endianess, false, line_scenario3)
     );
 
-    /* invalid input */
-    ck_assert(
-        !choose_read_line(
-            encoding, f, RF_EOL_LF, NULL, &byte_length, &buffer_size, &eof, endianess
-        )
-    );
-
-
     free(utf8);
     fclose(f);
 }
@@ -195,13 +187,6 @@ static void test_file_read_bytes_generic(const char* filename, int encoding,
     ck_assert_nnt_str_eq_cstr(
         buff,
         get_line(encoding, endianess, false, line_scenario4));
-
-    /* invalid input */
-    ck_assert(
-        !choose_read_line(
-            encoding, f, RF_EOL_LF, NULL, &byte_length, &buffer_size, &eof, endianess
-        )
-    );
 
     fclose(f);
 }
@@ -449,9 +434,9 @@ START_TEST(test_readline_invalid_args) {
     char *utf8;
     uint32_t byte_length;
     uint32_t buffer_size;
-    const struct RFstring fname = RF_STRING_STATIC_INIT("afilename");
+    const struct RFstring fname = RF_STRING_STATIC_INIT(CLIB_TESTS_PATH"utf8stringfile");
 
-    ck_assert((f = rf_fopen(&fname, "wb")) != NULL);
+    ck_assert((f = rf_fopen(&fname, "rb")) != NULL);
 
     /* invalid input */
     ck_assert(

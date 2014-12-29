@@ -465,8 +465,8 @@ Suite *utils_unicode_suite_create(void)
     TCase *boundary_utf8_encoding = tcase_create("UTF8 encoding "
                                                  "boundary conditions");
     tcase_add_checked_fixture(boundary_utf8_encoding,
-                              setup_generic_tests,
-                              teardown_generic_tests);
+                              setup_invalid_args_tests,
+                              teardown_invalid_args_tests);
     tcase_add_test(
         boundary_utf8_encoding,
         test_boundary_utf8_first_possible_sequence_of_certain_length);
@@ -478,8 +478,8 @@ Suite *utils_unicode_suite_create(void)
     TCase *malformed_utf8_encoding = tcase_create("UTF8 encoding "
                                                   "malformed streams");
     tcase_add_checked_fixture(malformed_utf8_encoding,
-                              setup_generic_tests,
-                              teardown_generic_tests);
+                              setup_invalid_args_tests,
+                              teardown_invalid_args_tests);
     tcase_add_test(
         malformed_utf8_encoding,
         test_malformed_utf8_unexpected_continuation_bytes
@@ -504,8 +504,8 @@ Suite *utils_unicode_suite_create(void)
     TCase *overlong_utf8_encoding = tcase_create("UTF8 encoding "
                                                   "overlong sequences");
     tcase_add_checked_fixture(overlong_utf8_encoding,
-                              setup_generic_tests,
-                              teardown_generic_tests);
+                              setup_invalid_args_tests,
+                              teardown_invalid_args_tests);
     tcase_add_test(overlong_utf8_encoding, test_overlong_utf8_ascii);
     tcase_add_test(overlong_utf8_encoding, test_maximum_overlong_utf8_sequence);
     tcase_add_test(overlong_utf8_encoding, test_utf8_overlong_null);
@@ -514,8 +514,8 @@ Suite *utils_unicode_suite_create(void)
         "UTF8 encoding "
         "illegal code positions");
     tcase_add_checked_fixture(illegal_code_position_utf8_encoding,
-                              setup_generic_tests,
-                              teardown_generic_tests);
+                              setup_invalid_args_tests,
+                              teardown_invalid_args_tests);
     tcase_add_test(illegal_code_position_utf8_encoding,
                    test_utf8_illegal_single_utf16_surrogate);
     tcase_add_test(illegal_code_position_utf8_encoding,

@@ -169,9 +169,6 @@ START_TEST(test_string_find) {
     ck_assert_int_eq(rf_string_find(&s3, &f4, RF_CASE_IGNORE|RF_MATCH_WORD),
                      RF_FAILURE);
 
-
-    ck_assert_int_eq(rf_string_find(&s3, NULL, 0), RF_FAILURE);
-
     rf_string_deinit(&s);
     rf_string_deinit(&s2);
     rf_string_deinit(&s3);
@@ -207,8 +204,6 @@ START_TEST(test_string_find_i) {
     ck_assert_int_eq(55, rf_string_find_i(&s2, &f2, 34, 120, 0));
 
     /* edge cases */
-    ck_assert_int_eq(RF_FAILURE,
-                     rf_string_find_i(&s, NULL, 2, 30, 0));
     ck_assert_int_eq(RF_FAILURE,
                      rf_string_find_i(&s, &f1, 1024, 30, 0));
 
@@ -326,9 +321,6 @@ START_TEST(test_string_count) {
 
     /* search specific bytelength */
     ck_assert_int_eq(2, rf_string_count(&s2, &f4, 11, 0, 0));
-
-    /* no search string is an error */
-    ck_assert_int_eq(-1 ,rf_string_count(&s, NULL, 0, 0, 0));
 
     rf_string_deinit(&s);
     rf_string_deinit(&s2);
@@ -590,6 +582,10 @@ START_TEST (test_invalid_string_retrieval) {
                   "with his team for response to governors and mayors seeking "
                   "federal assistance."));
     ck_assert(!rf_string_get_char(&s, 0, NULL));
+    ck_assert_int_eq(rf_string_find(&s, NULL, 0), RF_FAILURE);
+    ck_assert_int_eq(RF_FAILURE,
+                     rf_string_find_i(&s, NULL, 2, 30, 0));
+    ck_assert_int_eq(-1 ,rf_string_count(&s, NULL, 0, 0, 0));
     ck_assert(!rf_string_substr(&s, 21, 22, NULL));
     ck_assert(!rf_string_scanf_after(&s, NULL, "%d", &year));
     ck_assert(!rf_string_scanf_after(&s, &f1, NULL, &year));
