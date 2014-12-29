@@ -54,8 +54,6 @@ START_TEST(test_string_init) {
     ck_assert(rf_string_init(&s, "This is the test of String initialization"));
     ck_assert_rf_str_eq_cstr(&s, "This is the test of String initialization");
 
-    ck_assert(!rf_string_init(&s, NULL));
-
     rf_string_deinit(&s);
 }END_TEST
 
@@ -69,7 +67,6 @@ START_TEST(test_string_initv) {
     );
     ck_assert_rf_str_eq_cstr(&s,
                              "Printf style initialization 1337 3.142 912341");
-    ck_assert(!rf_string_initv(&s, NULL));
 
     RF_STRING_SHALLOW_INIT(&s2, rf_string_data(&s), rf_string_length(&s));
     ck_assert_rf_str_eq_cstr(&s2,
@@ -92,7 +89,6 @@ START_TEST(test_string_initvl) {
                              "Printf style initialization 1337 3.142 912341");
     ck_assert_rf_str_eq_cstr(s1,
                              "Printf style initialization 1337 3.142 912341");
-    ck_assert(!rf_string_initv(&s, NULL));
 
     RF_STRING_SHALLOW_INIT(&s2, rf_string_data(&s), rf_string_length(&s));
     ck_assert_rf_str_eq_cstr(&s2,
@@ -140,7 +136,6 @@ START_TEST(test_string_init_double) {
     ck_assert(rf_string_init_double(&s3, -0.00192, 5));
     ck_assert_rf_str_eq_cstr(&s3, "-0.00192");
 
-
     rf_string_deinit(&s3);
     rf_string_deinit(&s2);
     rf_string_deinit(&s1);
@@ -148,7 +143,7 @@ START_TEST(test_string_init_double) {
 
 
 START_TEST(test_string_init_utf16) {
-    struct RFstring s1, s2;
+    struct RFstring s1;
 
     const uint16_t utf16_buffer[] = {0xD834, 0xDD1E, 0x6771};
     unsigned int utf16b_len = 3 * sizeof(uint16_t);
@@ -157,21 +152,17 @@ START_TEST(test_string_init_utf16) {
     ck_assert(rf_string_init_utf16(&s1, utf16_buffer, utf16b_len));
     ck_assert_rf_str_eq_cstr(&s1, "\xf0\x9d\x84\x9e東");
 
-    ck_assert(!rf_string_init_utf16(&s2, 0, 0));
-
     rf_string_deinit(&s1);
 }END_TEST
 
 START_TEST(test_string_init_utf32) {
-    struct RFstring s1, s2;
+    struct RFstring s1;
 
     const uint32_t utf32_buffer[] = {0x6771,0x4EAC};
     unsigned int utf32b_len = 2;
 
     ck_assert(rf_string_init_utf32(&s1, utf32_buffer, utf32b_len));
     ck_assert_rf_str_eq_cstr(&s1, "東京");
-
-    ck_assert(!rf_string_init_utf32(&s2, 0, 0));
 
     rf_string_deinit(&s1);
 }END_TEST
@@ -190,6 +181,14 @@ START_TEST(test_string_init_unsafe_nnt) {
 
     rf_string_deinit(&s);
 }END_TEST
+
+START_TEST (test_invalid_string_init) {
+    struct RFstring s;
+    ck_assert(!rf_string_init(&s, NULL));
+    ck_assert(!rf_string_initv(&s, NULL));
+    ck_assert(!rf_string_init_utf16(&s, 0, 0));
+    ck_assert(!rf_string_init_utf32(&s, 0, 0));
+} END_TEST
 /* --- String Initialization Tests --- END --- */
 
 
@@ -202,8 +201,6 @@ START_TEST(test_string_assign) {
 
     ck_assert(rf_string_assign(&s, &s2));
     ck_assert_rf_str_eq_cstr(&s, "Nana this is a tasty orange");
-
-    ck_assert(!rf_string_assign(&s2, NULL));
 
     rf_string_deinit(&s);
     rf_string_deinit(&s2);
@@ -251,10 +248,15 @@ START_TEST(test_string_assign_unsafe_nnt) {
     ck_assert(rf_string_assign_unsafe_nnt(&s, cstr, strlen(cstr)));
     ck_assert_rf_str_eq_cstr(&s, "Assigned string, bigger than the assignee");
 
-    /* invalid input */
+    rf_string_deinit(&s);
+}END_TEST
+
+START_TEST(test_invalid_string_assign) {
+    struct RFstring s;
+
+    ck_assert(!rf_string_assign(&s, NULL));
     ck_assert(!rf_string_assign_unsafe_nnt(&s, NULL, 1));
 
-    rf_string_deinit(&s);
 }END_TEST
 /* --- String Assignment Tests --- END --- */
 
@@ -275,8 +277,6 @@ START_TEST(test_string_copy_in) {
     ck_assert_rf_str_eq_cstr(
         &s3, "Robot rock, Time of your life, Human after all");
 
-    ck_assert(!rf_string_copy_in(&s2, NULL));
-
     rf_string_deinit(&s);
     rf_string_deinit(&s2);
 }END_TEST
@@ -291,7 +291,6 @@ START_TEST(test_string_copy_chars) {
 
     ck_assert(rf_string_copy_chars(&s2, &s, 10));
     ck_assert_rf_str_eq_cstr(&s2, "Robot rock");
-    ck_assert(!rf_string_copy_chars(&s2, NULL, 0));
 
     ck_assert(rf_string_copy_chars(&s3, &s, 0));
     ck_assert_rf_str_eq_cstr(&s3, "");
@@ -299,6 +298,13 @@ START_TEST(test_string_copy_chars) {
     rf_string_deinit(&s);
     rf_string_deinit(&s2);
     rf_string_deinit(&s3);
+}END_TEST
+
+START_TEST(test_invalid_string_copy) {
+    struct RFstring s;
+
+    ck_assert(!rf_string_copy_in(&s, NULL));
+    ck_assert(!rf_string_copy_chars(&s, NULL, 0));
 }END_TEST
 /* --- String Copying Tests --- END --- */
 
@@ -511,11 +517,10 @@ START_TEST(test_stringx_init) {
     ck_assert(rf_stringx_init(&sx, "Initializing a StringX"));
     ck_assert_rf_strx_eq_cstr(&sx, "Initializing a StringX");
 
-    ck_assert(!rf_stringx_init(&sx, NULL));
-    ck_assert(!rf_stringx_init(&sx, NULL));
-
     rf_stringx_deinit(&sx);
 }END_TEST
+
+
 
 START_TEST(test_stringx_initv) {
     struct RFstringx sx;
@@ -527,8 +532,6 @@ START_TEST(test_stringx_initv) {
     );
     ck_assert_rf_strx_eq_cstr(&sx,
                               "Printf style initialization 1337 3.142 912341");
-
-    ck_assert(!rf_stringx_initv(&sx, NULL));
 
     rf_stringx_deinit(&sx);
 }END_TEST
@@ -548,7 +551,6 @@ START_TEST(test_stringx_initvl) {
     ck_assert_rf_strx_eq_cstr(sx_alloc,
                               "Printf style initialization 1337 3.142 912341");
 
-    ck_assert(!rf_stringx_initv(&sx, NULL));
 
     rf_stringx_deinit(&sx);
     rf_stringx_destroy(sx_alloc);
@@ -622,8 +624,6 @@ START_TEST(test_stringx_create_buffv) {
     ck_assert_rf_strx_eq_cstr(s2, "There are 45678 people here");
     ck_assert_int_eq(256, s2->bSize);
 
-    ck_assert(!rf_stringx_create_buffv(222, NULL));
-
     rf_stringx_destroy(s);
     rf_stringx_destroy(s2);
 }END_TEST
@@ -666,8 +666,6 @@ START_TEST(test_stringx_init_buffv) {
     );
     ck_assert_rf_strx_eq_cstr(&s2, "There are 45678 people here");
     ck_assert_int_eq(256, s2.bSize);
-
-    ck_assert(!rf_stringx_init_buffv(&s2, 222, NULL));
 
     rf_stringx_deinit(&s);
     rf_stringx_deinit(&s2);
@@ -712,10 +710,18 @@ START_TEST(test_stringx_init_buff) {
     ck_assert_rf_strx_eq_cstr(&s2, "There are 3 people here");
     ck_assert_int_eq(256, s2.bSize);
 
-    ck_assert(!rf_stringx_init_buff(&s2, 222, NULL));
-
     rf_stringx_deinit(&s);
     rf_stringx_deinit(&s2);
+}END_TEST
+
+START_TEST(test_invalid_stringx_init) {
+    struct RFstringx sx;
+
+    ck_assert(!rf_stringx_init(&sx, NULL));
+    ck_assert(!rf_stringx_initv(&sx, NULL));
+    ck_assert(!rf_stringx_init_buffv(&sx, 222, NULL));
+    ck_assert(!rf_stringx_create_buffv(222, NULL));
+
 }END_TEST
 /* --- Stringx Initialization Tests --- END --- */
 
@@ -729,8 +735,6 @@ START_TEST(test_stringx_assign) {
 
     ck_assert(rf_stringx_assign(&s, &s2));
     ck_assert_rf_strx_eq_cstr(&s, "Nana this is a tasty orange");
-
-    ck_assert(!rf_stringx_assign(&s2, NULL));
 
     rf_stringx_deinit(&s);
     rf_stringx_deinit(&s2);
@@ -786,9 +790,6 @@ START_TEST(test_stringx_assign_unsafe_nnt) {
     ck_assert(rf_stringx_assign_unsafe_nnt(&s, cstr, strlen(cstr)));
     ck_assert_rf_strx_eq_cstr(&s, "Assigned string, bigger than the assignee");
 
-    /* invalid input */
-    ck_assert(!rf_stringx_assign_unsafe_nnt(&s, NULL, 1));
-
     rf_stringx_deinit(&s);
 }END_TEST
 
@@ -811,10 +812,16 @@ START_TEST(test_stringx_from_string_in) {
         "characters चुनाव included"
     );
 
-    ck_assert(!rf_stringx_from_string_in(&sx, NULL));
-
     rf_string_deinit(&s);
     rf_stringx_deinit(&sx);
+}END_TEST
+
+START_TEST(test_invalid_stringx_assign) {
+    struct RFstringx s;
+
+    ck_assert(!rf_stringx_assign(&s, NULL));
+    ck_assert(!rf_stringx_assign_unsafe_nnt(&s, NULL, 1));
+    ck_assert(!rf_stringx_from_string_in(&s, NULL));
 }END_TEST
 /* --- Stringx Assignment Tests --- END --- */
 
@@ -832,8 +839,6 @@ START_TEST(test_stringx_copy_in) {
     ck_assert_rf_strx_eq_cstr(
         &s2, "Robot rock, Time of your life, Human after all");
 
-    ck_assert(!rf_stringx_copy_in(&s2, NULL));
-
     rf_stringx_deinit(&s);
     rf_stringx_deinit(&s2);
 }END_TEST
@@ -848,7 +853,6 @@ START_TEST(test_stringx_copy_chars) {
 
     ck_assert(rf_stringx_copy_chars(&s2, &s, 10));
     ck_assert_rf_strx_eq_cstr(&s2, "Robot rock");
-    ck_assert(!rf_stringx_copy_chars(&s2, NULL, 0));
 
     ck_assert(rf_stringx_copy_chars(&s3, &s, 0));
     ck_assert_rf_str_empty(&s3);
@@ -871,16 +875,14 @@ START_TEST(test_stringx_shallow_copies) {
 
     rf_stringx_deinit(&s);
 }END_TEST
+
+START_TEST(test_invalid_stringx_copy) {
+    struct RFstringx s;
+
+    ck_assert(!rf_stringx_copy_in(&s, NULL));
+    ck_assert(!rf_stringx_copy_chars(&s, NULL, 0));
+}END_TEST
 /* --- Stringx Copying Tests --- END --- */
-
-
-
-
-
-
-
-
-
 
 Suite *string_core_suite_create(void)
 {
@@ -962,6 +964,18 @@ Suite *string_core_suite_create(void)
     tcase_add_test(stringx_copy, test_stringx_shallow_copies);
 
 
+    TCase *string_invalid_args = tcase_create("string_core_invalid_args");
+    tcase_add_checked_fixture(string_invalid_args,
+                              setup_invalid_args_tests,
+                              teardown_invalid_args_tests);
+    tcase_add_test(string_invalid_args, test_invalid_string_init);
+    tcase_add_test(string_invalid_args, test_invalid_string_assign);
+    tcase_add_test(string_invalid_args, test_invalid_string_copy);
+    tcase_add_test(string_invalid_args, test_invalid_stringx_init);
+    tcase_add_test(string_invalid_args, test_invalid_stringx_assign);
+    tcase_add_test(string_invalid_args, test_invalid_stringx_copy);
+
+
     suite_add_tcase(s, string_init);
     suite_add_tcase(s, string_assign);
     suite_add_tcase(s, string_copy);
@@ -969,5 +983,6 @@ Suite *string_core_suite_create(void)
     suite_add_tcase(s, stringx_init);
     suite_add_tcase(s, stringx_assign);
     suite_add_tcase(s, stringx_copy);
+    suite_add_tcase(s, string_invalid_args);
     return s;
 }
