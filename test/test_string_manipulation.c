@@ -896,8 +896,8 @@ Suite *string_manipulation_suite_create(void)
 
     TCase *string_appending = tcase_create("String Appending");
     tcase_add_checked_fixture(string_appending,
-                              setup_string_tests,
-                              teardown_string_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(string_appending, test_string_append);
     tcase_add_test(string_appending, test_string_append_int);
     tcase_add_test(string_appending, test_string_append_double);
@@ -905,8 +905,8 @@ Suite *string_manipulation_suite_create(void)
 
     TCase *string_removing = tcase_create("String Removing");
     tcase_add_checked_fixture(string_removing,
-                              setup_string_tests,
-                              teardown_string_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(string_removing, test_string_remove);
     tcase_add_test(string_removing, test_string_keep_only);
     tcase_add_test(string_removing, test_string_prune_start);
@@ -919,16 +919,16 @@ Suite *string_manipulation_suite_create(void)
 
     TCase *string_replacing = tcase_create("String Replacing");
     tcase_add_checked_fixture(string_replacing,
-                              setup_string_tests,
-                              teardown_string_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(string_replacing, test_string_replace);
 
 
 
     TCase *stringx_appending = tcase_create("Stringx Appending");
     tcase_add_checked_fixture(stringx_appending,
-                              setup_string_tests,
-                              teardown_string_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(stringx_appending, test_stringx_append);
     tcase_add_test(stringx_appending, test_stringx_append_char);
     tcase_add_test(stringx_appending, test_stringx_append_chars);
@@ -937,15 +937,15 @@ Suite *string_manipulation_suite_create(void)
 
     TCase *stringx_unsafe_appending = tcase_create("Stringx Unsafe Appending");
     tcase_add_checked_fixture(stringx_unsafe_appending,
-                              setup_string_tests,
-                              teardown_string_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(stringx_unsafe_appending, test_stringx_append_bytes);
     tcase_add_test(stringx_unsafe_appending, test_stringx_append_cstr);
 
     TCase *stringx_replacing = tcase_create("Stringx Replacing");
     tcase_add_checked_fixture(stringx_replacing,
-                              setup_string_tests,
-                              teardown_string_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(stringx_replacing, test_stringx_replace);
     tcase_add_test(stringx_replacing, test_stringx_replace_between);
 

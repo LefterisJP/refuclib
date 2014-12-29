@@ -17,6 +17,16 @@
 #include <String/rf_str_retrieval.h>
 #include <IO/rf_textfile.h>
 
+void setup_log_tests()
+{
+    rf_init(LOG_TARGET_FILE, "refuclib.log", LOG_DEBUG);
+}
+
+void teardown_log_tests()
+{
+    rf_deinit();
+}
+
 /* --- Simple Log Tests --- START --- */
 START_TEST(test_log_flush_and_check) {
     static const struct RFstring log_name = RF_STRING_STATIC_INIT("refuclib.log");
@@ -111,8 +121,8 @@ Suite *log_suite_create(void)
 
     TCase *simple_log = tcase_create("Simple Log");
     tcase_add_checked_fixture(simple_log,
-                              setup_generic_tests,
-                              teardown_generic_tests);
+                              setup_log_tests,
+                              teardown_log_tests);
     tcase_add_test(simple_log, test_log_flush_and_check);
     tcase_add_test(simple_log, test_log_a_lot);
 

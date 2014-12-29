@@ -245,8 +245,7 @@ FILE* rf_fopen(const void* name, const char* mode)
     unsigned int index;
     char* cs;
     FILE* ret;
-    if(!(cs = rf_string_cstr_ibuff_push(name, &index)))
-    {
+    if (!(cs = rf_string_cstr_ibuff_push(name, &index))) {
         return NULL;
     }
     ret = fopen(cs, mode);
@@ -259,8 +258,7 @@ FILE* rf_freopen(const void* name, const char* mode, FILE* f)
     unsigned int index;
     char* cs;
     FILE* ret;
-    if(!(cs = rf_string_cstr_ibuff_push(name, &index)))
-    {
+    if (!(cs = rf_string_cstr_ibuff_push(name, &index))) {
         return NULL;
     }
     ret = freopen(cs, mode, f);

@@ -66,6 +66,22 @@ void teardown_textfile_tests()
     rf_deinit();
 }
 
+void setup_textfile_invalid_args_tests()
+{
+    rf_init(LOG_TARGET_FILE, "refuclib.log", LOG_DEBUG);
+    ck_assert(rf_stringx_init_buff(&g_buff, 512, ""));
+    ck_assert(rf_stringx_init_buff(&g_fname, 64, ""));
+}
+
+void teardown_textfile_invalid_args_tests()
+{
+    rf_stringx_deinit(&g_buff);
+    rf_stringx_deinit(&g_fname);
+    rf_deinit();
+}
+
+
+
 static void test_textfile_read_line_generic(const char *filename,
                                             enum RFtext_encoding encoding,
                                             enum RFendianess endianess)
@@ -142,6 +158,10 @@ START_TEST(test_textfile_init) {
                                RF_UTF8, RF_EOL_LF));
     ck_assert(rf_system_delete_file(&g_fname));
     rf_textfile_deinit(&f);
+}END_TEST
+
+START_TEST(test_invalid_textfile_init) {
+    struct RFtextfile f;
 
     /* illegal input */
     ck_assert(!rf_textfile_init(&f, &g_fname, 999,
@@ -150,9 +170,7 @@ START_TEST(test_textfile_init) {
     ck_assert(!rf_textfile_init(&f, &g_fname, RF_FILE_NEW,
                                RF_ENDIANESS_UNKNOWN,
                                RF_UTF8, 9999));
-    rf_textfile_deinit(&f);
 
-    ck_assert(rf_system_delete_file(&g_fname));
 }END_TEST
 
 START_TEST(test_textfile_copy) {
@@ -179,11 +197,23 @@ START_TEST(test_textfile_copy) {
         &g_buff,
         get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario2));
 
-    /* illegal input */
-    ck_assert(!rf_textfile_copy_in(&copy_f, NULL));
-
     rf_textfile_deinit(&f);
     rf_textfile_deinit(&copy_f);
+}END_TEST
+
+START_TEST(test_invalid_textfile_copy) {
+    struct RFtextfile f;
+    ck_assert(rf_stringx_assign_unsafe_nnt(
+                  &g_fname, CLIB_TESTS_PATH"utf8stringfile",
+                  strlen(CLIB_TESTS_PATH"utf8stringfile")));
+    ck_assert(rf_textfile_init(&f, &g_fname, RF_FILE_READ,
+                               RF_ENDIANESS_UNKNOWN,
+                               RF_UTF8, RF_EOL_LF));
+
+    /* illegal input */
+    ck_assert(!rf_textfile_copy_in(&f, NULL));
+
+    rf_textfile_deinit(&f);
 }END_TEST
 
 START_TEST(test_textfile_set_mode) {
@@ -385,9 +415,6 @@ START_TEST(test_textfile_write) {
                   strlen(s)));
     ck_assert(rf_textfile_write(&f, &g_buff));
 
-    /* illegal input */
-    ck_assert(!rf_textfile_write(&f, NULL));
-
     rf_textfile_deinit(&f);
 
     /* reading */
@@ -418,6 +445,27 @@ START_TEST(test_textfile_write) {
     ck_assert(rf_system_delete_file(&g_fname));
 
     rf_textfile_deinit(&rf);
+}END_TEST
+
+START_TEST(test_invalid_textfile_write) {
+    struct RFtextfile f;
+    struct RFtextfile rf;
+
+    static const char *s;
+    ck_assert(rf_stringx_assign_unsafe_nnt(
+                  &g_fname, CLIB_TESTS_PATH"temp_file",
+                  strlen(CLIB_TESTS_PATH"temp_file")));
+    ck_assert(rf_textfile_init(&f, &g_fname, RF_FILE_NEW,
+                               RF_ENDIANESS_UNKNOWN,
+                               RF_UTF8, RF_EOL_LF));
+
+
+    /* illegal input */
+    ck_assert(!rf_textfile_write(&f, NULL));
+
+    rf_textfile_deinit(&f);
+
+    ck_assert(rf_system_delete_file(&g_fname));
 }END_TEST
 
 START_TEST(test_textfile_insert_after) {
@@ -475,6 +523,35 @@ START_TEST(test_textfile_insert_after) {
         get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario3));
     /* EOF */
     ck_assert(RE_FILE_EOF == rf_textfile_read_line(&f, &g_buff));
+
+    ck_assert(rf_system_delete_file(&g_fname));
+    rf_textfile_deinit(&f);
+}END_TEST
+
+START_TEST(test_invalid_textfile_insert_after) {
+    struct RFtextfile f;
+    static const char *s;
+    static const struct RFstring str = RF_STRING_STATIC_INIT("placeholder");
+    ck_assert(rf_stringx_assign_unsafe_nnt(
+                  &g_fname, CLIB_TESTS_PATH"temp_file",
+                  strlen(CLIB_TESTS_PATH"temp_file")));
+    ck_assert(rf_textfile_init(&f, &g_fname, RF_FILE_NEW,
+                               RF_ENDIANESS_UNKNOWN,
+                               RF_UTF8, RF_EOL_LF));
+
+    /* write line 1 */
+    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario1);
+    ck_assert(rf_stringx_assign_unsafe_nnt(
+                  &g_buff, s,
+                  strlen(s)));
+    ck_assert(rf_textfile_write(&f, &g_buff));
+
+    /* write line 3 */
+    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario3);
+    ck_assert(rf_stringx_assign_unsafe_nnt(
+                  &g_buff, s,
+                  strlen(s)));
+    ck_assert(rf_textfile_write(&f, &g_buff));
 
     /* illegal input */
     ck_assert(!rf_textfile_insert(&f, 0, &str, true));
@@ -597,6 +674,27 @@ START_TEST(test_textfile_remove) {
     /* EOF */
     ck_assert(RE_FILE_EOF == rf_textfile_read_line(&f, &g_buff));
 
+    rf_textfile_deinit(&f);
+    ck_assert(rf_system_delete_file(&g_fname));
+}END_TEST
+
+START_TEST(test_invalid_textfile_remove) {
+    struct RFtextfile f;
+    static const char *s;
+    ck_assert(rf_stringx_assign_unsafe_nnt(
+                  &g_fname, CLIB_TESTS_PATH"temp_file",
+                  strlen(CLIB_TESTS_PATH"temp_file")));
+    ck_assert(rf_textfile_init(&f, &g_fname, RF_FILE_NEW,
+                               RF_ENDIANESS_UNKNOWN,
+                               RF_UTF8, RF_EOL_LF));
+
+    /* write line 1 */
+    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario1);
+    ck_assert(rf_stringx_assign_unsafe_nnt(
+                  &g_buff, s,
+                  strlen(s)));
+    ck_assert(rf_textfile_write(&f, &g_buff));
+
     /* illegal input */
     ck_assert(!rf_textfile_remove(&f, 0));
     ck_assert(!rf_textfile_remove(&f, 9999));
@@ -660,6 +758,28 @@ START_TEST(test_textfile_replace) {
     /* EOF */
     ck_assert(RE_FILE_EOF == rf_textfile_read_line(&f, &g_buff));
 
+    ck_assert(rf_system_delete_file(&g_fname));
+    rf_textfile_deinit(&f);
+}END_TEST
+
+START_TEST(test_invalid_textfile_replace) {
+    struct RFtextfile f;
+    static const char *s;
+    static struct RFstring str = RF_STRING_STATIC_INIT("Line Replacement");
+    ck_assert(rf_stringx_assign_unsafe_nnt(
+                  &g_fname, CLIB_TESTS_PATH"temp_file",
+                  strlen(CLIB_TESTS_PATH"temp_file")));
+    ck_assert(rf_textfile_init(&f, &g_fname, RF_FILE_NEW,
+                               RF_ENDIANESS_UNKNOWN,
+                               RF_UTF8, RF_EOL_LF));
+
+    /* write line 1 */
+    s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario1);
+    ck_assert(rf_stringx_assign_unsafe_nnt(
+                  &g_buff, s,
+                  strlen(s)));
+    ck_assert(rf_textfile_write(&f, &g_buff));
+
     /* illegal input */
     ck_assert(!rf_textfile_replace(&f, 0, &str));
     ck_assert(!rf_textfile_replace(&f, 9999, &str));
@@ -719,9 +839,21 @@ Suite *io_textfile_suite_create(void)
     tcase_add_test(textfile_writting, test_textfile_remove);
     tcase_add_test(textfile_writting, test_textfile_replace);
 
+    TCase *textfile_invalid_args = tcase_create("Textfile Invalid Arguments");
+    tcase_add_checked_fixture(textfile_invalid_args,
+                              setup_textfile_invalid_args_tests,
+                              teardown_textfile_invalid_args_tests);
+    tcase_add_test(textfile_invalid_args, test_invalid_textfile_init);
+    tcase_add_test(textfile_invalid_args, test_invalid_textfile_copy);
+    tcase_add_test(textfile_invalid_args, test_invalid_textfile_write);
+    tcase_add_test(textfile_invalid_args, test_invalid_textfile_insert_after);
+    tcase_add_test(textfile_invalid_args, test_invalid_textfile_remove);
+    tcase_add_test(textfile_invalid_args, test_invalid_textfile_replace);
+
     suite_add_tcase(s, textfile_control);
     suite_add_tcase(s, textfile_read_lines);
     suite_add_tcase(s, textfile_writting);
+    suite_add_tcase(s, textfile_invalid_args);
 
     return s;
 }

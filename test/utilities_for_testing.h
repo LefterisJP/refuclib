@@ -1,13 +1,9 @@
-#ifndef RF_STRING_TEST_HELPERS_H
-#define RF_STRING_TEST_HELPERS_H
+#ifndef RF_UTILITIES_FOR_TESTING_H
+#define RF_UTILITIES_FOR_TESTING_H
 
 void setup_generic_tests();
 void teardown_generic_tests();
 
-void setup_string_tests();
-void teardown_string_tests();
-
-void setup_textfile_tests();
-void teardown_textfile_tests();
-
+void setup_invalid_args_tests();
+void teardown_invalid_args_tests();
 #endif

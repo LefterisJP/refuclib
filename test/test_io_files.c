@@ -443,14 +443,34 @@ START_TEST(test_file_move_back_char_utf32_be) {
                                   RF_UTF32, RF_BIG_ENDIAN);
 }END_TEST
 
+START_TEST(test_readline_invalid_args) {
+    FILE *f;
+    char eof;
+    char *utf8;
+    uint32_t byte_length;
+    uint32_t buffer_size;
+    const struct RFstring fname = RF_STRING_STATIC_INIT("afilename");
+
+    ck_assert((f = rf_fopen(&fname, "wb")) != NULL);
+
+    /* invalid input */
+    ck_assert(
+        !choose_read_line(
+            RF_UTF8, f, RF_EOL_LF, NULL, &byte_length, &buffer_size, &eof, RF_ENDIANESS_UNKNOWN
+        )
+    );
+
+    fclose(f);
+} END_TEST
+
 Suite *io_files_suite_create(void)
 {
     Suite *s = suite_create("Files I/O");
 
     TCase *io_read_line = tcase_create("Read Line");
     tcase_add_checked_fixture(io_read_line,
-                              setup_string_tests,
-                              teardown_string_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(io_read_line, test_file_read_line_utf8);
     tcase_add_test(io_read_line, test_file_read_line_utf16_le);
     tcase_add_test(io_read_line, test_file_read_line_utf16_be);
@@ -459,8 +479,8 @@ Suite *io_files_suite_create(void)
 
     TCase *io_read_bytes = tcase_create("Read Bytes");
     tcase_add_checked_fixture(io_read_bytes,
-                              setup_string_tests,
-                              teardown_string_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(io_read_bytes, test_file_read_bytes_utf8);
     tcase_add_test(io_read_bytes, test_file_read_bytes_utf16_le);
     tcase_add_test(io_read_bytes, test_file_read_bytes_utf16_be);
@@ -469,29 +489,35 @@ Suite *io_files_suite_create(void)
 
     TCase *io_read_char = tcase_create("Read Character");
     tcase_add_checked_fixture(io_read_char,
-                              setup_string_tests,
-                              teardown_string_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(io_read_char, test_file_read_char_utf8);
     tcase_add_test(io_read_char, test_file_read_char_utf16_le);
     tcase_add_test(io_read_char, test_file_read_char_utf16_be);
     tcase_add_test(io_read_char, test_file_read_char_utf32_le);
     tcase_add_test(io_read_char, test_file_read_char_utf32_be);
 
-    TCase *io_move_back_char = tcase_create("Read Character");
+    TCase *io_move_back_char = tcase_create("Move back Character");
     tcase_add_checked_fixture(io_move_back_char,
-                              setup_string_tests,
-                              teardown_string_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(io_move_back_char, test_file_move_back_char_utf8);
     tcase_add_test(io_move_back_char, test_file_move_back_char_utf16_le);
     tcase_add_test(io_move_back_char, test_file_move_back_char_utf16_be);
     tcase_add_test(io_move_back_char, test_file_move_back_char_utf32_le);
     tcase_add_test(io_move_back_char, test_file_move_back_char_utf32_be);
 
+    TCase *io_invalid_args = tcase_create("Invalid arguments");
+    tcase_add_checked_fixture(io_invalid_args,
+                              setup_invalid_args_tests,
+                              teardown_invalid_args_tests);
+    tcase_add_test(io_invalid_args, test_readline_invalid_args);
 
     suite_add_tcase(s, io_read_line);
     suite_add_tcase(s, io_read_bytes);
     suite_add_tcase(s, io_read_char);
     suite_add_tcase(s, io_move_back_char);
+    suite_add_tcase(s, io_invalid_args);
 
     return s;
 }

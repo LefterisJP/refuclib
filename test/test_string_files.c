@@ -622,8 +622,8 @@ Suite *string_files_suite_create(void)
 
     TCase *string_files_init = tcase_create("String Files init");
     tcase_add_checked_fixture(string_files_init,
-                              setup_string_tests,
-                              teardown_string_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(string_files_init, test_string_from_file_init_utf8);
     tcase_add_test(string_files_init, test_string_from_file_init_utf16_le);
     tcase_add_test(string_files_init, test_string_from_file_init_utf16_be);
@@ -633,8 +633,8 @@ Suite *string_files_suite_create(void)
 
     TCase *string_files_assign = tcase_create("String Files Assign");
     tcase_add_checked_fixture(string_files_assign,
-                              setup_string_tests,
-                              teardown_string_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(string_files_assign, test_string_from_file_assign_utf8);
     tcase_add_test(string_files_assign, test_string_from_file_assign_utf16_le);
     tcase_add_test(string_files_assign, test_string_from_file_assign_utf16_be);
@@ -643,8 +643,8 @@ Suite *string_files_suite_create(void)
 
     TCase *string_files_append = tcase_create("String Files Append");
     tcase_add_checked_fixture(string_files_append,
-                              setup_string_tests,
-                              teardown_string_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(string_files_append, test_string_from_file_append_utf8);
     tcase_add_test(string_files_append, test_string_from_file_append_utf16_le);
     tcase_add_test(string_files_append, test_string_from_file_append_utf16_be);
@@ -653,8 +653,8 @@ Suite *string_files_suite_create(void)
 
     TCase *string_files_fwrite = tcase_create("String Files fwrite");
     tcase_add_checked_fixture(string_files_fwrite,
-                              setup_string_tests,
-                              teardown_string_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(string_files_fwrite, test_string_fwrite_utf8);
     tcase_add_test(string_files_fwrite, test_string_fwrite_utf16_le);
     tcase_add_test(string_files_fwrite, test_string_fwrite_utf16_be);
@@ -665,8 +665,8 @@ Suite *string_files_suite_create(void)
     /* RFstringx is almost idential so just check its assign and append */
     TCase *stringx_files_assign = tcase_create("Stringx Files Assign");
     tcase_add_checked_fixture(stringx_files_assign,
-                              setup_string_tests,
-                              teardown_string_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(stringx_files_assign, test_stringx_from_file_assign_utf8);
     tcase_add_test(stringx_files_assign, test_stringx_from_file_assign_utf16_le);
     tcase_add_test(stringx_files_assign, test_stringx_from_file_assign_utf16_be);
@@ -675,8 +675,8 @@ Suite *string_files_suite_create(void)
 
     TCase *stringx_files_append = tcase_create("Stringx Files Append");
     tcase_add_checked_fixture(stringx_files_append,
-                              setup_string_tests,
-                              teardown_string_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(stringx_files_append, test_stringx_from_file_append_utf8);
     tcase_add_test(stringx_files_append, test_stringx_from_file_append_utf16_le);
     tcase_add_test(stringx_files_append, test_stringx_from_file_append_utf16_be);

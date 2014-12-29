@@ -486,8 +486,8 @@ Suite *string_traversal_suite_create(void)
         "String Traversal Tests"
     );
     tcase_add_checked_fixture(stringx_traversal,
-                              setup_string_tests,
-                              teardown_string_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(stringx_traversal, test_stringx_move_after);
     tcase_add_test(stringx_traversal, test_stringx_move_end);
     tcase_add_test(stringx_traversal, test_stringx_move_back);

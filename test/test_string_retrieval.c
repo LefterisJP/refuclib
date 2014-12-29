@@ -610,8 +610,8 @@ Suite *string_retrieval_suite_create(void)
         "String Accessors"
     );
     tcase_add_checked_fixture(string_accessors,
-                              setup_string_tests,
-                              teardown_string_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(string_accessors, test_string_length);
     tcase_add_test(string_accessors, test_string_length_bytes);
     tcase_add_test(string_accessors, test_string_data);
@@ -621,8 +621,8 @@ Suite *string_retrieval_suite_create(void)
 
     TCase *string_retrieval = tcase_create("String Retrieval");
     tcase_add_checked_fixture(string_retrieval,
-                              setup_string_tests,
-                              teardown_string_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(string_retrieval, test_string_substr);
     tcase_add_test(string_retrieval, test_string_find);
     tcase_add_test(string_retrieval, test_string_find_i);
@@ -636,8 +636,8 @@ Suite *string_retrieval_suite_create(void)
         "String Positional Retrieval"
     );
     tcase_add_checked_fixture(string_positional_retrieval,
-                              setup_string_tests,
-                              teardown_string_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(string_positional_retrieval, test_string_scanf_after);
     tcase_add_test(string_positional_retrieval, test_string_between);
     tcase_add_test(string_positional_retrieval, test_string_beforev);
