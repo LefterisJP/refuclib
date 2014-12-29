@@ -105,8 +105,6 @@ START_TEST(test_string_get_char) {
     ck_assert_uint_eq(cp, 29987);
 
     ck_assert(!rf_string_get_char(&s2, 0, &cp));
-    ck_assert(!rf_string_get_char(&s2, 0, NULL));
-
 
     rf_string_deinit(&s);
     rf_string_deinit(&s2);
@@ -139,10 +137,8 @@ START_TEST(test_string_substr) {
     ck_assert(rf_string_substr(&s, 308, 10, &ret));
     ck_assert_rf_str_eq_cstr(&ret, "警戒レベルを超えた。");
 
-    /* edge cases. Null return and substr index out of bounds */
-    ck_assert(!rf_string_substr(&s, 21, 22, NULL));
+    /* edge case. substr index out of bounds */
     ck_assert(!rf_string_substr(&s, 1022, 22, &ret));
-
 
     rf_string_deinit(&s);
     rf_string_deinit(&ret);
@@ -402,10 +398,6 @@ START_TEST(test_string_scanf_after) {
     ck_assert(rf_string_scanf_after(&s, &f1, "%d", &year));
     ck_assert_int_eq(2013,year);
 
-    ck_assert(!rf_string_scanf_after(&s, NULL, "%d", &year));
-    ck_assert(!rf_string_scanf_after(&s, &f1, NULL, &year));
-    ck_assert(!rf_string_scanf_after(&s, &f1, "%d", NULL));
-
     rf_string_deinit(&s);
     rf_string_deinit(&f1);
 }END_TEST
@@ -453,10 +445,6 @@ START_TEST(test_string_between) {
     /* not found cases */
     ck_assert(!rf_string_between(&s, &p1l, &f1, &ret, 0));
     ck_assert(!rf_string_between(&s, &f1, &f1, &ret, 0));
-    /* wrong input case */
-    ck_assert(!rf_string_between(&s, NULL, &f1, &ret, 0));
-    ck_assert(!rf_string_between(&s, &p1l, NULL, &ret, 0));
-    ck_assert(!rf_string_between(&s, &p1l, &f1, NULL, 0));
 
     rf_string_deinit(&s);
     rf_string_deinit(&s2);
@@ -484,9 +472,6 @@ START_TEST(test_string_beforev) {
 
     /* not in the string */
     ck_assert(!rf_string_beforev(&s, &ret, 0, 2, &f3, &f4));
-    /* invalid input */
-    ck_assert(!rf_string_beforev(&s, NULL, 0, 2, &f3, &f4));
-    ck_assert(!rf_string_beforev(&s, &ret, 0, 2, NULL, NULL));
 
     rf_string_deinit(&s);
     rf_string_deinit(&f1);
@@ -518,9 +503,6 @@ START_TEST(test_string_before) {
     ck_assert_rf_str_eq_cstr(&ret, "神奈川県の黒岩知事");
     /* f2 is not a substring */
     ck_assert(!rf_string_before(&s, &f2 ,&ret, 0));
-    /* invalid input */
-    ck_assert(!rf_string_before(&s, NULL, &ret, 0));
-    ck_assert(!rf_string_before(&s, &f2, NULL, 0));
 
     rf_string_deinit(&s);
     rf_string_deinit(&f1);
@@ -556,10 +538,6 @@ START_TEST(test_string_after) {
     ck_assert(!rf_string_after(&s ,&f1, &ret, RF_MATCH_WORD));
     /* substring not in main string */
     ck_assert(!rf_string_after(&s, &f2, &ret, 0));
-    /* invalid input */
-    ck_assert(!rf_string_after(&s, NULL, &ret, 0));
-    ck_assert(!rf_string_after(&s, &f1, NULL, 0));
-
 
     rf_string_deinit(&s);
     rf_string_deinit(&f1);
@@ -588,10 +566,6 @@ START_TEST(test_string_afterv) {
 
     /* substring not in main string */
     ck_assert(!rf_string_afterv(&s, &ret, RF_STRINGX_ARGUMENT, 1, &f3));
-    /* invalid input */
-    ck_assert(!rf_string_afterv(&s, NULL, RF_STRINGX_ARGUMENT, 1, &f3));
-    ck_assert(!rf_string_afterv(&s, &ret, 0, 1, NULL));
-
 
     rf_string_deinit(&s);
     rf_string_deinit(&f1);
@@ -601,6 +575,39 @@ START_TEST(test_string_afterv) {
     rf_string_deinit(&ret2);
 
 }END_TEST
+
+START_TEST (test_invalid_string_retrieval) {
+    struct RFstring s;
+    struct RFstring f1;
+    struct RFstringx f3;
+    struct RFstring ret;
+    int year;
+    static const struct RFstring p1l = RF_STRING_STATIC_INIT("Αντίθετα, ");
+
+    ck_assert(rf_string_init(
+                  &s,
+                  "The president said he had set down a \"15-minute rule\""
+                  "with his team for response to governors and mayors seeking "
+                  "federal assistance."));
+    ck_assert(!rf_string_get_char(&s, 0, NULL));
+    ck_assert(!rf_string_substr(&s, 21, 22, NULL));
+    ck_assert(!rf_string_scanf_after(&s, NULL, "%d", &year));
+    ck_assert(!rf_string_scanf_after(&s, &f1, NULL, &year));
+    ck_assert(!rf_string_scanf_after(&s, &f1, "%d", NULL));
+    ck_assert(!rf_string_between(&s, NULL, &f1, &ret, 0));
+    ck_assert(!rf_string_between(&s, &p1l, NULL, &ret, 0));
+    ck_assert(!rf_string_between(&s, &p1l, &f1, NULL, 0));
+    ck_assert(!rf_string_beforev(&s, NULL, 0, 2, &f1, &p1l));
+    ck_assert(!rf_string_beforev(&s, &ret, 0, 2, NULL, NULL));
+    ck_assert(!rf_string_before(&s, NULL, &ret, 0));
+    ck_assert(!rf_string_before(&s, &f1, NULL, 0));
+    ck_assert(!rf_string_after(&s, NULL, &ret, 0));
+    ck_assert(!rf_string_after(&s, &f1, NULL, 0));
+    ck_assert(!rf_string_afterv(&s, NULL, RF_STRINGX_ARGUMENT, 1, &f3));
+    ck_assert(!rf_string_afterv(&s, &ret, 0, 1, NULL));
+
+    rf_string_deinit(&s);
+} END_TEST
 
 Suite *string_retrieval_suite_create(void)
 {
@@ -616,8 +623,6 @@ Suite *string_retrieval_suite_create(void)
     tcase_add_test(string_accessors, test_string_length_bytes);
     tcase_add_test(string_accessors, test_string_data);
     tcase_add_test(string_accessors, test_string_get_char);
-
-
 
     TCase *string_retrieval = tcase_create("String Retrieval");
     tcase_add_checked_fixture(string_retrieval,
@@ -645,10 +650,17 @@ Suite *string_retrieval_suite_create(void)
     tcase_add_test(string_positional_retrieval, test_string_after);
     tcase_add_test(string_positional_retrieval, test_string_afterv);
 
-
+    TCase *string_invalid_retrieval = tcase_create(
+        "String Invalid Retrieval"
+    );
+    tcase_add_checked_fixture(string_invalid_retrieval,
+                              setup_invalid_args_tests,
+                              teardown_invalid_args_tests);
+    tcase_add_test(string_invalid_retrieval, test_invalid_string_retrieval);
 
     suite_add_tcase(s, string_accessors);
     suite_add_tcase(s, string_retrieval);
     suite_add_tcase(s, string_positional_retrieval);
+    suite_add_tcase(s, string_invalid_retrieval);
     return s;
 }
