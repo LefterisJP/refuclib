@@ -137,86 +137,78 @@ static bool handle_EOL(struct RFtextfile* t, enum RFeol_mark eol)
     char ret=true;
     char eof_reached;
     //set the eol and if we need to auto detect it then do it
-    switch(eol)
-    {
-        case RF_EOL_AUTO:
-        case RF_EOL_LF:
-        case RF_EOL_CR:
-        case RF_EOL_CRLF:
-            t->eol = eol;
+    switch (eol) {
+    case RF_EOL_AUTO:
+    case RF_EOL_LF:
+    case RF_EOL_CR:
+    case RF_EOL_CRLF:
+        t->eol = eol;
         break;
-        default:
-            RF_ERROR("An illegal eol value has been given to the "
-                     "initialization of TextFile \""RF_STR_PF_FMT"\"",
-                     RF_STR_PF_ARG(&t->name));
-            t->eol = RF_EOL_DEFAULT;
-            return false;
-        break;
+    default:
+        RF_ERROR("An illegal eol value has been given to the "
+                 "initialization of TextFile \""RF_STR_PF_FMT"\"",
+                 RF_STR_PF_ARG(&t->name));
+        t->eol = RF_EOL_DEFAULT;
+        return false;
     }
-    if(eol == RF_EOL_AUTO)
-    {
+
+    if (eol == RF_EOL_AUTO) {
         t->eol = RF_EOL_DEFAULT;//set it as newline by default
-        do//begin the reading loop
-        {
-            switch(t->encoding)
-            {
-               case RF_UTF8:
-                   ret = rf_file_read_char_utf8(t->f,&c,true, &eof_reached);
-               break;
-               case RF_UTF16:
-                   ret = rf_file_read_char_utf16(t->f,&c,true, t->endianess, &eof_reached);
-               break;
-               case RF_UTF32:
+        do {//begin the reading loop
+            switch (t->encoding) {
+            case RF_UTF8:
+                ret = rf_file_read_char_utf8(t->f,&c,true, &eof_reached);
+                break;
+            case RF_UTF16:
+                ret = rf_file_read_char_utf16(t->f,&c,true, t->endianess, &eof_reached);
+                break;
+            case RF_UTF32:
                    ret = rf_file_read_char_utf32(t->f, &c, t->endianess, &eof_reached);
-               break;
+                   break;
             }
+
             //check for reading problem
-            if(ret == -1 || eof_reached)
-            {
+            if (ret == -1 || eof_reached) {
                 break;
             }
 
             //if you find a carriage return
-            if(c == RF_CR)
-            {   //check the next character and decide the EOL pattern accordingly
-                switch(t->encoding)
-                {
-                   case RF_UTF8:
-                       ret = rf_file_read_char_utf8(t->f,&n,true, &eof_reached);
-                   break;
-                   case RF_UTF16:
-                       ret = rf_file_read_char_utf16(t->f, &n, true, t->endianess,
-                                           &eof_reached);
-                   break;
-                   case RF_UTF32:
-                       ret = rf_file_read_char_utf32(t->f, &n, t->endianess,
-                                           &eof_reached);
-                   break;
+            if (c == RF_CR) {
+                //check the next character and decide the EOL pattern accordingly
+                switch (t->encoding) {
+                case RF_UTF8:
+                    ret = rf_file_read_char_utf8(t->f,&n,true, &eof_reached);
+                    break;
+                case RF_UTF16:
+                    ret = rf_file_read_char_utf16(t->f, &n, true, t->endianess,
+                                                  &eof_reached);
+                    break;
+                case RF_UTF32:
+                    ret = rf_file_read_char_utf32(t->f, &n, t->endianess,
+                                                  &eof_reached);
+                    break;
                 }
                 //check for reading problem
-                if(ret == -1 || eof_reached)
-                {
+                if (ret == -1 || eof_reached) {
                     break;
                 }
 
                 t->eol = RF_EOL_CR;
-                if(n == RF_LF)
-                {
+                if (n == RF_LF) {
                     t->eol = RF_EOL_CRLF;
                 }
                 //break from the reading loop
                 break;
-            }
-            else if(c == RF_LF)//else if we find a line feed character without
-            {                   //having found a CR then it should be the
-                               //default case of Unix style endings
+            } else if (c == RF_LF) {
+                //else if we find a line feed character without
+                //having found a CR then it should be the
+                //default case of Unix style endings
                 break;
             }
-        }while(ret >= 0 );//end of reading loop
+        } while(ret >= 0 );//end of reading loop
 
         //if we got here without ret being false but with eof make sure to note
-        if(eof_reached)
-        {
+        if(eof_reached) {
             ret = false;
         }
 
@@ -660,12 +652,11 @@ bool rf_textfile_init(struct RFtextfile* t, const void* name,
         }
         //finally handle the line encoding for the existingfile case
         if (!handle_EOL(t, eol)) {
-            RF_ERROR(
-                     "During initializing TextFile \""RF_STR_PF_FMT"\" "
+            RF_DEBUG("During initializing TextFile \""RF_STR_PF_FMT"\" "
                      "auto-detecting the "
                      "End Of Line Pattern failed. Considering default of "
                      "Unix-Style LF Endings", RF_STR_PF_ARG(&t->name));
-            goto close_file;
+            t->eol = RF_EOL_LF;
         }
 
     } else { //new file case

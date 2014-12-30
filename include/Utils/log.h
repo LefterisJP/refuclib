@@ -76,6 +76,8 @@ void rflog_target_deinit(struct RFlog_target *t);
  * The logging system levels. They follow
  * the syslog protocol as defined in RFC 5424
  * http://tools.ietf.org/html/rfc5424
+ * Must be kept in sync with the severity_level_string array in
+ * log.c
  */
 enum RFlog_level {
     LOG_EMERGENCY = 0,
