@@ -156,6 +156,23 @@ i_INLINE_DECL void rf_ilist_head_init(struct RFilist_head *h)
 	h->n.next = h->n.prev = &h->n;
 }
 
+i_INLINE_DECL void rf_ilist_copy(struct RFilist_head *from, struct RFilist_head *to)
+{
+    if (from->n.prev != &from->n) {
+        from->n.prev->next = &to->n;
+        to->n.prev = from->n.prev;
+    } else { // copying uninitialized
+        to->n.prev = &to->n;
+    }
+
+    if (from->n.next != &from->n) {
+        from->n.next->prev = &to->n;
+        to->n.next = from->n.next;
+    } else { // copying uninitialized
+        to->n.next = &to->n;
+    }
+}
+
 /**
  * rf_ilist_add - add an entry at the start of a linked list.
  * @h: the RFilist_head to add the node to

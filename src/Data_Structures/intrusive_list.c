@@ -16,9 +16,9 @@
 #include <Data_Structures/intrusive_list.h>
 
 static void *corrupt(const char *abortstr,
-		     const struct RFilist_node *head,
-		     const struct RFilist_node *node,
-		     unsigned int count)
+                     const struct RFilist_node *head,
+                     const struct RFilist_node *node,
+                     unsigned int count)
 {
 	if (abortstr) {
 		fprintf(stderr,
@@ -56,6 +56,7 @@ struct RFilist_head *rf_ilist_check(const struct RFilist_head *h,
 }
 
 i_INLINE_INS void rf_ilist_head_init(struct RFilist_head *h);
+i_INLINE_INS void rf_ilist_copy(struct RFilist_head *from, struct RFilist_head *to);
 i_INLINE_INS void rf_ilist_add(struct RFilist_head *h, struct RFilist_node *n);
 i_INLINE_INS void rf_ilist_add_tail(struct RFilist_head *h, struct RFilist_node *n);
 i_INLINE_INS bool rf_ilist_is_empty(const struct RFilist_head *h);
