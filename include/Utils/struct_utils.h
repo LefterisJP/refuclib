@@ -110,12 +110,26 @@
 
 // when using the common sigs macro, destruction functions get no additional arguments
 // if you want to provide additional arguments use the RF_STRUCT_DESTRUCTION_SIGS separately
-#define RF_STRUCT_COMMON_SIGS_NO_ALLOC(i_name_, ...)            \
+#define RF_STRUCT_COMMON_SIGS_NO_ALLOC(...)                             \
+    RP_SELECT_FUNC_IF_NARGIS3(RF_STRUCT_COMMON_SIGS_NO_ALLOC, 1, __VA_ARGS__)
+
+#define RF_STRUCT_COMMON_SIGS_NO_ALLOC0(i_name_, ...)           \
     RF_STRUCT_CONSTRUCTION_SIGS_NO_ALLOC(i_name_, __VA_ARGS__); \
     RF_STRUCT_DESTRUCTION_SIGS_NO_ALLOC(i_name_)
 
-#define RF_STRUCT_COMMON_SIGS_WITH_ALLOC(i_name_, ...)              \
+#define RF_STRUCT_COMMON_SIGS_NO_ALLOC1(i_name_)    \
+    RF_STRUCT_CONSTRUCTION_SIGS_NO_ALLOC(i_name_);  \
+    RF_STRUCT_DESTRUCTION_SIGS_NO_ALLOC(i_name_)
+
+#define RF_STRUCT_COMMON_SIGS_WITH_ALLOC(i_name_, ...)                  \
+    RP_SELECT_FUNC_IF_NARGIS3(RF_STRUCT_COMMON_SIGS_WITH_ALLOC, 1, __VA_ARGS__)
+
+#define RF_STRUCT_COMMON_SIGS_WITH_ALLOC0(i_name_, ...)             \
     RF_STRUCT_CONSTRUCTION_SIGS_WITH_ALLOC(i_name_, __VA_ARGS__);   \
+    RF_STRUCT_DESTRUCTION_SIGS_WITH_ALLOC(i_name_)
+
+#define RF_STRUCT_COMMON_SIGS_WITH_ALLOC1(i_name_)      \
+    RF_STRUCT_CONSTRUCTION_SIGS_WITH_ALLOC(i_name_);    \
     RF_STRUCT_DESTRUCTION_SIGS_WITH_ALLOC(i_name_)
 
 
@@ -212,12 +226,27 @@
 
 // when using the common defs macro, destruction functions get no additional arguments
 // if you want to provide additional arguments use the RF_STRUCT_DESTROY_DEF separately
-#define RF_STRUCT_COMMON_DEFS_NO_ALLOC(i_name_, ...)    \
+#define RF_STRUCT_COMMON_DEFS_NO_ALLOC(...)                             \
+    RP_SELECT_FUNC_IF_NARGIS3(RF_STRUCT_COMMON_DEFS_NO_ALLOC, 1, __VA_ARGS__)
+
+#define RF_STRUCT_COMMON_DEFS_NO_ALLOC0(i_name_, ...)   \
     RF_STRUCT_CREATE_DEF_NO_ALLOC(i_name_, __VA_ARGS__) \
     RF_STRUCT_DESTROY_DEF_NO_ALLOC(i_name_)
 
-#define RF_STRUCT_COMMON_DEFS_WITH_ALLOC(i_name_, ...)      \
+#define RF_STRUCT_COMMON_DEFS_NO_ALLOC1(i_name_)    \
+    RF_STRUCT_CREATE_DEF_NO_ALLOC(i_name_)          \
+    RF_STRUCT_DESTROY_DEF_NO_ALLOC(i_name_)
+
+
+#define RF_STRUCT_COMMON_DEFS_WITH_ALLOC( ...)                          \
+    RP_SELECT_FUNC_IF_NARGIS3(RF_STRUCT_COMMON_DEFS_WITH_ALLOC, 1, __VA_ARGS__)
+
+#define RF_STRUCT_COMMON_DEFS_WITH_ALLOC0(i_name_, ...)     \
     RF_STRUCT_CREATE_DEF_WITH_ALLOC(i_name_, __VA_ARGS__)   \
+    RF_STRUCT_DESTROY_DEF_WITH_ALLOC(i_name_)
+
+#define RF_STRUCT_COMMON_DEFS_WITH_ALLOC1(i_name_)  \
+    RF_STRUCT_CREATE_DEF_WITH_ALLOC(i_name_)        \
     RF_STRUCT_DESTROY_DEF_WITH_ALLOC(i_name_)
 
 #endif

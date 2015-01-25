@@ -172,6 +172,7 @@ i_RP_ISEMPTY(                                                               \
 //This macro helps select the function if the number of arguments is i_NARG
 #define RP_SELECT_FUNC_IF_NARGIS(i_FUNCNAME,i_NARG, ...)    i_RP_SELECT_FUNC_IF(i_FUNCNAME,RP_NARG_IS(i_NARG,__VA_ARGS__),__VA_ARGS__)
 #define RP_SELECT_FUNC_IF_NARGIS2(i_FUNCNAME,i_NARG, ...)    i_RP_SELECT_FUNC_IF2(i_FUNCNAME,RP_NARG_IS(i_NARG,__VA_ARGS__),__VA_ARGS__)
+#define RP_SELECT_FUNC_IF_NARGIS3(i_FUNCNAME,i_NARG, ...)    i_RP_SELECT_FUNC_IF3(i_FUNCNAME,RP_NARG_IS(i_NARG,__VA_ARGS__),__VA_ARGS__)
 //The macro below return true(token 1) or false (token 0) depending on whether the number of arguments is the one given at i_NARG
 #define RP_NARG_IS(i_NARG,...)    i_RP_NARG_IS(RF_NARG(__VA_ARGS__),i_NARG)
 #define i_RP_NARG_IS(i_WANTED,i_GOT)    RP_EQ(i_WANTED,i_GOT)
