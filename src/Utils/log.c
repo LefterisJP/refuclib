@@ -100,6 +100,7 @@ static struct RFlog _log;
 
 /* Keep in sync with @c enum RFlog_level */
 static const struct RFstring severity_level_string[] = {
+    RF_STRING_STATIC_INIT(" [Debug] "),
     RF_STRING_STATIC_INIT(" [Emergency] "),
     RF_STRING_STATIC_INIT(" [Alert] "),
     RF_STRING_STATIC_INIT(" [Critical] "),
@@ -107,7 +108,6 @@ static const struct RFstring severity_level_string[] = {
     RF_STRING_STATIC_INIT(" [Warning] "),
     RF_STRING_STATIC_INIT(" [Notice] "),
     RF_STRING_STATIC_INIT(" [Info] "),
-    RF_STRING_STATIC_INIT(" [Debug] ")
 };
 
 /* Remaining buffer size */

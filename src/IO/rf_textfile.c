@@ -652,7 +652,7 @@ bool rf_textfile_init(struct RFtextfile* t, const void* name,
         }
         //finally handle the line encoding for the existingfile case
         if (!handle_EOL(t, eol)) {
-            RF_DEBUG("During initializing TextFile \""RF_STR_PF_FMT"\" "
+            RF_INFO("During initializing TextFile \""RF_STR_PF_FMT"\" "
                      "auto-detecting the "
                      "End Of Line Pattern failed. Considering default of "
                      "Unix-Style LF Endings", RF_STR_PF_ARG(&t->name));

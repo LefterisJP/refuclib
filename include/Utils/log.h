@@ -80,14 +80,14 @@ void rflog_target_deinit(struct RFlog_target *t);
  * log.c
  */
 enum RFlog_level {
-    LOG_EMERGENCY = 0,
+    LOG_DEBUG = 0,
+    LOG_EMERGENCY,
     LOG_ALERT,
     LOG_CRITICAL,
     LOG_ERROR,
     LOG_WARNING,
     LOG_NOTICE,
     LOG_INFO,
-    LOG_DEBUG,
 
     LOG_LEVELS
 };
@@ -140,6 +140,14 @@ i_DECLIMEX_ void rf_log(enum RFlog_level level, const char* file,
 #define RF_WARNING(...) do {                    \
         RFS_buffer_push();                      \
         rf_log(LOG_WARNING, __FILE__, __func__, \
+               __LINE__,                        \
+               RFS_(__VA_ARGS__));              \
+        RFS_buffer_pop();                       \
+    } while (0)
+
+#define RF_NOTICE(...) do {                     \
+        RFS_buffer_push();                      \
+        rf_log(LOG_NOTICE, __FILE__, __func__, \
                __LINE__,                        \
                RFS_(__VA_ARGS__));              \
         RFS_buffer_pop();                       \
