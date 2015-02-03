@@ -174,7 +174,10 @@ i_INLINE_DECL bool rf_buffer_increase_size_(struct RFbuffer* b,
 
     /* RF_REALLOC(b->buff, char, b->size + added_size, return false); */
     // we don't use RF_REALLOC here since it logs an error and there is a
-    // nasty include dependency error here. TODO: fix    
+    // nasty include dependency error here. TODO: fix
+    // also note that if the realloc happens while we already have some strings
+    // in the buffer their pointers would be invalidated.
+    // TODO: Find some solution for the above that's better than just having big buffer size
     char *tmp = realloc(b->buff, b->size + added_size);
     if (!tmp) {
         return false;

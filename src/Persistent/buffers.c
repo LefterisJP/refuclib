@@ -5,7 +5,7 @@ i_THREAD__ struct RFbuffer _tsbuffa;
 
 bool rf_persistent_buffers_activate_ts()
 {
-    if(!rf_buffer_init(&_tsbuffa, 512))
+    if(!rf_buffer_init(&_tsbuffa, 2048))
     {
         return false;
     }
