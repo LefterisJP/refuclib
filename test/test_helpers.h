@@ -25,6 +25,20 @@
             rf_string_length_bytes(rfstr_), (cstr_), strlen(cstr_));  \
     } while(0)
 
+#define ck_assert_rf_str_eq_nntstr(rfstr_, nntstr_, length_)            \
+    do {                                                                \
+        ck_assert_msg(                                                  \
+            0 == memcmp(rf_string_data(rfstr_),                         \
+                        nntstr_, length_),                              \
+            "\""RF_STR_PF_FMT"\" != \"%.*s\"",                          \
+            RF_STR_PF_ARG(rfstr_), (length_), (nntstr_));               \
+        ck_assert_msg(                                                  \
+            rf_string_length_bytes(rfstr_) == (length_),                \
+            "len of RFstring \""RF_STR_PF_FMT"\"(%u) != "               \
+            "len of non null terminated string \"%.*s\"(%u)", RF_STR_PF_ARG(rfstr_), \
+            rf_string_length_bytes(rfstr_), (length_), (nntstr_), (length_)); \
+    } while(0)
+
 
 #define ck_assert_rf_strx_eq_cstr(str_, lit_)                           \
     do{                                                                 \
