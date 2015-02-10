@@ -275,7 +275,7 @@ void htable_delval(struct htable *ht, struct htable_iter *i)
 	ht->deleted++;
 }
 
-void htable_iterate_values(struct htable *ht, htable_iter_cb cb, void *user)
+void htable_iterate_records(struct htable *ht, htable_iter_cb cb, void *user)
 {
     struct htable_iter i;
     void *c;
