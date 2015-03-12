@@ -102,8 +102,6 @@ bool rf_fixed_memorypool_init(struct rf_fixed_memorypool *pool,
                               size_t element_size,
                               size_t chunk_size)
 {
-    unsigned int i;
-
     pool->element_size = element_size;
     if (element_size < POOL_META_SIZE) {
         pool->element_size = POOL_META_SIZE;
@@ -158,8 +156,6 @@ void rf_fixed_memorypool_destroy(struct rf_fixed_memorypool *pool)
 
 void *rf_fixed_memorypool_alloc_element(struct rf_fixed_memorypool *pool)
 {
-    struct rf_fixed_memory_meta *meta;
-    uint32_t idx;
     unsigned int i;
     bool found_chunk = false;
     void *allocated_element;

@@ -18,7 +18,6 @@
 START_TEST(test_stringx_move_after) {
     static const struct RFstring sub1 = RF_STRING_STATIC_INIT("に");
     static const struct RFstring sub2 = RF_STRING_STATIC_INIT("　");
-    static const struct RFstring sub3 = RF_STRING_STATIC_INIT("ain't there");
     struct RFstringx s;
     struct RFstringx str_buff;
     struct RFstring dependent_s;
@@ -267,8 +266,6 @@ START_TEST(test_stringx_move_afterv) {
     struct RFstring dependent_s;
     static const struct RFstring sub1 = RF_STRING_STATIC_INIT(",");
     static const struct RFstring sub2 = RF_STRING_STATIC_INIT("39");
-    static const struct RFstring sub3 = RF_STRING_STATIC_INIT("eleos");
-    static const struct RFstring sub4 = RF_STRING_STATIC_INIT("notthere");
     ck_assert(rf_stringx_init_buff(&str_buff, 1024, ""));
     ck_assert(
         rf_stringx_init(

@@ -96,8 +96,6 @@ struct RFlog {
     struct RFmutex lock;
 };
 
-static struct RFlog _log;
-
 /* Keep in sync with @c enum RFlog_level */
 static const struct RFstring severity_level_string[] = {
     RF_STRING_STATIC_INIT(" [Debug] "),

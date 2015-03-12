@@ -449,9 +449,7 @@ START_TEST(test_textfile_write) {
 
 START_TEST(test_invalid_textfile_write) {
     struct RFtextfile f;
-    struct RFtextfile rf;
 
-    static const char *s;
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_fname, CLIB_TESTS_PATH"temp_file",
                   strlen(CLIB_TESTS_PATH"temp_file")));
@@ -471,7 +469,6 @@ START_TEST(test_invalid_textfile_write) {
 START_TEST(test_textfile_insert_after) {
     struct RFtextfile f;
     static const char *s;
-    static const struct RFstring str = RF_STRING_STATIC_INIT("placeholder");
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_fname, CLIB_TESTS_PATH"temp_file",
                   strlen(CLIB_TESTS_PATH"temp_file")));

@@ -190,7 +190,7 @@ static void test_rf_string_init_generic(const char* filename, int encoding,
                                          int endianess)
 {
     FILE *f;
-    struct RFstring s, s2;
+    struct RFstring s;
     char eof;
 
     ck_assert((f = fopen(filename, "rb")) != NULL);
@@ -215,7 +215,7 @@ static void test_rf_string_assign_generic(const char* filename, int encoding,
                                          int endianess)
 {
     FILE *f;
-    struct RFstring s, s2;
+    struct RFstring s;
     char eof;
 
     ck_assert((f = fopen(filename, "rb")) != NULL);
@@ -240,7 +240,7 @@ static void test_rf_stringx_assign_generic(const char* filename, int encoding,
                                            int endianess)
 {
     FILE *f;
-    struct RFstringx s, s2;
+    struct RFstringx s;
     char eof;
 
     ck_assert((f = fopen(filename, "rb")) != NULL);
@@ -266,7 +266,7 @@ static void test_rf_string_append_generic(const char* filename, int encoding,
                                           int endianess)
 {
     FILE *f;
-    struct RFstring s, s2;
+    struct RFstring s;
     char eof;
 
     ck_assert((f = fopen(filename, "rb")) != NULL);
@@ -300,7 +300,7 @@ static void test_rf_stringx_append_generic(const char* filename, int encoding,
                                           int endianess)
 {
     FILE *f;
-    struct RFstringx s, s2;
+    struct RFstringx s;
     char eof;
 
     ck_assert((f = fopen(filename, "rb")) != NULL);

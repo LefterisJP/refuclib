@@ -431,7 +431,6 @@ START_TEST(test_file_move_back_char_utf32_be) {
 START_TEST(test_readline_invalid_args) {
     FILE *f;
     char eof;
-    char *utf8;
     uint32_t byte_length;
     uint32_t buffer_size;
     const struct RFstring fname = RF_STRING_STATIC_INIT(CLIB_TESTS_PATH"utf8stringfile");

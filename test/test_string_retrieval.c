@@ -239,7 +239,6 @@ START_TEST(test_string_begins_with_any) {
     const struct RFstring s = RF_STRING_STATIC_INIT(" \t    \t eleos");
     const struct RFstring s2 = RF_STRING_STATIC_INIT(" 影 π π eleos2");
     const struct RFstring s3 = RF_STRING_STATIC_INIT("not starting with stuff");
-    const struct RFstring s4 = RF_STRING_STATIC_INIT("no start but have \t ");
     static const struct RFstring chars1 = RF_STRING_STATIC_INIT(" \t");
     static const struct RFstring chars2 = RF_STRING_STATIC_INIT(" π影");
     unsigned int bytes;
