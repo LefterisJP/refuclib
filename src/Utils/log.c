@@ -98,7 +98,6 @@ struct RFlog {
 
 /* Keep in sync with @c enum RFlog_level */
 static const struct RFstring severity_level_string[] = {
-    RF_STRING_STATIC_INIT(" [Debug] "),
     RF_STRING_STATIC_INIT(" [Emergency] "),
     RF_STRING_STATIC_INIT(" [Alert] "),
     RF_STRING_STATIC_INIT(" [Critical] "),
@@ -106,6 +105,7 @@ static const struct RFstring severity_level_string[] = {
     RF_STRING_STATIC_INIT(" [Warning] "),
     RF_STRING_STATIC_INIT(" [Notice] "),
     RF_STRING_STATIC_INIT(" [Info] "),
+    RF_STRING_STATIC_INIT(" [Debug] "),
 };
 
 /* Remaining buffer size */
@@ -237,28 +237,26 @@ bool rf_log_flush(struct RFlog *log)
 }
 
 /* TODO: handle no memory case a bit better */
-#define INCREASE_BUFFER(i_log_)                               \
-    do{                                                       \
-        char* tmp;                                            \
-        uint64_t index = (i_log_)->index - (i_log_)->buffer;  \
-        (i_log_)->buff_size *= 2;                             \
-        tmp = realloc((i_log_)->buffer, (i_log_)->buff_size); \
-        if(!tmp)                                              \
-        {                                                     \
-            printf("No memory");                              \
-            exit(1);                                          \
-        }                                                     \
-        (i_log_)->buffer = tmp;                               \
-        (i_log_)->index = (i_log_)->buffer + index;           \
-    }while(0)
+#define INCREASE_BUFFER(i_log_)                                 \
+    do {                                                        \
+        char* tmp;                                              \
+        uint64_t index = (i_log_)->index - (i_log_)->buffer;    \
+        (i_log_)->buff_size *= 2;                               \
+        tmp = realloc((i_log_)->buffer, (i_log_)->buff_size);   \
+        if(!tmp) {                                              \
+            printf("No memory");                                \
+            exit(1);                                            \
+        }                                                       \
+        (i_log_)->buffer = tmp;                                 \
+        (i_log_)->index = (i_log_)->buffer + index;             \
+    } while(0)
 
-#define CHECK_BUFFER(i_log_, add_size)                  \
-    do{                                                 \
-        if (add_size >= REM(i_log_))  \
-        {                                               \
-            INCREASE_BUFFER(i_log_);                    \
-        }                                               \
-    }while(0);
+#define CHECK_BUFFER(i_log_, add_size)          \
+    do {                                        \
+        if (add_size >= REM(i_log_)) {          \
+            INCREASE_BUFFER(i_log_);            \
+        }                                       \
+    } while(0)
 
 
 static inline bool rf_log_add_location(
@@ -267,7 +265,10 @@ static inline bool rf_log_add_location(
     const char* func,
     int line)
 {
-    int file_len, func_len, ret, max;
+    unsigned int file_len;
+    unsigned int func_len;
+    unsigned int max;
+    int ret;
 
     file_len = strlen(file);
     func_len = strlen(func);
@@ -280,7 +281,7 @@ static inline bool rf_log_add_location(
                    file_len, file, func_len, func, line
     );
 
-    if(ret < 0 || ret >= max) {
+    if (ret < 0 || ret >= max) {
         return false;
     }
 
@@ -350,12 +351,10 @@ static void log_add(struct RFlog *log, enum RFlog_level level,
                     const char* file, const char* func,
                     int line, struct RFstring* msg)
 {
-    RFS_buffer_push();
     if (log->level < level) {
-        RFS_buffer_pop();
         return;
     }
-
+    RFS_buffer_push();
 
     /* TODO: Maybe use different synchronization strategy here? */
     rf_mutex_lock(&log->lock);

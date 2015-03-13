@@ -80,14 +80,14 @@ void rflog_target_deinit(struct RFlog_target *t);
  * log.c
  */
 enum RFlog_level {
-    LOG_DEBUG = 0,
-    LOG_EMERGENCY,
+    LOG_EMERGENCY = 0,
     LOG_ALERT,
     LOG_CRITICAL,
     LOG_ERROR,
     LOG_WARNING,
     LOG_NOTICE,
     LOG_INFO,
+    LOG_DEBUG,
 
     LOG_LEVELS
 };
