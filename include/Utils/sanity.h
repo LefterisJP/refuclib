@@ -83,14 +83,15 @@
 
 /* same as RF_ASSERT but in non debug mode it will log a critical error */
 #if defined(RF_OPTION_DEBUG) && !defined(RF_UNIT_TESTS)
-#define RF_ASSERT_OR_CRITICAL(condition_, ...)       \
+#define RF_ASSERT_OR_CRITICAL(condition_, _stmt, ...)    \
     RF_ASSERT(condition_, __VA_ARGS__)
 #else
-#define RF_ASSERT_OR_CRITICAL(condition_, ...)       \
-    do {                                             \
-        if (!(condition_)) {                         \
-            RF_CRITICAL(__VA_ARGS__);                \
-        }                                            \
+#define RF_ASSERT_OR_CRITICAL(condition_, _stmt, ...)   \
+    do {                                                \
+        if (!(condition_)) {                            \
+            RF_CRITICAL(__VA_ARGS__);                   \
+            _stmt;                                      \
+        }                                               \
     }while(0)
 #endif
 
@@ -98,12 +99,12 @@
 /* Checks if a condition that should never happen, does happen
  * and exits the program while also loggin an error
  */
-#define RF_CONDITIONAL_EXIT(condition_, ...)          \
-    do {                                              \
-        if ((condition_)) {                          \
-            RF_CRITICAL(__VA_ARGS__);                 \
-            exit(1);                                  \
-        }                                             \
+#define RF_CONDITIONAL_EXIT(condition_, ...)    \
+    do {                                        \
+        if ((condition_)) {                     \
+            RF_CRITICAL(__VA_ARGS__);           \
+            exit(1);                            \
+        }                                       \
     }while(0)
 
 
