@@ -95,18 +95,11 @@
     }while(0)
 #endif
 
-
-/* Checks if a condition that should never happen, does happen
- * and exits the program while also loggin an error
+/**
+ * Will kill the program(release) or assert(debug) if condition_ is not true
  */
-#define RF_CONDITIONAL_EXIT(condition_, ...)    \
-    do {                                        \
-        if ((condition_)) {                     \
-            RF_CRITICAL(__VA_ARGS__);           \
-            exit(1);                            \
-        }                                       \
-    }while(0)
-
+#define RF_ASSERT_OR_EXIT(condition_, ...)                  \
+    RF_ASSERT_OR_CRITICAL(condition_, exit(1), __VA_ARGS__)
 
 #define i_RF_CRITICAL_TEST(line, condition_, ...) \
     ({                                            \
