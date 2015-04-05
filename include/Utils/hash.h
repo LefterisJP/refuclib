@@ -2,7 +2,7 @@
  * http://ccodearchive.net/index.html
  * https://github.com/rustyrussell/ccan
  *
- * Slowly adapted for use with Refu
+ * Modified by Lefteris Karapetsas<lefteris@refu.co> to fit with refuclib
  */
 /* CC0 (Public domain) - see ccan-LICENSE file for details */
 #ifndef RF_UTILS_HASH_H
