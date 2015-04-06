@@ -13,6 +13,7 @@
 #include <Utils/tcon.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 static inline const void *objset_key_(const void *elem)
 {
@@ -56,6 +57,11 @@ HTABLE_DEFINE_TYPE(void, objset_key_, objset_hashfn_, objset_eqfn_, objset_h);
  */
 #define rf_objset_init(set) objset_h_init(&(set)->raw)
 
+static inline void objset_copy_shallow(struct objset_h *dst, const struct objset_h *src)
+{
+    memcpy(dst, src, sizeof(*dst));
+}
+
 /**
  * rf_objset_empty - is this set empty?
  * @set: the typed objset to check.
@@ -65,7 +71,6 @@ HTABLE_DEFINE_TYPE(void, objset_key_, objset_hashfn_, objset_eqfn_, objset_h);
  *		abort();
  */
 #define rf_objset_empty(set) objset_empty_(&(set)->raw)
-
 static inline bool objset_empty_(const struct objset_h *set)
 {
 	struct objset_h_iter i;
@@ -215,5 +220,21 @@ bool i_rf_objset_subset(struct objset_h *set1, struct objset_h *set2);
 bool i_rf_objset_equal(struct objset_h *set1, struct objset_h *set2);
 #define rf_objset_equal(set1_, set2_)                  \
     i_rf_objset_equal(&(set1_)->raw, &(set2_)->raw)
+
+/**
+ * rf_objset_equal_array - Checks if the contets of array are equal to a set
+ * @set_:              The set to compare against the array
+ * @arr_:              A pointer to the beginning of the array
+ * @arr_elem_size_:    Size in bytes of one array element
+ * @arr_size_:         Array size in elements
+ * @return             True if all elements of the array are unique and are all
+ *                     the elements of @set_
+ *
+ * added by Lefteris Karapetsas<lefteris@refu.co>
+ */
+bool rf_objset_equal_array(struct objset_h *set_,
+                           void *arr_,
+                           size_t arr_elem_size_,
+                           size_t arr_size_);
 
 #endif /* CCAN_OBJSET_H */

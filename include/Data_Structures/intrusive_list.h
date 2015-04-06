@@ -573,7 +573,7 @@ i_INLINE_DECL void rf_ilist_prepend_list(struct RFilist_head *to,
     rf_ilist_delete_from(h, rf_ilist_node_from_off((n), (off)))
 
 /* Offset helper functions so we only single-evaluate. */
-i_INLINE_DECL void *rf_ilist_node_to_off(struct RFilist_node *node, size_t off)
+i_INLINE_DECL void *rf_ilist_node_to_off(const struct RFilist_node *node, size_t off)
 {
 	return (void *)((char *)node - off);
 }

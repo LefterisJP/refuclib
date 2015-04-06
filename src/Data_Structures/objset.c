@@ -55,3 +55,29 @@ bool i_rf_objset_equal(struct objset_h *set1, struct objset_h *set2)
     //
     return rf_objset_subset_do(set1, set2) && rf_objset_subset_do(set2, set1);
 }
+
+bool rf_objset_equal_array(struct objset_h *set_,
+                           void *arr_,
+                           size_t arr_elem_size_,
+                           size_t arr_size_)
+{
+    unsigned int i;
+    bool ret = false;
+    char *arr = arr_; //pointer arithmetic on void* is illegal according to the standard
+    struct {OBJSET_MEMBERS(void*);} arr_set;
+    rf_objset_init(&arr_set);
+    for (i = 0; i < arr_size_; i++) {
+        char *val = arr + i * arr_elem_size_;
+        if (!rf_objset_get(&arr_set, val)) {
+            goto end; // duplicate value in the array
+        }
+        if (!rf_objset_add(&arr_set, val)) {
+            goto end; // internal error
+        }
+    }
+
+    ret = i_rf_objset_equal(set_, &arr_set.raw);
+end:
+    rf_objset_clear(&arr_set);
+    return ret;
+}
