@@ -1,8 +1,13 @@
 /* Taken from the CCAN project:
  * http://ccodearchive.net/index.html
  * https://github.com/rustyrussell/ccan
+ *
+ * The original code was Licensed under LGPLv2+ - see LICENSE file for details 
+ *
+ * Modified  a bit by Lefteris Karapetsas<lefteris@refu.co>.
+ * All additions are licensed under the same license
+ * as the rest of the project (BSD3)
  */
-/* Licensed under LGPLv2+ - see ccan-LICENSE file for details */
 #ifndef RF_DATASTRUCTURES_HTABLE_H
 #define RF_DATASTRUCTURES_HTABLE_H
 
@@ -178,13 +183,24 @@ void *htable_next(const struct htable *htable, struct htable_iter *i);
 void htable_delval(struct htable *ht, struct htable_iter *i);
 
 
+/**
+ * Iterate all values of the hash table
+ *
+ * @param ht_      The hash table to iterate
+ * @param it_      A struct htable_iter to use as an iterator
+ * @param val_     A pointer to hold each value during iteration
+ */
+#define htable_foreach(ht_, it_, val_)                   \
+    for (val_ = htable_first((ht_), (it_));              \
+         val_;                                           \
+         val_ = htable_next((ht_), (it_)))
+
 typedef void (*htable_iter_cb)(void *record, void *user_arg);
 /**
- * Added by Lefteris
- * htable_iterate_value - Perform an action for each record of the htable
- * @ht: the htable
- * @cb: the callback to execute for each record
- * @user_arg: the optional user argument to the callback
+ * Perform an action for each record of the htable
+ * @param ht        The hash table to iterate
+ * @param cb        The callback to execute for each record
+ * @param user_arg  The optional user argument to the callback
  */
 void htable_iterate_records(struct htable *ht, htable_iter_cb cb, void *user_arg);
 #endif
