@@ -83,6 +83,7 @@ int main(int argc, char **argv)
     srunner_add_suite(sr, utils_unicode_suite_create());
     srunner_add_suite(sr, utils_array_suite_create());
     srunner_add_suite(sr, utils_memory_pools_suite_create());
+    srunner_add_suite(sr, datastructs_objset_suite_create());
 
     srunner_add_suite(sr, intrusive_list_suite_create());
 

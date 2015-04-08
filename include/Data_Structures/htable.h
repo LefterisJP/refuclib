@@ -82,7 +82,8 @@ size_t htable_rehash(const void *elem);
  * @p: the non-NULL pointer
  *
  * Also note that this can only fail due to allocation failure.  Otherwise, it
- * returns true.
+ * returns true. If an item is already inserted into the htable it's added again.
+ * No duplicate checks happen in this function.
  */
 bool htable_add(struct htable *ht, size_t hash, const void *p);
 

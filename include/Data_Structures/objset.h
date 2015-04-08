@@ -46,7 +46,7 @@ struct objset_h {
  * otherwise the effect is undefined.
  */
 struct rf_objset_iter {
-    struct htable_iter i;
+    struct htable_iter it;
 };
 
 /**
@@ -63,10 +63,6 @@ struct rf_objset_iter {
 	{                                                                   \
 		htable_init(&set->ht, objset_##type##_hash, NULL);              \
 	}                                                                   \
-	static inline bool objset_##type##_add(struct objset_h *set, const type *elem) \
-	{                                                                   \
-		return htable_add(&set->ht, hashfn(keyof(elem)), elem);         \
-	}                                                                   \
 	static inline bool objset_##type##_del(struct objset_h *set, const type *elem) \
 	{                                                                   \
 		return htable_del(&set->ht, hashfn(keyof(elem)), elem);         \
@@ -82,6 +78,11 @@ struct rf_objset_iter {
                           (bool (*)(const void *, void *))(eqfn),       \
                           k);                                           \
 	}                                                                   \
+	static inline bool objset_##type##_add(struct objset_h *set, const type *elem) \
+	{                                                                   \
+        type *e = objset_##type##_get(set, elem);                       \
+		return e || htable_add(&set->ht, hashfn(keyof(elem)), elem);    \
+	}                                                                   \
 	static inline bool objset_##type##_delkey(struct objset_h *set,     \
                                               const HTABLE_KTYPE(keyof) k) \
 	{                                                                   \
@@ -90,8 +91,8 @@ struct rf_objset_iter {
 			return objset_##type##_del(set, elem);                      \
 		return false;                                                   \
 	}                                                                   \
-    static inline bool objset_##type##_subset(struct objset_h *set1,    \
-                                              struct objset_h *set2)    \
+    static inline bool objset_##type##_subset(const struct objset_h *set1, \
+                                              const struct objset_h *set2) \
     {                                                                   \
         struct htable_iter it1;                                         \
         type *elem;                                                     \
@@ -131,32 +132,34 @@ struct rf_objset_iter {
 #define rf_objset_init_default(set_) objset_void_init(&(set_)->raw)
 
 /**
- * rf_objset_empty - is this set empty?
- * @set: the typed objset to check.
- *
- * Example:
- *	if (!rf_objset_empty(&set))
- *		abort();
+ * Check if the set is empty
+ * @param set_     the typed objset to check.
+ * @return         True if the set has no elements and false otherwise
  */
-#define rf_objset_empty(set) objset_empty_(&(set)->raw)
-static inline bool objset_empty_(const struct objset_h *set)
-{
-    struct htable_iter it;
-	return htable_first(&set->ht, &it) == NULL;
-}
+#define rf_objset_empty(set) i_objset_empty_(&(set)->raw)
+bool i_objset_empty_(const struct objset_h *set);
+
+/**
+ * Get the number of elements in the set
+ * It can get expensive since it iterates over the set
+ * @param set_    The set whose number of elements to get
+ * @return        The number of elements stored in the set
+ */
+#define rf_objset_size(set_) i_objset_size_(&(set_)->raw)
+unsigned int i_objset_size_(const struct objset_h *set);
+
 
 /**
  * Get a value from a set
  * @param set_        The set_ to get from. Must be of a type containing OBJSET_MEMBERS
  * @param type_       Give the type of pointer objects the set is holding
  * @param value_      the (non-NULL) object to search for
- *
- * Returns the value, or NULL if it isn't in the set (and sets errno = ENOENT).
+ * @return            the value, or NULL if it isn't in the set
  */
 #define rf_objset_get(set_, type_, value_)                              \
 	tcon_cast((set_), canary, objset_##type_##_get(&(set_)->raw, (value_)))
 #define rf_objset_get_default(set_, value_)                             \
-	tcon_cast((set_), canary, ojset_void_get(&(set_)->raw, (value_)))
+	tcon_cast((set_), canary, objset_void_get(&(set_)->raw, (value_)))
 
 
 bool i_rf_objset_add(struct objset_h *set, void *value);
@@ -166,9 +169,8 @@ bool i_rf_objset_add(struct objset_h *set, void *value);
  * @param set_        The set_ to add to. Must be of a type containing OBJSET_MEMBERS
  * @param type_       Give the type of pointer objects the set is holding
  * @param value_      the (non-NULL) object to place in the set.
- *
- * This returns false if we run out of memory and true if
- * all went fine or if the object was already in the set.
+ * @return            false if we run out of memory and true if all went fine
+ *                    or if the object was already in the set.
  */
 #define rf_objset_add(set_, type_, value_)                              \
     objset_##type_##add(&tcon_check((set_), canary, (value_))->raw, (void *)(value_))
@@ -182,9 +184,7 @@ bool i_rf_objset_add(struct objset_h *set, void *value);
  * @param set_        The set to remove from. Must be of a type containing OBJSET_MEMBERS
  * @param type_       Give the type of pointer objects the set is holding
  * @param value_      the (non-NULL) object to find and remove from the set.
- *
- * This returns false NULL if @value was not in the set (and sets
- * errno = ENOENT).
+ * @return            false if @value was not in the set
  */
 #define rf_objset_del(set_, type_, value_)                            \
 	objset_##type_##_del(&tcon_check((set_), canary, value_)->raw,    \
@@ -200,7 +200,6 @@ bool i_rf_objset_add(struct objset_h *set, void *value);
  */
 #define rf_objset_clear(set) htable_clear(&(set)->raw.ht)
 
-
 /**
  * Get the first element in the set and initialize an iterator
  *
@@ -210,7 +209,7 @@ bool i_rf_objset_add(struct objset_h *set, void *value);
  *
  */
 #define rf_objset_first(set_, it_) \
-	tcon_cast((set_), canary, htable_first(&(set_)->raw.ht, &(it_)->iter))
+	tcon_cast((set_), canary, htable_first(&(set_)->raw.ht, &(it_)->it))
 
 /**
  * Get another element in the set using a previously initialized iterator
@@ -221,7 +220,7 @@ bool i_rf_objset_add(struct objset_h *set, void *value);
  *                 rf_objset_next() call.
  */
 #define rf_objset_next(set_, it_)                                       \
-	tcon_cast((set_), canary, htable_next(&(set)->raw.ht, &(it_)->iter))
+	tcon_cast((set_), canary, htable_next(&(set_)->raw.ht, &(it_)->it))
 
 /**
  * Iiterate all the elements in the set
@@ -242,12 +241,13 @@ bool i_rf_objset_add(struct objset_h *set, void *value);
  * @param set1_    The left part of ⊆
  * @param set2_    The right part of ⊆
  * @param type_    Give the type of pointer objects the set is holding
- * @return         True if all elements of set1 also exists in set2
+ * @return         True if all elements of set1 also exists in set2. That means
+ *                 for the empty set we will always get true.
  */
-#define rf_objset_subset(set1_, set2_, type_)           \
-    objset_##type_##_subset(&(set1)->raw, &(set2)->raw)
+#define rf_objset_subset(set1_, set2_, type_)               \
+    objset_##type_##_subset(&(set1_)->raw, &(set2_)->raw)
 #define rf_objset_subset_default(set1_, set2_)          \
-    objset_void_subset(&(set1)->raw, &(set2)->raw)
+    objset_void_subset(&(set1_)->raw, &(set2_)->raw)
 
 /**
  * Checks if two sets are equal
@@ -256,12 +256,12 @@ bool i_rf_objset_add(struct objset_h *set, void *value);
  * @param type_    Give the type of pointer objects the set is holding
  * @return         True if all elements of set1 also exists in set2 and vice versa
  */
-#define rf_objset_equal(set1_, set2_, type_)                \
-    (objset_##type_##_subset(&(set1)->raw, &(set2)->raw) && \
-     objset_##type_##_subset(&(set2)->raw, &(set1)->raw))
-#define rf_objset_equal_default(set1_, set2_)                \
-    (rf_objset_subset_default(&(set1)->raw, &(set2)->raw) && \
-     rf_objset_subset_default(&(set2)->raw, &(set1)->raw))
+#define rf_objset_equal(set1_, set2_, type_)    \
+    (rf_objset_subset(set1_, set2_, type_) &&   \
+     rf_objset_subset(set2_, set1_, type_))
+#define rf_objset_equal_default(set1_, set2_)   \
+    (rf_objset_subset_default(set1_, set2_) &&  \
+     rf_objset_subset_default(set2_, set1_))
 
 
 
