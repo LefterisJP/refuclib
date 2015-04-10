@@ -50,62 +50,6 @@ struct rf_objset_iter {
 };
 
 /**
- * Define a specific objset for a type. Heavily influenced by htable_type.h
- * @ref HTABLE_DEFINE_TYPE(). Same arguments apply but different/less functions
- * are generated
- */
-#define OBJSET_DEFINE_TYPE(type, keyof, hashfn, eqfn)                   \
-	static inline size_t objset_##type##_hash(const void *elem, void *priv) \
-	{                                                                   \
-		return hashfn(keyof((const type *)elem));                       \
-	}                                                                   \
-	static inline void objset_##type##_init(struct objset_h *set)       \
-	{                                                                   \
-		htable_init(&set->ht, objset_##type##_hash, NULL);              \
-	}                                                                   \
-	static inline bool objset_##type##_del(struct objset_h *set, const type *elem) \
-	{                                                                   \
-		return htable_del(&set->ht, hashfn(keyof(elem)), elem);         \
-	}                                                                   \
-	static inline type *objset_##type##_get(const struct objset_h *set, \
-                                            const HTABLE_KTYPE(keyof) k) \
-	{                                                                   \
-		/* Typecheck for eqfn */                                        \
-		(void)sizeof(eqfn((const type *)NULL,                           \
-                          keyof((const type *)NULL)));                  \
-		return htable_get(&set->ht,                                     \
-                          hashfn(k),                                    \
-                          (bool (*)(const void *, void *))(eqfn),       \
-                          k);                                           \
-	}                                                                   \
-	static inline bool objset_##type##_add(struct objset_h *set, const type *elem) \
-	{                                                                   \
-        type *e = objset_##type##_get(set, elem);                       \
-		return e || htable_add(&set->ht, hashfn(keyof(elem)), elem);    \
-	}                                                                   \
-	static inline bool objset_##type##_delkey(struct objset_h *set,     \
-                                              const HTABLE_KTYPE(keyof) k) \
-	{                                                                   \
-		type *elem = objset_##type##_get(set, k);                       \
-		if (elem)                                                       \
-			return objset_##type##_del(set, elem);                      \
-		return false;                                                   \
-	}                                                                   \
-    static inline bool objset_##type##_subset(const struct objset_h *set1, \
-                                              const struct objset_h *set2) \
-    {                                                                   \
-        struct htable_iter it1;                                         \
-        type *elem;                                                     \
-        htable_foreach(&set1->ht, &it1, elem) {                         \
-            if (!objset_##type##_get(set2, elem)) {                     \
-                return false;                                           \
-            }                                                           \
-        }                                                               \
-        return true;                                                    \
-    }
-
-
-/**
  * OBJSET_MEMBERS - declare members for a type-specific unordered objset.
  * @type: type for this set's values, or void * for any pointer.
  *
@@ -123,12 +67,69 @@ struct rf_objset_iter {
 	TCON(type canary)
 
 /**
+ * Define a specific objset for a type. Heavily influenced by htable_type.h
+ * @ref HTABLE_DEFINE_TYPE(). Same arguments apply but different/less functions
+ * are generated
+ */
+#define OBJSET_DEFINE_TYPE(name, type, keyof, hashfn, eqfn)             \
+    struct rf_objset_##name { OBJSET_MEMBERS(type *); };                \
+	static inline size_t objset_##name##_hash(const void *elem, void *priv) \
+	{                                                                   \
+		return hashfn(keyof((const type *)elem));                       \
+	}                                                                   \
+	static inline void objset_##name##_init(struct objset_h *set)       \
+	{                                                                   \
+		htable_init(&set->ht, objset_##name##_hash, NULL);              \
+	}                                                                   \
+	static inline bool objset_##name##_del(struct objset_h *set, const type *elem) \
+	{                                                                   \
+		return htable_del(&set->ht, hashfn(keyof(elem)), elem);         \
+	}                                                                   \
+	static inline type *objset_##name##_get(const struct objset_h *set, \
+                                            const HTABLE_KTYPE(keyof) k) \
+	{                                                                   \
+		/* Typecheck for eqfn */                                        \
+		(void)sizeof(eqfn((const type *)NULL,                           \
+                          keyof((const type *)NULL)));                  \
+		return htable_get(&set->ht,                                     \
+                          hashfn(k),                                    \
+                          (bool (*)(const void *, void *))(eqfn),       \
+                          k);                                           \
+	}                                                                   \
+	static inline bool objset_##name##_add(struct objset_h *set, const type *elem) \
+	{                                                                   \
+        type *e = objset_##name##_get(set, elem);                       \
+		return e || htable_add(&set->ht, hashfn(keyof(elem)), elem);    \
+	}                                                                   \
+	static inline bool objset_##name##_delkey(struct objset_h *set,     \
+                                              const HTABLE_KTYPE(keyof) k) \
+	{                                                                   \
+		type *elem = objset_##name##_get(set, k);                       \
+		if (elem)                                                       \
+			return objset_##name##_del(set, elem);                      \
+		return false;                                                   \
+	}                                                                   \
+    static inline bool objset_##name##_subset(const struct objset_h *set1, \
+                                              const struct objset_h *set2) \
+    {                                                                   \
+        struct htable_iter it1;                                         \
+        type *elem;                                                     \
+        htable_foreach(&set1->ht, &it1, elem) {                         \
+            if (!objset_##name##_get(set2, elem)) {                     \
+                return false;                                           \
+            }                                                           \
+        }                                                               \
+        return true;                                                    \
+    }
+
+/**
  * Initialize an rf_objset
  *
  * @param set_        The set_ to initialize. Must be of a type containing OBJSET_MEMBERS
- * @param type_       Give the type of pointer objects the set is holding
+ * @param name_       Give the name with which you described the type of the pointer
+ *                    when calling OBJSET_DEFINE_TYPE()
  */
-#define rf_objset_init(set_, type_) objset_##type_##_init(&(set_)->raw)
+#define rf_objset_init(set_, name_) objset_##name_##_init(&(set_)->raw)
 #define rf_objset_init_default(set_) objset_void_init(&(set_)->raw)
 
 /**
@@ -152,12 +153,13 @@ unsigned int i_objset_size_(const struct objset_h *set);
 /**
  * Get a value from a set
  * @param set_        The set_ to get from. Must be of a type containing OBJSET_MEMBERS
- * @param type_       Give the type of pointer objects the set is holding
+ * @param name_       Give the name with which you described the type of the pointer
+ *                    when calling OBJSET_DEFINE_TYPE()
  * @param value_      the (non-NULL) object to search for
  * @return            the value, or NULL if it isn't in the set
  */
-#define rf_objset_get(set_, type_, value_)                              \
-	tcon_cast((set_), canary, objset_##type_##_get(&(set_)->raw, (value_)))
+#define rf_objset_get(set_, name_, value_)                              \
+	tcon_cast((set_), canary, objset_##name_##_get(&(set_)->raw, (value_)))
 #define rf_objset_get_default(set_, value_)                             \
 	tcon_cast((set_), canary, objset_void_get(&(set_)->raw, (value_)))
 
@@ -167,13 +169,14 @@ bool i_rf_objset_add(struct objset_h *set, void *value);
  * Add a member to the set
  *
  * @param set_        The set_ to add to. Must be of a type containing OBJSET_MEMBERS
- * @param type_       Give the type of pointer objects the set is holding
+ * @param name_       Give the name with which you described the type of the pointer
+ *                    when calling OBJSET_DEFINE_TYPE()
  * @param value_      the (non-NULL) object to place in the set.
  * @return            false if we run out of memory and true if all went fine
  *                    or if the object was already in the set.
  */
-#define rf_objset_add(set_, type_, value_)                              \
-    objset_##type_##add(&tcon_check((set_), canary, (value_))->raw, (void *)(value_))
+#define rf_objset_add(set_, name_, value_)                              \
+    objset_##name_##_add(&tcon_check((set_), canary, (value_))->raw, (void *)(value_))
 #define rf_objset_add_default(set_, value_)                             \
     objset_void_add(&tcon_check((set_), canary, (value_))->raw, (void *)(value_))
 
@@ -182,12 +185,13 @@ bool i_rf_objset_add(struct objset_h *set, void *value);
  * Remove a member from the set.
  *
  * @param set_        The set to remove from. Must be of a type containing OBJSET_MEMBERS
- * @param type_       Give the type of pointer objects the set is holding
+ * @param name_       Give the name with which you described the type of the pointer
+ *                    when calling OBJSET_DEFINE_TYPE()
  * @param value_      the (non-NULL) object to find and remove from the set.
  * @return            false if @value was not in the set
  */
-#define rf_objset_del(set_, type_, value_)                            \
-	objset_##type_##_del(&tcon_check((set_), canary, value_)->raw,    \
+#define rf_objset_del(set_, name_, value_)                            \
+	objset_##name_##_del(&tcon_check((set_), canary, value_)->raw,    \
                          (const void *)value_)
 #define rf_objset_del_default(set_, value_)                           \
 	objset_void_del(&tcon_check((set_), canary, value_)->raw,         \
@@ -240,12 +244,13 @@ bool i_rf_objset_add(struct objset_h *set, void *value);
  * Checks if a set is a subset of another
  * @param set1_    The left part of ⊆
  * @param set2_    The right part of ⊆
- * @param type_    Give the type of pointer objects the set is holding
+ * @param name_       Give the name with which you described the type of the pointer
+ *                    when calling OBJSET_DEFINE_TYPE()
  * @return         True if all elements of set1 also exists in set2. That means
  *                 for the empty set we will always get true.
  */
-#define rf_objset_subset(set1_, set2_, type_)               \
-    objset_##type_##_subset(&(set1_)->raw, &(set2_)->raw)
+#define rf_objset_subset(set1_, set2_, name_)               \
+    objset_##name_##_subset(&(set1_)->raw, &(set2_)->raw)
 #define rf_objset_subset_default(set1_, set2_)          \
     objset_void_subset(&(set1_)->raw, &(set2_)->raw)
 
@@ -253,12 +258,13 @@ bool i_rf_objset_add(struct objset_h *set, void *value);
  * Checks if two sets are equal
  * @param set1_    The left part of equality
  * @param set2_    The right part of equality
- * @param type_    Give the type of pointer objects the set is holding
+ * @param name_       Give the name with which you described the type of the pointer
+ *                    when calling OBJSET_DEFINE_TYPE()
  * @return         True if all elements of set1 also exists in set2 and vice versa
  */
-#define rf_objset_equal(set1_, set2_, type_)    \
-    (rf_objset_subset(set1_, set2_, type_) &&   \
-     rf_objset_subset(set2_, set1_, type_))
+#define rf_objset_equal(set1_, set2_, name_)    \
+    (rf_objset_subset(set1_, set2_, name_) &&   \
+     rf_objset_subset(set2_, set1_, name_))
 #define rf_objset_equal_default(set1_, set2_)   \
     (rf_objset_subset_default(set1_, set2_) &&  \
      rf_objset_subset_default(set2_, set1_))
@@ -267,6 +273,7 @@ bool i_rf_objset_add(struct objset_h *set, void *value);
 
 // define functions for the the default set type which is simple pointer comparison
 OBJSET_DEFINE_TYPE(void,
+                   void,
                    default_objset_key_,
                    default_objset_hashfn_,
                    default_objset_eqfn_)
