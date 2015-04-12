@@ -49,17 +49,11 @@ i_THREAD__ struct RFbuffer g_tsbuff;
 static void rf_strings_buffer_add_string_ptr(struct RFstring **str, uint64_t index);
 static void rf_strings_buffer_add_string_buffer_ptr(char **buf, uint64_t index);
 
-static bool i_rf_string_create_local_assignva(struct RFstring **ret, const char* s, va_list args)
+static bool i_rf_string_create_local_assignva(struct RFstring **ret, const char *s, va_list args)
 {
     unsigned int size, bIndex;
     uint32_t index_before_string_alloc;
     char *buffPtr;
-
-    if (!rf_strings_buffer_fillfmt(s, &size, &buffPtr, &bIndex, args)) {
-        RF_ERROR("Local string creation failure due to failing at reading the"
-                 " formatted string");
-        return false;
-    }
 
     //allocate the string in its buffer
     index_before_string_alloc = rf_buffer_index(TSBUFF);
@@ -67,22 +61,39 @@ static bool i_rf_string_create_local_assignva(struct RFstring **ret, const char*
     if (!*ret) {
         return false;
     }
-    rf_string_data(*ret) = buffPtr;
-    rf_string_length_bytes(*ret) = size;
     // add it to the context
     rf_strings_buffer_add_string_ptr(ret, index_before_string_alloc);
+
+    // deal with the va_args buffer
+    if (!rf_strings_buffer_fillfmt(s, &size, &buffPtr, &bIndex, args)) {
+        RF_ERROR("Local string creation failure due to failing at reading the"
+                 " formatted string");
+        return false;
+    }
+    rf_string_data(*ret) = buffPtr;
+    rf_string_length_bytes(*ret) = size;
 
     return true;
 }
 
-bool i_rf_string_create_local_assignv(struct RFstring **ret, const char* s, ...)
+bool i_rf_string_create_local_assignv(struct RFstring **ret, const char *s, ...)
 {
     va_list args;
-    unsigned int size, bIndex;
+    unsigned int size;
+    unsigned int bIndex;
     uint32_t index_before_string_alloc;
     char *buffPtr;
+    
+    //allocate the string in its buffer
+    index_before_string_alloc = rf_buffer_index(TSBUFF);
+    *ret = rf_buffer_malloc(TSBUFF, sizeof(**ret));
+    if (!*ret) {
+        return false;
+    }
+    // add it to the context before filling the buffer. If there is a realloc we need it handled
+    rf_strings_buffer_add_string_ptr(ret, index_before_string_alloc);
 
-    //read the var args
+    // read the var args into the buffer
     va_start(args, s);
     if (!rf_strings_buffer_fillfmt(s, &size, &buffPtr, &bIndex, args)) {
         RF_ERROR("Local string creation failure due to failing at reading the"
@@ -91,21 +102,13 @@ bool i_rf_string_create_local_assignv(struct RFstring **ret, const char* s, ...)
     }
     va_end(args);
 
-    //allocate the string in its buffer
-    index_before_string_alloc = rf_buffer_index(TSBUFF);
-    *ret = rf_buffer_malloc(TSBUFF, sizeof(**ret));
-    if (!*ret) {
-        return false;
-    }
     rf_string_data(*ret) = buffPtr;
     rf_string_length_bytes(*ret) = size;
-    // add it to the context
-    rf_strings_buffer_add_string_ptr(ret, index_before_string_alloc);
 
     return true;
 }
 
-struct RFstring *i_rf_string_create_localv(const char* s, ...)
+struct RFstring *i_rf_string_create_localv(const char *s, ...)
 {
     struct RFstring *ret;
     bool rc;
