@@ -42,6 +42,8 @@ extern "C" {
 struct refu_clibctx;
 struct RFlog;
 
+#define RF_DEFAULT_STRING_BUFFERS_SIZE 1024
+
 /**
 ** @defgroup RFgeneral_g_r_p Initialization function
 ** @addtogroup RFgeneral_g_r_p

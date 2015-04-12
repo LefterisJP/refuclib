@@ -55,8 +55,7 @@ struct RFstring* rf_string_from_file_create(FILE* f, char* eof,
 {
     struct RFstring* ret;
     RF_MALLOC(ret, sizeof(*ret), return NULL);
-    if(!rf_string_from_file_init(ret, f, eof, eol, encoding, endianess, buff_size))
-    {
+    if (!rf_string_from_file_init(ret, f, eof, eol, encoding, endianess, buff_size)) {
         free(ret);
         ret = NULL;
     }
@@ -72,8 +71,7 @@ bool rf_string_from_file_init(struct RFstring* str, FILE* f, char* eof,
     uint32_t buff_size;
     RF_ASSERT(str, "got null string in function");
     /* sanity checks for the rest of the arguments are performed further down */
-    switch(encoding)
-    {
+    switch (encoding) {
         case RF_UTF8:
             if(!rf_file_read_line_utf8(f, eol, &rf_string_data(str),
                                  &rf_string_length_bytes(str), &buff_size, eof))
@@ -83,19 +81,18 @@ bool rf_string_from_file_init(struct RFstring* str, FILE* f, char* eof,
             }
             break;
         case RF_UTF16:
-            if(!rf_file_read_line_utf16(f, eol, &rf_string_data(str),
-                                  &rf_string_length_bytes(str), eof, &buff_size,
-                                  endianess))
-            {
+            if (!rf_file_read_line_utf16(f, eol, &rf_string_data(str),
+                                         &rf_string_length_bytes(str), eof, &buff_size,
+                                         endianess)) {
                 RF_ERROR("Failure to initialize a String from reading"
                          " a UTF-16 file");
                 return false;
             }
             break;
         case RF_UTF32:
-            if(!rf_file_read_line_utf32(f, eol, &rf_string_data(str),
-                                  &rf_string_length_bytes(str), eof,
-                                  &buff_size, endianess))
+            if (!rf_file_read_line_utf32(f, eol, &rf_string_data(str),
+                                         &rf_string_length_bytes(str), eof,
+                                         &buff_size, endianess))
             {
                 RF_ERROR("Failure to initialize a String from reading"
                          " a UTF-32 file");
