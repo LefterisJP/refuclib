@@ -35,7 +35,6 @@
 #include <String/rf_str_common.h> //for RFS_()
 #include <String/rf_str_corex.h> //for rf_stringx_init_buff() and others
 #include <String/rf_str_retrieval.h> //for accessors
-#include "../String/rf_str_conversion.ph" //for the buffer Cstr() conversion
 #include <Utils/log.h> //for error logging
 #include <Utils/memory.h> //for refu memory allocation
 #include <IO/rf_file.h> //rfStat() definition
@@ -52,23 +51,26 @@
 //Creates a directory
 bool rf_system_make_dir(void* dirname, int mode)
 {
-    char* cs;
-    unsigned int index;
+    char* cstr;
+    bool ret = false;
     RF_NULLCHECK1(dirname, "directory name", return false);
 
-    if (!(cs = rf_string_cstr_ibuff_push(dirname, &index))) {
-        return false;
+    RFS_push();
+    if (!(cstr = rf_string_cstr_from_buff(dirname))) {
+        goto end_pop;
     }
     
     //make the directory
-    if (mkdir(cs, mode) != 0) {
+    if (mkdir(cstr, mode) != 0) {
         RF_ERROR("Creating a directory failed due to mkdir() "
                  "errno %d", errno);
-        return false;
+        goto end_pop;
     }
+    ret = true;
 
-    rf_string_cstr_ibuff_pop(index);
-    return true;
+end_pop:
+    RFS_pop();
+    return ret;
 }
 
 //Removes a directory and all its files
@@ -77,13 +79,14 @@ bool rf_system_remove_dir(void* dirname)
     bool ret = true;
     DIR* dir;
     struct dirent *entry;
-    char *cs;
-    unsigned int index;
+    char *cstr;
     struct RFstringx path;
     RF_NULLCHECK1(dirname, "directory name", return false);
 
-    if (!(cs = rf_string_cstr_ibuff_push(dirname, &index))) {
-        return false;
+    RFS_push();
+    if (!(cstr = rf_string_cstr_from_buff(dirname))) {
+        ret = false;
+        goto cleanup_cstr_buff;
     }
 
     if (!rf_stringx_init_buff(&path, 1024, "")) {
@@ -92,7 +95,7 @@ bool rf_system_remove_dir(void* dirname)
         goto cleanup_cstr_buff;
     }
     //open the directory
-    if (!(dir = opendir(cs))) {
+    if (!(dir = opendir(cstr))) {
         RF_ERROR("Failed to open the given directory due to "
                  "opendir() errno %d", errno);
         ret = false;
@@ -170,59 +173,62 @@ bool rf_system_remove_dir(void* dirname)
 cleanup_path:
     rf_stringx_deinit(&path);
 cleanup_cstr_buff:
-    rf_string_cstr_ibuff_pop(index);
+    RFS_pop();
     return ret;
 }
 
 //Deletes a file
 bool rf_system_delete_file(const void* name)
 {
-    char *cs;
-    unsigned int index;
+    char *cstr;
+    bool ret = false;
     RF_NULLCHECK1(name, "file name", return false);
-    if (!(cs = rf_string_cstr_ibuff_push(name, &index))) {
-        return false;
+    RFS_push();
+    if (!(cstr = rf_string_cstr_from_buff(name))) {
+        goto end_pop;
     }        
 
     //if we get here this means it's a file that needs deletion
-    if (unlink(cs) != 0) {
+    if (unlink(cstr) != 0) {
         RF_ERROR("Removing file \""RF_STR_PF_FMT"\" failed due"
                  " to unlink() errno %d",
                  RF_STR_PF_ARG(name), errno);
-        return false;
+        goto end_pop;
     }//end of check of succesful file removal
+    ret = true;
 
-    rf_string_cstr_ibuff_pop(index);
-    return true;
+end_pop:
+    RFS_pop();
+    return ret;
 }
 
 // Renames a file
-bool rf_system_rename_file(void* name, void* newName)
+bool rf_system_rename_file(void* name, void* new_name)
 {
-    bool ret = true;
+    bool ret = false;
     char *cs_name;
     char *cs_new_name;
-    unsigned int index;
-    RF_NULLCHECK2(name, newName, return false);
+    RF_NULLCHECK2(name, new_name, return false);
 
-    if (!(cs_name = rf_string_cstr_ibuff_push(name, &index))) {
-        return false;
-    }    
-    if (!(cs_new_name = rf_string_cstr_ibuff_push(newName, NULL))) {
-        ret = false; goto cleanup1;
+    RFS_push();
+    if (!(cs_name = rf_string_cstr_from_buff(name))) {
+        goto end_pop;
     }
+    if (!(cs_new_name = rf_string_cstr_from_buff(new_name))) {
+        goto end_pop;
+    }        
 
     if (rename(cs_name, cs_new_name) != 0) {
         RF_ERROR("Renaming file \""RF_STR_PF_FMT"\" to "
                  "\""RF_STR_PF_FMT"\" failed due to rename() "
-                 "errno %d", RF_STR_PF_ARG(name), RF_STR_PF_ARG(newName),
+                 "errno %d", RF_STR_PF_ARG(name), RF_STR_PF_ARG(new_name),
                  errno);
-        ret = false;
+        goto end_pop;
     }//end of check for succesful renaming
+    ret = true;
 
-
-  cleanup1:
-    rf_string_cstr_ibuff_pop(index);
+  end_pop:
+    RFS_pop();
     return ret;
 }
 
@@ -242,35 +248,38 @@ RFthread_id rf_system_get_thread_id()
 
 FILE* rf_fopen(const void* name, const char* mode)
 {
-    unsigned int index;
-    char* cs;
-    FILE* ret;
-    if (!(cs = rf_string_cstr_ibuff_push(name, &index))) {
-        return NULL;
+    char* cstr;
+    FILE* ret = NULL;
+    RFS_push();
+    if (!(cstr = rf_string_cstr_from_buff(name))) {
+        goto end_pop;
     }
-    ret = fopen(cs, mode);
-    rf_string_cstr_ibuff_pop(index);
+    ret = fopen(cstr, mode);
+
+end_pop:
+    RFS_pop();
     return ret;
 }
 
 FILE* rf_freopen(const void* name, const char* mode, FILE* f)
 {
-    unsigned int index;
-    char* cs;
-    FILE* ret;
-    if (!(cs = rf_string_cstr_ibuff_push(name, &index))) {
-        return NULL;
+    char* cstr;
+    FILE* ret = NULL;
+    RFS_push();
+    if (!(cstr = rf_string_cstr_from_buff(name))) {
+        goto end_pop;
     }
-    ret = freopen(cs, mode, f);
-    rf_string_cstr_ibuff_pop(index);
+    ret = freopen(cstr, mode, f);
+
+end_pop:
+    RFS_pop();
     return ret;
 }
 
 FILE* rf_popen(const void *command, const char* mode)
 {
     FILE* ret = NULL;
-    unsigned int index;
-    char *cs;
+    char *cstr;
 
 
     if (strcmp(mode,"r") != 0 && strcmp(mode,"w") != 0) {
@@ -278,13 +287,14 @@ FILE* rf_popen(const void *command, const char* mode)
         return NULL;
     }
 
-    if(!(cs = rf_string_cstr_ibuff_push(command, &index))) {
-        return NULL;
+    RFS_push();
+    if (!(cstr = rf_string_cstr_from_buff(command))) {
+        goto end_pop;
     }
-
-    ret = popen(cs, mode);
-
-    rf_string_cstr_ibuff_pop(index);
+    ret = popen(cstr, mode);
+    
+end_pop:
+    RFS_pop();
     return ret;
 }
 

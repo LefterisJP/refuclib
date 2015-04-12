@@ -74,7 +74,8 @@ static void rf_atexit()
 //Initializes the Refu library
 bool rf_init(enum RFlog_target_type log_type,
              const char *log_file_name,
-             enum RFlog_level level)
+             enum RFlog_level level,
+             size_t string_buffer_size)
 {
     bool ret = false;
     /* create the refuclib ctx */
@@ -83,7 +84,7 @@ bool rf_init(enum RFlog_target_type log_type,
     }
 
     /* activate all modules */
-    if (!rf_string_activate()) {
+    if (!rf_string_activate(string_buffer_size)) {
         RF_ERROR("Failed to initialize the string module");
         goto cleanup;
     }

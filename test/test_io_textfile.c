@@ -55,7 +55,7 @@ struct RFstringx g_buff;
 struct RFstringx g_fname;
 void setup_textfile_tests()
 {
-    rf_init(LOG_TARGET_STDOUT, NULL, LOG_DEBUG);
+    rf_init(LOG_TARGET_STDOUT, NULL, LOG_DEBUG, 1024);
     ck_assert(rf_stringx_init_buff(&g_buff, 512, ""));
     ck_assert(rf_stringx_init_buff(&g_fname, 64, ""));
 }
@@ -68,7 +68,7 @@ void teardown_textfile_tests()
 
 void setup_textfile_invalid_args_tests()
 {
-    rf_init(LOG_TARGET_FILE, "refuclib.log", LOG_DEBUG);
+    rf_init(LOG_TARGET_FILE, "refuclib.log", LOG_DEBUG, 1024);
     ck_assert(rf_stringx_init_buff(&g_buff, 512, ""));
     ck_assert(rf_stringx_init_buff(&g_fname, 64, ""));
 }

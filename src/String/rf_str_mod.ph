@@ -2,8 +2,16 @@
 #define RF_STRING_MOD_PH
 
 #include <Definitions/retcodes.h> //for bool
+#include <stdlib.h>
 
-bool rf_string_activate();
+/**
+ * Activate the string module.
+ *
+ */
+bool rf_string_activate(size_t string_buffer_size);
+/**
+ * Deactivate the strings module
+ */
 void rf_string_deactivate();
 
 

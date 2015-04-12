@@ -29,13 +29,26 @@
 */
 
 #include <Utils/buffer.h>
+#include <Utils/memory.h>
 
-i_INLINE_INS bool rf_buffer_init(struct RFbuffer* b, size_t size);
+bool rf_buffer_init(struct RFbuffer* b, size_t size, rf_buffer_realloc_cb cb)
+{
+    b->size = size;
+    b->index = 0;
+    b->realloc_cb = cb;
+    RF_CALLOC(b->buff, size, 1, return false);
+    return true;
+}
 i_INLINE_INS void rf_buffer_deinit(struct RFbuffer* b);
-i_INLINE_INS bool rf_buffer_increase_size_(struct RFbuffer* b, size_t size);
-i_INLINE_INS bool rf_buffer_copy_at_current(struct RFbuffer* b, const char* src, size_t len);
+bool rf_buffer_increase_size(struct RFbuffer* b, size_t added_size)
+{
+    RF_REALLOC(b->buff, char, b->size + added_size, return false);
+    b->size += added_size;
+    return b->realloc_cb ? b->realloc_cb(b) :true;
+}
 i_INLINE_INS void* rf_buffer_current_ptr_(struct RFbuffer* b);
 i_INLINE_INS size_t rf_buffer_remaining_size_(struct RFbuffer* b);
+i_INLINE_INS bool rf_buffer_assert_remaining_size(struct RFbuffer *b, size_t size);
 i_INLINE_INS size_t rf_buffer_size(struct RFbuffer* b);
 i_INLINE_INS void rf_buffer_set_index_(struct RFbuffer* b, unsigned int index);
 i_INLINE_INS unsigned int rf_buffer_index(struct RFbuffer* b);

@@ -33,7 +33,6 @@
 /*------------- Module related inclusion -------------*/
 #include <String/rf_str_retrieval.h> //for rf_string_count
 #include <String/rf_str_common.h> //for RFS_()
-#include "rf_str_conversion.ph" //for rf_string_cstr_ibuff_push()
 #include "rf_str_common.ph" //for required string private macros and functions
 #include "rf_str_defines.ph" //for some defines
 /*------------- Outside Module inclusion -------------*/
@@ -112,15 +111,9 @@ char* rf_string_cstr(const void* str)
     return ret;
 }
 
-char* rf_string_cstr_from_buff(const void* s)
-{
-    return rf_string_cstr_ibuff_push(s, NULL);
-}
-
 bool rf_string_to_int(const void* str, int64_t* v, size_t *off)
 {
     char *cstr;
-    unsigned int index;
     char *end;
     size_t length;
     bool ret = true;
@@ -130,11 +123,12 @@ bool rf_string_to_int(const void* str, int64_t* v, size_t *off)
         return false;
     }
 
-    cstr = rf_string_cstr_ibuff_push(str, &index);
+    RFS_push();
+    cstr = rf_string_cstr_from_buff(str);
     errno = 0;
     *v = strtoull (cstr, &end, 10);
     length = end - cstr;
-    if(length == 0 || errno) {
+    if (length == 0 || errno) {
         ret = false;
     }
 
@@ -142,7 +136,7 @@ bool rf_string_to_int(const void* str, int64_t* v, size_t *off)
         *off = length - 1;
     }
 
-    rf_string_cstr_ibuff_pop(index);
+    RFS_pop();
     return ret;
 }
 
@@ -153,7 +147,6 @@ bool rf_string_to_uint(const void* str,
                        int base)
 {
     char *cstr;
-    unsigned int index;
     char *end;
     bool ret = true;
     size_t length;
@@ -163,7 +156,8 @@ bool rf_string_to_uint(const void* str,
         return false;
     }
 
-    cstr = rf_string_cstr_ibuff_push(str, &index);
+    RFS_push();
+    cstr = rf_string_cstr_from_buff(str);
     errno = 0;
     *v = strtoull (cstr + start_off, &end, base);
     length = end - cstr;
@@ -175,7 +169,7 @@ bool rf_string_to_uint(const void* str,
         }
     }
 
-    rf_string_cstr_ibuff_pop(index);
+    RFS_pop();
     return ret;
 }
 
@@ -195,7 +189,6 @@ i_INLINE_INS bool rf_string_to_uint_oct(const void* thisstr,
 bool rf_string_to_double(const void* str, double* f, size_t *off)
 {
     char *cstr;
-    unsigned int index;
     char *end;
     bool ret = true;
     size_t length;
@@ -205,7 +198,8 @@ bool rf_string_to_double(const void* str, double* f, size_t *off)
         return false;
     }
 
-    cstr = rf_string_cstr_ibuff_push(str, &index);
+    RFS_push();
+    cstr = rf_string_cstr_from_buff(str);
     errno = 0;
     *f = strtod (cstr, &end);
     length = end - cstr;
@@ -217,7 +211,7 @@ bool rf_string_to_double(const void* str, double* f, size_t *off)
         *off = length - 1;
     }
 
-    rf_string_cstr_ibuff_pop(index);
+    RFS_pop();
     return ret;
 }
 

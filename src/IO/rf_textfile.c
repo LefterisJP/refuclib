@@ -44,7 +44,6 @@
 #include <String/rf_str_traversalx.h> //for rf_stringx_reset()
 #include <String/rf_str_manipulationx.h> //for rf_stringx_append_char()
 #include <Utils/rf_unicode.h> //for rfReadLine family of functions
-#include "../String/rf_str_conversion.ph" //for rf_string_cstr with buffer
 
 #include <Utils/endianess.h> //for the endianess stuff
 #include <Utils/log.h> //for error logging

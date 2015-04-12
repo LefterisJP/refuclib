@@ -99,12 +99,6 @@ i_DECLIMEX_ uint32_t* rf_string_to_utf32(const void* s,uint32_t*length);
  ** Since RFstring is not null terminated this function shall allocate
  ** a c string where it will be stored.
  **
- ** @internal
- ** You can also use the internal @ref rf_string_cstr_ibuff_push()
- ** or its external API function @ref rf_string_cstr_from_buff()
- ** which combined with popping allows you to avoid mallocs
- ** @endinternal
- **
  ** @warning Make sure to free the returned string after using
  **
  ** @param s       The string whose cstring repesentation to get.

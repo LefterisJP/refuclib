@@ -287,7 +287,7 @@ bool rf_string_scanf_after(const void* str, const void* astr,
     sub_length = (rf_string_data(str) + rf_string_length_bytes(str)) - s + 1;
     buff_size = rf_buffer_remaining_size(TSBUFFA, char);
     if (buff_size <= sub_length) {
-        rf_buffer_increase_size(TSBUFFA, buff_size * 2, char);
+        rf_buffer_increase_size(TSBUFFA, buff_size * 2);
     }
     memcpy(rf_buffer_current_ptr(TSBUFFA, char), s, sub_length - 1);
     rf_buffer_from_current_at(TSBUFFA, sub_length, char) = '\0';

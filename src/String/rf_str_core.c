@@ -135,8 +135,7 @@ bool rf_string_init(struct RFstring* str, const char* s)
         RF_ERROR("Attempted to initialize string with a null c string");
         return false;
     }
-    if(!rf_utf8_verify(s, &byteLength, 0))
-    {
+    if (!rf_utf8_verify(s, &byteLength, 0)) {
         RF_ERROR("Error at String Initialization due to invalid UTF-8 "
                  "byte sequence");
         return false;

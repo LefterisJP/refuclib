@@ -19,7 +19,7 @@
 
 void setup_log_tests()
 {
-    rf_init(LOG_TARGET_FILE, "refuclib.log", LOG_DEBUG);
+    rf_init(LOG_TARGET_FILE, "refuclib.log", LOG_DEBUG, 1024);
 }
 
 void teardown_log_tests()

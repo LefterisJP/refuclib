@@ -212,7 +212,7 @@ i_INLINE_DECL bool fill_fmt_buffer(const char *fmt,
         return false;
     }
     if (rc >= n) {
-        if(!rf_buffer_increase_size(TSBUFFA, rc * 2, char)) {
+        if(!rf_buffer_increase_size(TSBUFFA, rc * 2)) {
             return false;
         }
         n = rf_buffer_size(TSBUFFA);
@@ -257,7 +257,7 @@ i_INLINE_DECL int rf_string_fill_codepoints(const struct RFstring* s)
     chars_num = rf_string_length(s);
     if (chars_num > rf_buffer_remaining_size(TSBUFFA, uint32_t)) {
 
-        if(rf_buffer_increase_size(TSBUFFA, chars_num * 2, uint32_t)) {
+        if (rf_buffer_increase_size(TSBUFFA, chars_num * 2 * sizeof(uint32_t))) {
             return -1;
         }
     }

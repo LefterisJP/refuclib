@@ -92,8 +92,8 @@ START_TEST(test_string_to_int) {
     int64_t num;
     size_t off;
     ck_assert(rf_stringx_init(&sx, "45687"));
-    ck_assert(rf_string_init(&s, "-123442"));
     ck_assert(rf_string_init(&s2, "0"));
+    ck_assert(rf_string_init(&s, "-123442"));
 
     ck_assert(rf_string_to_int(&sx, &num, NULL));
     ck_assert_int_eq(num, 45687);
@@ -357,8 +357,8 @@ Suite *string_conversion_suite_create(void)
         "String Encodings Conversion"
     );
     tcase_add_checked_fixture(string_encodings_conversions,
-                                  setup_generic_tests,
-                                  teardown_generic_tests);
+                              setup_generic_tests,
+                              teardown_generic_tests);
     tcase_add_test(string_encodings_conversions, test_string_to_utf16);
     tcase_add_test(string_encodings_conversions, test_string_to_utf32);
     tcase_add_test(string_encodings_conversions, test_string_to_cstr);

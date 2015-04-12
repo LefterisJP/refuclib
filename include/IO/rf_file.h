@@ -38,9 +38,10 @@
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/inline.h> //for inline definitions
 #include <Definitions/retcodes.h> //for booleans
-#include "../../src/String/rf_str_conversion.ph" //for rf_string_cstr with buffer
 #include <Utils/endianess.h> //for RFendianess
 #include <String/rf_str_decl.h> //for RFstring
+#include <String/rf_str_common.h> //for RFstring
+#include <String/rf_str_conversion.h> //for RFstring
 /*------------- System specific inclusion --------------*/
 #ifdef _MSC_VER
 #error TODO
@@ -77,15 +78,17 @@ extern "C"
 #else
 i_INLINE_DECL int rfStat(struct RFstring* f, stat_rft* buffer)
 {
-    unsigned int index;
-    int ret;
-    char * cs;
-    if(!(cs = rf_string_cstr_ibuff_push(f, &index)))
-    {
-        return -1;
+    int ret = -1;
+    char *cstr;
+
+    RFS_push();
+    if (!(cstr = rf_string_cstr_from_buff(f))) {
+        goto end_pop;
     }
-    ret = stat(cs, (struct stat*)buffer);
-    rf_string_cstr_ibuff_pop(index);
+    ret = stat(cstr, (struct stat*)buffer);
+
+end_pop:
+    RFS_pop();
     return ret;
 }
 #endif

@@ -101,7 +101,7 @@ i_INLINE_DECL bool replace_intro(void* s, uint32_t* number,
         foundN++;
         //if buffer is in danger of overflow realloc it
         if(foundN >= rf_buffer_remaining_size(TSBUFFA, uint32_t)) {
-            if(rf_buffer_increase_size(TSBUFFA, foundN * 2, uint32_t)) {
+            if(rf_buffer_increase_size(TSBUFFA, foundN * 2 * sizeof(uint32_t))) {
                 RF_ERROR("Not enough memory to increase internal buffer");
                 ret = false;
                 goto cleanup;

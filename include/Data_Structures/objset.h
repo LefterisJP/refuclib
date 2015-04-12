@@ -22,9 +22,9 @@ static inline const void *default_objset_key_(const void *elem)
 {
 	return elem;
 }
-static inline size_t default_objset_hashfn_(const void *elem)
+static inline size_t default_objset_hashfn_(const void *key)
 {
-	return hash_pointer(elem, 0);
+	return hash_pointer(key, 0);
 }
 static inline bool default_objset_eqfn_(const void *e1, const void *e2)
 {

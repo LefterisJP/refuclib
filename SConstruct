@@ -52,6 +52,7 @@ unit_test_files = [
     'test_string_files.c',
     'test_string_manipulation.c',
     'test_string_traversal.c',
+    'test_string_buffers.c',
 
     'test_utils_unicode.c',
     'test_utils_array.c',

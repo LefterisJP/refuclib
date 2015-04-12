@@ -37,6 +37,9 @@
 /*------------- Outside Module inclusion -------------*/
 #include <Definitions/defarg.h> //for default argument trick
 #include <Definitions/imex.h> //for the import export macro
+/*------------- libc inclusion --------------*/
+#include <stdarg.h> //for va_list and friends
+#include <stdlib.h>
 /*------------- End of includes -------------*/
 
 #ifdef __cplusplus
@@ -114,6 +117,35 @@ i_DECLIMEX_ struct RFstring* i_NVrf_string_create_local(const char* s);
 /// TODO: fix this nasty inclusion requirement ...
 #define RFS_buffer_push() uint32_t i_buffer_index_ ## __FILE__ = rf_buffer_index(TSBUFFA)
 #define RFS_buffer_pop() rf_buffer_set_index_(TSBUFFA, i_buffer_index_ ## __FILE__)
+
+
+
+
+bool rf_strings_buffer_ctx_init(size_t string_buffer_size);
+void rf_strings_buffer_ctx_deinit();
+
+/**
+ * Reads the formatted string and the va_args and fills in
+ * the buffer returning the string's size in bytes
+ **
+ ** @param fmt[in]         The formatted string
+ ** @param size[out]       The string's byte size
+ ** @param buffPtr[out]    The pointer to the beginning of the String
+ **                        in the internal buffer
+ ** @param bIndex[out]     The index to return the buffer to after we
+ **                        are done with it
+ ** @return                Returns @c true in success and @c false in failure
+ */
+bool rf_strings_buffer_fillfmt(const char *fmt,
+                               unsigned int *size,
+                               char **buffPtr,
+                               unsigned int *bIndex,
+                               va_list args);
+
+void rf_strings_buffer_ctx_push();
+void rf_strings_buffer_ctx_pop();
+#define RFS_push() rf_strings_buffer_ctx_push()
+#define RFS_pop() rf_strings_buffer_ctx_pop()
 
 #ifdef __cplusplus
 }//closing bracket for calling from C++

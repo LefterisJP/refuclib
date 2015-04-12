@@ -54,18 +54,21 @@ struct RFlog;
  ** This function needs to be called in the very beginning of any program
  ** using the library.
  **
- ** @param log_type         The type of target for all logging functionality.
- **                         Choose between a file, stdout or stderr.
- **                         For more details: @ref RFlog_target_type
- ** @param log_file_name    A c string literal with the filename of the log
- **                         to create.
- ** @param level            The level of the logging system. Possible values
- **                         are enumerated by @ref RFlog_level
- ** @return                 Returns @c true in success
+ ** @param log_type             The type of target for all logging functionality.
+ **                             Choose between a file, stdout or stderr.
+ **                             For more details: @ref RFlog_target_type
+ ** @param log_file_name        A c string literal with the filename of the log
+ **                             to create.
+ ** @param level                The level of the logging system. Possible values
+ **                             are enumerated by @ref RFlog_level
+ ** @param string_buffer_size   The initial buffer size in bytes that will be
+ **                             given to thetemporary string buffer
+ ** @return                     Returns @c true in success
  **/
 i_DECLIMEX_ bool rf_init(enum RFlog_target_type log_type,
                          const char *log_file_name,
-                         enum RFlog_level level);
+                         enum RFlog_level level,
+                         size_t string_buffer_size);
 
 /**
  ** Deinitializes the library. Frees the constructs of all the modules
