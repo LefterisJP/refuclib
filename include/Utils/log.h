@@ -114,62 +114,62 @@ i_DECLIMEX_ void rf_log(enum RFlog_level level, const char* file,
 
 
 #define RF_ALERT(...) do {                      \
-        RFS_buffer_push();                      \
+        RFS_push();                             \
         rf_log(LOG_ALERT, __FILE__, __func__,   \
                __LINE__,                        \
                RFS_(__VA_ARGS__));              \
-        RFS_buffer_pop();                       \
+        RFS_pop();                              \
     } while (0)
 
 #define RF_CRITICAL(...) do {                       \
-        RFS_buffer_push();                          \
+        RFS_push();                                 \
         rf_log(LOG_CRITICAL, __FILE__, __func__,    \
                __LINE__,                            \
                RFS_(__VA_ARGS__));                  \
-        RFS_buffer_pop();                           \
+        RFS_pop();                                  \
     } while (0)
 
 #define RF_ERROR(...) do {                      \
-        RFS_buffer_push();                      \
+        RFS_push();                             \
         rf_log(LOG_ERROR, __FILE__, __func__,   \
                __LINE__,                        \
                RFS_(__VA_ARGS__));              \
-        RFS_buffer_pop();                       \
+        RFS_pop();                              \
     } while (0)
 
 #define RF_WARNING(...) do {                    \
-        RFS_buffer_push();                      \
+        RFS_push();                             \
         rf_log(LOG_WARNING, __FILE__, __func__, \
                __LINE__,                        \
                RFS_(__VA_ARGS__));              \
-        RFS_buffer_pop();                       \
+        RFS_pop();                              \
     } while (0)
 
 #define RF_NOTICE(...) do {                     \
-        RFS_buffer_push();                      \
-        rf_log(LOG_NOTICE, __FILE__, __func__, \
+        RFS_push();                             \
+        rf_log(LOG_NOTICE, __FILE__, __func__,  \
                __LINE__,                        \
                RFS_(__VA_ARGS__));              \
-        RFS_buffer_pop();                       \
+        RFS_pop();                              \
     } while (0)
 
 #define RF_INFO(...) do {                       \
-        RFS_buffer_push();                      \
+        RFS_push();                             \
         rf_log(LOG_INFO, __FILE__, __func__,    \
                __LINE__,                        \
                RFS_(__VA_ARGS__));              \
-        RFS_buffer_pop();                       \
+        RFS_pop();                              \
     } while (0)
 
 
 
 #ifdef RF_OPTION_DEBUG
 #define RF_DEBUG(...) do {                      \
-        RFS_buffer_push();                      \
+        RFS_push();                             \
         rf_log(LOG_DEBUG, __FILE__, __func__,   \
                __LINE__,                        \
                RFS_(__VA_ARGS__));              \
-        RFS_buffer_pop();                       \
+        RFS_pop();                              \
     } while (0)
 #else
 #define RF_DEBUG(...)

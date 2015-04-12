@@ -97,18 +97,28 @@ extern "C" {
  ** due to invalid byte sequence for the given encoding
  ** @isinherited{StringX}
  **/
-#ifdef RF_IAMHERE_FOR_DOXYGEN
-struct RFstring* RFS_(const char *s, ...);
-#else
-#define RFS_(...) i_rf_string_create_local(__VA_ARGS__)
-#endif
+#define RFS_(...) RF_SELECT_STRING_CREATE_LOCAL(__VA_ARGS__)
+#define RFS_assign(...) RF_SELECT_STRING_CREATE_LOCAL_ASSIGN(__VA_ARGS__)
 
 ///Internal functions that create a temporary RFstring*
-i_DECLIMEX_ struct RFstring* i_rf_string_create_local1(const char* s,...);
-i_DECLIMEX_ struct RFstring* i_NVrf_string_create_local(const char* s);
-#define i_rf_string_create_local(...)  RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATELOCAL,1,__VA_ARGS__)
-#define i_SELECT_RF_STRING_CREATELOCAL1(...) i_NVrf_string_create_local(__VA_ARGS__)
-#define i_SELECT_RF_STRING_CREATELOCAL0(...) i_rf_string_create_local1(__VA_ARGS__)
+i_DECLIMEX_ struct RFstring *i_rf_string_create_local(const char* s);
+i_DECLIMEX_ struct RFstring *i_rf_string_create_localv(const char* s, ...);
+i_DECLIMEX_ bool i_rf_string_create_local_assign(struct RFstring **ret, const char* s);
+i_DECLIMEX_ bool i_rf_string_create_local_assignv(struct RFstring **ret, const char* s, ...);
+
+#define RF_SELECT_STRING_CREATE_LOCAL(...)  \
+    RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATELOCAL, 1, __VA_ARGS__)
+#define i_SELECT_RF_STRING_CREATELOCAL1(...)  \
+    i_rf_string_create_local(__VA_ARGS__)
+#define i_SELECT_RF_STRING_CREATELOCAL0(...)  \
+    i_rf_string_create_localv(__VA_ARGS__)
+
+#define RF_SELECT_STRING_CREATE_LOCAL_ASSIGN(...)  \
+    RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATELOCAL_ASSIGN, 2, __VA_ARGS__)
+#define i_SELECT_RF_STRING_CREATELOCAL_ASSIGN1(ptr_, ...)  \
+    i_rf_string_create_local_assign(ptr_, __VA_ARGS__)
+#define i_SELECT_RF_STRING_CREATELOCAL_ASSIGN0(ptr_, ...)  \
+    i_rf_string_create_local_assignv(ptr_, __VA_ARGS__)
 
 
 /// Since RFS_() macro uses the internal buffer we need to push and pop the

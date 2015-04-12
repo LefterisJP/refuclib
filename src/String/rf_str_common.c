@@ -46,12 +46,37 @@
 i_THREAD__ struct RFbuffer g_tsbuff;
 #define TSBUFF (&g_tsbuff)
 
-static void rf_strings_buffer_add_string_ptr(struct RFstring *str, uint64_t index);
-static void rf_strings_buffer_add_string_buffer_ptr(char *buf, uint64_t index);
+static void rf_strings_buffer_add_string_ptr(struct RFstring **str, uint64_t index);
+static void rf_strings_buffer_add_string_buffer_ptr(char **buf, uint64_t index);
 
-struct RFstring* i_rf_string_create_local1(const char* s,...)
+static bool i_rf_string_create_local_assignva(struct RFstring **ret, const char* s, va_list args)
 {
-    struct RFstring* ret;
+    unsigned int size, bIndex;
+    uint32_t index_before_string_alloc;
+    char *buffPtr;
+
+    if (!rf_strings_buffer_fillfmt(s, &size, &buffPtr, &bIndex, args)) {
+        RF_ERROR("Local string creation failure due to failing at reading the"
+                 " formatted string");
+        return false;
+    }
+
+    //allocate the string in its buffer
+    index_before_string_alloc = rf_buffer_index(TSBUFF);
+    *ret = rf_buffer_malloc(TSBUFF, sizeof(**ret));
+    if (!*ret) {
+        return false;
+    }
+    rf_string_data(*ret) = buffPtr;
+    rf_string_length_bytes(*ret) = size;
+    // add it to the context
+    rf_strings_buffer_add_string_ptr(ret, index_before_string_alloc);
+
+    return true;
+}
+
+bool i_rf_string_create_local_assignv(struct RFstring **ret, const char* s, ...)
+{
     va_list args;
     unsigned int size, bIndex;
     uint32_t index_before_string_alloc;
@@ -62,59 +87,72 @@ struct RFstring* i_rf_string_create_local1(const char* s,...)
     if (!rf_strings_buffer_fillfmt(s, &size, &buffPtr, &bIndex, args)) {
         RF_ERROR("Local string creation failure due to failing at reading the"
                  " formatted string");
-        return NULL;
+        return false;
     }
     va_end(args);
 
     //allocate the string in its buffer
     index_before_string_alloc = rf_buffer_index(TSBUFF);
-    ret = rf_buffer_malloc(TSBUFF, sizeof(*ret));
-    if (!ret) {
-        //pop back the buffer
-        rf_buffer_set_index(TSBUFF, bIndex, char);
-        return NULL;
+    *ret = rf_buffer_malloc(TSBUFF, sizeof(**ret));
+    if (!*ret) {
+        return false;
     }
-    rf_string_data(ret) = buffPtr;
-    rf_string_length_bytes(ret) = size;
+    rf_string_data(*ret) = buffPtr;
+    rf_string_length_bytes(*ret) = size;
     // add it to the context
     rf_strings_buffer_add_string_ptr(ret, index_before_string_alloc);
 
-    return ret;
+    return true;
 }
 
-struct RFstring* i_NVrf_string_create_local(const char* s)
+struct RFstring *i_rf_string_create_localv(const char* s, ...)
 {
-    struct RFstring* ret;
+    struct RFstring *ret;
+    bool rc;
+    va_list args;
+    va_start(args, s);
+    rc = i_rf_string_create_local_assignva(&ret, s, args);
+    va_end(args);
+    return rc ? ret : NULL;
+}
+
+bool i_rf_string_create_local_assign(struct RFstring **ret, const char *s)
+{
     uint32_t byteLength;
     uint32_t index_before;
     //check for validity of the given sequence and get the character length
     if (!rf_utf8_verify(s, &byteLength, 0)) {
         RF_ERROR("Error at String Allocation due to invalid "
                  "UTF-8 byte sequence");
-        return NULL;
+        return false;
     }
 
     index_before = rf_buffer_index(TSBUFF);
     //allocate the string and its buffer in the local memory stack
-    ret = rf_buffer_malloc(TSBUFF, sizeof(*ret) + byteLength);
-    if (!ret) {
-        return NULL;
+    *ret = rf_buffer_malloc(TSBUFF, sizeof(**ret) + byteLength);
+    if (!*ret) {
+        return false;
     }
-    rf_string_data(ret) = (char*)ret + sizeof(*ret);
-    memcpy(rf_string_data(ret), s, byteLength);
-    rf_string_length_bytes(ret) = byteLength;
+    rf_string_data(*ret) = (char*)*ret + sizeof(**ret);
+    memcpy(rf_string_data(*ret), s, byteLength);
+    rf_string_length_bytes(*ret) = byteLength;
     // add it to the context
     rf_strings_buffer_add_string_ptr(ret, index_before);
-    rf_strings_buffer_add_string_buffer_ptr(rf_string_data(ret), index_before + sizeof(*ret));
 
-    return ret;
+    return true;
+}
+
+struct RFstring *i_rf_string_create_local(const char* s)
+{
+    struct RFstring *ret;
+    return i_rf_string_create_local_assign(&ret, s) ? ret : NULL;
 }
 
 struct rf_strings_buffer_ctx {
     // these are used to remember positions in the buffer for reallocing
-    struct {darray(struct RFstring*);} string_ptrs;
+    struct {darray(struct RFstring**);} string_ptrs;
     struct {darray(uint64_t);} string_indices;
-    struct {darray(char*);} string_buffer_ptrs;
+    struct {darray(char**);} string_buffer_ptrs;
     struct {darray(uint64_t);} string_buffer_indices;
 
     // these are used when pushing/popping the context
@@ -126,16 +164,17 @@ i_THREAD__ struct rf_strings_buffer_ctx g_strctx;
 
 bool rf_strings_buffer_realloc_cb(struct RFbuffer *b)
 {
-    struct RFstring **s;
-    char **s_buff;
+    struct RFstring ***s;
+    char ***s_buff;
     size_t i = 0;
-    darray_foreach(s, g_strctx.string_ptrs) {
-        *s = (struct RFstring*)(b->buff + darray_item(g_strctx.string_indices, i));
+    darray_foreach(s_buff, g_strctx.string_buffer_ptrs) {
+        **s_buff = b->buff + darray_item(g_strctx.string_buffer_indices, i);
         ++i;
     }
     i = 0;
-    darray_foreach(s_buff, g_strctx.string_buffer_ptrs) {
-        *s_buff = b->buff + darray_item(g_strctx.string_indices, i);
+    darray_foreach(s, g_strctx.string_ptrs) {
+        **s = (struct RFstring*)(b->buff + darray_item(g_strctx.string_indices, i));
+        rf_string_data(**s) = (b->buff + darray_item(g_strctx.string_indices, i) + sizeof(***s));
         ++i;
     }
     return true;
@@ -215,30 +254,43 @@ bool rf_strings_buffer_fillfmt(const char *fmt,
         }
     }
     // add it to the context
-    rf_strings_buffer_add_string_buffer_ptr(*buffPtr, *bIndex);
+    rf_strings_buffer_add_string_buffer_ptr(buffPtr, *bIndex);
     rf_buffer_move_index(TSBUFF, rc, char);
     *size = rc;
 
     return true;
 }
 
-static void rf_strings_buffer_add_string_ptr(struct RFstring *str, uint64_t index)
+static void rf_strings_buffer_add_string_ptr(struct RFstring **str, uint64_t index)
 {
+    // due to RF_ASSERT also logging a critical error (which also uses the
+    // temporary string buffer) this is gonna be an infinite loop if it hits.
+    // Hence using a simple assert. TODO: Figure out a better way to do this?
+#if 0
     RF_ASSERT(
         darray_size(g_strctx.string_ptrs) == darray_size(g_strctx.string_indices),
         "String stack size mismatch"
     );
+#endif
+    assert(darray_size(g_strctx.string_ptrs) == darray_size(g_strctx.string_indices));
+
     darray_append(g_strctx.string_ptrs, str);
     darray_append(g_strctx.string_indices, index);
 }
 
-static void rf_strings_buffer_add_string_buffer_ptr(char *buf, uint64_t index)
+static void rf_strings_buffer_add_string_buffer_ptr(char **buf, uint64_t index)
 {
+    // due to RF_ASSERT also logging a critical error (which also uses the
+    // temporary string buffer) this is gonna be an infinite loop if it hits.
+    // Hence using a simple assert. TODO: Figure out a better way to do this?
+#if 0
     RF_ASSERT(
         darray_size(g_strctx.string_buffer_ptrs) == darray_size(g_strctx.string_buffer_indices),
         "String buffer stack size mismatch"
     );
-                                                                     
+#endif
+    assert(darray_size(g_strctx.string_buffer_ptrs) == darray_size(g_strctx.string_buffer_indices));
+    
     darray_append(g_strctx.string_buffer_ptrs, buf);
     darray_append(g_strctx.string_buffer_indices, index);
 }
@@ -256,11 +308,13 @@ void rf_strings_buffer_ctx_pop()
     size = darray_pop(g_strctx.mark_str_buff_indices);
     while (darray_size(g_strctx.string_buffer_ptrs) > size) {
         (void)darray_pop(g_strctx.string_buffer_ptrs);
+        (void)darray_pop(g_strctx.string_buffer_indices);
     }
 
     size = darray_pop(g_strctx.mark_str_indices);
     while (darray_size(g_strctx.string_ptrs) > size) {
         (void)darray_pop(g_strctx.string_ptrs);
+        (void)darray_pop(g_strctx.string_indices);
     }
     rf_buffer_set_index_(TSBUFF, darray_pop(g_strctx.mark_buff_index));
 }

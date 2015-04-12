@@ -44,7 +44,7 @@ bool rf_buffer_increase_size(struct RFbuffer* b, size_t added_size)
 {
     RF_REALLOC(b->buff, char, b->size + added_size, return false);
     b->size += added_size;
-    return b->realloc_cb ? b->realloc_cb(b) :true;
+    return b->realloc_cb ? b->realloc_cb(b) : true;
 }
 i_INLINE_INS void* rf_buffer_current_ptr_(struct RFbuffer* b);
 i_INLINE_INS size_t rf_buffer_remaining_size_(struct RFbuffer* b);

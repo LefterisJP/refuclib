@@ -189,9 +189,7 @@ i_DECLIMEX_ void rf_stringx_reset(struct RFstringx* thisstr);
  ** Searches for any of the given Substrings inside @c thisstr. Moves the
  ** internal pointer right after the first occuring substring. Optionally and
  ** if the value given at @c result is not 0 the string between the start and
- ** the end of the moving is returned. The parameters accepted can be of any
- ** string type, even temporary strings initialized with the RFS_() macro
- ** @lmsFunction
+ ** the end of the moving is returned.
  ** @param thisstr      The extended string to work on
  ** @param result       For details @see rf_stringx_move_after()
  ** @param options      For details @see rf_stringx_move_after()
