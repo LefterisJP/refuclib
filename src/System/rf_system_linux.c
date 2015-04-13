@@ -108,21 +108,19 @@ bool rf_system_remove_dir(void* dirname)
         
         //skip this and the parent dir
         if (strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..")) {
-            
+            struct RFstring *full_entry_name;
             //create the full entry name
-            RFS_buffer_push();
-            if (!rf_stringx_assign(
-                    &path,
-                    RFS_(RF_STR_PF_FMT RF_DIRSEP "%s",
-                         RF_STR_PF_ARG(dirname), entry->d_name))) {
-
+            RFS_push();
+            RFS(&full_entry_name, RF_STR_PF_FMT RF_DIRSEP "%s",
+                RF_STR_PF_ARG(dirname), entry->d_name);
+            if (!rf_stringx_assign(&path, full_entry_name)) {
                 RF_ERROR("Failure at assigning the directory name to the "
                          "path string");
                 ret = false;
-                RFS_buffer_pop();
+                RFS_pop();
                 goto cleanup_path;
             }
-            RFS_buffer_pop();
+            RFS_pop();
             
             //if this directory entry is a directory itself, call the function recursively
             if (entry->d_type == DT_DIR) {

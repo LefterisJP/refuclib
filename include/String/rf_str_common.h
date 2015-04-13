@@ -62,45 +62,72 @@ extern "C" {
 #endif
 #endif
 /**
- ** @brief Create a termporary String from a String literal
- **
- ** A macro to be used only inside a function call that accepts an
- ** @ref RFstring or any inherited data type
- ** such as @ref RF_StringX. It creates a Temporary RFstring*
- ** that will be used by the function. This macro accepts from 1 to N arguments.
- **
- ** The first argument shall either be a String literal or a printf styled
- ** string literal given in UTF-8 encoding. Other encodings are easy to support
- ** but are not currently supported since the current
- ** limitation is for UTF-8 encoded source code.
- **
- ** Optionally the first argument can be followed by a sequence of additional
- ** arguments that would specify how to format
- ** the string @c s.
- ** @warning
- ** + If no extra arguments are given then the given string @c s is
- ** not interpreted as a formatted
- ** string and is instead printed as is.
- ** @warning
- ** + This macro can not be called recursively with extra arguments and doing
- ** so is undefined behaviour.
- ** @param s                The formatted string that will constitute the
- **                         RF_String. Must be in the same encoding as that of
- **                         the source file. Default is UTF-8.
- ** @param ...              \rfoptional{nothing}  Depending on the string
- **                         literal, the function may expect a sequence of
- **                         additional arguments, each containing one value to
- **                         be inserted instead of each %-tag
- ** specified in the @c slit parameter, if any. There should be
- ** the same number of these arguments as the number of %-tags that expect a value.
- ** @return Returns true in case of correct initialization and false
- ** due to invalid byte sequence for the given encoding
- ** @isinherited{StringX}
- **/
-#define RFS_(...) RF_SELECT_STRING_CREATE_LOCAL(__VA_ARGS__)
-#define RFS_assign(...) RF_SELECT_STRING_CREATE_LOCAL_ASSIGN(__VA_ARGS__)
+ * Create a temporary tring from a literal with optional printf-like argumens.
+ * Unsafe version of @ref RFS(). Check the return value to see why this is unsafe.
+ * 
+ * @param s         A string literal 
+ * @param ...       Optional prinflike arguments
+ * @return          A pointer to the created string. The reason this is an unsafe
+ *                  function is that if the buffer reallocates at some point after
+ *                  we want to use this the pointer is invalidated.
+ */
+#define RFS_UNSAFE(...) RF_SELECT_STRING_CREATE_LOCAL(__VA_ARGS__)
+/* #define RFS_(...) RF_SELECT_STRING_CREATE_LOCAL(__VA_ARGS__) */
+/**
+ * Create a temporary tring from a literal with optional printf-like argumens.
+ * @param ret       Pass a string pointer by reference to have it point to the 
+ *                  temporary string position in the buffer
+ * @param s         A string literal 
+ * @param ...       Optional prinflike arguments
+ * @return          true if all went fine and false in error
+ */
+#define RFS(...) RF_SELECT_STRING_CREATE_LOCAL_ASSIGN(__VA_ARGS__)
+/**
+ * Remember the current point in the string buffer.
+ *
+ * Should be used to save a state of the string buffer at any given point before
+ * using @ref RFS(). Should always have an equivalent @ref RFS_pop()
+ */
+#define RFS_push() rf_strings_buffer_ctx_push()
+/**
+ * Pop a bookmarked string buffer point
+ *
+ * Used to pop back a buffer position saved by a push.
+ * Should always have an equivalent @ref RFS_pop()
+ */
+#define RFS_pop() rf_strings_buffer_ctx_pop()
 
-///Internal functions that create a temporary RFstring*
+/* -- rf_strings_buffer_ctx_code -- */
+
+/**
+ * Initialize the strings buffer context
+ * 
+ * @param string_buffer_size         The initial size of the string buffer
+ * @return                           true in succes and false in failure
+ */
+bool rf_strings_buffer_ctx_init(size_t string_buffer_size);
+void rf_strings_buffer_ctx_deinit();
+
+/**
+ * Reads the formatted string and the va_args and fills in
+ * the string buffer returning the string's size in bytes
+ * Can realloc the buffer if not enough space remains
+ *
+ * @param fmt[in]         The formatted string
+ * @param size[out]       The string's byte size
+ * @param buffPtr[out]    The pointer to the beginning of the String
+ *                        in the internal buffer
+ * @return                Returns @c true in success and @c false in failure
+ */
+bool rf_strings_buffer_fillfmt(const char *fmt,
+                               unsigned int *size,
+                               char **buffPtr,
+                               va_list args);
+void rf_strings_buffer_ctx_push();
+void rf_strings_buffer_ctx_pop();
+
+/* -- internal functions used in the above API -- */
+
 i_DECLIMEX_ struct RFstring *i_rf_string_create_local(const char* s);
 i_DECLIMEX_ struct RFstring *i_rf_string_create_localv(const char* s, ...);
 i_DECLIMEX_ bool i_rf_string_create_local_assign(struct RFstring **ret, const char* s);
@@ -121,41 +148,10 @@ i_DECLIMEX_ bool i_rf_string_create_local_assignv(struct RFstring **ret, const c
     i_rf_string_create_local_assignv(ptr_, __VA_ARGS__)
 
 
-/// Since RFS_() macro uses the internal buffer we need to push and pop the
-/// internal buffer for strings wherever RFS_() is used.
-/// Note: All users need to include Persistent/buffers.h
-/// TODO: fix this nasty inclusion requirement ...
+/// @warning: Deprecated. Unsafe for realloc case
+/// Push and push an aritrary buffer. 
 #define RFS_buffer_push() uint32_t i_buffer_index_ ## __FILE__ = rf_buffer_index(TSBUFFA)
 #define RFS_buffer_pop() rf_buffer_set_index_(TSBUFFA, i_buffer_index_ ## __FILE__)
-
-
-
-
-bool rf_strings_buffer_ctx_init(size_t string_buffer_size);
-void rf_strings_buffer_ctx_deinit();
-
-/**
- * Reads the formatted string and the va_args and fills in
- * the buffer returning the string's size in bytes
- **
- ** @param fmt[in]         The formatted string
- ** @param size[out]       The string's byte size
- ** @param buffPtr[out]    The pointer to the beginning of the String
- **                        in the internal buffer
- ** @param bIndex[out]     The index to return the buffer to after we
- **                        are done with it
- ** @return                Returns @c true in success and @c false in failure
- */
-bool rf_strings_buffer_fillfmt(const char *fmt,
-                               unsigned int *size,
-                               char **buffPtr,
-                               unsigned int *bIndex,
-                               va_list args);
-
-void rf_strings_buffer_ctx_push();
-void rf_strings_buffer_ctx_pop();
-#define RFS_push() rf_strings_buffer_ctx_push()
-#define RFS_pop() rf_strings_buffer_ctx_pop()
 
 #ifdef __cplusplus
 }//closing bracket for calling from C++

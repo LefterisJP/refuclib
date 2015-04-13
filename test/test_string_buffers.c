@@ -9,12 +9,12 @@
 #include <String/rf_str_core.h>
 #include <String/rf_str_common.h>
 
-START_TEST (test_RFS) {
+START_TEST (test_RFS_unsafe) {
     RFS_push();
-    struct RFstring *s1 = RFS_("am a simple string");
+    struct RFstring *s1 = RFS_UNSAFE("am a simple string");
     ck_assert_rf_str_eq_cstr(s1, "am a simple string");
     RFS_push();
-    struct RFstring *s2 = RFS_("foo "RF_STR_PF_FMT" %d", RF_STR_PF_ARG(s1), 55);
+    struct RFstring *s2 = RFS_UNSAFE("foo "RF_STR_PF_FMT" %d", RF_STR_PF_ARG(s1), 55);
     ck_assert_rf_str_eq_cstr(s1, "am a simple string");
     ck_assert_rf_str_eq_cstr(s2, "foo am a simple string 55");
 
@@ -22,14 +22,14 @@ START_TEST (test_RFS) {
     RFS_pop();
 } END_TEST
 
-START_TEST (test_RFS_assign) {
+START_TEST (test_RFS) {
     struct RFstring *s1;
     struct RFstring *s2;
     RFS_push();
-    RFS_assign(&s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
+    RFS(&s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
     ck_assert_rf_str_eq_cstr(s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
     RFS_push();
-    RFS_assign(&s2, "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    RFS(&s2, "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ");
     ck_assert_rf_str_eq_cstr(s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
     ck_assert_rf_str_eq_cstr(s2, "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
@@ -51,10 +51,10 @@ START_TEST (test_RFS_realloc_at_second_use) {
     struct RFstring *s1;
     struct RFstring *s2;
     RFS_push();
-    RFS_assign(&s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
+    RFS(&s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
     ck_assert_rf_str_eq_cstr(s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
     RFS_push();
-    RFS_assign(&s2, "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    RFS(&s2, "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ");
     ck_assert_rf_str_eq_cstr(s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
     ck_assert_rf_str_eq_cstr(s2, "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
@@ -66,7 +66,7 @@ START_TEST (test_RFS_realloc_at_first_use) {
     struct RFstring *s1;
     struct RFstring *s2;
     RFS_push();
-    RFS_assign(&s1,
+    RFS(&s1,
                "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
                "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
     ck_assert_rf_str_eq_cstr(
@@ -74,7 +74,7 @@ START_TEST (test_RFS_realloc_at_first_use) {
         "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
         "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
     RFS_push();
-    RFS_assign(&s2, "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    RFS(&s2, "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ");
     ck_assert_rf_str_eq_cstr(
         s1,
         "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
@@ -85,15 +85,14 @@ START_TEST (test_RFS_realloc_at_first_use) {
     RFS_pop();
 } END_TEST
 
-
 START_TEST (test_RFS_realloc_vararg_at_second_use) {
     struct RFstring *s1;
     struct RFstring *s2;
     RFS_push();
-    RFS_assign(&s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz%d%d", 23, 24);
+    RFS(&s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz%d%d", 23, 24);
     ck_assert_rf_str_eq_cstr(s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz2324");
     RFS_push();
-    RFS_assign(&s2, "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ%s%d", "eleos", 124);
+    RFS(&s2, "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ%s%d", "eleos", 124);
     ck_assert_rf_str_eq_cstr(s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz2324");
     ck_assert_rf_str_eq_cstr(s2, "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZeleos124");
 
@@ -105,14 +104,14 @@ START_TEST (test_RFS_realloc_vararg_at_first_use) {
     struct RFstring *s1;
     struct RFstring *s2;
     RFS_push();
-    RFS_assign(&s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
-               "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxy%d%d", 23, 24);
+    RFS(&s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+        "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxy%d%d", 23, 24);
     ck_assert_rf_str_eq_cstr(
         s1,
         "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
         "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxy2324");
     RFS_push();
-    RFS_assign(&s2, "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ%s%d", "eleos", 124);
+    RFS(&s2, "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ%s%d", "eleos", 124);
     ck_assert_rf_str_eq_cstr(
         s1,
         "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
@@ -131,8 +130,8 @@ Suite *string_buffers_suite_create(void)
     tcase_add_checked_fixture(tc1,
                               setup_generic_tests,
                               teardown_generic_tests);
+    tcase_add_test(tc1, test_RFS_unsafe);
     tcase_add_test(tc1, test_RFS);
-    tcase_add_test(tc1, test_RFS_assign);
 
     TCase *tc2 = tcase_create("string_buffers_realloc");
     tcase_add_checked_fixture(tc2,

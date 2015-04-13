@@ -51,7 +51,7 @@ static void rf_strings_buffer_add_string_buffer_ptr(char **buf, uint64_t index);
 
 static bool i_rf_string_create_local_assignva(struct RFstring **ret, const char *s, va_list args)
 {
-    unsigned int size, bIndex;
+    unsigned int size;
     uint32_t index_before_string_alloc;
     char *buffPtr;
 
@@ -65,7 +65,7 @@ static bool i_rf_string_create_local_assignva(struct RFstring **ret, const char 
     rf_strings_buffer_add_string_ptr(ret, index_before_string_alloc);
 
     // deal with the va_args buffer
-    if (!rf_strings_buffer_fillfmt(s, &size, &buffPtr, &bIndex, args)) {
+    if (!rf_strings_buffer_fillfmt(s, &size, &buffPtr, args)) {
         RF_ERROR("Local string creation failure due to failing at reading the"
                  " formatted string");
         return false;
@@ -80,7 +80,6 @@ bool i_rf_string_create_local_assignv(struct RFstring **ret, const char *s, ...)
 {
     va_list args;
     unsigned int size;
-    unsigned int bIndex;
     uint32_t index_before_string_alloc;
     char *buffPtr;
     
@@ -95,7 +94,7 @@ bool i_rf_string_create_local_assignv(struct RFstring **ret, const char *s, ...)
 
     // read the var args into the buffer
     va_start(args, s);
-    if (!rf_strings_buffer_fillfmt(s, &size, &buffPtr, &bIndex, args)) {
+    if (!rf_strings_buffer_fillfmt(s, &size, &buffPtr, args)) {
         RF_ERROR("Local string creation failure due to failing at reading the"
                  " formatted string");
         return false;
@@ -230,13 +229,13 @@ char *rf_string_cstr_from_buff(const void *s)
 bool rf_strings_buffer_fillfmt(const char *fmt,
                                unsigned int *size,
                                char **buffPtr,
-                               unsigned int *bIndex,
                                va_list args)
 {
     int rc;
     va_list copy_va_list;
+    unsigned int bIndex;
     int64_t n = rf_buffer_remaining_size(TSBUFF, char);
-    *bIndex = rf_buffer_index(TSBUFF);
+    bIndex = rf_buffer_index(TSBUFF);
     *buffPtr = rf_buffer_current_ptr(TSBUFF, char);
     va_copy(copy_va_list, args); /* C99 only */
     rc = vsnprintf(rf_buffer_current_ptr(TSBUFF, char), n, fmt, copy_va_list);
@@ -249,7 +248,7 @@ bool rf_strings_buffer_fillfmt(const char *fmt,
         }
         n = rf_buffer_size(TSBUFF);
         *buffPtr = rf_buffer_current_ptr(TSBUFF, char);
-        *bIndex = rf_buffer_index(TSBUFF);
+        bIndex = rf_buffer_index(TSBUFF);
         
         rc = vsnprintf(rf_buffer_current_ptr(TSBUFF, char), n, fmt, args);
         if (rc < 0 || rc >= n) {
@@ -257,7 +256,7 @@ bool rf_strings_buffer_fillfmt(const char *fmt,
         }
     }
     // add it to the context
-    rf_strings_buffer_add_string_buffer_ptr(buffPtr, *bIndex);
+    rf_strings_buffer_add_string_buffer_ptr(buffPtr, bIndex);
     rf_buffer_move_index(TSBUFF, rc, char);
     *size = rc;
 
