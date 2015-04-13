@@ -19,7 +19,9 @@
 
 void setup_log_tests()
 {
-    rf_init(LOG_TARGET_FILE, "refuclib.log", LOG_DEBUG, RF_DEFAULT_STRING_BUFFERS_SIZE);
+    rf_init(LOG_TARGET_FILE, "refuclib.log", LOG_DEBUG,
+            RF_DEFAULT_STRING_BUFFERS_SIZE,
+            RF_DEFAULT_TS_WORKBUFF_SIZE);
 }
 
 void teardown_log_tests()

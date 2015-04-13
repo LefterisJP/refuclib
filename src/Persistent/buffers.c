@@ -1,27 +1,24 @@
 #include <Persistent/buffers.h>
 
 
-i_THREAD__ struct RFbuffer _tsbuffa;
+i_THREAD__ struct RFbuffer _ts_workbuf;
 
-bool rf_persistent_buffers_activate_ts()
+bool rf_persistent_buffers_activate_ts(size_t ts_buffer_size)
 {
-    // TSBUFFA is used for various string operations but not for temporary strings
-    // would be good if it was slowly removed in favour of the much more safe
-    // rf_strings_buffer_ctx
-    if (!rf_buffer_init(&_tsbuffa, 1024, NULL)) {
+    if (!rf_buffer_init(&_ts_workbuf, ts_buffer_size, NULL)) {
         return false;
     }
     return true;
 }
 
-bool rf_persistent_buffers_activate()
+bool rf_persistent_buffers_activate(size_t ts_buffer_size)
 {
-    return rf_persistent_buffers_activate_ts();
+    return rf_persistent_buffers_activate_ts(ts_buffer_size);
 }
 
 void rf_persistent_buffers_deactivate_ts()
 {
-    rf_buffer_deinit(&_tsbuffa);
+    rf_buffer_deinit(&_ts_workbuf);
 }
 
 void rf_persistent_buffers_deactivate()

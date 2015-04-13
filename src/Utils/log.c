@@ -35,7 +35,6 @@
 #include <String/rf_str_core.h> //for static RFstring init
 #include <String/rf_str_retrieval.h> //for string accessors
 #include <String/rf_str_conversion.h> //for rf_string_cstr_from_buff()
-#include <Persistent/buffers.h> // for TSBUFFA
 #include <Parallel/rf_threading.h> //for thread id and RFmutex
 #include <Utils/sanity.h> //for RF_ASSERT
 #include <Utils/memory.h> //for RF_MALLOC

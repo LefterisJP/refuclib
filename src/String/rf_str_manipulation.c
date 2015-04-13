@@ -204,8 +204,8 @@ bool rf_string_keep_only(void* thisstr, const void* keepstr, int *removals)
     rf_string_iterate_start(thisstr, i, charValue)
         //for every character check if it exists in the keep str
         exists = false;
-    for (j = 0; j < keepLength; j++) {
-        if (rf_buffer_from_current_at(TSBUFFA, j, uint32_t) == charValue) {
+    for (j = 0; j < keepLength; ++j) {
+        if (rf_buffer_from_current_at(RF_TSBUFF, j, uint32_t) == charValue) {
             exists = true;
         }
     }
@@ -511,10 +511,10 @@ bool rf_string_trim_end(void* thisstr, const void* sub, unsigned int *rem)
     RF_STRING_ITERATEB_START(thisstr, i, byte_position)
         iteration_match = true;
         //for every substring character
-        for (j = 0; j < subLength; j++) {
+        for (j = 0; j < subLength; ++j) {
         //if we got a match
             if (rf_string_bytepos_to_codepoint(thisstr, byte_position) ==
-               rf_buffer_from_current_at(TSBUFFA, j, uint32_t)) {
+               rf_buffer_from_current_at(RF_TSBUFF, j, uint32_t)) {
                 
                 removals += 1;
                 iteration_match = false;

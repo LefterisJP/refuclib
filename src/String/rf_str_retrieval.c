@@ -180,9 +180,8 @@ unsigned int rf_string_begins_with_any(const void *thisstr,
         //for every substring character
         for(j = 0; j < subLength; j++) {
             //if we got a match
-            if(rf_string_bytepos_to_codepoint(thisstr, byte_position) ==
-               rf_buffer_from_current_at(TSBUFFA, j, uint32_t))
-            {
+            if (rf_string_bytepos_to_codepoint(thisstr, byte_position) ==
+                rf_buffer_from_current_at(RF_TSBUFF, j, uint32_t)) {
                 iteration_match = false;
                 matching_chars += 1;
                 break;
@@ -285,16 +284,16 @@ bool rf_string_scanf_after(const void* str, const void* astr,
 
     // copy it into a temporary buffer to null terminate it for sscanf
     sub_length = (rf_string_data(str) + rf_string_length_bytes(str)) - s + 1;
-    buff_size = rf_buffer_remaining_size(TSBUFFA, char);
+    buff_size = rf_buffer_remaining_size(RF_TSBUFF, char);
     if (buff_size <= sub_length) {
-        rf_buffer_increase_size(TSBUFFA, buff_size * 2);
+        rf_buffer_increase_size(RF_TSBUFF, buff_size * 2);
     }
-    memcpy(rf_buffer_current_ptr(TSBUFFA, char), s, sub_length - 1);
-    rf_buffer_from_current_at(TSBUFFA, sub_length, char) = '\0';
+    memcpy(rf_buffer_current_ptr(RF_TSBUFF, char), s, sub_length - 1);
+    rf_buffer_from_current_at(RF_TSBUFF, sub_length, char) = '\0';
 
 
     //use sscanf (!!!) strings are not null terminated
-    if (sscanf(rf_buffer_current_ptr(TSBUFFA, char), format, var) <= 0) {
+    if (sscanf(rf_buffer_current_ptr(RF_TSBUFF, char), format, var) <= 0) {
         return false;
     }
 

@@ -79,7 +79,7 @@ START_TEST (test_string_buffer_fillfmt) {
 
 void setup_realloc_tests()
 {
-    rf_init(LOG_TARGET_STDOUT, NULL, LOG_DEBUG, 128);
+    rf_init(LOG_TARGET_STDOUT, NULL, LOG_DEBUG, 128, RF_DEFAULT_TS_WORKBUFF_SIZE);
 }
 
 void teardown_realloc_tests()

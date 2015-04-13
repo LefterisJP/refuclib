@@ -39,8 +39,8 @@
 #include <Definitions/types.h> //for fixed size types
 #include <Definitions/defarg.h> //since LOG_ERROR macros use argument counting
 #include <String/rf_str_decl.h> //for RFstring
-#include <String/rf_str_common.h> //for RFS_() macro
-#include <Persistent/buffers.h> // for TSBUFFA
+#include <String/rf_str_common.h> //for RFS() macro
+#include <Persistent/buffers.h> // for RF_TSBUFF
 /*------------- libc inclusion -------------*/
 #include <errno.h>  // for std library function error reporting
 /*------------- End of includes -------------*/

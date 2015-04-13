@@ -12,17 +12,30 @@
 //for thread specific attribute
     #include <Definitions/threadspecific.h>
 
-extern i_THREAD__ struct RFbuffer _tsbuffa;
-#define TSBUFFA (&_tsbuffa)
+extern i_THREAD__ struct RFbuffer _ts_workbuf;
+#define RF_TSBUFF (&_ts_workbuf)
 
 /**
  * Activate thread-specific persistent buffers
+ *
+ * The thread specific work buffer is an RFbuffer used for temporary storage
+ * of various kinds. Size must be checked and realloc handled manually in all
+ * cases. @ref RF_TSBUFF will give you a pointer to this buffer.
+ *
+ * For temporary strings we use the rf_strings_buffer_ctx_XXX() family
+ * of functions
+ *
+ * @param ts_buffer_size        The initial size of the thread specific
+ *                              work buffer in bytes
+ * @return                      true for succesful activation and false otherwise
  */
-bool rf_persistent_buffers_activate_ts();
+bool rf_persistent_buffers_activate_ts(size_t ts_buffer_size);
 /**
  * Activate all persistent buffers
+ *
+ * @see rf_persistent_buffers_activate_ts()
  */
-bool rf_persistent_buffers_activate();
+bool rf_persistent_buffers_activate(size_t ts_buffer_size);
 /**
  * Dactivate thread-specific persistent buffers
  */

@@ -77,7 +77,7 @@ static void *WorkerLoop(void *t)
     RFworker_thread *worker = t;
     RFworker_task *task;
     /* do all thread specific initialization here */
-    if(!rf_init_thread_specific()) {
+    if (!rf_init_thread_specific()) {
         return 0;
     }
 

@@ -181,7 +181,8 @@ bool strcmp_nnt(char* s1, unsigned int s1_len,
 int rf_string_find_byte_pos(const void* thisstr, const void* sstr,
                             const char options);
 
-i_INLINE_DECL void rf_string_generic_append(void *thisstr, const char* other,
+i_INLINE_DECL void rf_string_generic_append(void *thisstr,
+                                            const char *other,
                                             unsigned int bytes_to_copy)
 {
     //add the string to this one
@@ -198,21 +199,20 @@ i_INLINE_DECL void rf_string_generic_append(void *thisstr, const char* other,
  * A function used to fill in a buffer with characters of a string.
  * Returns number of unicode characters the array was filled with
 */
-i_INLINE_DECL int rf_string_fill_codepoints(const struct RFstring* s)
+i_INLINE_DECL int rf_string_fill_codepoints(const struct RFstring *s)
 {
     unsigned int i = 0;
     uint32_t charValue;
     uint32_t chars_num;
 
     chars_num = rf_string_length(s);
-    if (chars_num > rf_buffer_remaining_size(TSBUFFA, uint32_t)) {
-
-        if (rf_buffer_increase_size(TSBUFFA, chars_num * 2 * sizeof(uint32_t))) {
+    if (chars_num > rf_buffer_remaining_size(RF_TSBUFF, uint32_t)) {
+        if (rf_buffer_increase_size(RF_TSBUFF, chars_num * 2 * sizeof(uint32_t))) {
             return -1;
         }
     }
     rf_string_iterate_start(s, i, charValue)
-        rf_buffer_from_current_at(TSBUFFA, i, uint32_t) = charValue;
+        rf_buffer_from_current_at(RF_TSBUFF, i, uint32_t) = charValue;
     rf_string_iterate_end(i)
 
     return chars_num;

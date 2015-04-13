@@ -147,12 +147,6 @@ i_DECLIMEX_ bool i_rf_string_create_local_assignv(struct RFstring **ret, const c
 #define i_SELECT_RF_STRING_CREATELOCAL_ASSIGN0(ptr_, ...)  \
     i_rf_string_create_local_assignv(ptr_, __VA_ARGS__)
 
-
-/// @warning: Deprecated. Unsafe for realloc case
-/// Push and push an aritrary buffer. 
-#define RFS_buffer_push() uint32_t i_buffer_index_ ## __FILE__ = rf_buffer_index(TSBUFFA)
-#define RFS_buffer_pop() rf_buffer_set_index_(TSBUFFA, i_buffer_index_ ## __FILE__)
-
 #ifdef __cplusplus
 }//closing bracket for calling from C++
 #endif
