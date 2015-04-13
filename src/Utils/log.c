@@ -175,9 +175,9 @@ static bool rf_log_flush_file(struct RFlog *log)
     int rc;
     FILE *f;
 
-    RFS_buffer_push();
+    RFS_push();
     f = fopen(rf_string_cstr_from_buff(&log->target.file_name), "ab");
-    RFS_buffer_pop();
+    RFS_pop();
     if (!f) {
         return false;
     }
@@ -354,7 +354,7 @@ static void log_add(struct RFlog *log, enum RFlog_level level,
     if (log->level < level) {
         return;
     }
-    RFS_buffer_push();
+    RFS_push();
 
     /* TODO: Maybe use different synchronization strategy here? */
     rf_mutex_lock(&log->lock);
@@ -363,7 +363,7 @@ static void log_add(struct RFlog *log, enum RFlog_level level,
         RF_ASSERT(0, "Could not add a log message");
     }
     rf_mutex_unlock(&log->lock);
-    RFS_buffer_pop();
+    RFS_pop();
     return;
 }
 

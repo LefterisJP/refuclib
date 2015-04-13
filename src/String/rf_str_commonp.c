@@ -213,13 +213,6 @@ int rf_string_find_byte_pos(const void* tstr, const void* sstr, const char optio
 #undef CHECK_NOT_CHAR
 }
 
-
-
-i_INLINE_INS bool fill_fmt_buffer(const char* fmt,
-                                  unsigned int* size,
-                                  char **buffPtr,
-                                  unsigned int *bIndex,
-                                  va_list args);
 i_INLINE_INS void rf_string_generic_append(void* thisstr,
                                      const char* other,
                                      unsigned int bytes_to_copy);

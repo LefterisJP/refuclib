@@ -9,6 +9,19 @@
 #include <String/rf_str_core.h>
 #include <String/rf_str_common.h>
 
+static bool test_rf_strings_buffer_fillfmt(const char *fmt,
+                                           unsigned int *size,
+                                           char **buffPtr,
+                                           ...)
+{
+    bool rc;
+    va_list args;
+    va_start(args, buffPtr);
+    rc = rf_strings_buffer_fillfmt(fmt, size, buffPtr, args);
+    va_end(args);
+    return rc;
+}
+
 START_TEST (test_RFS_unsafe) {
     RFS_push();
     struct RFstring *s1 = RFS_UNSAFE("am a simple string");
@@ -33,6 +46,33 @@ START_TEST (test_RFS) {
     ck_assert_rf_str_eq_cstr(s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
     ck_assert_rf_str_eq_cstr(s2, "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
+    RFS_pop();
+    RFS_pop();
+} END_TEST
+
+START_TEST (test_string_buffer_fillfmt) {
+    unsigned int size;
+    RFS_push();
+    char *buff1;
+    char *buff2;
+    ck_assert(test_rf_strings_buffer_fillfmt(
+                  "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz%d%s",
+                  &size,
+                  &buff1,
+                  42, "ABCD"));
+    ck_assert_uint_eq(size, 58);
+    ck_assert_nnt_str_eq_cstr(
+        buff1,
+        "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz42ABCD");
+    RFS_push();
+    ck_assert(test_rf_strings_buffer_fillfmt(
+                  "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                  &size,
+                  &buff2));
+    ck_assert_uint_eq(size, 52);
+    ck_assert_nnt_str_eq_cstr(
+        buff2,
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ");
     RFS_pop();
     RFS_pop();
 } END_TEST
@@ -122,6 +162,39 @@ START_TEST (test_RFS_realloc_vararg_at_first_use) {
     RFS_pop();
 } END_TEST
 
+START_TEST (test_string_buffer_fillfmt_realloc) {
+    unsigned int size;
+    RFS_push();
+    char *buff1;
+    char *buff2;
+    ck_assert(test_rf_strings_buffer_fillfmt(
+                  "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz%d%s",
+                  &size,
+                  &buff1,
+                  42, "ABCD"));
+    ck_assert_uint_eq(size, 58);
+    ck_assert_nnt_str_eq_cstr(
+        buff1,
+        "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz42ABCD");
+    RFS_push();
+    ck_assert(test_rf_strings_buffer_fillfmt(
+                  "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                  "abcdefghijklmnopqrstuvwxyz%d%s",
+                  &size,
+                  &buff2,
+                  1337, "CELINA"));
+    ck_assert_uint_eq(size, 88);
+    ck_assert_nnt_str_eq_cstr(
+        buff2,
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz1337CELINA");
+    ck_assert_nnt_str_eq_cstr(
+        buff1,
+        "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz42ABCD");
+    RFS_pop();
+    RFS_pop();
+} END_TEST
+
 Suite *string_buffers_suite_create(void)
 {
     Suite *s = suite_create("string_buffers");
@@ -132,6 +205,7 @@ Suite *string_buffers_suite_create(void)
                               teardown_generic_tests);
     tcase_add_test(tc1, test_RFS_unsafe);
     tcase_add_test(tc1, test_RFS);
+    tcase_add_test(tc1, test_string_buffer_fillfmt);
 
     TCase *tc2 = tcase_create("string_buffers_realloc");
     tcase_add_checked_fixture(tc2,
@@ -141,6 +215,7 @@ Suite *string_buffers_suite_create(void)
     tcase_add_test(tc2, test_RFS_realloc_at_first_use);
     tcase_add_test(tc2, test_RFS_realloc_vararg_at_second_use);
     tcase_add_test(tc2, test_RFS_realloc_vararg_at_first_use);
+    tcase_add_test(tc2, test_string_buffer_fillfmt_realloc);
 
     suite_add_tcase(s, tc1);
     suite_add_tcase(s, tc2);

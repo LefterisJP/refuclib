@@ -181,56 +181,6 @@ bool strcmp_nnt(char* s1, unsigned int s1_len,
 int rf_string_find_byte_pos(const void* thisstr, const void* sstr,
                             const char options);
 
-
-/**
- * Reads the formatted string and the va_args and fills in
- * the a buffer returning the string's size in bytes
- **
- ** @param fmt[in]         The formatted string
- ** @param size[out]       The string's byte size
- ** @param buffPtr[out]    The pointer to the beginning of the String
- **                        in the internal buffer
- ** @param bIndex[out]     The index to return the buffer to after we
- **                        are done with it
- ** @return                Returns @c true in success and @c false in failure
- */
-i_INLINE_DECL bool fill_fmt_buffer(const char *fmt,
-                                   unsigned int *size,
-                                   char **buffPtr,
-                                   unsigned int *bIndex,
-                                   va_list args)
-{
-    int rc;
-    va_list copy_va_list;
-    size_t n = rf_buffer_remaining_size(TSBUFFA, char);
-    *bIndex = rf_buffer_index(TSBUFFA);
-    *buffPtr = rf_buffer_current_ptr(TSBUFFA, char);
-    va_copy(copy_va_list, args); /* C99 only */
-    rc = vsnprintf(rf_buffer_current_ptr(TSBUFFA, char), n, fmt, copy_va_list);
-    va_end(copy_va_list);
-    if (rc < 0) {
-        return false;
-    }
-    if (rc >= n) {
-        if(!rf_buffer_increase_size(TSBUFFA, rc * 2)) {
-            return false;
-        }
-        n = rf_buffer_size(TSBUFFA);
-        *buffPtr = rf_buffer_current_ptr(TSBUFFA, char);
-        *bIndex = rf_buffer_index(TSBUFFA);
-        
-        rc = vsnprintf(rf_buffer_current_ptr(TSBUFFA, char), n, fmt, args);
-        if (rc < 0 || rc >= n) {
-            return false;
-        }
-    }
-    rf_buffer_move_index(TSBUFFA, rc, char);
-    *size = rc;
-
-    return true;
-}
-
-
 i_INLINE_DECL void rf_string_generic_append(void *thisstr, const char* other,
                                             unsigned int bytes_to_copy)
 {

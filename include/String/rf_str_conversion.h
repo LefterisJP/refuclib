@@ -109,8 +109,8 @@ i_DECLIMEX_ char* rf_string_cstr(const void* s);
 
 /**
  ** Turns the given string into a null terminated c string.
- ** Make sure to call @ref RFS_buffer_push() before use
- **  and @ref RFS_buffer_pop() after use
+ ** Make sure to call @ref RFS_push() before use
+ **  and @ref RFS_pop() after use
  **/
 i_DECLIMEX_ char* rf_string_cstr_from_buff(const void* s);
 

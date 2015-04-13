@@ -93,8 +93,8 @@ bool rf_string_initv(struct RFstring* str, const char* s, ...)
 
 bool rf_string_initvl(struct RFstring* str, const char* s, va_list args)
 {
-    unsigned int size, buff_index;
-    bool ret = true;
+    unsigned int size;
+    bool ret = false;
     char *buff_ptr;
     RF_ASSERT(str, "got null string in function");
 
@@ -104,24 +104,23 @@ bool rf_string_initvl(struct RFstring* str, const char* s, va_list args)
     }
 
     //read the var args
-    if (!fill_fmt_buffer(s, &size, &buff_ptr, &buff_index, args)) {
+    RFS_push();
+    if (!rf_strings_buffer_fillfmt(s, &size, &buff_ptr, args)) {
         RF_ERROR("String creation failure due to failing at reading the "
                  "formatted string");
-        return false;
+        goto end;
     }
 
     //get length
     rf_string_length_bytes(str) = size;
     //now that we know the length we can allocate the buffer and copy the bytes
     RF_MALLOC(rf_string_data(str), rf_string_length_bytes(str),
-              ret = false; goto cleanup_buffer);
+              ret = false; goto end);
     memcpy(rf_string_data(str), buff_ptr, rf_string_length_bytes(str));
+    ret = true;
 
-#ifdef RF_OPTION_DEBUG
-cleanup_buffer:
-#endif
-    rf_buffer_set_index(TSBUFFA, buff_index, char);
-
+end:
+    RFS_pop();
     return ret;
 }
 
@@ -410,8 +409,9 @@ bool rf_string_assignvl(struct RFstring* str,
                         const char* s,
                         va_list args)
 {
-    unsigned int size, buff_index;
+    unsigned int size;
     char *buff_ptr;
+    bool ret = false;
     RF_ASSERT(str, "got null string in function");
 
     if (!s) {
@@ -419,22 +419,24 @@ bool rf_string_assignvl(struct RFstring* str,
         return false;
     }
     //read the var args
-    if (!fill_fmt_buffer(s, &size, &buff_ptr, &buff_index, args)) {
+    RFS_push();
+    if (!rf_strings_buffer_fillfmt(s, &size, &buff_ptr, args)) {
         RF_ERROR("String assignment failure due to failing at reading the "
                  "formatted string");
-        return false;
+        goto end;
     }
 
-    rf_buffer_set_index(TSBUFFA, buff_index, char);
-
     if (rf_string_length_bytes(str) < size) {
-        RF_REALLOC(rf_string_data(str), char, size, return false);
+        RF_REALLOC(rf_string_data(str), char, size, goto end);
     }
     //get length
     rf_string_length_bytes(str) = size;
     memcpy(rf_string_data(str), buff_ptr, rf_string_length_bytes(str));
-    
-    return true;
+    ret = true;
+
+end:
+    RFS_pop();
+    return ret;
 }
 
 //Assigns the value of a unicode character to the string

@@ -99,35 +99,34 @@ bool rf_stringx_initv(struct RFstringx* str, const char* lit, ...)
 
 bool rf_stringx_initvl(struct RFstringx* str, const char* lit, va_list args)
 {
-    bool ret = true;
+    bool ret = false;
     char *buff_ptr;
-    unsigned int size, buff_index;
+    unsigned int size;
     RF_ASSERT(str, "got NULL string in function");
 
     if (!lit) {
         RF_ERROR("String initialization failed due to null pointer input");
-        ret = false;
-        goto cleanup_lscope;
+        return false;
     }
 
     //read the var args
-    if (!fill_fmt_buffer(lit, &size, &buff_ptr, &buff_index, args)) {
+    RFS_push();
+    if (!rf_strings_buffer_fillfmt(lit, &size, &buff_ptr, args)) {
         RF_ERROR("StringX creation failure due to failing at reading the "
                   "formatted string");
-        ret = false;
-        goto cleanup_lscope;
+        goto end;
     }
     //initialize the string
     if (!rf_stringx_init_unsafe_nnt(str,
-                                   (const char*)buff_ptr,
-                                   size)) {
-
-        ret = false;
+                                    (const char*)buff_ptr,
+                                    size)) {
+        goto end;
     }
+    ret = true;
 
 
-    rf_buffer_set_index(TSBUFFA, buff_index, char);
-cleanup_lscope:
+end:
+    RFS_pop();
     return ret;
 }
 
@@ -311,10 +310,10 @@ bool rf_stringx_init_unsafe_bnnt(struct RFstringx* str, const char* s,
 
 struct RFstringx* rf_stringx_create_buffv(uint32_t buffSize, const char* lit, ...)
 {
-    struct RFstringx* ret;
+    struct RFstringx* ret = NULL;
     va_list args;
     char *buff_ptr;
-    unsigned int size, buff_index;
+    unsigned int size;
 
     if (!lit) {
         RF_ERROR("Provided null pointer for the string literal");
@@ -323,10 +322,11 @@ struct RFstringx* rf_stringx_create_buffv(uint32_t buffSize, const char* lit, ..
 
     va_start(args, lit);
     //read the var args
-    if (!fill_fmt_buffer(lit, &size, &buff_ptr, &buff_index, args)) {
+    RFS_push();
+    if (!rf_strings_buffer_fillfmt(lit, &size, &buff_ptr, args)) {
         RF_ERROR("StringX creation failure due to failing at reading the "
                   "formatted string");
-        return NULL;
+        goto end;
     }
     va_end(args);
 
@@ -334,24 +334,21 @@ struct RFstringx* rf_stringx_create_buffv(uint32_t buffSize, const char* lit, ..
     if (buffSize < size) {
         buffSize = size;
     }
-    RF_MALLOC(ret, sizeof(*ret), ret = NULL; goto cleanup_buffer);
+    RF_MALLOC(ret, sizeof(*ret), ret = NULL; goto end);
     if (!rf_stringx_init_unsafe_bnnt(ret, buff_ptr, size, buffSize)) {
         free(ret);
         ret = NULL;
     }
 
-#ifdef RF_OPTION_DEBUG
-cleanup_buffer:
-#endif
-    rf_buffer_set_index(TSBUFFA, buff_index, char);
+end:
+    RFS_pop();
     return ret;
 }
 struct RFstringx* rf_stringx_create_buff(uint32_t buffSize,const char* lit)
 {
     struct RFstringx* ret;
     RF_MALLOC(ret, sizeof(*ret), return NULL);
-    if(!rf_stringx_init_buff(ret, buffSize, lit))
-    {
+    if (!rf_stringx_init_buff(ret, buffSize, lit)) {
         free(ret);
         return NULL;
     }
@@ -359,13 +356,14 @@ struct RFstringx* rf_stringx_create_buff(uint32_t buffSize,const char* lit)
 }
 
 
-bool rf_stringx_init_buffv(struct RFstringx* str, uint32_t buffSize,
-                         const char* lit, ...)
+bool rf_stringx_init_buffv(struct RFstringx* str,
+                           uint32_t buffSize,
+                           const char* lit, ...)
 {
-    bool ret = true;
+    bool ret = false;
     va_list args;
     char *buff_ptr;
-    unsigned int size, buff_index;
+    unsigned int size;
     RF_ASSERT(str, "got NULL string in function");
 
     if (!lit) {
@@ -375,22 +373,23 @@ bool rf_stringx_init_buffv(struct RFstringx* str, uint32_t buffSize,
 
     va_start(args, lit);
     //read the var args
-    if(!fill_fmt_buffer(lit, &size, &buff_ptr, &buff_index, args))
-    {
+    RFS_push();
+    if (!rf_strings_buffer_fillfmt(lit, &size, &buff_ptr, args)) {
         RF_ERROR("StringX creation failure due to failing at reading the "
                   "formatted string");
-        return false;
+        goto end;
     }
     va_end(args);
 
     //Make sure that the buff size fits the string
-    if(buffSize < size)
-    {
+    if (buffSize < size) {
         buffSize = size;
     }
     ret = rf_stringx_init_unsafe_bnnt(str, buff_ptr, size, buffSize);
-    rf_buffer_set_index(TSBUFFA, buff_index, char);
+    ret = true;
 
+end:
+    RFS_pop();
     return ret;
 }
 
@@ -404,15 +403,13 @@ bool rf_stringx_init_buff(struct RFstringx* str, uint32_t buffSize,
         RF_WARNING("provided null source string literal");
         return false;
     }
-    if(!rf_utf8_verify(lit, &byteLength, 0))
-    {
+    if (!rf_utf8_verify(lit, &byteLength, 0)) {
         RF_ERROR("Error at StringX initialization due to invalid UTF-8 "
                   "byte sequence");
         return false;
     }
     //make sure that the buff size fits the string
-    if(buffSize < byteLength)
-    {
+    if (buffSize < byteLength) {
         buffSize = byteLength;
     }
     return rf_stringx_init_unsafe_bnnt(str, lit, byteLength, buffSize);
@@ -455,8 +452,9 @@ i_DECLIMEX_ bool rf_stringx_assignvl(struct RFstringx* str,
                                      const char* s,
                                      va_list args)
 {
-    unsigned int size, buff_index;
+    unsigned int size;
     char *buff_ptr;
+    bool ret = false;
     RF_ASSERT(str, "got NULL string in function");
 
     if (!s) {
@@ -464,19 +462,21 @@ i_DECLIMEX_ bool rf_stringx_assignvl(struct RFstringx* str,
         return false;
     }
     //read the var args
-    if (!fill_fmt_buffer(s, &size, &buff_ptr, &buff_index, args)) {
+    RFS_push();
+    if (!rf_strings_buffer_fillfmt(s, &size, &buff_ptr, args)) {
         RF_ERROR("Stringx assignment failure due to failing at reading the "
                  "formatted string");
-        return false;
+        goto end;
     }
-    rf_buffer_set_index(TSBUFFA, buff_index, char);
-
-    RF_STRINGX_REALLOC(str, size, return false);
+    RF_STRINGX_REALLOC(str, size, goto end;);
     //get length
     rf_string_length_bytes(str) = size;
     memcpy(rf_string_data(str), buff_ptr, rf_string_length_bytes(str));
+    ret = true;
 
-    return true;
+end:
+    RFS_pop();
+    return ret;
 }
 
 bool rf_stringx_assign_char(struct RFstringx* str, uint32_t codepoint)
@@ -490,8 +490,7 @@ bool rf_stringx_assign_char(struct RFstringx* str, uint32_t codepoint)
         RF_REALLOC(rf_string_data(str), char,
                    5 * RF_OPTION_STRINGX_CAPACITY_MULTIPLIER, return false);
     }
-    if((bytes=rf_utf8_encode_single(codepoint, rf_string_data(str))) <= 0)
-    {
+    if ((bytes=rf_utf8_encode_single(codepoint, rf_string_data(str))) <= 0) {
         RF_ERROR("Assigning a character to an RFstringx failed "
                  "due to utf8 encoding");
         return false;
