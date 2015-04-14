@@ -37,6 +37,7 @@
 /*------------- Outside Module inclusion -------------*/
 #include <Definitions/defarg.h> //for default argument trick
 #include <Definitions/imex.h> //for the import export macro
+#include <Utils/sanity.h>
 /*------------- libc inclusion --------------*/
 #include <stdarg.h> //for va_list and friends
 #include <stdlib.h>
@@ -72,16 +73,36 @@ extern "C" {
  *                  we want to use this the pointer is invalidated.
  */
 #define RFS_UNSAFE(...) RF_SELECT_STRING_CREATE_LOCAL(__VA_ARGS__)
-/* #define RFS_(...) RF_SELECT_STRING_CREATE_LOCAL(__VA_ARGS__) */
 /**
  * Create a temporary tring from a literal with optional printf-like argumens.
  * @param ret       Pass a string pointer by reference to have it point to the 
  *                  temporary string position in the buffer
  * @param s         A string literal 
  * @param ...       Optional prinflike arguments
- * @return          true if all went fine and false in error
+ * @return          true if all went fine and false in error. Error most probably
+ *                  means problems with the string buffer itself due to realloc
  */
 #define RFS(...) RF_SELECT_STRING_CREATE_LOCAL_ASSIGN(__VA_ARGS__)
+/**
+ * A version of @ref RFS() which also performs an action in case of error
+ * Keep in mind most errors are gonna be really hard to recover from.
+ */
+#define RFS_CHECK(stmt_, ...)                   \
+    do {                                        \
+        if (!RFS(__VA_ARGS__)) {                \
+            RF_ERROR("RFS() failure");          \
+            stmt_;                              \
+        }                                       \
+    } while (0)
+/**
+ * A version of @ref RFS() which kills the program in case of error
+ */
+#define RFS_OR_DIE(...)                                         \
+    do {                                                    \
+        if (!RFS(__VA_ARGS__)) {                            \
+            RF_ASSERT_OR_EXIT(false, "RFS() failure");      \
+        }                                                   \
+    } while (0)
 /**
  * Remember the current point in the string buffer.
  *
@@ -101,7 +122,7 @@ extern "C" {
 
 /**
  * Initialize the strings buffer context
- * 
+ *
  * @param string_buffer_size         The initial size of the string buffer
  * @return                           true in succes and false in failure
  */
@@ -135,15 +156,15 @@ i_DECLIMEX_ bool i_rf_string_create_local_assignv(struct RFstring **ret, const c
 
 #define RF_SELECT_STRING_CREATE_LOCAL(...)  \
     RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATELOCAL, 1, __VA_ARGS__)
-#define i_SELECT_RF_STRING_CREATELOCAL1(...)  \
-    i_rf_string_create_local(__VA_ARGS__)
+#define i_SELECT_RF_STRING_CREATELOCAL1(arg_)  \
+    i_rf_string_create_local(arg_)
 #define i_SELECT_RF_STRING_CREATELOCAL0(...)  \
     i_rf_string_create_localv(__VA_ARGS__)
 
 #define RF_SELECT_STRING_CREATE_LOCAL_ASSIGN(...)  \
     RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATELOCAL_ASSIGN, 2, __VA_ARGS__)
-#define i_SELECT_RF_STRING_CREATELOCAL_ASSIGN1(ptr_, ...)  \
-    i_rf_string_create_local_assign(ptr_, __VA_ARGS__)
+#define i_SELECT_RF_STRING_CREATELOCAL_ASSIGN1(ptr_, arg_)  \
+    i_rf_string_create_local_assign(ptr_, arg_)
 #define i_SELECT_RF_STRING_CREATELOCAL_ASSIGN0(ptr_, ...)  \
     i_rf_string_create_local_assignv(ptr_, __VA_ARGS__)
 

@@ -40,6 +40,7 @@
 #include <Definitions/retcodes.h> //for bool
 #include <Definitions/inline.h> //for inline
 #include <Utils/memory.h> //for alloc realloc
+#include <String/rf_str_common.h> // for RFS()
 /*------------- libc inclusion --------------*/
 #include <string.h> //for memcpy
 /*------------- End of includes -------------*/

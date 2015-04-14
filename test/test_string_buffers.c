@@ -50,6 +50,19 @@ START_TEST (test_RFS) {
     RFS_pop();
 } END_TEST
 
+START_TEST (test_RFS_same_ptr) {
+    struct RFstring *s1;
+    RFS_push();
+    RFS(&s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
+    ck_assert_rf_str_eq_cstr(s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
+    RFS(&s1, RF_STR_PF_FMT "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        RF_STR_PF_ARG(s1));
+    ck_assert_rf_str_eq_cstr(s1,
+        "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    RFS_pop();
+} END_TEST
+
 START_TEST (test_string_buffer_fillfmt) {
     unsigned int size;
     RFS_push();
@@ -195,6 +208,19 @@ START_TEST (test_string_buffer_fillfmt_realloc) {
     RFS_pop();
 } END_TEST
 
+START_TEST (test_RFS_same_ptr_realloc) {
+    struct RFstring *s1;
+    RFS_push();
+    RFS(&s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
+    ck_assert_rf_str_eq_cstr(s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
+    RFS(&s1, RF_STR_PF_FMT "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        RF_STR_PF_ARG(s1));
+    ck_assert_rf_str_eq_cstr(s1,
+        "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    RFS_pop();
+} END_TEST
+
 Suite *string_buffers_suite_create(void)
 {
     Suite *s = suite_create("string_buffers");
@@ -205,6 +231,7 @@ Suite *string_buffers_suite_create(void)
                               teardown_generic_tests);
     tcase_add_test(tc1, test_RFS_unsafe);
     tcase_add_test(tc1, test_RFS);
+    tcase_add_test(tc1, test_RFS_same_ptr);
     tcase_add_test(tc1, test_string_buffer_fillfmt);
 
     TCase *tc2 = tcase_create("string_buffers_realloc");
@@ -216,6 +243,7 @@ Suite *string_buffers_suite_create(void)
     tcase_add_test(tc2, test_RFS_realloc_vararg_at_second_use);
     tcase_add_test(tc2, test_RFS_realloc_vararg_at_first_use);
     tcase_add_test(tc2, test_string_buffer_fillfmt_realloc);
+    tcase_add_test(tc2, test_RFS_same_ptr_realloc);
 
     suite_add_tcase(s, tc1);
     suite_add_tcase(s, tc2);

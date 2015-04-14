@@ -82,7 +82,7 @@ bool i_rf_string_create_local_assignv(struct RFstring **ret, const char *s, ...)
     unsigned int size;
     uint32_t index_before_string_alloc;
     char *buffPtr;
-    
+
     //allocate the string in its buffer
     index_before_string_alloc = rf_buffer_index(TSBUFF);
     *ret = rf_buffer_malloc(TSBUFF, sizeof(**ret));
@@ -203,7 +203,7 @@ void rf_strings_buffer_ctx_deinit()
     darray_free(g_strctx.mark_buff_index);
     darray_free(g_strctx.mark_str_buff_indices);
     darray_free(g_strctx.mark_str_indices);
-    
+
     darray_free(g_strctx.string_buffer_ptrs);
     darray_free(g_strctx.string_ptrs);
     darray_free(g_strctx.string_buffer_indices);
@@ -214,7 +214,7 @@ void rf_strings_buffer_ctx_deinit()
 
 char *rf_string_cstr_from_buff(const void *s)
 {
-    char* ret;
+    char *ret;
     unsigned int length = rf_string_length_bytes(s);
     ret = rf_buffer_current_ptr(TSBUFF, char);
     if (!rf_buffer_assert_remaining_size(TSBUFF, length)) {
@@ -223,6 +223,16 @@ char *rf_string_cstr_from_buff(const void *s)
     memcpy(rf_buffer_current_ptr(TSBUFF, char), rf_string_data(s), length);
     rf_buffer_from_current_at(TSBUFF, length, char) = '\0';
     rf_buffer_move_index(TSBUFF, length + 1, char);
+    return ret;
+}
+
+char *rf_string_cstr_from_buff_or_die(const void* s)
+{
+    char *ret = rf_string_cstr_from_buff(s);
+    if (!ret) {
+        RF_CRITICAL("Failure to create null terminated cstring from RFstring");
+        exit(1);
+    }
     return ret;
 }
 
@@ -249,7 +259,7 @@ bool rf_strings_buffer_fillfmt(const char *fmt,
         n = rf_buffer_size(TSBUFF);
         *buffPtr = rf_buffer_current_ptr(TSBUFF, char);
         bIndex = rf_buffer_index(TSBUFF);
-        
+
         rc = vsnprintf(rf_buffer_current_ptr(TSBUFF, char), n, fmt, args);
         if (rc < 0 || rc >= n) {
             return false;
@@ -292,7 +302,7 @@ static void rf_strings_buffer_add_string_buffer_ptr(char **buf, uint64_t index)
     );
 #endif
     assert(darray_size(g_strctx.string_buffer_ptrs) == darray_size(g_strctx.string_buffer_indices));
-    
+
     darray_append(g_strctx.string_buffer_ptrs, buf);
     darray_append(g_strctx.string_buffer_indices, index);
 }

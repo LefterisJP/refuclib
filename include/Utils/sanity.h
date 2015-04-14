@@ -36,8 +36,10 @@
 /*------------- Outside Module inclusion -------------*/
 #include <rf_options.h>
 #include <Utils/log.h>
+#include <String/rf_str_common.h>
 /*------------- libc inclusion --------------*/
 #include <assert.h>
+#include <stdlib.h> // for exit()
 /*------------- End of includes -------------*/
 
 
