@@ -75,6 +75,13 @@ extern "C" {
 #define RFS_UNSAFE(...) RF_SELECT_STRING_CREATE_LOCAL(__VA_ARGS__)
 /**
  * Create a temporary tring from a literal with optional printf-like argumens.
+ *
+ * @warning Do not call this function recursively. That is, do not provide the
+ *          string you assign to as a variable argument to the function. The
+ *          char* is stored in a va_list and as such can't be accessed or changed
+ *          even after the reallocation, leading to undefined behaviour.
+ *          
+ *
  * @param ret       Pass a string pointer by reference to have it point to the 
  *                  temporary string position in the buffer
  * @param s         A string literal 
