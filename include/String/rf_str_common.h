@@ -73,13 +73,16 @@ enum RFS_rc {
 };
 
 /**
- * Create a temporary string from a literal with optional printf-like argumens.
+ * Create a temporary string from a literal with optional printf-like arguments.
  *
- * @warning Do not call this function recursively. That is, do not provide the
- *          string you assign to as a variable argument to the function. The
- *          char* is stored in a va_list and as such can't be accessed or changed
- *          even after the reallocation, leading to undefined behaviour.
+ * Reallocation is taken care of if only this macro is what is called.
+ * If this macro is encased in a function then there are some known limitation
+ * regarding calling it recursively with assigning to the same memory location
+ * as the one you read from in the varargs.
  *
+ * That case has to be specifically checked for and then the vararg argument must
+ * be provided accordinly as shown at the test_RFS_return_from_function_with_realloc()
+ * test case of test_string_buffers.c
  *
  * @param ret       Pass a string pointer by reference to have it point to the
  *                  temporary string position in the buffer

@@ -305,6 +305,64 @@ START_TEST (test_RFS_same_ptr_realloc_vararg) {
     RFS_pop();
 } END_TEST
 
+static struct RFstring *get_str(struct RFstring **ret, int choice)
+{
+    if (choice == 1) {
+        RFS(ret, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
+    } else {
+        RFS(ret, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ%d",
+            1337);
+    }
+    return *ret;
+}
+
+static struct RFstring *get_str_with_RFC_recursive(struct RFstring **ret, struct RFstring *s)
+{
+    if (s == *ret) {
+    RFS(ret, RF_STR_PF_FMT"abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        RF_STR_PF_ARG(*ret));
+    } else {
+        RFS(ret, RF_STR_PF_FMT"abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ",
+            RF_STR_PF_ARG(s));
+    }
+    return *ret;
+}
+
+START_TEST (test_RFS_return_from_function_with_realloc) {
+    RFS_push();
+    struct RFstring *s1;
+    struct RFstring *s2;
+    s1 = get_str(&s1, 1);
+    ck_assert_rf_str_eq_cstr(s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
+    s2 = get_str(&s2, 2);
+    ck_assert_rf_str_eq_cstr(s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
+    ck_assert_rf_str_eq_cstr(s2,
+                             "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+                             "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ1337");
+    RFS_pop();
+} END_TEST
+
+// note: This test shows one major limitation of RFS().
+// If you try to use it inside another function and call it recursively
+// with the same string being assigned to and also read from in the varargs
+// you need to explicitly check for that and call the macro accordingly as seen
+// at get_str_with_RFC_recursive()
+START_TEST (test_RFS_return_from_function_with_realloc_same_ptr) {
+    RFS_push();
+    struct RFstring *s1;
+    s1 = get_str(&s1, 1);
+    ck_assert_rf_str_eq_cstr(s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
+    s1 = get_str_with_RFC_recursive(&s1, s1);
+    ck_assert_rf_str_eq_cstr(s1,
+                             "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+                             "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+                             "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    RFS_pop();
+} END_TEST
+
 
 Suite *string_buffers_suite_create(void)
 {
@@ -332,7 +390,15 @@ Suite *string_buffers_suite_create(void)
     tcase_add_test(tc2, test_RFS_same_ptr_realloc_vararg);
     tcase_add_test(tc2, test_string_buffer_fillfmt_detect_realloc_with_realloc);
 
+    TCase *tc3 = tcase_create("string_buffers_misc");
+    tcase_add_checked_fixture(tc3,
+                              setup_realloc_tests,
+                              teardown_realloc_tests);
+    tcase_add_test(tc3, test_RFS_return_from_function_with_realloc);
+    tcase_add_test(tc3, test_RFS_return_from_function_with_realloc_same_ptr);
+
     suite_add_tcase(s, tc1);
     suite_add_tcase(s, tc2);
+    suite_add_tcase(s, tc3);
     return s;
 }
