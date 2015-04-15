@@ -40,6 +40,7 @@
 /*------------- libc inclusion --------------*/
 #include <assert.h>
 #include <stdlib.h> // for exit()
+#include <stdio.h> // for printf()
 /*------------- End of includes -------------*/
 
 
@@ -96,6 +97,20 @@
         }                                               \
     }while(0)
 #endif
+
+/**
+ * Behaves likes RF_ASSERT_OR_EXIT() but does not use any RFS() calls. Is
+ * useful in only a handful of situations to avoid cyclic dependencies
+ */
+#define RF_ASSERT_OR_EXIT_NO_RFS(condition_, message_)  \
+    do {                                                \
+        assert((condition_) && message_);               \
+        if (!(condition_)) {                            \
+            printf("CRITICAL: "message_"\n");           \
+            fflush(stdout);                             \
+            exit(1);                                    \
+        }                                               \
+    } while (0)
 
 /**
  * Will kill the program(release) or assert(debug) if condition_ is not true

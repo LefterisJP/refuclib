@@ -62,54 +62,41 @@ extern "C" {
     rf_string_length_bytes(i_str_), rf_string_data(i_str_)
 #endif
 #endif
+
 /**
- * Create a temporary tring from a literal with optional printf-like argumens.
- * Unsafe version of @ref RFS(). Check the return value to see why this is unsafe.
- * 
- * @param s         A string literal 
- * @param ...       Optional prinflike arguments
- * @return          A pointer to the created string. The reason this is an unsafe
- *                  function is that if the buffer reallocates at some point after
- *                  we want to use this the pointer is invalidated.
+ * Possible return values of some RFS functions
  */
-#define RFS_UNSAFE(...) RF_SELECT_STRING_CREATE_LOCAL(__VA_ARGS__)
+enum RFS_rc {
+    RFS_FAIL = 0,  /*!< Allocation failure. Is almost always fatal */
+    RFS_SUCCESS,   /*!< Allocation was succesfull */
+    RFS_REALLOC    /*!< No allocation happened but a succesfull reallocation occured */
+};
+
 /**
- * Create a temporary tring from a literal with optional printf-like argumens.
+ * Create a temporary string from a literal with optional printf-like argumens.
  *
  * @warning Do not call this function recursively. That is, do not provide the
  *          string you assign to as a variable argument to the function. The
  *          char* is stored in a va_list and as such can't be accessed or changed
  *          even after the reallocation, leading to undefined behaviour.
- *          
  *
- * @param ret       Pass a string pointer by reference to have it point to the 
+ *
+ * @param ret       Pass a string pointer by reference to have it point to the
  *                  temporary string position in the buffer
- * @param s         A string literal 
+ * @param s         A string literal
  * @param ...       Optional prinflike arguments
- * @return          true if all went fine and false in error. Error most probably
- *                  means problems with the string buffer itself due to realloc
  */
-#define RFS(...) RF_SELECT_STRING_CREATE_LOCAL_ASSIGN(__VA_ARGS__)
-/**
- * A version of @ref RFS() which also performs an action in case of error
- * Keep in mind most errors are gonna be really hard to recover from.
- */
-#define RFS_CHECK(stmt_, ...)                   \
-    do {                                        \
-        if (!RFS(__VA_ARGS__)) {                \
-            RF_ERROR("RFS() failure");          \
-            stmt_;                              \
-        }                                       \
-    } while (0)
-/**
- * A version of @ref RFS() which kills the program in case of error
- */
-#define RFS_OR_DIE(...)                                         \
-    do {                                                    \
-        if (!RFS(__VA_ARGS__)) {                            \
-            RF_ASSERT_OR_EXIT(false, "RFS() failure");      \
-        }                                                   \
-    } while (0)
+#define RFS(...)                                                        \
+    do {                                                                \
+        enum RFS_rc rc;                                                 \
+        do {                                                            \
+            rc = RF_SELECT_STRING_CREATE_LOCAL_ASSIGN(__VA_ARGS__);     \
+        } while (rc == RFS_REALLOC);                                    \
+        /* due to cyclic dependency introduced by RFS() and log macros can't use \
+           RF_ASSERT_OR_EXIT() here. Using special version which does not use RFS() */ \
+        RF_ASSERT_OR_EXIT_NO_RFS(rc == RFS_SUCCESS, "RFS() failure");   \
+    } while(0)
+
 /**
  * Remember the current point in the string buffer.
  *
@@ -151,28 +138,29 @@ bool rf_strings_buffer_fillfmt(const char *fmt,
                                unsigned int *size,
                                char **buffPtr,
                                va_list args);
+/**
+ * A version of @ref rf_strings_buffer_fillfmt() which notifies the user of realloc
+ *
+ * Behaves just like @ref rf_strings_buffer_fillfmt() but if a realloc of the
+ * buffer occurs then the @a buffPtr won't be writtern to and RFS_REALLOC will
+ * be returned.
+ */
+enum RFS_rc rf_strings_buffer_fillfmt_detect_realloc(const char *fmt,
+                                                     unsigned int *size,
+                                                     char **buffPtr,
+                                                     va_list args);
 void rf_strings_buffer_ctx_push();
 void rf_strings_buffer_ctx_pop();
 
 /* -- internal functions used in the above API -- */
+i_DECLIMEX_ enum RFS_rc i_rf_string_create_local_assign(struct RFstring **ret, const char* s);
+i_DECLIMEX_ enum RFS_rc i_rf_string_create_local_assignv(struct RFstring **ret, const char* s, ...);
 
-i_DECLIMEX_ struct RFstring *i_rf_string_create_local(const char* s);
-i_DECLIMEX_ struct RFstring *i_rf_string_create_localv(const char* s, ...);
-i_DECLIMEX_ bool i_rf_string_create_local_assign(struct RFstring **ret, const char* s);
-i_DECLIMEX_ bool i_rf_string_create_local_assignv(struct RFstring **ret, const char* s, ...);
-
-#define RF_SELECT_STRING_CREATE_LOCAL(...)  \
-    RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATELOCAL, 1, __VA_ARGS__)
-#define i_SELECT_RF_STRING_CREATELOCAL1(arg_)  \
-    i_rf_string_create_local(arg_)
-#define i_SELECT_RF_STRING_CREATELOCAL0(...)  \
-    i_rf_string_create_localv(__VA_ARGS__)
-
-#define RF_SELECT_STRING_CREATE_LOCAL_ASSIGN(...)  \
+#define RF_SELECT_STRING_CREATE_LOCAL_ASSIGN(...)                       \
     RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATELOCAL_ASSIGN, 2, __VA_ARGS__)
 #define i_SELECT_RF_STRING_CREATELOCAL_ASSIGN1(ptr_, arg_)  \
     i_rf_string_create_local_assign(ptr_, arg_)
-#define i_SELECT_RF_STRING_CREATELOCAL_ASSIGN0(ptr_, ...)  \
+#define i_SELECT_RF_STRING_CREATELOCAL_ASSIGN0(ptr_, ...)   \
     i_rf_string_create_local_assignv(ptr_, __VA_ARGS__)
 
 #ifdef __cplusplus

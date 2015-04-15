@@ -165,6 +165,18 @@ i_INLINE_DECL bool rf_buffer_assert_remaining_size(struct RFbuffer *b, size_t si
     return rf_buffer_increase_size(b, size);
 }
 
+i_INLINE_DECL bool rf_buffer_assert_remaining_size_detect_realloc(struct RFbuffer *b,
+                                                                  size_t size,
+                                                                  bool *had_realloc)
+{
+    if (rf_buffer_remaining_size_(b) > size) {
+        *had_realloc = false;
+        return true;
+    }
+    *had_realloc = true;
+    return rf_buffer_increase_size(b, size);
+}
+
 i_INLINE_DECL void rf_buffer_set_index_(struct RFbuffer* b, unsigned int index)
 {
     b->index = index;
@@ -175,7 +187,7 @@ i_INLINE_DECL void rf_buffer_set_index_(struct RFbuffer* b, unsigned int index)
  */
 
 /**
- * Allocates @c len_bytes from @c buffer b
+ * Allocates a number of bytes from buffer. Reallocs if needed.
  */
 i_INLINE_DECL void *rf_buffer_malloc(struct RFbuffer *b, size_t len_bytes)
 {
@@ -183,7 +195,29 @@ i_INLINE_DECL void *rf_buffer_malloc(struct RFbuffer *b, size_t len_bytes)
     if (!rf_buffer_assert_remaining_size(b, len_bytes)) {
         return NULL;
     }
-    
+
+    ret = rf_buffer_current_ptr(b, char);
+    rf_buffer_move_index(b, len_bytes, char);
+    return ret;
+}
+
+/**
+ * Allocates a number of bytes from buffer. If realloc happens then it does
+ * not actually "malloc" anything on the buffer but instead sets had_realloc to true
+ * and returns NULL
+ */
+i_INLINE_DECL void *rf_buffer_malloc_or_detect_realloc(struct RFbuffer *b,
+                                                       size_t len_bytes,
+                                                       bool *had_realloc)
+{
+    char *ret;
+    if (!rf_buffer_assert_remaining_size_detect_realloc(b, len_bytes, had_realloc)) {
+        return NULL;
+    }
+    if (*had_realloc) {
+        return NULL;
+    }
+
     ret = rf_buffer_current_ptr(b, char);
     rf_buffer_move_index(b, len_bytes, char);
     return ret;

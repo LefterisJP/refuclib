@@ -49,7 +49,13 @@ bool rf_buffer_increase_size(struct RFbuffer* b, size_t added_size)
 i_INLINE_INS void* rf_buffer_current_ptr_(struct RFbuffer* b);
 i_INLINE_INS size_t rf_buffer_remaining_size_(struct RFbuffer* b);
 i_INLINE_INS bool rf_buffer_assert_remaining_size(struct RFbuffer *b, size_t size);
+i_INLINE_INS bool rf_buffer_assert_remaining_size_detect_realloc(struct RFbuffer *b,
+                                                                 size_t size,
+                                                                 bool *had_realloc);
 i_INLINE_INS size_t rf_buffer_size(struct RFbuffer* b);
 i_INLINE_INS void rf_buffer_set_index_(struct RFbuffer* b, unsigned int index);
 i_INLINE_INS unsigned int rf_buffer_index(struct RFbuffer* b);
 i_INLINE_INS void *rf_buffer_malloc(struct RFbuffer *b, size_t len_bytes);
+i_INLINE_INS void *rf_buffer_malloc_or_detect_realloc(struct RFbuffer *b,
+                                                      size_t len_bytes,
+                                                      bool *had_realloc);

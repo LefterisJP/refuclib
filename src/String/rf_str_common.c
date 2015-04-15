@@ -49,105 +49,90 @@ i_THREAD__ struct RFbuffer g_tsbuff;
 static void rf_strings_buffer_add_string_ptr(struct RFstring **str, uint64_t index);
 static void rf_strings_buffer_add_string_buffer_ptr(char **buf, uint64_t index);
 
-static bool i_rf_string_create_local_assignva(struct RFstring **ret, const char *s, va_list args)
-{
-    unsigned int size;
-    uint32_t index_before_string_alloc;
-    char *buffPtr;
-
-    //allocate the string in its buffer
-    index_before_string_alloc = rf_buffer_index(TSBUFF);
-    *ret = rf_buffer_malloc(TSBUFF, sizeof(**ret));
-    if (!*ret) {
-        return false;
-    }
-    // add it to the context
-    rf_strings_buffer_add_string_ptr(ret, index_before_string_alloc);
-
-    // deal with the va_args buffer
-    if (!rf_strings_buffer_fillfmt(s, &size, &buffPtr, args)) {
-        RF_ERROR("Local string creation failure due to failing at reading the"
-                 " formatted string");
-        return false;
-    }
-    rf_string_data(*ret) = buffPtr;
-    rf_string_length_bytes(*ret) = size;
-
-    return true;
-}
-
-bool i_rf_string_create_local_assignv(struct RFstring **ret, const char *s, ...)
+enum RFS_rc i_rf_string_create_local_assignv(struct RFstring **ret, const char *s, ...)
 {
     va_list args;
     unsigned int size;
     uint32_t index_before_string_alloc;
     char *buffPtr;
+    bool had_realloc;
+    enum RFS_rc rc;
+    enum RFS_rc ret_rc = RFS_FAIL;
+    struct RFstring *temp_ptr;
 
     //allocate the string in its buffer
     index_before_string_alloc = rf_buffer_index(TSBUFF);
-    *ret = rf_buffer_malloc(TSBUFF, sizeof(**ret));
-    if (!*ret) {
-        return false;
+    temp_ptr = rf_buffer_malloc_or_detect_realloc(TSBUFF, sizeof(*temp_ptr), &had_realloc);
+    if (!temp_ptr) {
+        if (had_realloc) {
+            ret_rc = RFS_REALLOC;
+            rf_buffer_set_index_(TSBUFF, index_before_string_alloc);
+        }
+        goto end;
     }
-    // add it to the context before filling the buffer. If there is a realloc we need it handled
-    rf_strings_buffer_add_string_ptr(ret, index_before_string_alloc);
 
     // read the var args into the buffer
     va_start(args, s);
-    if (!rf_strings_buffer_fillfmt(s, &size, &buffPtr, args)) {
-        RF_ERROR("Local string creation failure due to failing at reading the"
-                 " formatted string");
-        return false;
-    }
+    rc = rf_strings_buffer_fillfmt_detect_realloc(s, &size, &buffPtr, args);
     va_end(args);
+    if (rc != RFS_SUCCESS) {
+        ret_rc = rc;
+        rf_buffer_set_index_(TSBUFF, index_before_string_alloc);
+        goto end;
+    }
 
+    // only after this point will ret pointer
+    ret_rc = RFS_SUCCESS;
+    *ret = temp_ptr;
+    // add it to the context before filling the buffer. If there is a realloc we need it handled
+    rf_strings_buffer_add_string_ptr(ret, index_before_string_alloc);
     rf_string_data(*ret) = buffPtr;
     rf_string_length_bytes(*ret) = size;
 
-    return true;
+end:
+    return ret_rc;
 }
 
-struct RFstring *i_rf_string_create_localv(const char *s, ...)
-{
-    struct RFstring *ret;
-    bool rc;
-    va_list args;
-    va_start(args, s);
-    rc = i_rf_string_create_local_assignva(&ret, s, args);
-    va_end(args);
-    return rc ? ret : NULL;
-}
-
-bool i_rf_string_create_local_assign(struct RFstring **ret, const char *s)
+enum RFS_rc i_rf_string_create_local_assign(struct RFstring **ret, const char *s)
 {
     uint32_t byteLength;
-    uint32_t index_before;
+    uint32_t index_before_string_alloc;
+    enum RFS_rc rc = RFS_FAIL;
+    bool had_realloc;
     //check for validity of the given sequence and get the character length
     if (!rf_utf8_verify(s, &byteLength, 0)) {
         RF_ERROR("Error at String Allocation due to invalid "
                  "UTF-8 byte sequence");
-        return false;
+        goto end;
     }
 
-    index_before = rf_buffer_index(TSBUFF);
+    index_before_string_alloc = rf_buffer_index(TSBUFF);
     //allocate the string and its buffer in the local memory stack
-    *ret = rf_buffer_malloc(TSBUFF, sizeof(**ret) + byteLength);
+    *ret = rf_buffer_malloc_or_detect_realloc(TSBUFF,
+                                              sizeof(**ret) + byteLength,
+                                              &had_realloc);
     if (!*ret) {
-        return false;
+        if (had_realloc) {
+            rf_buffer_set_index_(TSBUFF, index_before_string_alloc);
+            rc = RFS_REALLOC;
+        }
+        goto end;
     }
     rf_string_data(*ret) = (char*)*ret + sizeof(**ret);
     memcpy(rf_string_data(*ret), s, byteLength);
     rf_string_length_bytes(*ret) = byteLength;
     // add it to the context
-    rf_strings_buffer_add_string_ptr(ret, index_before);
+    rf_strings_buffer_add_string_ptr(ret, index_before_string_alloc);
+    rc = RFS_SUCCESS;
 
-    return true;
+end:
+    return rc;
 }
 
 struct RFstring *i_rf_string_create_local(const char* s)
 {
     struct RFstring *ret;
-    return i_rf_string_create_local_assign(&ret, s) ? ret : NULL;
+    return i_rf_string_create_local_assign(&ret, s) == RFS_SUCCESS ? ret : NULL;
 }
 
 struct rf_strings_buffer_ctx {
@@ -271,6 +256,39 @@ bool rf_strings_buffer_fillfmt(const char *fmt,
     *size = rc;
 
     return true;
+}
+
+enum RFS_rc rf_strings_buffer_fillfmt_detect_realloc(const char *fmt,
+                                                     unsigned int *size,
+                                                     char **buffPtr,
+                                                     va_list args)
+{
+    enum RFS_rc ret = RFS_FAIL;
+    int rc;
+    va_list copy_va_list;
+    unsigned int bIndex;
+    int64_t n = rf_buffer_remaining_size(TSBUFF, char);
+    bIndex = rf_buffer_index(TSBUFF);
+    *buffPtr = rf_buffer_current_ptr(TSBUFF, char);
+    va_copy(copy_va_list, args); /* C99 only */
+    rc = vsnprintf(rf_buffer_current_ptr(TSBUFF, char), n, fmt, copy_va_list);
+    va_end(copy_va_list);
+    if (rc < 0) {
+        goto end;
+    } else if (rc >= n) {
+        if (rf_buffer_increase_size(TSBUFF, rc * 2)) {
+            ret = RFS_REALLOC;
+        }
+        goto end;
+    }
+    // add it to the context
+    rf_strings_buffer_add_string_buffer_ptr(buffPtr, bIndex);
+    rf_buffer_move_index(TSBUFF, rc, char);
+    *size = rc;
+    ret = RFS_SUCCESS;
+
+end:
+    return ret;
 }
 
 static void rf_strings_buffer_add_string_ptr(struct RFstring **str, uint64_t index)
