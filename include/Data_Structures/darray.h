@@ -226,6 +226,12 @@ typedef darray(unsigned long)  darray_ulong;
 /* Warning: Do not call darray_pop on an empty darray. */
 #define darray_pop(arr) ((arr).item[--(arr).size])
 #define darray_pop_check(arr) ((arr).size ? darray_pop(arr) : NULL)
+#define darray_clear(arr_)                      \
+    do {                                        \
+        while (!darray_empty(arr_)) {           \
+            (void)darray_pop(arr_);             \
+        }                                       \
+    } while(0)                                                          
 /* Warning, slow: Requires copying all elements after removed item. */
 #define darray_remove(arr, index) do { \
 	if (index < arr.size-1)    \
