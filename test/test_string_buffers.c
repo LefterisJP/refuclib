@@ -363,29 +363,119 @@ START_TEST (test_RFS_return_from_function_with_realloc_same_ptr) {
     RFS_pop();
 } END_TEST
 
-static struct RFstring *get_str_rec(struct RFstring **ret, int num)
+static struct RFstring *get_str_rec(struct RFstring **ret, int num, bool first)
 {
-    struct RFstring *s;
-    RFS(&s, "pre%d", num);
-    RFS(ret,
-        RF_STR_PF_FMT"abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz%d",
-        RF_STR_PF_ARG(s),
-        num);
+    if (first) {
+        RFS(ret,
+            "%dabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz", num);
+    } else {
+        RFS(ret,
+            RF_STR_PF_FMT "%dabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz",
+            RF_STR_PF_ARG(*ret), num);
+    }
     if (num > 0) {
-        get_str_rec(ret, num - 1);
+        get_str_rec(ret, num - 1, false);
     }
 
     return *ret;
 }
 
-START_TEST (test_RFS_in_recursive_functions) {
+// test RFS calls in recursive functions that add local RFS initialized strings
+// to the returned string
+static struct RFstring *get_str_rec_with_local(struct RFstring **ret, int num)
+{
+    if (num > 0) {
+        get_str_rec_with_local(ret, num - 1);
+    }
+    struct RFstring *s;
+    RFS(&s, "pre%d", num);
+    if (num == 0) {
+        RFS(ret,
+            RF_STR_PF_FMT"abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz",
+            RF_STR_PF_ARG(s));
+    } else {
+        RFS(ret,
+            RF_STR_PF_FMT RF_STR_PF_FMT "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz",
+            RF_STR_PF_ARG(*ret), RF_STR_PF_ARG(s));
+    }
+
+    return *ret;
+}
+
+static void test_RFS_in_recursive_functions_with_local()
+{
     RFS_push();
     struct RFstring *s1;
-    s1 = get_str_rec(&s1, 1);
+    s1 = get_str_rec_with_local(&s1, 0);
     ck_assert_rf_str_eq_cstr(
         s1,
-        "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
+        "pre0abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
     RFS_pop();
+    RFS_push();
+    struct RFstring *s2;
+    s2 = get_str_rec_with_local(&s2, 1);
+    ck_assert_rf_str_eq_cstr(
+        s2,
+        "pre0abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+        "pre1abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+    );
+    RFS_pop();
+    RFS_push();
+    struct RFstring *s3;
+    s3 = get_str_rec_with_local(&s3, 2);
+    ck_assert_rf_str_eq_cstr(
+        s3,
+        "pre0abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+        "pre1abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+        "pre2abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+    );
+    RFS_pop();
+    RFS_push();
+    struct RFstring *s4;
+    s4 = get_str_rec_with_local(&s4, 3);
+    ck_assert_rf_str_eq_cstr(
+        s4,
+        "pre0abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+        "pre1abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+        "pre2abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+        "pre3abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+    );
+    RFS_pop();
+}
+
+static void test_RFS_in_recursive_functions()
+{
+    RFS_push();
+    struct RFstring *s1;
+    s1 = get_str_rec(&s1, 0, true);
+    ck_assert_rf_str_eq_cstr(
+        s1,
+        "0abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
+    RFS_pop();
+    RFS_push();
+    struct RFstring *s2;
+    s2 = get_str_rec(&s2, 1, true);
+    ck_assert_rf_str_eq_cstr(
+        s2,
+        "1abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+        "0abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
+    RFS_pop();
+}
+
+START_TEST (test_RFS_in_recursive_functions_no_realloc) {
+    test_RFS_in_recursive_functions();
+} END_TEST
+
+START_TEST (test_RFS_in_recursive_functions_with_realloc) {
+    test_RFS_in_recursive_functions();
+} END_TEST
+
+START_TEST (test_RFS_in_recursive_functions_with_local_no_realloc) {
+    test_RFS_in_recursive_functions_with_local();
+} END_TEST
+
+START_TEST (test_RFS_in_recursive_functions_with_local_with_realloc) {
+    test_RFS_in_recursive_functions_with_local();
 } END_TEST
 
 
@@ -422,10 +512,19 @@ Suite *string_buffers_suite_create(void)
                               teardown_realloc_tests);
     tcase_add_test(tc3, test_RFS_return_from_function_with_realloc);
     tcase_add_test(tc3, test_RFS_return_from_function_with_realloc_same_ptr);
-    tcase_add_test(tc3, test_RFS_in_recursive_functions);
+    tcase_add_test(tc3, test_RFS_in_recursive_functions_with_realloc);
+    tcase_add_test(tc3, test_RFS_in_recursive_functions_with_local_with_realloc);
+
+    TCase *tc4 = tcase_create("string_buffers_misc_no_realloc");
+    tcase_add_checked_fixture(tc4,
+                              setup_generic_tests,
+                              teardown_realloc_tests);
+    tcase_add_test(tc4, test_RFS_in_recursive_functions_no_realloc);
+    tcase_add_test(tc4, test_RFS_in_recursive_functions_with_local_no_realloc);
 
     suite_add_tcase(s, tc1);
     suite_add_tcase(s, tc2);
     suite_add_tcase(s, tc3);
+    suite_add_tcase(s, tc4);
     return s;
 }
