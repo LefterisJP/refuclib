@@ -363,6 +363,32 @@ START_TEST (test_RFS_return_from_function_with_realloc_same_ptr) {
     RFS_pop();
 } END_TEST
 
+static struct RFstring *get_str_rec(struct RFstring **ret, int num)
+{
+    struct RFstring *s;
+    RFS(&s, "pre%d", num);
+    RFS(ret,
+        RF_STR_PF_FMT"abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz%d",
+        RF_STR_PF_ARG(s),
+        num);
+    if (num > 0) {
+        get_str_rec(ret, num - 1);
+    }
+
+    return *ret;
+}
+
+START_TEST (test_RFS_in_recursive_functions) {
+    RFS_push();
+    struct RFstring *s1;
+    s1 = get_str_rec(&s1, 1);
+    ck_assert_rf_str_eq_cstr(
+        s1,
+        "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
+    RFS_pop();
+} END_TEST
+
+
 
 Suite *string_buffers_suite_create(void)
 {
@@ -390,12 +416,13 @@ Suite *string_buffers_suite_create(void)
     tcase_add_test(tc2, test_RFS_same_ptr_realloc_vararg);
     tcase_add_test(tc2, test_string_buffer_fillfmt_detect_realloc_with_realloc);
 
-    TCase *tc3 = tcase_create("string_buffers_misc");
+    TCase *tc3 = tcase_create("string_buffers_misc_at_realloc");
     tcase_add_checked_fixture(tc3,
                               setup_realloc_tests,
                               teardown_realloc_tests);
     tcase_add_test(tc3, test_RFS_return_from_function_with_realloc);
     tcase_add_test(tc3, test_RFS_return_from_function_with_realloc_same_ptr);
+    tcase_add_test(tc3, test_RFS_in_recursive_functions);
 
     suite_add_tcase(s, tc1);
     suite_add_tcase(s, tc2);
