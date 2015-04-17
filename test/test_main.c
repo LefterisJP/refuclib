@@ -16,6 +16,7 @@ Suite *utils_unicode_suite_create(void);
 Suite *utils_array_suite_create(void);
 Suite *utils_memory_pools_suite_create(void);
 Suite *datastructs_objset_suite_create(void);
+Suite *datastructs_mbuffer_suite_create(void);
 
 Suite *intrusive_list_suite_create(void);
 
@@ -86,6 +87,7 @@ int main(int argc, char **argv)
     srunner_add_suite(sr, utils_array_suite_create());
     srunner_add_suite(sr, utils_memory_pools_suite_create());
     srunner_add_suite(sr, datastructs_objset_suite_create());
+    srunner_add_suite(sr, datastructs_mbuffer_suite_create());
 
     srunner_add_suite(sr, intrusive_list_suite_create());
 

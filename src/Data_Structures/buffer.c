@@ -28,7 +28,7 @@
  *    == END OF REFU LICENSE ==
 */
 
-#include <Utils/buffer.h>
+#include <Data_Structures/buffer.h>
 #include <Utils/memory.h>
 
 bool rf_buffer_init(struct RFbuffer* b, size_t size, rf_buffer_realloc_cb cb)
