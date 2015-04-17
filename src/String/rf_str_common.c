@@ -238,7 +238,7 @@ bool rf_strings_buffer_fillfmt(const char *fmt,
     if (rc < 0) {
         return false;
     } else if (rc >= n) {
-        if (!rf_buffer_increase_size(TSBUFF, rc * 2)) {
+        if (!rf_buffer_increase_size(TSBUFF, rc)) {
             return false;
         }
         n = rf_buffer_size(TSBUFF);
@@ -276,7 +276,7 @@ enum RFS_rc rf_strings_buffer_fillfmt_detect_realloc(const char *fmt,
     if (rc < 0) {
         goto end;
     } else if (rc >= n) {
-        if (rf_buffer_increase_size(TSBUFF, rc * 2)) {
+        if (rf_buffer_increase_size(TSBUFF, rc)) {
             ret = RFS_REALLOC;
         }
         goto end;

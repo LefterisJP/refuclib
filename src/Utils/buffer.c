@@ -39,11 +39,12 @@ bool rf_buffer_init(struct RFbuffer* b, size_t size, rf_buffer_realloc_cb cb)
     RF_CALLOC(b->buff, size, 1, return false);
     return true;
 }
+
 i_INLINE_INS void rf_buffer_deinit(struct RFbuffer* b);
 bool rf_buffer_increase_size(struct RFbuffer* b, size_t added_size)
 {
-    RF_REALLOC(b->buff, char, b->size + added_size, return false);
-    b->size += added_size;
+    RF_REALLOC(b->buff, char, (b->size + added_size) * 2, return false);
+    b->size = (b->size + added_size) * 2;
     return b->realloc_cb ? b->realloc_cb(b) : true;
 }
 i_INLINE_INS void* rf_buffer_current_ptr_(struct RFbuffer* b);

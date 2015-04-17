@@ -139,7 +139,8 @@ i_INLINE_DECL uint64_t rf_buffer_get_offset(struct RFbuffer *b, char *byte)
  * Increase the buffer size and execute realloc callback if existing
  *
  * @param b            The buffer whose size to increase
- * @param added_size   The size in bytes to add
+ * @param added_size   The size in bytes to add. The actual new size will be
+ *                     double the current size + added_size
  * @return             true in success and false in failure
  */
 bool rf_buffer_increase_size(struct RFbuffer *b, size_t added_size);

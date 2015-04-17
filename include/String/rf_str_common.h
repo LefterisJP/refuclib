@@ -84,6 +84,14 @@ enum RFS_rc {
  * be provided accordinly as shown at the test_RFS_return_from_function_with_realloc()
  * test case of test_string_buffers.c
  *
+ * Another situation that can be dangerous is if you utilize the RFS() macro or
+ * a function using RFS() in a loop assigning to the same string variable over
+ * and over. In such a case you have to also make sure that RFS_push() and RFS_pop()
+ * is also inside the body of the loop or else you are going to be overwritting 
+ * the same variable over and over but keeping multiple pointers to it for realloc
+ * which can lead to very funny behaviour. TODO: test to showcase this problem
+ * and proper solution
+ *
  * @param ret       Pass a string pointer by reference to have it point to the
  *                  temporary string position in the buffer
  * @param s         A string literal
