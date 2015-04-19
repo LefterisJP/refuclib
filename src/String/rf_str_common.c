@@ -172,14 +172,15 @@ bool rf_strings_buffer_fillfmt(const char *fmt,
     va_end(copy_va_list);
     if (rc < 0) {
         return false;
-    } else if (rc >= n) {
+    } else if (rc > (int)n) {
+        size_t needed_size = rc + 1; // +1 is for the null terminating character
         rf_mbuffer_shrink(RF_TSBUFFM, n);
-        *buff_ptr = rf_mbuffer_alloc(RF_TSBUFFM, rc);
+        *buff_ptr = rf_mbuffer_alloc(RF_TSBUFFM, needed_size);
         if (!*buff_ptr) {
             return false;
         }
-        rc = vsnprintf(*buff_ptr, rc, fmt, args);
-        if (rc < 0 || rc >= n) {
+        rc = vsnprintf(*buff_ptr, needed_size, fmt, args);
+        if (rc < 0 || rc > (int)needed_size) {
             return false;
         }
     } else {

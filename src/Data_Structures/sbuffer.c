@@ -36,7 +36,7 @@ struct RFsbuffer_stack {
     struct {darray(size_t);} index_stack;
 };
 
-struct RFsbuffer_stack *RFsbuffer_stack_create()
+struct RFsbuffer_stack *rf_sbuffer_stack_create()
 {
     struct RFsbuffer_stack *ret;
     RF_MALLOC(ret, sizeof(*ret), return NULL);
@@ -44,7 +44,7 @@ struct RFsbuffer_stack *RFsbuffer_stack_create()
     return ret;
 }
 
-void RFsbuffer_stack_destroy(struct RFsbuffer_stack *b)
+void rf_sbuffer_stack_destroy(struct RFsbuffer_stack *b)
 {
     darray_free(b->index_stack);
     free(b);
@@ -57,18 +57,26 @@ bool rf_sbuffer_init(struct RFsbuffer *b, size_t size, rf_sbuffer_realloc_cb cb)
     b->index = 0;
     b->realloc_cb = cb;
     RF_CALLOC(b->buff, size, 1, return false);
-    
-    return true;
+    b->stack = rf_sbuffer_stack_create();
+    return b->stack;
 }
 
 void rf_sbuffer_deinit(struct RFsbuffer *b)
 {
+    rf_sbuffer_stack_destroy(b->stack);
     free(b->buff);
 }
 
 static inline size_t rf_sbuffer_remsize(const struct RFsbuffer *b)
 {
     return b->size - b->index;
+}
+
+static inline bool rf_sbuffer_realloc(struct RFsbuffer *b, size_t new_size)
+{
+    // else we need to realloc
+    RF_REALLOC(b->buff, char, new_size, return false);
+    return b->realloc_cb ? b->realloc_cb(b) : true;
 }
 
 void *rf_sbuffer_alloc(struct RFsbuffer *b, size_t size)
@@ -81,7 +89,9 @@ void *rf_sbuffer_alloc(struct RFsbuffer *b, size_t size)
 
     size_t new_size = b->size > size ? b->size : size;
     // else we need to realloc
-    RF_REALLOC(b->buff, char, new_size * 2, return NULL);
+    if (!rf_sbuffer_realloc(b, new_size * 2)) {
+        return NULL;
+    }
     // assignment needs to happen again due to realloc
     ret = b->buff + b->index;
     b->index += size;
@@ -96,7 +106,9 @@ void *rf_sbuffer_extend(struct RFsbuffer *b, size_t added_size)
         return ret;
     }
     size_t new_size = b->size + added_size;
-    RF_REALLOC(b->buff, char, new_size * 2, return NULL);
+    if (!rf_sbuffer_realloc(b, new_size * 2)) {
+        return NULL;
+    }
     // assignment needs to happen again due to realloc
     ret = b->buff + darray_top(b->stack->index_stack);
     b->index += added_size;

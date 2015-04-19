@@ -59,6 +59,7 @@ unit_test_files = [
     'test_utils_memory_pools.c',
     'test_datastructs_objset.c',
     'test_datastructs_mbuffer.c',
+    'test_datastructs_sbuffer.c',
 
     'test_intrusive_list.c',
 

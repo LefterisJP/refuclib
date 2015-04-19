@@ -13,13 +13,13 @@ struct foo {
     double y;
 };
 
-void foo_init(struct foo *f, uint64_t x, double y)
+static void foo_init(struct foo *f, uint64_t x, double y)
 {
     f->x = x;
     f->y = y;
 }
 
-bool foo_init_check(struct foo *f, uint64_t x, double y)
+static bool foo_init_check(struct foo *f, uint64_t x, double y)
 {
     if (!f) {
         return false;
@@ -109,13 +109,13 @@ struct boo {
     char padding[128];
 };
 
-void boo_init(struct boo *f, uint64_t x, double y)
+static void boo_init(struct boo *f, uint64_t x, double y)
 {
     f->x = x;
     f->y = y;
 }
 
-bool boo_init_check(struct boo *f, uint64_t x, double y)
+static bool boo_init_check(struct boo *f, uint64_t x, double y)
 {
     if (!f) {
         return false;

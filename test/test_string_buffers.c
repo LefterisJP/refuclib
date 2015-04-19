@@ -229,7 +229,7 @@ static struct RFstring *get_str_rec(struct RFstring *s, int num, bool first)
                 RF_STR_PF_ARG(s), num);
     }
     if (num > 0) {
-        get_str_rec(s, num - 1, false);
+        s = get_str_rec(s, num - 1, false);
     }
 
     return s;
@@ -240,7 +240,7 @@ static struct RFstring *get_str_rec(struct RFstring *s, int num, bool first)
 static struct RFstring *get_str_rec_with_local(struct RFstring *ret, int num)
 {
     if (num > 0) {
-        get_str_rec_with_local(ret, num - 1);
+        ret = get_str_rec_with_local(ret, num - 1);
     }
     struct RFstring *s;
     s = RFS("pre%d", num);
