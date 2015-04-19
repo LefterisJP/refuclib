@@ -35,70 +35,73 @@
 #include <Utils/sanity.h>
 #include <Utils/log.h> //for error logging
 #include <Utils/rf_unicode.h> //for rf_utf8_verify()
-#include <Persistent/buffers.h> //for the internal persistent buffer
-#include <Data_Structures/darray.h>
 /*------------- libc inclusion --------------*/
 #include <stdio.h>
 #include <stdarg.h> //for va_list
 #include <stdlib.h> //for exit()
 /*------------- End of includes -------------*/
 
-i_THREAD__ struct RFbuffer g_tsbuff;
-#define TSBUFF (&g_tsbuff)
-
-static void rf_strings_buffer_add_string_ptr(struct RFstring **str, uint64_t index);
-static void rf_strings_buffer_add_string_buffer_ptr(char **buf, uint64_t index);
-
-enum RFS_rc i_rf_string_create_local_assignv(struct RFstring **ret, const char *s, ...)
+struct RFstring *i_rf_string_create_localv(const char *s, ...)
 {
     va_list args;
     unsigned int size;
-    uint32_t index_before_string_alloc;
     char *buffPtr;
-    bool had_realloc;
-    enum RFS_rc rc;
-    enum RFS_rc ret_rc = RFS_FAIL;
-    struct RFstring *temp_ptr;
+    bool rc;
+    struct RFstring *ret;
 
-    //allocate the string in its buffer
-    index_before_string_alloc = rf_buffer_index(TSBUFF);
-    temp_ptr = rf_buffer_malloc_or_detect_realloc(TSBUFF, sizeof(*temp_ptr), &had_realloc);
-    if (!temp_ptr) {
-        if (had_realloc) {
-            ret_rc = RFS_REALLOC;
-            rf_buffer_set_index_(TSBUFF, index_before_string_alloc);
-        }
-        goto end;
+    ret = rf_mbuffer_alloc(RF_TSBUFFM, sizeof(*ret));
+    if (!ret) {
+        return NULL;
     }
 
     // read the var args into the buffer
     va_start(args, s);
-    rc = rf_strings_buffer_fillfmt_detect_realloc(s, &size, &buffPtr, args);
+    rc = rf_strings_buffer_fillfmt(s, &size, &buffPtr, args);
     va_end(args);
-    if (rc != RFS_SUCCESS) {
-        ret_rc = rc;
-        rf_buffer_set_index_(TSBUFF, index_before_string_alloc);
-        goto end;
+    if (!rc) {
+        return NULL;
     }
+    rf_string_data(ret) = buffPtr;
+    rf_string_length_bytes(ret) = size;
 
-    // only after this point will ret pointer
-    ret_rc = RFS_SUCCESS;
-    *ret = temp_ptr;
-    // add it to the context before filling the buffer. If there is a realloc we need it handled
-    rf_strings_buffer_add_string_ptr(ret, index_before_string_alloc);
-    rf_string_data(*ret) = buffPtr;
-    rf_string_length_bytes(*ret) = size;
-
-end:
-    return ret_rc;
+    return ret;
 }
 
-enum RFS_rc i_rf_string_create_local_assign(struct RFstring **ret, const char *s)
+// to avoid duplication I could have a function accepting va_list and in both
+// cases create it and call said function
+struct RFstring *i_rf_string_create_localv_or_die(const char *s, ...)
+{
+    va_list args;
+    unsigned int size;
+    char *buffPtr;
+    bool rc;
+    struct RFstring *ret;
+
+    ret = rf_mbuffer_alloc(RF_TSBUFFM, sizeof(*ret));
+    if (!ret) {
+        goto fail;
+    }
+
+    // read the var args into the buffer
+    va_start(args, s);
+    rc = rf_strings_buffer_fillfmt(s, &size, &buffPtr, args);
+    va_end(args);
+    if (!rc) {
+        goto fail;
+    }
+    rf_string_data(ret) = buffPtr;
+    rf_string_length_bytes(ret) = size;
+
+    return ret;
+fail:
+    RF_CRITICAL("RFS() failure");
+    exit(1);
+}
+
+struct RFstring *i_rf_string_create_local(const char *s)
 {
     uint32_t byteLength;
-    uint32_t index_before_string_alloc;
-    enum RFS_rc rc = RFS_FAIL;
-    bool had_realloc;
+    struct RFstring *ret = NULL;
     //check for validity of the given sequence and get the character length
     if (!rf_utf8_verify(s, &byteLength, 0)) {
         RF_ERROR("Error at String Allocation due to invalid "
@@ -106,108 +109,39 @@ enum RFS_rc i_rf_string_create_local_assign(struct RFstring **ret, const char *s
         goto end;
     }
 
-    index_before_string_alloc = rf_buffer_index(TSBUFF);
     //allocate the string and its buffer in the local memory stack
-    *ret = rf_buffer_malloc_or_detect_realloc(TSBUFF,
-                                              sizeof(**ret) + byteLength,
-                                              &had_realloc);
-    if (!*ret) {
-        if (had_realloc) {
-            rf_buffer_set_index_(TSBUFF, index_before_string_alloc);
-            rc = RFS_REALLOC;
-        }
+    ret = rf_mbuffer_alloc(RF_TSBUFFM, sizeof(*ret) + byteLength);
+    if (!ret) {
         goto end;
     }
-    rf_string_data(*ret) = (char*)*ret + sizeof(**ret);
-    memcpy(rf_string_data(*ret), s, byteLength);
-    rf_string_length_bytes(*ret) = byteLength;
-    // add it to the context
-    rf_strings_buffer_add_string_ptr(ret, index_before_string_alloc);
-    rc = RFS_SUCCESS;
+    rf_string_data(ret) = (char*)ret + sizeof(*ret);
+    memcpy(rf_string_data(ret), s, byteLength);
+    rf_string_length_bytes(ret) = byteLength;
 
 end:
-    return rc;
+    return ret;
 }
 
-struct RFstring *i_rf_string_create_local(const char* s)
+struct RFstring *i_rf_string_create_local_or_die(const char *s)
 {
-    struct RFstring *ret;
-    return i_rf_string_create_local_assign(&ret, s) == RFS_SUCCESS ? ret : NULL;
-}
-
-struct rf_strings_buffer_ctx {
-    // these are used to remember positions in the buffer for reallocing
-    struct {darray(struct RFstring**);} string_ptrs;
-    struct {darray(uint64_t);} string_indices;
-    struct {darray(char**);} string_buffer_ptrs;
-    struct {darray(uint64_t);} string_buffer_indices;
-
-    // these are used when pushing/popping the context
-    struct {darray(uint64_t);} mark_str_indices;
-    struct {darray(uint64_t);} mark_str_buff_indices;
-    struct {darray(uint64_t);} mark_buff_index;
-};
-i_THREAD__ struct rf_strings_buffer_ctx g_strctx;
-
-bool rf_strings_buffer_realloc_cb(struct RFbuffer *b)
-{
-    struct RFstring ***s;
-    char ***s_buff;
-    size_t i = 0;
-    darray_foreach(s_buff, g_strctx.string_buffer_ptrs) {
-        **s_buff = b->buff + darray_item(g_strctx.string_buffer_indices, i);
-        ++i;
+    struct RFstring *ret = i_rf_string_create_local(s);
+    if (!ret) {
+        RF_CRITICAL("RFS() failure");
+        exit(1);
     }
-    i = 0;
-    darray_foreach(s, g_strctx.string_ptrs) {
-        **s = (struct RFstring*)(b->buff + darray_item(g_strctx.string_indices, i));
-        rf_string_data(**s) = (b->buff + darray_item(g_strctx.string_indices, i) + sizeof(***s));
-        ++i;
-    }
-    return true;
-}
-
-bool rf_strings_buffer_ctx_init(size_t string_buffer_size)
-{
-    if (!rf_buffer_init(&g_tsbuff, string_buffer_size, rf_strings_buffer_realloc_cb)) {
-        return false;
-    }
-    darray_init(g_strctx.string_indices);
-    darray_init(g_strctx.string_buffer_indices);
-    darray_init(g_strctx.string_ptrs);
-    darray_init(g_strctx.string_buffer_ptrs);
-
-    darray_init(g_strctx.mark_str_indices);
-    darray_init(g_strctx.mark_str_buff_indices);
-    darray_init(g_strctx.mark_buff_index);
-    return true;
-}
-
-void rf_strings_buffer_ctx_deinit()
-{
-    darray_free(g_strctx.mark_buff_index);
-    darray_free(g_strctx.mark_str_buff_indices);
-    darray_free(g_strctx.mark_str_indices);
-
-    darray_free(g_strctx.string_buffer_ptrs);
-    darray_free(g_strctx.string_ptrs);
-    darray_free(g_strctx.string_buffer_indices);
-    darray_free(g_strctx.string_indices);
-
-    rf_buffer_deinit(&g_tsbuff);
+    return ret;
 }
 
 char *rf_string_cstr_from_buff(const void *s)
 {
     char *ret;
     unsigned int length = rf_string_length_bytes(s);
-    ret = rf_buffer_current_ptr(TSBUFF, char);
-    if (!rf_buffer_assert_remaining_size(TSBUFF, length)) {
+    ret = rf_mbuffer_alloc(RF_TSBUFFM, length + 1);
+    if (!ret) {
         return NULL;
     }
-    memcpy(rf_buffer_current_ptr(TSBUFF, char), rf_string_data(s), length);
-    rf_buffer_from_current_at(TSBUFF, length, char) = '\0';
-    rf_buffer_move_index(TSBUFF, length + 1, char);
+    memcpy(ret, rf_string_data(s), length);
+    ret[length] = '\0';
     return ret;
 }
 
@@ -223,128 +157,34 @@ char *rf_string_cstr_from_buff_or_die(const void* s)
 
 bool rf_strings_buffer_fillfmt(const char *fmt,
                                unsigned int *size,
-                               char **buffPtr,
+                               char **buff_ptr,
                                va_list args)
 {
     int rc;
     va_list copy_va_list;
-    unsigned int bIndex;
-    int64_t n = rf_buffer_remaining_size(TSBUFF, char);
-    bIndex = rf_buffer_index(TSBUFF);
-    *buffPtr = rf_buffer_current_ptr(TSBUFF, char);
+    size_t n = rf_mbuffer_currblock_remsize(RF_TSBUFFM);
+    *buff_ptr = rf_mbuffer_alloc(RF_TSBUFFM, n);
+    if (!*buff_ptr) {
+        return false;
+    }
     va_copy(copy_va_list, args); /* C99 only */
-    rc = vsnprintf(rf_buffer_current_ptr(TSBUFF, char), n, fmt, copy_va_list);
+    rc = vsnprintf(*buff_ptr, n, fmt, copy_va_list);
     va_end(copy_va_list);
     if (rc < 0) {
         return false;
     } else if (rc >= n) {
-        if (!rf_buffer_increase_size(TSBUFF, rc)) {
+        rf_mbuffer_shrink(RF_TSBUFFM, n);
+        *buff_ptr = rf_mbuffer_alloc(RF_TSBUFFM, rc);
+        if (!*buff_ptr) {
             return false;
         }
-        n = rf_buffer_size(TSBUFF);
-        *buffPtr = rf_buffer_current_ptr(TSBUFF, char);
-        bIndex = rf_buffer_index(TSBUFF);
-
-        rc = vsnprintf(rf_buffer_current_ptr(TSBUFF, char), n, fmt, args);
+        rc = vsnprintf(*buff_ptr, rc, fmt, args);
         if (rc < 0 || rc >= n) {
             return false;
         }
+    } else {
+        rf_mbuffer_shrink(RF_TSBUFFM, n - rc);
     }
-    // add it to the context
-    rf_strings_buffer_add_string_buffer_ptr(buffPtr, bIndex);
-    rf_buffer_move_index(TSBUFF, rc, char);
     *size = rc;
-
     return true;
-}
-
-enum RFS_rc rf_strings_buffer_fillfmt_detect_realloc(const char *fmt,
-                                                     unsigned int *size,
-                                                     char **buffPtr,
-                                                     va_list args)
-{
-    enum RFS_rc ret = RFS_FAIL;
-    int rc;
-    va_list copy_va_list;
-    unsigned int bIndex;
-    int64_t n = rf_buffer_remaining_size(TSBUFF, char);
-    bIndex = rf_buffer_index(TSBUFF);
-    *buffPtr = rf_buffer_current_ptr(TSBUFF, char);
-    va_copy(copy_va_list, args); /* C99 only */
-    rc = vsnprintf(rf_buffer_current_ptr(TSBUFF, char), n, fmt, copy_va_list);
-    va_end(copy_va_list);
-    if (rc < 0) {
-        goto end;
-    } else if (rc >= n) {
-        if (rf_buffer_increase_size(TSBUFF, rc)) {
-            ret = RFS_REALLOC;
-        }
-        goto end;
-    }
-    // add it to the context
-    rf_strings_buffer_add_string_buffer_ptr(buffPtr, bIndex);
-    rf_buffer_move_index(TSBUFF, rc, char);
-    *size = rc;
-    ret = RFS_SUCCESS;
-
-end:
-    return ret;
-}
-
-static void rf_strings_buffer_add_string_ptr(struct RFstring **str, uint64_t index)
-{
-    // due to RF_ASSERT also logging a critical error (which also uses the
-    // temporary string buffer) this is gonna be an infinite loop if it hits.
-    // Hence using a simple assert. TODO: Figure out a better way to do this?
-#if 0
-    RF_ASSERT(
-        darray_size(g_strctx.string_ptrs) == darray_size(g_strctx.string_indices),
-        "String stack size mismatch"
-    );
-#endif
-    assert(darray_size(g_strctx.string_ptrs) == darray_size(g_strctx.string_indices));
-
-    darray_append(g_strctx.string_ptrs, str);
-    darray_append(g_strctx.string_indices, index);
-}
-
-static void rf_strings_buffer_add_string_buffer_ptr(char **buf, uint64_t index)
-{
-    // due to RF_ASSERT also logging a critical error (which also uses the
-    // temporary string buffer) this is gonna be an infinite loop if it hits.
-    // Hence using a simple assert. TODO: Figure out a better way to do this?
-#if 0
-    RF_ASSERT(
-        darray_size(g_strctx.string_buffer_ptrs) == darray_size(g_strctx.string_buffer_indices),
-        "String buffer stack size mismatch"
-    );
-#endif
-    assert(darray_size(g_strctx.string_buffer_ptrs) == darray_size(g_strctx.string_buffer_indices));
-
-    darray_append(g_strctx.string_buffer_ptrs, buf);
-    darray_append(g_strctx.string_buffer_indices, index);
-}
-
-void rf_strings_buffer_ctx_push()
-{
-    darray_append(g_strctx.mark_buff_index, rf_buffer_index(TSBUFF));
-    darray_append(g_strctx.mark_str_indices, darray_size(g_strctx.string_ptrs));
-    darray_append(g_strctx.mark_str_buff_indices, darray_size(g_strctx.string_buffer_ptrs));
-}
-
-void rf_strings_buffer_ctx_pop()
-{
-    uint64_t size;
-    size = darray_pop(g_strctx.mark_str_buff_indices);
-    while (darray_size(g_strctx.string_buffer_ptrs) > size) {
-        (void)darray_pop(g_strctx.string_buffer_ptrs);
-        (void)darray_pop(g_strctx.string_buffer_indices);
-    }
-
-    size = darray_pop(g_strctx.mark_str_indices);
-    while (darray_size(g_strctx.string_ptrs) > size) {
-        (void)darray_pop(g_strctx.string_ptrs);
-        (void)darray_pop(g_strctx.string_indices);
-    }
-    rf_buffer_set_index_(TSBUFF, darray_pop(g_strctx.mark_buff_index));
 }

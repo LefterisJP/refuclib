@@ -104,7 +104,7 @@ bool rf_string_initvl(struct RFstring* str, const char* s, va_list args)
     }
 
     //read the var args
-    RFS_push();
+    RFS_PUSH();
     if (!rf_strings_buffer_fillfmt(s, &size, &buff_ptr, args)) {
         RF_ERROR("String creation failure due to failing at reading the "
                  "formatted string");
@@ -120,7 +120,7 @@ bool rf_string_initvl(struct RFstring* str, const char* s, va_list args)
     ret = true;
 
 end:
-    RFS_pop();
+    RFS_POP();
     return ret;
 }
 
@@ -419,7 +419,7 @@ bool rf_string_assignvl(struct RFstring* str,
         return false;
     }
     //read the var args
-    RFS_push();
+    RFS_PUSH();
     if (!rf_strings_buffer_fillfmt(s, &size, &buff_ptr, args)) {
         RF_ERROR("String assignment failure due to failing at reading the "
                  "formatted string");
@@ -435,7 +435,7 @@ bool rf_string_assignvl(struct RFstring* str,
     ret = true;
 
 end:
-    RFS_pop();
+    RFS_POP();
     return ret;
 }
 

@@ -38,6 +38,8 @@
 #include <Definitions/defarg.h> //for default argument trick
 #include <Definitions/imex.h> //for the import export macro
 #include <Utils/sanity.h>
+#include <Data_Structures/mbuffer.h>
+#include <Persistent/buffers.h>
 /*------------- libc inclusion --------------*/
 #include <stdarg.h> //for va_list and friends
 #include <stdlib.h>
@@ -64,75 +66,39 @@ extern "C" {
 #endif
 
 /**
- * Possible return values of some RFS functions
- */
-enum RFS_rc {
-    RFS_FAIL = 0,  /*!< Allocation failure. Is almost always fatal */
-    RFS_SUCCESS,   /*!< Allocation was succesfull */
-    RFS_REALLOC    /*!< No allocation happened but a succesfull reallocation occured */
-};
-
-/**
  * Create a temporary string from a literal with optional printf-like arguments.
  *
- * Reallocation is taken care of if only this macro is what is called.
- * If this macro is encased in a function then there are some known limitation
- * regarding calling it recursively with assigning to the same memory location
- * as the one you read from in the varargs.
- *
- * That case has to be specifically checked for and then the vararg argument must
- * be provided accordinly as shown at the test_RFS_return_from_function_with_realloc()
- * test case of test_string_buffers.c
- *
- * Another situation that can be dangerous is if you utilize the RFS() macro or
- * a function using RFS() in a loop assigning to the same string variable over
- * and over. In such a case you have to also make sure that RFS_push() and RFS_pop()
- * is also inside the body of the loop or else you are going to be overwritting 
- * the same variable over and over but keeping multiple pointers to it for realloc
- * which can lead to very funny behaviour. TODO: test to showcase this problem
- * and proper solution
+ * Wrap around @ref RFS_PUSH() and @ref RFS_POP() to make sure the temporary
+ * string is freed
  *
  * @param ret       Pass a string pointer by reference to have it point to the
  *                  temporary string position in the buffer
  * @param s         A string literal
  * @param ...       Optional prinflike arguments
+ * @return          A pointer to the temporary string or NULL in failure
  */
-#define RFS(...)                                                        \
-    do {                                                                \
-        enum RFS_rc rc;                                                 \
-        do {                                                            \
-            rc = RF_SELECT_STRING_CREATE_LOCAL_ASSIGN(__VA_ARGS__);     \
-        } while (rc == RFS_REALLOC);                                    \
-        /* due to cyclic dependency introduced by RFS() and log macros can't use \
-           RF_ASSERT_OR_EXIT() here. Using special version which does not use RFS() */ \
-        RF_ASSERT_OR_EXIT_NO_RFS(rc == RFS_SUCCESS, "RFS() failure");   \
-    } while(0)
+#define RFS(...) RF_SELECT_STRING_CREATE_LOCAL(__VA_ARGS__)
+
+/**
+ * Just like @ref RFS() but kills the program in case of failure
+ */
+#define RFS_OR_DIE(...) RF_SELECT_STRING_CREATE_LOCAL_OR_DIE(__VA_ARGS__)
 
 /**
  * Remember the current point in the string buffer.
  *
  * Should be used to save a state of the string buffer at any given point before
- * using @ref RFS(). Should always have an equivalent @ref RFS_pop()
+ * using @ref RFS(). Should always have an equivalent @ref RFS_POP()
  */
-#define RFS_push() rf_strings_buffer_ctx_push()
+#define RFS_PUSH() rf_mbuffer_push(RF_TSBUFFM)
+
 /**
  * Pop a bookmarked string buffer point
  *
  * Used to pop back a buffer position saved by a push.
- * Should always have an equivalent @ref RFS_pop()
+ * Should always have an equivalent @ref RFS_POP()
  */
-#define RFS_pop() rf_strings_buffer_ctx_pop()
-
-/* -- rf_strings_buffer_ctx_code -- */
-
-/**
- * Initialize the strings buffer context
- *
- * @param string_buffer_size         The initial size of the string buffer
- * @return                           true in succes and false in failure
- */
-bool rf_strings_buffer_ctx_init(size_t string_buffer_size);
-void rf_strings_buffer_ctx_deinit();
+#define RFS_POP() rf_mbuffer_pop(RF_TSBUFFM)
 
 /**
  * Reads the formatted string and the va_args and fills in
@@ -141,38 +107,34 @@ void rf_strings_buffer_ctx_deinit();
  *
  * @param fmt[in]         The formatted string
  * @param size[out]       The string's byte size
- * @param buffPtr[out]    The pointer to the beginning of the String
+ * @param buff_ptr[out]   The pointer to the beginning of the String
  *                        in the internal buffer
  * @return                Returns @c true in success and @c false in failure
  */
 bool rf_strings_buffer_fillfmt(const char *fmt,
                                unsigned int *size,
-                               char **buffPtr,
+                               char **buff_ptr,
                                va_list args);
-/**
- * A version of @ref rf_strings_buffer_fillfmt() which notifies the user of realloc
- *
- * Behaves just like @ref rf_strings_buffer_fillfmt() but if a realloc of the
- * buffer occurs then the @a buffPtr won't be writtern to and RFS_REALLOC will
- * be returned.
- */
-enum RFS_rc rf_strings_buffer_fillfmt_detect_realloc(const char *fmt,
-                                                     unsigned int *size,
-                                                     char **buffPtr,
-                                                     va_list args);
-void rf_strings_buffer_ctx_push();
-void rf_strings_buffer_ctx_pop();
 
 /* -- internal functions used in the above API -- */
-i_DECLIMEX_ enum RFS_rc i_rf_string_create_local_assign(struct RFstring **ret, const char* s);
-i_DECLIMEX_ enum RFS_rc i_rf_string_create_local_assignv(struct RFstring **ret, const char* s, ...);
+i_DECLIMEX_ struct RFstring *i_rf_string_create_local(const char *s);
+i_DECLIMEX_ struct RFstring *i_rf_string_create_local_or_die(const char *s);
+i_DECLIMEX_ struct RFstring *i_rf_string_create_localv(const char *s, ...);
+i_DECLIMEX_ struct RFstring *i_rf_string_create_localv_or_die(const char *s, ...);
 
-#define RF_SELECT_STRING_CREATE_LOCAL_ASSIGN(...)                       \
-    RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATELOCAL_ASSIGN, 2, __VA_ARGS__)
-#define i_SELECT_RF_STRING_CREATELOCAL_ASSIGN1(ptr_, arg_)  \
-    i_rf_string_create_local_assign(ptr_, arg_)
-#define i_SELECT_RF_STRING_CREATELOCAL_ASSIGN0(ptr_, ...)   \
-    i_rf_string_create_local_assignv(ptr_, __VA_ARGS__)
+#define RF_SELECT_STRING_CREATE_LOCAL(...)                              \
+    RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATELOCAL, 1, __VA_ARGS__)
+#define i_SELECT_RF_STRING_CREATELOCAL1(slit_)  \
+    i_rf_string_create_local(slit_)
+#define i_SELECT_RF_STRING_CREATELOCAL0(...)    \
+    i_rf_string_create_localv(__VA_ARGS__)
+
+#define RF_SELECT_STRING_CREATE_LOCAL_OR_DIE(...)                       \
+    RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATELOCAL_OR_DIE, 1, __VA_ARGS__)
+#define i_SELECT_RF_STRING_CREATELOCAL_OR_DIE1(slit_)   \
+    i_rf_string_create_local_or_die(slit_)
+#define i_SELECT_RF_STRING_CREATELOCAL_OR_DIE0(...) \
+    i_rf_string_create_localv_or_die(__VA_ARGS__)
 
 #ifdef __cplusplus
 }//closing bracket for calling from C++

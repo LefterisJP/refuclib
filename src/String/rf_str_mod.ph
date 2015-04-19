@@ -8,7 +8,7 @@
  * Activate the string module.
  *
  */
-bool rf_string_activate(size_t string_buffer_size);
+bool rf_string_activate();
 /**
  * Deactivate the strings module
  */

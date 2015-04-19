@@ -91,6 +91,11 @@ static char *rf_mbuffer_block_tryalloc(struct RFmbuffer_block *b, size_t size)
     return b->data + old_index;
 }
 
+static inline char *rf_mbuffer_block_currptr(const struct RFmbuffer_block *b)
+{
+    return b->data + b->index;
+}
+
 /* -- RFmbuffer functions -- */
 
 bool rf_mbuffer_init(struct RFmbuffer *b, size_t initial_buffer_size)
@@ -145,6 +150,34 @@ void *rf_mbuffer_alloc(struct RFmbuffer *b, size_t size)
         return NULL;
     }
     return rf_mbuffer_block_tryalloc(b->blocks[b->curr_block_idx], size);
+}
+
+bool rf_mbuffer_extend(struct RFmbuffer *b, size_t added_size)
+{
+    if (added_size > rf_mbuffer_currblock_remsize(b)) {
+        return false;
+    }
+    b->blocks[b->curr_block_idx]->index += added_size;
+    return true;
+}
+
+void rf_mbuffer_shrink(struct RFmbuffer *b, size_t shrink_size)
+{
+    if (b->blocks[b->curr_block_idx]->index > shrink_size) {
+        b->blocks[b->curr_block_idx]->index -= shrink_size;
+    } else {
+        b->blocks[b->curr_block_idx]->index = 0;
+    }
+}
+
+size_t rf_mbuffer_currblock_remsize(const struct RFmbuffer *b)
+{
+    return rf_mbuffer_block_remsize(b->blocks[b->curr_block_idx]);
+}
+
+void *rf_mbuffer_currblock_currptr(const struct RFmbuffer *b)
+{
+    return rf_mbuffer_block_currptr(b->blocks[b->curr_block_idx]);
 }
 
 void rf_mbuffer_push(struct RFmbuffer *b)

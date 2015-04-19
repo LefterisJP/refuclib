@@ -60,83 +60,52 @@ i_INLINE_DECL bool rf_stringx_generic_append(struct RFstringx* s,
     return true;
 }
 
-i_INLINE_DECL bool replace_intro(void* s, uint32_t* number,
-                                 const void* sstr,
-                                 enum RFstring_matching_options options)
+/**
+ * Prepares necessary steps for replacing substrings inside a string
+ *
+ * This function calls rf_sbuffer_push(RF_TSBUFFS) without popping it since it
+ * returns the buffer to be used by subsequent functions. After finishing always
+ * remember to pop it.
+ *
+ * It is used in conjuction with @ref replace_greater(), @ref replace_lesser()
+ * and @ref replace_equal(). Afterwards the buffer should be popped.
+ *
+ * @param[in] s              The string to replace
+ * @param[in/out] number     Pointer to a uint32_t containing the number of first
+ *                           substrings to replace. If 0 then all substrings are
+ *                           replaced. At the end this will contain the actual
+ *                           number of substrings found.
+ * @param[in] sstr           The substring to replace
+ * @param options            Replacement options. Check @ref enum RFstring_matching_options
+ *                           for details
+ * @return                   A pointer to a buffer containing the starting indices
+ *                           of the found substrings in the string or NULL in
+ *                           case of failure
+ */
+uint32_t *replace_intro(void *s,
+                        uint32_t *number,
+                        const void *sstr,
+                        enum RFstring_matching_options options);
+
+i_INLINE_DECL void replace_greater(void *s,
+                                   uint32_t *buff,
+                                   uint32_t number,
+                                   const void *sstr,
+                                   const void *rstr)
 {
-    //TODO: Change this with a thread local buffer or thread local string
-    struct RFstringx temp;//just a temporary string for finding the occurences
-    //will keep the number of found instances of the substring
-    //if the substring string is not even found return false
-    uint32_t foundN = 0;
-    bool ret = true;
-    int found_pos;
-    if (rf_string_find_byte_pos(s, sstr, options) == RF_FAILURE) {
-        return false;
-    }
-
-    //if the given num is 0 just make sure we replace all
-    if (*number == 0) {
-        *number = UINT_MAX;
-    }
-    //find how many occurences exist
-    if (!rf_stringx_from_string_in(&temp, s)) {
-        return false;
-    }
-
-    found_pos = rf_string_find_byte_pos(&temp, sstr, options);
-    rf_buffer_from_current_at(RF_TSBUFF, foundN, uint32_t) = found_pos;
-    while (found_pos != RF_FAILURE) {
-        int32_t move = (rf_buffer_from_current_at(RF_TSBUFF, foundN, uint32_t) +
-                        rf_string_length_bytes(sstr));
-        rf_buffer_from_current_at(RF_TSBUFF, foundN, uint32_t) = (
-            rf_buffer_from_current_at(RF_TSBUFF, foundN, uint32_t) + temp.bIndex
-        );
-        temp.bIndex += move;
-        rf_string_data(&temp) += move;
-        rf_string_length_bytes(&temp) -= move;
-        foundN++;
-        //if buffer is in danger of overflow realloc it
-        if (foundN >= rf_buffer_remaining_size(RF_TSBUFF, uint32_t)) {
-            if (rf_buffer_increase_size(RF_TSBUFF, foundN * 2 * sizeof(uint32_t))) {
-                RF_ERROR("Not enough memory to increase internal buffer");
-                ret = false;
-                goto cleanup;
-            }
-        }
-        //if we found the required number of occurences break;
-        if (foundN >= *number) {
-            break;
-        }
-        found_pos = rf_string_find_byte_pos(&temp, sstr, options);
-        rf_buffer_from_current_at(RF_TSBUFF, foundN, uint32_t) = found_pos;
-    }
-
-    //don't replace more than possible
-    if (*number > foundN) {
-        *number = foundN;
-    }
-
-  cleanup:
-    rf_stringx_deinit(&temp);
-    return ret;
-}
-
-i_INLINE_DECL void replace_greater(void* s, uint32_t number,
-                                   const void* sstr, const void* rstr)
-{
-    unsigned int i, j;
+    unsigned int i;
+    unsigned int j;
     unsigned int diff = rf_string_length_bytes(rstr) - rf_string_length_bytes(sstr);
     //now replace all the substrings one by one
     for (i = 0; i < number; i ++) {
         memmove(
-            rf_string_data(s) + rf_buffer_from_current_at(RF_TSBUFF, i, uint32_t) + rf_string_length_bytes(sstr)+ diff,
-            rf_string_data(s) + rf_buffer_from_current_at(RF_TSBUFF, i, uint32_t) + rf_string_length_bytes(sstr),
-            rf_string_length_bytes(s) - (rf_buffer_from_current_at(RF_TSBUFF, i, uint32_t) + rf_string_length_bytes(sstr))
+            rf_string_data(s) + buff[i] + rf_string_length_bytes(sstr) + diff,
+            rf_string_data(s) + buff[i] + rf_string_length_bytes(sstr),
+            rf_string_length_bytes(s) - (buff[i] + rf_string_length_bytes(sstr))
         );
         //copy in the replacement
         memcpy(
-            rf_string_data(s) + rf_buffer_from_current_at(RF_TSBUFF, i, uint32_t),
+            rf_string_data(s) + buff[i],
             rf_string_data(rstr),
             rf_string_length_bytes(rstr)
         );
@@ -144,47 +113,53 @@ i_INLINE_DECL void replace_greater(void* s, uint32_t number,
         rf_string_length_bytes(s) += diff;
         //also increase all the subsequent found byte positions
         for (j = i + 1; j < number; j ++) {
-            rf_buffer_from_current_at(RF_TSBUFF, j, uint32_t) = rf_buffer_from_current_at(RF_TSBUFF, j, uint32_t) + diff;
+            buff[j] = buff[j] + diff;
         }
     }
 }
 
-
-i_INLINE_DECL void replace_lesser(void* s, uint32_t number,
-                                  const void* sstr, const void* rstr)
+i_INLINE_DECL void replace_lesser(void *s,
+                                  uint32_t *buff,
+                                  uint32_t number,
+                                  const void *sstr,
+                                  const void *rstr)
 {
-    unsigned int i, j;
+    unsigned int i;
+    unsigned int j;
     unsigned int diff = rf_string_length_bytes(sstr) - rf_string_length_bytes(rstr);
 
     //now replace all the substrings one by one
     for (i = 0; i < number; ++i) {
         //copy in the replacement
         memcpy(
-            rf_string_data(s) + rf_buffer_from_current_at(RF_TSBUFF, i, uint32_t),
+            rf_string_data(s) + buff[i],
             rf_string_data(rstr),
             rf_string_length_bytes(rstr)
         );
         //move all of the contents of the string to fit the replacement
         memmove(
-            rf_string_data(s) + rf_buffer_from_current_at(RF_TSBUFF, i, uint32_t) + rf_string_length_bytes(rstr),
-            rf_string_data(s) + rf_buffer_from_current_at(RF_TSBUFF, i, uint32_t) + rf_string_length_bytes(sstr),
-            rf_string_length_bytes(s) - (rf_buffer_from_current_at(RF_TSBUFF, i, uint32_t) + rf_string_length_bytes(sstr))
+            rf_string_data(s) + buff[i] + rf_string_length_bytes(rstr),
+            rf_string_data(s) + buff[i] + rf_string_length_bytes(sstr),
+            rf_string_length_bytes(s) - (buff[i] + rf_string_length_bytes(sstr))
         );
         //reduce bytelength
         rf_string_length_bytes(s) -= diff;
         //also decrease all the subsequent found byte positions
         for (j = i + 1; j < number; ++j) {
-            rf_buffer_from_current_at(RF_TSBUFF, j, uint32_t) = rf_buffer_from_current_at(RF_TSBUFF, j, uint32_t) - diff;
+            buff[j] = buff[j] - diff;
         }
     }
 }
 
-i_INLINE_DECL void replace_equal(void* s, uint32_t number, const void* rstr)
+i_INLINE_DECL void replace_equal(void *s,
+                                 const uint32_t *buff,
+                                 uint32_t number,
+                                 const void *rstr)
 {
     unsigned int i;
     for(i = 0; i < number; ++i) {
         memcpy(
-            rf_string_data(s) + rf_buffer_from_current_at(RF_TSBUFF, i, uint32_t),
+            rf_string_data(s) + buff[i],
             rf_string_data(rstr),
             rf_string_length_bytes(rstr)
         );

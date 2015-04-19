@@ -110,7 +110,7 @@ bool rf_stringx_initvl(struct RFstringx* str, const char* lit, va_list args)
     }
 
     //read the var args
-    RFS_push();
+    RFS_PUSH();
     if (!rf_strings_buffer_fillfmt(lit, &size, &buff_ptr, args)) {
         RF_ERROR("StringX creation failure due to failing at reading the "
                   "formatted string");
@@ -126,7 +126,7 @@ bool rf_stringx_initvl(struct RFstringx* str, const char* lit, va_list args)
 
 
 end:
-    RFS_pop();
+    RFS_POP();
     return ret;
 }
 
@@ -322,7 +322,7 @@ struct RFstringx* rf_stringx_create_buffv(uint32_t buffSize, const char* lit, ..
 
     va_start(args, lit);
     //read the var args
-    RFS_push();
+    RFS_PUSH();
     if (!rf_strings_buffer_fillfmt(lit, &size, &buff_ptr, args)) {
         RF_ERROR("StringX creation failure due to failing at reading the "
                   "formatted string");
@@ -341,7 +341,7 @@ struct RFstringx* rf_stringx_create_buffv(uint32_t buffSize, const char* lit, ..
     }
 
 end:
-    RFS_pop();
+    RFS_POP();
     return ret;
 }
 struct RFstringx* rf_stringx_create_buff(uint32_t buffSize,const char* lit)
@@ -373,7 +373,7 @@ bool rf_stringx_init_buffv(struct RFstringx* str,
 
     va_start(args, lit);
     //read the var args
-    RFS_push();
+    RFS_PUSH();
     if (!rf_strings_buffer_fillfmt(lit, &size, &buff_ptr, args)) {
         RF_ERROR("StringX creation failure due to failing at reading the "
                   "formatted string");
@@ -389,7 +389,7 @@ bool rf_stringx_init_buffv(struct RFstringx* str,
     ret = true;
 
 end:
-    RFS_pop();
+    RFS_POP();
     return ret;
 }
 
@@ -462,7 +462,7 @@ i_DECLIMEX_ bool rf_stringx_assignvl(struct RFstringx* str,
         return false;
     }
     //read the var args
-    RFS_push();
+    RFS_PUSH();
     if (!rf_strings_buffer_fillfmt(s, &size, &buff_ptr, args)) {
         RF_ERROR("Stringx assignment failure due to failing at reading the "
                  "formatted string");
@@ -475,7 +475,7 @@ i_DECLIMEX_ bool rf_stringx_assignvl(struct RFstringx* str,
     ret = true;
 
 end:
-    RFS_pop();
+    RFS_POP();
     return ret;
 }
 

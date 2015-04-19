@@ -179,9 +179,11 @@ bool rf_string_keep_only(void* thisstr, const void* keepstr, int *removals)
     uint32_t i;
     char unused[MAX_UTF8C_BYTES];
     int character_byte_length;
-    int keepLength;
+    size_t keep_length;
     int j;
     bool exists;
+    bool ret = false;
+    uint32_t *buffer;
     RF_ASSERT(thisstr, "got null string in function");
 
     if (!keepstr) {
@@ -194,9 +196,10 @@ bool rf_string_keep_only(void* thisstr, const void* keepstr, int *removals)
     }
 
     //get all characters of the string in the array
-    keepLength = rf_string_fill_codepoints(keepstr);
-    if (keepLength < 0 ) {
-        return false;
+    rf_mbuffer_push(RF_TSBUFFM);
+    buffer = rf_string_fill_codepoints(keepstr, &keep_length);
+    if (!buffer) {
+        goto end;
     }
 
     //now iterate every character of this string
@@ -204,8 +207,8 @@ bool rf_string_keep_only(void* thisstr, const void* keepstr, int *removals)
     rf_string_iterate_start(thisstr, i, charValue)
         //for every character check if it exists in the keep str
         exists = false;
-    for (j = 0; j < keepLength; ++j) {
-        if (rf_buffer_from_current_at(RF_TSBUFF, j, uint32_t) == charValue) {
+    for (j = 0; j < keep_length; ++j) {
+        if (buffer[j] == charValue) {
             exists = true;
         }
     }
@@ -215,7 +218,7 @@ bool rf_string_keep_only(void* thisstr, const void* keepstr, int *removals)
             character_byte_length = rf_utf8_encode_single(charValue, unused);
             if(character_byte_length < 0) {
                 RF_ERROR("Could not decode a codepoint into UTF-8");
-                return false;
+                goto end;
             }
 
             if (removals) {
@@ -241,8 +244,11 @@ bool rf_string_keep_only(void* thisstr, const void* keepstr, int *removals)
             continue;//by contiuing here we make sure that the current string position won't be moved to assure that we also check the newly moved characters
     }
     rf_string_iterate_end(i)
+    ret = true;
 
-    return true;
+end:
+    rf_mbuffer_pop(RF_TSBUFFM);
+    return ret;
 }
 
 bool rf_string_prune_start(void* thisstr, uint32_t n, unsigned int *removals)
@@ -487,10 +493,13 @@ bool rf_string_trim_end(void* thisstr, const void* sub, unsigned int *rem)
 {
     bool iteration_match;
     uint32_t i;
-    uint32_t byte_position, last_byte_position;
-    int subLength;
+    uint32_t byte_position;
+    uint32_t last_byte_position;
+    size_t sub_length;
     int j;
+    uint32_t *buffer;
     unsigned int removals = 0;
+    bool ret = false;
     RF_ASSERT(thisstr, "got null string in function");
     
     if (!sub) {
@@ -501,9 +510,10 @@ bool rf_string_trim_end(void* thisstr, const void* sub, unsigned int *rem)
     last_byte_position = 0;
 
     //get all the codepoints of the string
-    subLength = rf_string_fill_codepoints(sub);
-    if (subLength < 0) {
-        return false;
+    rf_mbuffer_push(RF_TSBUFFM);
+    buffer = rf_string_fill_codepoints(sub, &sub_length);
+    if (!buffer) {
+        goto end;
     }
 
     //iterate thisstring from the end
@@ -511,11 +521,9 @@ bool rf_string_trim_end(void* thisstr, const void* sub, unsigned int *rem)
     RF_STRING_ITERATEB_START(thisstr, i, byte_position)
         iteration_match = true;
         //for every substring character
-        for (j = 0; j < subLength; ++j) {
-        //if we got a match
-            if (rf_string_bytepos_to_codepoint(thisstr, byte_position) ==
-               rf_buffer_from_current_at(RF_TSBUFF, j, uint32_t)) {
-                
+        for (j = 0; j < sub_length; ++j) {
+            //if we got a match
+            if (rf_string_bytepos_to_codepoint(thisstr, byte_position) == buffer[j]) {
                 removals += 1;
                 iteration_match = false;
                 last_byte_position = byte_position;
@@ -537,8 +545,11 @@ bool rf_string_trim_end(void* thisstr, const void* sub, unsigned int *rem)
     if (rem) {
         *rem = removals;
     }
+    ret = true;
 
-    return true;
+end:
+    rf_mbuffer_pop(RF_TSBUFFM);
+    return ret;
 }
 
 bool rf_string_trim(void* thisstrP, const void* subP, unsigned int *removals)
@@ -558,13 +569,16 @@ bool rf_string_trim(void* thisstrP, const void* subP, unsigned int *removals)
 }
 
 
-bool rf_string_replace(struct RFstring* thisstr, const void* sstr,
-                       const void* rstr, const uint32_t num,
+bool rf_string_replace(struct RFstring* thisstr,
+                       const void* sstr,
+                       const void* rstr,
+                       const uint32_t num,
                        enum RFstring_matching_options options)
 {
-    //will keep the number of given instances to find
     uint32_t number = num;
-    RF_ASSERT(thisstr, "got null string in function");
+    uint32_t *buff;
+    bool ret = false;
+    RF_ASSERT(thisstr, "got NULL string in function");
 
     /* sstr existence is checked for inside replace_intro() function */
     if (!rstr) {
@@ -572,30 +586,29 @@ bool rf_string_replace(struct RFstring* thisstr, const void* sstr,
         return false;
     }
 
-    if(!replace_intro(thisstr, &number, sstr, options)) {
+    if (!(buff = replace_intro(thisstr, &number, sstr, options))) {
         return false;
     }
 
     //act depending on the size difference of rstr and sstr
     if (rf_string_length_bytes(rstr)> rf_string_length_bytes(sstr)) {
-        
         RF_REALLOC(
             rf_string_data(thisstr), char,
             rf_string_length_bytes(thisstr) + number * (
                 rf_string_length_bytes(rstr) - rf_string_length_bytes(sstr)
             ),
-            return false
+            goto end
         );
-        replace_greater(thisstr, number, sstr, rstr);
+        replace_greater(thisstr, buff, number, sstr, rstr);
     } else if (rf_string_length_bytes(rstr) < rf_string_length_bytes(sstr)) {
-        
-        replace_lesser(thisstr, number, sstr, rstr);
+        replace_lesser(thisstr, buff, number, sstr, rstr);
     } else { //replace and remove strings are equal
-
-        replace_equal(thisstr, number, rstr);
+        replace_equal(thisstr, buff, number, rstr);
     }
+    ret = true;
 
-    return true;
+end:
+    return ret;
 }
 
 
@@ -604,10 +617,90 @@ bool rf_string_replace(struct RFstring* thisstr, const void* sstr,
 i_INLINE_INS bool rf_string_generic_prepend(void* thisstr, const char* other,
                                       unsigned int orig_size,
                                       unsigned int other_size);
-i_INLINE_INS bool replace_intro(void* s, uint32_t* number, const void* sstr,
-                                enum RFstring_matching_options options);
-i_INLINE_INS void replace_greater(void* s, uint32_t number,
-                                  const void* sstr, const void* rstr);
-i_INLINE_INS void replace_lesser(void* s, uint32_t number,
-                                 const void* sstr, const void* rstr);
-i_INLINE_INS void replace_equal(void* s, uint32_t number, const void* rstr);
+
+uint32_t *replace_intro(void *s,
+                        uint32_t *number,
+                        const void *sstr,
+                        enum RFstring_matching_options options)
+{
+    //TODO: Change this with a thread local buffer or thread local string
+    struct RFstringx temp;//just a temporary string for finding the occurences
+    //will keep the number of found instances of the substring
+    //if the substring string is not even found return false
+    uint32_t foundN = 0;
+    int found_pos;
+    size_t buff_size;
+    uint32_t *buff;
+    if (rf_string_find_byte_pos(s, sstr, options) == RF_FAILURE) {
+        return NULL;
+    }
+
+    //if the given num is 0 just make sure we replace all
+    if (*number == 0) {
+        *number = UINT_MAX;
+        // 24, initial size of buffer since we don't know how many occurences there will be
+        buff_size = 24 * sizeof(uint32_t);
+    } else {
+        buff_size = (*number) * sizeof(uint32_t);
+    }
+    
+    //find how many occurences exist
+    if (!rf_stringx_from_string_in(&temp, s)) {
+        return NULL;
+    }
+
+    rf_sbuffer_push(RF_TSBUFFS);
+    buff = rf_sbuffer_alloc(RF_TSBUFFS, buff_size);
+    if (!buff) {
+        goto end;
+    }
+
+    found_pos = rf_string_find_byte_pos(&temp, sstr, options);
+    buff[0] = found_pos;
+    while (found_pos != RF_FAILURE) {
+        int32_t move = buff[foundN] + rf_string_length_bytes(sstr);
+        buff[foundN]= buff[foundN] + temp.bIndex;
+        temp.bIndex += move;
+        rf_string_data(&temp) += move;
+        rf_string_length_bytes(&temp) -= move;
+        foundN++;
+        //if buffer is in danger of overflow realloc it
+        if (foundN >= buff_size) {
+            buff_size *= 2;
+            buff = rf_sbuffer_extend(RF_TSBUFFS, buff_size);
+            if (!buff) {
+                RF_ERROR("Not enough memory to increase internal buffer");
+                goto end;
+            }
+        }
+        //if we found the required number of occurences break;
+        if (foundN >= *number) {
+            break;
+        }
+        found_pos = rf_string_find_byte_pos(&temp, sstr, options);
+        buff[foundN] = found_pos;
+    }
+
+    //don't replace more than possible
+    if (*number > foundN) {
+        *number = foundN;
+    }
+
+  end:
+    rf_stringx_deinit(&temp);
+    return buff;
+}
+i_INLINE_INS void replace_greater(void *s,
+                                  uint32_t *buff,
+                                  uint32_t number,
+                                  const void *sstr,
+                                  const void *rstr);
+i_INLINE_INS void replace_lesser(void *s,
+                                 uint32_t *buff,
+                                 uint32_t number,
+                                 const void *sstr,
+                                 const void *rstr);
+i_INLINE_INS void replace_equal(void *s,
+                                const uint32_t *buff,
+                                uint32_t number,
+                                const void *rstr);

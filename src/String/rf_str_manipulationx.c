@@ -219,13 +219,15 @@ bool rf_stringx_append_cstr(struct RFstringx* thisstr, const char* cstr)
 
 /*--- RFstringx replacing functions---*/
 
-bool rf_stringx_replace(struct RFstringx* thisstr, const void* sstr,
-                        const void* rstr, uint32_t num,
+bool rf_stringx_replace(struct RFstringx* thisstr,
+                        const void* sstr,
+                        const void* rstr,
+                        uint32_t num,
                         enum RFstring_matching_options options)
 {
-    //will keep the number of given instances to find
     uint32_t number = num;
-
+    uint32_t *buff;
+    bool ret = false;
     RF_ASSERT(thisstr, "got NULL string in function");
 
     /* sstr existence is checked for inside replace_intro() function */
@@ -233,28 +235,31 @@ bool rf_stringx_replace(struct RFstringx* thisstr, const void* sstr,
         RF_WARNING("Gave null pointer for the substring to replace");
         return false;
     }
-    if (!replace_intro(thisstr, &number, sstr, options)) {
+    if (!(buff = replace_intro(thisstr, &number, sstr, options))) {
         return false;
     }
 
     //act depending on the size difference of rstr and sstr
-    if (rf_string_length_bytes(rstr)> rf_string_length_bytes(sstr)) {
+    if (rf_string_length_bytes(rstr) > rf_string_length_bytes(sstr)) {
         //reallocate the string if needed
         RF_STRINGX_REALLOC(
             thisstr,
             rf_string_length_bytes(thisstr) + number * (
                 rf_string_length_bytes(rstr) - rf_string_length_bytes(sstr)
             ),
-            return false
+            goto end
         );
-        replace_greater(thisstr, number, sstr, rstr);
+        replace_greater(thisstr, buff, number, sstr, rstr);
     } else if (rf_string_length_bytes(rstr) < rf_string_length_bytes(sstr)) {
-        replace_lesser(thisstr, number, sstr, rstr);
+        replace_lesser(thisstr, buff, number, sstr, rstr);
     } else { //replace and remove strings are equal
-        replace_equal(thisstr, number, rstr);
+        replace_equal(thisstr, buff, number, rstr);
     }
+    ret = true;
 
-    return true;
+end:
+    rf_sbuffer_pop(RF_TSBUFFS);
+    return ret;
 }
 
 //TODO: I really don't like this temporary string_buff. Try to get rid of it

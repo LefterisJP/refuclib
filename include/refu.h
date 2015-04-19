@@ -42,8 +42,8 @@ extern "C" {
 struct refu_clibctx;
 struct RFlog;
 
-#define RF_DEFAULT_STRING_BUFFERS_SIZE 1024
-#define RF_DEFAULT_TS_WORKBUFF_SIZE 1024
+#define RF_DEFAULT_TS_MBUFF_INITIAL_SIZE 1024
+#define RF_DEFAULT_TS_SBUFF_INITIAL_SIZE 1024
 
 /**
 ** @defgroup RFgeneral_g_r_p Initialization function
@@ -64,17 +64,17 @@ struct RFlog;
  **                             to create.
  ** @param level                The level of the logging system. Possible values
  **                             are enumerated by @ref RFlog_level
- ** @param string_buffer_size   The initial buffer size in bytes that will be
- **                             given to thetemporary string buffer
- ** @param ts_workbuff_size     The initial size of the thread specific
- *                              work buffer in bytes
+ ** @param ts_mbuff_size        The initial buffer size in bytes that will be
+ **                             given to the thread specific multi block buffer
+ ** @param ts_sbuff_size        The initial buffer size in bytes that will be
+ **                             given to the thread specific single block buffer
  ** @return                     Returns @c true in success
  **/
 i_DECLIMEX_ bool rf_init(enum RFlog_target_type log_type,
                          const char *log_file_name,
                          enum RFlog_level level,
-                         size_t string_buffer_size,
-                         size_t ts_workbuff_size);
+                         size_t ts_mbuff_size,
+                         size_t ts_sbuff_size);
 
 /**
  ** Deinitializes the library. Frees the constructs of all the modules

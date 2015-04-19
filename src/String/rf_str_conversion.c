@@ -123,7 +123,7 @@ bool rf_string_to_int(const void* str, int64_t* v, size_t *off)
         return false;
     }
 
-    RFS_push();
+    RFS_PUSH();
     cstr = rf_string_cstr_from_buff(str);
     errno = 0;
     *v = strtoull (cstr, &end, 10);
@@ -136,7 +136,7 @@ bool rf_string_to_int(const void* str, int64_t* v, size_t *off)
         *off = length - 1;
     }
 
-    RFS_pop();
+    RFS_POP();
     return ret;
 }
 
@@ -156,7 +156,7 @@ bool rf_string_to_uint(const void* str,
         return false;
     }
 
-    RFS_push();
+    RFS_PUSH();
     cstr = rf_string_cstr_from_buff(str);
     errno = 0;
     *v = strtoull (cstr + start_off, &end, base);
@@ -169,7 +169,7 @@ bool rf_string_to_uint(const void* str,
         }
     }
 
-    RFS_pop();
+    RFS_POP();
     return ret;
 }
 
@@ -198,7 +198,7 @@ bool rf_string_to_double(const void* str, double* f, size_t *off)
         return false;
     }
 
-    RFS_push();
+    RFS_PUSH();
     cstr = rf_string_cstr_from_buff(str);
     errno = 0;
     *f = strtod (cstr, &end);
@@ -211,7 +211,7 @@ bool rf_string_to_double(const void* str, double* f, size_t *off)
         *off = length - 1;
     }
 
-    RFS_pop();
+    RFS_POP();
     return ret;
 }
 

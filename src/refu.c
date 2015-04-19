@@ -75,8 +75,8 @@ static void rf_atexit()
 bool rf_init(enum RFlog_target_type log_type,
              const char *log_file_name,
              enum RFlog_level level,
-             size_t string_buffer_size,
-             size_t ts_workbuff_size)
+             size_t ts_mbuff_size,
+             size_t ts_sbuff_size)
 {
     bool ret = false;
     /* create the refuclib ctx */
@@ -85,11 +85,11 @@ bool rf_init(enum RFlog_target_type log_type,
     }
 
     /* activate all modules */
-    if (!rf_string_activate(string_buffer_size)) {
+    if (!rf_string_activate()) {
         RF_ERROR("Failed to initialize the string module");
         goto cleanup;
     }
-    if (!rf_persistent_buffers_activate(ts_workbuff_size)) {
+    if (!rf_persistent_buffers_activate(ts_mbuff_size, ts_sbuff_size)) {
         RF_ERROR("Failed to initialize the persisten data");
         goto cleanup;
     }

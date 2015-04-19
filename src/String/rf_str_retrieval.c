@@ -33,6 +33,7 @@
 /*------------- Module related inclusion -------------*/
 #include <String/rf_str_core.h>
 #include <String/rf_str_corex.h> //for rf_stringx_init_unsafe()
+#include <String/rf_str_conversion.h>
 #include "rf_str_common.ph" //for required string private macros and functions
 /*------------- Outside Module inclusion -------------*/
 #include <Definitions/retcodes.h> //for bool
@@ -161,15 +162,17 @@ unsigned int rf_string_begins_with_any(const void *thisstr,
                                        unsigned int *bytes)
 {
     bool iteration_match;
-    int subLength;
+    size_t sub_length;
     uint32_t byte_position;
     unsigned int matching_chars = 0;
     int i = 0;
     int j = 0;
+    uint32_t *buffer;
 
+    rf_mbuffer_push(RF_TSBUFFM);
     //get all the codepoints of the string
-    subLength = rf_string_fill_codepoints(chars);
-    if (subLength <= 0) {
+    buffer = rf_string_fill_codepoints(chars, &sub_length);
+    if (!buffer) {
         goto cleanup;
     }
 
@@ -178,10 +181,9 @@ unsigned int rf_string_begins_with_any(const void *thisstr,
     RF_STRING_ITERATE_START(thisstr, i, byte_position)
         iteration_match = true;
         //for every substring character
-        for(j = 0; j < subLength; j++) {
+        for(j = 0; j < sub_length; j++) {
             //if we got a match
-            if (rf_string_bytepos_to_codepoint(thisstr, byte_position) ==
-                rf_buffer_from_current_at(RF_TSBUFF, j, uint32_t)) {
+            if (rf_string_bytepos_to_codepoint(thisstr, byte_position) == buffer[j]) {
                 iteration_match = false;
                 matching_chars += 1;
                 break;
@@ -199,6 +201,7 @@ unsigned int rf_string_begins_with_any(const void *thisstr,
     RF_STRING_ITERATE_END(i, byte_position)
 
 cleanup:
+    rf_mbuffer_pop(RF_TSBUFFM);
     if (bytes) {
         *bytes = byte_position;
     }
@@ -253,9 +256,10 @@ bool rf_string_scanf_after(const void* str, const void* astr,
                          const char* format, void* var)
 {
     char *s;
+    char *cstr;
     const char *found;
     unsigned int sub_length;
-    unsigned int buff_size;
+    bool ret = false;
 
     RF_ASSERT(str, "got null string in function");
     if (!astr) {
@@ -283,22 +287,23 @@ bool rf_string_scanf_after(const void* str, const void* astr,
 
 
     // copy it into a temporary buffer to null terminate it for sscanf
+    struct RFstring temps;
     sub_length = (rf_string_data(str) + rf_string_length_bytes(str)) - s + 1;
-    buff_size = rf_buffer_remaining_size(RF_TSBUFF, char);
-    if (buff_size <= sub_length) {
-        rf_buffer_increase_size(RF_TSBUFF, (sub_length - buff_size) * 2);
+    RF_STRING_SHALLOW_INIT(&temps, s, sub_length - 1);
+    RFS_PUSH();
+    if (!(cstr = rf_string_cstr_from_buff(&temps))) {
+        goto end;
     }
-    memcpy(rf_buffer_current_ptr(RF_TSBUFF, char), s, sub_length - 1);
-    rf_buffer_from_current_at(RF_TSBUFF, sub_length, char) = '\0';
-
-
     //use sscanf (!!!) strings are not null terminated
-    if (sscanf(rf_buffer_current_ptr(RF_TSBUFF, char), format, var) <= 0) {
-        return false;
+    if (sscanf(cstr, format, var) <= 0) {
+        goto end;
     }
+    ret = true;
 
+end:
     //success
-    return true;
+    RFS_POP();
+    return ret;
 }
 
 

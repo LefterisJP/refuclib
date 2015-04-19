@@ -55,11 +55,11 @@ bool rf_system_make_dir(void* dirname, int mode)
     bool ret = false;
     RF_NULLCHECK1(dirname, "directory name", return false);
 
-    RFS_push();
+    RFS_PUSH();
     if (!(cstr = rf_string_cstr_from_buff(dirname))) {
         goto end_pop;
     }
-    
+
     //make the directory
     if (mkdir(cstr, mode) != 0) {
         RF_ERROR("Creating a directory failed due to mkdir() "
@@ -69,7 +69,7 @@ bool rf_system_make_dir(void* dirname, int mode)
     ret = true;
 
 end_pop:
-    RFS_pop();
+    RFS_POP();
     return ret;
 }
 
@@ -83,7 +83,7 @@ bool rf_system_remove_dir(void* dirname)
     struct RFstringx path;
     RF_NULLCHECK1(dirname, "directory name", return false);
 
-    RFS_push();
+    RFS_PUSH();
     if (!(cstr = rf_string_cstr_from_buff(dirname))) {
         ret = false;
         goto cleanup_cstr_buff;
@@ -105,23 +105,22 @@ bool rf_system_remove_dir(void* dirname)
     //keep the previous errno for  comparison
     int prErrno = errno;
     while ((entry = readdir(dir)) != NULL) {
-        
+
         //skip this and the parent dir
         if (strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..")) {
-            struct RFstring *full_entry_name;
-            //create the full entry name
-            RFS_push();
-            RFS(&full_entry_name, RF_STR_PF_FMT RF_DIRSEP "%s",
-                RF_STR_PF_ARG(dirname), entry->d_name);
-            if (!rf_stringx_assign(&path, full_entry_name)) {
+            RFS_PUSH();
+            struct RFstring *full_entry_name = RFS(RF_STR_PF_FMT RF_DIRSEP "%s",
+                                                   RF_STR_PF_ARG(dirname),
+                                                   entry->d_name);
+            if (!full_entry_name || !rf_stringx_assign(&path, full_entry_name)) {
                 RF_ERROR("Failure at assigning the directory name to the "
                          "path string");
                 ret = false;
-                RFS_pop();
+                RFS_POP();
                 goto cleanup_path;
             }
-            RFS_pop();
-            
+            RFS_POP();
+
             //if this directory entry is a directory itself, call the function recursively
             if (entry->d_type == DT_DIR) {
                 if (!rf_system_remove_dir(&path)) {
@@ -134,7 +133,7 @@ bool rf_system_remove_dir(void* dirname)
                 //else we deleted that directory and we should go to the next entry of this directory
                 continue;
             }
-            
+
             //if we get here this means it's a file that needs deletion
             if (!rf_system_delete_file(&path)) {
                 RF_ERROR("Failed to remove file \""RF_STR_PF_FMT"\""
@@ -145,7 +144,7 @@ bool rf_system_remove_dir(void* dirname)
             }//end of check of succesful file removal
         }//end of the current and parent dir check
     }//end of directory entries iteration
-    
+
     //check for readdir error
     if (errno != prErrno) { //is this the best way to check?
         RF_ERROR("Failure in reading the contents of a directory "
@@ -153,7 +152,7 @@ bool rf_system_remove_dir(void* dirname)
         ret = false;
         goto cleanup_path;
     }
-    
+
     if (closedir(dir) != 0) {
         RF_ERROR("Failure in closing a directory", "closedir");
         ret = false;
@@ -171,7 +170,7 @@ bool rf_system_remove_dir(void* dirname)
 cleanup_path:
     rf_stringx_deinit(&path);
 cleanup_cstr_buff:
-    RFS_pop();
+    RFS_POP();
     return ret;
 }
 
@@ -181,10 +180,10 @@ bool rf_system_delete_file(const void* name)
     char *cstr;
     bool ret = false;
     RF_NULLCHECK1(name, "file name", return false);
-    RFS_push();
+    RFS_PUSH();
     if (!(cstr = rf_string_cstr_from_buff(name))) {
         goto end_pop;
-    }        
+    }
 
     //if we get here this means it's a file that needs deletion
     if (unlink(cstr) != 0) {
@@ -196,7 +195,7 @@ bool rf_system_delete_file(const void* name)
     ret = true;
 
 end_pop:
-    RFS_pop();
+    RFS_POP();
     return ret;
 }
 
@@ -208,13 +207,13 @@ bool rf_system_rename_file(void* name, void* new_name)
     char *cs_new_name;
     RF_NULLCHECK2(name, new_name, return false);
 
-    RFS_push();
+    RFS_PUSH();
     if (!(cs_name = rf_string_cstr_from_buff(name))) {
         goto end_pop;
     }
     if (!(cs_new_name = rf_string_cstr_from_buff(new_name))) {
         goto end_pop;
-    }        
+    }
 
     if (rename(cs_name, cs_new_name) != 0) {
         RF_ERROR("Renaming file \""RF_STR_PF_FMT"\" to "
@@ -226,14 +225,14 @@ bool rf_system_rename_file(void* name, void* new_name)
     ret = true;
 
   end_pop:
-    RFS_pop();
+    RFS_POP();
     return ret;
 }
 
 
 bool rf_system_file_exists(void* name)
 {
-    stat_rft sb;   
+    stat_rft sb;
     struct RFstring* file_name = name;
     return (rfStat(file_name, &sb) == 0);
 }
@@ -248,14 +247,14 @@ FILE* rf_fopen(const void* name, const char* mode)
 {
     char* cstr;
     FILE* ret = NULL;
-    RFS_push();
+    RFS_PUSH();
     if (!(cstr = rf_string_cstr_from_buff(name))) {
         goto end_pop;
     }
     ret = fopen(cstr, mode);
 
 end_pop:
-    RFS_pop();
+    RFS_POP();
     return ret;
 }
 
@@ -263,14 +262,14 @@ FILE* rf_freopen(const void* name, const char* mode, FILE* f)
 {
     char* cstr;
     FILE* ret = NULL;
-    RFS_push();
+    RFS_PUSH();
     if (!(cstr = rf_string_cstr_from_buff(name))) {
         goto end_pop;
     }
     ret = freopen(cstr, mode, f);
 
 end_pop:
-    RFS_pop();
+    RFS_POP();
     return ret;
 }
 
@@ -285,14 +284,14 @@ FILE* rf_popen(const void *command, const char* mode)
         return NULL;
     }
 
-    RFS_push();
+    RFS_PUSH();
     if (!(cstr = rf_string_cstr_from_buff(command))) {
         goto end_pop;
     }
     ret = popen(cstr, mode);
-    
+
 end_pop:
-    RFS_pop();
+    RFS_POP();
     return ret;
 }
 
@@ -304,7 +303,7 @@ int rf_pclose(FILE* stream)
 bool rf_system_activate()
 {
     int32_t anint;
-    
+
     /* get system endianess */
     anint= (int32_t)0xdeadbeef;
     g_sys_info.endianess = (*(char *)&anint == (char)0xef)?

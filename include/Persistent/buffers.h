@@ -4,38 +4,36 @@
 /**
  * Some persistent buffers that get activated at library initialization
  */
+#include <Definitions/retcodes.h>
+#include <Data_Structures/mbuffer.h>
+#include <Data_Structures/sbuffer.h>
+#include <Definitions/threadspecific.h>
 
-//for bool
-    #include <Definitions/retcodes.h>
-//for RFbuffer
-    #include <Data_Structures/buffer.h>
-//for thread specific attribute
-    #include <Definitions/threadspecific.h>
-
-extern i_THREAD__ struct RFbuffer _ts_workbuf;
-#define RF_TSBUFF (&_ts_workbuf)
+extern i_THREAD__ struct RFmbuffer i_ts_mbuf;
+#define RF_TSBUFFM (&i_ts_mbuf)
+extern i_THREAD__ struct RFsbuffer i_ts_sbuf;
+#define RF_TSBUFFS (&i_ts_sbuf)
 
 /**
  * Activate thread-specific persistent buffers
  *
- * The thread specific work buffer is an RFbuffer used for temporary storage
- * of various kinds. Size must be checked and realloc handled manually in all
- * cases. @ref RF_TSBUFF will give you a pointer to this buffer.
+ * The thread specific work buffer is an RFmbuffer used for temporary storage
+ * of various different things. @ref RF_TSBUFF will give you a pointer to this buffer.
  *
- * For temporary strings we use the rf_strings_buffer_ctx_XXX() family
- * of functions
  *
- * @param ts_buffer_size        The initial size of the thread specific
- *                              work buffer in bytes
+ * @param ts_mbuffer_size       The initial size of the thread specific
+ *                              multiblock work buffer in bytes
+ * @param ts_mbuffer_size       The initial size of the thread specific
+ *                              single block work buffer in bytes
  * @return                      true for succesful activation and false otherwise
  */
-bool rf_persistent_buffers_activate_ts(size_t ts_buffer_size);
+bool rf_persistent_buffers_activate_ts(size_t ts_mbuffer_size, size_t ts_sbuffer_size);
 /**
  * Activate all persistent buffers
  *
  * @see rf_persistent_buffers_activate_ts()
  */
-bool rf_persistent_buffers_activate(size_t ts_buffer_size);
+bool rf_persistent_buffers_activate(size_t ts_mbuffer_size, size_t ts_sbuffer_size);
 /**
  * Dactivate thread-specific persistent buffers
  */

@@ -81,14 +81,14 @@ i_INLINE_DECL int rfStat(struct RFstring* f, stat_rft* buffer)
     int ret = -1;
     char *cstr;
 
-    RFS_push();
+    RFS_PUSH();
     if (!(cstr = rf_string_cstr_from_buff(f))) {
         goto end_pop;
     }
     ret = stat(cstr, (struct stat*)buffer);
 
 end_pop:
-    RFS_pop();
+    RFS_POP();
     return ret;
 }
 #endif

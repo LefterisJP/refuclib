@@ -196,26 +196,34 @@ i_INLINE_DECL void rf_string_generic_append(void *thisstr,
 }
 
 /**
- * A function used to fill in a buffer with characters of a string.
- * Returns number of unicode characters the array was filled with
-*/
-i_INLINE_DECL int rf_string_fill_codepoints(const struct RFstring *s)
+ * Fill in the thread specific mbuffer with codepoints of a string
+ *
+ * @note: Use rf_mbuffer_push() and rf_mbuffer_pop() in order to free the used
+ *        memory when you are done with it.
+ *
+ * @param s            The string whose codepoints we need
+ * @param chars_num    A pointer to contain the number of returned codepoints
+ * @return             A pointer to the beginning of the buffer position to hold
+ *                     the codepoints or NULL for failure
+ */
+i_INLINE_DECL uint32_t *rf_string_fill_codepoints(const struct RFstring *s,
+                                                  size_t *chars_num_out)
 {
     unsigned int i = 0;
-    uint32_t charValue;
-    uint32_t chars_num;
+    uint32_t char_value;
+    size_t chars_num;
+    uint32_t *buff;
 
     chars_num = rf_string_length(s);
-    if (chars_num > rf_buffer_remaining_size(RF_TSBUFF, uint32_t)) {
-        if (rf_buffer_increase_size(RF_TSBUFF, chars_num * 2 * sizeof(uint32_t))) {
-            return -1;
-        }
+    buff = rf_mbuffer_alloc(RF_TSBUFFM, sizeof(uint32_t) * chars_num);
+    if (!buff) {
+        return NULL;
     }
-    rf_string_iterate_start(s, i, charValue)
-        rf_buffer_from_current_at(RF_TSBUFF, i, uint32_t) = charValue;
+    rf_string_iterate_start(s, i, char_value)
+        buff[i] = char_value;
     rf_string_iterate_end(i)
-
-    return chars_num;
+    *chars_num_out = chars_num;
+    return buff;
 }
 
 #ifdef __cplusplus

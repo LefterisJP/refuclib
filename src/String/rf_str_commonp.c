@@ -216,4 +216,5 @@ int rf_string_find_byte_pos(const void* tstr, const void* sstr, const char optio
 i_INLINE_INS void rf_string_generic_append(void* thisstr,
                                      const char* other,
                                      unsigned int bytes_to_copy);
-i_INLINE_INS int rf_string_fill_codepoints(const struct RFstring* s);
+i_INLINE_INS uint32_t *rf_string_fill_codepoints(const struct RFstring *s,
+                                                 size_t *chars_num);
