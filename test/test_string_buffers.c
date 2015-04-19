@@ -333,6 +333,28 @@ START_TEST (test_RFS_in_recursive_functions_with_local_with_realloc) {
     test_RFS_in_recursive_functions_with_local();
 } END_TEST
 
+START_TEST (test_RFS_NT) {
+    struct RFstring *s1 = RFS_NT("a string");
+    struct RFstring *s2 = RFS_NT("a string %s %d", "with", 123);
+    ck_assert_rf_str_eq_cstr(s1, "a string");
+    ck_assert(rf_string_data(s1)[rf_string_length_bytes(s1)] == '\0');
+    ck_assert_rf_str_eq_cstr(s2, "a string with 123");
+    ck_assert(rf_string_data(s2)[rf_string_length_bytes(s2)] == '\0');
+    struct RFstring *s3 = RFS_NT_OR_DIE("a string");
+    struct RFstring *s4 = RFS_NT("a string %s %d", "with", 123);
+    ck_assert_rf_str_eq_cstr(s3, "a string");
+    ck_assert(rf_string_data(s3)[rf_string_length_bytes(s3)] == '\0');
+    ck_assert_rf_str_eq_cstr(s4, "a string with 123");
+    ck_assert(rf_string_data(s4)[rf_string_length_bytes(s4)] == '\0');
+
+    // test that subsequent allocations don't overwite the null terminating
+    // character
+    ck_assert(rf_string_data(s1)[rf_string_length_bytes(s1)] == '\0');
+    ck_assert(rf_string_data(s2)[rf_string_length_bytes(s2)] == '\0');
+    ck_assert(rf_string_data(s3)[rf_string_length_bytes(s3)] == '\0');
+    ck_assert(rf_string_data(s4)[rf_string_length_bytes(s4)] == '\0');
+} END_TEST
+
 
 
 Suite *string_buffers_suite_create(void)
@@ -371,6 +393,7 @@ Suite *string_buffers_suite_create(void)
                               teardown_realloc_tests);
     tcase_add_test(tc4, test_RFS_in_recursive_functions_no_realloc);
     tcase_add_test(tc4, test_RFS_in_recursive_functions_with_local_no_realloc);
+    tcase_add_test(tc4, test_RFS_NT);
 
     suite_add_tcase(s, tc1);
     suite_add_tcase(s, tc2);

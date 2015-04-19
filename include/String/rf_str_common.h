@@ -151,8 +151,8 @@ i_DECLIMEX_ struct RFstring *i_rf_string_create_localv_or_die(bool null_terminat
 #define RF_SELECT_STRING_CREATE_LOCAL_NT(...)                              \
     RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATELOCAL_NT, 1, __VA_ARGS__)
 #define i_SELECT_RF_STRING_CREATELOCAL_NT1(slit_) \
-    i_rf_string_create_local(true, slit)
-#define i_SELECT_RF_STRING_CREATELOCAL_NT(...)    \
+    i_rf_string_create_local(true, slit_)
+#define i_SELECT_RF_STRING_CREATELOCAL_NT0(...)    \
     i_rf_string_create_localv(true, __VA_ARGS__)
 
 #define RF_SELECT_STRING_CREATE_LOCAL_OR_DIE(...)                       \

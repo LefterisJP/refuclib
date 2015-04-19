@@ -61,7 +61,7 @@ static struct RFstring *i_rf_string_create_localva(bool null_terminate,
         return NULL;
     }
     rf_string_data(ret) = buffPtr;
-    rf_string_length_bytes(ret) = null_terminate ? size + 1: size;
+    rf_string_length_bytes(ret) = size;
 
     return ret;
 }
@@ -97,6 +97,7 @@ struct RFstring *i_rf_string_create_localv_or_die(bool null_terminate,
 struct RFstring *i_rf_string_create_local(bool null_terminate, const char *s)
 {
     uint32_t byteLength;
+    size_t alloc_size;
     struct RFstring *ret = NULL;
     //check for validity of the given sequence and get the character length
     if (!rf_utf8_verify(s, &byteLength, 0)) {
@@ -104,18 +105,15 @@ struct RFstring *i_rf_string_create_local(bool null_terminate, const char *s)
                  "UTF-8 byte sequence");
         goto end;
     }
-    if (null_terminate) {
-        byteLength += 1;
-    }
-
+    alloc_size = sizeof(*ret) + byteLength;
     //allocate the string and its buffer in the local memory stack
-    ret = rf_mbuffer_alloc(RF_TSBUFFM, sizeof(*ret) + byteLength);
+    ret = rf_mbuffer_alloc(RF_TSBUFFM, null_terminate ? alloc_size + 1 : alloc_size);
     if (!ret) {
         goto end;
     }
     rf_string_data(ret) = (char*)ret + sizeof(*ret);
     if (null_terminate) {
-        memcpy(rf_string_data(ret), s, byteLength - 1);
+        memcpy(rf_string_data(ret), s, byteLength);
         rf_string_data(ret)[byteLength] = '\0';
     } else {
         memcpy(rf_string_data(ret), s, byteLength);
@@ -188,7 +186,7 @@ bool rf_strings_buffer_fillfmt(const char *fmt,
             return false;
         }
     } else {
-        rf_mbuffer_shrink(RF_TSBUFFM, n - rc);
+        rf_mbuffer_shrink(RF_TSBUFFM, n - rc - 1); // - 1 is for the null terminating character
     }
     *size = rc;
     return true;
