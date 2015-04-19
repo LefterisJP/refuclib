@@ -41,9 +41,10 @@
 #include <stdlib.h> //for exit()
 /*------------- End of includes -------------*/
 
-struct RFstring *i_rf_string_create_localv(const char *s, ...)
+static struct RFstring *i_rf_string_create_localva(bool null_terminate,
+                                                   const char *s,
+                                                   va_list args)
 {
-    va_list args;
     unsigned int size;
     char *buffPtr;
     bool rc;
@@ -55,50 +56,45 @@ struct RFstring *i_rf_string_create_localv(const char *s, ...)
     }
 
     // read the var args into the buffer
-    va_start(args, s);
     rc = rf_strings_buffer_fillfmt(s, &size, &buffPtr, args);
-    va_end(args);
     if (!rc) {
         return NULL;
     }
     rf_string_data(ret) = buffPtr;
-    rf_string_length_bytes(ret) = size;
+    rf_string_length_bytes(ret) = null_terminate ? size + 1: size;
 
     return ret;
 }
 
-// to avoid duplication I could have a function accepting va_list and in both
-// cases create it and call said function
-struct RFstring *i_rf_string_create_localv_or_die(const char *s, ...)
+struct RFstring *i_rf_string_create_localv(bool null_terminate,
+                                           const char *s,
+                                           ...)
 {
     va_list args;
-    unsigned int size;
-    char *buffPtr;
-    bool rc;
     struct RFstring *ret;
-
-    ret = rf_mbuffer_alloc(RF_TSBUFFM, sizeof(*ret));
-    if (!ret) {
-        goto fail;
-    }
-
-    // read the var args into the buffer
     va_start(args, s);
-    rc = rf_strings_buffer_fillfmt(s, &size, &buffPtr, args);
+    ret = i_rf_string_create_localva(null_terminate, s, args);
     va_end(args);
-    if (!rc) {
-        goto fail;
-    }
-    rf_string_data(ret) = buffPtr;
-    rf_string_length_bytes(ret) = size;
-
     return ret;
-fail:
-    RF_CRITICAL("RFS() failure");
-    exit(1);
 }
 
-struct RFstring *i_rf_string_create_local(const char *s)
+struct RFstring *i_rf_string_create_localv_or_die(bool null_terminate,
+                                                  const char *s,
+                                                  ...)
+{
+    va_list args;
+    struct RFstring *ret;
+    va_start(args, s);
+    ret = i_rf_string_create_localva(null_terminate, s, args);
+    va_end(args);
+    if (!ret) {
+        RF_CRITICAL("RFS() failure");
+        exit(1);
+    }
+    return ret;
+}
+
+struct RFstring *i_rf_string_create_local(bool null_terminate, const char *s)
 {
     uint32_t byteLength;
     struct RFstring *ret = NULL;
@@ -108,6 +104,9 @@ struct RFstring *i_rf_string_create_local(const char *s)
                  "UTF-8 byte sequence");
         goto end;
     }
+    if (null_terminate) {
+        byteLength += 1;
+    }
 
     //allocate the string and its buffer in the local memory stack
     ret = rf_mbuffer_alloc(RF_TSBUFFM, sizeof(*ret) + byteLength);
@@ -115,16 +114,21 @@ struct RFstring *i_rf_string_create_local(const char *s)
         goto end;
     }
     rf_string_data(ret) = (char*)ret + sizeof(*ret);
-    memcpy(rf_string_data(ret), s, byteLength);
+    if (null_terminate) {
+        memcpy(rf_string_data(ret), s, byteLength - 1);
+        rf_string_data(ret)[byteLength] = '\0';
+    } else {
+        memcpy(rf_string_data(ret), s, byteLength);
+    }
     rf_string_length_bytes(ret) = byteLength;
 
 end:
     return ret;
 }
 
-struct RFstring *i_rf_string_create_local_or_die(const char *s)
+struct RFstring *i_rf_string_create_local_or_die(bool null_terminate, const char *s)
 {
-    struct RFstring *ret = i_rf_string_create_local(s);
+    struct RFstring *ret = i_rf_string_create_local(null_terminate, s);
     if (!ret) {
         RF_CRITICAL("RFS() failure");
         exit(1);

@@ -85,6 +85,18 @@ extern "C" {
 #define RFS_OR_DIE(...) RF_SELECT_STRING_CREATE_LOCAL_OR_DIE(__VA_ARGS__)
 
 /**
+ * Just like @ref RFS() but the resulting string is null terminated. It is useful
+ * to create temporary strings to provide to APIs that accept nullterminated cstrings
+ */
+#define RFS_NT(...) RF_SELECT_STRING_CREATE_LOCAL_NT(__VA_ARGS__)
+
+/**
+ * Just like @ref RFS() but the resulting string is null terminated and the
+ * program is killed in case of failure
+ */
+#define RFS_NT_OR_DIE(...) RF_SELECT_STRING_CREATE_LOCAL_OR_DIE_NT(__VA_ARGS__)
+
+/**
  * Remember the current point in the string buffer.
  *
  * Should be used to save a state of the string buffer at any given point before
@@ -102,11 +114,12 @@ extern "C" {
 
 /**
  * Reads the formatted string and the va_args and fills in
- * the string buffer returning the string's size in bytes
+ * the string buffer returning the string's size in bytes (not including null termination)
  * Can realloc the buffer if not enough space remains
  *
  * @param fmt[in]         The formatted string
- * @param size[out]       The string's byte size
+ * @param size[out]       The string's byte size not including the null
+ *                        terminating character
  * @param buff_ptr[out]   The pointer to the beginning of the String
  *                        in the internal buffer
  * @return                Returns @c true in success and @c false in failure
@@ -117,24 +130,44 @@ bool rf_strings_buffer_fillfmt(const char *fmt,
                                va_list args);
 
 /* -- internal functions used in the above API -- */
-i_DECLIMEX_ struct RFstring *i_rf_string_create_local(const char *s);
-i_DECLIMEX_ struct RFstring *i_rf_string_create_local_or_die(const char *s);
-i_DECLIMEX_ struct RFstring *i_rf_string_create_localv(const char *s, ...);
-i_DECLIMEX_ struct RFstring *i_rf_string_create_localv_or_die(const char *s, ...);
+i_DECLIMEX_ struct RFstring *i_rf_string_create_local(bool null_terminate,
+                                                      const char *s);
+i_DECLIMEX_ struct RFstring *i_rf_string_create_local_or_die(bool null_terminate,
+                                                             const char *s);
+i_DECLIMEX_ struct RFstring *i_rf_string_create_localv(bool null_terminate,
+                                                       const char *s,
+                                                       ...);
+i_DECLIMEX_ struct RFstring *i_rf_string_create_localv_or_die(bool null_terminate,
+                                                              const char *s,
+                                                              ...);
 
 #define RF_SELECT_STRING_CREATE_LOCAL(...)                              \
     RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATELOCAL, 1, __VA_ARGS__)
-#define i_SELECT_RF_STRING_CREATELOCAL1(slit_)  \
-    i_rf_string_create_local(slit_)
+#define i_SELECT_RF_STRING_CREATELOCAL1(slit_) \
+    i_rf_string_create_local(false, slit_)
 #define i_SELECT_RF_STRING_CREATELOCAL0(...)    \
-    i_rf_string_create_localv(__VA_ARGS__)
+    i_rf_string_create_localv(false, __VA_ARGS__)
+
+#define RF_SELECT_STRING_CREATE_LOCAL_NT(...)                              \
+    RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATELOCAL_NT, 1, __VA_ARGS__)
+#define i_SELECT_RF_STRING_CREATELOCAL_NT1(slit_) \
+    i_rf_string_create_local(true, slit)
+#define i_SELECT_RF_STRING_CREATELOCAL_NT(...)    \
+    i_rf_string_create_localv(true, __VA_ARGS__)
 
 #define RF_SELECT_STRING_CREATE_LOCAL_OR_DIE(...)                       \
     RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATELOCAL_OR_DIE, 1, __VA_ARGS__)
 #define i_SELECT_RF_STRING_CREATELOCAL_OR_DIE1(slit_)   \
-    i_rf_string_create_local_or_die(slit_)
+    i_rf_string_create_local_or_die(false, slit_)
 #define i_SELECT_RF_STRING_CREATELOCAL_OR_DIE0(...) \
-    i_rf_string_create_localv_or_die(__VA_ARGS__)
+    i_rf_string_create_localv_or_die(false, __VA_ARGS__)
+
+#define RF_SELECT_STRING_CREATE_LOCAL_OR_DIE_NT(...)                       \
+    RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATELOCAL_OR_DIE_NT, 1, __VA_ARGS__)
+#define i_SELECT_RF_STRING_CREATELOCAL_OR_DIE_NT1(slit_)   \
+    i_rf_string_create_local_or_die(true, slit_)
+#define i_SELECT_RF_STRING_CREATELOCAL_OR_DIE_NT0(...) \
+    i_rf_string_create_localv_or_die(true, __VA_ARGS__)
 
 #ifdef __cplusplus
 }//closing bracket for calling from C++

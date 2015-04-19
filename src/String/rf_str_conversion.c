@@ -124,7 +124,7 @@ bool rf_string_to_int(const void* str, int64_t* v, size_t *off)
     }
 
     RFS_PUSH();
-    cstr = rf_string_cstr_from_buff(str);
+    cstr = rf_string_cstr_from_buff_or_die(str);
     errno = 0;
     *v = strtoull (cstr, &end, 10);
     length = end - cstr;
@@ -157,7 +157,7 @@ bool rf_string_to_uint(const void* str,
     }
 
     RFS_PUSH();
-    cstr = rf_string_cstr_from_buff(str);
+    cstr = rf_string_cstr_from_buff_or_die(str);
     errno = 0;
     *v = strtoull (cstr + start_off, &end, base);
     length = end - cstr;
@@ -199,7 +199,7 @@ bool rf_string_to_double(const void* str, double* f, size_t *off)
     }
 
     RFS_PUSH();
-    cstr = rf_string_cstr_from_buff(str);
+    cstr = rf_string_cstr_from_buff_or_die(str);
     errno = 0;
     *f = strtod (cstr, &end);
     length = end - cstr;

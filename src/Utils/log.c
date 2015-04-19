@@ -175,7 +175,7 @@ static bool rf_log_flush_file(struct RFlog *log)
     FILE *f;
 
     RFS_PUSH();
-    f = fopen(rf_string_cstr_from_buff(&log->target.file_name), "ab");
+    f = fopen(rf_string_cstr_from_buff_or_die(&log->target.file_name), "ab");
     RFS_POP();
     if (!f) {
         return false;
