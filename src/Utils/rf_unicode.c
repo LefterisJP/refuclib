@@ -323,6 +323,7 @@ static inline bool utf8_range_byte4_check(const char *bytes, uint32_t i)
     return true;
 }
 
+#if 0 //unused functions at the moment since we don't deal with extended UTF
 static inline bool utf8_range_byte5_check(const char *bytes, uint32_t i)
 {
     if(!rf_utf8_is_continuation_byte(bytes[i+1]) ||
@@ -343,7 +344,6 @@ static inline bool utf8_range_byte5_check(const char *bytes, uint32_t i)
     }
     return true;
 }
-
 static inline bool utf8_range_byte6_check(const char *bytes, uint32_t i)
 {
     if(!rf_utf8_is_continuation_byte(bytes[i+1]) ||
@@ -366,6 +366,7 @@ static inline bool utf8_range_byte6_check(const char *bytes, uint32_t i)
 
     return true;
 }
+#endif
 
 bool rf_utf8_decode_single(const char *s,
                            const char *lim,

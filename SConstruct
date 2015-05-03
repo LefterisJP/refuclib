@@ -76,6 +76,11 @@ test_env.Append(CHECK_EXTRA_DEFINES={
         os.path.join(test_env['CLIB_DIR'], 'test')
     ) + "/\\\""
 })
+test_env.Append(CHECK_SINGLE_FILE_OPTIONS={
+    # This file tests invalid UTF8 string literals and will
+    # generate this warning in clang
+    'test_utils_unicode.c': ['-Wno-invalid-source-encoding'],
+})
 test_sources = [os.path.join("test", s) for s in unit_test_files]
 test_sources.extend([os.path.join("src", s) for s in orig_sources])
 clib_tests = test_env.Check(

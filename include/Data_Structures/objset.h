@@ -101,14 +101,6 @@ struct rf_objset_iter {
         type *e = objset_##name##_get(set, elem);                       \
 		return e || htable_add(&set->ht, hashfn(keyof(elem)), elem);    \
 	}                                                                   \
-	static inline bool objset_##name##_delkey(struct objset_h *set,     \
-                                              const HTABLE_KTYPE(keyof) k) \
-	{                                                                   \
-		type *elem = objset_##name##_get(set, k);                       \
-		if (elem)                                                       \
-			return objset_##name##_del(set, elem);                      \
-		return false;                                                   \
-	}                                                                   \
     static inline bool objset_##name##_subset(const struct objset_h *set1, \
                                               const struct objset_h *set2) \
     {                                                                   \

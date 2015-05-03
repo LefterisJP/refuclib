@@ -227,7 +227,8 @@ static bool handle_EOL(struct RFtextfile* t, enum RFeol_mark eol)
 
 /* Adds a Byte order mark to the file at the current position.
    Only to be used at the start of the file */
-static bool add_BOM(FILE* f, enum RFtext_encoding encoding,
+static bool add_BOM(FILE *f,
+                    enum RFtext_encoding encoding,
                     enum RFendianess endianess)
 {
 #define FWRITE_FAIL(i_msg_)                                             \
@@ -2164,9 +2165,8 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
         goto cleanup2;
     }
     if (t->hasBom) {
-        if (!add_BOM(newFile, t->endianess, t->encoding)) {
-            RF_ERROR(
-                     "Failed to add BOM to the newly created temporary file");
+        if (!add_BOM(newFile, t->encoding, t->endianess)) {
+            RF_ERROR("Failed to add BOM to the newly created temporary file");
             ret = false;
             goto cleanup2;
         }
