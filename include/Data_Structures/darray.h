@@ -1,6 +1,8 @@
 /* Taken from the CCAN project:
  * http://ccodearchive.net/index.html
  * https://github.com/rustyrussell/ccan
+ *
+ * Some minor changes added by Lefteris Karapetsas
  */
 /*
  * Copyright (C) 2011 Joseph Adams <joeyadams3.14159@gmail.com>

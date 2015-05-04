@@ -1,56 +1,15 @@
-/*
- *    == START OF REFU LICENSE ==
- *
- * Copyright (c) 2011-2013, Karapetsas Eleftherios
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *  1. Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright notice,
- *     this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. Neither the name of the Original Author of Refu nor the names of its
- *     contributors may be used to endorse or promote products derived from
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES;LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
- * THE POSSIBILITY OF SUCH DAMAGE.
- *    == END OF REFU LICENSE ==
-*/
+/**
+ * @author: Lefteris Karapetsas
+ * @licence: BSD3 (Check repository root for details)
+ */
 #ifndef RF_RETURNCODES_H
 #define RF_RETURNCODES_H
 
-
+#include <stdbool.h> 
 // Return codes These should always be considered as 0 for success and negative for some very generic error. More specific error codes are declared for the functiosn they are found in.
 // These error codes should always fit in an int32_t
 #define RF_SUCCESS                      0
 #define RF_FAILURE                      -1
-
-/* defining true/false/bool */
-#ifndef __cplusplus
-
-/* for C99 code assume we have stdbool.h */
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
-    #include <stdbool.h> 
-#else
-    #define true 1
-    #define TRUE 1
-    #define FALSE 0
-    #define false 0
-    typedef int bool;
-#endif
-
-#endif//end of not c++
 
 // This macro defines the highest error value used by the refu library.
 // As a user it is is safe to define errors with values more negative
