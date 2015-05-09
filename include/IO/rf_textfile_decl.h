@@ -19,8 +19,8 @@
 
 
 /**
- ** The possible modes in which an RFtextfile
- ** can be opened
+ * The possible modes in which an RFtextfile
+ * can be opened
  */
 enum RFtextfile_mode {
     RF_FILE_READ = 1,/*!< The file is open for reading */
@@ -28,21 +28,25 @@ enum RFtextfile_mode {
     RF_FILE_READWRITE, /*!< the file is open for both reading and writting */
     RF_FILE_NEW, /*!< The file opens for writting and if already existing
                    its contents are erased */
-    RF_FILE_READWRITE_NEW /*!< Creates a new file for reading and writting.
+    RF_FILE_READWRITE_NEW, /*!< Creates a new file for reading and writting.
                             If it already exists its  contents are erased */
+    RF_FILE_STDIN, /*!< Read from stdin */
 };
 
 /**
-** @brief TextFile handler
-**
-** This is a TextFile handler that allows for the manipulation of files that contain
-** text in any of the UTF encodings.
-**
-** It allows for manipulation of a text file without placing the whole file in memory
-** and contains many different functions for moving inside the file in regards to specific line positions
-** or even retrieving said lines themselves inside an @ref RF_String.
-** For individual line parsing it is recommended to use the @ref RFstring and @ref RFstringx functions.
-**/
+ * @brief TextFile handler
+ *
+ * This is a TextFile handler that allows for the manipulation of files that contain
+ * text in any of the UTF encodings.
+ *
+ * It is made to work with files and not generic streams like pipes. It can also
+ * work with stdin but it admittedly feels like a hack, added over old code.
+ *
+ * It allows for manipulation of a text file without placing the whole file in memory
+ * and contains many different functions for moving inside the file in regards to specific line positions
+ * or even retrieving said lines themselves inside an @ref RF_String.
+ * For individual line parsing it is recommended to use the @ref RFstring and @ref RFstringx functions.
+ */
 struct RFtextfile {
     //! The file descriptor
     FILE* f;

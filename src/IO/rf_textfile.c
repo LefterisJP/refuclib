@@ -490,68 +490,54 @@ static bool scan_for_space_UTF32(struct RFtextfile* t)
     return true;
 }
 
-/* Scans a textfile's beginning for a BOM or space character to determine endianess*/
+/* Scans a textfile's beginning for a BOM or space character to determine endianess */
 static bool determine_endianess(struct RFtextfile* t,
                                 enum RFtext_encoding encoding,
                                 enum RFendianess endianess)
 {
     //in case no detection works go with what we have in the beginning
-    if(endianess != RF_ENDIANESS_UNKNOWN)
-    {
+    if (endianess != RF_ENDIANESS_UNKNOWN) {
         t->endianess = endianess;
     }
     t->encoding = encoding;
-    switch(encoding)
-    {
-        case RF_UTF16://if we are reading the file in UTF-16 we need to find endianess
-            //search for the BOM
-            if(!check_BOM_UTF16(t, endianess))
-            {
-                return false;//error
-            }
-
-           if(!t->hasBom &&
-              endianess == RF_ENDIANESS_UNKNOWN)//no BOM at beginning, scan the file for the space character 0x0020
-            {
-                if(!scan_for_space_UTF16(t))
-                {
-                    return false;
-                }
-            }//end of no BOM at beginning case
-        break;
-        case RF_UTF32://if we are reading the file in UTF-32 we need to find endianess
-
-            if(!check_BOM_UTF32(t, endianess))
-            {
-                return false;//error
-            }
-            if(!t->hasBom &&
-               endianess == RF_ENDIANESS_UNKNOWN)//no BOM at beginning, scan the file for the space character 0x0020
-            {
-                if(!scan_for_space_UTF32(t))
-                {
-                    return false;
-                }
-            }//end of no BOM at beginning case
-        break;
-        case RF_UTF8:
-            if(!check_BOM_UTF8(t, endianess))
-            {
-                //no BOM, just take the system's endianess
-                t->endianess = rf_system_get_endianess();
-            }
-        break;
-        default:
-            RF_ERROR(
-                "Attempted to initialize TextFile \""RF_STR_PF_FMT"\" with "
-                "illegal encoding parameter", RF_STR_PF_ARG(&t->name));
-            rf_string_deinit(&t->name);
+    switch(encoding) {
+    case RF_UTF16:
+        if (!check_BOM_UTF16(t, endianess)) {
             return false;
-            break;
+        }
+        if (!t->hasBom && endianess == RF_ENDIANESS_UNKNOWN) {
+            //no BOM at beginning, scan the file for the space character 0x0020
+            if (!scan_for_space_UTF16(t)) {
+                return false;
+            }
+        }//end of no BOM at beginning case
+        break;
+    case RF_UTF32:
+        if (!check_BOM_UTF32(t, endianess)) {
+            return false;//error
+        }
+        if(!t->hasBom && endianess == RF_ENDIANESS_UNKNOWN) {
+            //no BOM at beginning, scan the file for the space character 0x0020
+            if (!scan_for_space_UTF32(t)) {
+                return false;
+            }
+        }//end of no BOM at beginning case
+        break;
+    case RF_UTF8:
+        if (!check_BOM_UTF8(t, endianess)) {
+            //no BOM, just take the system's endianess
+            t->endianess = rf_system_get_endianess();
+        }
+        break;
+    default:
+        RF_ERROR(
+            "Attempted to initialize TextFile \""RF_STR_PF_FMT"\" with "
+            "illegal encoding parameter", RF_STR_PF_ARG(&t->name));
+        rf_string_deinit(&t->name);
+        return false;
     }//end of switch
     //after all operations go to the beginning of the file
-    if(!goto_filestart(t))
-    {
+    if (!goto_filestart(t)) {
         return false;
     }
     return true;
@@ -559,7 +545,8 @@ static bool determine_endianess(struct RFtextfile* t,
 
 /* --- Textfile Creation Functions --- */
 
-bool rf_textfile_init(struct RFtextfile* t, const void* name,
+bool rf_textfile_init(struct RFtextfile* t,
+                      const void* name,
                       enum RFtextfile_mode mode,
                       enum RFendianess endianess,
                       enum RFtext_encoding encoding,
@@ -573,39 +560,50 @@ bool rf_textfile_init(struct RFtextfile* t, const void* name,
     }
 
     //save the name of the file
-    if (!rf_string_copy_in(&t->name, name)) {
-        RF_ERROR("Could not copy the file's \""RF_STR_PF_FMT"\" filename",
-                 RF_STR_PF_ARG(&name));
-        return false;
+    if (mode == RF_FILE_STDIN) {
+        if (!rf_string_init(&t->name, "stdin")) {
+            RF_ERROR("Could not init the file's name");
+            return false;
+        }
+    } else {
+        if (!rf_string_copy_in(&t->name, name)) {
+            RF_ERROR("Could not copy the file's \""RF_STR_PF_FMT"\" filename",
+                     RF_STR_PF_ARG(&name));
+            return false;
+        }
     }
     t->hasBom = false;
 
-    //depending on the mode open the file
+    // depending on the mode open the file
     switch (mode) {
-        case RF_FILE_WRITE:
-            t->mode = RF_FILE_READWRITE;
-            t->f = rf_fopen(name, "a"i_PLUSB_WIN32"+");
+    case RF_FILE_WRITE:
+        t->mode = RF_FILE_READWRITE;
+        t->f = rf_fopen(name, "a"i_PLUSB_WIN32"+");
         break;
-        case RF_FILE_READ:
-            t->mode = RF_FILE_READ;
-            t->f = rf_fopen(name, "r"i_PLUSB_WIN32);
+    case RF_FILE_READ:
+        t->mode = RF_FILE_READ;
+        t->f = rf_fopen(name, "r"i_PLUSB_WIN32);
         break;
-        case RF_FILE_NEW:
-            t->mode=RF_FILE_WRITE;
-            t->f = rf_fopen(name, "w"i_PLUSB_WIN32);
+    case RF_FILE_NEW:
+        t->mode=RF_FILE_WRITE;
+        t->f = rf_fopen(name, "w"i_PLUSB_WIN32);
         break;
-        case RF_FILE_READWRITE:
-            t->mode = RF_FILE_READWRITE;
-            t->f = rf_fopen(name, "r"i_PLUSB_WIN32"+");
+    case RF_FILE_READWRITE:
+        t->mode = RF_FILE_READWRITE;
+        t->f = rf_fopen(name, "r"i_PLUSB_WIN32"+");
         break;
-        case RF_FILE_READWRITE_NEW:
-            t->mode = RF_FILE_READWRITE;
-            t->f = rf_fopen(name, "w"i_PLUSB_WIN32"+");
+    case RF_FILE_READWRITE_NEW:
+        t->mode = RF_FILE_READWRITE;
+        t->f = rf_fopen(name, "w"i_PLUSB_WIN32"+");
         break;
-        default:
-            RF_ERROR("Attempted to initialize textfile \""RF_STR_PF_FMT"\" with "
-                     "illegal mode", RF_STR_PF_ARG(name));
-            goto free_name_copy;
+    case RF_FILE_STDIN:
+        t->mode = RF_FILE_STDIN;
+        t->f = stdin;
+        break;
+    default:
+        RF_ERROR("Attempted to initialize textfile \""RF_STR_PF_FMT"\" with "
+                 "illegal mode", RF_STR_PF_ARG(name));
+        goto free_name_copy;
     }//end of opening mode switch
 
     //if the file failed to open read errno
@@ -617,7 +615,7 @@ bool rf_textfile_init(struct RFtextfile* t, const void* name,
 
 
     //for an existing file
-    if (mode == RF_FILE_READ || mode == RF_FILE_READWRITE) {
+    if (mode == RF_FILE_READ || mode == RF_FILE_READWRITE ) {
         //scan the file for BOM to determine endianess if needed
         if (!determine_endianess(t, encoding, endianess)) {
             RF_ERROR("Error while trying to determine the endianess of "
@@ -627,12 +625,15 @@ bool rf_textfile_init(struct RFtextfile* t, const void* name,
         //finally handle the line encoding for the existingfile case
         if (!handle_EOL(t, eol)) {
             RF_INFO("During initializing TextFile \""RF_STR_PF_FMT"\" "
-                     "auto-detecting the "
-                     "End Of Line Pattern failed. Considering default of "
-                     "Unix-Style LF Endings", RF_STR_PF_ARG(&t->name));
+                    "auto-detecting the "
+                    "End Of Line Pattern failed. Considering default of "
+                    "Unix-Style LF Endings", RF_STR_PF_ARG(&t->name));
             t->eol = RF_EOL_LF;
         }
-
+    } else if (mode == RF_FILE_STDIN) {
+        // totally avoid BOM and newline check in STDIN case.
+        t->endianess = rf_system_get_endianess();
+        t->eol = RF_EOL_DEFAULT;
     } else { //new file case
         //check the eol argument
         switch (eol) {
@@ -669,14 +670,14 @@ bool rf_textfile_init(struct RFtextfile* t, const void* name,
     t->line = 1;
     t->previousOp = 0;
 
-
-
     // success
     return true;
 
     //failure
 close_file:
-    fclose(t->f);
+    if (mode != RF_FILE_STDIN) {
+        fclose(t->f);
+    }
 free_name_copy:
     rf_string_deinit(&t->name);
     return false;
@@ -780,8 +781,7 @@ struct RFtextfile* rf_textfile_copy_out(struct RFtextfile* src)
 {
     struct RFtextfile* dst;
     RF_MALLOC(dst, sizeof(*dst), return NULL);
-    if(!rf_textfile_copy_in(dst, src))
-    {
+    if (!rf_textfile_copy_in(dst, src)) {
         free(dst);
         dst = NULL;
     }
@@ -792,14 +792,15 @@ struct RFtextfile* rf_textfile_copy_out(struct RFtextfile* src)
 
 void rf_textfile_deinit(struct RFtextfile* t)
 {
-    fclose(t->f);
+    if (t->mode != RF_FILE_STDIN) {
+        fclose(t->f);
+    }
     rf_string_deinit(&t->name);
 }
 
 void rf_textfile_destroy(struct RFtextfile* t)
 {
-    fclose(t->f);
-    rf_string_deinit(&t->name);
+    rf_textfile_deinit(t);
     free(t);
 }
 
@@ -1450,27 +1451,30 @@ int32_t rf_textfile_get_line_begin(struct RFtextfile* t, uint64_t lineN,
     RFfile_offset prOff;
     char prEof;
     struct RFstringx buffer;
+    
+    if (t->mode == RF_FILE_STDIN) {
+        RF_WARNING("Can't move around stdin stream");
+        return -1;
+    }
+    
     //in the very beginning keep the previous file position
     prLine = t->line;
 
-    if(lineN == 0)
-    {
+    if (lineN == 0) {
         RF_ERROR(
                  "Invalid input given for the lineN argument. It can never be"
                  " zero");
         return -1;
     }
 
-    if((prOff = rfFtell(t->f)) == (RFfile_offset)-1)
-    {
+    if ((prOff = rfFtell(t->f)) == (RFfile_offset) - 1) {
         RF_ERROR("Querying current file pointer at function start failed "
                  "due to ftell() with errno %d", errno);
         return -1;
     }
     prEof = t->eof;
     //now get the position to the beginning of the file
-    if(!goto_filestart(t))
-    {
+    if (!goto_filestart(t)) {
         RF_ERROR(
                  "Failed to move the internal filepointer"
                  " of TextFile \""RF_STR_PF_FMT"\" "
@@ -1481,19 +1485,15 @@ int32_t rf_textfile_get_line_begin(struct RFtextfile* t, uint64_t lineN,
 
     ///since we got here start reading the file again, line by line until we
     //get to the requested line. Also initialize the buffer string for readline
-    if(!rf_stringx_init_buff(&buffer,RF_OPTION_FGETS_READ_BYTESN,""))
-    {
+    if (!rf_stringx_init_buff(&buffer,RF_OPTION_FGETS_READ_BYTESN,"")) {
         RF_ERROR("Failed to initialize the line buffer string");
         return -1;
     }
     //read all the lines until you get to the one we need
-    while((error = rf_textfile_read_line(t,&buffer)) == RF_SUCCESS)
-    {
+    while ((error = rf_textfile_read_line(t,&buffer)) == RF_SUCCESS) {
         //if this is the line we need, assign it to the given string
-        if(i==lineN)
-        {
-            if(rf_stringx_assign(line,&buffer) == false)
-            {
+        if (i==lineN) {
+            if (rf_stringx_assign(line,&buffer) == false) {
                 RF_ERROR("Failure at string assignment when reading lines "
                          "from Textfile \""RF_STR_PF_FMT"\"",
                          RF_STR_PF_ARG(&t->name));
@@ -1504,10 +1504,8 @@ int32_t rf_textfile_get_line_begin(struct RFtextfile* t, uint64_t lineN,
         i++;
     }
     //if we get here and we haven't reached the line
-    if(i != lineN)
-    {
-        if(error == RE_FILE_EOF)
-        {
+    if (i != lineN) {
+        if (error == RE_FILE_EOF) {
             TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, return -1);
             RF_ERROR(
                      "While searching for line [%llu] in Text File"
@@ -1542,19 +1540,16 @@ int32_t rf_textfile_get_line(struct RFtextfile* t, uint64_t lineN,
     int32_t error;
     //in the very beginning keep the previous file position and line number
     prLine = t->line;
-    if((prOff = rfFtell(t->f)) == (RFfile_offset)-1)
-    {
+    if ((prOff = rfFtell(t->f)) == (RFfile_offset) - 1) {
         RF_ERROR("Querying current file pointer at function start failed "
                  "due to ftell() with errno %d", errno);
         return -1;
     }
     prEof = t->eof;
     //move to the beginning of the line and get it. If there was an error reset everything back
-    if((error=rf_textfile_move_lines(t,lineN-t->line)) != RF_SUCCESS)
-    {
+    if ((error = rf_textfile_move_lines(t,lineN-t->line)) != RF_SUCCESS) {
         TEXTFILE_RESETPTR_FROMSTART(t, prLine, prEof, prOff, return -1);
-        if(error == RE_FILE_EOF)
-        {
+        if (error == RE_FILE_EOF) {
             RF_ERROR("Tried to move beyond the end of file for Textfile "
                      "\""RF_STR_PF_FMT"\" while requesting a line",
                      RF_STR_PF_ARG(&t->name));
@@ -1565,8 +1560,7 @@ int32_t rf_textfile_get_line(struct RFtextfile* t, uint64_t lineN,
         return -1;
     }
     //and now get it
-    if(rf_textfile_read_line(t,line) != RF_SUCCESS)
-    {
+    if (rf_textfile_read_line(t,line) != RF_SUCCESS) {
         RF_ERROR("Error at getting the requested line for Textfile "
                  "\""RF_STR_PF_FMT"\"", RF_STR_PF_ARG(&t->name));
         return -1;
@@ -1582,6 +1576,11 @@ bool rf_textfile_write(struct RFtextfile* t, void* s)
 {
     int32_t linesN;
     char allocatedS = false;
+
+    if (t->mode == RF_FILE_STDIN) {
+        RF_WARNING("Can't write anything to the stdin stream");
+        return false;
+    }
 
     if (!s) {
         RF_WARNING("Provided a null pointer for the to-write string");
@@ -1651,6 +1650,11 @@ bool rf_textfile_insert(struct RFtextfile* t, uint64_t lineN,
 
     if (!stringIN) {
         RF_WARNING("Provided null pointer for insertion");
+        return false;
+    }
+
+    if (t->mode == RF_FILE_STDIN) {
+        RF_WARNING("Can't add anything to the stdin stream");
         return false;
     }
 
@@ -1879,16 +1883,14 @@ cleanup3:
     rf_stringx_deinit(&buffer);
 cleanup2:
     fclose(newFile);
-    if(!rf_system_delete_file(&tempFileName))
-    {
+    if (!rf_system_delete_file(&tempFileName)) {
         RF_ERROR("Failed to delete file "RF_STR_PF_FMT" during cleanup",
                  RF_STR_PF_ARG(&tempFileName));
         ret = false;
     }
     rf_string_deinit(&tempFileName);
 cleanup1:
-    if(allocatedS)
-    {
+    if (allocatedS) {
         rf_string_destroy(string);
     }
     return ret;
@@ -1907,6 +1909,11 @@ bool rf_textfile_remove(struct RFtextfile* t, uint64_t lineN)
     int32_t error;
     RF_ASSERT(t, "got NULL textfile in function");
 
+    if (t->mode == RF_FILE_STDIN) {
+        RF_WARNING("Can't remove anything from the stdin stream");
+        return false;
+    }
+    
     lineFound = false;
     //determine the target line
     if (lineN == 0) {
@@ -1967,7 +1974,7 @@ bool rf_textfile_remove(struct RFtextfile* t, uint64_t lineN)
     }
 
     //read every line of this file from the beginning
-    while ((error =rf_textfile_read_line(t,&buffer)) == RF_SUCCESS) {
+    while ((error = rf_textfile_read_line(t,&buffer)) == RF_SUCCESS) {
 
         //only if this line is not the one to remove write the line to the temporary file
         if(t->line-1 != lineN) {//-1 is since right after the ReadLine function the current line changes
@@ -2071,6 +2078,11 @@ bool rf_textfile_replace(struct RFtextfile* t, uint64_t lineN, void* string)
     RFfile_offset tOff=0;
     int32_t error;
 
+    if (t->mode == RF_FILE_STDIN) {
+        RF_WARNING("Can't replace anything in the stdin stream");
+        return false;
+    }
+    
     if (!string) {
         RF_ERROR("The replace string argument given is NULL");
         return false;

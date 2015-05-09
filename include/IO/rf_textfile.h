@@ -83,7 +83,8 @@ extern "C"
  **
  ** @return                       Returns @c true in success
  **/
-i_DECLIMEX_ bool rf_textfile_init(struct RFtextfile* t, const void* name,
+i_DECLIMEX_ bool rf_textfile_init(struct RFtextfile* t,
+                                  const void* name,
                                   enum RFtextfile_mode mode,
                                   enum RFendianess endianess,
                                   enum RFtext_encoding encoding,
