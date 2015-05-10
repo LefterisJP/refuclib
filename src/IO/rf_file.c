@@ -292,17 +292,17 @@ bool rf_file_read_bytes_utf8(char* buff, uint32_t num, FILE* f,
     eolReached = false;
     bytes_read = 0;
     //if end of file or end of line is not found, keep reading
-    do{
-        bytesN = rf_file_read_char_utf8(f, (uint32_t*)(buff + bytes_read),
-                                        false, eof);
+    do {
+        bytesN = rf_file_read_char_utf8(f,
+                                        (uint32_t*)(buff + bytes_read),
+                                        false,
+                                        eof);
 
-        if(eof && *eof == true)
-        {
+        if (eof && *eof == true) {
             break;//EOF found
         }
         //error check
-        if(bytesN < 0)
-        {
+        if (bytesN < 0) {
             RF_ERROR("An error was encountered while reading a UTF8 line "
                      "from a file");
             return false;
@@ -310,64 +310,54 @@ bool rf_file_read_bytes_utf8(char* buff, uint32_t num, FILE* f,
 
         bytes_read += bytesN;
         //if we have read the number of characters requested by the function
-        if(bytes_read >= num)
-        {
+        if (bytes_read >= num) {
             break;
         }
 
         //newline check depending on the EOL pattern
         c = *(uint32_t*)(buff + bytes_read -bytesN);
-        switch(eol)
-        {
-            case RF_EOL_LF:
-                if(c == RF_LF)
-                {
-                    eolReached = true;
-                }
+        switch (eol) {
+        case RF_EOL_LF:
+            if (c == RF_LF) {
+                eolReached = true;
+            }
             break;
-            case RF_EOL_CRLF:
-                if(c == RF_LF)
-                {
-                    if( buff[bytes_read - bytesN - 1] == RF_CR)
-                    {
-                        eolReached = true;
-                        bytes_read -= 1;
-                        buff[bytes_read - 1] = '\n';
-                    }
-                }
-            break;
-            case RF_EOL_CR:
-                if(c == RF_CR)
-                {
+        case RF_EOL_CRLF:
+            if (c == RF_LF) {
+                if (buff[bytes_read - bytesN - 1] == RF_CR) {
                     eolReached = true;
+                    bytes_read -= 1;
                     buff[bytes_read - 1] = '\n';
                 }
+            }
+            break;
+        case RF_EOL_CR:
+            if (c == RF_CR) {
+                eolReached = true;
+                buff[bytes_read - 1] = '\n';
+            }
             break;
         default:
             assert(0);
             break;
         }//end of EOL dependent newline check
-    }while(c != (uint32_t) EOF && !eolReached);
+    } while(c != (uint32_t) EOF && !eolReached);
     //null terminate the buffer for UTF8
     buff[bytes_read] = '\0';
 
     //finally check yet again for end of file right after the new line
-    if( RF_HEXEQ_C(fgetc(f),EOF))
-    {//check for error
-        if(ferror(f) == 0)
-        {
+    if (RF_HEXEQ_C(fgetc(f), EOF)) {
+        //check for error
+        if (ferror(f) == 0) {
             *eof = true;
-        }
-        else
-        {
+        } else {
            RF_ERROR("During reading a UTF-8 file there was a "
                     "read error due to fgetc() failing with errno %d");
            return -1;
         }
-    }//undo the peek ahead of the file pointer
-    else
-    {
-        if(rfFseek(f,-1,SEEK_CUR) != 0)
+    } else {
+        //undo the peek ahead of the file pointer
+        if(rfFseek(f, -1, SEEK_CUR) != 0)
         {
             RF_ERROR("Failed to undo the peek ahead of the file pointer due "
                      "to fseek() failure with errno %d", errno);

@@ -631,7 +631,8 @@ bool rf_textfile_init(struct RFtextfile* t,
             t->eol = RF_EOL_LF;
         }
     } else if (mode == RF_FILE_STDIN) {
-        // totally avoid BOM and newline check in STDIN case.
+        // totally avoid encodingBOM and newline check in STDIN case.
+        t->encoding = encoding;
         t->endianess = rf_system_get_endianess();
         t->eol = RF_EOL_DEFAULT;
     } else { //new file case
@@ -1304,30 +1305,30 @@ int rf_textfile_read_line(struct RFtextfile* t, struct RFstringx* line)
     char eof = false;
     RFfile_offset startOff;
 
-    //check if we can read from this textfile
-    RF_TEXTFILE_CANREAD(t, -1);
+
+    if (t->mode != RF_FILE_STDIN) {
+        //check if we can read from this textfile
+        RF_TEXTFILE_CANREAD(t, -1);
+        //get the file position at start
+        if ((startOff = rfFtell(t->f))== (RFfile_offset) - 1) {
+            RF_ERROR("Reading the file position at function start failed "
+                     "due to ftell() with errno %d", errno);
+            return -1;
+        }
+    }
+
     //set the file operation
     t->previousOp = RF_FILE_READ;
-    //get the file position at start
-    if((startOff = rfFtell(t->f))== (RFfile_offset)-1)
-    {
-        RF_ERROR("Reading the file position at function start failed "
-                 "due to ftell() with errno %d", errno);
-        return -1;
-    }
     //check for eof
-    if(t->eof == true)
-    {
+    if (t->eof == true) {
         return RE_FILE_EOF;
     }
 
     //Read the file depending on the encoding
-    if(!rf_stringx_from_file_assign(line, t->f, &eof, t->eol, t->encoding, t->endianess))
-    {
+    if (!rf_stringx_from_file_assign(line, t->f, &eof, t->eol, t->encoding, t->endianess)) {
         RF_ERROR(
                  "Reading line [%llu] of a text file failed", t->line);
-        if(rfFseek(t->f,startOff,SEEK_SET) != 0)
-        {
+        if (rfFseek(t->f, startOff, SEEK_SET) != 0) {
             RF_ERROR("After a failed readline operation rewinding "
                      "the file pointer to its value before the function"
                      "'s execution failed due to fseek() errno %d",
@@ -1350,31 +1351,31 @@ int rf_textfile_read_line_chars(struct RFtextfile* t,
 {
     RFfile_offset startOff;
     char eof = false;
-    //check if we can read from this textfile
-    RF_TEXTFILE_CANREAD(t, -1);
-    //get the file offset at the function's start
-    if((startOff = rfFtell(t->f))== (RFfile_offset)-1)
-    {
-        RF_ERROR("Reading the file position at function start failed "
-                 "due to ftell() with errno %d", errno);
 
-        return -1;
+    if (t->mode != RF_FILE_STDIN) {
+        //check if we can read from this textfile
+        RF_TEXTFILE_CANREAD(t, -1);
+
+        //get the file offset at the function's start
+        if((startOff = rfFtell(t->f))== (RFfile_offset)-1)
+        {
+            RF_ERROR("Reading the file position at function start failed "
+                     "due to ftell() with errno %d", errno);
+
+            return -1;
+        }
     }
     //set the operation
     t->previousOp = RF_FILE_READ;
     //check for eof
-    if(t->eof == true)
-    {
+    if (t->eof == true) {
         return RE_FILE_EOF;
     }
 
     //Read the file depending on the encoding
-    if(!rf_stringx_from_file_assign(line, t->f, &eof, t->eol, t->encoding, t->endianess))
-    {
-        RF_ERROR(
-                 "Reading line [%llu] of a text file failed", t->line);
-        if(rfFseek(t->f,startOff,SEEK_SET) != 0)
-        {
+    if (!rf_stringx_from_file_assign(line, t->f, &eof, t->eol, t->encoding, t->endianess)) {
+        RF_ERROR("Reading line [%llu] of a text file failed", t->line);
+        if(rfFseek(t->f,startOff,SEEK_SET) != 0) {
             RF_ERROR("After a failed readline operation rewindind "
                      "the file pointer to its value before the function"
                      "'s execution failed due to fseek() errno %d", errno);
@@ -1382,8 +1383,8 @@ int rf_textfile_read_line_chars(struct RFtextfile* t,
         return -1;
     }
 
-    if(characters != 0)//if we need specific characters
-    {
+    if (characters != 0) {
+        //if we need specific characters
         uint32_t charsN = rf_string_length(line);
         rf_string_prune_end(line, charsN-characters, NULL);
     } else {
@@ -1405,7 +1406,7 @@ int rf_textfile_read_lines(struct RFtextfile* t,
         if ((arr_)) {                                                   \
             rf_array_set(lines_pos, index_, uint32_t, val_, return -1); \
         }                                                               \
-    }while(0)
+    } while(0)
     unsigned int lines_read = 0;
     unsigned int pr_index = str->bIndex;
     unsigned int pr_length = 0;
