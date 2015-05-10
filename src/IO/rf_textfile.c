@@ -1408,10 +1408,14 @@ int rf_textfile_read_lines(struct RFtextfile* t,
     unsigned int lines_read = 0;
     unsigned int pr_index = str->bIndex;
     unsigned int pr_length = 0;
+    int rc;
 
     add_line_pos(lines_pos, 0, 0);
-
-    while (RF_SUCCESS == rf_textfile_read_line(t, str)) {
+    do {
+        rc = rf_textfile_read_line(t, str);
+        if (rc != RF_SUCCESS && rc != RE_FILE_EOF) {
+            return -1;
+        }
         lines_read ++;
         rf_stringx_append_char(str, (unsigned int)'\n');
 
@@ -1423,7 +1427,8 @@ int rf_textfile_read_lines(struct RFtextfile* t,
         if (lines_read == lines) {
             break;
         }
-    }
+    } while(rc != RE_FILE_EOF);
+
     rf_stringx_move_to_index(str, pr_index);
     return lines_read;
 
@@ -1432,8 +1437,7 @@ int rf_textfile_read_lines(struct RFtextfile* t,
 
 bool rf_textfile_get_offset(struct RFtextfile* t, RFfile_offset* offset)
 {
-    if(((*offset) = rfFtell(t->f)) == (RFfile_offset)-1)
-    {
+    if (((*offset) = rfFtell(t->f)) == (RFfile_offset)-1) {
         RF_ERROR("Retrieving the current file offset failed "
                  "due to ftell() with errno %d", errno);
         return false;

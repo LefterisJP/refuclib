@@ -341,12 +341,12 @@ START_TEST(test_textfile_read_lines) {
                                RF_UTF8, RF_EOL_LF));
 
     rf_stringx_reset(&g_buff);
-    /* read all lines (3) */
-    ck_assert(3 == rf_textfile_read_lines(&f, 0, &g_buff, &line_arr));
+    /* read all lines (3 + 1 empty line) */
+    ck_assert_int_eq(4, rf_textfile_read_lines(&f, 0, &g_buff, &line_arr));
     ck_assert_rf_str_eq_cstr(&g_buff,
                              FIRST_LINE_UTF8"\n"
                              SECOND_LINE_UTF8"\n"
-                             THIRD_LINE_UTF8"\n"
+                             THIRD_LINE_UTF8"\n\n"
     );
 
     ck_assert_int_eq(rf_array_at_unsafe(&line_arr, 0, uint32_t), 0);
