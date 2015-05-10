@@ -45,8 +45,7 @@ bool rf_file_read_line_utf8(FILE* f,
     (*byte_length) += bytesN;
 
     //if the last character was a newline we are done
-    if(*((*utf8)+bytesN-1) == (char)RF_LF)
-    {
+    if (*((*utf8) + bytesN) == (char)RF_LF) {
         return true;
     }
 
@@ -345,26 +344,6 @@ bool rf_file_read_bytes_utf8(char* buff, uint32_t num, FILE* f,
     //null terminate the buffer for UTF8
     buff[bytes_read] = '\0';
 
-    //finally check yet again for end of file right after the new line
-    if (RF_HEXEQ_C(fgetc(f), EOF)) {
-        //check for error
-        if (ferror(f) == 0) {
-            *eof = true;
-        } else {
-           RF_ERROR("During reading a UTF-8 file there was a "
-                    "read error due to fgetc() failing with errno %d");
-           return -1;
-        }
-    } else {
-        //undo the peek ahead of the file pointer
-        if(rfFseek(f, -1, SEEK_CUR) != 0)
-        {
-            RF_ERROR("Failed to undo the peek ahead of the file pointer due "
-                     "to fseek() failure with errno %d", errno);
-            return false;
-        }
-    }
-
     if (bytes_read_ret) {
         *bytes_read_ret = bytes_read;
     }
@@ -442,25 +421,6 @@ bool rf_file_read_bytes_utf16(char* buff, uint32_t num, FILE* f,
         }//end of EOL dependent newline check
     }while(c !=(uint32_t) EOF && !eolReached);
 
-    //finally check yet again for end of file right after the new line
-    bytesN = rf_file_read_char_utf16(f, &c, false, endianess, eof);
-    if(bytesN < 0 && !(*eof))
-    {
-        RF_ERROR("An error was encountered while reading the end of "
-                 "a stream of bytes from a UTF-16 file descriptor");
-        return false;
-    }
-    
-    if(!(*eof))
-    {//unless it's EOF undo the peak ahead
-        if(rfFseek(f,-bytesN,SEEK_CUR) != 0)
-        {
-            RF_ERROR("Failed to undo the peek ahead of the file pointer",
-                     "due to fseek() failure with errno %d", errno);
-            return false;
-        }
-    }
-
     if (bytes_read_ret) {
         *bytes_read_ret = bytes_read;
     }
@@ -537,23 +497,7 @@ bool rf_file_read_bytes_utf32(char* buff, uint32_t num, FILE* f,
     //null terminate the buffer for UTF32
     buff[bytes_read] =  buff[bytes_read + 1] = buff[bytes_read + 2] = 
     buff[bytes_read + 3] = '\0';
-    //finally check yet again for end of file right after the new line
-    if(rf_file_read_char_utf32(f,&c, endianess, eof) < 0 && !(*eof))
-    {
-            RF_ERROR("Reading error while reading from a "
-                     "UTF-32 byte stream");
-            return false;
-    }
 
-    if(!(*eof))
-    {//unless it's EOF undo the peak ahead
-        if(rfFseek(f,-4,SEEK_CUR) != 0)
-        {
-            RF_ERROR("Failed to undo the peek ahead of the file pointer"
-                     "due to fseek() failure with errno %d", errno);
-            return false;
-        }
-    }
     if (bytes_read_ret) {
         *bytes_read_ret = bytes_read;
     }

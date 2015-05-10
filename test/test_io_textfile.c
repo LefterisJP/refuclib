@@ -267,14 +267,11 @@ START_TEST(test_textfile_set_mode) {
         &g_buff,
         get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario2));
 
-    /* read 3rd line */
-    ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));
+    /* read 3rd (and last) line */
+    ck_assert(RE_FILE_EOF == rf_textfile_read_line(&f, &g_buff));
     ck_assert_rf_str_eq_cstr(
         &g_buff,
         get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario3));
-
-    /* check for EOF */
-    ck_assert(RE_FILE_EOF == rf_textfile_read_line(&f, &g_buff));
 
     ck_assert(rf_system_delete_file(&g_fname));
 
@@ -443,7 +440,7 @@ START_TEST(test_textfile_write) {
         &g_buff,
         get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario3));
 
-    /* check for EOF */
+    /* check for empty line and EOF */
     ck_assert(RE_FILE_EOF == rf_textfile_read_line(&rf, &g_buff));
 
     ck_assert(rf_system_delete_file(&g_fname));
@@ -522,7 +519,7 @@ START_TEST(test_textfile_insert_after) {
     ck_assert_rf_str_eq_cstr(
         &g_buff,
         get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario3));
-    /* EOF */
+    /* check for empty line and EOF */
     ck_assert(RE_FILE_EOF == rf_textfile_read_line(&f, &g_buff));
 
     ck_assert(rf_system_delete_file(&g_fname));
@@ -616,7 +613,7 @@ START_TEST(test_textfile_insert_before) {
     ck_assert_rf_str_eq_cstr(
         &g_buff,
         get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario3));
-    /* EOF */
+    /* check for empty line and EOF */
     ck_assert(RE_FILE_EOF == rf_textfile_read_line(&f, &g_buff));
 
     rf_textfile_deinit(&f);
@@ -672,7 +669,7 @@ START_TEST(test_textfile_remove) {
         &g_buff,
         get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario3));
 
-    /* EOF */
+    /* check for empty line and EOF */
     ck_assert(RE_FILE_EOF == rf_textfile_read_line(&f, &g_buff));
 
     rf_textfile_deinit(&f);
@@ -756,7 +753,7 @@ START_TEST(test_textfile_replace) {
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));
     ck_assert_rf_str_eq_cstr(&g_buff, THIRD_LINE_UTF8);
 
-    /* EOF */
+    /* check for empty line and EOF */
     ck_assert(RE_FILE_EOF == rf_textfile_read_line(&f, &g_buff));
 
     ck_assert(rf_system_delete_file(&g_fname));

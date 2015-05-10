@@ -108,7 +108,8 @@ bool rf_string_from_file_assign(struct RFstring* str,
     return ret;
 }
 
-bool rf_string_from_file_append(struct RFstring* str, FILE* f,
+bool rf_string_from_file_append(struct RFstring* str,
+                                FILE* f,
                                 char* eof,
                                 enum RFeol_mark eol,
                                 enum RFtext_encoding encoding,

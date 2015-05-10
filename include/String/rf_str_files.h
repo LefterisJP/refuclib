@@ -97,7 +97,7 @@ i_DECLIMEX_ bool rf_string_from_file_assign(struct RFstring* str,
                                             enum RFtext_encoding encoding,
                                             enum RFendianess endianess);
 /**
- ** @brief Appends to a string from file parsing
+ ** @brief Appends to a string from file parsing. Reads one line.
  **
  ** @notinherited{StringX}
  ** @param str The string to append to

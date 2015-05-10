@@ -1304,7 +1304,10 @@ int rf_textfile_read_line(struct RFtextfile* t, struct RFstringx* line)
 {
     char eof = false;
     RFfile_offset startOff;
-
+    //check for eof before doing anything
+    if (t->eof == true) {
+        return RE_FILE_EOF;
+    }
 
     if (t->mode != RF_FILE_STDIN) {
         //check if we can read from this textfile
@@ -1316,13 +1319,8 @@ int rf_textfile_read_line(struct RFtextfile* t, struct RFstringx* line)
             return -1;
         }
     }
-
     //set the file operation
     t->previousOp = RF_FILE_READ;
-    //check for eof
-    if (t->eof == true) {
-        return RE_FILE_EOF;
-    }
 
     //Read the file depending on the encoding
     if (!rf_stringx_from_file_assign(line, t->f, &eof, t->eol, t->encoding, t->endianess)) {
@@ -1340,7 +1338,7 @@ int rf_textfile_read_line(struct RFtextfile* t, struct RFstringx* line)
     t->line++;
     t->eof = eof;
     exclude_end_of_line(line);
-    return RF_SUCCESS;
+    return t->eof ? RE_FILE_EOF : RF_SUCCESS;
 }
 
 /* --- Textfile Retrieval Functions --- */
@@ -1351,6 +1349,10 @@ int rf_textfile_read_line_chars(struct RFtextfile* t,
 {
     RFfile_offset startOff;
     char eof = false;
+    //check for eof before doing anything
+    if (t->eof == true) {
+        return RE_FILE_EOF;
+    }
 
     if (t->mode != RF_FILE_STDIN) {
         //check if we can read from this textfile
@@ -1367,10 +1369,6 @@ int rf_textfile_read_line_chars(struct RFtextfile* t,
     }
     //set the operation
     t->previousOp = RF_FILE_READ;
-    //check for eof
-    if (t->eof == true) {
-        return RE_FILE_EOF;
-    }
 
     //Read the file depending on the encoding
     if (!rf_stringx_from_file_assign(line, t->f, &eof, t->eol, t->encoding, t->endianess)) {
@@ -1393,7 +1391,7 @@ int rf_textfile_read_line_chars(struct RFtextfile* t,
     //success
     t->line++;
     t->eof = eof;
-    return RF_SUCCESS;
+    return t->eof ? RE_FILE_EOF : RF_SUCCESS;
 }
 
 int rf_textfile_read_lines(struct RFtextfile* t,

@@ -358,6 +358,10 @@ static void test_rf_string_fwrite_generic(const char* filename, int encoding,
         rf_string_from_file_append(
             &s, f, &eof, RF_EOL_LF, encoding, endianess)
     );
+    ck_assert(
+        rf_string_from_file_append(
+            &s, f, &eof, RF_EOL_LF, encoding, endianess)
+    );
     /* end of file should have been reached */
     ck_assert(eof == true);
 
