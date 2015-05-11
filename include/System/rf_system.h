@@ -14,6 +14,7 @@
 #include <stdio.h> //for FILE* and friends
 /*------------- End of includes -------------*/
 
+struct RFstring;
 
 /**
 ** @defgroup RFsystem_g_r_p System
@@ -221,7 +222,7 @@ i_DECLIMEX_ RFthread_id rf_system_get_thread_id();
 /**
  ** @brief A wrapper for fopen with RFstring
  */
-i_DECLIMEX_ FILE* rf_fopen(const void* name, const char* mode);
+i_DECLIMEX_ FILE *rf_fopen(const struct RFstring *n, const char *mode);
 
 /**
  ** @brief A wrapper for freopen with RFstring

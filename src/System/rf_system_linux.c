@@ -216,18 +216,11 @@ RFthread_id rf_system_get_thread_id()
     return syscall(SYS_gettid);
 }
 
-
-FILE* rf_fopen(const void* name, const char* mode)
+FILE *rf_fopen(const struct RFstring *n, const char *mode)
 {
-    char* cstr;
-    FILE* ret = NULL;
+    FILE *ret;
     RFS_PUSH();
-    if (!(cstr = rf_string_cstr_from_buff(name))) {
-        goto end_pop;
-    }
-    ret = fopen(cstr, mode);
-
-end_pop:
+    ret = fopen(rf_string_cstr_from_buff_or_die(n), mode);
     RFS_POP();
     return ret;
 }
