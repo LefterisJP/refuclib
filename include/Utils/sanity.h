@@ -52,6 +52,9 @@
         do {                                         \
             if (!(condition_)) {                     \
                 RF_CRITICAL(__VA_ARGS__);            \
+                printf(__VA_ARGS__);                 \
+                printf("\n");                        \
+                fflush(stdout);                      \
                 assert(condition_);                  \
             }                                        \
         }while(0)
