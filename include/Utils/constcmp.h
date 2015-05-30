@@ -11,56 +11,46 @@
 /*------------- End of includes -------------*/
 
 /**
- **  Returns true if float a > float b
- **
- **/
-#define FLCMP_G(a__,b__)  (a__)-(b__) > FLT_EPSILON
+ *  @return true if float a > float b
+ */
+#define FLCMP_G(a__, b__)  ((a__) - (b__) > FLT_EPSILON)
 /**
- **  Retuns true if float a >= float b
- **
- **/
-#define FLCMP_GE(a__,b__)   (a__)-(b__) >= 0
+ *  @retun true if float a >= float b
+ */
+#define FLCMP_GE(a__, b__)   ((a__) - (b__) >= 0)
 /**
- **  Returns true if float a < float b
- **
- **/
-#define FLCMP_L(a__,b__)    (b__)-(a__) > FLT_EPSILON
+ *  @return true if float a < float b
+ */
+#define FLCMP_L(a__, b__)    ((b__) - (a__) > FLT_EPSILON)
 /**
- **  Returns true if float a <= float b
- **
- **/
-#define FLCMP_LE(a__,b__)   (b__)-(a__) >= 0
+ *  @return true if float a <= float b
+ */
+#define FLCMP_LE(a__, b__)   ((b__) - (a__) >= 0)
 /**
- **  Returns true if float a == float b
- **
- **/
-#define FLCMP_EQ(a__,b__)   fabs( (a__)-(b__))<FLT_EPSILON
+ *  @return true if float a == float b
+ */
+#define FLCMP_EQ(a__, b__)   (fabs((a__) - (b__)) < FLT_EPSILON)
 
 /**
- **  Returns true if float a > float b
- **
+ *  @return true if float a > float b
  **/
-#define DBLCMP_G(a__,b__)  a__-b__>DBL_EPSILON
+#define DBLCMP_G(a__, b__)  ((a__) - (b__) > DBL_EPSILON)
 /**
- **  Retuns true if float a >= float b
- **
- **/
-#define DBLCMP_GE(a__,b__)   a__-b__>=0
+ *  @retun true if float a >= float b
+ */
+#define DBLCMP_GE(a__, b__)   ((a__) - (b__) >= 0)
 /**
- **  Returns true if float a < float b
- **
+ *  @return true if float a < float b
  **/
-#define DBLCMP_L(a__,b__)    b__-a__>DBL_EPSILON
+#define DBLCMP_L(a__, b__)    ((b__) - (a__) > DBL_EPSILON)
 /**
- **  Returns true if float a <= float b
- **
- **/
-#define DBLCMP_LE(a__,b__)   b__-a__>=0
+ *  @return true if float a <= float b
+ */
+#define DBLCMP_LE(a__, b__)   ((b__) - (a__) >= 0)
 /**
- **  Returns true if float a == float b
- **
- **/
-#define DBLCMP_EQ(a__,b__)   fabs((a__) -(b__)) < DBL_EPSILON
+ *  @return true if float a == float b
+ */
+#define DBLCMP_EQ(a__,b__)   (fabs((a__) - (b__)) < DBL_EPSILON)
 
 
 /* ------ Safe Hex Literal comparisons ------ */
