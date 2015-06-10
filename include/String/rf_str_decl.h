@@ -37,12 +37,14 @@
 ** @endcpp
 ** @endinternal
 */
-struct RFstring
+// for ABI compatibility with refu LLVM backend the string needs to be packed
+// TODO: Maybe make this conditional iff it's a compile of the language runtime
+struct __attribute__((__packed__)) RFstring
 {
-    //! The string's data
-    char* data;
     //! String's length in bytes
     uint32_t length;
+    //! The string's data
+    char* data;
 };
 
 #endif//include guards end

@@ -28,7 +28,7 @@ extern "C"
 /**
  ** Statically initialize a string
  */
-#define RF_STRING_STATIC_INIT(s_) {s_, sizeof(s_) - 1}
+#define RF_STRING_STATIC_INIT(s_) { sizeof(s_) - 1, (s_) }
 
 /**
  ** Shallow initialization of a string. If the source buffer,
@@ -43,7 +43,7 @@ extern "C"
 /**
  ** Shallow initialization of a string from a cstring
  **/
-#define RF_STRING_SHALLOW_INIT_CSTR(s_) {s_, strlen(s_)}
+#define RF_STRING_SHALLOW_INIT_CSTR(s_) {strlen(s_), (s_) }
 
 
 /**
