@@ -6,7 +6,6 @@
 #define RF_STRING_MODULE_HEADERS
 
 #include <rf_options.h>
-#ifdef RF_MODULE_STRINGS//check if the strings are included as a module
 
 
 /*---------other needed headers-----*/
@@ -25,9 +24,5 @@
 #include <String/rf_str_traversalx.h>
 #include <String/rf_str_filesx.h>
 #include <stdarg.h> //needed for the va_list argument
-
-#else //end of the strings module include
-    #error Attempted to include Refu String manipulation without the proper flag
-#endif
 
 #endif //end OF ifndef guards

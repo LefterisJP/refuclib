@@ -34,7 +34,7 @@
 #include <Definitions/types.h> //for the fixed size data types
 /*------------- Module related inclusion -------------*/
 #include <Time/sleep.h> //for the refu sleep functions
-/*------------- Outside Module inclusion -------------*/c
+/*------------- Outside Module inclusion -------------*/
 #include <Utils/log.h> //for error logging
 #include <Utils/memory.h> //for refu memory allocation
 /*------------- System specific -------------*/

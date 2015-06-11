@@ -1,4 +1,5 @@
 from build_extra.config import set_debug_mode
+from build_extra.utils import build_msg
 import os
 
 Import('env')
@@ -9,15 +10,63 @@ local_env = env.Clone()
 # TODO: Figure out a better way
 set_debug_mode(local_env, True)
 
-# setup the required modules
-(modules, orig_sources) = SConscript(
-    '#build_system/build_extra/clib/modules.py',
-    exports='local_env')
+orig_sources = [
+    'Data_Structures/binaryarray.c',
+    'Data_Structures/sbuffer.c',
+    'Data_Structures/objset.c',
+    'Data_Structures/intrusive_list.c',
+    'Data_Structures/htable.c',
+    'Data_Structures/mbuffer.c',
+    'Utils/fixed_memory_pool.c',
+    'Utils/endianess.c',
+    'Utils/rf_unicode.c',
+    'Utils/hash.c',
+    'Utils/log.c',
+    'Utils/array.c',
+    'Utils/math.c',
+    'String/rf_str_commonp.c',
+    'String/rf_str_conversion.c',
+    'String/rf_str_core.c',
+    'String/rf_str_filesx.c',
+    'String/rf_str_traversalx.c',
+    'String/rf_str_corex.c',
+    'String/rf_str_files.c',
+    'String/rf_str_retrieval.c',
+    'String/rf_str_common.c',
+    'String/rf_str_module.c',
+    'String/rf_str_manipulationx.c',
+    'String/rf_str_manipulation.c',
+    'stdlib/io.c',
+    'Parallel/rf_worker_pool_linux.c',
+    'Parallel/rf_threading_linux.c',
+    'Parallel/rf_threading.c',
+    'refu.c',
+    'Persistent/buffers.c',
+    'Numeric/Integer/conversion.c',
+    'IO/rf_file.c',
+    'IO/rf_textfile.c',
+]
+
+if local_env['TARGET_SYSTEM'] == 'Linux':
+    orig_sources += [
+        'Time/time_linux.c',
+        'System/rf_system_info_linux.c',
+        'System/rf_system_linux.c',
+    ]
+elif local_env['TARGET_SYSTEM'] == 'Linux':
+    orig_sources += [
+        'Time/time_win32.c',
+        'System/rf_system_win32.c',
+        'System/rf_system_info_win32.c',
+    ]
+else:
+    build_msg("Unsupported OS detected during source selection", "Error")
+    Exit(1)
 
 # only if actually building create the options file
 options_header = SConscript(
     '#build_system/build_extra/clib/options_header_creator.py',
-    exports='modules local_env')
+    exports='local_env')
 
 # -- STATIC LIBRARY
 static_env = local_env.Clone()
