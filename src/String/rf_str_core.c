@@ -18,9 +18,18 @@
 #include <stdio.h> // for snprintf
 /*------------- End of includes -------------*/
 
+struct RFstring *rf_string_create(const char *s)
+{
+    struct RFstring *ret;
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
+    if (!rf_string_init(ret, s)) {
+        free(ret);
+        return NULL;
+    }
+    return ret;
+}
 
-
-struct RFstring* rf_string_createv(const char* s, ...)
+struct RFstring *rf_string_createv(const char *s, ...)
 {
     struct RFstring *ret;
     va_list args;
@@ -31,7 +40,7 @@ struct RFstring* rf_string_createv(const char* s, ...)
     return ret;
 }
 
-struct RFstring *rf_string_createvl(const char* s, va_list args)
+struct RFstring *rf_string_createvl(const char *s, va_list args)
 {
     struct RFstring* ret;
 
@@ -43,18 +52,7 @@ struct RFstring *rf_string_createvl(const char* s, va_list args)
     return ret;
 }
 
-struct RFstring* rf_string_create(const char* s)
-{
-    struct RFstring* ret;
-    RF_MALLOC(ret, sizeof(*ret), return NULL);
-    if (!rf_string_init(ret, s)) {
-        free(ret);
-        return NULL;
-    }
-    return ret;
-}
-
-bool rf_string_initv(struct RFstring* str, const char* s, ...)
+bool rf_string_initv(struct RFstring *str, const char *s, ...)
 {
     va_list args;
     bool ret;
@@ -65,7 +63,7 @@ bool rf_string_initv(struct RFstring* str, const char* s, ...)
     return ret;
 }
 
-bool rf_string_initvl(struct RFstring* str, const char* s, va_list args)
+bool rf_string_initvl(struct RFstring *str, const char* s, va_list args)
 {
     unsigned int size;
     bool ret = false;
@@ -98,7 +96,7 @@ end:
     return ret;
 }
 
-bool rf_string_init(struct RFstring* str, const char* s)
+bool rf_string_init(struct RFstring *str, const char *s)
 {
     //check for validity of the given sequence and get the character length
     uint32_t byteLength;
@@ -125,7 +123,7 @@ bool rf_string_init(struct RFstring* str, const char* s)
 
 
 //Allocates a String by turning a unicode code point in a String (encoded in UTF-8).
-struct RFstring* rf_string_create_cp(uint32_t codepoint)
+struct RFstring *rf_string_create_cp(uint32_t codepoint)
 {
     struct RFstring* ret;
     RF_MALLOC(ret, sizeof(*ret), return NULL);
@@ -139,7 +137,7 @@ struct RFstring* rf_string_create_cp(uint32_t codepoint)
 }
 
 //Turns a unicode code point in a String (encoded in UTF-8).
-bool rf_string_init_cp(struct RFstring* str, uint32_t codepoint)
+bool rf_string_init_cp(struct RFstring *str, uint32_t codepoint)
 {
     RF_ASSERT(str, "got null string in function");
     //alloc enough for a utf8 character
@@ -154,7 +152,7 @@ bool rf_string_init_cp(struct RFstring* str, uint32_t codepoint)
     return true;
 }
 
-struct RFstring* rf_string_create_int(int i)
+struct RFstring *rf_string_create_int(int i)
 {
     //initialize the string and return it
     struct RFstring* ret;
@@ -167,7 +165,7 @@ struct RFstring* rf_string_create_int(int i)
     return ret;
 }
 
-bool rf_string_init_int(struct RFstring* str, int i)
+bool rf_string_init_int(struct RFstring *str, int i)
 {
     //the size of the int32_t buffer
     int len;
@@ -189,7 +187,7 @@ bool rf_string_init_int(struct RFstring* str, int i)
     return true;
 }
 
-struct RFstring* rf_string_create_double(double f, unsigned int precision)
+struct RFstring *rf_string_create_double(double f, unsigned int precision)
 {
     struct RFstring* ret;
     RF_MALLOC(ret, sizeof(*ret), return NULL);
@@ -201,7 +199,7 @@ struct RFstring* rf_string_create_double(double f, unsigned int precision)
     return ret;
 }
 
-bool rf_string_init_double(struct RFstring* str,
+bool rf_string_init_double(struct RFstring *str,
                            double f,
                            unsigned int precision)
 {
@@ -225,9 +223,9 @@ bool rf_string_init_double(struct RFstring* str,
     return true;
 }
 
-struct RFstring* rf_string_create_utf16(const uint16_t* s, unsigned int len)
+struct RFstring *rf_string_create_utf16(const uint16_t *s, unsigned int len)
 {
-    struct RFstring* ret;
+    struct RFstring *ret;
     RF_MALLOC(ret, sizeof(*ret), return NULL);
     if(!rf_string_init_utf16(ret, s, len))
     {
@@ -237,7 +235,7 @@ struct RFstring* rf_string_create_utf16(const uint16_t* s, unsigned int len)
     return ret;
 }
 
-bool rf_string_init_utf16(struct RFstring* str, const uint16_t* s, unsigned int len)
+bool rf_string_init_utf16(struct RFstring *str, const uint16_t *s, unsigned int len)
 {
     //decode the utf-16 and get the code points
     uint32_t* codepoints;
@@ -278,7 +276,7 @@ bool rf_string_init_utf16(struct RFstring* str, const uint16_t* s, unsigned int 
     return true;
 }
 
-struct RFstring* rf_string_create_utf32(const uint32_t* s, unsigned int len)
+struct RFstring *rf_string_create_utf32(const uint32_t *s, unsigned int len)
 {
     struct RFstring* ret;
     RF_MALLOC(ret, sizeof(*ret), return NULL);
@@ -290,8 +288,9 @@ struct RFstring* rf_string_create_utf32(const uint32_t* s, unsigned int len)
     return ret;
 }
 
-bool rf_string_init_utf32(struct RFstring* str, const uint32_t* codeBuffer,
-                         unsigned int length)
+bool rf_string_init_utf32(struct RFstring *str,
+                          const uint32_t *codeBuffer,
+                          unsigned int length)
 {
     //find the length of the utf32 buffer in characters
     uint32_t utf8ByteLength;
@@ -317,9 +316,9 @@ bool rf_string_init_utf32(struct RFstring* str, const uint32_t* codeBuffer,
 }
 
 
-struct RFstring* rf_string_create_unsafe(const char* s)
+struct RFstring *rf_string_create_unsafe(const char *s)
 {
-    struct RFstring* ret;
+    struct RFstring *ret;
     RF_MALLOC(ret, sizeof(*ret), return NULL);
     if(!rf_string_init_unsafe(ret, s))
     {
@@ -329,13 +328,13 @@ struct RFstring* rf_string_create_unsafe(const char* s)
     return ret;
 }
 
-bool rf_string_init_unsafe(struct RFstring* str, const char* s)
+bool rf_string_init_unsafe(struct RFstring *str, const char *s)
 {
     return rf_string_init_unsafe_nnt(str, s, strlen(s));
 }
 
 
-bool rf_string_init_unsafe_nnt(struct RFstring* str, const char* s, size_t length)
+bool rf_string_init_unsafe_nnt(struct RFstring *str, const char *s, size_t length)
 {
     RF_ASSERT(str, "got null string in function");
     RF_MALLOC(rf_string_data(str), length, return false);
@@ -348,7 +347,7 @@ bool rf_string_init_unsafe_nnt(struct RFstring* str, const char* s, size_t lengt
 /* --- Assigning to a String --- */
 
 
-bool rf_string_assign(struct RFstring* dst, const void* src)
+bool rf_string_assign(struct RFstring *dst, const struct RFstring *src)
 {
     RF_ASSERT(dst, "got null string in function");
 
@@ -369,7 +368,7 @@ bool rf_string_assign(struct RFstring* dst, const void* src)
     return true;
 }
 
-bool rf_string_assignv(struct RFstring* str, const char* s, ...)
+bool rf_string_assignv(struct RFstring *str, const char *s, ...)
 {
     va_list args;
     bool ret;
@@ -379,8 +378,8 @@ bool rf_string_assignv(struct RFstring* str, const char* s, ...)
     va_end(args);
     return ret;
 }
-bool rf_string_assignvl(struct RFstring* str,
-                        const char* s,
+bool rf_string_assignvl(struct RFstring *str,
+                        const char *s,
                         va_list args)
 {
     unsigned int size;
@@ -414,7 +413,7 @@ end:
 }
 
 //Assigns the value of a unicode character to the string
-bool rf_string_assign_char(struct RFstring* str,uint32_t codepoint)
+bool rf_string_assign_char(struct RFstring* str, uint32_t codepoint)
 {
     RF_ASSERT(str, "got null string in function");
     //realloc if needed
@@ -422,15 +421,15 @@ bool rf_string_assign_char(struct RFstring* str,uint32_t codepoint)
         RF_REALLOC(rf_string_data(str), char, 5, return false);
     }
     rf_string_length_bytes(str) = rf_utf8_encode_single(codepoint,
-                                                    rf_string_data(str));
-    if(!rf_string_length_bytes(str))
-    {
+                                                        rf_string_data(str));
+    if (!rf_string_length_bytes(str)) {
         return false;
     }
     return true;
 }
 
-bool rf_string_assign_unsafe_nnt(struct RFstring* str, const char* s,
+bool rf_string_assign_unsafe_nnt(struct RFstring *str,
+                                 const char *s,
                                  size_t length)
 {
     bool ret = true;
@@ -456,7 +455,7 @@ bool rf_string_assign_unsafe_nnt(struct RFstring* str, const char* s,
 
 /*--- RFstring copying functions ---*/
 
-struct RFstring* rf_string_copy_out(const void* src)
+struct RFstring* rf_string_copy_out(const struct RFstring *src)
 {
     struct RFstring* ret;
     //create the new string
@@ -469,18 +468,20 @@ struct RFstring* rf_string_copy_out(const void* src)
     return ret;
 }
 
-bool rf_string_copy_in(struct RFstring* dst, const void* src)
+bool rf_string_copy_in(struct RFstring *dst, const struct RFstring *src)
 {
     if (!src) {
         RF_WARNING("Provided null source string");
         return false;
     }
     return rf_string_init_unsafe_nnt(dst,
-                                    rf_string_data(src),
-                                    rf_string_length_bytes(src));
+                                     rf_string_data(src),
+                                     rf_string_length_bytes(src));
 }
 //Copies a certain number of characters from a string
-bool rf_string_copy_chars(struct RFstring* dst, const void* src, uint32_t charsN)
+bool rf_string_copy_chars(struct RFstring *dst,
+                          const struct RFstring *src,
+                          uint32_t charsN)
 {
     uint32_t i = 0,bytePos;
     if (!src) {
@@ -499,26 +500,24 @@ bool rf_string_copy_chars(struct RFstring* dst, const void* src, uint32_t charsN
 /*--- Methods to get rid of an RFstring ---*/
 
 // Deletes a string object and also frees its pointer.
-void rf_string_destroy(struct RFstring* s)
+void rf_string_destroy(struct RFstring *s)
 {
-    if(s != 0)
-    {
-        free(rf_string_data(s));
+    if (s != 0) {
+        rf_string_deinit(s);
         free(s);
     }
 }
 // Deletes a string object only, not its memory.
-void rf_string_deinit(struct RFstring* s)
+void rf_string_deinit(struct RFstring *s)
 {
-    if(s != 0)
-    {
+    if (s != 0) {
         free(rf_string_data(s));
     }
 }
 
 /*--- Equality check ---*/
 
-bool rf_string_equal(const void* s1, const void* s2)
+bool rf_string_equal(const struct RFstring *s1, const struct RFstring *s2)
 {
     bool ret;
     RF_ASSERT(s1, "got null 1st string in function");
@@ -531,7 +530,7 @@ bool rf_string_equal(const void* s1, const void* s2)
 /*--- 2 functions used in the iteration macros ---*/
 
 
-uint32_t rf_string_bytepos_to_codepoint(const void* str, uint32_t i)
+uint32_t rf_string_bytepos_to_codepoint(const struct RFstring *str, uint32_t i)
 {
     uint32_t codePoint=0;
     /*
@@ -584,8 +583,9 @@ uint32_t rf_string_bytepos_to_codepoint(const void* str, uint32_t i)
     return codePoint;
 }
 //Retrieves character position of a byte position
-uint32_t rf_string_bytepos_to_charpos(const void* str, uint32_t bytepos,
-                                   bool before)
+uint32_t rf_string_bytepos_to_charpos(const struct RFstring *str,
+                                      uint32_t bytepos,
+                                      bool before)
 {
     /*
       here there is no check if this is actually a byte pos inside the string's
@@ -618,7 +618,7 @@ uint32_t rf_string_bytepos_to_charpos(const void* str, uint32_t bytepos,
 }
 
 /* -- iteration related -- */
-void rf_string_get_iter(const void *thisstr,
+void rf_string_get_iter(const struct RFstring *thisstr,
                         struct RFstring_iterator *ret)
 {
     RF_ASSERT(thisstr, "got null string in function");

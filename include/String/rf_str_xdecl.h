@@ -61,6 +61,7 @@ struct RFstringx {
     uint32_t bSize;
 };
 
-
+//! Pass an RFstrinx as a normal RFstring to a functions that accept it
+#define RF_STRX2STR(i_strx_) (&(i_strx_)->INH_String)
 
 #endif //include guards end

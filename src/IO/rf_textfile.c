@@ -1383,8 +1383,8 @@ int rf_textfile_read_line_chars(struct RFtextfile* t,
 
     if (characters != 0) {
         //if we need specific characters
-        uint32_t charsN = rf_string_length(line);
-        rf_string_prune_end(line, charsN-characters, NULL);
+        uint32_t charsN = rf_string_length(RF_STRX2STR(line));
+        rf_string_prune_end(RF_STRX2STR(line), charsN-characters, NULL);
     } else {
         exclude_end_of_line(line);
     }
@@ -1495,8 +1495,8 @@ int32_t rf_textfile_get_line_begin(struct RFtextfile* t, uint64_t lineN,
     //read all the lines until you get to the one we need
     while ((error = rf_textfile_read_line(t,&buffer)) == RF_SUCCESS) {
         //if this is the line we need, assign it to the given string
-        if (i==lineN) {
-            if (rf_stringx_assign(line,&buffer) == false) {
+        if (i == lineN) {
+            if (rf_stringx_assign(line, RF_STRX2STR(&buffer)) == false) {
                 RF_ERROR("Failure at string assignment when reading lines "
                          "from Textfile \""RF_STR_PF_FMT"\"",
                          RF_STR_PF_ARG(&t->name));

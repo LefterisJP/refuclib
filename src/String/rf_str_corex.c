@@ -392,7 +392,7 @@ bool rf_stringx_init_buff(struct RFstringx* str, uint32_t buffSize,
 
 /*---- Methods to copy/assign an RFstringx ----*/
 
-bool rf_stringx_assign(struct RFstringx* dst, const void* source)
+bool rf_stringx_assign(struct RFstringx* dst, const struct RFstring *source)
 {
     RF_ASSERT(dst, "got NULL string in function");
     if (!source) {

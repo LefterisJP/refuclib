@@ -50,11 +50,11 @@ extern "C"
  ** interested in its value
  ** @return Returns @c true for success and @c false otherwise
  **/
-i_DECLIMEX_ bool rf_string_from_file_init(struct RFstring* str, FILE* f, char* eof,
-                                 enum RFeol_mark eol,
-                                 enum RFtext_encoding encoding,
-                                 enum RFendianess endianess,
-                                 unsigned int* buff_size);
+i_DECLIMEX_ bool rf_string_from_file_init(struct RFstring *str, FILE* f, char* eof,
+                                          enum RFeol_mark eol,
+                                          enum RFtext_encoding encoding,
+                                          enum RFendianess endianess,
+                                          unsigned int* buff_size);
 
 /**
  ** @brief Allocates and returns a string from file parsing
@@ -64,10 +64,10 @@ i_DECLIMEX_ bool rf_string_from_file_init(struct RFstring* str, FILE* f, char* e
  ** @see rf_string_from_file_append()
  **/
 i_DECLIMEX_ struct RFstring* rf_string_from_file_create(FILE* f, char* eof,
-                                        enum RFeol_mark eol,
-                                        enum RFtext_encoding encoding,
-                                        enum RFendianess endianess,
-                                        unsigned int* buff_size);
+                                                        enum RFeol_mark eol,
+                                                        enum RFtext_encoding encoding,
+                                                        enum RFendianess endianess,
+                                                        unsigned int* buff_size);
 /**
  ** @brief Assigns to a string from file parsing
  **
@@ -91,8 +91,8 @@ i_DECLIMEX_ struct RFstring* rf_string_from_file_create(FILE* f, char* eof,
  ** @see rf_string_from_file_append()
  **
  **/
-i_DECLIMEX_ bool rf_string_from_file_assign(struct RFstring* str,
-                                            FILE* f, char* eof,
+i_DECLIMEX_ bool rf_string_from_file_assign(struct RFstring *str,
+                                            FILE *f, char *eof,
                                             enum RFeol_mark eol,
                                             enum RFtext_encoding encoding,
                                             enum RFendianess endianess);
@@ -117,7 +117,7 @@ i_DECLIMEX_ bool rf_string_from_file_assign(struct RFstring* str,
  ** @see rf_string_from_file_assign()
  **
  **/
-i_DECLIMEX_ bool rf_string_from_file_append(struct RFstring* str, FILE* f,
+i_DECLIMEX_ bool rf_string_from_file_append(struct RFstring *str, FILE *f,
                                             char* eof,
                                             enum RFeol_mark eol,
                                             enum RFtext_encoding encoding,
@@ -140,7 +140,7 @@ i_DECLIMEX_ bool rf_string_from_file_append(struct RFstring* str, FILE* f,
  ** encoded in. Look @ref RFendianess for posssible values.
  ** @return            Returns @c true for success and @c false otherwise
  **/
-i_DECLIMEX_ bool rf_string_fwrite(const void* s, FILE* f,
+i_DECLIMEX_ bool rf_string_fwrite(const struct RFstring *s, FILE* f,
                                   enum RFtext_encoding encoding,
                                   enum RFendianess endianess);
 

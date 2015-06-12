@@ -27,9 +27,10 @@
     rf_string_length_bytes(str_) += rc_;                                \
 
 
-i_INLINE_DECL bool rf_string_generic_prepend(void* thisstr, const char* other,
-                                       unsigned int orig_size,
-                                       unsigned int other_size)
+i_INLINE_DECL bool rf_string_generic_prepend(struct RFstring *thisstr,
+                                             const char* other,
+                                             unsigned int orig_size,
+                                             unsigned int other_size)
 {
     int i;
     //move the old string to the end of the buffer
@@ -56,7 +57,7 @@ i_INLINE_DECL bool rf_stringx_generic_append(struct RFstringx* s,
     RF_STRINGX_REALLOC(s,
                        rf_string_length_bytes(s) + bytes_to_copy,
                        return false);
-    rf_string_generic_append(s, other, bytes_to_copy);
+    rf_string_generic_append(RF_STRX2STR(s), other, bytes_to_copy);
     return true;
 }
 
@@ -82,16 +83,16 @@ i_INLINE_DECL bool rf_stringx_generic_append(struct RFstringx* s,
  *                           of the found substrings in the string or NULL in
  *                           case of failure
  */
-uint32_t *replace_intro(void *s,
+uint32_t *replace_intro(struct RFstring *s,
                         uint32_t *number,
-                        const void *sstr,
+                        const struct RFstring *sstr,
                         enum RFstring_matching_options options);
 
-i_INLINE_DECL void replace_greater(void *s,
+i_INLINE_DECL void replace_greater(struct RFstring *s,
                                    uint32_t *buff,
                                    uint32_t number,
-                                   const void *sstr,
-                                   const void *rstr)
+                                   const struct RFstring *sstr,
+                                   const struct RFstring *rstr)
 {
     unsigned int i;
     unsigned int j;
@@ -118,11 +119,11 @@ i_INLINE_DECL void replace_greater(void *s,
     }
 }
 
-i_INLINE_DECL void replace_lesser(void *s,
+i_INLINE_DECL void replace_lesser(struct RFstring *s,
                                   uint32_t *buff,
                                   uint32_t number,
-                                  const void *sstr,
-                                  const void *rstr)
+                                  const struct RFstring *sstr,
+                                  const struct RFstring *rstr)
 {
     unsigned int i;
     unsigned int j;
@@ -151,10 +152,10 @@ i_INLINE_DECL void replace_lesser(void *s,
     }
 }
 
-i_INLINE_DECL void replace_equal(void *s,
+i_INLINE_DECL void replace_equal(struct RFstring *s,
                                  const uint32_t *buff,
                                  uint32_t number,
-                                 const void *rstr)
+                                 const struct RFstring *rstr)
 {
     unsigned int i;
     for(i = 0; i < number; ++i) {

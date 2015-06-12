@@ -35,7 +35,7 @@ START_TEST(test_string_length) {
                              "った。"));
 
 
-    ck_assert_uint_eq(rf_string_length(&sx), 23);
+    ck_assert_uint_eq(rf_string_length(RF_STRX2STR(&sx)), 23);
     ck_assert_uint_eq(rf_string_length(&s), 131);
     ck_assert_uint_eq(rf_string_length(&s2), 0);
     ck_assert_uint_eq(rf_string_length(&s3), 123);
@@ -552,7 +552,7 @@ START_TEST(test_string_afterv) {
             &s, &ret, RF_STRINGX_ARGUMENT, 2, &f1, &f2)
     );
     ck_assert_rf_str_eq_cstr(&ret, "福島県,和歌山県");
-    ck_assert(rf_string_before(&ret, &f2, &ret2, 0));
+    ck_assert(rf_string_before(RF_STRX2STR(&ret), &f2, &ret2, 0));
     ck_assert_rf_str_eq_cstr(&ret2, "福島県");
 
     /* substring not in main string */

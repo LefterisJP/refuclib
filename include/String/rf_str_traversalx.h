@@ -66,9 +66,9 @@ extern "C"
  ** @see rf_stringx_reset()
  **/
 i_DECLIMEX_ int32_t rf_stringx_move_after(
-    struct RFstringx* thisstr,
-    const void* sub,
-    void* result,
+    struct RFstringx *thisstr,
+    const struct RFstring *sub,
+    void *result,
     enum RFstring_matching_options options
 );
 
@@ -204,7 +204,7 @@ i_DECLIMEX_ bool rf_stringx_move_afterv(struct RFstringx* thisstr, void* result,
  ** @return                  The number of chars of @thisstr that were skipped
  **/
 i_DECLIMEX_ unsigned int rf_stringx_skip_chars(struct RFstringx* thisstr,
-                                               const void *chars,
+                                               const struct RFstring *chars,
                                                const char *limit,
                                                unsigned int *bytes,
                                                unsigned int *line_count);
@@ -244,8 +244,9 @@ i_DECLIMEX_ unsigned int rf_stringx_skip_chars(struct RFstringx* thisstr,
  **/
 i_DECLIMEX_ bool rf_stringx_move_after_pair(
     struct RFstringx* thisstr,
-    const void* left,
-    const void* right, void* result, 
+    const struct RFstring *left,
+    const struct RFstring *right,
+    void *result, 
     enum RFstring_matching_options options,
     uint32_t occurence
 );

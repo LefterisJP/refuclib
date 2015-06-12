@@ -747,7 +747,7 @@ START_TEST(test_textfile_replace) {
 
     /* read 2nd line */
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));
-    ck_assert(rf_string_equal(&str, &g_buff));
+    ck_assert(rf_string_equal(&str, RF_STRX2STR(&g_buff)));
 
     /* read 3rd line */
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&f, &g_buff));

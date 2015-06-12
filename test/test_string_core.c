@@ -323,7 +323,7 @@ START_TEST(test_string_equal) {
                   "Δοκιμαζουμε την αναθεση για StringX"
               )
     );
-    ck_assert(rf_string_equal(&s, &sx));
+    ck_assert(rf_string_equal(&s, RF_STRX2STR(&sx)));
 
     rf_stringx_deinit(&sx);
     rf_string_deinit(&s);
@@ -733,7 +733,7 @@ START_TEST(test_stringx_assign) {
     ck_assert(rf_stringx_init(&s, "Nana this is an apple"));
     ck_assert(rf_stringx_init(&s2,  "Nana this is a tasty orange"));
 
-    ck_assert(rf_stringx_assign(&s, &s2));
+    ck_assert(rf_stringx_assign(&s, RF_STRX2STR(&s2)));
     ck_assert_rf_strx_eq_cstr(&s, "Nana this is a tasty orange");
 
     rf_stringx_deinit(&s);

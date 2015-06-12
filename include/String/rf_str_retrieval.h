@@ -32,7 +32,7 @@ struct RFarray;
  **               @inhtype{String,StringX}
  ** @return       Returns the length of the string in characters
  **/
-i_DECLIMEX_ uint32_t rf_string_length(const void * s);
+i_DECLIMEX_ uint32_t rf_string_length(const struct RFstring *s);
 
 
 /**
@@ -67,9 +67,9 @@ i_DECLIMEX_ uint32_t rf_string_length(const void * s);
  ** @param cp           Will return the unicode codepoint if succesfull
  ** @return             returns @c true for success and @c false for failure
  **/
-i_DECLIMEX_ bool rf_string_get_char(const void* thisstr,
+i_DECLIMEX_ bool rf_string_get_char(const struct RFstring *thisstr,
                                     uint32_t c,
-                                    uint32_t* cp);
+                                    uint32_t *cp);
 //! @}
 
 //! @name String Retrieval
@@ -98,8 +98,10 @@ i_DECLIMEX_ bool rf_string_get_char(const void* thisstr,
  ** @see rf_string_after()
  ** @see rf_string_before()
  **/
-i_DECLIMEX_ bool rf_string_substr(const void* thisstr, uint32_t startPos,
-                                 uint32_t charsN, struct RFstring* ret);
+i_DECLIMEX_ bool rf_string_substr(const struct RFstring *thisstr,
+                                  uint32_t startPos,
+                                  uint32_t charsN,
+                                  struct RFstring *ret);
 
 /**
  ** @brief Finds if a substring exists inside another string.
@@ -120,7 +122,8 @@ i_DECLIMEX_ bool rf_string_substr(const void* thisstr, uint32_t startPos,
  **                         substring or RF_FAILURE for not found
  ** @see rf_string_find_i()
  **/
-i_DECLIMEX_ int32_t rf_string_find(const void* thisstr, const void* sstr,
+i_DECLIMEX_ int32_t rf_string_find(const struct RFstring *thisstr,
+                                   const struct RFstring *sstr,
                                    enum RFstring_matching_options options);
 
 /**
@@ -130,8 +133,10 @@ i_DECLIMEX_ int32_t rf_string_find(const void* thisstr, const void* sstr,
  ** @lmsFunction
  ** @see rf_string_find()
  **/
-i_DECLIMEX_ int32_t rf_string_find_i(const void* thisstr, const void* sstr,
-                                     uint32_t startPos, uint32_t length,
+i_DECLIMEX_ int32_t rf_string_find_i(const struct RFstring *thisstr,
+                                     const struct RFstring *sstr,
+                                     uint32_t startPos,
+                                     uint32_t length,
                                      enum RFstring_matching_options options);
 
 
@@ -200,8 +205,8 @@ i_DECLIMEX_ int32_t rf_string_find_i(const void* thisstr, const void* sstr,
  ** @return               How many character of the beginning of the string
  **                       are part of the @c chars string
  */
-unsigned int rf_string_begins_with_any(const void *thisstr,
-                                       const void *chars,
+unsigned int rf_string_begins_with_any(const struct RFstring *thisstr,
+                                       const struct RFstring *chars,
                                        const char *limit,
                                        unsigned int *bytes);
 
@@ -228,7 +233,8 @@ unsigned int rf_string_begins_with_any(const void *thisstr,
  **                      invalid input(null pointers).
  **/
 i_DECLIMEX_ int rf_string_count(
-    const void* thisstr, const void* sstr,
+    const struct RFstring *thisstr,
+    const struct RFstring *sstr,
     unsigned int bytes,
     struct RFarray *positions,
     enum RFstring_matching_options options
@@ -254,8 +260,10 @@ i_DECLIMEX_ int rf_string_count(
  **                          otherwise, substring not being found in the string
  **                          or sscanf unable to read into the variable
  **/
-i_DECLIMEX_ bool rf_string_scanf_after(const void* thisstr, const void* afterstr,
-                                       const char* format, void* var);
+i_DECLIMEX_ bool rf_string_scanf_after(const struct RFstring *thisstr,
+                                       const struct RFstring *afterstr,
+                                       const char* format,
+                                       void *var);
 
 /**
  ** @brief Initializes the first substring, between two given strings
@@ -288,8 +296,10 @@ i_DECLIMEX_ bool rf_string_scanf_after(const void* thisstr, const void* afterstr
  ** @see rf_string_after()
  ** @see rf_stringx_move_after_pair()
  **/
-i_DECLIMEX_ bool rf_string_between(const void* thisstr, const void* lstr,
-                                   const void* rstr, void* result,
+i_DECLIMEX_ bool rf_string_between(const struct RFstring *thisstr,
+                                   const struct RFstring *lstr,
+                                   const struct RFstring *rstr,
+                                   void *result,
                                    enum RFstring_matching_options options);
 
 
@@ -315,7 +325,8 @@ i_DECLIMEX_ bool rf_string_between(const void* thisstr, const void* lstr,
  ** @see rf_string_before()
  ** @see rf_string_afterv()
  **/
-i_DECLIMEX_ bool rf_string_beforev(const void* thisstr, void* result,
+i_DECLIMEX_ bool rf_string_beforev(const struct RFstring *thisstr,
+                                   void *result,
                                    enum RFstring_matching_options options,
                                    const unsigned char parN,
                                    ...);
@@ -340,8 +351,9 @@ i_DECLIMEX_ bool rf_string_beforev(const void* thisstr, void* result,
  ** @see rf_string_beforev()
  ** @see rf_string_after()
  **/
-i_DECLIMEX_ bool rf_string_before(const void* thisstr, const void* sstr,
-                                  void* result,
+i_DECLIMEX_ bool rf_string_before(const struct RFstring *thisstr,
+                                  const struct RFstring *sstr,
+                                  void *result,
                                   enum RFstring_matching_options options);
 
 /**
@@ -365,8 +377,9 @@ i_DECLIMEX_ bool rf_string_before(const void* thisstr, const void* sstr,
  ** @see rf_string_before()
  ** @see rf_stringx_move_after()
  **/
-i_DECLIMEX_ bool rf_string_after(const void* thisstr, const void* after,
-                                 void* result,
+i_DECLIMEX_ bool rf_string_after(const struct RFstring *thisstr,
+                                 const struct RFstring *after,
+                                 void *result,
                                  enum RFstring_matching_options options);
 
 /**
@@ -393,7 +406,8 @@ i_DECLIMEX_ bool rf_string_after(const void* thisstr, const void* after,
  ** @see rf_string_after()
  ** @see rf_string_beforev()
  **/
-i_DECLIMEX_ bool rf_string_afterv(const void* thisstr, void* result,
+i_DECLIMEX_ bool rf_string_afterv(const struct RFstring *thisstr,
+                                  void *result,
                                   enum RFstring_matching_options options,
                                   const unsigned char parN,
                                   ...);

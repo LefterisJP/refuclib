@@ -65,25 +65,25 @@ START_TEST(test_log_flush_and_check) {
     ck_assert(rf_stringx_init_buff(&buff, 1024, ""));
 
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&log_file, &buff));
-    ck_assert(RF_FAILURE != rf_string_find(&buff, &s1, 0));
+    ck_assert(RF_FAILURE != rf_string_find(RF_STRX2STR(&buff), &s1, 0));
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&log_file, &buff));
-    ck_assert(RF_FAILURE != rf_string_find(&buff, &s2, 0));
+    ck_assert(RF_FAILURE != rf_string_find(RF_STRX2STR(&buff), &s2, 0));
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&log_file, &buff));
-    ck_assert(RF_FAILURE != rf_string_find(&buff, &s3, 0));
+    ck_assert(RF_FAILURE != rf_string_find(RF_STRX2STR(&buff), &s3, 0));
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&log_file, &buff));
-    ck_assert(RF_FAILURE != rf_string_find(&buff, &s4, 0));
+    ck_assert(RF_FAILURE != rf_string_find(RF_STRX2STR(&buff), &s4, 0));
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&log_file, &buff));
-    ck_assert(RF_FAILURE != rf_string_find(&buff, &s5, 0));
+    ck_assert(RF_FAILURE != rf_string_find(RF_STRX2STR(&buff), &s5, 0));
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&log_file, &buff));
-    ck_assert(RF_FAILURE != rf_string_find(&buff, &s6, 0));
+    ck_assert(RF_FAILURE != rf_string_find(RF_STRX2STR(&buff), &s6, 0));
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&log_file, &buff));
-    ck_assert(RF_FAILURE != rf_string_find(&buff, &s7, 0));
+    ck_assert(RF_FAILURE != rf_string_find(RF_STRX2STR(&buff), &s7, 0));
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&log_file, &buff));
-    ck_assert(RF_FAILURE != rf_string_find(&buff, &s8, 0));
+    ck_assert(RF_FAILURE != rf_string_find(RF_STRX2STR(&buff), &s8, 0));
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&log_file, &buff));
-    ck_assert(RF_FAILURE != rf_string_find(&buff, &s9, 0));
+    ck_assert(RF_FAILURE != rf_string_find(RF_STRX2STR(&buff), &s9, 0));
     ck_assert(RF_SUCCESS == rf_textfile_read_line(&log_file, &buff));
-    ck_assert(RF_FAILURE != rf_string_find(&buff, &s10, 0));
+    ck_assert(RF_FAILURE != rf_string_find(RF_STRX2STR(&buff), &s10, 0));
 
     rf_stringx_deinit(&buff);
     rf_textfile_deinit(&log_file);

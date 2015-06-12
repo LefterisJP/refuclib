@@ -20,7 +20,7 @@
 /*------------- End of includes -------------*/
 
 static inline bool move_internal_ptr(struct RFstringx* s, int32_t move,
-                                     void* resultP, uint32_t len, char options)
+                                     void *resultP, uint32_t len, char options)
 {
     s->bIndex += move;
     rf_string_data(s) += move;
@@ -61,15 +61,16 @@ static inline bool move_internal_ptr(struct RFstringx* s, int32_t move,
     return true;
 }
 
-int32_t rf_stringx_move_after(struct RFstringx* thisstr, const void* sub,
-                              void* result,
+int32_t rf_stringx_move_after(struct RFstringx* thisstr,
+                              const struct RFstring *sub,
+                              void *result,
                               enum RFstring_matching_options options)
 {
     int32_t move;
     /* rf_string_find_byte_pos takes care of invalid input checking */
 
     //check for substring existence and return failure if not found
-    if((move = rf_string_find_byte_pos(thisstr, sub, options)) == RF_FAILURE) {
+    if((move = rf_string_find_byte_pos(RF_STRX2STR(thisstr), sub, options)) == RF_FAILURE) {
         return RF_FAILURE;
     }
     //if found, move the internal pointer
@@ -105,7 +106,7 @@ void rf_stringx_move_back(struct RFstringx* thisstr, uint32_t n)
 }
 
 i_INLINE_INS void rf_stringx_move_to_index(struct RFstringx* thisstr,
-                                            uint32_t n);
+                                           uint32_t n);
 
 void rf_stringx_move_forward(struct RFstringx* thisstr, uint32_t n)
 {
@@ -142,7 +143,8 @@ void rf_stringx_reset(struct RFstringx* thisstr)
     thisstr->bIndex = 0;
 }
 
-bool rf_stringx_move_afterv(struct RFstringx* thisstr, void* result,
+bool rf_stringx_move_afterv(struct RFstringx* thisstr,
+                            void* result,
                             enum RFstring_matching_options options,
                             const unsigned char parN, ...)
 {
@@ -163,7 +165,7 @@ bool rf_stringx_move_afterv(struct RFstringx* thisstr, void* result,
         //get the param
         struct RFstring* s = va_arg(argList, struct RFstring*);
         //if the parameter got found in the string see if it's the closest
-        if((thisPos = rf_string_find_byte_pos(thisstr, s, options)) != RF_FAILURE)
+        if((thisPos = rf_string_find_byte_pos(RF_STRX2STR(thisstr), s, options)) != RF_FAILURE)
         {
             if(thisPos < minPos)
             {
@@ -184,7 +186,7 @@ bool rf_stringx_move_afterv(struct RFstringx* thisstr, void* result,
 }
 
 unsigned int rf_stringx_skip_chars(struct RFstringx* thisstr,
-                                   const void *chars,
+                                   const struct RFstring *chars,
                                    const char *limit,
                                    unsigned int *bytes,
                                    unsigned int *line_count)
@@ -193,12 +195,12 @@ unsigned int rf_stringx_skip_chars(struct RFstringx* thisstr,
     unsigned int chars_to_skip;
     static const struct RFstring nl = RF_STRING_STATIC_INIT("\n");
 
-    chars_to_skip = rf_string_begins_with_any(thisstr,
+    chars_to_skip = rf_string_begins_with_any(RF_STRX2STR(thisstr),
                                               chars, limit,
                                               &bytes_to_move);
 
     if (chars_to_skip && line_count) {
-        *line_count = rf_string_count(thisstr, &nl, bytes_to_move, 0, 0);
+        *line_count = rf_string_count(RF_STRX2STR(thisstr), &nl, bytes_to_move, 0, 0);
     }
 
     if (chars_to_skip) {
@@ -212,8 +214,10 @@ unsigned int rf_stringx_skip_chars(struct RFstringx* thisstr,
 }
 
 //TODO: replace this ugly string_buff with something else
-bool rf_stringx_move_after_pair(struct RFstringx* thisstr, const void* left,
-                                const void* right, void* resultP,
+bool rf_stringx_move_after_pair(struct RFstringx* thisstr,
+                                const struct RFstring *left,
+                                const struct RFstring *right,
+                                void *resultP,
                                 enum RFstring_matching_options options,
                                 uint32_t occurence)
 {
@@ -243,7 +247,7 @@ bool rf_stringx_move_after_pair(struct RFstringx* thisstr, const void* left,
     for (i = 1; i <= occurence; i ++) {
 
         //attempt to get the in between string
-        if(!rf_string_between(thisstr, left, right,
+        if(!rf_string_between(RF_STRX2STR(thisstr), left, right,
                               &string_buff, options|RF_STRINGX_ARGUMENT))
         {
             ret = false;
@@ -251,7 +255,7 @@ bool rf_stringx_move_after_pair(struct RFstringx* thisstr, const void* left,
         }
 
         //move after this occurence of the pair
-        rf_stringx_move_after(thisstr, &string_buff, 0, options);
+        rf_stringx_move_after(thisstr, RF_STRX2STR(&string_buff), 0, options);
 
         /* if left == right don't go over the right separator when searching */
         if (!same_separators) {
@@ -279,7 +283,7 @@ bool rf_stringx_move_after_pair(struct RFstringx* thisstr, const void* left,
         if (options & RF_STRINGX_ARGUMENT) {
             rf_stringx_copy_in(resultP, &string_buff);
         } else {
-            rf_string_copy_in(resultP, &string_buff);
+            rf_string_copy_in(resultP, RF_STRX2STR(&string_buff));
         }
     }
 

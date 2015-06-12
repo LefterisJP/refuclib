@@ -23,7 +23,7 @@
 /*------------- End of includes -------------*/
 
 
-uint16_t* rf_string_to_utf16(const void* s, uint32_t* length)
+uint16_t *rf_string_to_utf16(const struct RFstring *s, uint32_t *length)
 {
     uint32_t* codepoints,charsN;
     uint16_t* utf16;
@@ -56,7 +56,7 @@ uint16_t* rf_string_to_utf16(const void* s, uint32_t* length)
     return utf16;
 }
 
-uint32_t* rf_string_to_utf32(const void* s, uint32_t* length)
+uint32_t *rf_string_to_utf32(const struct RFstring *s, uint32_t *length)
 {
     uint32_t* cp;
     RF_ASSERT(s, "got null string in function");
@@ -75,7 +75,7 @@ uint32_t* rf_string_to_utf32(const void* s, uint32_t* length)
     return cp;
 }
 
-char* rf_string_cstr(const void* str)
+char *rf_string_cstr(const struct RFstring *str)
 {
     char* ret;
     RF_ASSERT(str, "got null string in function");
@@ -85,7 +85,7 @@ char* rf_string_cstr(const void* str)
     return ret;
 }
 
-bool rf_string_to_int(const void* str, int64_t* v, size_t *off)
+bool rf_string_to_int(const struct RFstring *str, int64_t *v, size_t *off)
 {
     char *cstr;
     char *end;
@@ -114,11 +114,11 @@ bool rf_string_to_int(const void* str, int64_t* v, size_t *off)
     return ret;
 }
 
-bool rf_string_to_uint(const void* str,
-                       size_t start_off,
-                       uint64_t* v,
-                       size_t *off,
-                       int base)
+i_DECLIMEX_ bool rf_string_to_uint(const struct RFstring *str,
+                                   size_t start_off,
+                                   uint64_t *v,
+                                   size_t *off,
+                                   int base)
 {
     char *cstr;
     char *end;
@@ -147,20 +147,20 @@ bool rf_string_to_uint(const void* str,
     return ret;
 }
 
-i_INLINE_INS bool rf_string_to_uint_dec(const void* thisstr,
-                                        uint64_t* v,
+i_INLINE_INS bool rf_string_to_uint_dec(const struct RFstring *thisstr,
+                                        uint64_t *v,
                                         size_t *off);
-i_INLINE_INS bool rf_string_to_uint_hex(const void* thisstr,
-                                        uint64_t* v,
+i_INLINE_INS bool rf_string_to_uint_hex(const struct RFstring *thisstr,
+                                        uint64_t *v,
                                         size_t *off);
-i_INLINE_INS bool rf_string_to_uint_bin(const void* thisstr,
-                                        uint64_t* v,
+i_INLINE_INS bool rf_string_to_uint_bin(const struct RFstring *thisstr,
+                                        uint64_t *v,
                                         size_t *off);
-i_INLINE_INS bool rf_string_to_uint_oct(const void* thisstr,
-                                        uint64_t* v,
+i_INLINE_INS bool rf_string_to_uint_oct(const struct RFstring *thisstr,
+                                        uint64_t *v,
                                         size_t *off);
 
-bool rf_string_to_double(const void* str, double* f, size_t *off)
+bool rf_string_to_double(const struct RFstring *str, double *f, size_t *off)
 {
     char *cstr;
     char *end;
@@ -189,7 +189,7 @@ bool rf_string_to_double(const void* str, double* f, size_t *off)
     return ret;
 }
 
-void rf_string_to_lower(void* s)
+void rf_string_to_lower(struct RFstring *s)
 {
     uint32_t charI,byteI;
     RF_ASSERT(s, "got null string in function");
@@ -204,7 +204,7 @@ void rf_string_to_lower(void* s)
     RF_STRING_ITERATE_END(charI, byteI)
 }
 
-void rf_string_to_upper(void* s)
+void rf_string_to_upper(struct RFstring *s)
 {
     uint32_t charI, byteI;
     RF_STRING_ITERATE_START(s, charI, byteI)
@@ -217,8 +217,10 @@ void rf_string_to_upper(void* s)
     RF_STRING_ITERATE_END(charI, byteI)
 }
 
-bool rf_string_tokenize(const void* str, const void* sep,
-                       uint32_t* ret_tokens_num, struct RFstring** tokens)
+bool rf_string_tokenize(const struct RFstring *str,
+                        const struct RFstring *sep,
+                        uint32_t *ret_tokens_num,
+                        struct RFstring **tokens)
 {
     uint32_t i, sepLen;
     char *s;
@@ -250,7 +252,8 @@ bool rf_string_tokenize(const void* str, const void* sep,
 
     s = rf_string_data(str);
     e = rf_string_data(str) + rf_string_length_bytes(str);
-    for (i = 0; i < tokens_num - 1; i ++) {
+    // the cast is safe here due to the if check above
+    for (i = 0; i < (uint32_t)tokens_num - 1; i ++) {
         //find each substring
         e = strstr_nnt(s, e - s,
                        rf_string_data(sep), rf_string_length_bytes(sep));

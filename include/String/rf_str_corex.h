@@ -145,7 +145,7 @@ i_DECLIMEX_ bool rf_stringx_init_buffv(struct RFstringx* str,
  ** @return Returns @c true for success and @c false otherwise
  ** @see rf_stringx_assign_char()
  **/
-i_DECLIMEX_ bool rf_stringx_assign(struct RFstringx* dest, const void* source);
+i_DECLIMEX_ bool rf_stringx_assign(struct RFstringx* dest, const struct RFstring *source);
 
 /**
  ** @brief Assigns to a stringx with the given format (varargs)

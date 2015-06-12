@@ -651,7 +651,7 @@ START_TEST(test_stringx_prepend) {
 
     ck_assert(rf_stringx_prepend(&s, &p1));
     ck_assert(rf_stringx_append(&s, &a1));
-    ck_assert(rf_stringx_append(&s, &s2));
+    ck_assert(rf_stringx_append(&s, RF_STRX2STR(&s2)));
     ck_assert(rf_stringx_prepend(&s, &p2));
 
     ck_assert_rf_str_eq_cstr(

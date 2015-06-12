@@ -23,7 +23,7 @@
 /*------------- End of includes -------------*/
 
 // Finds the length of the string in characters
-uint32_t rf_string_length(const void* str)
+uint32_t rf_string_length(const struct RFstring *str)
 {
     uint32_t length,i;
     RF_ASSERT(str, "got null string in function");
@@ -32,7 +32,7 @@ uint32_t rf_string_length(const void* str)
     return length;
 }
 
-bool rf_string_get_char(const void* str, uint32_t c, uint32_t* cp)
+bool rf_string_get_char(const struct RFstring *str, uint32_t c, uint32_t *cp)
 {
     uint32_t length, i;
     RF_ASSERT(str, "got null string in function");
@@ -51,8 +51,10 @@ bool rf_string_get_char(const void* str, uint32_t c, uint32_t* cp)
     return false;
 }
 
-bool rf_string_substr(const void* s, uint32_t start_pos,
-                     uint32_t chars_num, struct RFstring* ret)
+bool rf_string_substr(const struct RFstring *s,
+                      uint32_t start_pos,
+                      uint32_t chars_num,
+                      struct RFstring *ret)
 {
     uint32_t charI,byteI,startI,endI;
     bool started = false, ended = false;
@@ -97,7 +99,8 @@ bool rf_string_substr(const void* s, uint32_t start_pos,
 }
 
 
-int32_t rf_string_find(const void* tstr, const void* sstr,
+int32_t rf_string_find(const struct RFstring *tstr,
+                       const struct RFstring *sstr,
                        enum RFstring_matching_options options)
 {
     /* sanity checks are performed inside rf_string_find_byte_pos() */
@@ -110,8 +113,10 @@ int32_t rf_string_find(const void* tstr, const void* sstr,
 }
 
 
-int32_t rf_string_find_i(const void* thisstr, const void* sstr,
-                         uint32_t start_pos, uint32_t length,
+int32_t rf_string_find_i(const struct RFstring *thisstr,
+                         const struct RFstring *sstr,
+                         uint32_t start_pos,
+                         uint32_t length,
                          enum RFstring_matching_options options)
 {
     struct RFstring sub;
@@ -130,8 +135,8 @@ int32_t rf_string_find_i(const void* thisstr, const void* sstr,
     return ret;
 }
 
-unsigned int rf_string_begins_with_any(const void *thisstr,
-                                       const void *chars,
+unsigned int rf_string_begins_with_any(const struct RFstring *thisstr,
+                                       const struct RFstring *chars,
                                        const char *limit,
                                        unsigned int *bytes)
 {
@@ -182,8 +187,8 @@ cleanup:
     return matching_chars;
 }
 
-int rf_string_count(const void* tstr,
-                    const void* sstr,
+int rf_string_count(const struct RFstring *tstr,
+                    const struct RFstring *sstr,
                     unsigned int bytes,
                     struct RFarray *positions,
                     enum RFstring_matching_options options)
@@ -226,8 +231,10 @@ int rf_string_count(const void* tstr,
 }
 
 
-bool rf_string_scanf_after(const void* str, const void* astr,
-                         const char* format, void* var)
+bool rf_string_scanf_after(const struct RFstring *str,
+                           const struct RFstring *astr,
+                           const char* format,
+                           void* var)
 {
     char *s;
     char *cstr;
@@ -281,8 +288,10 @@ end:
 }
 
 
-bool rf_string_between(const void* tstr, const void* lstr,
-                       const void* rstr, void* result,
+bool rf_string_between(const struct RFstring *tstr,
+                       const struct RFstring *lstr,
+                       const struct RFstring *rstr,
+                       void *result,
                        enum RFstring_matching_options options)
 {
     int start, end;
@@ -335,7 +344,8 @@ cleanup_temp:
     return ret;
 }
 
-bool rf_string_beforev(const void* thisstr, void* result,
+bool rf_string_beforev(const struct RFstring *thisstr,
+                       void *result,
                        enum RFstring_matching_options options,
                        const unsigned char parN,  ...)
 {
@@ -381,8 +391,9 @@ bool rf_string_beforev(const void* thisstr, void* result,
     return true;
 }
 
-bool rf_string_before(const void* thisstr, const void* sstr,
-                      void* result,
+bool rf_string_before(const struct RFstring *thisstr,
+                      const struct RFstring *sstr,
+                      void *result,
                       enum RFstring_matching_options options)
 {
     int32_t rv;
@@ -414,8 +425,9 @@ bool rf_string_before(const void* thisstr, const void* sstr,
     return true;
 }
 
-bool rf_string_after(const void* thisstr, const void* after,
-                     void* result,
+bool rf_string_after(const struct RFstring *thisstr,
+                     const struct RFstring *after,
+                     void *result,
                      enum RFstring_matching_options options)
 {
     int32_t bytePos;
@@ -453,7 +465,8 @@ bool rf_string_after(const void* thisstr, const void* after,
 }
 
 
-bool rf_string_afterv(const void* thisstr, void* result,
+bool rf_string_afterv(const struct RFstring *thisstr,
+                      void *result,
                       enum RFstring_matching_options options,
                       const unsigned char parN, ...)
 {

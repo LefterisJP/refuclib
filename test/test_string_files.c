@@ -252,7 +252,7 @@ static void test_rf_stringx_assign_generic(const char* filename, int encoding,
 
 
     /* get rid of the BOM and check for the right string */
-    ck_assert(rf_string_prune_start(&s, 1, NULL));
+    ck_assert(rf_string_prune_start(RF_STRX2STR(&s), 1, NULL));
     ck_assert_rf_strx_eq_cstr(&s, get_line(encoding,
                                            endianess,
                                            true,
@@ -312,7 +312,7 @@ static void test_rf_stringx_append_generic(const char* filename, int encoding,
 
 
     /* get rid of the BOM and check for the right string */
-    ck_assert(rf_string_prune_start(&s, 1, NULL));
+    ck_assert(rf_string_prune_start(RF_STRX2STR(&s), 1, NULL));
     ck_assert_rf_strx_eq_cstr(&s, get_line(encoding,
                                            endianess,
                                            true,

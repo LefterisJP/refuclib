@@ -63,7 +63,9 @@ bool strcmp_nnt(char* s1, unsigned int s1_len,
 }
 
 // Internal version of rf_string_find, used for byte position.
-int rf_string_find_byte_pos(const void* tstr, const void* sstr, const char options)
+int rf_string_find_byte_pos(const struct RFstring *tstr,
+                            const struct RFstring *sstr,
+                            const char options)
 {
 #define CHECK_NOT_CHAR(s_, i_)                  \
     do{                                         \
@@ -187,8 +189,8 @@ int rf_string_find_byte_pos(const void* tstr, const void* sstr, const char optio
 #undef CHECK_NOT_CHAR
 }
 
-i_INLINE_INS void rf_string_generic_append(void* thisstr,
-                                     const char* other,
-                                     unsigned int bytes_to_copy);
+i_INLINE_INS void rf_string_generic_append(struct RFstring *thisstr,
+                                           const char* other,
+                                           unsigned int bytes_to_copy);
 i_INLINE_INS uint32_t *rf_string_fill_codepoints(const struct RFstring *s,
                                                  size_t *chars_num);

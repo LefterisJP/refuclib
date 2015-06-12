@@ -95,7 +95,7 @@ START_TEST(test_string_to_int) {
     ck_assert(rf_string_init(&s2, "0"));
     ck_assert(rf_string_init(&s, "-123442"));
 
-    ck_assert(rf_string_to_int(&sx, &num, NULL));
+    ck_assert(rf_string_to_int(RF_STRX2STR(&sx), &num, NULL));
     ck_assert_int_eq(num, 45687);
 
     ck_assert(rf_string_to_int(&s, &num, &off));
@@ -172,7 +172,7 @@ START_TEST(test_string_to_double) {
     ck_assert(rf_string_init(&s, "-0.02341"));
     ck_assert(rf_string_init(&s2, "0.0"));
 
-    ck_assert(rf_string_to_double(&sx, &num, NULL));
+    ck_assert(rf_string_to_double(RF_STRX2STR(&sx), &num, NULL));
     ck_assert_double_eq(num, 245.9310);
 
     ck_assert(rf_string_to_double(&s, &num, &off));
@@ -209,7 +209,7 @@ START_TEST(test_string_to_lower) {
     struct RFstringx sx;
     struct RFstring s;
     ck_assert(rf_stringx_init(&sx, "ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
-    rf_string_to_lower(&sx);
+    rf_string_to_lower(RF_STRX2STR(&sx));
     ck_assert_rf_str_eq_cstr(&sx, "abcdefghijklmnopqrstuvwxyz");
 
     ck_assert(rf_string_init(&s, ""));
@@ -223,7 +223,7 @@ START_TEST(test_string_to_upper) {
     struct RFstringx sx;
     struct RFstring s;
     ck_assert(rf_stringx_init(&sx, "abcdefghijklmnopqrstuvwxyz"));
-    rf_string_to_upper(&sx);
+    rf_string_to_upper(RF_STRX2STR(&sx));
     ck_assert_rf_str_eq_cstr(&sx, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
     ck_assert(rf_string_init(&s, ""));
@@ -255,7 +255,7 @@ START_TEST(test_string_tokenize) {
     ck_assert(rf_string_init(&tok_space, " "));
     ck_assert(rf_string_init(&tok_comma, ","));
 
-    ck_assert(rf_string_tokenize(&sx, &tok_space, &words_num, &words));
+    ck_assert(rf_string_tokenize(RF_STRX2STR(&sx), &tok_space, &words_num, &words));
     ck_assert_int_eq(words_num, sizeof(words_arr)/sizeof(char*));
     for(i = 0; i < words_num; i++) {
         ck_assert_rf_str_eq_cstr(&words[i], words_arr[i]);
@@ -288,11 +288,11 @@ START_TEST(test_invalid_string_tokenize) {
     ck_assert(rf_string_init(&tok_comma, ","));
 
     /* no commas in the string */
-    ck_assert(!rf_string_tokenize(&sx, &tok_comma ,&words_num, &words));
+    ck_assert(!rf_string_tokenize(RF_STRX2STR(&sx), &tok_comma ,&words_num, &words));
     /* no separator string */
-    ck_assert(!rf_string_tokenize(&sx, NULL ,&words_num, &words));
+    ck_assert(!rf_string_tokenize(RF_STRX2STR(&sx), NULL ,&words_num, &words));
     /* no output data */
-    ck_assert(!rf_string_tokenize(&sx, &tok_space, NULL, NULL));
+    ck_assert(!rf_string_tokenize(RF_STRX2STR(&sx), &tok_space, NULL, NULL));
 
     rf_stringx_deinit(&sx);
     rf_string_deinit(&tok_space);

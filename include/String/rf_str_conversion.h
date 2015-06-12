@@ -42,7 +42,7 @@ extern "C"
  ** @see rf_string_tout_f8()
  ** @see rf_string_to_utf32()
  **/
-i_DECLIMEX_ uint16_t* rf_string_to_utf16(const void* s, uint32_t* length);
+i_DECLIMEX_ uint16_t *rf_string_to_utf16(const struct RFstring *s, uint32_t *length);
 
 /**
  ** @brief Returns the strings contents as a UTF-32 buffer
@@ -60,7 +60,7 @@ i_DECLIMEX_ uint16_t* rf_string_to_utf16(const void* s, uint32_t* length);
  ** @see rf_string_tout_f8()
  ** @see rf_string_to_utf16()
  **/
-i_DECLIMEX_ uint32_t* rf_string_to_utf32(const void* s,uint32_t*length);
+i_DECLIMEX_ uint32_t *rf_string_to_utf32(const struct RFstring *s, uint32_t *length);
 
 //! @}
 
@@ -80,7 +80,7 @@ i_DECLIMEX_ uint32_t* rf_string_to_utf32(const void* s,uint32_t*length);
  **                @inhtype{String,StringX}
  ** @return        Returns the pointer to the allocated c string
  **/
-i_DECLIMEX_ char *rf_string_cstr(const void* s);
+i_DECLIMEX_ char *rf_string_cstr(const struct RFstring *s);
 
 /**
  ** Turns the given string into a null terminated c string.
@@ -109,22 +109,22 @@ i_DECLIMEX_ char *rf_string_cstr_from_buff_or_die(const void* s);
  **                    integer was represented by the string
  ** @see rf_string_to_double()
  **/
-i_DECLIMEX_ bool rf_string_to_int(const void* thisstr, int64_t* v, size_t *off);
-i_DECLIMEX_ bool rf_string_to_uint(const void* thisstr,
+i_DECLIMEX_ bool rf_string_to_int(const struct RFstring *s, int64_t *v, size_t *off);
+i_DECLIMEX_ bool rf_string_to_uint(const struct RFstring *thisstr,
                                    size_t start_off,
-                                   uint64_t* v,
+                                   uint64_t *v,
                                    size_t *off,
                                    int base);
 
-i_INLINE_DECL bool rf_string_to_uint_dec(const void* thisstr,
-                                        uint64_t* v,
-                                        size_t *off)
+i_INLINE_DECL bool rf_string_to_uint_dec(const struct RFstring *thisstr,
+                                         uint64_t *v,
+                                         size_t *off)
 {
     return rf_string_to_uint(thisstr, 0, v, off, 10);
 }
 
-i_INLINE_DECL bool rf_string_to_uint_hex(const void* thisstr,
-                                         uint64_t* v,
+i_INLINE_DECL bool rf_string_to_uint_hex(const struct RFstring *thisstr,
+                                         uint64_t *v,
                                          size_t *off)
 {
     const char *c = rf_string_data(thisstr);
@@ -139,9 +139,9 @@ i_INLINE_DECL bool rf_string_to_uint_hex(const void* thisstr,
     return true;
 }
 
-i_INLINE_DECL bool rf_string_to_uint_bin(const void* thisstr,
-                                        uint64_t* v,
-                                        size_t *off)
+i_INLINE_DECL bool rf_string_to_uint_bin(const struct RFstring *thisstr,
+                                         uint64_t *v,
+                                         size_t *off)
 {
     char *s = rf_string_data(thisstr);
 
@@ -151,9 +151,9 @@ i_INLINE_DECL bool rf_string_to_uint_bin(const void* thisstr,
     return rf_string_to_uint(thisstr, 0, v, off, 2);
 }
 
-i_INLINE_DECL bool rf_string_to_uint_oct(const void* thisstr,
-                                        uint64_t* v,
-                                        size_t *off)
+i_INLINE_DECL bool rf_string_to_uint_oct(const struct RFstring *thisstr,
+                                         uint64_t *v,
+                                         size_t *off)
 {
     const char *c = rf_string_data(thisstr);
     if (!rf_string_to_uint(thisstr, 0, v, off, 0)) {
@@ -181,8 +181,8 @@ i_INLINE_DECL bool rf_string_to_uint_oct(const void* thisstr,
  **                    double was represented by the string
  ** @see rf_string_to_int()
  **/
-i_DECLIMEX_ bool rf_string_to_double(const void* thisstr,
-                                     double* f,
+i_DECLIMEX_ bool rf_string_to_double(const struct RFstring *thisstr,
+                                     double *f,
                                      size_t *off);
 
 /**
@@ -196,7 +196,7 @@ i_DECLIMEX_ bool rf_string_to_double(const void* thisstr,
  **                to lowercase conversion
  ** @see rf_string_to_upper()
  **/
-i_DECLIMEX_ void rf_string_to_lower(void* thisstr);
+i_DECLIMEX_ void rf_string_to_lower(struct RFstring *thisstr);
 
 /**
  ** @brief Turns any lowercase characters of the string into upper case
@@ -209,7 +209,7 @@ i_DECLIMEX_ void rf_string_to_lower(void* thisstr);
  **                uppercase conversion
  ** @see rf_string_to_lower()
  **/
-i_DECLIMEX_ void rf_string_to_upper(void* thisstr);
+i_DECLIMEX_ void rf_string_to_upper(struct RFstring *thisstr);
 
 /**
  ** @brief Tokenizes the given string
@@ -233,8 +233,10 @@ i_DECLIMEX_ void rf_string_to_upper(void* thisstr);
  ** @return Returns @c true in success and @c false in case the the
  ** separating character has not been found
  **/
-i_DECLIMEX_ bool rf_string_tokenize(const void* thisstr, const void* sep,
-                                    uint32_t* tokensN, struct RFstring** tokens);
+i_DECLIMEX_ bool rf_string_tokenize(const struct RFstring *thisstr,
+                                    const struct RFstring *sep,
+                                    uint32_t *tokensN,
+                                    struct RFstring **tokens);
 
 //! @}
 

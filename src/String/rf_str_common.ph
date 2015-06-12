@@ -178,10 +178,11 @@ bool strcmp_nnt(char* s1, unsigned int s1_len,
  ** @endinternal
  **
  **/
-int rf_string_find_byte_pos(const void* thisstr, const void* sstr,
+int rf_string_find_byte_pos(const struct RFstring *thisstr,
+                            const struct RFstring *sstr,
                             const char options);
 
-i_INLINE_DECL void rf_string_generic_append(void *thisstr,
+i_INLINE_DECL void rf_string_generic_append(struct RFstring *thisstr,
                                             const char *other,
                                             unsigned int bytes_to_copy)
 {

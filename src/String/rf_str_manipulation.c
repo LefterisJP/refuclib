@@ -24,7 +24,7 @@
 /*------------- End of includes -------------*/
 
 // Appends the parameter String to this one
-bool rf_string_append(struct RFstring* thisstr, const void* other)
+bool rf_string_append(struct RFstring* thisstr, const struct RFstring *other)
 {
     unsigned int newLen;
     RF_ASSERT(thisstr, "got null string in function");
@@ -72,7 +72,7 @@ bool rf_string_append_double(struct RFstring* thisstr,
     return true;
 }
 
-bool rf_string_prepend(struct RFstring* thisstr, const void* other)
+bool rf_string_prepend(struct RFstring* thisstr, const struct RFstring *other)
 {
     RF_ASSERT(thisstr, "got null string in function");
     if (!other) {
@@ -96,7 +96,9 @@ bool rf_string_prepend(struct RFstring* thisstr, const void* other)
     return true;
 }
 
-bool rf_string_remove(void* thisstr, const void* rstr, uint32_t number,
+bool rf_string_remove(struct RFstring *thisstr,
+                      const struct RFstring *rstr,
+                      uint32_t number,
                       enum RFstring_matching_options options)
 {
     uint32_t i, count, occurences=0;
@@ -147,7 +149,9 @@ bool rf_string_remove(void* thisstr, const void* rstr, uint32_t number,
 }
 
 //Removes all of the characters of the string except those specified
-bool rf_string_keep_only(void* thisstr, const void* keepstr, int *removals)
+bool rf_string_keep_only(struct RFstring *thisstr,
+                         const struct RFstring *keepstr,
+                         int *removals)
 {
     uint32_t charValue;
     uint32_t i;
@@ -225,7 +229,7 @@ end:
     return ret;
 }
 
-bool rf_string_prune_start(void* thisstr, uint32_t n, unsigned int *removals)
+bool rf_string_prune_start(struct RFstring *thisstr, uint32_t n, unsigned int *removals)
 {
     //iterate the characters of the string
     uint32_t i;
@@ -270,7 +274,7 @@ bool rf_string_prune_start(void* thisstr, uint32_t n, unsigned int *removals)
     return true;
 }
 
-bool rf_string_prune_end(void* thisstr, uint32_t n, unsigned int *removals)
+bool rf_string_prune_end(struct RFstring *thisstr, uint32_t n, unsigned int *removals)
 {
     //start the iteration of the characters from the end of the string
     int32_t new_byte_pos = -1;
@@ -309,7 +313,7 @@ bool rf_string_prune_end(void* thisstr, uint32_t n, unsigned int *removals)
     return true;
 }
 
-bool rf_string_prune_middle_b(void* thisstr, uint32_t p,
+bool rf_string_prune_middle_b(struct RFstring *thisstr, uint32_t p,
                               uint32_t n, unsigned int *removals)
 {
     uint32_t byte_position;
@@ -365,7 +369,7 @@ bool rf_string_prune_middle_b(void* thisstr, uint32_t p,
     return true;
 }
 
-bool rf_string_prune_middle_f(void* thisstr, uint32_t p,
+bool rf_string_prune_middle_f(struct RFstring *thisstr, uint32_t p,
                               uint32_t n, unsigned int *removals)
 {
     uint32_t j, i;
@@ -431,7 +435,9 @@ bool rf_string_prune_middle_f(void* thisstr, uint32_t p,
     return true;
 }
 
-bool rf_string_trim_start(void* thisstr, const void* sub, unsigned int *removals)
+bool rf_string_trim_start(struct RFstring *thisstr,
+                          const struct RFstring *sub,
+                          unsigned int *removals)
 {
     uint32_t byte_position;
     unsigned int i;
@@ -463,7 +469,9 @@ bool rf_string_trim_start(void* thisstr, const void* sub, unsigned int *removals
     return true;
 }
 
-bool rf_string_trim_end(void* thisstr, const void* sub, unsigned int *rem)
+bool rf_string_trim_end(struct RFstring *thisstr,
+                        const struct RFstring *sub,
+                        unsigned int *rem)
 {
     bool iteration_match;
     uint32_t i;
@@ -526,7 +534,9 @@ end:
     return ret;
 }
 
-bool rf_string_trim(void* thisstrP, const void* subP, unsigned int *removals)
+bool rf_string_trim(struct RFstring *thisstrP,
+                    const struct RFstring *subP,
+                    unsigned int *removals)
 {
     unsigned int local_removals = 0;
     bool res1, res2;
@@ -544,8 +554,8 @@ bool rf_string_trim(void* thisstrP, const void* subP, unsigned int *removals)
 
 
 bool rf_string_replace(struct RFstring* thisstr,
-                       const void* sstr,
-                       const void* rstr,
+                       const struct RFstring *sstr,
+                       const struct RFstring *rstr,
                        const uint32_t num,
                        enum RFstring_matching_options options)
 {
@@ -588,13 +598,14 @@ end:
 
 /* module related inline object insertion*/
 
-i_INLINE_INS bool rf_string_generic_prepend(void* thisstr, const char* other,
-                                      unsigned int orig_size,
-                                      unsigned int other_size);
+i_INLINE_INS bool rf_string_generic_prepend(struct RFstring *thisstr,
+                                            const char* other,
+                                            unsigned int orig_size,
+                                            unsigned int other_size);
 
-uint32_t *replace_intro(void *s,
+uint32_t *replace_intro(struct RFstring *s,
                         uint32_t *number,
-                        const void *sstr,
+                        const struct RFstring *sstr,
                         enum RFstring_matching_options options)
 {
     //TODO: Change this with a thread local buffer or thread local string
@@ -629,7 +640,7 @@ uint32_t *replace_intro(void *s,
         goto end;
     }
 
-    found_pos = rf_string_find_byte_pos(&temp, sstr, options);
+    found_pos = rf_string_find_byte_pos(RF_STRX2STR(&temp), sstr, options);
     buff[0] = found_pos;
     while (found_pos != RF_FAILURE) {
         int32_t move = buff[foundN] + rf_string_length_bytes(sstr);
@@ -651,7 +662,7 @@ uint32_t *replace_intro(void *s,
         if (foundN >= *number) {
             break;
         }
-        found_pos = rf_string_find_byte_pos(&temp, sstr, options);
+        found_pos = rf_string_find_byte_pos(RF_STRX2STR(&temp), sstr, options);
         buff[foundN] = found_pos;
     }
 
@@ -664,17 +675,17 @@ uint32_t *replace_intro(void *s,
     rf_stringx_deinit(&temp);
     return buff;
 }
-i_INLINE_INS void replace_greater(void *s,
+i_INLINE_INS void replace_greater(struct RFstring *s,
                                   uint32_t *buff,
                                   uint32_t number,
-                                  const void *sstr,
-                                  const void *rstr);
-i_INLINE_INS void replace_lesser(void *s,
+                                  const struct RFstring *sstr,
+                                  const struct RFstring *rstr);
+i_INLINE_INS void replace_lesser(struct RFstring *s,
                                  uint32_t *buff,
                                  uint32_t number,
-                                 const void *sstr,
-                                 const void *rstr);
-i_INLINE_INS void replace_equal(void *s,
+                                 const struct RFstring *sstr,
+                                 const struct RFstring *rstr);
+i_INLINE_INS void replace_equal(struct RFstring *s,
                                 const uint32_t *buff,
                                 uint32_t number,
-                                const void *rstr);
+                                const struct RFstring *rstr);

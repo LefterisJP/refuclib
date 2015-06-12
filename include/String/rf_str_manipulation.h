@@ -35,7 +35,7 @@ extern "C"
  ** @see rf_string_append_double()
  ** @see rf_string_prepend()
  **/
-i_DECLIMEX_ bool rf_string_append(struct RFstring* thisstr, const void* other);
+i_DECLIMEX_ bool rf_string_append(struct RFstring* thisstr, const struct RFstring *other);
 
 
 /**
@@ -79,7 +79,7 @@ i_DECLIMEX_ bool rf_string_append_double(struct RFstring* thisstr,
  ** @return          Returns @c true for success and @c false otherwise
  ** @see rf_string_append()
  **/
-i_DECLIMEX_ bool rf_string_prepend(struct RFstring* thisstr, const void* other);
+i_DECLIMEX_ bool rf_string_prepend(struct RFstring* thisstr, const struct RFstring *other);
 
 
 //! @}
@@ -116,9 +116,10 @@ i_DECLIMEX_ bool rf_string_prepend(struct RFstring* thisstr, const void* other);
  ** @see rf_string_trim()
  **
  **/
-i_DECLIMEX_ bool rf_string_remove(void* thisstr, const void* rstr,
-                                 uint32_t number,
-                                 enum RFstring_matching_options options);
+i_DECLIMEX_ bool rf_string_remove(struct RFstring *thisstr,
+                                  const struct RFstring *rstr,
+                                  uint32_t number,
+                                  enum RFstring_matching_options options);
 
 
 /**
@@ -136,7 +137,8 @@ i_DECLIMEX_ bool rf_string_remove(void* thisstr, const void* rstr,
  **                    pass an int here . If not just leave as NULL.
  ** @return            Returns @c true in success and @c false otherwise
  **/
-i_DECLIMEX_ bool rf_string_keep_only(void* thisstr, const void* keepstr,
+i_DECLIMEX_ bool rf_string_keep_only(struct RFstring *thisstr,
+                                     const struct RFstring *keepstr,
                                      int *removals);
 
 
@@ -154,7 +156,7 @@ i_DECLIMEX_ bool rf_string_keep_only(void* thisstr, const void* keepstr,
  ** @see rf_string_prune_middle_b()
  ** @see rf_string_prune_middle_f()
  **/
-i_DECLIMEX_ bool rf_string_prune_start(void* thisstr, uint32_t n,
+i_DECLIMEX_ bool rf_string_prune_start(struct RFstring *thisstr, uint32_t n,
                                        unsigned int *removals);
 
 /**
@@ -171,7 +173,7 @@ i_DECLIMEX_ bool rf_string_prune_start(void* thisstr, uint32_t n,
  ** @see rf_string_prune_middle_b()
  ** @see rf_string_prune_middle_f()
  **/
-i_DECLIMEX_ bool rf_string_prune_end(void* thisstr, uint32_t n,
+i_DECLIMEX_ bool rf_string_prune_end(struct RFstring *thisstr, uint32_t n,
                                      unsigned int *removals);
 
 /**
@@ -198,7 +200,7 @@ i_DECLIMEX_ bool rf_string_prune_end(void* thisstr, uint32_t n,
  ** @see rf_string_prune_start()
  ** @see rf_string_prune_end()
  **/
-i_DECLIMEX_ bool rf_string_prune_middle_b(void* thisstr, uint32_t p,
+i_DECLIMEX_ bool rf_string_prune_middle_b(struct RFstring *thisstr, uint32_t p,
                                           uint32_t n, unsigned int *removals);
 /**
  ** @brief Removes characters from one point of the string
@@ -224,7 +226,7 @@ i_DECLIMEX_ bool rf_string_prune_middle_b(void* thisstr, uint32_t p,
  ** @see rf_string_prune_start()
  ** @see rf_string_prune_end()
  **/
-i_DECLIMEX_ bool rf_string_prune_middle_f(void* thisstr, uint32_t p,
+i_DECLIMEX_ bool rf_string_prune_middle_f(struct RFstring *thisstr, uint32_t p,
                                           uint32_t n, unsigned int *removals);
 
 /**
@@ -248,7 +250,8 @@ i_DECLIMEX_ bool rf_string_prune_middle_f(void* thisstr, uint32_t p,
  ** @see rf_string_trim()
  ** @see rf_string_trim_end()
  **/
-i_DECLIMEX_ bool rf_string_trim_start(void* thisstr, const void* sub,
+i_DECLIMEX_ bool rf_string_trim_start(struct RFstring *thisstr,
+                                      const struct RFstring *sub,
                                       unsigned int *removals);
 
 /**
@@ -272,7 +275,8 @@ i_DECLIMEX_ bool rf_string_trim_start(void* thisstr, const void* sub,
  ** @see rf_string_trim()
  ** @see rf_string_trim_start()
  **/
-i_DECLIMEX_ bool rf_string_trim_end(void* thisstr, const void* sub,
+i_DECLIMEX_ bool rf_string_trim_end(struct RFstring *thisstr,
+                                    const struct RFstring *sub,
                                     unsigned int *removals);
 
 /**
@@ -298,7 +302,8 @@ i_DECLIMEX_ bool rf_string_trim_end(void* thisstr, const void* sub,
  ** @see rf_string_trim_start()
  ** @see rf_string_trim_end()
  **/
-i_DECLIMEX_ bool rf_string_trim(void* thisstr, const void* sub,
+i_DECLIMEX_ bool rf_string_trim(struct RFstring *thisstr,
+                                const struct RFstring *sub,
                                 unsigned int *removals);
 
 //! @}
@@ -333,8 +338,10 @@ i_DECLIMEX_ bool rf_string_trim(void* thisstr, const void* sub,
  **                           the substring was not even found inside the string
  ** @see rf_stringx_replace()
  **/
-i_DECLIMEX_ bool rf_string_replace(struct RFstring* thisstr, const void* sstr,
-                                   const void* rstr, const uint32_t number,
+i_DECLIMEX_ bool rf_string_replace(struct RFstring *thisstr,
+                                   const struct RFstring *sstr,
+                                   const struct RFstring *rstr,
+                                   const uint32_t number,
                                    enum RFstring_matching_options options);
 //! @}
 

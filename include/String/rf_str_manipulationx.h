@@ -33,7 +33,7 @@ extern "C"
  ** @return            Returns @c true in success and @c false otherwise
  ** @see rf_stringx_prepend()
  **/
-i_DECLIMEX_ bool rf_stringx_append(struct RFstringx* thisstr, const void* other);
+i_DECLIMEX_ bool rf_stringx_append(struct RFstringx* thisstr, const struct RFstring *other);
 
 /**
  ** @brief Appends a number of characters from the parameter String
@@ -50,8 +50,8 @@ i_DECLIMEX_ bool rf_stringx_append(struct RFstringx* thisstr, const void* other)
  ** @return             Returns @c true in success and @c false otherwise
  ** @see rf_stringx_prepend()
  **/
-i_DECLIMEX_ bool rf_stringx_append_chars(struct RFstringx* thisstr,
-                                        const void* other,
+i_DECLIMEX_ bool rf_stringx_append_chars(struct RFstringx *thisstr,
+                                        const struct RFstring *other,
                                         unsigned int chars);
 
 /**
@@ -75,7 +75,7 @@ i_DECLIMEX_ bool rf_stringx_append_char(struct RFstringx* thisstr, uint32_t unic
  ** @return               Returns @c true in success and @c false otherwise
  ** @see rf_stringx_append()
  **/
-i_DECLIMEX_ bool rf_stringx_prepend(struct RFstringx* thisstr, const void* other);
+i_DECLIMEX_ bool rf_stringx_prepend(struct RFstringx* thisstr, const struct RFstring *other);
 
 
 
@@ -96,8 +96,9 @@ i_DECLIMEX_ bool rf_stringx_prepend(struct RFstringx* thisstr, const void* other
  ** @see rf_stringx_append()
  ** @see rf_stringx_prepend()
  **/
-i_DECLIMEX_ bool rf_stringx_insert(struct RFstringx* thisstr, uint32_t pos,
-                                  const void* other);
+i_DECLIMEX_ bool rf_stringx_insert(struct RFstringx* thisstr,
+                                   uint32_t pos,
+                                   const struct RFstring *other);
 
 //! @}
 
@@ -122,8 +123,8 @@ i_DECLIMEX_ bool rf_stringx_insert(struct RFstringx* thisstr, uint32_t pos,
  ** @see rf_stringx_append()
  **/
 i_DECLIMEX_ bool rf_stringx_append_bytes(struct RFstringx* thisstr,
-                                        const void* other,
-                                        const unsigned int bytes);
+                                         const struct RFstring *other,
+                                         const unsigned int bytes);
 /**
  ** @brief Appends a cstring to this string
  **
@@ -148,8 +149,10 @@ i_DECLIMEX_ bool rf_stringx_append_cstr(struct RFstringx* thisstr,
  ** @brief Replaces all occurences of a String
  ** @see rf_string_replace()
  **/
-i_DECLIMEX_ bool rf_stringx_replace(struct RFstringx* thisstr, const void* sstr,
-                                    const void* rstr, uint32_t number,
+i_DECLIMEX_ bool rf_stringx_replace(struct RFstringx *thisstr,
+                                    const struct RFstring *sstr,
+                                    const struct RFstring *rstr,
+                                    uint32_t number,
                                     enum RFstring_matching_options options);
 
 
@@ -174,10 +177,10 @@ i_DECLIMEX_ bool rf_stringx_replace(struct RFstringx* thisstr, const void* sstr,
  ** @see rf_stringx_replace()
  **/
 i_DECLIMEX_ bool rf_stringx_replace_between(
-    struct RFstringx* thisstr,
-    const void* left,
-    const void* right,
-    const void* rstr,
+    struct RFstringx *thisstr,
+    const struct RFstring *left,
+    const struct RFstring *right,
+    const struct RFstring *rstr,
     enum RFstring_matching_options options,
     uint32_t i
 );

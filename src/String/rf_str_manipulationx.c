@@ -17,7 +17,7 @@
 #include <Utils/sanity.h> //for sanity macros
 /*------------- End of includes -------------*/
 
-bool rf_stringx_append(struct RFstringx* thisstr, const void* other)
+bool rf_stringx_append(struct RFstringx* thisstr, const struct RFstring *other)
 {
     RF_ASSERT(thisstr, "got NULL string in function");
 
@@ -30,8 +30,8 @@ bool rf_stringx_append(struct RFstringx* thisstr, const void* other)
                                      rf_string_length_bytes(other));
 }
 
-bool rf_stringx_append_chars(struct RFstringx* thisstr,
-                             const void* other,
+bool rf_stringx_append_chars(struct RFstringx *thisstr,
+                             const struct RFstring *other,
                              unsigned int chars)
 {
     uint32_t i;
@@ -72,7 +72,7 @@ bool rf_stringx_append_char(struct RFstringx* thisstr, uint32_t unichar)
     return rf_stringx_generic_append(thisstr, utf8, length);
 }
 
-bool rf_stringx_prepend(struct RFstringx* thisstr, const void* other)
+bool rf_stringx_prepend(struct RFstringx* thisstr, const struct RFstring *other)
 {
     RF_ASSERT(thisstr, "got NULL string in function");
 
@@ -88,7 +88,7 @@ bool rf_stringx_prepend(struct RFstringx* thisstr, const void* other)
         return false
     );
 
-    if (!rf_string_generic_prepend(thisstr,
+    if (!rf_string_generic_prepend(RF_STRX2STR(thisstr),
                                    rf_string_data(other),
                                    rf_string_length_bytes(thisstr),
                                    rf_string_length_bytes(other))) {
@@ -98,8 +98,9 @@ bool rf_stringx_prepend(struct RFstringx* thisstr, const void* other)
     return true;
 }
 
-bool rf_stringx_insert(struct RFstringx* thisstr, uint32_t pos,
-                      const void* other)
+bool rf_stringx_insert(struct RFstringx* thisstr,
+                       uint32_t pos,
+                       const struct RFstring *other)
 {
     uint32_t length;
     uint32_t bytePos;
@@ -148,7 +149,8 @@ bool rf_stringx_insert(struct RFstringx* thisstr, uint32_t pos,
 
 /*--- RFstringx unsafe appending functions---*/
 
-bool rf_stringx_append_bytes(struct RFstringx* thisstr, const void* other,
+bool rf_stringx_append_bytes(struct RFstringx* thisstr,
+                             const struct RFstring *other,
                              const unsigned int bytes)
 {
     unsigned int add_bytes;
@@ -193,9 +195,9 @@ bool rf_stringx_append_cstr(struct RFstringx* thisstr, const char* cstr)
 
 /*--- RFstringx replacing functions---*/
 
-bool rf_stringx_replace(struct RFstringx* thisstr,
-                        const void* sstr,
-                        const void* rstr,
+bool rf_stringx_replace(struct RFstringx *thisstr,
+                        const struct RFstring *sstr,
+                        const struct RFstring *rstr,
                         uint32_t num,
                         enum RFstring_matching_options options)
 {
@@ -209,7 +211,7 @@ bool rf_stringx_replace(struct RFstringx* thisstr,
         RF_WARNING("Gave null pointer for the substring to replace");
         return false;
     }
-    if (!(buff = replace_intro(thisstr, &number, sstr, options))) {
+    if (!(buff = replace_intro(RF_STRX2STR(thisstr), &number, sstr, options))) {
         return false;
     }
 
@@ -223,11 +225,11 @@ bool rf_stringx_replace(struct RFstringx* thisstr,
             ),
             goto end
         );
-        replace_greater(thisstr, buff, number, sstr, rstr);
+        replace_greater(RF_STRX2STR(thisstr), buff, number, sstr, rstr);
     } else if (rf_string_length_bytes(rstr) < rf_string_length_bytes(sstr)) {
-        replace_lesser(thisstr, buff, number, sstr, rstr);
+        replace_lesser(RF_STRX2STR(thisstr), buff, number, sstr, rstr);
     } else { //replace and remove strings are equal
-        replace_equal(thisstr, buff, number, rstr);
+        replace_equal(RF_STRX2STR(thisstr), buff, number, rstr);
     }
     ret = true;
 
@@ -237,8 +239,10 @@ end:
 }
 
 //TODO: I really don't like this temporary string_buff. Try to get rid of it
-bool rf_stringx_replace_between(struct RFstringx* thisstr, const void* left,
-                                const void* right, const void* rstr,
+bool rf_stringx_replace_between(struct RFstringx *thisstr,
+                                const struct RFstring *left,
+                                const struct RFstring *right,
+                                const struct RFstring *rstr,
                                 enum RFstring_matching_options options,
                                 uint32_t i)
 {
@@ -274,7 +278,7 @@ bool rf_stringx_replace_between(struct RFstringx* thisstr, const void* left,
     if (i == 0) { //if we want all occurences replaced
         
         //while we have occurences of the pair
-        while (!rf_string_between(thisstr, left, right, &string_buff, options)) {
+        while (!rf_string_between(RF_STRX2STR(thisstr), left, right, &string_buff, options)) {
             found = true;
             /*
              * move the internal pointer right after the left part of the pair
@@ -282,7 +286,7 @@ bool rf_stringx_replace_between(struct RFstringx* thisstr, const void* left,
              * below fail since the while condition is true
              */
             rf_stringx_move_after(thisstr, left, 0, options);
-            if (rf_stringx_replace(thisstr, &string_buff, rstr, 1, options)) {
+            if (rf_stringx_replace(thisstr, RF_STRX2STR(&string_buff), rstr, 1, options)) {
                 goto cleanup2;
             }
 
@@ -323,7 +327,7 @@ bool rf_stringx_replace_between(struct RFstringx* thisstr, const void* left,
         }
     }
     //move after the pair of the inbetween substrings we actually want
-    if (!rf_string_between(thisstr, left, right, &string_buff, options)) {
+    if (!rf_string_between(RF_STRX2STR(thisstr), left, right, &string_buff, options)) {
         //and if the occurence does not exist
         move = thisstr->bIndex-start;
         rf_string_data(thisstr) -= move;
@@ -336,7 +340,7 @@ bool rf_stringx_replace_between(struct RFstringx* thisstr, const void* left,
     //move after the left part of the pair
     rf_stringx_move_after(thisstr, left, 0, options);
     //and then replace the occurence
-    if (!rf_stringx_replace(thisstr, &string_buff, rstr, 1, options)) {
+    if (!rf_stringx_replace(thisstr, RF_STRX2STR(&string_buff), rstr, 1, options)) {
         //failure
         goto cleanup2;
     }
@@ -357,5 +361,5 @@ cleanup2:
 
 
 i_INLINE_INS bool rf_stringx_generic_append(struct RFstringx* s,
-                                      const char* other,
-                                      unsigned int bytes_to_copy);
+                                            const char* other,
+                                            unsigned int bytes_to_copy);
