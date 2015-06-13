@@ -8,7 +8,9 @@
 #include <stdint.h>
 struct RFstring;
 
-void rf_stdlib_print_int(int64_t n);
+void rf_stdlib_print_int64(int64_t n);
+void rf_stdlib_print_uint64(uint64_t n);
+void rf_stdlib_print_double(double n);
 void rf_stdlib_print_string(const struct RFstring *s);
 
 #endif
