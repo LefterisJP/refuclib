@@ -153,8 +153,10 @@ i_DECLIMEX_ void rf_log(enum RFlog_level level, const char* file,
  * Convenience debugt macro. Not part of the log framework. Simply printfs
  */
 #define RF_CDEBUG(...) do {                     \
+        RFS_PUSH();                             \
         printf(__VA_ARGS__);                    \
         fflush(stdout);                         \
+        RFS_POP();                              \
     } while (0)
 
 #define RF_ERRNOMEM() RF_CRITICAL("We are out of memory!")
