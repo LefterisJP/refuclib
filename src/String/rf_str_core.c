@@ -527,6 +527,12 @@ bool rf_string_equal(const struct RFstring *s1, const struct RFstring *s2)
     return ret;
 }
 
+bool rf_string_equal_cstr(const struct RFstring *str, const char *cstr)
+{
+    return strcmp_nnt(rf_string_data(str), rf_string_length_bytes(str),
+                      cstr, strlen(cstr));
+}
+
 /*--- 2 functions used in the iteration macros ---*/
 
 

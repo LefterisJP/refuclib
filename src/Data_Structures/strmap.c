@@ -1,38 +1,12 @@
 #include <Data_Structures/strmap.h>
 
-
-/* -- Functions needed from ccan/str/str. -- */
-/* #include <ccan/str/str.h> */
-#include <string.h>
-/**
- * streq - Are two strings equal?
- * @a: first string
- * @b: first string
- *
- * This macro is arguably more readable than "!strcmp(a, b)".
- *
- * Example:
- *	if (streq(somestring, ""))
- *		printf("String is empty!\n");
- */
-#define streq(a,b) (strcmp((a),(b)) == 0)
-
-/**
- * strstarts - Does this string start with this prefix?
- * @str: string to test
- * @prefix: prefix to look for at start of str
- *
- * Example:
- *	if (strstarts(somestring, "foo"))
- *		printf("String %s begins with 'foo'!\n", somestring);
- */
-#define strstarts(str,prefix) (strncmp((str),(prefix),strlen(prefix)) == 0)
-/* -- Functions needed from ccan/str/str. -- */
-
-#include <math/ilog.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <errno.h>
+
+#include <String/rf_str_retrieval.h>
+#include <String/rf_str_core.h>
+#include <math/ilog.h>
 
 struct node {
 	/* These point to strings or nodes. */
@@ -44,16 +18,15 @@ struct node {
 };
 
 /* Closest member to this in a non-empty map. */
-static struct strmap *closest(struct strmap *n, const char *member)
+static struct strmap *closest(struct strmap *n, const struct RFstring *member)
 {
-	size_t len = strlen(member);
-	const uint8_t *bytes = (const uint8_t *)member;
+	const uint8_t *bytes = (const uint8_t *)rf_string_data(member);
 
 	/* Anything with NULL value is a node. */
 	while (!n->v) {
 		uint8_t direction = 0;
 
-		if (n->u.n->byte_num < len) {
+		if (n->u.n->byte_num < rf_string_length_bytes(member)) {
 			uint8_t c = bytes[n->u.n->byte_num];
 			direction = (c >> n->u.n->bit_num) & 1;
 		}
@@ -62,28 +35,29 @@ static struct strmap *closest(struct strmap *n, const char *member)
 	return n;
 }
 
-void *strmap_get_(const struct strmap *map, const char *member)
+void *strmap_get_(const struct strmap *map, const struct RFstring *member)
 {
 	struct strmap *n;
 
 	/* Not empty map? */
 	if (map->u.n) {
 		n = closest((struct strmap *)map, member);
-		if (streq(member, n->u.s))
+		if (rf_string_equal(member, n->u.s))
 			return n->v;
 	}
 	errno = ENOENT;
 	return NULL;
 }
 
-bool strmap_add_(struct strmap *map, const char *member, const void *value)
+bool strmap_add_(struct strmap *map, const struct RFstring *member, const void *value)
 {
-	size_t len = strlen(member);
-	const uint8_t *bytes = (const uint8_t *)member;
+    size_t len = rf_string_length_bytes(member);
+	const uint8_t *bytes = (const uint8_t *)rf_string_data(member);
 	struct strmap *n;
 	struct node *newn;
 	size_t byte_num;
-	uint8_t bit_num, new_dir;
+	uint8_t bit_num;
+    uint8_t new_dir;
 
 	assert(value);
 
@@ -98,8 +72,9 @@ bool strmap_add_(struct strmap *map, const char *member, const void *value)
 	n = closest(map, member);
 
 	/* Find where they differ. */
-	for (byte_num = 0; n->u.s[byte_num] == member[byte_num]; byte_num++) {
-		if (member[byte_num] == '\0') {
+    const uint8_t *n_bytes = (const uint8_t*)rf_string_data(n->u.s);
+	for (byte_num = 0; n_bytes[byte_num] == bytes[byte_num]; byte_num++) {
+		if (byte_num == len) {
 			/* All identical! */
 			errno = EEXIST;
 			return false;
@@ -107,7 +82,7 @@ bool strmap_add_(struct strmap *map, const char *member, const void *value)
 	}
 
 	/* Find which bit differs (if we had ilog8, we'd use it) */
-	bit_num = ilog32_nz((uint8_t)n->u.s[byte_num] ^ bytes[byte_num]) - 1;
+	bit_num = ilog32_nz((uint8_t)n_bytes[byte_num] ^ bytes[byte_num]) - 1;
 	assert(bit_num < CHAR_BIT);
 
 	/* Which direction do we go at this bit? */
@@ -148,12 +123,13 @@ bool strmap_add_(struct strmap *map, const char *member, const void *value)
 	return true;
 }
 
-char *strmap_del_(struct strmap *map, const char *member, void **valuep)
+struct RFstring *strmap_del_(struct strmap *map, const struct RFstring *member, void **valuep)
 {
-	size_t len = strlen(member);
-	const uint8_t *bytes = (const uint8_t *)member;
-	struct strmap *parent = NULL, *n;
-	const char *ret = NULL;
+	size_t len = rf_string_length_bytes(member);
+	const uint8_t *bytes = (const uint8_t *)rf_string_data(member);
+    struct strmap *n;
+	struct strmap *parent = NULL;
+	const struct RFstring *ret = NULL;
 	uint8_t direction = 0; /* prevent bogus gcc warning. */
 
 	/* Empty map? */
@@ -172,20 +148,22 @@ char *strmap_del_(struct strmap *map, const char *member, void **valuep)
 		if (n->u.n->byte_num < len) {
 			c = bytes[n->u.n->byte_num];
 			direction = (c >> n->u.n->bit_num) & 1;
-		} else
+		} else {
 			direction = 0;
+        }
 		n = &n->u.n->child[direction];
 	}
 
 	/* Did we find it? */
-	if (!streq(member, n->u.s)) {
+	if (!rf_string_equal(member, n->u.s)) {
 		errno = ENOENT;
 		return NULL;
 	}
 
 	ret = n->u.s;
-	if (valuep)
+	if (valuep) {
 		*valuep = n->v;
+    }
 
 	if (!parent) {
 		/* We deleted last node. */
@@ -197,12 +175,12 @@ char *strmap_del_(struct strmap *map, const char *member, void **valuep)
 		free(old);
 	}
 
-	return (char *)ret;
+	return (struct RFstring *)ret;
 }
 
 static bool iterate(struct strmap n,
-		    bool (*handle)(const char *, void *, void *),
-		    const void *data)
+                    bool (*handle)(const struct RFstring *, void *, void *),
+                    const void *data)
 {
 	if (n.v)
 		return handle(n.u.s, n.v, (void *)data);
@@ -212,8 +190,8 @@ static bool iterate(struct strmap n,
 }
 
 void strmap_iterate_(const struct strmap *map,
-		     bool (*handle)(const char *, void *, void *),
-		     const void *data)
+                     bool (*handle)(const struct RFstring *, void *, void *),
+                     const void *data)
 {
 	/* Empty map? */
 	if (!map->u.n)
@@ -223,32 +201,35 @@ void strmap_iterate_(const struct strmap *map,
 }
 
 const struct strmap *strmap_prefix_(const struct strmap *map,
-				    const char *prefix)
+                                    const struct RFstring *prefix)
 {
-	const struct strmap *n, *top;
-	size_t len = strlen(prefix);
-	const uint8_t *bytes = (const uint8_t *)prefix;
+	const struct strmap *n;
+    const struct strmap *top;
+	const uint8_t *bytes = (const uint8_t *)rf_string_data(prefix);
 
 	/* Empty map -> return empty map. */
-	if (!map->u.n)
+	if (!map->u.n) {
 		return map;
+    }
 
 	top = n = map;
 
 	/* We walk to find the top, but keep going to check prefix matches. */
 	while (!n->v) {
-		uint8_t c = 0, direction;
+        uint8_t direction;
+		uint8_t c = 0;
 
-		if (n->u.n->byte_num < len)
+		if (n->u.n->byte_num < rf_string_length_bytes(prefix))
 			c = bytes[n->u.n->byte_num];
 
 		direction = (c >> n->u.n->bit_num) & 1;
 		n = &n->u.n->child[direction];
-		if (c)
+		if (c) {
 			top = n;
+        }
 	}
 
-	if (!strstarts(n->u.s, prefix)) {
+	if (!rf_string_begins_with(n->u.s, prefix, 0)) {
 		/* Convenient return for prefixes which do not appear in map. */
 		static const struct strmap empty_map;
 		return &empty_map;

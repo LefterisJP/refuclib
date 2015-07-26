@@ -144,8 +144,8 @@ char* strstr_nnt(const char* s1, unsigned int s1_len,
  ** No checks are performed on the input
  ** @endinternal
 **/
-bool strcmp_nnt(char* s1, unsigned int s1_len,
-                char* s2, unsigned int s2_len);
+bool strcmp_nnt(const char* s1, unsigned int s1_len,
+                const char* s2, unsigned int s2_len);
 
 /**
  ** @internal

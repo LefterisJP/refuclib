@@ -1,6 +1,8 @@
 /* Taken and adapted from the CCAN project:
  * http://ccodearchive.net/info/strmap.html
  *
+ * An ordered map of strings to values
+ * It is based on crit-bit trees: http://cr.yp.to/critbit.html
  * Original license is CC0 (Public Domain)
  */
 #ifndef RF_STRMAP_H
@@ -9,6 +11,8 @@
 #include <Utils/typesafe_cb.h>
 #include <stdlib.h>
 #include <stdbool.h>
+
+struct RFstring;
 
 /**
  * struct strmap - representation of a string map
@@ -19,7 +23,7 @@
 struct strmap {
 	union {
 		struct node *n;
-		const char *s;
+		const struct RFstring *s;
 	} u;
 	void *v;
 };
@@ -90,7 +94,7 @@ static inline bool strmap_empty_(const struct strmap *map)
  */
 #define strmap_get(map, member) \
 	tcon_cast((map), canary, strmap_get_(&(map)->raw, (member)))
-void *strmap_get_(const struct strmap *map, const char *member);
+void *strmap_get_(const struct strmap *map, const struct RFstring *member);
 
 /**
  * strmap_add - place a member in the string map.
@@ -114,7 +118,7 @@ void *strmap_get_(const struct strmap *map, const char *member);
 	strmap_add_(&tcon_check((map), canary, (value))->raw,	\
 		    (member), (void *)(value))
 
-bool strmap_add_(struct strmap *map, const char *member, const void *value);
+bool strmap_add_(struct strmap *map, const struct RFstring *member, const void *value);
 
 /**
  * strmap_del - remove a member from the string map.
@@ -136,7 +140,7 @@ bool strmap_add_(struct strmap *map, const char *member, const void *value);
 #define strmap_del(map, member, valuep)					\
 	strmap_del_(&tcon_check_ptr((map), canary, valuep)->raw,	\
 		    (member), (void **)valuep)
-char *strmap_del_(struct strmap *map, const char *member, void **valuep);
+struct RFstring *strmap_del_(struct strmap *map, const struct RFstring *member, void **valuep);
 
 /**
  * strmap_clear - remove every member from the map.
@@ -158,7 +162,7 @@ void strmap_clear_(struct strmap *map);
  * @arg: the argument for the function (types should match).
  *
  * @handle's prototype should be:
- *	bool @handle(const char *member, type value, typeof(arg) arg)
+ *	bool @handle(const struct RFstring *member, type value, typeof(arg) arg)
  *
  * If @handle returns false, the iteration will stop.
  * You should not alter the map within the @handle function!
@@ -167,7 +171,7 @@ void strmap_clear_(struct strmap *map);
  *	struct strmap_intp {
  *		STRMAP_MEMBERS(int *);
  *	};
- *	static bool dump_some(const char *member, int *value, int *num)
+ *	static bool dump_some(const struct RFstring *member, int *value, int *num)
  *	{
  *		// Only dump out num nodes.
  *		if (*(num--) == 0)
@@ -186,15 +190,15 @@ void strmap_clear_(struct strmap *map);
  */
 #define strmap_iterate(map, handle, arg)				\
 	strmap_iterate_(&(map)->raw,					\
-			typesafe_cb_cast(bool (*)(const char *,		\
+			typesafe_cb_cast(bool (*)(const struct RFstring *,		\
 						  void *, void *),	\
-					 bool (*)(const char *,		\
+					 bool (*)(const struct RFstring *,		\
 						  tcon_type((map), canary), \
 						  __typeof__(arg)), (handle)), \
 			(arg))
 void strmap_iterate_(const struct strmap *map,
-		     bool (*handle)(const char *, void *, void *),
-		     const void *data);
+                     bool (*handle)(const struct RFstring *, void *, void *),
+                     const void *data);
 
 /**
  * strmap_prefix - return a submap matching a prefix
@@ -207,7 +211,7 @@ void strmap_iterate_(const struct strmap *map,
  *
  * Example:
  *	static void dump_prefix(const struct strmap_intp *map,
- *				const char *prefix)
+ *				const struct RFstring *prefix)
  *	{
  *		int max = 100;
  *		printf("Nodes with prefix %s:\n", prefix);
@@ -225,6 +229,6 @@ void strmap_iterate_(const struct strmap *map,
 #endif
 
 const struct strmap *strmap_prefix_(const struct strmap *map,
-				    const char *prefix);
+                                    const struct RFstring *prefix);
 
 #endif

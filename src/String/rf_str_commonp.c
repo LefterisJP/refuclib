@@ -46,8 +46,8 @@ char* strstr_nnt(const char* s1, unsigned int s1_len,
     return 0;
 }
 
-bool strcmp_nnt(char* s1, unsigned int s1_len,
-                char* s2, unsigned int s2_len)
+bool strcmp_nnt(const char* s1, unsigned int s1_len,
+                const char* s2, unsigned int s2_len)
 {
     unsigned int i;
     if(s1_len != s2_len) {return false;}

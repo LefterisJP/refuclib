@@ -431,6 +431,14 @@ i_DECLIMEX_ void rf_string_deinit(struct RFstring *s);
 i_DECLIMEX_ bool rf_string_equal(const struct RFstring *s1, const struct RFstring *s2);
 
 /**
+ * Compares a string with a cstr
+ * @param str  The string to compare
+ * @param cstr The c-string to compare with
+ * @return     True for equality, false otherwise
+ */
+i_DECLIMEX_ bool rf_string_equal_cstr(const struct RFstring *str, const char *cstr);
+
+/**
  ** @brief Checks that a string is null
  **/
 #define rf_string_is_null(i_STRING)                                     \
