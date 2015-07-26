@@ -17,6 +17,7 @@ orig_sources = [
     'Data_Structures/intrusive_list.c',
     'Data_Structures/htable.c',
     'Data_Structures/mbuffer.c',
+    'Data_Structures/strmap.c',
     'Utils/fixed_memory_pool.c',
     'Utils/endianess.c',
     'Utils/rf_unicode.c',
