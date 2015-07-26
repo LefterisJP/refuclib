@@ -1,10 +1,10 @@
 /**
- ** Code for typesafe callbacks taken from the CCAN project
- ** http://ccodearchive.net/info/typesafe_cb.html
- **
- ** The license is public domain, check the license file in the root directory
- ** of the library
- **/
+ * Code for typesafe callbacks taken from the CCAN project
+ * http://ccodearchive.net/info/typesafe_cb.html
+ *
+ * The license is public domain, check the license file in the root directory
+ * of the library
+ */
 
 /* CC0 (Public domain) - see LICENSE file for details */
 #ifndef RF_TYPESAFE_CB_H

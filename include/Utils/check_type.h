@@ -1,12 +1,12 @@
 /**
- ** This file is copied from the CCAN project
- ** http://ccodearchive.net/info/container_of.html and provides
- ** an implementation of the container_of macro which is used 
- ** a lot in the linux kernel.
- **
- ** The license is public domain, check the license file in the root directory
- ** of the library
- **/
+ * This file is copied from the CCAN project
+ * http://ccodearchive.net/info/container_of.html and provides
+ * an implementation of the container_of macro which is used
+ * a lot in the linux kernel.
+ *
+ * The license is public domain, check the license file in the root directory
+ * of the library
+ */
 #ifndef RF_CHECK_TYPE_H
 #define RF_CHECK_TYPE_H
 

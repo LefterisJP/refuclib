@@ -7,9 +7,10 @@
  */
 /* CC0 (Public domain) - see LICENSE file for details */
 #if !defined(_ilog_H)
-# define _ilog_H (1)
-# include <stdint.h>
-# include <limits.h>
+#define _ilog_H (1)
+#include <Utils/compile_constant.h>
+#include <stdint.h>
+#include <limits.h>
 
 /**
  * ilog32 - Integer binary logarithm of a 32-bit value.
