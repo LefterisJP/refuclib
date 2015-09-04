@@ -452,6 +452,10 @@ i_DECLIMEX_ bool rf_string_equal_cstr(const struct RFstring *str, const char *cs
 #define rf_string_is_empty(i_STRING)            \
     (rf_string_length_bytes(i_STRING) == 0)
 
+/**
+ * @return a pointer to the empty string
+ */
+i_DECLIMEX_ const struct RFstring *rf_string_empty_get();
 //! @}
 
 

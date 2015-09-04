@@ -533,6 +533,12 @@ bool rf_string_equal_cstr(const struct RFstring *str, const char *cstr)
                       cstr, strlen(cstr));
 }
 
+const struct RFstring *rf_string_empty_get()
+{
+    static const struct RFstring empty = RF_STRING_STATIC_INIT("");
+    return &empty;
+}
+
 /*--- 2 functions used in the iteration macros ---*/
 
 
