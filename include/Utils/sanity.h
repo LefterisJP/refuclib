@@ -62,6 +62,15 @@
 #define RF_ASSERT(condition_, ...)
 #endif
 
+/**
+ * Will unconditionally terminate the program after emitting a critical message
+ */
+#define RF_CRITICAL_FAIL(...)                   \
+    do {                                        \
+        RF_CRITICAL(__VA_ARGS__);               \
+        exit(1);                                \
+    } while (0)
+
 /* same as RF_ASSERT but in non debug mode it will log a critical error */
 #if defined(RF_OPTION_DEBUG) && !defined(RF_UNIT_TESTS)
 #define RF_ASSERT_OR_CRITICAL(condition_, _stmt, ...)    \
