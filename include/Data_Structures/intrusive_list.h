@@ -476,7 +476,7 @@ i_INLINE_DECL void rf_ilist_append_list(struct RFilist_head *to,
  *	parent->num_children = 0;
  */
 i_INLINE_DECL void rf_ilist_prepend_list(struct RFilist_head *to,
-                                       struct RFilist_head *from)
+                                         struct RFilist_head *from)
 {
 	struct RFilist_node *from_tail = rf_ilist_debug(from)->n.prev;
 	struct RFilist_node *to_head = rf_ilist_debug(to)->n.next;
@@ -590,5 +590,23 @@ i_INLINE_DECL struct RFilist_node *rf_ilist_node_from_off(void *ptr, size_t off)
 #define rf_ilist_off_var(var, member)           \
     (container_off_var(var, member) +           \
      check_type(var->member, struct RFilist_node))
+
+/**
+ * rf_ilist_has - a simple search in the linked list for a particular object
+ *
+ * @l: The list to search in
+ * @n: The RFlist_node to search for in the list
+ * @return true if @n is found and false otherwise
+ */
+i_INLINE_DECL bool rf_ilist_has(struct RFilist_head *l, const struct RFilist_node *n)
+{
+    struct RFilist_node *i;
+    rf_ilist_for_each_off(l, i, 0) {
+        if (i == n) {
+            return true;
+        }
+    }
+    return false;
+}
 
 #endif // include guards end

@@ -124,6 +124,35 @@ START_TEST (test_intrusive_list_copy_empty) {
     }
 } END_TEST
 
+START_TEST (test_intrusive_list_has) {
+    struct RFilist_head h1;
+    struct foo_elem *used1 = foo_elem_create(1);
+    struct foo_elem *used2 = foo_elem_create(2);
+    struct foo_elem *used3 = foo_elem_create(3);
+    rf_ilist_head_init(&h1);
+    rf_ilist_add_tail(&h1, &used1->ln);
+    rf_ilist_add_tail(&h1, &used2->ln);
+    rf_ilist_add_tail(&h1, &used3->ln);
+
+    // check that all of the added list objects return true;
+    ck_assert(rf_ilist_has(&h1, &used1->ln));
+    ck_assert(rf_ilist_has(&h1, &used2->ln));
+    ck_assert(rf_ilist_has(&h1, &used3->ln));
+
+    //create 2 other objects, don't add them and check if they are there
+    struct foo_elem *unknown1 = foo_elem_create(13234);
+    struct foo_elem *unknown2 = foo_elem_create(918034);
+    ck_assert(!rf_ilist_has(&h1, &unknown1->ln));
+    ck_assert(!rf_ilist_has(&h1, &unknown2->ln));
+
+    // free stuff
+    foo_elem_destroy(used1);
+    foo_elem_destroy(used2);
+    foo_elem_destroy(used3);
+    foo_elem_destroy(unknown1);
+    foo_elem_destroy(unknown2);
+} END_TEST
+
 Suite *intrusive_list_suite_create(void)
 {
     Suite *s = suite_create("Intrusive_List");
@@ -132,7 +161,10 @@ Suite *intrusive_list_suite_create(void)
     tcase_add_test(tc1, test_intrusive_list_copy);
     tcase_add_test(tc1, test_intrusive_list_copy_empty);
 
-    suite_add_tcase(s, tc1);
+    TCase *tc2 = tcase_create("Intrusive_List_Misc");
+    tcase_add_test(tc2, test_intrusive_list_has);
 
+    suite_add_tcase(s, tc1);
+    suite_add_tcase(s, tc2);
     return s;
 }
