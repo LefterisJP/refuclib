@@ -57,18 +57,20 @@ struct RFilist_head *rf_ilist_check(const struct RFilist_head *h,
 
 i_INLINE_INS void rf_ilist_head_init(struct RFilist_head *h);
 i_INLINE_INS void rf_ilist_copy(struct RFilist_head *from, struct RFilist_head *to);
-i_INLINE_INS void rf_ilist_add(struct RFilist_head *h, struct RFilist_node *n);
-i_INLINE_INS void rf_ilist_add_tail(struct RFilist_head *h, struct RFilist_node *n);
-i_INLINE_INS bool rf_ilist_is_empty(const struct RFilist_head *h);
-i_INLINE_INS void rf_ilist_delete(struct RFilist_node *n);
+i_INLINE_INS void i_rf_ilist_add(struct RFilist_head *h, struct RFilist_node *n, const char *errstr);
+i_INLINE_INS void i_rf_ilist_add_tail(struct RFilist_head *h, struct RFilist_node *n, const char *errstr);
+i_INLINE_INS bool i_rf_ilist_is_empty(const struct RFilist_head *h, const char *errstr);
+i_INLINE_INS void i_rf_ilist_delete(struct RFilist_node *n, const char *errstr);
 i_INLINE_INS void rf_ilist_delete_from(struct RFilist_head *h, struct RFilist_node *n);
 i_INLINE_INS const void *rf_ilist_top_(const struct RFilist_head *h, size_t off);
 i_INLINE_INS const void *rf_ilist_pop_(const struct RFilist_head *h, size_t off);
 i_INLINE_INS const void *rf_ilist_tail_(const struct RFilist_head *h, size_t off);
-i_INLINE_INS void rf_ilist_append_list(struct RFilist_head *to,
-                                        struct RFilist_head *from);
-i_INLINE_INS void rf_ilist_prepend_list(struct RFilist_head *to,
-                                         struct RFilist_head *from);
+i_INLINE_INS void i_rf_ilist_append_list(struct RFilist_head *to,
+                                         struct RFilist_head *from,
+                                         const char *errstr);
+i_INLINE_INS void i_rf_ilist_prepend_list(struct RFilist_head *to,
+                                        struct RFilist_head *from,
+                                        const char *errstr);
 i_INLINE_INS void *rf_ilist_node_to_off(const struct RFilist_node *node, size_t off);
 i_INLINE_INS struct RFilist_node *rf_ilist_node_from_off(void *ptr, size_t off);
 i_INLINE_INS bool rf_ilist_has(struct RFilist_head *l, const struct RFilist_node *n);
