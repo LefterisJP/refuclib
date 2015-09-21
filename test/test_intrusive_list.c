@@ -173,6 +173,46 @@ START_TEST (test_intrusive_list_size) {
     foo_destroy(f1);
 } END_TEST
 
+struct babushka {
+    struct foo_elem e;
+};
+
+struct babushka *babushka_create(int val)
+{
+    struct babushka *b;
+    RF_MALLOC(b, sizeof(*b), return NULL);
+    b->e.value = val;
+    return b;
+}
+
+void babushka_destroy(struct babushka *b)
+{
+    free(b);
+}
+
+START_TEST (test_intrusive_list_nested) {
+    // test for working with intrusive lists if handles are nested within structures
+    struct RFilist_head list;
+    rf_ilist_head_init(&list);
+    struct babushka *b = babushka_create(3);
+    rf_ilist_add_tail(&list, &b->e.ln);
+    b = babushka_create(5);
+    rf_ilist_add_tail(&list, &b->e.ln);
+    b = babushka_create(42);
+    rf_ilist_add_tail(&list, &b->e.ln);
+
+    b = rf_ilist_pop(&list, struct babushka, e.ln);
+    ck_assert_int_eq(b->e.value, 3);
+    babushka_destroy(b);
+    b = rf_ilist_pop(&list, struct babushka, e.ln);
+    ck_assert_int_eq(b->e.value, 5);
+    babushka_destroy(b);
+    b = rf_ilist_pop(&list, struct babushka, e.ln);
+    ck_assert_int_eq(b->e.value, 42);
+    babushka_destroy(b);
+    ck_assert(!rf_ilist_pop(&list, struct babushka, e.ln));
+} END_TEST
+
 Suite *intrusive_list_suite_create(void)
 {
     Suite *s = suite_create("Intrusive_List");
@@ -184,6 +224,7 @@ Suite *intrusive_list_suite_create(void)
     TCase *tc2 = tcase_create("Intrusive_List_Misc");
     tcase_add_test(tc2, test_intrusive_list_has);
     tcase_add_test(tc2, test_intrusive_list_size);
+    tcase_add_test(tc2, test_intrusive_list_nested);
 
     suite_add_tcase(s, tc1);
     suite_add_tcase(s, tc2);
