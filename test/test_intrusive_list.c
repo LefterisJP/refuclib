@@ -153,6 +153,26 @@ START_TEST (test_intrusive_list_has) {
     foo_elem_destroy(unknown2);
 } END_TEST
 
+START_TEST (test_intrusive_list_size) {
+    struct foo *f1;
+    unsigned int i;
+    struct foo_elem *elem;
+    struct foo_elem *tmp;
+
+    f1 = foo_create();
+    ck_assert(f1);
+    for (i = 0; i < sizeof(check_arr) / sizeof(int); i++) {
+        ck_assert(foo_add(f1, check_arr[i]));
+    }
+    ck_assert_uint_eq(sizeof(check_arr) / sizeof(int), rf_ilist_size(&f1->lh));
+
+    // test done, free stuff
+    rf_ilist_for_each_safe(&f1->lh, elem, tmp, ln) {
+        foo_elem_destroy(elem);
+    }
+    foo_destroy(f1);
+} END_TEST
+
 Suite *intrusive_list_suite_create(void)
 {
     Suite *s = suite_create("Intrusive_List");
@@ -163,6 +183,7 @@ Suite *intrusive_list_suite_create(void)
 
     TCase *tc2 = tcase_create("Intrusive_List_Misc");
     tcase_add_test(tc2, test_intrusive_list_has);
+    tcase_add_test(tc2, test_intrusive_list_size);
 
     suite_add_tcase(s, tc1);
     suite_add_tcase(s, tc2);

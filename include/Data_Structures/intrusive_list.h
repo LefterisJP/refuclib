@@ -735,4 +735,26 @@ i_INLINE_DECL bool rf_ilist_has(struct RFilist_head *l, const struct RFilist_nod
     return false;
 }
 
+/**
+ * rf_ilist_size - Number of members in a linked list
+ * @h: the RFilist_head
+ *
+ * Return the number of members of a linked list.
+ * Is expensive. Iterates the entire list
+ *
+ * Example:
+ *  unsigned int sz = rf_ilist_size(list)
+ */
+#define rf_ilist_size(h) i_rf_ilist_size(h, RF_LIST_LOC)
+i_INLINE_DECL unsigned int i_rf_ilist_size(const struct RFilist_head *h, const char *errstr)
+{
+    (void)rf_ilist_debug(h, errstr);
+    struct RFilist_node *i;
+    unsigned int count = 0;
+    rf_ilist_for_each_off(h, i, 0) {
+        ++count;
+    }
+    return count;
+}
+
 #endif // include guards end
