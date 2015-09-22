@@ -64,6 +64,11 @@ i_INLINE_INS void i_rf_ilist_delete(struct RFilist_node *n, const char *errstr);
 i_INLINE_INS void rf_ilist_delete_from(struct RFilist_head *h, struct RFilist_node *n);
 i_INLINE_INS const void *rf_ilist_top_(const struct RFilist_head *h, size_t off);
 i_INLINE_INS const void *rf_ilist_pop_(const struct RFilist_head *h, size_t off);
+i_INLINE_INS struct RFilist_node *rf_ilist_pop_raw(const struct RFilist_head *h);
+i_INLINE_INS const void *rf_ilist_pop_back_(const struct RFilist_head *h, size_t off);
+i_INLINE_INS void rf_ilist_pop_until(const struct RFilist_head *h, struct RFilist_node *n);
+i_INLINE_INS void rf_ilist_pop_back_until(const struct RFilist_head *h, struct RFilist_node *n);
+i_INLINE_INS struct RFilist_node *rf_ilist_pop_back_raw(const struct RFilist_head *h);
 i_INLINE_INS const void *rf_ilist_tail_(const struct RFilist_head *h, size_t off);
 i_INLINE_INS void i_rf_ilist_append_list(struct RFilist_head *to,
                                          struct RFilist_head *from,

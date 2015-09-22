@@ -330,7 +330,7 @@ i_INLINE_DECL const void *rf_ilist_top_(const struct RFilist_head *h, size_t off
 }
 
 /**
- * rf_ilist_pop - remove the first entry in a list
+ * rf_ilist_pop - remove and return the first entry in a list
  * @h: the RFilist_head
  * @type: the type of the entry
  * @member: the RFilist_node member of the type
@@ -346,15 +346,85 @@ i_INLINE_DECL const void *rf_ilist_top_(const struct RFilist_head *h, size_t off
 #define rf_ilist_pop(h, type, member)                   \
     ((type *)rf_ilist_pop_((h), rf_ilist_off(type, member)))
 
-i_INLINE_DECL const void *rf_ilist_pop_(const struct RFilist_head *h, size_t off)
+i_INLINE_DECL struct RFilist_node *rf_ilist_pop_raw(const struct RFilist_head *h)
 {
     struct RFilist_node *n;
-
     if (rf_ilist_is_empty(h))
         return NULL;
     n = h->n.next;
     rf_ilist_delete(n);
-    return (const char *)n - off;
+    return n;
+}
+i_INLINE_DECL const void *rf_ilist_pop_(const struct RFilist_head *h, size_t off)
+{
+    struct RFilist_node *n = rf_ilist_pop_raw(h);
+    return n ? (const char *)n - off : NULL;
+}
+
+/**
+ * rf_ilist_pop_back - remove the last entry in a list
+ * @h: the RFilist_head
+ * @type: the type of the entry
+ * @member: the RFilist_node member of the type
+ *
+ * If the list is empty, returns NULL.
+ *
+ * Example:
+ *  struct child *one;
+ *  one = rf_ilist_pop_back(&parent->children, struct child, list);
+ *  if (!one)
+ *      printf("Empty list!\n");
+ */
+#define rf_ilist_pop_back(h, type, member)                   \
+    ((type *)rf_ilist_pop_back_((h), rf_ilist_off(type, member)))
+
+i_INLINE_DECL struct RFilist_node *rf_ilist_pop_back_raw(const struct RFilist_head *h)
+{
+    struct RFilist_node *n;
+    if (rf_ilist_is_empty(h))
+        return NULL;
+    n = h->n.prev;
+    rf_ilist_delete(n);
+    return n;
+}
+i_INLINE_DECL const void *rf_ilist_pop_back_(const struct RFilist_head *h, size_t off)
+{
+    struct RFilist_node *n = rf_ilist_pop_back_raw(h);
+    return n ? (const char *)n - off : NULL;
+}
+
+/**
+ * Will pop back the list until (not including) a specific node
+ * @h: The RFilist_head
+ * @n: The node until (and not including) which to remove members starting from
+ *     the end of the list
+ *
+ * If the list is empty, this does nothing. If @a n is not found then this will happily
+ * empty out the whole list
+ */
+i_INLINE_DECL void rf_ilist_pop_back_until(const struct RFilist_head *h, struct RFilist_node *n)
+{
+    const struct RFilist_node *curr = &h->n;
+    while ( curr->prev != n && (curr = rf_ilist_pop_back_raw(h))) {
+        ;
+    }
+}
+
+/**
+ * Will pop the list until (not including) a specific node
+ * @h: The RFilist_head
+ * @n: The node until (and not including) which to remove members starting from
+ *     the beginning of the list
+ *
+ * If the list is empty, this does nothing. If @a n is not found then this will happily
+ * empty out the whole list
+ */
+i_INLINE_DECL void rf_ilist_pop_until(const struct RFilist_head *h, struct RFilist_node *n)
+{
+    const struct RFilist_node *curr = &h->n;
+    while ( curr->next != n && (curr = rf_ilist_pop_raw(h))) {
+        ;
+    }
 }
 
 /**

@@ -124,6 +124,104 @@ START_TEST (test_intrusive_list_copy_empty) {
     }
 } END_TEST
 
+START_TEST (test_intrusive_list_pop) {
+    struct RFilist_head h1;
+    struct foo_elem *used1 = foo_elem_create(1);
+    struct foo_elem *used2 = foo_elem_create(2);
+    struct foo_elem *used3 = foo_elem_create(3);
+    rf_ilist_head_init(&h1);
+    rf_ilist_add_tail(&h1, &used1->ln);
+    rf_ilist_add_tail(&h1, &used2->ln);
+    rf_ilist_add_tail(&h1, &used3->ln);
+
+    struct foo_elem *p = rf_ilist_pop(&h1, struct foo_elem, ln);
+    ck_assert_int_eq(p->value, 1);
+    ck_assert_int_eq(rf_ilist_size(&h1), 2);
+
+    foo_elem_destroy(used1);
+    foo_elem_destroy(used2);
+    foo_elem_destroy(used3);
+} END_TEST
+
+START_TEST (test_intrusive_list_pop_back) {
+    struct RFilist_head h1;
+    struct foo_elem *used1 = foo_elem_create(1);
+    struct foo_elem *used2 = foo_elem_create(2);
+    struct foo_elem *used3 = foo_elem_create(3);
+    rf_ilist_head_init(&h1);
+    rf_ilist_add_tail(&h1, &used1->ln);
+    rf_ilist_add_tail(&h1, &used2->ln);
+    rf_ilist_add_tail(&h1, &used3->ln);
+
+    struct foo_elem *p = rf_ilist_pop_back(&h1, struct foo_elem, ln);
+    ck_assert_int_eq(p->value, 3);
+    ck_assert_int_eq(rf_ilist_size(&h1), 2);
+
+    foo_elem_destroy(used1);
+    foo_elem_destroy(used2);
+    foo_elem_destroy(used3);
+} END_TEST
+
+START_TEST (test_intrusive_list_pop_until) {
+    const static int carr[] = { 4, 5 };
+    struct RFilist_head h1;
+    struct foo_elem *used1 = foo_elem_create(1);
+    struct foo_elem *used2 = foo_elem_create(2);
+    struct foo_elem *used3 = foo_elem_create(3);
+    struct foo_elem *used4 = foo_elem_create(4);
+    struct foo_elem *used5 = foo_elem_create(5);
+    rf_ilist_head_init(&h1);
+    rf_ilist_add_tail(&h1, &used1->ln);
+    rf_ilist_add_tail(&h1, &used2->ln);
+    rf_ilist_add_tail(&h1, &used3->ln);
+    rf_ilist_add_tail(&h1, &used4->ln);
+    rf_ilist_add_tail(&h1, &used5->ln);
+
+    rf_ilist_pop_until(&h1, &used4->ln);
+    unsigned int idx = 0;
+    struct foo_elem *elem;
+    rf_ilist_for_each(&h1, elem, ln) {
+        ck_assert_int_eq(elem->value, carr[idx]);
+        ++idx;
+    }
+
+    foo_elem_destroy(used1);
+    foo_elem_destroy(used2);
+    foo_elem_destroy(used3);
+    foo_elem_destroy(used4);
+    foo_elem_destroy(used5);
+} END_TEST
+
+START_TEST (test_intrusive_list_pop_back_until) {
+    const static int carr[] = { 1, 2, 3};
+    struct RFilist_head h1;
+    struct foo_elem *used1 = foo_elem_create(1);
+    struct foo_elem *used2 = foo_elem_create(2);
+    struct foo_elem *used3 = foo_elem_create(3);
+    struct foo_elem *used4 = foo_elem_create(4);
+    struct foo_elem *used5 = foo_elem_create(5);
+    rf_ilist_head_init(&h1);
+    rf_ilist_add_tail(&h1, &used1->ln);
+    rf_ilist_add_tail(&h1, &used2->ln);
+    rf_ilist_add_tail(&h1, &used3->ln);
+    rf_ilist_add_tail(&h1, &used4->ln);
+    rf_ilist_add_tail(&h1, &used5->ln);
+
+    rf_ilist_pop_back_until(&h1, &used3->ln);
+    unsigned int idx = 0;
+    struct foo_elem *elem;
+    rf_ilist_for_each(&h1, elem, ln) {
+        ck_assert_int_eq(elem->value, carr[idx]);
+        ++idx;
+    }
+
+    foo_elem_destroy(used1);
+    foo_elem_destroy(used2);
+    foo_elem_destroy(used3);
+    foo_elem_destroy(used4);
+    foo_elem_destroy(used5);
+} END_TEST
+
 START_TEST (test_intrusive_list_has) {
     struct RFilist_head h1;
     struct foo_elem *used1 = foo_elem_create(1);
@@ -221,12 +319,19 @@ Suite *intrusive_list_suite_create(void)
     tcase_add_test(tc1, test_intrusive_list_copy);
     tcase_add_test(tc1, test_intrusive_list_copy_empty);
 
-    TCase *tc2 = tcase_create("Intrusive_List_Misc");
-    tcase_add_test(tc2, test_intrusive_list_has);
-    tcase_add_test(tc2, test_intrusive_list_size);
-    tcase_add_test(tc2, test_intrusive_list_nested);
+    TCase *tc2 = tcase_create("Intrusive_List_Removals");
+    tcase_add_test(tc2, test_intrusive_list_pop);
+    tcase_add_test(tc2, test_intrusive_list_pop_back);
+    tcase_add_test(tc2, test_intrusive_list_pop_until);
+    tcase_add_test(tc2, test_intrusive_list_pop_back_until);
+
+    TCase *tc3 = tcase_create("Intrusive_List_Misc");
+    tcase_add_test(tc3, test_intrusive_list_has);
+    tcase_add_test(tc3, test_intrusive_list_size);
+    tcase_add_test(tc3, test_intrusive_list_nested);
 
     suite_add_tcase(s, tc1);
     suite_add_tcase(s, tc2);
+    suite_add_tcase(s, tc3);
     return s;
 }
