@@ -121,7 +121,7 @@ i_DECLIMEX_ struct RFstring *rf_string_create_cp(uint32_t code);
  ** @brief Initializes a string by turning a unicode code point 
  **        in a String (encoded in UTF-8).
  **
-v ** @notinherited{StringX}
+ ** @notinherited{StringX}
  ** @see rf_string_create_cp()
  ** @see rf_stringx_init_cp()
  **/

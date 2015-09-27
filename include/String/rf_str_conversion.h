@@ -27,39 +27,39 @@ extern "C"
 //! @{
 
 /**
- ** @brief Returns the strings contents as a UTF-16 buffer
- **
- ** @isinherited{StringX}
- ** This function allocates a UTF-16 buffer in which the string's
- ** UTF-8 contents are encoded as UTF-16. The endianess of the buffer
- ** is that of the system. The returned buffer needs to be freed by the user
- ** later.
- ** @param[in]  s      The string in question. @inhtype{String,StringX}
- ** @param[out] length Give a reference to a uint32_t in
- **             this argument to receive the length of
- **             the returned UTF-16 buffer in 16-bit words
- ** @return Returns an allocated UTF-16 buffer. Needs to be freed by the user later.
- ** @see rf_string_tout_f8()
- ** @see rf_string_to_utf32()
- **/
+ * @brief Returns the strings contents as a UTF-16 buffer
+ *
+ * @isinherited{StringX}
+ * This function allocates a UTF-16 buffer in which the string's
+ * UTF-8 contents are encoded as UTF-16. The endianess of the buffer
+ * is that of the system. The returned buffer needs to be freed by the user
+ * later.
+ * @param[in]  s      The string in question. @inhtype{String,StringX}
+ * @param[out] length Give a reference to a uint32_t in
+ *             this argument to receive the length of
+ *             the returned UTF-16 buffer in 16-bit words
+ * @return Returns an allocated UTF-16 buffer. Needs to be freed by the user later.
+ * @see rf_string_tout_f8()
+ * @see rf_string_to_utf32()
+ */
 i_DECLIMEX_ uint16_t *rf_string_to_utf16(const struct RFstring *s, uint32_t *length);
 
 /**
- ** @brief Returns the strings contents as a UTF-32 buffer
- **
- ** @isinherited{StringX}
- ** This function allocates a UTF-32 buffer in which the string's
- ** UTF-8 contents are encoded as UTF-32. The endianess of the buffer
- ** is that of the system. The returned buffer needs to be freed by the user
- ** later.
- ** @param[in]  s      The string in question. @inhtype{String,StringX}
- ** @param[out] length Give a reference to a uint32_t in this
- **                    argument to receive the length
- **                   of the returned UTF-32 buffer in codepoints. (32-bit) words
- ** @return Returns an allocated UTF-16 buffer. Needs to be freed by the user later.
- ** @see rf_string_tout_f8()
- ** @see rf_string_to_utf16()
- **/
+ * @brief Returns the strings contents as a UTF-32 buffer
+ *
+ * @isinherited{StringX}
+ * This function allocates a UTF-32 buffer in which the string's
+ * UTF-8 contents are encoded as UTF-32. The endianess of the buffer
+ * is that of the system. The returned buffer needs to be freed by the user
+ * later.
+ * @param[in]  s      The string in question. @inhtype{String,StringX}
+ * @param[out] length Give a reference to a uint32_t in this
+ *                    argument to receive the length
+ *                   of the returned UTF-32 buffer in codepoints. (32-bit) words
+ * @return Returns an allocated UTF-16 buffer. Needs to be freed by the user later.
+ * @see rf_string_tout_f8()
+ * @see rf_string_to_utf16()
+ */
 i_DECLIMEX_ uint32_t *rf_string_to_utf32(const struct RFstring *s, uint32_t *length);
 
 //! @}
@@ -68,47 +68,47 @@ i_DECLIMEX_ uint32_t *rf_string_to_utf32(const struct RFstring *s, uint32_t *len
 //! @{
 
 /**
- ** @brief Creates a Cstring representation of the string
- **
- ** @isinherited{StringX}
- ** Since RFstring is not null terminated this function shall allocate
- ** a c string where it will be stored.
- **
- ** @warning Make sure to free the returned string after using
- **
- ** @param s       The string whose cstring repesentation to get.
- **                @inhtype{String,StringX}
- ** @return        Returns the pointer to the allocated c string
- **/
+ * @brief Creates a Cstring representation of the string
+ *
+ * @isinherited{StringX}
+ * Since RFstring is not null terminated this function shall allocate
+ * a c string where it will be stored.
+ *
+ * @warning Make sure to free the returned string after using
+ *
+ * @param s       The string whose cstring repesentation to get.
+ *                @inhtype{String,StringX}
+ * @return        Returns the pointer to the allocated c string
+ */
 i_DECLIMEX_ char *rf_string_cstr(const struct RFstring *s);
 
 /**
- ** Turns the given string into a null terminated c string.
- ** Make sure to call @ref RFS_PUSH() before use
- **  and @ref RFS_POP() after use
- **/
+ * Turns the given string into a null terminated c string.
+ * Make sure to call @ref RFS_PUSH() before use
+ *  and @ref RFS_POP() after use
+ */
 i_DECLIMEX_ char *rf_string_cstr_from_buff(const void* s);
 i_DECLIMEX_ char *rf_string_cstr_from_buff_or_die(const void* s);
 
 /**
- ** @brief Returns the integer value of a String
- **
- ** The parameter string must start with a number in any form.
- ** @isinherited{StringX}
- ** @param thisstr     The string whose integer value to return.
- **                    @inhtype{String,StringX}
- ** @param start_off  The offset of the string at which to start
- **                    the conversion attempt. This is needed since some
- **                    bases, like octal and binary may start with 0b or 0
- **                    and are not understoof by strtol().
- ** @param[out] v      Will hold the return value
- ** @param[out] off    Will hold the offset from the beginning of
- **                    the string up to which a conversion happened.
- **                    Is absolutely needed for hex and octal versions.
- ** @return            True in case of succesfull conversion or false if no
- **                    integer was represented by the string
- ** @see rf_string_to_double()
- **/
+ * @brief Returns the integer value of a String
+ *
+ * The parameter string must start with a number in any form.
+ * @isinherited{StringX}
+ * @param thisstr     The string whose integer value to return.
+ *                    @inhtype{String,StringX}
+ * @param start_off  The offset of the string at which to start
+ *                    the conversion attempt. This is needed since some
+ *                    bases, like octal and binary may start with 0b or 0
+ *                    and are not understoof by strtol().
+ * @param[out] v      Will hold the return value
+ * @param[out] off    Will hold the offset from the beginning of
+ *                    the string up to which a conversion happened.
+ *                    Is absolutely needed for hex and octal versions.
+ * @return            True in case of succesfull conversion or false if no
+ *                    integer was represented by the string
+ * @see rf_string_to_double()
+ */
 i_DECLIMEX_ bool rf_string_to_int(const struct RFstring *s, int64_t *v, size_t *off);
 i_DECLIMEX_ bool rf_string_to_uint(const struct RFstring *thisstr,
                                    size_t start_off,
@@ -168,71 +168,71 @@ i_INLINE_DECL bool rf_string_to_uint_oct(const struct RFstring *thisstr,
 }
 
 /**
- ** @brief Returns the double value of a String
- **
- ** @isinherited{StringX}
- ** The parameter string must start with a floating point number
- ** @param thisstr     The string whose floating point value to return.
- **                    @inhtype{String,StringX}
- ** @param[out] f      Will hold the return float value
- ** @param[out] off    Optional. Will hold the offset from the beginning of
- **                    the string up to which a conversion happened.
- ** @return            True in case of succesfull conversion or false if no
- **                    double was represented by the string
- ** @see rf_string_to_int()
- **/
+ * @brief Returns the double value of a String
+ *
+ * @isinherited{StringX}
+ * The parameter string must start with a floating point number
+ * @param thisstr     The string whose floating point value to return.
+ *                    @inhtype{String,StringX}
+ * @param[out] f      Will hold the return float value
+ * @param[out] off    Optional. Will hold the offset from the beginning of
+ *                    the string up to which a conversion happened.
+ * @return            True in case of succesfull conversion or false if no
+ *                    double was represented by the string
+ * @see rf_string_to_int()
+ */
 i_DECLIMEX_ bool rf_string_to_double(const struct RFstring *thisstr,
                                      double *f,
                                      size_t *off);
 
 /**
- ** @brief Turns any uppercase characters of the string into lower case
- **
- ** @isinherited{StringX}
- ** This function as of now only works with letter of the English alphabet.
- ** All the characters of the string that are uppercase shall
- ** be turned into lowercase
- ** @param thisstr The string for which to perform the uppercase
- **                to lowercase conversion
- ** @see rf_string_to_upper()
- **/
+ * @brief Turns any uppercase characters of the string into lower case
+ *
+ * @isinherited{StringX}
+ * This function as of now only works with letter of the English alphabet.
+ * All the characters of the string that are uppercase shall
+ * be turned into lowercase
+ * @param thisstr The string for which to perform the uppercase
+ *                to lowercase conversion
+ * @see rf_string_to_upper()
+ */
 i_DECLIMEX_ void rf_string_to_lower(struct RFstring *thisstr);
 
 /**
- ** @brief Turns any lowercase characters of the string into upper case
- **
- ** @isinherited{StringX}
- ** This function as of now only works with letter of the English alphabet.
- ** All the characters of the string that are lowercase shall be turned
- ** into uppercase
- ** @param thisstr The string for which to perform the lowercase to
- **                uppercase conversion
- ** @see rf_string_to_lower()
- **/
+ * @brief Turns any lowercase characters of the string into upper case
+ *
+ * @isinherited{StringX}
+ * This function as of now only works with letter of the English alphabet.
+ * All the characters of the string that are lowercase shall be turned
+ * into uppercase
+ * @param thisstr The string for which to perform the lowercase to
+ *                uppercase conversion
+ * @see rf_string_to_lower()
+ */
 i_DECLIMEX_ void rf_string_to_upper(struct RFstring *thisstr);
 
 /**
- ** @brief Tokenizes the given string
- **
- ** @isinherited{StringX}
- ** Separates it into @c tokensN depending on how many substrings
- ** can be created from the @c sep separator and stores them
- ** into the Array of RFstring* that should be passed to the
- ** function. The array gets initialized inside the function and
- ** <b>has to be freed explicitly</b> later by thg user.
- ** Also each String inside the array has to be Deinitialized too.
- ** Here is an example usage:
- ** @snippet Strings/tokenize.cpp Tokenize_C
- ** @lmsFunction
- ** @param[in] thisstr    The string to tokenize.
- **                       @inhtype{String,StringX}
- ** @param[in] sep        A substring that will be used as a separator
- **                       @inhtype{String,StringX}
- ** @param[out] tokensN   The number of tokens that got created
- ** @param[out] tokens    Pass a pointer to an array of RF_Strings. @keepptr
- ** @return Returns @c true in success and @c false in case the the
- ** separating character has not been found
- **/
+ * @brief Tokenizes the given string
+ *
+ * @isinherited{StringX}
+ * Separates it into @c tokensN depending on how many substrings
+ * can be created from the @c sep separator and stores them
+ * into the Array of RFstring* that should be passed to the
+ * function. The array gets initialized inside the function and
+ * <b>has to be freed explicitly</b> later by thg user.
+ * Also each String inside the array has to be Deinitialized too.
+ * Here is an example usage:
+ * @snippet Strings/tokenize.cpp Tokenize_C
+ * @lmsFunction
+ * @param[in] thisstr    The string to tokenize.
+ *                       @inhtype{String,StringX}
+ * @param[in] sep        A substring that will be used as a separator
+ *                       @inhtype{String,StringX}
+ * @param[out] tokensN   The number of tokens that got created
+ * @param[out] tokens    Pass a pointer to an array of RF_Strings. @keepptr
+ * @return Returns @c true in success and @c false in case the the
+ * separating character has not been found
+ */
 i_DECLIMEX_ bool rf_string_tokenize(const struct RFstring *thisstr,
                                     const struct RFstring *sep,
                                     uint32_t *tokensN,
