@@ -111,6 +111,7 @@ unit_test_files = [
     'test_datastructs_objset.c',
     'test_datastructs_mbuffer.c',
     'test_datastructs_sbuffer.c',
+    'test_datastructs_strmap.c',
 
     'test_intrusive_list.c',
 

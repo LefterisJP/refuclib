@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <errno.h>
 
+#include <Utils/log.h>
 #include <String/rf_str_retrieval.h>
 #include <String/rf_str_core.h>
 #include <math/ilog.h>
@@ -60,6 +61,12 @@ bool strmap_add_(struct strmap *map, const struct RFstring *member, const void *
     uint8_t new_dir;
 
 	assert(value);
+
+    /* Empty string? */
+    if (len == 0) {
+        RF_ERROR("Tried to insert an empty string to a strmap");
+        return false;
+    }
 
 	/* Empty map? */
 	if (!map->u.n) {
