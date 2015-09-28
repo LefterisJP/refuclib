@@ -62,13 +62,15 @@ void *rf_sbuffer_alloc(struct RFsbuffer *b, size_t size)
     }
 
     size_t new_size = b->size > size ? b->size : size;
+    new_size *= 2;
     // else we need to realloc
-    if (!rf_sbuffer_realloc(b, new_size * 2)) {
+    if (!rf_sbuffer_realloc(b, new_size)) {
         return NULL;
     }
     // assignment needs to happen again due to realloc
     ret = b->buff + b->index;
     b->index += size;
+    b->size = new_size;
     return ret;
 }
 
@@ -80,12 +82,14 @@ void *rf_sbuffer_extend(struct RFsbuffer *b, size_t added_size)
         return ret;
     }
     size_t new_size = b->size + added_size;
-    if (!rf_sbuffer_realloc(b, new_size * 2)) {
+    new_size *= 2;
+    if (!rf_sbuffer_realloc(b, new_size)) {
         return NULL;
     }
     // assignment needs to happen again due to realloc
     ret = b->buff + darray_top(b->stack->index_stack);
     b->index += added_size;
+    b->size = new_size;
     return ret;
 }
 

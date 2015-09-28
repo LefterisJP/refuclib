@@ -161,7 +161,6 @@ START_TEST (test_sbuffer_alloc_multiple_reallocs_with_push_pop) {
     struct foo *f1;
     struct foo *f2;
     struct foo *f3;
-    struct foo *f4;
     struct boo *b1;
     struct boo *b2;
     struct boo *b3;
@@ -206,9 +205,6 @@ START_TEST (test_sbuffer_alloc_multiple_reallocs_with_push_pop) {
     ck_assert(!realloc_occured);
     b3 = rf_sbuffer_alloc(&b, sizeof(struct boo));
     ck_assert(boo_init_check(b3, 7, 7.17));
-    ck_assert(!realloc_occured);
-    f4 = rf_sbuffer_alloc(&b, sizeof(struct foo));
-    ck_assert(foo_init_check(f4, 8, 8.18));
     ck_assert(realloc_occured);
     rf_sbuffer_pop(&b);
 
