@@ -80,13 +80,14 @@ bool strmap_add_(struct strmap *map, const struct RFstring *member, const void *
 
 	/* Find where they differ. */
     const uint8_t *n_bytes = (const uint8_t*)rf_string_data(n->u.s);
-	for (byte_num = 0; n_bytes[byte_num] == bytes[byte_num]; byte_num++) {
-		if (byte_num == len) {
-			/* All identical! */
-			errno = EEXIST;
-			return false;
-		}
+	for (byte_num = 0; byte_num != len && n_bytes[byte_num] == bytes[byte_num]; byte_num++) {
+        ;
 	}
+    if (byte_num == len) {
+        /* All identical! */
+        errno = EEXIST;
+        return false;
+    }
 
 	/* Find which bit differs (if we had ilog8, we'd use it) */
 	bit_num = ilog32_nz((uint8_t)n_bytes[byte_num] ^ bytes[byte_num]) - 1;
