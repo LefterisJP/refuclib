@@ -41,6 +41,7 @@ START_TEST (test_strmap_add_different_strings) {
 
     for (i = 0; i < ARR_SIZE; i++) {
         struct object *obj = strmap_get(&map, &stringobjs[i].str);
+        ck_assert(obj);
         ck_assert_int_eq(obj->val, stringobjs[i].obj.val);
     }
 
@@ -60,6 +61,7 @@ START_TEST (test_strmap_add_sameval_string) {
 
     for (i = 0; i < ARR_SIZE; i++) {
         struct object *obj = strmap_get(&map, &stringobjs[i].str);
+        ck_assert(obj);
         ck_assert_int_eq(obj->val, stringobjs[i].obj.val);
     }
 
@@ -68,12 +70,69 @@ START_TEST (test_strmap_add_sameval_string) {
     ck_assert(!strmap_add(&map, other, &stringobjs[0].obj));
     ck_assert_int_eq(errno, EEXIST); // make sure errno is set correctly
 
+    ck_assert(!strmap_add(&map, &stringobjs[0].str, &stringobjs[0].obj));
+    ck_assert_int_eq(errno, EEXIST); // make sure errno is set correctly
+
     strmap_clear(&map);
     rf_string_destroy(other);
 
 } END_TEST
 
+START_TEST (test_strmap_add_suffix_string) {
+    struct obj_strmap map;
+    strmap_init(&map);
+    // in the past there was a memory access error when using prefix strings
+    // in the strmap. This test reproduces this error and valgrind should catch
+    // any resurfacing
+    struct RFstring *s1 = rf_string_create("abcd");
+    struct RFstring *s2 = rf_string_create("abcdef");
+    struct object obj1 = { 55 };
+    struct object obj2 = { 42 };
+    ck_assert(strmap_add(&map, s1, &obj1));
+    ck_assert(strmap_add(&map, s2, &obj2));
+
+    struct object *obj = strmap_get(&map, s1);
+    ck_assert(obj);
+    ck_assert_int_eq(obj->val, 55);
+    obj = strmap_get(&map, s2);
+    ck_assert(obj);
+    ck_assert_int_eq(obj->val, 42);
+
+    strmap_clear(&map);
+    rf_string_destroy(s1);
+    rf_string_destroy(s2);
+} END_TEST
+
 START_TEST (test_strmap_del) {
+    unsigned int i;
+    struct obj_strmap map;
+    strmap_init(&map);
+    for (i = 0; i < ARR_SIZE; i++) {
+        ck_assert(strmap_add(&map, &stringobjs[i].str, &stringobjs[i].obj));
+    }
+
+    for (i = 0; i < ARR_SIZE; i++) {
+        struct object *obj = strmap_get(&map, &stringobjs[i].str);
+        ck_assert(obj);
+        ck_assert_int_eq(obj->val, stringobjs[i].obj.val);
+    }
+
+    // it's important to test a different string pointer
+    struct RFstring *other = rf_string_create("String1");
+    struct RFstring *s = strmap_del(&map, other, NULL);
+    ck_assert(rf_string_equal(other, s));
+    s = strmap_del(&map, &stringobjs[1].str, NULL);
+    ck_assert(rf_string_equal(&stringobjs[1].str, s));
+
+    // try to get the string objects, to make sure they are deleted
+    ck_assert(!strmap_get(&map, &stringobjs[0].str));
+    ck_assert(!strmap_get(&map, &stringobjs[1].str));
+
+    strmap_clear(&map);
+    rf_string_destroy(other);
+} END_TEST
+
+START_TEST (test_strmap_del_and_add_again) {
     unsigned int i;
     struct obj_strmap map;
     strmap_init(&map);
@@ -96,6 +155,9 @@ START_TEST (test_strmap_del) {
     // try to get the string objects, to make sure they are deleted
     ck_assert(!strmap_get(&map, &stringobjs[0].str));
     ck_assert(!strmap_get(&map, &stringobjs[1].str));
+
+    // now add the first object again
+    ck_assert(strmap_add(&map, other, &stringobjs[0].obj));
 
     strmap_clear(&map);
     rf_string_destroy(other);
@@ -138,9 +200,11 @@ Suite *datastructs_strmap_suite_create(void)
     TCase *tc1 = tcase_create("strmap_add");
     tcase_add_test(tc1, test_strmap_add_different_strings);
     tcase_add_test(tc1, test_strmap_add_sameval_string);
+    tcase_add_test(tc1, test_strmap_add_suffix_string);
 
     TCase *tc2 = tcase_create("strmap_del");
     tcase_add_test(tc2, test_strmap_del);
+    tcase_add_test(tc2, test_strmap_del_and_add_again);
 
     TCase *tc3 = tcase_create("strmap_iterate");
     tcase_add_test(tc3, test_strmap_iterate);

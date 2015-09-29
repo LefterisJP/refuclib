@@ -21,11 +21,11 @@ struct RFstring;
  * trivial functions.
  */
 struct strmap {
-	union {
-		struct node *n;
-		const struct RFstring *s;
-	} u;
-	void *v;
+    union {
+        struct node *n;
+        const struct RFstring *s;
+    } u;
+    void *v;
 };
 
 /**
@@ -37,13 +37,13 @@ struct strmap {
  * value!
  *
  * Example:
- *	struct strmap_intp {
- *		STRMAP_MEMBERS(int *);
- *	};
+ *  struct strmap_intp {
+ *      STRMAP_MEMBERS(int *);
+ *  };
  */
-#define STRMAP_MEMBERS(type)			\
-	struct strmap raw;			\
-	TCON(type canary)
+#define STRMAP_MEMBERS(type)            \
+    struct strmap raw;          \
+    TCON(type canary)
 
 
 /**
@@ -54,15 +54,15 @@ struct strmap {
  * need this.
  *
  * Example:
- *	struct strmap_intp map;
+ *  struct strmap_intp map;
  *
- *	strmap_init(&map);
+ *  strmap_init(&map);
  */
 #define strmap_init(map) strmap_init_(&(map)->raw)
 
 static inline void strmap_init_(struct strmap *map)
 {
-	map->u.n = NULL;
+    map->u.n = NULL;
 }
 
 /**
@@ -70,14 +70,14 @@ static inline void strmap_init_(struct strmap *map)
  * @map: the typed strmap to check.
  *
  * Example:
- *	if (!strmap_empty(&map))
- *		abort();
+ *  if (!strmap_empty(&map))
+ *      abort();
  */
 #define strmap_empty(map) strmap_empty_(&(map)->raw)
 
 static inline bool strmap_empty_(const struct strmap *map)
 {
-	return map->u.n == NULL;
+    return map->u.n == NULL;
 }
 
 /**
@@ -88,12 +88,12 @@ static inline bool strmap_empty_(const struct strmap *map)
  * Returns the value, or NULL if it isn't in the map (and sets errno = ENOENT).
  *
  * Example:
- *	int *val = strmap_get(&map, "hello");
- *	if (val)
- *		printf("hello => %i\n", *val);
+ *  int *val = strmap_get(&map, "hello");
+ *  if (val)
+ *      printf("hello => %i\n", *val);
  */
 #define strmap_get(map, member) \
-	tcon_cast((map), canary, strmap_get_(&(map)->raw, (member)))
+    tcon_cast((map), canary, strmap_get_(&(map)->raw, (member)))
 void *strmap_get_(const struct strmap *map, const struct RFstring *member);
 
 /**
@@ -109,14 +109,14 @@ void *strmap_get_(const struct strmap *map, const struct RFstring *member);
  * you want a copy in the map, use strdup().  Similarly for the value.
  *
  * Example:
- *	val = malloc(sizeof *val);
- *	*val = 17;
- *	if (!strmap_add(&map, "goodbye", val))
- *		printf("goodbye was already in the map\n");
+ *  val = malloc(sizeof *val);
+ *  *val = 17;
+ *  if (!strmap_add(&map, "goodbye", val))
+ *      printf("goodbye was already in the map\n");
  */
-#define strmap_add(map, member, value)				\
-	strmap_add_(&tcon_check((map), canary, (value))->raw,	\
-		    (member), (void *)(value))
+#define strmap_add(map, member, value)              \
+    strmap_add_(&tcon_check((map), canary, (value))->raw,   \
+            (member), (void *)(value))
 
 bool strmap_add_(struct strmap *map, const struct RFstring *member, const void *value);
 
@@ -134,12 +134,12 @@ bool strmap_add_(struct strmap *map, const struct RFstring *member, const void *
  * @valuep is not NULL.
  *
  * Example:
- *	if (!strmap_del(&map, "goodbye", NULL))
- *		printf("goodbye was not in the map?\n");
+ *  if (!strmap_del(&map, "goodbye", NULL))
+ *      printf("goodbye was not in the map?\n");
  */
-#define strmap_del(map, member, valuep)					\
-	strmap_del_(&tcon_check_ptr((map), canary, valuep)->raw,	\
-		    (member), (void **)valuep)
+#define strmap_del(map, member, valuep)                     \
+    strmap_del_(&tcon_check_ptr((map), canary, valuep)->raw,    \
+            (member), (void **)valuep)
 struct RFstring *strmap_del_(struct strmap *map, const struct RFstring *member, void **valuep);
 
 /**
@@ -149,7 +149,7 @@ struct RFstring *strmap_del_(struct strmap *map, const struct RFstring *member, 
  * The map will be empty after this.
  *
  * Example:
- *	strmap_clear(&map);
+ *  strmap_clear(&map);
  */
 #define strmap_clear(map) strmap_clear_(&(map)->raw)
 
@@ -162,40 +162,40 @@ void strmap_clear_(struct strmap *map);
  * @arg: the argument for the function (types should match).
  *
  * @handle's prototype should be:
- *	bool @handle(const struct RFstring *member, type value, typeof(arg) arg)
+ *  bool @handle(const struct RFstring *member, type value, typeof(arg) arg)
  *
  * If @handle returns false, the iteration will stop.
  * You should not alter the map within the @handle function!
  *
  * Example:
- *	struct strmap_intp {
- *		STRMAP_MEMBERS(int *);
- *	};
- *	static bool dump_some(const struct RFstring *member, int *value, int *num)
- *	{
- *		// Only dump out num nodes.
- *		if (*(num--) == 0)
- *			return false;
- *		printf("%s=>%i\n", member, *value);
- *		return true;
- *	}
+ *  struct strmap_intp {
+ *      STRMAP_MEMBERS(int *);
+ *  };
+ *  static bool dump_some(const struct RFstring *member, int *value, int *num)
+ *  {
+ *      // Only dump out num nodes.
+ *      if (*(num--) == 0)
+ *          return false;
+ *      printf("%s=>%i\n", member, *value);
+ *      return true;
+ *  }
  *
- *	static void dump_map(const struct strmap_intp *map)
- *	{
- *		int max = 100;
- *		strmap_iterate(map, dump_some, &max);
- *		if (max < 0)
- *			printf("... (truncated to 100 entries)\n");
- *	}
+ *  static void dump_map(const struct strmap_intp *map)
+ *  {
+ *      int max = 100;
+ *      strmap_iterate(map, dump_some, &max);
+ *      if (max < 0)
+ *          printf("... (truncated to 100 entries)\n");
+ *  }
  */
-#define strmap_iterate(map, handle, arg)				\
-	strmap_iterate_(&(map)->raw,					\
-			typesafe_cb_cast(bool (*)(const struct RFstring *,		\
-						  void *, void *),	\
-					 bool (*)(const struct RFstring *,		\
-						  tcon_type((map), canary), \
-						  __typeof__(arg)), (handle)), \
-			(arg))
+#define strmap_iterate(map, handle, arg)                \
+    strmap_iterate_(&(map)->raw,                    \
+            typesafe_cb_cast(bool (*)(const struct RFstring *,      \
+                          void *, void *),  \
+                     bool (*)(const struct RFstring *,      \
+                          tcon_type((map), canary), \
+                          __typeof__(arg)), (handle)), \
+            (arg))
 void strmap_iterate_(const struct strmap *map,
                      bool (*handle)(const struct RFstring *, void *, void *),
                      const void *data);
@@ -210,22 +210,22 @@ void strmap_iterate_(const struct strmap *map,
  * strmap_empty() on the returned pointer.
  *
  * Example:
- *	static void dump_prefix(const struct strmap_intp *map,
- *				const struct RFstring *prefix)
- *	{
- *		int max = 100;
- *		printf("Nodes with prefix %s:\n", prefix);
- *		strmap_iterate(strmap_prefix(map, prefix), dump_some, &max);
- *		if (max < 0)
- *			printf("... (truncated to 100 entries)\n");
- *	}
+ *  static void dump_prefix(const struct strmap_intp *map,
+ *              const struct RFstring *prefix)
+ *  {
+ *      int max = 100;
+ *      printf("Nodes with prefix %s:\n", prefix);
+ *      strmap_iterate(strmap_prefix(map, prefix), dump_some, &max);
+ *      if (max < 0)
+ *          printf("... (truncated to 100 entries)\n");
+ *  }
  */
 #if HAVE_TYPEOF
 #define strmap_prefix(map, prefix) \
-	((const __typeof__(map))strmap_prefix_(&(map)->raw, (prefix)))
+    ((const __typeof__(map))strmap_prefix_(&(map)->raw, (prefix)))
 #else
 #define strmap_prefix(map, prefix) \
-	((const void *)strmap_prefix_(&(map)->raw, (prefix)))
+    ((const void *)strmap_prefix_(&(map)->raw, (prefix)))
 #endif
 
 const struct strmap *strmap_prefix_(const struct strmap *map,
