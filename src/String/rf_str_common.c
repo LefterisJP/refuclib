@@ -15,8 +15,7 @@
 #include <stdlib.h> //for exit()
 /*------------- End of includes -------------*/
 
-static struct RFstring *i_rf_string_create_localva(bool null_terminate,
-                                                   const char *s,
+static struct RFstring *i_rf_string_create_localva(const char *s,
                                                    va_list args)
 {
     unsigned int size;
@@ -40,26 +39,24 @@ static struct RFstring *i_rf_string_create_localva(bool null_terminate,
     return ret;
 }
 
-struct RFstring *i_rf_string_create_localv(bool null_terminate,
-                                           const char *s,
+struct RFstring *i_rf_string_create_localv(const char *s,
                                            ...)
 {
     va_list args;
     struct RFstring *ret;
     va_start(args, s);
-    ret = i_rf_string_create_localva(null_terminate, s, args);
+    ret = i_rf_string_create_localva(s, args);
     va_end(args);
     return ret;
 }
 
-struct RFstring *i_rf_string_create_localv_or_die(bool null_terminate,
-                                                  const char *s,
+struct RFstring *i_rf_string_create_localv_or_die(const char *s,
                                                   ...)
 {
     va_list args;
     struct RFstring *ret;
     va_start(args, s);
-    ret = i_rf_string_create_localva(null_terminate, s, args);
+    ret = i_rf_string_create_localva(s, args);
     va_end(args);
     if (!ret) {
         RF_CRITICAL("RFS() failure");

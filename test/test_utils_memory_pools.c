@@ -218,7 +218,7 @@ static void foo_arr_shuffle(struct foo **array, size_t n)
 
 static void do_test_multiple_alloc_dealloc(uint32_t pool_chunk_size,
                                            int alloc_percentage,
-                                           int test_actions)
+                                           unsigned int test_actions)
 {
     unsigned int i;
     unsigned int allocated_elements = 0;

@@ -344,7 +344,6 @@ static inline bool utf8_range_byte6_check(const char *bytes, uint32_t i)
 #endif
 
 bool rf_utf8_decode_single(const char *s,
-                           const char *lim,
                            uint32_t *index,
                            uint32_t *cp)
 {

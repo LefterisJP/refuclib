@@ -43,6 +43,7 @@ static void teardown_sbuffer_tests()
 
 static bool realloc_cb(struct RFsbuffer *b)
 {
+    (void)b;
     realloc_occured = true;
     return true;
 }

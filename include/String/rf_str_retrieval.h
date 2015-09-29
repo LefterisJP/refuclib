@@ -12,6 +12,7 @@
 #include <Definitions/imex.h> //for the import export macro
 #include <Definitions/types.h> //for exact sized types
 #include <Definitions/retcodes.h> //for bool
+#include <Definitions/inline.h> //for inline
 /*------------- End of includes -------------*/
 
 #ifdef __cplusplus
@@ -181,10 +182,14 @@ i_DECLIMEX_ int32_t rf_string_find_i(const struct RFstring *thisstr,
  * @see rf_string_begins_with()
  *
  */
-#define rf_string_ends_with(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_)           \
-    (                                                                   \
-        rf_string_find(i_THISSTR_,i_SEARCHSTR_,i_OPTIONS_)               \
-        == (rf_string_length(i_THISSTR_)-rf_string_length(i_SEARCHSTR_)) )
+i_INLINE_DECL bool rf_string_ends_with(const struct RFstring *thisstr,
+                                       const struct RFstring *searchstr,
+                                       enum RFstring_matching_options options)
+{
+    int32_t res = rf_string_find(thisstr, searchstr, options);
+    return res >= 0 &&
+        (unsigned int)res == (rf_string_length(thisstr) - rf_string_length(searchstr));
+}
 
 /**
  * @brief Checks if a string begins with any of the specified characters

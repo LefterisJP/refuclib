@@ -269,7 +269,7 @@ static bool add_BOM(FILE *f,
 #undef FWRITE_FAIL
 }
 
-static bool check_BOM_UTF8(struct RFtextfile* t, enum RFendianess endianess)
+static bool check_BOM_UTF8(struct RFtextfile* t)
 {
     uint32_t c;
     char eof;
@@ -524,7 +524,7 @@ static bool determine_endianess(struct RFtextfile* t,
         }//end of no BOM at beginning case
         break;
     case RF_UTF8:
-        if (!check_BOM_UTF8(t, endianess)) {
+        if (!check_BOM_UTF8(t)) {
             //no BOM, just take the system's endianess
             t->endianess = rf_system_get_endianess();
         }

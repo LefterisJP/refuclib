@@ -98,7 +98,6 @@ i_DECLIMEX_ int rf_utf8_encode_single(const uint32_t codepoint, char* utf8);
  **
  **
  ** @param[in] utf8               The utf8 buffer
- ** @param[in] lim                The last byte of the buffer
  ** @param[out] index             The next index in the buffer after the
  **                               decoded codepoint
  ** @param[out] cp                The decoded codepoint
@@ -106,7 +105,6 @@ i_DECLIMEX_ int rf_utf8_encode_single(const uint32_t codepoint, char* utf8);
  **                               @c false otherwise
  **/
 bool rf_utf8_decode_single(const char *s,
-                           const char *lim,
                            uint32_t *index,
                            uint32_t *cp);
 

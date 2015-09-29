@@ -75,6 +75,7 @@ struct rf_objset_iter {
     struct rf_objset_##name { OBJSET_MEMBERS(type *); };                \
 	static inline size_t objset_##name##_hash(const void *elem, void *priv) \
 	{                                                                   \
+        (void)priv;                                                     \
 		return hashfn(keyof((const type *)elem));                       \
 	}                                                                   \
 	static inline void objset_##name##_init(struct objset_h *set)       \

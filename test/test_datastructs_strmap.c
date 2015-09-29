@@ -103,6 +103,7 @@ START_TEST (test_strmap_del) {
 
 bool iterate_cb(const struct RFstring *member, struct object *obj, void *userdata)
 {
+    (void)member;
     bool *foundarr = userdata;
     // let's consider obj->val - 1 as the index to the found array
     unsigned idx = obj->val - 1;

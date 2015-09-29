@@ -158,7 +158,7 @@ bool rf_string_keep_only(struct RFstring *thisstr,
     char unused[MAX_UTF8C_BYTES];
     int character_byte_length;
     size_t keep_length;
-    int j;
+    unsigned j;
     bool exists;
     bool ret = false;
     uint32_t *buffer;
@@ -478,7 +478,7 @@ bool rf_string_trim_end(struct RFstring *thisstr,
     uint32_t byte_position;
     uint32_t last_byte_position;
     size_t sub_length;
-    int j;
+    unsigned j;
     uint32_t *buffer;
     unsigned int removals = 0;
     bool ret = false;

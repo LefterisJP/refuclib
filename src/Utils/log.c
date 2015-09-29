@@ -254,7 +254,7 @@ static inline bool rf_log_add_location(
                    file_len, file, func_len, func, line
     );
 
-    if (ret < 0 || ret >= max) {
+    if (ret < 0 || ret >= (int)max) {
         return false;
     }
 

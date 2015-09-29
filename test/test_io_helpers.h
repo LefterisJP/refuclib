@@ -131,8 +131,9 @@ inline static const char *get_line(int encoding,
     return with_newline ? scenario[3] : scenario[8];
 }
 
-inline static const uint32_t get_uint32_array(int encoding, int endianess,
-                                              const uint32_t* arr)
+inline static uint32_t get_uint32_array(int encoding,
+                                        int endianess,
+                                        const uint32_t* arr)
 {
     if (encoding == RF_UTF8) {
         return arr[0];

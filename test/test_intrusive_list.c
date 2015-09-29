@@ -66,7 +66,7 @@ bool foo_add(struct foo *f, int val)
     return true;
 }
 
-const static int check_arr[] = { 0, 1, 1, 2, 3, 5};
+static const int check_arr[] = { 0, 1, 1, 2, 3, 5};
 
 START_TEST (test_intrusive_list_copy) {
     struct foo *f1;
@@ -163,7 +163,7 @@ START_TEST (test_intrusive_list_pop_back) {
 } END_TEST
 
 START_TEST (test_intrusive_list_pop_until) {
-    const static int carr[] = { 4, 5 };
+    static const int carr[] = { 4, 5 };
     struct RFilist_head h1;
     struct foo_elem *used1 = foo_elem_create(1);
     struct foo_elem *used2 = foo_elem_create(2);
@@ -193,7 +193,7 @@ START_TEST (test_intrusive_list_pop_until) {
 } END_TEST
 
 START_TEST (test_intrusive_list_pop_back_until) {
-    const static int carr[] = { 1, 2, 3};
+    static const int carr[] = { 1, 2, 3};
     struct RFilist_head h1;
     struct foo_elem *used1 = foo_elem_create(1);
     struct foo_elem *used2 = foo_elem_create(2);

@@ -656,7 +656,7 @@ bool rf_string_iterator_next(struct RFstring_iterator *it,
         }
     }
 
-    if (!rf_utf8_decode_single(it->p, it->ep, &index, value)) {
+    if (!rf_utf8_decode_single(it->p, &index, value)) {
         RF_ERROR("Error at utf-8 decoding during string iteration");
         return false;
     }

@@ -135,6 +135,10 @@ int32_t rf_string_find_i(const struct RFstring *thisstr,
     return ret;
 }
 
+i_INLINE_INS bool rf_string_ends_with(const struct RFstring *thisstr,
+                                       const struct RFstring *endstr,
+                                       enum RFstring_matching_options options);
+
 unsigned int rf_string_begins_with_any(const struct RFstring *thisstr,
                                        const struct RFstring *chars,
                                        const char *limit,
@@ -144,8 +148,8 @@ unsigned int rf_string_begins_with_any(const struct RFstring *thisstr,
     size_t sub_length;
     uint32_t byte_position;
     unsigned int matching_chars = 0;
-    int i = 0;
-    int j = 0;
+    unsigned i = 0;
+    unsigned j = 0;
     uint32_t *buffer;
 
     rf_mbuffer_push(RF_TSBUFFM);
@@ -193,6 +197,7 @@ int rf_string_count(const struct RFstring *tstr,
                     struct RFarray *positions,
                     enum RFstring_matching_options options)
 {
+    (void)options; //reserved for future use
     unsigned int n;
     char *s;
     char *prs;

@@ -109,11 +109,9 @@ i_DECLIMEX_ struct RFstring *i_rf_string_create_local(bool null_terminate,
                                                       const char *s);
 i_DECLIMEX_ struct RFstring *i_rf_string_create_local_or_die(bool null_terminate,
                                                              const char *s);
-i_DECLIMEX_ struct RFstring *i_rf_string_create_localv(bool null_terminate,
-                                                       const char *s,
+i_DECLIMEX_ struct RFstring *i_rf_string_create_localv(const char *s,
                                                        ...);
-i_DECLIMEX_ struct RFstring *i_rf_string_create_localv_or_die(bool null_terminate,
-                                                              const char *s,
+i_DECLIMEX_ struct RFstring *i_rf_string_create_localv_or_die(const char *s,
                                                               ...);
 
 #define RF_SELECT_STRING_CREATE_LOCAL(...)                              \
@@ -121,28 +119,28 @@ i_DECLIMEX_ struct RFstring *i_rf_string_create_localv_or_die(bool null_terminat
 #define i_SELECT_RF_STRING_CREATELOCAL1(slit_) \
     i_rf_string_create_local(false, slit_)
 #define i_SELECT_RF_STRING_CREATELOCAL0(...)    \
-    i_rf_string_create_localv(false, __VA_ARGS__)
+    i_rf_string_create_localv(__VA_ARGS__)
 
 #define RF_SELECT_STRING_CREATE_LOCAL_NT(...)                              \
     RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATELOCAL_NT, 1, __VA_ARGS__)
 #define i_SELECT_RF_STRING_CREATELOCAL_NT1(slit_) \
     i_rf_string_create_local(true, slit_)
 #define i_SELECT_RF_STRING_CREATELOCAL_NT0(...)    \
-    i_rf_string_create_localv(true, __VA_ARGS__)
+    i_rf_string_create_localv(__VA_ARGS__)
 
 #define RF_SELECT_STRING_CREATE_LOCAL_OR_DIE(...)                       \
     RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATELOCAL_OR_DIE, 1, __VA_ARGS__)
 #define i_SELECT_RF_STRING_CREATELOCAL_OR_DIE1(slit_)   \
     i_rf_string_create_local_or_die(false, slit_)
 #define i_SELECT_RF_STRING_CREATELOCAL_OR_DIE0(...) \
-    i_rf_string_create_localv_or_die(false, __VA_ARGS__)
+    i_rf_string_create_localv_or_die(__VA_ARGS__)
 
 #define RF_SELECT_STRING_CREATE_LOCAL_OR_DIE_NT(...)                       \
     RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATELOCAL_OR_DIE_NT, 1, __VA_ARGS__)
 #define i_SELECT_RF_STRING_CREATELOCAL_OR_DIE_NT1(slit_)   \
     i_rf_string_create_local_or_die(true, slit_)
 #define i_SELECT_RF_STRING_CREATELOCAL_OR_DIE_NT0(...) \
-    i_rf_string_create_localv_or_die(true, __VA_ARGS__)
+    i_rf_string_create_localv_or_die(__VA_ARGS__)
 
 #ifdef __cplusplus
 }//closing bracket for calling from C++
