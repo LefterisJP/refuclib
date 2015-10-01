@@ -39,7 +39,7 @@
  *		TCON(char *charp_canary; int int_canary);
  *	};
  */
-#if HAVE_FLEXIBLE_ARRAY_MEMBER
+#if RF_HAVE_FLEXIBLE_ARRAY_MEMBER
 #define TCON(decls) struct { decls; } _tcon[]
 #else
 #define TCON(decls) struct { decls; } _tcon[1]
