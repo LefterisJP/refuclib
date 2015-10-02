@@ -8,31 +8,69 @@
 /*------------- Outside Module inclusion -------------*/
 #include <Definitions/inline.h>
 #include <Definitions/types.h> //for the fixed size data types
+#include <Utils/build_assert.h>
 /*------------- End of includes -------------*/
 
-/**
- ** @brief Returns the maximum of 2 ints
- **/
-i_INLINE_DECL int rf_math_max(int a, int b)
-{
-    if(a >= b)
-    {
-        return a;
-    }
-    return b;
-}
+#if RF_HAVE_STATEMENT_EXPR && RF_HAVE_TYPEOF
+// rf_min, rf_max and rf_clamp have been taken from the CCANN project. License is Public domain.
+#if RF_HAVE_BUILTIN_TYPES_COMPATIBLE_P
+#define MINMAX_ASSERT_COMPATIBLE(a, b) \
+	BUILD_ASSERT(__builtin_types_compatible_p(a, b))
+#else
+#define MINMAX_ASSERT_COMPATIBLE(a, b) \
+	do { } while (0)
+#endif
 
-/**
- ** @brief Returns the minimum of 2 ints
- **/
-i_INLINE_DECL int rf_math_min(int a, int b)
-{
-    if(a <= b)
-    {
-        return a;
-    }
-    return b;
-}
+#define rf_min(a, b) \
+	({ \
+		typeof(a) _a = (a); \
+		typeof(b) _b = (b); \
+		MINMAX_ASSERT_COMPATIBLE(typeof(_a), typeof(_b)); \
+		_a < _b ? _a : _b; \
+	})
+
+#define rf_max(a, b) \
+	({ \
+		typeof(a) _a = (a); \
+		typeof(b) _b = (b); \
+		MINMAX_ASSERT_COMPATIBLE(typeof(_a), typeof(_b)); \
+		_a > _b ? _a : _b; \
+	})
+
+#define rf_clamp(v, f, c)	(max(min((v), (c)), (f)))
+
+
+#define rf_min_t(t, a, b) \
+	({ \
+		t _ta = (a); \
+		t _tb = (b); \
+		rf_min(_ta, _tb); \
+	})
+#define rf_max_t(t, a, b) \
+	({ \
+		t _ta = (a); \
+		t _tb = (b); \
+		rf_max(_ta, _tb); \
+	})
+
+#define rf_clamp_t(t, v, f, c) \
+	({ \
+		t _tv = (v); \
+		t _tf = (f); \
+		t _tc = (c); \
+		rf_clamp(_tv, _tf, _tc); \
+	})
+
+#else
+
+/*
+ * Without statement expressions and typeof the above macros would be dangerous
+ * as there would be no way to avoid unsafe double evaluation of the arguments.
+ * 
+ * Use a more modern compiler ... or create inline functions for your use case?
+ */
+#error Compiler does not support statement expressions and/or typeof. See comment.
+#endif
 
 /**
  ** @brief Calculates the logarithm base 2 of an @c uint32_t
