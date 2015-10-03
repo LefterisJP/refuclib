@@ -32,7 +32,7 @@ struct foo {
     int elems;
 };
 
-struct foo *foo_create()
+static struct foo *foo_create()
 {
     struct foo *ret;
     RF_MALLOC(ret, sizeof(*ret), return NULL);
@@ -42,7 +42,7 @@ struct foo *foo_create()
 }
 
 // free foo without freeing the list
-void foo_destroy(struct foo *f)
+static void foo_destroy(struct foo *f)
 {
     free(f);
 }
