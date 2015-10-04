@@ -73,6 +73,27 @@ START_TEST (test_darray_prepend_empty) {
     darray_free(arr);
 } END_TEST
 
+START_TEST (test_darray_foreach_reverse) {
+    struct foo_arr arr;
+    struct foo *f;
+    unsigned int i;
+    darray_init(arr);
+    for (i = 1; i < ARR_SIZE; ++i) {
+        f = foo_create(expectarr[i].x, expectarr[i].y);
+        darray_append(arr, f);
+    }
+
+    struct foo **itf;
+    i = ARR_SIZE - 1;
+    darray_foreach_reverse(itf, arr) {
+        ck_assert_int_eq((*itf)->x, expectarr[i].x);
+        ck_assert((*itf)->y == expectarr[i].y);
+        --i;
+        foo_destroy(*itf);
+    }
+    darray_free(arr);
+} END_TEST
+
 
 Suite *datastructs_darray_suite_create(void)
 {
@@ -82,7 +103,11 @@ Suite *datastructs_darray_suite_create(void)
     tcase_add_test(tc1, test_darray_prepend);
     tcase_add_test(tc1, test_darray_prepend_empty);
 
+    TCase *tc2 = tcase_create("darray_foreach");
+    tcase_add_test(tc2, test_darray_foreach_reverse);
+
     suite_add_tcase(s, tc1);
+    suite_add_tcase(s, tc2);
 
     return s;
 }
