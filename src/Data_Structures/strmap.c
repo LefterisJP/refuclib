@@ -85,7 +85,7 @@ bool strmap_add_(struct strmap *map, const struct RFstring *member, const void *
     for (byte_num = 0; byte_num != smlen && close_bytes[byte_num] == arg_bytes[byte_num]; byte_num++) {
         ;
     }
-    if (byte_num == len) {
+    if (byte_num == len && len == n_len) {
         /* All identical! */
         errno = EEXIST;
         return false;

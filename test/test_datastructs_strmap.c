@@ -103,6 +103,49 @@ START_TEST (test_strmap_add_suffix_string) {
     rf_string_destroy(s2);
 } END_TEST
 
+START_TEST (test_strmap_add_substring) {
+    struct obj_strmap map;
+    strmap_init(&map);
+    // make sure that if you add a substring after a string was already added to
+    // the map it's not considered to already be there
+    struct RFstring *s1 = rf_string_create("abcdef");
+    struct RFstring *s2 = rf_string_create("abcde");
+    struct object obj1 = { 55 };
+    struct object obj2 = { 42 };
+    ck_assert(strmap_add(&map, s1, &obj1));
+    ck_assert(strmap_add(&map, s2, &obj2));
+
+    struct object *obj = strmap_get(&map, s1);
+    ck_assert(obj);
+    ck_assert_int_eq(obj->val, 55);
+    obj = strmap_get(&map, s2);
+    ck_assert(obj);
+    ck_assert_int_eq(obj->val, 42);
+
+    strmap_clear(&map);
+    rf_string_destroy(s1);
+    rf_string_destroy(s2);
+} END_TEST
+
+START_TEST (test_strmap_add_same_string) {
+    struct obj_strmap map;
+    strmap_init(&map);
+    struct RFstring *s1 = rf_string_create("abcdef");
+    struct RFstring *s2 = rf_string_create("abcdef");
+    struct object obj1 = { 55 };
+    struct object obj2 = { 42 };
+    ck_assert(strmap_add(&map, s1, &obj1));
+    ck_assert(!strmap_add(&map, s2, &obj2));
+    ck_assert(errno == EEXIST);
+
+    struct object *obj = strmap_get(&map, s1);
+    ck_assert(obj);
+    ck_assert_int_eq(obj->val, 55);
+    strmap_clear(&map);
+    rf_string_destroy(s1);
+    rf_string_destroy(s2);
+} END_TEST
+
 START_TEST (test_strmap_del) {
     unsigned int i;
     struct obj_strmap map;
@@ -193,6 +236,53 @@ START_TEST (test_strmap_iterate) {
     strmap_clear(&map);
 } END_TEST
 
+START_TEST (test_strmap_clear) {
+    unsigned int i;
+    struct obj_strmap map;
+    strmap_init(&map);
+    for (i = 0; i < ARR_SIZE; i++) {
+        ck_assert(strmap_add(&map, &stringobjs[i].str, &stringobjs[i].obj));
+    }
+
+    for (i = 0; i < ARR_SIZE; i++) {
+        struct object *obj = strmap_get(&map, &stringobjs[i].str);
+        ck_assert_int_eq(obj->val, stringobjs[i].obj.val);
+    }
+    strmap_clear(&map);
+
+    // try to test that the objects are not there
+    for (i = 0; i < ARR_SIZE; i++) {
+        struct object *obj = strmap_get(&map, &stringobjs[i].str);
+        ck_assert(!obj);
+    }
+
+    // it's important to test a different string pointer
+    struct RFstring *other = rf_string_create("String1");
+    ck_assert(!strmap_get(&map, other));
+    rf_string_destroy(other);
+} END_TEST
+
+START_TEST (test_strmap_clear_and_add_again) {
+    unsigned int i;
+    struct obj_strmap map;
+    strmap_init(&map);
+    for (i = 0; i < ARR_SIZE; i++) {
+        ck_assert(strmap_add(&map, &stringobjs[i].str, &stringobjs[i].obj));
+    }
+
+    for (i = 0; i < ARR_SIZE; i++) {
+        struct object *obj = strmap_get(&map, &stringobjs[i].str);
+        ck_assert_int_eq(obj->val, stringobjs[i].obj.val);
+    }
+    strmap_clear(&map);
+
+    // it's important to test a different string pointer
+    struct RFstring *other = rf_string_create("String1");
+    ck_assert(strmap_add(&map, other, &stringobjs[0].obj));
+    rf_string_destroy(other);
+    strmap_clear(&map);
+} END_TEST
+
 Suite *datastructs_strmap_suite_create(void)
 {
     Suite *s = suite_create("data_structures_strmap");
@@ -201,6 +291,8 @@ Suite *datastructs_strmap_suite_create(void)
     tcase_add_test(tc1, test_strmap_add_different_strings);
     tcase_add_test(tc1, test_strmap_add_sameval_string);
     tcase_add_test(tc1, test_strmap_add_suffix_string);
+    tcase_add_test(tc1, test_strmap_add_substring);
+    tcase_add_test(tc1, test_strmap_add_same_string);
 
     TCase *tc2 = tcase_create("strmap_del");
     tcase_add_test(tc2, test_strmap_del);
@@ -209,8 +301,13 @@ Suite *datastructs_strmap_suite_create(void)
     TCase *tc3 = tcase_create("strmap_iterate");
     tcase_add_test(tc3, test_strmap_iterate);
 
+    TCase *tc4 = tcase_create("strmap_clear");
+    tcase_add_test(tc4, test_strmap_clear);
+    tcase_add_test(tc4, test_strmap_clear_and_add_again);
+
     suite_add_tcase(s, tc1);
     suite_add_tcase(s, tc2);
     suite_add_tcase(s, tc3);
+    suite_add_tcase(s, tc4);
     return s;
 }
