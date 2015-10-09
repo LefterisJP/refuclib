@@ -62,12 +62,6 @@ bool strmap_add_(struct strmap *map, const struct RFstring *member, const void *
 
     assert(value);
 
-    /* Empty string? */
-    if (len == 0) {
-        RF_ERROR("Tried to insert an empty string to a strmap");
-        return false;
-    }
-
     /* Empty map? */
     if (!map->u.n) {
         map->u.s = member;

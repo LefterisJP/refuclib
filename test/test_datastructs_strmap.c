@@ -146,6 +146,32 @@ START_TEST (test_strmap_add_same_string) {
     rf_string_destroy(s2);
 } END_TEST
 
+START_TEST (test_strmap_add_empty_string) {
+    struct obj_strmap map;
+    strmap_init(&map);
+    struct RFstring *s1 = rf_string_create("abcdef");
+    struct RFstring *s2 = rf_string_create("");
+    struct object obj1 = { 55 };
+    struct object obj2 = { 42 };
+    ck_assert(strmap_add(&map, s1, &obj1));
+    ck_assert(strmap_add(&map, s2, &obj2));
+    ck_assert(strmap_add(&map, &stringobjs[0].str, &stringobjs[0].obj));
+
+    struct object *obj = strmap_get(&map, s1);
+    ck_assert(obj);
+    ck_assert_int_eq(obj->val, 55);
+    obj = strmap_get(&map, s2);
+    ck_assert(obj);
+    ck_assert_int_eq(obj->val, 42);
+    obj = strmap_get(&map, &stringobjs[0].str);
+    ck_assert(obj);
+    ck_assert_int_eq(obj->val, stringobjs[0].obj.val);
+
+    strmap_clear(&map);
+    rf_string_destroy(s1);
+    rf_string_destroy(s2);
+} END_TEST
+
 START_TEST (test_strmap_del) {
     unsigned int i;
     struct obj_strmap map;
@@ -293,6 +319,7 @@ Suite *datastructs_strmap_suite_create(void)
     tcase_add_test(tc1, test_strmap_add_suffix_string);
     tcase_add_test(tc1, test_strmap_add_substring);
     tcase_add_test(tc1, test_strmap_add_same_string);
+    tcase_add_test(tc1, test_strmap_add_empty_string);
 
     TCase *tc2 = tcase_create("strmap_del");
     tcase_add_test(tc2, test_strmap_del);
