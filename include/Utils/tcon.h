@@ -39,7 +39,10 @@
  *		TCON(char *charp_canary; int int_canary);
  *	};
  */
-#if RF_HAVE_FLEXIBLE_ARRAY_MEMBER
+// Commenting out the flexible array member because that makes any structure that
+// uses TCON useable only once in any structure and at the end of the parent structure.
+// e.g.: We can't have 2 strmaps in one structure if we use this..
+#if 0//RF_HAVE_FLEXIBLE_ARRAY_MEMBER
 #define TCON(decls) struct { decls; } _tcon[]
 #else
 #define TCON(decls) struct { decls; } _tcon[1]
