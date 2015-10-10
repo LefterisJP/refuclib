@@ -252,7 +252,7 @@ START_TEST (test_strmap_iterate) {
         ck_assert(strmap_add(&map, &stringobjs[i].str, &stringobjs[i].obj));
     }
 
-    strmap_iterate(&map, iterate_cb, &found);
+    strmap_iterate(&map, (strmap_it_cb)iterate_cb, &found);
 
     // check that the iterate callback is filled the found array
     for (i = 0; i < ARR_SIZE; i++) {

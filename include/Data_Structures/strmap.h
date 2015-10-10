@@ -196,9 +196,8 @@ void strmap_clear_(struct strmap *map);
                           tcon_type((map), canary), \
                           __typeof__(arg)), (handle)), \
             (arg))
-void strmap_iterate_(const struct strmap *map,
-                     bool (*handle)(const struct RFstring *, void *, void *),
-                     const void *data);
+typedef bool (*strmap_it_cb)(const struct RFstring *, void *, void *);
+void strmap_iterate_(const struct strmap *map, strmap_it_cb cb, const void *data);
 
 /**
  * strmap_prefix - return a submap matching a prefix

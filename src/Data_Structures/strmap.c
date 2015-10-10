@@ -196,15 +196,13 @@ static bool iterate(struct strmap n,
         && iterate(n.u.n->child[1], handle, data);
 }
 
-void strmap_iterate_(const struct strmap *map,
-                     bool (*handle)(const struct RFstring *, void *, void *),
-                     const void *data)
+void strmap_iterate_(const struct strmap *map, strmap_it_cb cb, const void *data)
 {
     /* Empty map? */
     if (!map->u.n)
         return;
 
-    iterate(*map, handle, data);
+    iterate(*map, cb, data);
 }
 
 const struct strmap *strmap_prefix_(const struct strmap *map,
