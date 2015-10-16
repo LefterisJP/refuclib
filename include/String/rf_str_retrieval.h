@@ -267,7 +267,7 @@ i_DECLIMEX_ int rf_string_count(
  */
 i_DECLIMEX_ bool rf_string_scanf_after(const struct RFstring *thisstr,
                                        const struct RFstring *afterstr,
-                                       const char* format,
+                                       const char *format,
                                        void *var);
 
 /**
