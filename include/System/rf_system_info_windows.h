@@ -37,9 +37,8 @@
 #include <Utils/endianess.h> //for RFendianess
 /*------------- End of includes -------------*/
 
-
 /**
- ** System information holding structure
+ * System information holding structure
  */
 struct RFsystem_info {
     /**
@@ -61,17 +60,17 @@ struct RFsystem_info {
 extern struct RFsystem_info g_sys_info;
 
 /**
- ** Returns the endianess of the system. For possible values look
- ** at @ref RFendianess
- **/
+ * Returns the endianess of the system. For possible values look
+ * at @ref RFendianess
+ */
 i_DECLIMEX_ i_INLINE_DECL enum RFendianess rf_system_get_endianess()
 {
     return g_sys_info.endianess;
 }
 /**
- ** Returns the opposite of the endianess of the system.
- ** For possible values look at @ref RFendianess
- **/
+ * Returns the opposite of the endianess of the system.
+ * For possible values look at @ref RFendianess
+ */
 i_DECLIMEX_ i_INLINE_DECL enum RFendianess rf_system_get_other_endianess()
 {
     if(g_sys_info.endianess == RF_LITTLE_ENDIAN)
@@ -82,8 +81,8 @@ i_DECLIMEX_ i_INLINE_DECL enum RFendianess rf_system_get_other_endianess()
 }
 
 /**
- ** Returns @c true if high resolution timers are supported or not
- **/
+ * Returns @c true if high resolution timers are supported or not
+ */
 i_DECLIMEX_ i_INLINE_DECL bool rf_system_has_high_res_timer()
 {
     return g_sys_info.has_high_res_timer;

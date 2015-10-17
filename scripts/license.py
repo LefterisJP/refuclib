@@ -7,6 +7,7 @@ license_string = (
     "* @licence: BSD3 (Check repository root for details)\n */\n"
 )
 
+
 def find_files(dir):
     matches = []
     for root, dirnames, filenames in os.walk(dir):

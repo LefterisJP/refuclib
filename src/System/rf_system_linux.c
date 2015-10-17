@@ -23,9 +23,9 @@
 
 
 //Creates a directory
-bool rf_system_make_dir(void* dirname, int mode)
+bool rf_system_make_dir(void *dirname, int mode)
 {
-    char* cstr;
+    char *cstr;
     bool ret = false;
     RF_NULLCHECK1(dirname, "directory name", return false);
 
@@ -48,10 +48,10 @@ end_pop:
 }
 
 //Removes a directory and all its files
-bool rf_system_remove_dir(void* dirname)
+bool rf_system_remove_dir(void *dirname)
 {
     bool ret = true;
-    DIR* dir;
+    DIR *dir;
     struct dirent *entry;
     char *cstr;
     struct RFstringx path;
@@ -149,7 +149,7 @@ cleanup_cstr_buff:
 }
 
 //Deletes a file
-bool rf_system_delete_file(const void* name)
+bool rf_system_delete_file(const void *name)
 {
     char *cstr;
     bool ret = false;
@@ -174,7 +174,7 @@ end_pop:
 }
 
 // Renames a file
-bool rf_system_rename_file(void* name, void* new_name)
+bool rf_system_rename_file(void *name, void *new_name)
 {
     bool ret = false;
     char *cs_name;
@@ -204,10 +204,10 @@ bool rf_system_rename_file(void* name, void* new_name)
 }
 
 
-bool rf_system_file_exists(void* name)
+bool rf_system_file_exists(void *name)
 {
     stat_rft sb;
-    struct RFstring* file_name = name;
+    struct RFstring *file_name = name;
     return (rfStat(file_name, &sb) == 0);
 }
 
@@ -225,10 +225,10 @@ FILE *rf_fopen(const struct RFstring *n, const char *mode)
     return ret;
 }
 
-FILE* rf_freopen(const void* name, const char* mode, FILE* f)
+FILE *rf_freopen(const void *name, const char *mode, FILE *f)
 {
-    char* cstr;
-    FILE* ret = NULL;
+    char *cstr;
+    FILE *ret = NULL;
     RFS_PUSH();
     if (!(cstr = rf_string_cstr_from_buff(name))) {
         goto end_pop;
@@ -240,9 +240,9 @@ end_pop:
     return ret;
 }
 
-FILE* rf_popen(const void *command, const char* mode)
+FILE *rf_popen(const void *command, const char *mode)
 {
-    FILE* ret = NULL;
+    FILE *ret = NULL;
     char *cstr;
 
 
@@ -262,7 +262,7 @@ end_pop:
     return ret;
 }
 
-int rf_pclose(FILE* stream)
+int rf_pclose(FILE *stream)
 {
     return pclose(stream);
 }
@@ -271,12 +271,12 @@ bool rf_system_activate()
 {
     int32_t anint;
 
-    /* get system endianess */
+    // get system endianess
     anint= (int32_t)0xdeadbeef;
     g_sys_info.endianess = (*(char *)&anint == (char)0xef)?
     RF_LITTLE_ENDIAN : RF_BIG_ENDIAN;
 
-    /* see if we can have high res timer */
+    // see if we can have high res timer
     g_sys_info.has_high_res_timer = true;
     if (clock_getres(CLOCK_PROCESS_CPUTIME_ID, 0) == -1) {
         if (clock_getres(CLOCK_MONOTONIC, 0) == -1) {

@@ -46,9 +46,9 @@
 /*------------- End of includes -------------*/
 
 //Creates a directory
-int32_t rf_system_make_dir(void* dirnameP,int mode)
+int32_t rf_system_make_dir(void *dirnameP,int mode)
 {
-    RFstring* dirname = (RFstring*)dirnameP;
+    RFstring *dirname = (RFstring*)dirnameP;
     int32_t error = RF_SUCCESS;
 
     //make the directory
@@ -71,10 +71,10 @@ int32_t rf_system_make_dir(void* dirnameP,int mode)
 }
 
 //Removes a directory and all its files
-int32_t rf_system_remove_dir(void* dirnameP)
+int32_t rf_system_remove_dir(void *dirnameP)
 {
-    RFstring* dirname = (RFstring*)dirnameP;
-    DIR* dir;
+    RFstring *dirname = (RFstring*)dirnameP;
+    DIR *dir;
     struct dirent *entry;
     RFstringx path;
     struct stat s;
@@ -153,9 +153,9 @@ int32_t rf_system_remove_dir(void* dirnameP)
 }
 
 //Deletes a file
-int32_t rf_system_delete_file(void* nameP)
+int32_t rf_system_delete_file(void *nameP)
 {
-    RFstring* name = (RFstring*)nameP;
+    RFstring *name = (RFstring*)nameP;
 
     if (DeleteFile(name->bytes) == 0) {
         RF_WIN32_GETSYSERROR(strBuff)
@@ -170,10 +170,10 @@ int32_t rf_system_delete_file(void* nameP)
     return RF_SUCCESS;
 }
 // Renames a file
-int32_t rf_system_rename_file(void* nameP,void* newNameP)
+int32_t rf_system_rename_file(void *nameP,void *newNameP)
 {
-    RFstring* name = (RFstring*)nameP;
-    RFstring* newName = (RFstring*)newNameP;
+    RFstring *name = (RFstring*)nameP;
+    RFstring *newName = (RFstring*)newNameP;
 
 
     if (MoveFile(name->bytes,newName->bytes) == 0) {
@@ -190,9 +190,9 @@ int32_t rf_system_rename_file(void* nameP,void* newNameP)
 }
 
 //Opens another process as a pipe
-FILE* rf_popen(void* commandP,const char* mode)
+FILE *rf_popen(void *commandP,const char *mode)
 {
-    RFstring* command = (RFstring*)commandP;
+    RFstring *command = (RFstring*)commandP;
 
     if (strcmp(mode,"r") != 0 && strcmp(mode,"w") != 0) {
         RF_ERROR("Invalid mode argument provided to rf_popen()");
@@ -203,7 +203,7 @@ FILE* rf_popen(void* commandP,const char* mode)
 }
 
 //Closes a pipe
-int rf_pclose(FILE* stream)
+int rf_pclose(FILE *stream)
 {
     return _pclose(stream);
 }
@@ -212,11 +212,11 @@ bool rf_system_activate()
 {
     int32_t anint;
 
-    /* get endianess */
+    // get endianess
     anint= (int32_t)0xdeadbeef;
     g_sys_info.endianess = (*(char *)&anint == (char)0xef)?
     RF_LITTLE_ENDIAN : RF_BIG_ENDIAN;
-    /* see if we can have High resolution timer */
+    // see if we can have High resolution timer
     g_sys_info.hasHighResTimer = QueryPerformanceFrequency(
         (LARGE_INTEGER *)&g_sys_info.pc_frequency,
     );
