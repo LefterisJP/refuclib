@@ -55,7 +55,7 @@ if local_env['TARGET_SYSTEM'] == 'Linux':
         'System/rf_system_info_linux.c',
         'System/rf_system_linux.c',
     ]
-elif local_env['TARGET_SYSTEM'] == 'Linux':
+elif local_env['TARGET_SYSTEM'] == 'Windows':
     orig_sources += [
         'Time/time_win32.c',
         'System/rf_system_win32.c',
