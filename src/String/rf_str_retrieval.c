@@ -51,6 +51,11 @@ bool rf_string_get_char(const struct RFstring *str, uint32_t c, uint32_t *cp)
     return false;
 }
 
+const struct RFstring *rf_string_or_empty(const struct RFstring *s)
+{
+    return s ? s : rf_string_empty_get();
+}
+
 bool rf_string_substr(const struct RFstring *s,
                       uint32_t start_pos,
                       uint32_t chars_num,

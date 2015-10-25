@@ -71,6 +71,15 @@ i_DECLIMEX_ uint32_t rf_string_length(const struct RFstring *s);
 i_DECLIMEX_ bool rf_string_get_char(const struct RFstring *thisstr,
                                     uint32_t c,
                                     uint32_t *cp);
+
+/**
+ * @brief Returns either the given string @a s or the empty string if s is NULL
+ *
+ * @param s            The string to check if exists or not
+ * @return             If @a s is not NULL then return s, otherwise return the
+ *                     empty string.
+ */
+const struct RFstring *rf_string_or_empty(const struct RFstring *s);
 //! @}
 
 //! @name String Retrieval
@@ -139,7 +148,6 @@ i_DECLIMEX_ int32_t rf_string_find_i(const struct RFstring *thisstr,
                                      uint32_t startPos,
                                      uint32_t length,
                                      enum RFstring_matching_options options);
-
 
 /**
  * @brief Finds if a String begins with a particular substring
