@@ -113,6 +113,7 @@ unit_test_files = [
     'test_datastructs_sbuffer.c',
     'test_datastructs_strmap.c',
     'test_datastructs_darray.c',
+    'test_datastructs_htable.c',
 
     'test_intrusive_list.c',
 
