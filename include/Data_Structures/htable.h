@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <Definitions/inline.h>
 
 /**
  * struct htable - private definition of a htable.
@@ -162,6 +163,18 @@ static inline void *htable_get(const struct htable *ht,
  * Get an entry in the hashtable; NULL if empty.
  */
 void *htable_first(const struct htable *htable, struct htable_iter *i);
+
+/**
+ * htable_is_empty - check if the hash table is empty
+ * @ht: the hashtable to check for
+ *
+ * @return true if it's empty and false if not
+ */
+i_INLINE_DECL bool htable_is_empty(const struct htable *htable)
+{
+    struct htable_iter it;
+    return htable_first(htable, &it) == NULL;
+}
 
 /**
  * htable_next - find another entry in the hash table

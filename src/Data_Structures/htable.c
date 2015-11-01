@@ -106,6 +106,8 @@ void *htable_first(const struct htable *ht, struct htable_iter *i)
 	return NULL;
 }
 
+i_INLINE_INS bool htable_is_empty(const struct htable *htable);
+
 void *htable_next(const struct htable *ht, struct htable_iter *i)
 {
 	for (i->off++; i->off < (size_t)1 << ht->bits; i->off++) {
