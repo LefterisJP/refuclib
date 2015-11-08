@@ -36,14 +36,14 @@ typedef struct stat stat_rft;
 #endif
 
 /**
- ** New line feed
- **
- **/
+ * New line feed
+ *
+ */
 #define RF_LF   0xA
 /**
- ** Carriage Return
- **
- **/
+ * Carriage Return
+ *
+ */
 #define RF_CR   0xD
 
 #ifdef REFU_WIN32_VERSION
@@ -53,8 +53,8 @@ typedef struct stat stat_rft;
 #endif
 
 /**
- ** The different end of line mark types for
- **/
+ * The different end of line mark types
+ */
 enum RFeol_mark {
     RF_EOL_AUTO  = 1,/*!< Used by functions that can autodetect the eol mark */
     RF_EOL_LF, /*!< Unix style line ending with '\n' */
