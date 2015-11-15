@@ -1,0 +1,7 @@
+#+TITLE: Refulang Clib
+#+AUTHOR: Lefteris Karapetsas
+
+This is the main repository for the helper C library of [[http://refu.co/spec.html][refulang]]. All PRs and issues regarding
+the helper library should go here.
+
+It is also indexed for convenience under the [[https://github.com/LefterisJP/refulang][umbrella]] refulang project.
