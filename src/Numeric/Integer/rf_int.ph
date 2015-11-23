@@ -48,7 +48,7 @@
     X^=Y;\
 }\
 
-i_INLINE_DECL int intToStr(int64_t i,char* buff)
+i_INLINE_DECL int intToStr(int64_t i, char *buff)
 {
     int64_t num = i;
     char hasSign=0;
@@ -84,7 +84,7 @@ i_INLINE_DECL int intToStr(int64_t i,char* buff)
     return j;
 }
 
-i_INLINE_DECL int uintToStr(uint64_t i,char* buff)
+i_INLINE_DECL int uintToStr(uint64_t i, char *buff)
 {
     uint64_t num = i;
     int j = 0,k=0;
@@ -110,7 +110,7 @@ i_INLINE_DECL int uintToStr(uint64_t i,char* buff)
 
 extern char hexU [];
 extern char hexL [];
-i_INLINE_DECL int uintToUHexStr(uint64_t i,char* buff)
+i_INLINE_DECL int uintToUHexStr(uint64_t i, char *buff)
 {
 
     int len=0,k=0;
@@ -126,7 +126,7 @@ i_INLINE_DECL int uintToUHexStr(uint64_t i,char* buff)
     return len;
 }
 
-i_INLINE_DECL int uintToLHexStr(uint64_t i,char* buff)
+i_INLINE_DECL int uintToLHexStr(uint64_t i, char *buff)
 {
     int len=0,k=0;
     do
