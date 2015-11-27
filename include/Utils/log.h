@@ -163,26 +163,28 @@ i_DECLIMEX_ void rf_log(enum RFlog_level level, const char* file,
 
 #ifdef REFU_WIN32_VERSION
 /**
- ** @brief Gets Windows Last System error
- **
- ** Gets Windows Last System error and turns it into a char* that later needs to be freed by the user using the @c LocalFree() function
- ** @param i_STRBUFF The String buffer
- **
- **/
-#define RF_WIN32_GETSYSERROR(i_STRBUFF) \
-/*The buffer to hold the string*/\
-char* i_STRBUFF;\
-/*The DWORD to hold the error code*/\
-DWORD i_ERROR_CODE = GetLastError();\
-FormatMessage(\
-FORMAT_MESSAGE_ALLOCATE_BUFFER |\
-FORMAT_MESSAGE_FROM_SYSTEM |\
-FORMAT_MESSAGE_IGNORE_INSERTS,\
-NULL,\
-i_ERROR_CODE,\
-MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),\
-(LPTSTR) &i_STRBUFF,\
-0, NULL );
+ * @brief Gets Windows Last System error
+ *
+ * Gets Windows Last System error and turns it into a char* that later needs
+ * to be freed by the user using the @c LocalFree() function
+ * @param i_STRBUFF The String buffer
+ *
+ */
+#define RF_WIN32_GETSYSERROR(i_STRBUFF)             \
+    /* The buffer to hold the string */             \
+    char *i_STRBUFF;                                \
+    /* The DWORD to hold the error code */          \
+    DWORD i_ERROR_CODE = GetLastError();            \
+    FormatMessage(                                  \
+        FORMAT_MESSAGE_ALLOCATE_BUFFER |            \
+        FORMAT_MESSAGE_FROM_SYSTEM |                \
+        FORMAT_MESSAGE_IGNORE_INSERTS,              \
+        NULL,                                       \
+        i_ERROR_CODE,                               \
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),  \
+        (LPTSTR) &i_STRBUFF,                        \
+        0,                                          \
+        NULL );
 #endif
 
 
