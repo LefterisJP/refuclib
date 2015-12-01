@@ -158,6 +158,13 @@ i_INLINE_DECL void rf_stringx_move_end(struct RFstringx *s)
 i_DECLIMEX_ void rf_stringx_reset(struct RFstringx *thisstr);
 
 /**
+ * @brief Resets the internal pointer and makes sure the string is empty.
+ *
+ * @param thisstr The stringX to clear
+ */
+i_DECLIMEX_ void rf_stringx_clear(struct RFstringx *thisstr);
+
+/**
  * @brief Moves the internal pointer after the first occurence of any
  * of the given substrings
  *

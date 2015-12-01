@@ -143,6 +143,12 @@ void rf_stringx_reset(struct RFstringx* thisstr)
     thisstr->bIndex = 0;
 }
 
+void rf_stringx_clear(struct RFstringx *thisstr)
+{
+    rf_stringx_reset(thisstr);
+    rf_string_length_bytes(thisstr) = 0;
+}
+
 bool rf_stringx_move_afterv(struct RFstringx* thisstr,
                             void* result,
                             enum RFstring_matching_options options,
