@@ -151,7 +151,7 @@ extern "C"
  * + @c RFP_ISVTX: This is the sticky bit
  * @return Returns @c true for success and @c false for error
  */
-i_DECLIMEX_ bool rf_system_make_dir(void *dirname, int mode);
+i_DECLIMEX_ bool rf_system_make_dir(const struct RFstring *dirname, int mode);
 
 /**
  * @brief Removes a directory and all its files recursively
@@ -170,6 +170,11 @@ i_DECLIMEX_ bool rf_system_make_dir(void *dirname, int mode);
  * @return Returns @c true for success and @c false otherwise
  */
 i_DECLIMEX_ bool rf_system_remove_dir(void *dirname);
+
+/**
+ * Get the current user's home directory in a temporary RFstring.
+ */
+i_DECLIMEX_ const struct RFstring *rf_homedir();
 
 
 /**
@@ -206,8 +211,7 @@ i_DECLIMEX_ bool rf_system_rename_file(void *name, void *newName);
  * @inhtype{String,StringX} @tmpSTR
  * @return Returns @c true if the file exists and @c false otherwise
  */
-i_DECLIMEX_ bool rf_system_file_exists(void *name);
-
+i_DECLIMEX_ bool rf_system_file_exists(const struct RFstring *name);
 
 /**
  * @brief Returns a unique address for the calling thread
@@ -259,7 +263,6 @@ i_DECLIMEX_ FILE *rf_popen(const void *command, const char *mode);
  *
  */
 i_DECLIMEX_ int rf_pclose(FILE *stream);
-
 
 /**
  * Initializes the system information holding structure

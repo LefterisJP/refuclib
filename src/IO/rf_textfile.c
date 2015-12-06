@@ -1575,7 +1575,7 @@ int32_t rf_textfile_get_line(struct RFtextfile* t, uint64_t lineN,
 
 /* --- Textfile Writting Functions --- */
 
-bool rf_textfile_write(struct RFtextfile* t, void* s)
+bool rf_textfile_write(struct RFtextfile* t, const struct RFstring *s)
 {
     int32_t linesN;
     char allocatedS = false;
@@ -1595,39 +1595,41 @@ bool rf_textfile_write(struct RFtextfile* t, void* s)
     t->previousOp = RF_FILE_WRITE;
     //let's see how many lines it will be adding to the text file
     linesN = rf_string_count(s, &g_eol_lf, 0, 0, 0);
+
+    struct RFstring *mut_s = (struct RFstring*)s;
     //if we don't have the default RFstring Unix style line ending
     if (t->eol != RF_EOL_LF && linesN != 0) {
         allocatedS = true;
         //making a new one since stringP can be on the local stack and we
         //can't use replace since that would act on the local stack
-        s = rf_string_copy_out((struct RFstring*)s);
-        if (t->eol==RF_EOL_CRLF) {
-            if (!rf_string_replace(s, &g_eol_lf, &g_eol_crlf, 0, 0)) {
+        mut_s = rf_string_copy_out(s);
+        if (t->eol == RF_EOL_CRLF) {
+            if (!rf_string_replace(mut_s, &g_eol_lf, &g_eol_crlf, 0, 0)) {
                 RF_ERROR("Failure at editing the newline character"
                          "while writing string \""RF_STR_PF_FMT"\""
                          " to Textfile \""RF_STR_PF_FMT"\"",
-                         RF_STR_PF_ARG(s), RF_STR_PF_ARG(&t->name));
+                         RF_STR_PF_ARG(mut_s), RF_STR_PF_ARG(&t->name));
                 return false;
             }
         } else {
-            if (!rf_string_replace(s, &g_eol_lf, &g_eol_cr, 0, 0)) {
+            if (!rf_string_replace(mut_s, &g_eol_lf, &g_eol_cr, 0, 0)) {
                 RF_ERROR("Failure at editing the newline character"
                          "while writing string \""RF_STR_PF_FMT"\""
                          " to Textfile \""RF_STR_PF_FMT"\"",
-                         RF_STR_PF_ARG(s), RF_STR_PF_ARG(&t->name));
+                         RF_STR_PF_ARG(mut_s), RF_STR_PF_ARG(&t->name));
                 return false;
             }
         }
     }
     //depending on the encoding of the file
-    if (!rf_string_fwrite(s, t->f, t->encoding, t->endianess)) {
+    if (!rf_string_fwrite(mut_s, t->f, t->encoding, t->endianess)) {
         RF_ERROR(
                  "There was a file write error while writting string"
                  " \""RF_STR_PF_FMT"\" "
                  "to Text File \""RF_STR_PF_FMT"\"",
-                 RF_STR_PF_ARG(s), RF_STR_PF_ARG(&t->name));
+                 RF_STR_PF_ARG(mut_s), RF_STR_PF_ARG(&t->name));
         if (allocatedS == true) {
-            rf_string_destroy(s);
+            rf_string_destroy(mut_s);
         }
         return false;
     }

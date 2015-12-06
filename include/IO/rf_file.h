@@ -51,7 +51,7 @@ extern "C"
 #error TODO
 
 #else
-i_INLINE_DECL int rfStat(struct RFstring* f, stat_rft* buffer)
+i_INLINE_DECL int rfStat(const struct RFstring* f, stat_rft* buffer)
 {
     int ret = -1;
     char *cstr;

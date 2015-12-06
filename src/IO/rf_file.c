@@ -1031,4 +1031,4 @@ int rf_file_move_back_char_utf32(FILE* f, uint32_t *c,
 }
 
 //for creation of external symbol
-i_INLINE_INS int rfStat(struct RFstring* f, stat_rft* buffer);
+i_INLINE_INS int rfStat(const struct RFstring* f, stat_rft* buffer);

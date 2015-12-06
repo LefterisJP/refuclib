@@ -19,11 +19,12 @@
 /*------------- system includes -------------*/
 #include <unistd.h> //for syscall and tid
 #include <sys/syscall.h> //for syscall and tid
+#include <pwd.h> // for getpwuid()
 /*------------- End of includes -------------*/
 
 
 //Creates a directory
-bool rf_system_make_dir(void *dirname, int mode)
+bool rf_system_make_dir(const struct RFstring *dirname, int mode)
 {
     char *cstr;
     bool ret = false;
@@ -148,6 +149,18 @@ cleanup_cstr_buff:
     return ret;
 }
 
+const struct RFstring *rf_homedir()
+{
+    char *home_dir = getenv("HOME");
+	if (!home_dir || strlen(home_dir) == 0) {
+		struct passwd *pwd = getpwuid(getuid());
+		if (pwd) {
+			home_dir = pwd->pw_dir;
+        }
+    }
+    return RFS("%s", home_dir);
+}
+
 //Deletes a file
 bool rf_system_delete_file(const void *name)
 {
@@ -204,11 +217,10 @@ bool rf_system_rename_file(void *name, void *new_name)
 }
 
 
-bool rf_system_file_exists(void *name)
+bool rf_system_file_exists(const struct RFstring *name)
 {
     stat_rft sb;
-    struct RFstring *file_name = name;
-    return (rfStat(file_name, &sb) == 0);
+    return (rfStat(name, &sb) == 0);
 }
 
 RFthread_id rf_system_get_thread_id()
@@ -269,10 +281,8 @@ int rf_pclose(FILE *stream)
 
 bool rf_system_activate()
 {
-    int32_t anint;
-
     // get system endianess
-    anint= (int32_t)0xdeadbeef;
+    int32_t anint = (int32_t)0xdeadbeef;
     g_sys_info.endianess = (*(char *)&anint == (char)0xef)?
     RF_LITTLE_ENDIAN : RF_BIG_ENDIAN;
 

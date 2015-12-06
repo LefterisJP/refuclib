@@ -510,7 +510,7 @@ i_DECLIMEX_ int32_t rf_textfile_get_line(struct RFtextfile* t,
  * @return Returns @c true for succesfull writting and @c false if an
  * error happened
  */
-i_DECLIMEX_ bool rf_textfile_write(struct RFtextfile* t, void* string);
+i_DECLIMEX_ bool rf_textfile_write(struct RFtextfile *t, const struct RFstring *string);
 
 
 /**
