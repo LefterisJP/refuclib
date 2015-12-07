@@ -54,12 +54,14 @@ if local_env['TARGET_SYSTEM'] == 'Linux':
         'Time/time_linux.c',
         'System/rf_system_info_linux.c',
         'System/rf_system_linux.c',
+        'System/rf_dlib_linux.c',
     ]
 elif local_env['TARGET_SYSTEM'] == 'Windows':
     orig_sources += [
         'Time/time_win32.c',
         'System/rf_system_win32.c',
         'System/rf_system_info_win32.c',
+        'System/rf_dlib_win32.c',
     ]
 else:
     build_msg("Unsupported OS detected during source selection", "Error")
