@@ -72,6 +72,11 @@ options_header = SConscript(
     '#build_system/build_extra/clib/options_header_creator.py',
     exports='local_env')
 
+# add specific environment variables
+local_env.Append(CPPDEFINES={
+    'FILE_BUFF_INITIAL_SIZE': local_env['INPUT_FILE_BUFF_INITIAL_SIZE']
+})
+
 # -- STATIC LIBRARY
 static_env = local_env.Clone()
 static_env.Append(CPPDEFINES='REFU_STATIC_LIB')

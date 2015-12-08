@@ -607,6 +607,31 @@ i_DECLIMEX_ bool rf_textfile_replace(struct RFtextfile* t,
                                      uint64_t lineN,
                                      void* string);
 
+/**
+ * Convenience functions to parse a file into a string and optionally return
+ * lines number and positions array.
+ *
+ * Essentially a wrapper over rf_textfile_init() and rf_textfile_read_lines().
+ *
+ * @param name            The full path to the file to open or "stdin" if we want
+ *                        to read from stdin
+ * @param lines           An optional unsigned int to contain the number of lines
+ *                        found in the file's string
+ * @param lines_pos       Optionally pass an array just like in rf_textfile_read_lines()
+ *                        to get newline positions.
+ * @param strbuff_in      Only for the XXX_in version of the function, provide an
+ *                        already allocated stringx which to create the buffer from.
+ * @return                An allocated Stringx with the contents of the entire
+ *                        file, or NULL for failure.
+ */
+i_DECLIMEX_ struct RFstringx *rf_textfile_tostr(const struct RFstring *name,
+                                                unsigned int *lines,
+                                                struct RFarray *lines_pos);
+i_DECLIMEX_ bool rf_textfile_tostr_in(const struct RFstring *name,
+                                      unsigned int *lines,
+                                      struct RFarray *lines_pos,
+                                      struct RFstringx *strbuff_in);
+
 //! @}
 
 

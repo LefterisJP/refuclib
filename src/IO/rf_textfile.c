@@ -2275,3 +2275,51 @@ cleanup1:
     return ret;
 }
 
+struct RFstringx *rf_textfile_tostr(const struct RFstring *name,
+                                    unsigned int *out_lines,
+                                    struct RFarray *lines_pos)
+{
+    struct RFstringx *ret;
+    RF_MALLOC(ret, sizeof(*ret), return NULL);
+    if (!rf_textfile_tostr_in(name, out_lines, lines_pos, ret)) {
+        free(ret);
+        ret = NULL;
+    }
+    return ret;
+}
+
+i_DECLIMEX_ bool rf_textfile_tostr_in(const struct RFstring *name,
+                                      unsigned int *out_lines,
+                                      struct RFarray *lines_pos,
+                                      struct RFstringx *strbuff_in)
+{
+    struct RFtextfile file;
+    static const struct RFstring s_stdin = RF_STRING_STATIC_INIT("stdin");
+    if (!(rf_stringx_init_buff(strbuff_in, FILE_BUFF_INITIAL_SIZE, ""))) {
+        RF_ERRNOMEM();
+        return false;
+    }
+
+    if (!rf_textfile_init(&file,
+                          name,
+                          rf_string_equal(name, &s_stdin) ? RF_FILE_STDIN : RF_FILE_READ,
+                          RF_ENDIANESS_UNKNOWN,
+                          RF_UTF8,
+                          RF_EOL_AUTO)) {
+        goto fail_free_buff;
+    }
+
+    int lines = rf_textfile_read_lines(&file, 0, strbuff_in, lines_pos);
+    rf_textfile_deinit(&file);
+    if (lines == -1) {
+        goto fail_free_buff;
+    }
+    if (out_lines) {
+        *out_lines = lines;
+    }
+    return true;
+
+fail_free_buff:
+    rf_stringx_deinit(strbuff_in);
+    return false;
+}
