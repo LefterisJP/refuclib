@@ -77,6 +77,12 @@ local_env.Append(CPPDEFINES={
     'FILE_BUFF_INITIAL_SIZE': local_env['INPUT_FILE_BUFF_INITIAL_SIZE']
 })
 
+# if we got PCRE2 add regular expressions
+if local_env['has_pcre2']:
+    local_env.ParseConfig("pcre2-config --libs8 --cflags")
+    orig_sources += ['String/regex.c']
+
+
 # -- STATIC LIBRARY
 static_env = local_env.Clone()
 static_env.Append(CPPDEFINES='REFU_STATIC_LIB')
