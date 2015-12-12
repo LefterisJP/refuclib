@@ -235,21 +235,21 @@ START_TEST(test_textfile_set_mode) {
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
-    ck_assert(rf_textfile_write(&f, &g_buff));
+    ck_assert(rf_textfile_write(&f, RF_STRX2STR(&g_buff)));
 
     /* write line 2 */
     s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario2);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
-    ck_assert(rf_textfile_write(&f, &g_buff));
+    ck_assert(rf_textfile_write(&f, RF_STRX2STR(&g_buff)));
 
     /* write line 3 */
     s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario3);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
-    ck_assert(rf_textfile_write(&f, &g_buff));
+    ck_assert(rf_textfile_write(&f, RF_STRX2STR(&g_buff)));
 
     /* go to the starting position and switch to reading */
     ck_assert(RF_SUCCESS == rf_textfile_go_to_line(&f, 1));
@@ -400,21 +400,21 @@ START_TEST(test_textfile_write) {
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
-    ck_assert(rf_textfile_write(&f, &g_buff));
+    ck_assert(rf_textfile_write(&f, RF_STRX2STR(&g_buff)));
 
     /* write line 2 */
     s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario2);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
-    ck_assert(rf_textfile_write(&f, &g_buff));
+    ck_assert(rf_textfile_write(&f, RF_STRX2STR(&g_buff)));
 
     /* write line 3 */
     s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario3);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
-    ck_assert(rf_textfile_write(&f, &g_buff));
+    ck_assert(rf_textfile_write(&f, RF_STRX2STR(&g_buff)));
 
     rf_textfile_deinit(&f);
 
@@ -482,14 +482,14 @@ START_TEST(test_textfile_insert_after) {
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
-    ck_assert(rf_textfile_write(&f, &g_buff));
+    ck_assert(rf_textfile_write(&f, RF_STRX2STR(&g_buff)));
 
     /* write line 3 */
     s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario3);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
-    ck_assert(rf_textfile_write(&f, &g_buff));
+    ck_assert(rf_textfile_write(&f, RF_STRX2STR(&g_buff)));
 
     /* now insert line in between */
     s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario2);
@@ -542,14 +542,14 @@ START_TEST(test_invalid_textfile_insert_after) {
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
-    ck_assert(rf_textfile_write(&f, &g_buff));
+    ck_assert(rf_textfile_write(&f, RF_STRX2STR(&g_buff)));
 
     /* write line 3 */
     s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario3);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
-    ck_assert(rf_textfile_write(&f, &g_buff));
+    ck_assert(rf_textfile_write(&f, RF_STRX2STR(&g_buff)));
 
     /* illegal input */
     ck_assert(!rf_textfile_insert(&f, 0, &str, true));
@@ -576,14 +576,14 @@ START_TEST(test_textfile_insert_before) {
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
-    ck_assert(rf_textfile_write(&f, &g_buff));
+    ck_assert(rf_textfile_write(&f, RF_STRX2STR(&g_buff)));
 
     /* write line 3 */
     s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario3);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
-    ck_assert(rf_textfile_write(&f, &g_buff));
+    ck_assert(rf_textfile_write(&f, RF_STRX2STR(&g_buff)));
 
     /* now insert line before 1st */
     s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, false, line_scenario2);
@@ -635,20 +635,20 @@ START_TEST(test_textfile_remove) {
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
-    ck_assert(rf_textfile_write(&f, &g_buff));
+    ck_assert(rf_textfile_write(&f, RF_STRX2STR(&g_buff)));
 
     /* write line 2 */
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, SECOND_LINE_UTF8"\n",
                   strlen(SECOND_LINE_UTF8"\n")));
-    ck_assert(rf_textfile_write(&f, &g_buff));
+    ck_assert(rf_textfile_write(&f, RF_STRX2STR(&g_buff)));
 
     /* write line 3 */
     s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario3);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, THIRD_LINE_UTF8"\n",
                   strlen(THIRD_LINE_UTF8"\n")));
-    ck_assert(rf_textfile_write(&f, &g_buff));
+    ck_assert(rf_textfile_write(&f, RF_STRX2STR(&g_buff)));
 
     /* remove the 2nd line */
     ck_assert(rf_textfile_remove(&f, 2));
@@ -691,7 +691,7 @@ START_TEST(test_invalid_textfile_remove) {
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
-    ck_assert(rf_textfile_write(&f, &g_buff));
+    ck_assert(rf_textfile_write(&f, RF_STRX2STR(&g_buff)));
 
     /* illegal input */
     ck_assert(!rf_textfile_remove(&f, 0));
@@ -717,20 +717,20 @@ START_TEST(test_textfile_replace) {
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
-    ck_assert(rf_textfile_write(&f, &g_buff));
+    ck_assert(rf_textfile_write(&f, RF_STRX2STR(&g_buff)));
 
     /* write line 2 */
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, SECOND_LINE_UTF8"\n",
                   strlen(SECOND_LINE_UTF8"\n")));
-    ck_assert(rf_textfile_write(&f, &g_buff));
+    ck_assert(rf_textfile_write(&f, RF_STRX2STR(&g_buff)));
 
     /* write line 3 */
     s = get_line(RF_UTF8, RF_ENDIANESS_UNKNOWN, true, line_scenario3);
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, THIRD_LINE_UTF8"\n",
                   strlen(THIRD_LINE_UTF8"\n")));
-    ck_assert(rf_textfile_write(&f, &g_buff));
+    ck_assert(rf_textfile_write(&f, RF_STRX2STR(&g_buff)));
 
     /* replace the 2nd line */
     ck_assert(rf_textfile_replace(&f, 2, &str));
@@ -776,7 +776,7 @@ START_TEST(test_invalid_textfile_replace) {
     ck_assert(rf_stringx_assign_unsafe_nnt(
                   &g_buff, s,
                   strlen(s)));
-    ck_assert(rf_textfile_write(&f, &g_buff));
+    ck_assert(rf_textfile_write(&f, RF_STRX2STR(&g_buff)));
 
     /* illegal input */
     ck_assert(!rf_textfile_replace(&f, 0, &str));

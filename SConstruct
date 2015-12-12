@@ -76,6 +76,7 @@ options_header = SConscript(
 local_env.Append(CPPDEFINES={
     'FILE_BUFF_INITIAL_SIZE': local_env['INPUT_FILE_BUFF_INITIAL_SIZE']
 })
+local_env.Append(LIBS=['dl'])
 
 # if we got PCRE2 add regular expressions
 if local_env['has_pcre2']:
