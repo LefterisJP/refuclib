@@ -12,6 +12,8 @@ Suite *string_manipulation_suite_create(void);
 Suite *string_traversal_suite_create(void);
 Suite *string_buffers_suite_create(void);
 
+Suite *regex_suite_create(void);
+
 Suite *utils_unicode_suite_create(void);
 Suite *utils_array_suite_create(void);
 Suite *utils_memory_pools_suite_create(void);
@@ -86,6 +88,7 @@ int main(int argc, char **argv)
     srunner_add_suite(sr, string_manipulation_suite_create());
     srunner_add_suite(sr, string_traversal_suite_create());
     srunner_add_suite(sr, string_buffers_suite_create());
+    srunner_add_suite(sr, regex_suite_create());
 
     srunner_add_suite(sr, utils_unicode_suite_create());
     srunner_add_suite(sr, utils_array_suite_create());

@@ -10,6 +10,7 @@ local_env = env.Clone()
 # TODO: Figure out a better way
 set_debug_mode(local_env, True)
 
+unit_test_files = []
 orig_sources = [
     'Data_Structures/binaryarray.c',
     'Data_Structures/sbuffer.c',
@@ -82,6 +83,7 @@ local_env.Append(LIBS=['dl'])
 if local_env['has_pcre2']:
     local_env.ParseConfig("pcre2-config --libs8 --cflags")
     orig_sources += ['String/regex.c']
+    unit_test_files += ['test_regex.c']
 
 
 # -- STATIC LIBRARY
@@ -108,7 +110,7 @@ local_env.Alias('clib_shared', clib_shared)
 
 
 # -- UNIT TESTS
-unit_test_files = [
+unit_test_files += [
     'test_main.c',
     'utilities_for_testing.c',
     'test_string_core.c',
