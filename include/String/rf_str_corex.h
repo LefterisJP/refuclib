@@ -30,8 +30,20 @@ extern "C"
 #define RF_STRINGX_STATIC_INIT(s_) {            \
         {RF_STRING_STATIC_INIT(s_)},            \
         .bIndex=0,                              \
-         .bSize=sizeof(s_) - 1                  \
-         }
+        .bSize=sizeof(s_) - 1                   \
+    }
+#define RF_STRINGX_SHALLOW_INIT(i_string, i_buff, i_len)                \
+    do {                                                                \
+        RF_STRING_SHALLOW_INIT(&(i_string)->INH_String, i_buff, i_len); \
+        (i_string)->bIndex = 0;                                         \
+        (i_string)->bSize = i_len;                                      \
+    } while(0)
+
+#define RF_STRINGX_SHALLOW_FROM_STR(i_string, i_from)       \
+    RF_STRINGX_SHALLOW_INIT(i_string,                       \
+                            rf_string_data(i_from),         \
+                            rf_string_length_bytes(i_from))
+
 i_DECLIMEX_ struct RFstringx *rf_stringx_create(const char *lit);
 i_DECLIMEX_ struct RFstringx *rf_stringx_createv(const char *lit,...);
 i_DECLIMEX_ struct RFstringx *rf_stringx_createvl(const char *lit,
