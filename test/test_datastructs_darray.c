@@ -94,6 +94,42 @@ START_TEST (test_darray_foreach_reverse) {
     darray_free(arr);
 } END_TEST
 
+struct boo {
+    struct foo_arr arr;
+    int x;
+};
+
+START_TEST (test_darray_shallow_copy) {
+    struct boo *b1;
+    struct boo *b2;
+    RF_MALLOC(b1, sizeof(*b1), ;);
+    b1->x = 1;
+    darray_init(b1->arr);
+
+    struct foo *f;
+    unsigned i;
+    for (i = 0; i < ARR_SIZE; ++i) {
+        f = foo_create(expectarr[i].x, expectarr[i].y);
+        darray_append(b1->arr, f);
+    }
+
+    RF_MALLOC(b2, sizeof(*b2), ;);
+    b2->x = 2;
+    darray_init(b2->arr);
+    darray_shallow_copy(b2->arr, b1->arr);
+    free(b1);
+
+    struct foo **itf;
+    i = 0;
+    darray_foreach(itf, b2->arr) {
+        ck_assert_int_eq((*itf)->x, expectarr[i].x);
+        ck_assert((*itf)->y == expectarr[i].y);
+        ++i;
+        foo_destroy(*itf);
+    }
+    darray_free(b2->arr);
+} END_TEST
+
 
 Suite *datastructs_darray_suite_create(void)
 {
@@ -106,8 +142,12 @@ Suite *datastructs_darray_suite_create(void)
     TCase *tc2 = tcase_create("darray_foreach");
     tcase_add_test(tc2, test_darray_foreach_reverse);
 
+    TCase *tc3 = tcase_create("darray_copy");
+    tcase_add_test(tc3, test_darray_shallow_copy);
+
     suite_add_tcase(s, tc1);
     suite_add_tcase(s, tc2);
+    suite_add_tcase(s, tc3);
 
     return s;
 }

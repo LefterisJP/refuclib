@@ -222,6 +222,15 @@ typedef darray(unsigned long)  darray_ulong;
 		darray_prepend_items(arr, __src, sizeof(__src)/sizeof(*__src)); \
 	} while(0)
 
+/*** Copying ***/
+
+#define darray_shallow_copy(i_dst_, i_src_)     \
+    do {                                        \
+        (i_dst_).item = (i_src_).item;          \
+        (i_dst_).size = (i_src_).size;          \
+        (i_dst_).alloc = (i_src_).alloc;        \
+    } while(0)
+
 
 /*** Removal ***/
 
