@@ -347,6 +347,30 @@ START_TEST(test_string_tokenize_unicode) {
     rf_string_deinit(&tok);
 }END_TEST
 
+START_TEST(test_string_ordinal) {
+    RFS_PUSH();
+    ck_assert_rf_str_eq_cstr(rf_string_ordinal(0), "0th");
+    ck_assert_rf_str_eq_cstr(rf_string_ordinal(1), "1st");
+    ck_assert_rf_str_eq_cstr(rf_string_ordinal(2), "2nd");
+    ck_assert_rf_str_eq_cstr(rf_string_ordinal(3), "3rd");
+    ck_assert_rf_str_eq_cstr(rf_string_ordinal(4), "4th");
+    ck_assert_rf_str_eq_cstr(rf_string_ordinal(5), "5th");
+    ck_assert_rf_str_eq_cstr(rf_string_ordinal(11), "11th");
+    ck_assert_rf_str_eq_cstr(rf_string_ordinal(12), "12th");
+    ck_assert_rf_str_eq_cstr(rf_string_ordinal(13), "13th");
+    ck_assert_rf_str_eq_cstr(rf_string_ordinal(14), "14th");
+    ck_assert_rf_str_eq_cstr(rf_string_ordinal(15), "15th");
+    ck_assert_rf_str_eq_cstr(rf_string_ordinal(20), "20th");
+    ck_assert_rf_str_eq_cstr(rf_string_ordinal(21), "21st");
+    ck_assert_rf_str_eq_cstr(rf_string_ordinal(22), "22nd");
+    ck_assert_rf_str_eq_cstr(rf_string_ordinal(23), "23rd");
+    ck_assert_rf_str_eq_cstr(rf_string_ordinal(24), "24th");
+    ck_assert_rf_str_eq_cstr(rf_string_ordinal(102), "102nd");
+    ck_assert_rf_str_eq_cstr(rf_string_ordinal(103), "103rd");
+    ck_assert_rf_str_eq_cstr(rf_string_ordinal(104), "104th");
+    RFS_POP();
+}END_TEST
+
 /* --- String Other Conversion Tests --- END --- */
 
 Suite *string_conversion_suite_create(void)
@@ -375,6 +399,7 @@ Suite *string_conversion_suite_create(void)
     tcase_add_test(string_other_conversions, test_string_to_upper);
     tcase_add_test(string_other_conversions, test_string_tokenize);
     tcase_add_test(string_other_conversions, test_string_tokenize_unicode);
+    tcase_add_test(string_other_conversions, test_string_ordinal);
 
     TCase *string_invalid_conversions = tcase_create("String Invalid Arguments Conversion");
     tcase_add_checked_fixture(string_invalid_conversions,

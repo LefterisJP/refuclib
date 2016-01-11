@@ -238,6 +238,16 @@ i_DECLIMEX_ bool rf_string_tokenize(const struct RFstring *thisstr,
                                     uint32_t *tokensN,
                                     struct RFstring **tokens);
 
+/**
+ * @brief Get the string reprentation of an ordinal of a number
+ *
+ * @isinherited{StringX}
+ * @warning wrap in RFS_PUSH()/RFS_POP()
+ *
+ * @param num           The number whose ordinal string to get
+ * @return              The string representation of the number's ordinal
+ */
+i_DECLIMEX_ const struct RFstring *rf_string_ordinal(unsigned int num);
 //! @}
 
 #ifdef __cplusplus

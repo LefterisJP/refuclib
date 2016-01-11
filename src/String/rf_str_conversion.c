@@ -289,3 +289,19 @@ bool rf_string_tokenize(const struct RFstring *str,
 
     return true;
 }
+
+const struct RFstring *rf_string_ordinal(unsigned int num)
+{
+    if (num <= 4 || num >= 21) { // these rules don't apply for 10-20
+        switch (num % 10) {
+        case 1:
+            return RFS("%ust", num);
+        case 2:
+            return RFS("%und", num);
+        case 3:
+            return RFS("%urd", num);
+        }
+    }
+    // else
+    return RFS("%uth", num);
+}
