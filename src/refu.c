@@ -14,7 +14,10 @@
 #include <string.h> //for strcmp
 #include <stdlib.h> //for exit() and at_exit()
 #include <time.h>
+#include <signal.h>
 /*------------- End of includes -------------*/
+
+void rf_termination_handler(int sig);
 
 struct refu_clibctx {
     struct RFlog *log;
@@ -75,6 +78,11 @@ bool rf_init(enum RFlog_target_type log_type,
     /* initialize random seed: */
     srand(time(NULL));
 
+    /* setup signal handlers */
+    signal(SIGSEGV, rf_termination_handler);
+    signal(SIGTERM, rf_termination_handler);
+    signal(SIGABRT, rf_termination_handler);
+
 
     /* register a function to exeute at exit() */
     if (atexit(rf_atexit) != 0) {
@@ -110,4 +118,25 @@ struct refu_clibctx *refu_clib_get_ctx()
 struct RFlog *refu_clib_get_log()
 {
     return i_refu_clibctx.log;
+}
+
+volatile sig_atomic_t fatal_error_in_progress = false;
+void rf_termination_handler(int sig)
+{
+    /*
+     * Since this handler is established for more than one kind of signal,
+     * it might still get invoked recursively by delivery of some other kind
+     * of signal.  Use a static variable to keep track of that.
+     */
+    if (fatal_error_in_progress) {
+        raise(sig);
+    }
+    fatal_error_in_progress = true;
+
+    // actual signal cleanup action
+    rf_deinit();
+
+    // reraise signal's default handler to terminate process properly
+    signal(sig, SIG_DFL);
+    raise(sig);
 }
