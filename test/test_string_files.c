@@ -201,7 +201,7 @@ static void test_rf_string_init_generic(const char* filename, int encoding,
 
 
     /* get rid of the BOM and check for the right string */
-    ck_assert(rf_string_prune_start(&s, 1, NULL));
+    ck_assert(rf_string_prune_start(&s, 1, RF_SOPT_DEFAULT, NULL));
     ck_assert_rf_str_eq_cstr(&s, get_line(encoding,
                                           endianess,
                                           true,
@@ -227,7 +227,7 @@ static void test_rf_string_assign_generic(const char* filename, int encoding,
 
 
     /* get rid of the BOM and check for the right string */
-    ck_assert(rf_string_prune_start(&s, 1, NULL));
+    ck_assert(rf_string_prune_start(&s, 1, RF_SOPT_DEFAULT, NULL));
     ck_assert_rf_str_eq_cstr(&s, get_line(encoding,
                                           endianess,
                                           true,
@@ -252,7 +252,7 @@ static void test_rf_stringx_assign_generic(const char* filename, int encoding,
 
 
     /* get rid of the BOM and check for the right string */
-    ck_assert(rf_string_prune_start(RF_STRX2STR(&s), 1, NULL));
+    ck_assert(rf_string_prune_start(RF_STRX2STR(&s), 1, RF_SOPT_DEFAULT, NULL));
     ck_assert_rf_strx_eq_cstr(&s, get_line(encoding,
                                            endianess,
                                            true,
@@ -278,7 +278,7 @@ static void test_rf_string_append_generic(const char* filename, int encoding,
 
 
     /* get rid of the BOM and check for the right string */
-    ck_assert(rf_string_prune_start(&s, 1, NULL));
+    ck_assert(rf_string_prune_start(&s, 1, RF_SOPT_DEFAULT, NULL));
     ck_assert_rf_str_eq_cstr(&s, get_line(encoding,
                                           endianess,
                                           true,
@@ -312,7 +312,7 @@ static void test_rf_stringx_append_generic(const char* filename, int encoding,
 
 
     /* get rid of the BOM and check for the right string */
-    ck_assert(rf_string_prune_start(RF_STRX2STR(&s), 1, NULL));
+    ck_assert(rf_string_prune_start(RF_STRX2STR(&s), 1, RF_SOPT_DEFAULT, NULL));
     ck_assert_rf_strx_eq_cstr(&s, get_line(encoding,
                                            endianess,
                                            true,
@@ -348,7 +348,7 @@ static void test_rf_string_fwrite_generic(const char* filename, int encoding,
             &s, f, &eof, RF_EOL_LF, encoding, endianess, NULL)
     );
     /* get rid of the BOM and read in the rest of the file */
-    ck_assert(rf_string_prune_start(&s, 1, NULL));
+    ck_assert(rf_string_prune_start(&s, 1, RF_SOPT_DEFAULT, NULL));
 
     ck_assert(
         rf_string_from_file_append(

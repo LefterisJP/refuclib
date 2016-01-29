@@ -56,51 +56,68 @@ const struct RFstring *rf_string_or_empty(const struct RFstring *s)
     return s ? s : rf_string_empty_get();
 }
 
-bool rf_string_substr(const struct RFstring *s,
-                      uint32_t start_pos,
-                      uint32_t chars_num,
-                      struct RFstring *ret)
+struct RFstring *rf_string_substr(
+    const struct RFstring *s,
+    uint32_t start_pos,
+    uint32_t chars_num,
+    int options,
+    struct RFstring *ret
+)
 {
-    uint32_t charI,byteI,startI,endI;
-    bool started = false, ended = false;
+    uint32_t charI;
+    uint32_t byteI;
+    uint32_t startI;
+    uint32_t endI;
+    bool started = false;
+    bool ended = false;
     startI = endI = 0;
     RF_ASSERT(s, "got null string in function");
-    if (!ret) {
-        RF_WARNING("provided null pointer for the return string");
-        return false;
-    }
 
-    RF_STRING_ITERATE_START(s, charI, byteI)
-        if(charI == start_pos)
-        {
-            startI = byteI;
-            started = true;
-        }
-        if(charI == start_pos+chars_num)
-        {
-            endI = byteI;
-            ended = true;
-            break;
-        }
-    RF_STRING_ITERATE_END(charI, byteI)
-    if(!ended)
-    {
-        //if the start was found return from there until the end of the string
-        if(started)
-        {
-            endI = byteI;
-        }
-        else//else the substring was not found
-        {
+    if (!RF_BITFLAG_ON(options, RF_SOPT_ASCII)) {
+        if (!ret) {
+            RF_WARNING("provided null pointer for the return string");
             return false;
         }
-    }
-    /* else success and init the return string */
-    return rf_string_init_unsafe_nnt(ret,
-                                    rf_string_data(s) + startI,
-                                    endI - startI
-    );
 
+        RF_STRING_ITERATE_START(s, charI, byteI)
+            if (charI == start_pos) {
+                startI = byteI;
+                started = true;
+            }
+            if (charI == start_pos + chars_num) {
+                endI = byteI;
+                ended = true;
+                break;
+            }
+        RF_STRING_ITERATE_END(charI, byteI)
+    }
+
+    if (RF_BITFLAG_ON(options, RF_SOPT_TMP)) {
+        if (start_pos >= rf_string_length_bytes(s)) {
+            return false;
+        }
+        if (chars_num + start_pos >= rf_string_length_bytes(s)) {
+            return false;
+        }
+        return RFS(
+            "%.*s",
+            chars_num,
+            rf_string_data(s) + start_pos
+        );
+    } else {
+        if (!ended) {
+            // if the start was found return from there until the end of the string
+            if (started) {
+                endI = byteI;
+            } else { // else the substring was not found
+                return NULL;
+            }
+        }
+        if (!rf_string_init_unsafe_nnt(ret, rf_string_data(s) + startI, endI - startI)) {
+            return NULL;
+        }
+        return ret;
+    }
 }
 
 
@@ -127,7 +144,7 @@ int32_t rf_string_find_i(const struct RFstring *thisstr,
     struct RFstring sub;
     int32_t ret = RF_FAILURE;//the return value
     /* sanity checks are performed inside rf_string_substr() */
-    if (!rf_string_substr(thisstr, start_pos, length, &sub)) {
+    if (!rf_string_substr(thisstr, start_pos, length, RF_SOPT_DEFAULT, &sub)) {
         return RF_FAILURE;
     }
 

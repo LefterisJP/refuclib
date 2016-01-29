@@ -100,18 +100,27 @@ const struct RFstring *rf_string_or_empty(const struct RFstring *s);
  *                       If they exceed the end of the string then,
  *                       a substring only until the end of the string
  *                       shall be returned.
+ * @param options        General string options. Accepted values here are:
+ *                           + RF_SOPT_TEMP: Make sure to wrap call with
+ *                                           RFS_PUSH()/POP()
+ *                           + RF_SOPT_ASCII
  * @param ret            Pass a reference to an RFstring here to receive
- *                       the resulting substring.
- * @return               Returns @c true if a substring exists and
- *                       @c false otherwise
+ *                       the resulting substring. Should be NULL if the function
+ *                       is used to make a temporary string.
+ * @return               If succesful, returns a pointer to the modified @a
+ *                       thisstr or a new temporary string if @a options contain
+ *                       RF_SOPT_TEMP. Null for failure.
  * @see rf_string_between()
  * @see rf_string_after()
  * @see rf_string_before()
  */
-i_DECLIMEX_ bool rf_string_substr(const struct RFstring *thisstr,
-                                  uint32_t startPos,
-                                  uint32_t charsN,
-                                  struct RFstring *ret);
+i_DECLIMEX_ struct RFstring *rf_string_substr(
+    const struct RFstring *thisstr,
+    uint32_t startPos,
+    uint32_t charsN,
+    int options,
+    struct RFstring *ret
+);
 
 /**
  * @brief Finds if a substring exists inside another string.

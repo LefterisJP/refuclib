@@ -128,6 +128,7 @@ START_TEST (test_darray_shallow_copy) {
         foo_destroy(*itf);
     }
     darray_free(b2->arr);
+    free(b2);
 } END_TEST
 
 

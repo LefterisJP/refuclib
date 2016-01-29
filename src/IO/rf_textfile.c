@@ -1384,7 +1384,7 @@ int rf_textfile_read_line_chars(struct RFtextfile* t,
     if (characters != 0) {
         //if we need specific characters
         uint32_t charsN = rf_string_length(RF_STRX2STR(line));
-        rf_string_prune_end(RF_STRX2STR(line), charsN-characters, NULL);
+        rf_string_prune_end(RF_STRX2STR(line), charsN - characters, RF_SOPT_DEFAULT, NULL);
     } else {
         exclude_end_of_line(line);
     }

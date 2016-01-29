@@ -14,6 +14,7 @@
 #include "rf_str_defines.ph" //for some defines
 /*------------- Outside Module inclusion -------------*/
 #include <Utils/log.h>
+#include <Utils/bits.h>
 #include <Utils/rf_unicode.h> //for unicode functions
 #include <Utils/memory.h> //for refu memory allocation
 #include <Utils/sanity.h> //for sanity macros
@@ -229,55 +230,82 @@ end:
     return ret;
 }
 
-bool rf_string_prune_start(struct RFstring *thisstr, uint32_t n, unsigned int *removals)
+struct RFstring *rf_string_prune_start(
+    struct RFstring *thisstr,
+    uint32_t n,
+    int options,
+    unsigned int *removals
+)
 {
     //iterate the characters of the string
     uint32_t i;
     uint32_t length = 0;
     unsigned new_byte_pos = 0;
-    char found = false;
+    bool found = false;
     RF_ASSERT(thisstr, "got null string in function");
 
     if (removals) {
         *removals = 0;
     }
 
-    RF_STRING_ITERATE_START(thisstr, length, i);
-        //if we reach the number of characters passed as a parameter, note it
-        if(length == n)
-        {
-            //remember that now i is the byte position we need
-            new_byte_pos = i;
-            found = true;
-            break;
+    if (!RF_BITFLAG_ON(options, RF_SOPT_ASCII)) {
+        RF_STRING_ITERATE_START(thisstr, length, i);
+            //if we reach the number of characters passed as a parameter, note it
+            if (length == n) {
+                //remember that now i is the byte position we need
+                new_byte_pos = i;
+                found = true;
+                break;
+            }
+            if (removals) {
+                 *removals = *removals + 1;
+            }
+        RF_STRING_ITERATE_END(length, i)
+    } else {
+        new_byte_pos = n;
+    }
+
+    // if a temporary string was requested it's easy
+    if (RF_BITFLAG_ON(options, RF_SOPT_TMP)) {
+        if (new_byte_pos >= rf_string_length_bytes(thisstr)) {
+            return RFS("");
         }
         if (removals) {
-             *removals = *removals + 1;
+            *removals = new_byte_pos;
         }
-    RF_STRING_ITERATE_END(length, i)
+        return RFS(
+            "%.*s",
+            rf_string_length_bytes(thisstr) - new_byte_pos,
+            rf_string_data(thisstr) + new_byte_pos
+        );
+    }
 
+    /* -- from here and on for non temporary strings -- */
     //if the string does not have n chars to remove it becomes an empty string
-    if(!found)
-    {
+    if (!found) {
         rf_string_length_bytes(thisstr) = 0;
-        return true;
+        return thisstr;
     }
 
     //move the string back to cover the empty places
-    for(i = 0; i < rf_string_length_bytes(thisstr) - new_byte_pos; i++)
-    {
+    for (i = 0; i < rf_string_length_bytes(thisstr) - new_byte_pos; i++) {
         rf_string_data(thisstr)[i] = rf_string_data(thisstr)[i + new_byte_pos];
     }
     //get the new bytelength
     rf_string_length_bytes(thisstr) -= new_byte_pos;
 
-    return true;
+    return thisstr;
 }
 
-bool rf_string_prune_end(struct RFstring *thisstr, uint32_t n, unsigned int *removals)
+struct RFstring *rf_string_prune_end(
+    struct RFstring *thisstr,
+    uint32_t n,
+    int options,
+    unsigned int *removals
+)
 {
     //start the iteration of the characters from the end of the string
-    int32_t new_byte_pos = -1;
+    int32_t new_end_pos = -1;
     uint32_t character_position;
     uint32_t byte_position;
     RF_ASSERT(thisstr, "got null string in function");
@@ -286,31 +314,51 @@ bool rf_string_prune_end(struct RFstring *thisstr, uint32_t n, unsigned int *rem
         *removals = 0;
     }
     if (!n) {
-        return true;
+        return thisstr;
     }
 
-    RF_STRING_ITERATEB_START(thisstr, character_position, byte_position)
+    if (!RF_BITFLAG_ON(options, RF_SOPT_ASCII)) {
+        RF_STRING_ITERATEB_START(thisstr, character_position, byte_position)
+            if (removals) {
+                *removals = *removals + 1;
+            }
+            //if we found the requested number of characters from the end
+            if (character_position == n) {
+                new_end_pos = byte_position;
+                break;
+            }
+        RF_STRING_ITERATEB_END(character_position, byte_position)
+    } else {
+        new_end_pos = rf_string_length_bytes(thisstr) - n;
+    }
+
+    // if a temporary string was requested it's easy
+    if (RF_BITFLAG_ON(options, RF_SOPT_TMP)) {
+        if (new_end_pos <= 0) {
+            return RFS("");
+        }
         if (removals) {
-            *removals = *removals + 1;
+            *removals = n;
         }
-        //if we found the requested number of characters from the end
-        if (character_position == n) {
-            new_byte_pos = byte_position;
-            break;
-        }
-    RF_STRING_ITERATEB_END(character_position, byte_position)
-
-    //if the string does not have n chars to remove, fail
-    if (new_byte_pos == -1) {
-        rf_string_length_bytes(thisstr) = 0;
-        return true;
+        return RFS(
+            "%.*s",
+            rf_string_length_bytes(thisstr) - n,
+            rf_string_data(thisstr)
+        );
     }
 
-    //juts set the new byte length
+    /* -- from here and on for non temporary strings -- */
+    //if the string does not have n chars to remove, fail
+    if (new_end_pos == -1) {
+        rf_string_length_bytes(thisstr) = 0;
+        return thisstr;
+    }
+
+    // just set the new byte length
     rf_string_length_bytes(thisstr) -= (
-        (rf_string_length_bytes(thisstr) - new_byte_pos)
+        (rf_string_length_bytes(thisstr) - new_end_pos)
     );
-    return true;
+    return thisstr;
 }
 
 bool rf_string_prune_middle_b(struct RFstring *thisstr, uint32_t p,

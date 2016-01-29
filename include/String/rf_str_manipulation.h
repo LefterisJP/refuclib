@@ -147,15 +147,25 @@ i_DECLIMEX_ bool rf_string_keep_only(struct RFstring *thisstr,
  * @param thisstr    The string to prune from. @inhtype{String,StringX}
  * @param n          The number of characters to remove. Must be a
  *                   positive integer.
+ * @param options    General string options. Accepted values here are:
+ *                       + RF_SOPT_TEMP: Make sure to wrap call with
+ *                                       RFS_PUSH()/POP()
+ *                       + RF_SOPT_ASCII
  * @param removals   Pass a variable in which to return the number of
  *                   pruned characters or NULL if you don't care.
- * @return           True if n characters got removed and false in error
+ * @return           In success, a pointer to @a thisstr with n characters
+ *                   removed or a temporary string if that was requested.
+ *                   NULL for failure.
  * @see rf_string_prune_end()
  * @see rf_string_prune_middle_b()
  * @see rf_string_prune_middle_f()
  */
-i_DECLIMEX_ bool rf_string_prune_start(struct RFstring *thisstr, uint32_t n,
-                                       unsigned int *removals);
+i_DECLIMEX_ struct RFstring *rf_string_prune_start(
+    struct RFstring *thisstr,
+    uint32_t n,
+    int options,
+    unsigned int *removals
+);
 
 /**
  * @brief Removes the last n characters from the end of the string
@@ -164,15 +174,25 @@ i_DECLIMEX_ bool rf_string_prune_start(struct RFstring *thisstr, uint32_t n,
  * @param thisstr       The string to prune from. @inhtype{String,StringX}
  * @param n             The number of characters to remove.
  *                      Must be a positive integer.
+ * @param options       General string options. Accepted values here are:
+ *                         + RF_SOPT_TEMP: Make sure to wrap call with
+ *                                       RFS_PUSH()/POP()
+ *                         + RF_SOPT_ASCII
  * @param removals      Pass a variable in which to return the number of
  *                      pruned characters or NULL if you don't care.
- * @return              True if n characters got removed and false in error
+ * @return              In success, a pointer to @a thisstr with n characters
+ *                      removed or a temporary string if that was requested.
+ *                      NULL for failure.
  * @see rf_string_prune_start()
  * @see rf_string_prune_middle_b()
  * @see rf_string_prune_middle_f()
  */
-i_DECLIMEX_ bool rf_string_prune_end(struct RFstring *thisstr, uint32_t n,
-                                     unsigned int *removals);
+i_DECLIMEX_ struct RFstring *rf_string_prune_end(
+    struct RFstring *thisstr,
+    uint32_t n,
+    int options,
+    unsigned int *removals
+);
 
 /**
  * @brief Removes characters from one point of the string

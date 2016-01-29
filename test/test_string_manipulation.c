@@ -217,7 +217,12 @@ START_TEST(test_string_prune_start) {
             "αγοράς και κυρίως στις τράπεζες.")
     );
 
-    ck_assert(rf_string_prune_start(&s, 7, NULL));
+    ck_assert(rf_string_prune_start(
+                  &s,
+                  7,
+                  RF_SOPT_DEFAULT,
+                  NULL)
+    );
     ck_assert_rf_str_eq_cstr(
         &s,
         "σημειώνει το Χρηματιστήριο την "
@@ -227,19 +232,45 @@ START_TEST(test_string_prune_start) {
     );
 
     /* prune all remaining */
-    ck_assert(rf_string_prune_start(&s, 9999, &removals));
+    ck_assert(rf_string_prune_start(&s, 9999, RF_SOPT_DEFAULT, &removals));
     ck_assert_rf_str_eq_cstr(&s, "");
     ck_assert_uint_eq(removals, 138);
 
     /* prune nothing */
     ck_assert(rf_string_init(&s2, "Testity string"));
-    ck_assert(rf_string_prune_start(&s2, 0, &removals));
+    ck_assert(rf_string_prune_start(&s2, 0, RF_SOPT_DEFAULT, &removals));
     ck_assert_rf_str_eq_cstr(&s2, "Testity string");
     ck_assert_uint_eq(removals, 0);
 
     rf_string_deinit(&s);
     rf_string_deinit(&s2);
 }END_TEST
+
+START_TEST (test_string_prune_start_ascii_tmp) {
+    unsigned int removals;
+    struct RFstring *ret;
+    struct RFstring s = RF_STRING_STATIC_INIT("$(%@foobarzorz");
+    RFS_PUSH();
+
+    ck_assert(ret = rf_string_prune_start(
+                  &s,
+                  4,
+                  RF_SOPT_ASCII | RF_SOPT_TMP,
+                  &removals)
+    );
+    ck_assert_rf_str_eq_cstr(ret, "foobarzorz");
+    ck_assert_uint_eq(removals, 4);
+
+    ck_assert(ret = rf_string_prune_start(
+                  &s,
+                  9999,
+                  RF_SOPT_ASCII | RF_SOPT_TMP,
+                  &removals)
+    );
+    ck_assert_rf_str_eq_cstr(ret, "");
+
+    RFS_POP();
+} END_TEST
 
 START_TEST(test_string_prune_end) {
     struct RFstring s, s2;
@@ -253,7 +284,7 @@ START_TEST(test_string_prune_end) {
             "αγοράς και κυρίως στις τράπεζες.")
     );
 
-    ck_assert(rf_string_prune_end(&s, 10, &removals));
+    ck_assert(rf_string_prune_end(&s, 10, RF_SOPT_DEFAULT, &removals));
     ck_assert_rf_str_eq_cstr(
         &s,
         "Βουτιά σημειώνει το Χρηματιστήριο την "
@@ -264,18 +295,38 @@ START_TEST(test_string_prune_end) {
     ck_assert_uint_eq(removals, 10);
 
     /* prune all remaining */
-    ck_assert(rf_string_prune_end(&s, 9999, &removals));
+    ck_assert(rf_string_prune_end(&s, 9999, RF_SOPT_DEFAULT, &removals));
     ck_assert_rf_str_eq_cstr(&s, "");
     ck_assert_uint_eq(removals, 135);
 
     /* prune nothing */
     ck_assert(rf_string_init(&s2, "Testity string"));
-    ck_assert(rf_string_prune_end(&s2, 0, &removals));
+    ck_assert(rf_string_prune_end(&s2, 0, RF_SOPT_DEFAULT, &removals));
     ck_assert_rf_str_eq_cstr(&s2, "Testity string");
     ck_assert_uint_eq(removals, 0);
 
     rf_string_deinit(&s);
     rf_string_deinit(&s2);
+}END_TEST
+
+START_TEST (test_string_prune_end_ascii_tmp) {
+    unsigned int removals;
+    struct RFstring *ret;
+    struct RFstring s = RF_STRING_STATIC_INIT("foobarzorz$%^&");
+    RFS_PUSH();
+
+    ck_assert(
+        ret = rf_string_prune_end(&s, 4, RF_SOPT_ASCII | RF_SOPT_TMP, &removals)
+    );
+    ck_assert_rf_str_eq_cstr(ret, "foobarzorz");
+    ck_assert_uint_eq(removals, 4);
+
+    ck_assert(
+        ret = rf_string_prune_end(&s, 999, RF_SOPT_ASCII | RF_SOPT_TMP, &removals)
+    );
+    ck_assert_rf_str_eq_cstr(ret, "");
+
+    RFS_POP();
 }END_TEST
 
 START_TEST(test_string_prune_middle_b) {
@@ -941,7 +992,9 @@ Suite *string_manipulation_suite_create(void)
     tcase_add_test(string_removing, test_string_remove);
     tcase_add_test(string_removing, test_string_keep_only);
     tcase_add_test(string_removing, test_string_prune_start);
+    tcase_add_test(string_removing, test_string_prune_start_ascii_tmp);
     tcase_add_test(string_removing, test_string_prune_end);
+    tcase_add_test(string_removing, test_string_prune_end_ascii_tmp);
     tcase_add_test(string_removing, test_string_prune_middle_b);
     tcase_add_test(string_removing, test_string_prune_middle_f);
     tcase_add_test(string_removing, test_string_trim_start);

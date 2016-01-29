@@ -134,14 +134,27 @@ START_TEST(test_string_substr) {
                   "戒」を宣言して事態を注視している。")
     );
     /* get substring at startpos 308 and 1 positions on */
-    ck_assert(rf_string_substr(&s, 308, 10, &ret));
+    ck_assert(rf_string_substr(&s, 308, 10, RF_SOPT_DEFAULT, &ret));
     ck_assert_rf_str_eq_cstr(&ret, "警戒レベルを超えた。");
 
     /* edge case. substr index out of bounds */
-    ck_assert(!rf_string_substr(&s, 1022, 22, &ret));
+    ck_assert(!rf_string_substr(&s, 1022, 22, RF_SOPT_DEFAULT, &ret));
 
     rf_string_deinit(&s);
     rf_string_deinit(&ret);
+}END_TEST
+
+START_TEST(test_string_substr_ascii_temp) {
+    const struct RFstring s = RF_STRING_STATIC_INIT("$%foo$%");
+    struct RFstring *ret;
+
+
+    /* get substring at startpos 308 and 1 positions on */
+    RFS_PUSH();
+    ck_assert(ret = rf_string_substr(&s, 2, 3, RF_SOPT_TMP | RF_SOPT_ASCII, NULL));
+    ck_assert_rf_str_eq_cstr(ret, "foo");
+    RFS_POP();
+
 }END_TEST
 
 START_TEST(test_string_find) {
@@ -585,7 +598,7 @@ START_TEST (test_invalid_string_retrieval) {
     ck_assert_int_eq(RF_FAILURE,
                      rf_string_find_i(&s, NULL, 2, 30, 0));
     ck_assert_int_eq(-1 ,rf_string_count(&s, NULL, 0, 0, 0));
-    ck_assert(!rf_string_substr(&s, 21, 22, NULL));
+    ck_assert(!rf_string_substr(&s, 21, 22, RF_SOPT_DEFAULT, NULL));
     ck_assert(!rf_string_scanf_after(&s, NULL, "%d", &year));
     ck_assert(!rf_string_scanf_after(&s, &f1, NULL, &year));
     ck_assert(!rf_string_scanf_after(&s, &f1, "%d", NULL));
@@ -624,6 +637,7 @@ Suite *string_retrieval_suite_create(void)
                               setup_generic_tests,
                               teardown_generic_tests);
     tcase_add_test(string_retrieval, test_string_substr);
+    tcase_add_test(string_retrieval, test_string_substr_ascii_temp);
     tcase_add_test(string_retrieval, test_string_find);
     tcase_add_test(string_retrieval, test_string_find_i);
     tcase_add_test(string_retrieval, test_string_begins_with);

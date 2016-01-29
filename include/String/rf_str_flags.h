@@ -29,9 +29,17 @@ enum RFstring_matching_options {
 
 };
 
+// flags for general string options, that are accepted by some functions
+
+//! No special options
+#define RF_SOPT_DEFAULT 0
+//! A temporary string was passed into the function
+#define RF_SOPT_TMP 0x1
+//! Treat the input string as ASCII string
+#define RF_SOPT_ASCII 0x2
 
 
-//flags for string formatting
+// flags for string formatting
 #define RF_FORMATFLAG_LJUSTIFY   0x1
 #define RF_FORMATFLAG_SIGN       0x2
 #define RF_FORMATFLAG_NOSIGN     0x4
