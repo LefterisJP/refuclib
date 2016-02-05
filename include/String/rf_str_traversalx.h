@@ -187,9 +187,13 @@ i_DECLIMEX_ void rf_stringx_clear(struct RFstringx *thisstr);
  * @see rf_stringx_move_back()
  * @see rf_stringx_reset()
  */
-i_DECLIMEX_ bool rf_stringx_move_afterv(struct RFstringx *thisstr, void *result,
-                                        enum RFstring_matching_options options,
-                                        const unsigned char parN, ...);
+i_DECLIMEX_ bool rf_stringx_move_afterv(
+    struct RFstringx *thisstr,
+    void *result,
+    enum RFstring_matching_options options,
+    const unsigned char parN,
+    ...
+);
 
 /**
  * @brief Moves the internal pointer by as much as needed to skip characters
@@ -210,11 +214,13 @@ i_DECLIMEX_ bool rf_stringx_move_afterv(struct RFstringx *thisstr, void *result,
  *                          that were skipped
  * @return                  The number of chars of @thisstr that were skipped
  */
-i_DECLIMEX_ unsigned int rf_stringx_skip_chars(struct RFstringx *thisstr,
-                                               const struct RFstring *chars,
-                                               const char *limit,
-                                               unsigned int *bytes,
-                                               unsigned int *line_count);
+i_DECLIMEX_ unsigned int rf_stringx_skip_chars(
+    struct RFstringx *thisstr,
+    const struct RFstring *chars,
+    const char *limit,
+    unsigned int *bytes,
+    unsigned int *line_count
+);
 
 /**
  * @brief Moves the internal string pointer after the substring formed

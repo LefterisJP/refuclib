@@ -99,20 +99,27 @@ extern "C" {
  *                        in the internal buffer
  * @return                Returns @c true in success and @c false in failure
  */
-bool rf_strings_buffer_fillfmt(const char *fmt,
-                               unsigned int *size,
-                               char **buff_ptr,
-                               va_list args);
+bool rf_strings_buffer_fillfmt(
+    const char *fmt,
+    unsigned int *size,
+    char **buff_ptr,
+    va_list args
+);
 
 /* -- internal functions used in the above API -- */
-i_DECLIMEX_ struct RFstring *i_rf_string_create_local(bool null_terminate,
-                                                      const char *s);
-i_DECLIMEX_ struct RFstring *i_rf_string_create_local_or_die(bool null_terminate,
-                                                             const char *s);
-i_DECLIMEX_ struct RFstring *i_rf_string_create_localv(const char *s,
-                                                       ...);
-i_DECLIMEX_ struct RFstring *i_rf_string_create_localv_or_die(const char *s,
-                                                              ...);
+i_DECLIMEX_ struct RFstring *i_rf_string_create_local(
+    bool null_terminate,
+    const char *s
+);
+i_DECLIMEX_ struct RFstring *i_rf_string_create_local_or_die(
+    bool null_terminate,
+    const char *s
+);
+i_DECLIMEX_ struct RFstring *i_rf_string_create_localv(const char *s, ...);
+i_DECLIMEX_ struct RFstring *i_rf_string_create_localv_or_die(
+    const char *s,
+    ...
+);
 
 #define RF_SELECT_STRING_CREATE_LOCAL(...)                              \
     RP_SELECT_FUNC_IF_NARGIS(i_SELECT_RF_STRING_CREATELOCAL, 1, __VA_ARGS__)

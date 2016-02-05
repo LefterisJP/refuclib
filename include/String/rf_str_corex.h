@@ -45,15 +45,16 @@ extern "C"
                             rf_string_length_bytes(i_from))
 
 i_DECLIMEX_ struct RFstringx *rf_stringx_create(const char *lit);
-i_DECLIMEX_ struct RFstringx *rf_stringx_createv(const char *lit,...);
-i_DECLIMEX_ struct RFstringx *rf_stringx_createvl(const char *lit,
-                                                 va_list args);
+i_DECLIMEX_ struct RFstringx *rf_stringx_createv(const char *lit, ...);
+i_DECLIMEX_ struct RFstringx *rf_stringx_createvl(const char *lit, va_list args);
 
 i_DECLIMEX_ bool rf_stringx_init(struct RFstringx *str,const char *lit);
 i_DECLIMEX_ bool rf_stringx_initv(struct RFstringx *str,const char *lit,...);
-i_DECLIMEX_ bool rf_stringx_initvl(struct RFstringx *str,
-                                   const char *lit,
-                                   va_list args);
+i_DECLIMEX_ bool rf_stringx_initvl(
+    struct RFstringx *str,
+    const char *lit,
+    va_list args
+);
 
 
 
@@ -63,32 +64,51 @@ i_DECLIMEX_ bool rf_stringx_init_cp(struct RFstringx *str, uint32_t code);
 i_DECLIMEX_ struct RFstringx *rf_stringx_create_unsafe(const char *lit);
 i_DECLIMEX_ bool rf_stringx_init_unsafe(struct RFstringx *str, const char *lit);
 
-i_DECLIMEX_ bool rf_stringx_init_unsafe_nnt(struct RFstringx *str, const char *s,
-                                           size_t length);
+i_DECLIMEX_ bool rf_stringx_init_unsafe_nnt(
+    struct RFstringx *str,
+    const char *s,
+    size_t length
+);
 i_DECLIMEX_ bool rf_stringx_init_unsafe_bnnt(
-    struct RFstringx *str, const char *s,
-    size_t length, size_t buff_size);
+    struct RFstringx *str,
+    const char *s,
+    size_t length,
+    size_t buff_size
+);
 
 
 i_DECLIMEX_ struct RFstringx *rf_stringx_create_int(int i);
 i_DECLIMEX_ bool rf_stringx_init_int(struct RFstringx *str, int i);
 
-i_DECLIMEX_ struct RFstringx *rf_stringx_create_double(double d,
-                                                       unsigned int precision);
-i_DECLIMEX_ bool rf_stringx_init_double(struct RFstringx *str,
-                                        double d,
-                                        unsigned int precision);
+i_DECLIMEX_ struct RFstringx *rf_stringx_create_double(
+    double d,
+    unsigned int precision
+);
+i_DECLIMEX_ bool rf_stringx_init_double(
+    struct RFstringx *str,
+    double d,
+    unsigned int precision
+);
 
-i_DECLIMEX_ struct RFstringx *rf_stringx_create_utf16(const uint16_t *s,
-                                               unsigned int len);
-i_DECLIMEX_ bool rf_stringx_init_utf16(struct RFstringx *str,
-                                      const uint16_t *s,
-                                      unsigned int len);
+i_DECLIMEX_ struct RFstringx *rf_stringx_create_utf16(
+    const uint16_t *s,
+    unsigned int len
+);
+i_DECLIMEX_ bool rf_stringx_init_utf16(
+    struct RFstringx *str,
+    const uint16_t *s,
+    unsigned int len
+);
 
-i_DECLIMEX_ struct RFstringx *rf_stringx_create_utf32(const uint32_t *s,
-                                               unsigned int len);
-i_DECLIMEX_ bool rf_stringx_init_utf32(struct RFstringx *str, const uint32_t *s,
-                                      unsigned int len);
+i_DECLIMEX_ struct RFstringx *rf_stringx_create_utf32(
+    const uint32_t *s,
+    unsigned int len
+);
+i_DECLIMEX_ bool rf_stringx_init_utf32(
+    struct RFstringx *str,
+    const uint32_t *s,
+    unsigned int len
+);
 
 
 /* --- Functions that already exist for RFstring - END --- */
@@ -109,15 +129,16 @@ i_DECLIMEX_ bool rf_stringx_init_utf32(struct RFstringx *str, const uint32_t *s,
  * @return                       The newly initialized string
  * @see rf_stringx_init_buff()
  */
-i_DECLIMEX_ struct RFstringx* rf_stringx_create_buff(uint32_t buffSize,
-                                                     const char *lit);
+i_DECLIMEX_ struct RFstringx* rf_stringx_create_buff(uint32_t buffSize, const char *lit);
 
 /**
  * @brief Creates an RFstringx with a specified buffer size (varargs)
  */
-i_DECLIMEX_ struct RFstringx *rf_stringx_create_buffv(uint32_t buffSize,
-                                                      const char *lit,
-                                                      ...);
+i_DECLIMEX_ struct RFstringx *rf_stringx_create_buffv(
+    uint32_t buffSize,
+    const char *lit,
+    ...
+);
 
 
 /**
@@ -125,19 +146,23 @@ i_DECLIMEX_ struct RFstringx *rf_stringx_create_buffv(uint32_t buffSize,
  * @lmsFunction
  * @see rf_stringx_create_buff() for details
  */
-i_DECLIMEX_ bool rf_stringx_init_buff(struct RFstringx *str,
-                                     uint32_t buffSize,
-                                     const char* lit);
+i_DECLIMEX_ bool rf_stringx_init_buff(
+    struct RFstringx *str,
+    uint32_t buffSize,
+    const char* lit
+);
 
 /**
  * @brief Initializes an RFstringx with a specified buffer size
  * @lmsFunction
  * @see rf_stringx_init_buffv() for details
  */
-i_DECLIMEX_ bool rf_stringx_init_buffv(struct RFstringx *str,
-                                       uint32_t buffSize,
-                                       const char* lit,
-                                       ...);
+i_DECLIMEX_ bool rf_stringx_init_buffv(
+    struct RFstringx *str,
+    uint32_t buffSize,
+    const char* lit,
+    ...
+);
 
 //! @}
 
@@ -167,9 +192,11 @@ i_DECLIMEX_ bool rf_stringx_assign(struct RFstringx *dest, const struct RFstring
  *
  */
 i_DECLIMEX_ bool rf_stringx_assignv(struct RFstringx *str, const char *s, ...);
-i_DECLIMEX_ bool rf_stringx_assignvl(struct RFstringx *str,
-                                     const char *s,
-                                     va_list args);
+i_DECLIMEX_ bool rf_stringx_assignvl(
+    struct RFstringx *str,
+    const char *s,
+    va_list args
+);
 
 /**
  * @brief Assigns the value of a unicode character to the string
@@ -187,8 +214,11 @@ i_DECLIMEX_ bool rf_stringx_assign_char(struct RFstringx *thisstr, uint32_t char
  * and for the given bytelength
  *
  */
-i_DECLIMEX_ bool rf_stringx_assign_unsafe_nnt(struct RFstringx *str, const char *s,
-                                              size_t length);
+i_DECLIMEX_ bool rf_stringx_assign_unsafe_nnt(
+    struct RFstringx *str,
+    const char *s,
+    size_t length
+);
 
 /**
  * @brief Nullifies a string
@@ -221,9 +251,7 @@ i_DECLIMEX_ bool rf_stringx_assign_unsafe_nnt(struct RFstringx *str, const char 
  * @see rf_stringx_copy_out()
  * @see rf_stringx_copy_chars()
  */
-i_DECLIMEX_ struct RFstringx *rf_stringx_from_string_out(
-    const struct RFstring *s
-);
+i_DECLIMEX_ struct RFstringx *rf_stringx_from_string_out(const struct RFstring *s);
 
 /**
  * @brief Initializes an RFstringx from an RF_string
@@ -235,8 +263,10 @@ i_DECLIMEX_ struct RFstringx *rf_stringx_from_string_out(
  * @see rf_stringx_copy_in()
  * @see rf_stringx_copy_chars()
  */
-i_DECLIMEX_ bool rf_stringx_from_string_in(struct RFstringx *dst,
-                                           const struct RFstring *src);
+i_DECLIMEX_ bool rf_stringx_from_string_in(
+    struct RFstringx *dst,
+    const struct RFstring *src
+);
 
 
 /**
@@ -292,9 +322,11 @@ i_DECLIMEX_ bool rf_stringx_copy_in(struct RFstringx *dst, struct RFstringx *src
  * @see rf_stringx_copy_out()
  * @see rf_stringx_copy_in()
  */
-i_DECLIMEX_ bool rf_stringx_copy_chars(struct RFstringx *dst,
-                                       struct RFstringx *src,
-                                       uint32_t n);
+i_DECLIMEX_ bool rf_stringx_copy_chars(
+    struct RFstringx *dst,
+    struct RFstringx *src,
+    uint32_t n
+);
 
 
 //! @}

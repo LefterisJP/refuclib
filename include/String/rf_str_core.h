@@ -161,9 +161,11 @@ i_DECLIMEX_ bool rf_string_init_unsafe(struct RFstring *str, const char* s);
  * @notinherited{StringX}
  * @see rf_string_init_unsafe()
  */
-i_DECLIMEX_ bool rf_string_init_unsafe_nnt(struct RFstring *str,
-                                           const char *s,
-                                           size_t length);
+i_DECLIMEX_ bool rf_string_init_unsafe_nnt(
+    struct RFstring *str,
+    const char *s,
+    size_t length
+);
 
 /**
  * @opassign
@@ -194,17 +196,22 @@ i_DECLIMEX_ bool rf_string_init_int(struct RFstring* str, int i);
  * @return Returns the initialized RF_string
  * @see rf_string_init_double()
  */
-i_DECLIMEX_ struct RFstring *rf_string_create_double(double f,
-                                                     unsigned int precision);
+i_DECLIMEX_ struct RFstring *rf_string_create_double(
+    double f,
+    unsigned int precision
+);
+
 /**
  * @brief Initializes a string with the given double.
  *
  * @notinherited{StringX}
  * @see rf_string_create_double()
  */
-i_DECLIMEX_ bool rf_string_init_double(struct RFstring *str,
-                                       double f,
-                                       unsigned int precision);
+i_DECLIMEX_ bool rf_string_init_double(
+    struct RFstring *str,
+    double f,
+    unsigned int precision
+);
 
 /**
  * @brief Allocates and returns a string with the given UTF-16 byte sequence.
@@ -219,8 +226,11 @@ i_DECLIMEX_ bool rf_string_init_double(struct RFstring *str,
  * @see rf_string_create_f_utf16()
  * @see rf_string_init_utf16()
  */
-i_DECLIMEX_ struct RFstring *rf_string_create_utf16(const uint16_t *s,
-                                                    unsigned int len);
+i_DECLIMEX_ struct RFstring *rf_string_create_utf16(
+    const uint16_t *s,
+    unsigned int len
+);
+
 /**
  * @brief Initializes a string with the given UTF-16 byte sequence.
  *
@@ -229,9 +239,11 @@ i_DECLIMEX_ struct RFstring *rf_string_create_utf16(const uint16_t *s,
  * @see rf_string_create_f_utf16()
  * @see rf_string_init_utf16()
  */
-i_DECLIMEX_ bool rf_string_init_utf16(struct RFstring *str,
-                                      const uint16_t *s,
-                                      unsigned int len);
+i_DECLIMEX_ bool rf_string_init_utf16(
+    struct RFstring *str,
+    const uint16_t *s,
+    unsigned int len
+);
 
 /**
  * @brief Allocates and returns a string with the given UTF-32 byte sequence.
@@ -248,8 +260,10 @@ i_DECLIMEX_ bool rf_string_init_utf16(struct RFstring *str,
  * @see rf_string_create_f_utf32()
  * @see rf_string_init_utf32()
  */
-i_DECLIMEX_ struct RFstring *rf_string_create_utf32(const uint32_t *s,
-                                                    unsigned int len);
+i_DECLIMEX_ struct RFstring *rf_string_create_utf32(
+    const uint32_t *s,
+    unsigned int len
+);
 /**
  * @brief Initializes a string with the given UTF-32 byte sequence.
  *
@@ -258,9 +272,11 @@ i_DECLIMEX_ struct RFstring *rf_string_create_utf32(const uint32_t *s,
  * @see rf_string_create_f_utf32()
  * @see rf_string_init_utf32()
  */
-i_DECLIMEX_ bool rf_string_init_utf32(struct RFstring *str,
-                                      const uint32_t *s,
-                                      unsigned int len);
+i_DECLIMEX_ bool rf_string_init_utf32(
+    struct RFstring *str,
+    const uint32_t *s,
+    unsigned int len
+);
 
 //! @}
 
@@ -292,9 +308,11 @@ i_DECLIMEX_ bool rf_string_assign(struct RFstring *dest, const struct RFstring *
  *
  */
 i_DECLIMEX_ bool rf_string_assignv(struct RFstring *str, const char *s, ...);
-i_DECLIMEX_ bool rf_string_assignvl(struct RFstring *str,
-                                    const char *s,
-                                    va_list args);
+i_DECLIMEX_ bool rf_string_assignvl(
+    struct RFstring *str,
+    const char *s,
+    va_list args
+);
 
 /**
  * @brief Assigns the value of a unicode character to the string
@@ -375,9 +393,11 @@ i_DECLIMEX_ bool rf_string_copy_in(struct RFstring *dst, const struct RFstring *
  * @see rf_string_copy_out()
  *
  */
-i_DECLIMEX_ bool rf_string_copy_chars(struct RFstring *dst,
-                                      const struct RFstring *src,
-                                      uint32_t n);
+i_DECLIMEX_ bool rf_string_copy_chars(
+    struct RFstring *dst,
+    const struct RFstring *src,
+    uint32_t n
+);
 
 /**
  * @brief Shallow initialization of an RFstring from an RFstringx
@@ -429,7 +449,10 @@ i_DECLIMEX_ void rf_string_deinit(struct RFstring *s);
  * @param s2 The second string to compare @inhtype{String,StringX} @tmpSTR
  * @return True in case the strings are equal and false otherwise
  */
-i_DECLIMEX_ bool rf_string_equal(const struct RFstring *s1, const struct RFstring *s2);
+i_DECLIMEX_ bool rf_string_equal(
+    const struct RFstring *s1,
+    const struct RFstring *s2
+);
 
 /**
  * Compares a string with a cstr
@@ -489,8 +512,11 @@ i_DECLIMEX_ const struct RFstring *rf_string_empty_get();
  * @return Returns the code point of the byte position as an uint32_t
  * @endinternal
  */
-i_DECLIMEX_ uint32_t rf_string_bytepos_to_codepoint(const struct RFstring *thisstr,
-                                                    uint32_t bytepos);
+i_DECLIMEX_ uint32_t rf_string_bytepos_to_codepoint(
+    const struct RFstring *thisstr,
+    uint32_t bytepos
+);
+
 /**
  * @internal
  * @brief Retrieves character position of a byte position
@@ -515,9 +541,11 @@ i_DECLIMEX_ uint32_t rf_string_bytepos_to_codepoint(const struct RFstring *thiss
  *               first character position after the continuation byte.
  * @endinternal
  */
-i_DECLIMEX_ uint32_t rf_string_bytepos_to_charpos(const struct RFstring *thisstr,
-                                                  uint32_t bytepos,
-                                                  bool before);
+i_DECLIMEX_ uint32_t rf_string_bytepos_to_charpos(
+    const struct RFstring *thisstr,
+    uint32_t bytepos,
+    bool before
+);
 
 
 // Checks if a given byte is a continuation byte
@@ -536,14 +564,15 @@ struct RFstring_iterator {
 /**
  ** Returns an iterator for the given string
  */
-i_DECLIMEX_ void rf_string_get_iter(const struct RFstring *thisstr,
-                                    struct RFstring_iterator *ret);
+i_DECLIMEX_ void rf_string_get_iter(
+    const struct RFstring *thisstr,
+    struct RFstring_iterator *ret
+);
 
 /**
  ** Iterates the characters of a string
  */
-bool rf_string_iterator_next(struct RFstring_iterator *it,
-                             uint32_t *value);
+bool rf_string_iterator_next(struct RFstring_iterator *it, uint32_t *value);
 
 
 /*

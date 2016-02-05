@@ -50,9 +50,11 @@ i_DECLIMEX_ bool rf_stringx_append(struct RFstringx *thisstr, const struct RFstr
  * @return             Returns @c true in success and @c false otherwise
  * @see rf_stringx_prepend()
  */
-i_DECLIMEX_ bool rf_stringx_append_chars(struct RFstringx *thisstr,
-                                         const struct RFstring *other,
-                                         unsigned int chars);
+i_DECLIMEX_ bool rf_stringx_append_chars(
+    struct RFstringx *thisstr,
+    const struct RFstring *other,
+    unsigned int chars
+);
 
 /**
  * @brief Appends a single unicode character to this string
@@ -96,9 +98,11 @@ i_DECLIMEX_ bool rf_stringx_prepend(struct RFstringx *thisstr, const struct RFst
  * @see rf_stringx_append()
  * @see rf_stringx_prepend()
  */
-i_DECLIMEX_ bool rf_stringx_insert(struct RFstringx* thisstr,
-                                   uint32_t pos,
-                                   const struct RFstring *other);
+i_DECLIMEX_ bool rf_stringx_insert(
+    struct RFstringx* thisstr,
+    uint32_t pos,
+    const struct RFstring *other
+);
 
 //! @}
 
@@ -122,9 +126,12 @@ i_DECLIMEX_ bool rf_stringx_insert(struct RFstringx* thisstr,
  * @return             Returns @c true in success and @c false otherwise
  * @see rf_stringx_append()
  */
-i_DECLIMEX_ bool rf_stringx_append_bytes(struct RFstringx *thisstr,
-                                         const struct RFstring *other,
-                                         const unsigned int bytes);
+i_DECLIMEX_ bool rf_stringx_append_bytes(
+    struct RFstringx *thisstr,
+    const struct RFstring *other,
+    const unsigned int bytes
+);
+
 /**
  * @brief Appends a cstring to this string
  *
@@ -137,8 +144,10 @@ i_DECLIMEX_ bool rf_stringx_append_bytes(struct RFstringx *thisstr,
  * @return             Returns @c true in success and @c false otherwise
  * @see rf_stringx_append()
  */
-i_DECLIMEX_ bool rf_stringx_append_cstr(struct RFstringx *thisstr,
-                                        const char *cstr);
+i_DECLIMEX_ bool rf_stringx_append_cstr(
+    struct RFstringx *thisstr,
+    const char *cstr
+);
 
 //! @}
 

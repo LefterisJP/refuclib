@@ -110,22 +110,28 @@ i_DECLIMEX_ char *rf_string_cstr_from_buff_or_die(const void* s);
  * @see rf_string_to_double()
  */
 i_DECLIMEX_ bool rf_string_to_int(const struct RFstring *s, int64_t *v, size_t *off);
-i_DECLIMEX_ bool rf_string_to_uint(const struct RFstring *thisstr,
-                                   size_t start_off,
-                                   uint64_t *v,
-                                   size_t *off,
-                                   int base);
+i_DECLIMEX_ bool rf_string_to_uint(
+    const struct RFstring *thisstr,
+    size_t start_off,
+    uint64_t *v,
+    size_t *off,
+    int base
+);
 
-i_INLINE_DECL bool rf_string_to_uint_dec(const struct RFstring *thisstr,
-                                         uint64_t *v,
-                                         size_t *off)
+i_INLINE_DECL bool rf_string_to_uint_dec(
+    const struct RFstring *thisstr,
+    uint64_t *v,
+    size_t *off
+)
 {
     return rf_string_to_uint(thisstr, 0, v, off, 10);
 }
 
-i_INLINE_DECL bool rf_string_to_uint_hex(const struct RFstring *thisstr,
-                                         uint64_t *v,
-                                         size_t *off)
+i_INLINE_DECL bool rf_string_to_uint_hex(
+    const struct RFstring *thisstr,
+    uint64_t *v,
+    size_t *off
+)
 {
     const char *c = rf_string_data(thisstr);
     if (!rf_string_to_uint(thisstr, 0, v, off, 16)) {
@@ -139,9 +145,11 @@ i_INLINE_DECL bool rf_string_to_uint_hex(const struct RFstring *thisstr,
     return true;
 }
 
-i_INLINE_DECL bool rf_string_to_uint_bin(const struct RFstring *thisstr,
-                                         uint64_t *v,
-                                         size_t *off)
+i_INLINE_DECL bool rf_string_to_uint_bin(
+    const struct RFstring *thisstr,
+    uint64_t *v,
+    size_t *off
+)
 {
     char *s = rf_string_data(thisstr);
 
@@ -151,9 +159,11 @@ i_INLINE_DECL bool rf_string_to_uint_bin(const struct RFstring *thisstr,
     return rf_string_to_uint(thisstr, 0, v, off, 2);
 }
 
-i_INLINE_DECL bool rf_string_to_uint_oct(const struct RFstring *thisstr,
-                                         uint64_t *v,
-                                         size_t *off)
+i_INLINE_DECL bool rf_string_to_uint_oct(
+    const struct RFstring *thisstr,
+    uint64_t *v,
+    size_t *off
+)
 {
     const char *c = rf_string_data(thisstr);
     if (!rf_string_to_uint(thisstr, 0, v, off, 0)) {
@@ -181,9 +191,11 @@ i_INLINE_DECL bool rf_string_to_uint_oct(const struct RFstring *thisstr,
  *                    double was represented by the string
  * @see rf_string_to_int()
  */
-i_DECLIMEX_ bool rf_string_to_double(const struct RFstring *thisstr,
-                                     double *f,
-                                     size_t *off);
+i_DECLIMEX_ bool rf_string_to_double(
+    const struct RFstring *thisstr,
+    double *f,
+    size_t *off
+);
 
 /**
  * @brief Turns any uppercase characters of the string into lower case
@@ -233,10 +245,12 @@ i_DECLIMEX_ void rf_string_to_upper(struct RFstring *thisstr);
  * @return Returns @c true in success and @c false in case the the
  * separating character has not been found
  */
-i_DECLIMEX_ bool rf_string_tokenize(const struct RFstring *thisstr,
-                                    const struct RFstring *sep,
-                                    uint32_t *tokensN,
-                                    struct RFstring **tokens);
+i_DECLIMEX_ bool rf_string_tokenize(
+    const struct RFstring *thisstr,
+    const struct RFstring *sep,
+    uint32_t *tokensN,
+    struct RFstring **tokens
+);
 
 /**
  * @brief Get the string reprentation of an ordinal of a number
