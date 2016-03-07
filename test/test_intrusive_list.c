@@ -311,6 +311,29 @@ START_TEST (test_intrusive_list_nested) {
     ck_assert(!rf_ilist_pop(&list, struct babushka, e.ln));
 } END_TEST
 
+START_TEST (test_intrusive_list_at) {
+    struct RFilist_head h1;
+    struct foo_elem *f1 = foo_elem_create(1);
+    struct foo_elem *f2 = foo_elem_create(2);
+    struct foo_elem *f3 = foo_elem_create(3);
+    struct foo_elem *f4 = foo_elem_create(4);
+    rf_ilist_head_init(&h1);
+    rf_ilist_add_tail(&h1, &f1->ln);
+    rf_ilist_add_tail(&h1, &f2->ln);
+    rf_ilist_add_tail(&h1, &f3->ln);
+    rf_ilist_add_tail(&h1, &f4->ln);
+
+    ck_assert(f3 == rf_ilist_at(&h1, struct foo_elem, ln, 2));
+    ck_assert(f4 == rf_ilist_at(&h1, struct foo_elem, ln, 3));
+    ck_assert(!rf_ilist_at(&h1, struct foo_elem, ln, 8));
+
+    // free stuff
+    foo_elem_destroy(f4);
+    foo_elem_destroy(f3);
+    foo_elem_destroy(f2);
+    foo_elem_destroy(f1);
+} END_TEST
+
 Suite *intrusive_list_suite_create(void)
 {
     Suite *s = suite_create("Intrusive_List");
@@ -329,6 +352,7 @@ Suite *intrusive_list_suite_create(void)
     tcase_add_test(tc3, test_intrusive_list_has);
     tcase_add_test(tc3, test_intrusive_list_size);
     tcase_add_test(tc3, test_intrusive_list_nested);
+    tcase_add_test(tc3, test_intrusive_list_at);
 
     suite_add_tcase(s, tc1);
     suite_add_tcase(s, tc2);

@@ -806,6 +806,28 @@ i_INLINE_DECL bool rf_ilist_has(struct RFilist_head *l, const struct RFilist_nod
 }
 
 /**
+ * rf_ilist_at - a simple search in the linked list for object at an index
+ *
+ * @l: The list to search in
+ * @type: the type of the entry
+ * @member: the RFilist_node member of the type
+ * @i: The index whose object to return
+ * @return true if @n is found and false otherwise
+ */
+#define rf_ilist_at(l, type, member, i) rf_ilist_entry(i_rf_ilist_at(l, i), type, member)
+i_INLINE_DECL struct RFilist_node *i_rf_ilist_at(struct RFilist_head *l, unsigned int idx)
+{
+    struct RFilist_node *n;
+    unsigned int i = 0;
+    rf_ilist_for_each_off(l, n, 0) {
+        if (i++ == idx) {
+            return n;
+        }
+    }
+    return NULL;
+}
+
+/**
  * rf_ilist_size - Number of members in a linked list
  * @h: the RFilist_head
  *

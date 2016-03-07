@@ -79,4 +79,5 @@ i_INLINE_INS void i_rf_ilist_prepend_list(struct RFilist_head *to,
 i_INLINE_INS void *rf_ilist_node_to_off(const struct RFilist_node *node, size_t off);
 i_INLINE_INS struct RFilist_node *rf_ilist_node_from_off(void *ptr, size_t off);
 i_INLINE_INS bool rf_ilist_has(struct RFilist_head *l, const struct RFilist_node *n);
+i_INLINE_INS struct RFilist_node *i_rf_ilist_at(struct RFilist_head *l, unsigned int idx);
 i_INLINE_INS unsigned int i_rf_ilist_size(const struct RFilist_head *h, const char *errstr);
