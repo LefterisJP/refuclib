@@ -764,8 +764,8 @@ i_INLINE_DECL struct RFilist_node *rf_ilist_node_from_off(void *ptr, size_t off)
     (container_off(type, member) +                    \
      check_type(((type *)0)->member, struct RFilist_node))
 
-#define rf_ilist_off_var(var, member)           \
-    (container_off_var(var, member) +           \
+#define rf_ilist_off_var(var, member)               \
+    (container_off_var(var, member) +               \
      check_type(var->member, struct RFilist_node))
 
 /**
@@ -814,14 +814,14 @@ i_INLINE_DECL bool rf_ilist_has(struct RFilist_head *l, const struct RFilist_nod
  * @i: The index whose object to return
  * @return true if @n is found and false otherwise
  */
-#define rf_ilist_at(l, type, member, i) rf_ilist_entry(i_rf_ilist_at(l, i), type, member)
-i_INLINE_DECL struct RFilist_node *i_rf_ilist_at(struct RFilist_head *l, unsigned int idx)
+#define rf_ilist_at(l, type, member, i) ((type*)(i_rf_ilist_at(l, rf_ilist_off(type, member), i)))
+i_INLINE_DECL void *i_rf_ilist_at(struct RFilist_head *l, size_t off, unsigned int idx)
 {
     struct RFilist_node *n;
     unsigned int i = 0;
     rf_ilist_for_each_off(l, n, 0) {
         if (i++ == idx) {
-            return n;
+            return rf_ilist_node_to_off(n, off);
         }
     }
     return NULL;
