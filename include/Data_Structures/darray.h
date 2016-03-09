@@ -231,6 +231,12 @@ typedef darray(unsigned long)  darray_ulong;
         (i_dst_).alloc = (i_src_).alloc;        \
     } while(0)
 
+#define darray_raw_copy(i_dst_, i_src_, i_size_)    \
+    do {                                            \
+        (i_dst_).item = i_src_;                     \
+        (i_dst_).size = i_size_;                    \
+        (i_dst_).alloc = i_size_;                   \
+    } while (0)
 
 /*** Removal ***/
 

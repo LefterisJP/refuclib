@@ -29,7 +29,6 @@ static void foo_destroy(struct foo *f)
 
 struct foo_arr {darray(struct foo*);};
 
-
 struct foo expectarr[] = {
     {.x = 42,  .y = 3.14},
     {.x = 55,  .y = 0.21},
@@ -131,6 +130,21 @@ START_TEST (test_darray_shallow_copy) {
     free(b2);
 } END_TEST
 
+struct foo_arr_np {darray(struct foo);};
+
+START_TEST (test_darray_raw_copy) {
+    struct foo_arr_np arr1;
+    darray_raw_copy(arr1, expectarr, sizeof(expectarr) / sizeof(struct foo));
+
+    struct foo *itf;
+    unsigned int i = 0;
+    darray_foreach(itf, arr1) {
+        ck_assert_int_eq(itf->x, expectarr[i].x);
+        ck_assert(itf->y == expectarr[i].y);
+        ++i;
+    }
+} END_TEST
+
 
 Suite *datastructs_darray_suite_create(void)
 {
@@ -145,6 +159,7 @@ Suite *datastructs_darray_suite_create(void)
 
     TCase *tc3 = tcase_create("darray_copy");
     tcase_add_test(tc3, test_darray_shallow_copy);
+    tcase_add_test(tc3, test_darray_raw_copy);
 
     suite_add_tcase(s, tc1);
     suite_add_tcase(s, tc2);
