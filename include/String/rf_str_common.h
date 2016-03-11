@@ -27,6 +27,9 @@ extern "C" {
 #define RF_STR_PF_FMT "%.*s"
 #define RF_STR_PF_ARG(i_str_) \
     rf_string_length_bytes(i_str_), rf_string_data(i_str_)
+//! For printfs, evaluate val_ as bool and output string representation
+#define FMT_BOOL(val_) (val_) ? "true" : "false"
+
 #if 0 /* TODO: Using this I get address always evaluates to true in some cases,
          think how we can get rid of that warning */
 
