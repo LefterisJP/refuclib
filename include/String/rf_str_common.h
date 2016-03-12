@@ -24,8 +24,10 @@
 extern "C" {
 #endif
 
-#define RF_STR_PF_FMT "%.*s"
-#define RF_STR_PF_ARG(i_str_) \
+//! Printf format specifier for RFString
+#define RFS_PF "%.*s"
+//! Printf argument macro for RFstring, to be used in conjuction with the 'PF'
+#define RFS_PA(i_str_)                                      \
     rf_string_length_bytes(i_str_), rf_string_data(i_str_)
 //! For printfs, evaluate val_ as bool and output string representation
 #define FMT_BOOL(val_) (val_) ? "true" : "false"
@@ -34,11 +36,11 @@ extern "C" {
          think how we can get rid of that warning */
 
 #if RF_OPTION_DEBUG
-#define RF_STR_PF_ARG(i_str_)                      \
+#define RFS_PA(i_str_)                             \
     (i_str_) ? rf_string_length_bytes(i_str_) : 0, \
         (i_str_) ? rf_string_data(i_str_) : ""
 #else
-#define RF_STR_PF_ARG(i_str_) \
+#define RFS_PA(i_str_)                                      \
     rf_string_length_bytes(i_str_), rf_string_data(i_str_)
 #endif
 #endif

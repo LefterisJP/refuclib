@@ -42,8 +42,8 @@ START_TEST (test_RFS_same_ptr) {
     RFS_PUSH();
     s1 = RFS("abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
     ck_assert_rf_str_eq_cstr(s1, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
-    s1 = RFS(RF_STR_PF_FMT "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ",
-             RF_STR_PF_ARG(s1));
+    s1 = RFS(RFS_PF "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ",
+             RFS_PA(s1));
     ck_assert_rf_str_eq_cstr(s1,
         "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
         "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ");
@@ -225,8 +225,8 @@ static struct RFstring *get_str_rec(struct RFstring *s, int num, bool first)
     if (first) {
         s = RFS("%dabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz", num);
     } else {
-        s = RFS(RF_STR_PF_FMT "%dabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz",
-                RF_STR_PF_ARG(s), num);
+        s = RFS(RFS_PF "%dabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz",
+                RFS_PA(s), num);
     }
     if (num > 0) {
         s = get_str_rec(s, num - 1, false);
@@ -245,13 +245,13 @@ static struct RFstring *get_str_rec_with_local(struct RFstring *ret, int num)
     struct RFstring *s;
     s = RFS("pre%d", num);
     if (num == 0) {
-        ret = RFS(RF_STR_PF_FMT"abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz",
-                  RF_STR_PF_ARG(s));
+        ret = RFS(RFS_PF"abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz",
+                  RFS_PA(s));
     } else {
-        ret = RFS(RF_STR_PF_FMT
-                  RF_STR_PF_FMT
+        ret = RFS(RFS_PF
+                  RFS_PF
                   "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz",
-                  RF_STR_PF_ARG(ret), RF_STR_PF_ARG(s));
+                  RFS_PA(ret), RFS_PA(s));
     }
 
     return ret;

@@ -218,7 +218,7 @@ START_TEST(test_string_assignv) {
 
     // see if reallocation happens correctly
     ck_assert(rf_string_assignv(&s2, "number: %d and string: \""
-                                RF_STR_PF_FMT"\"", 1337, RF_STR_PF_ARG(&big)));
+                                RFS_PF"\"", 1337, RFS_PA(&big)));
     ck_assert_rf_str_eq_cstr(&s2, "number: 1337 and string: \"this is a big "
                              "string, oder?\"");
     rf_string_deinit(&s);
@@ -751,8 +751,8 @@ START_TEST(test_stringx_assignv) {
     // test assigning to a moved string
     ck_assert(rf_stringx_init(&s2, "Moved rf_stringx assignment"));
     rf_stringx_move_forward(&s2, 6);
-    ck_assert(rf_stringx_assignv(&s2, "number: %u str: \""RF_STR_PF_FMT"\"",
-                                 42, RF_STR_PF_ARG(&ss)));
+    ck_assert(rf_stringx_assignv(&s2, "number: %u str: \""RFS_PF"\"",
+                                 42, RFS_PA(&ss)));
     ck_assert_rf_str_eq_cstr(&s2, "number: 42 str: \"other\"");
     rf_stringx_reset(&s2);
     ck_assert_rf_str_eq_cstr(&s2, "Moved number: 42 str: \"other\"");

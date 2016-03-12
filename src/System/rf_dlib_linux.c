@@ -21,18 +21,19 @@ struct rf_dlib *rf_dlib_create(const struct RFstring *path, const struct RFstrin
     RFS_PUSH();
     struct RFstring *tmpname;
     if (path) {
-        tmpname = RFS(RF_STR_PF_FMT "/" RF_STR_PF_FMT".so",
-                      RF_STR_PF_ARG(path),
-                      RF_STR_PF_ARG(name));
+        tmpname = RFS(RFS_PF "/" RFS_PF".so", RFS_PA(path), RFS_PA(name));
     } else {
-        tmpname = RFS(RF_STR_PF_FMT".so", RF_STR_PF_ARG(name));
+        tmpname = RFS(RFS_PF".so", RFS_PA(name));
     }
     ret->hndl = dlopen(rf_string_cstr_from_buff_or_die(tmpname), RTLD_LAZY);
     RFS_POP();
 
     if (!ret->hndl) {
-        RF_ERROR("Failed to open dynamic library \""RF_STR_PF_FMT"\".\n%s",
-                 RF_STR_PF_ARG(name), dlerror());
+        RF_ERROR(
+            "Failed to open dynamic library \""RFS_PF"\".\n%s",
+            RFS_PA(name),
+            dlerror()
+        );
         rf_string_deinit(&ret->name);
         free(ret);
         ret = NULL;
@@ -44,8 +45,8 @@ bool rf_dlib_destroy(struct rf_dlib *dl)
 {
     bool ret = true;
     if (0 != dlclose(dl->hndl)) {
-        RF_ERROR("dlclose() failed on library "RF_STR_PF_FMT".\n%s",
-                 RF_STR_PF_ARG(&dl->name), dlerror());
+        RF_ERROR("dlclose() failed on library "RFS_PF".\n%s",
+                 RFS_PA(&dl->name), dlerror());
         ret = false;
     }
     rf_string_deinit(&dl->name);
@@ -63,15 +64,15 @@ void *rf_dlib_symbol(struct rf_dlib *dl, const struct RFstring *name)
     if (!sym) {
         char *err = dlerror();
         if (!err) {
-            RF_ERROR("No symbol named \""RF_STR_PF_FMT"\" could be found in "
-                     "library "RF_STR_PF_FMT".",
-                     RF_STR_PF_ARG(name),
-                     RF_STR_PF_ARG(&dl->name));
+            RF_ERROR("No symbol named \""RFS_PF"\" could be found in "
+                     "library "RFS_PF".",
+                     RFS_PA(name),
+                     RFS_PA(&dl->name));
         } else {
-            RF_ERROR("Failed to to load symbol \""RF_STR_PF_FMT"\" from library "
-                     RF_STR_PF_FMT".\n%s",
-                     RF_STR_PF_ARG(name),
-                     RF_STR_PF_ARG(&dl->name),
+            RF_ERROR("Failed to to load symbol \""RFS_PF"\" from library "
+                     RFS_PF".\n%s",
+                     RFS_PA(name),
+                     RFS_PA(&dl->name),
                      err);
         }
     }

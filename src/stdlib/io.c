@@ -23,6 +23,6 @@ void rf_stdlib_print_double(double n)
 
 void rf_stdlib_print_string(const struct RFstring *s)
 {
-    printf(RF_STR_PF_FMT, RF_STR_PF_ARG(s));
+    printf(RFS_PF, RFS_PA(s));
     fflush(stdout);
 }

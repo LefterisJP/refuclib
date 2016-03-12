@@ -84,9 +84,11 @@ bool rf_system_remove_dir(void *dirname)
         //skip this and the parent dir
         if (strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..")) {
             RFS_PUSH();
-            struct RFstring *full_entry_name = RFS(RF_STR_PF_FMT RF_DIRSEP "%s",
-                                                   RF_STR_PF_ARG(dirname),
-                                                   entry->d_name);
+            struct RFstring *full_entry_name = RFS(
+                RFS_PF RF_DIRSEP "%s",
+                RFS_PA(dirname),
+                entry->d_name
+            );
             if (!full_entry_name || !rf_stringx_assign(&path, full_entry_name)) {
                 RF_ERROR("Failure at assigning the directory name to the "
                          "path string");
@@ -99,9 +101,11 @@ bool rf_system_remove_dir(void *dirname)
             //if this directory entry is a directory itself, call the function recursively
             if (entry->d_type == DT_DIR) {
                 if (!rf_system_remove_dir(&path)) {
-                    RF_ERROR("Calling rf_system_remove_dir on directory "
-                             "\""RF_STR_PF_FMT"\" failed",
-                             RF_STR_PF_ARG(&path));
+                    RF_ERROR(
+                        "Calling rf_system_remove_dir on directory "
+                        "\""RFS_PF"\" failed",
+                        RFS_PA(&path)
+                    );
                     ret = false;
                     goto cleanup_path;
                 }
@@ -111,9 +115,11 @@ bool rf_system_remove_dir(void *dirname)
 
             //if we get here this means it's a file that needs deletion
             if (!rf_system_delete_file(&path)) {
-                RF_ERROR("Failed to remove file \""RF_STR_PF_FMT"\""
-                         " due to unlink() "
-                         "errno %d", RF_STR_PF_ARG(&path), errno);
+                RF_ERROR(
+                    "Failed to remove file \""RFS_PF"\" due to unlink errno %d",
+                    RFS_PA(&path),
+                    errno
+                );
                 ret = false;
                 goto cleanup_path;
             }//end of check of succesful file removal
@@ -135,9 +141,11 @@ bool rf_system_remove_dir(void *dirname)
     }
     //finally delete the directory itself
     if (!rf_system_remove_dir(dirname)) {
-        RF_ERROR("Failed to remove directory \""RF_STR_PF_FMT"\" "
-                 "due to rmdir() errno %d",
-                 RF_STR_PF_ARG(dirname), errno);
+        RF_ERROR(
+            "Failed to remove directory \""RFS_PF"\" due to rmdir() errno %d",
+            RFS_PA(dirname),
+            errno
+        );
         ret = false;
     }
 
@@ -174,9 +182,11 @@ bool rf_system_delete_file(const void *name)
 
     //if we get here this means it's a file that needs deletion
     if (unlink(cstr) != 0) {
-        RF_ERROR("Removing file \""RF_STR_PF_FMT"\" failed due"
-                 " to unlink() errno %d",
-                 RF_STR_PF_ARG(name), errno);
+        RF_ERROR(
+            "Removing file \""RFS_PF"\" failed due to unlink() errno %d",
+            RFS_PA(name),
+            errno
+        );
         goto end_pop;
     }//end of check of succesful file removal
     ret = true;
@@ -203,10 +213,13 @@ bool rf_system_rename_file(void *name, void *new_name)
     }
 
     if (rename(cs_name, cs_new_name) != 0) {
-        RF_ERROR("Renaming file \""RF_STR_PF_FMT"\" to "
-                 "\""RF_STR_PF_FMT"\" failed due to rename() "
-                 "errno %d", RF_STR_PF_ARG(name), RF_STR_PF_ARG(new_name),
-                 errno);
+        RF_ERROR(
+            "Renaming file \""RFS_PF"\" to \""RFS_PF"\" failed due to rename()"
+            " errno %d",
+            RFS_PA(name),
+            RFS_PA(new_name),
+            errno
+        );
         goto end_pop;
     }//end of check for succesful renaming
     ret = true;
