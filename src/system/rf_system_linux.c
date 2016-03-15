@@ -4,10 +4,10 @@
  */
 #include <rflib/system/rf_system.h>
 
-#include <rflib/string/rf_str_xdecl.h>
-#include <rflib/string/rf_str_common.h>
-#include <rflib/string/rf_str_corex.h>
-#include <rflib/string/rf_str_retrieval.h>
+#include <rflib/string/xdecl.h>
+#include <rflib/string/common.h>
+#include <rflib/string/corex.h>
+#include <rflib/string/retrieval.h>
 #include <rflib/utils/log.h>
 #include <rflib/utils/memory.h>
 #include <rflib/io/rf_file.h>

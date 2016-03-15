@@ -12,7 +12,7 @@
 #include <stdlib.h>
 
 #include <rflib/utils/build_assert.h>
-#include <rflib/string/rf_str_retrieval.h>
+#include <rflib/string/retrieval.h>
 
 
 /* Taken mostly from: lookup3.c, by Bob Jenkins, May 2006, Public Domain.

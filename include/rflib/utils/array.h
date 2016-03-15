@@ -8,7 +8,7 @@
 #include <rflib/defs/retcodes.h>
 #include <rflib/defs/inline.h>
 #include <rflib/utils/memory.h>
-#include <rflib/string/rf_str_common.h>
+#include <rflib/string/common.h>
 
 #include <string.h>
 #include <stdio.h>

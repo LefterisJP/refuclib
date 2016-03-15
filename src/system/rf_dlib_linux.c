@@ -1,6 +1,6 @@
 #include <rflib/system/rf_dlib.h>
-#include <rflib/string/rf_str_core.h>
-#include <rflib/string/rf_str_conversion.h>
+#include <rflib/string/core.h>
+#include <rflib/string/conversion.h>
 #include <rflib/utils/memory.h>
 
 #include <dlfcn.h>

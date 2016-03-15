@@ -12,9 +12,9 @@
 #include <rflib/defs/inline.h>
 #include <rflib/defs/retcodes.h>
 #include <rflib/utils/endianess.h>
-#include <rflib/string/rf_str_decl.h>
-#include <rflib/string/rf_str_common.h>
-#include <rflib/string/rf_str_conversion.h>
+#include <rflib/string/decl.h>
+#include <rflib/string/common.h>
+#include <rflib/string/conversion.h>
 
 #ifdef _MSC_VER
 #error TODO

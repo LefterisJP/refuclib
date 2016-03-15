@@ -2,7 +2,7 @@
  * @author: Lefteris Karapetsas
  * @licence: BSD3 (Check repository root for details)
  */
-#include <rflib/string/rf_str_common.h>
+#include <rflib/string/common.h>
 
 #include <rflib/utils/sanity.h>
 #include <rflib/utils/log.h>

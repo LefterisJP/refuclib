@@ -3,13 +3,13 @@
  * @licence: BSD3 (Check repository root for details)
  */
 
-#include <rflib/string/rf_str_filesx.h>
+#include <rflib/string/filesx.h>
 
-#include <rflib/string/rf_str_common.h>
-#include <rflib/string/rf_str_manipulationx.h>
-#include <rflib/string/rf_str_traversalx.h>
+#include <rflib/string/common.h>
+#include <rflib/string/manipulationx.h>
+#include <rflib/string/traversalx.h>
 #include "rf_str_files.ph"
-#include <rflib/string/rf_str_files.h>
+#include <rflib/string/files.h>
 #include <rflib/io/rf_file.h>
 #include "rf_str_manipulation.ph"
 

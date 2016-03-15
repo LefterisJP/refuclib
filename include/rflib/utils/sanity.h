@@ -10,7 +10,7 @@
 
 #include <rf_options.h>
 #include <rflib/utils/log.h>
-#include <rflib/string/rf_str_common.h>
+#include <rflib/string/common.h>
 
 #include <assert.h>
 #include <stdlib.h>

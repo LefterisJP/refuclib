@@ -2,12 +2,11 @@
  * @author: Lefteris Karapetsas
  * @licence: BSD3 (Check repository root for details)
  */
-
 #include <rflib/utils/log.h>
 
-#include <rflib/string/rf_str_core.h>
-#include <rflib/string/rf_str_retrieval.h>
-#include <rflib/string/rf_str_conversion.h>
+#include <rflib/string/core.h>
+#include <rflib/string/retrieval.h>
+#include <rflib/string/conversion.h>
 #include <rflib/parallel/rf_threading.h>
 #include <rflib/utils/sanity.h>
 #include <rflib/utils/memory.h>

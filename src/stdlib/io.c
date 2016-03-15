@@ -1,6 +1,6 @@
 #include <rflib/RFstdlib.h>
 
-#include <rflib/string/rf_str_common.h>
+#include <rflib/string/common.h>
 #include <stdio.h>
 
 void rf_stdlib_print_int64(int64_t n)

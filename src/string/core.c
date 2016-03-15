@@ -3,7 +3,7 @@
  * @licence: BSD3 (Check repository root for details)
  */
 
-#include <rflib/string/rf_str_core.h>
+#include <rflib/string/core.h>
 
 #include "rf_str_common.ph"
 #include "rf_str_defines.ph"

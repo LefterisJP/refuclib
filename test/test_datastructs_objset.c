@@ -6,7 +6,7 @@
 #include "test_helpers.h"
 #include "utilities_for_testing.h"
 
-#include <rflib/string/rf_str_core.h>
+#include <rflib/string/core.h>
 #include <rflib/datastructs/objset.h>
 
 static const int test_int_arr[] = { 0, 1, 2, 3, 4, 5 };

@@ -7,11 +7,11 @@
 #include "utilities_for_testing.h"
 
 #include <rflib/refu.h>
-#include <rflib/string/rf_str_manipulation.h>
-#include <rflib/string/rf_str_manipulationx.h>
-#include <rflib/string/rf_str_traversalx.h>
-#include <rflib/string/rf_str_core.h>
-#include <rflib/string/rf_str_corex.h>
+#include <rflib/string/manipulation.h>
+#include <rflib/string/manipulationx.h>
+#include <rflib/string/traversalx.h>
+#include <rflib/string/core.h>
+#include <rflib/string/corex.h>
 
 /* --- String Appending Tests --- START --- */
 START_TEST(test_string_append) {

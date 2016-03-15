@@ -1,5 +1,5 @@
 #include <rflib/string/regex.h>
-#include <rflib/string/rf_str_core.h>
+#include <rflib/string/core.h>
 #include <rflib/utils/sanity.h>
 #include <rflib/utils/memory.h>
 

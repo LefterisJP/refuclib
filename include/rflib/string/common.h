@@ -5,8 +5,8 @@
 #ifndef RF_STRING_COMMON_H
 #define RF_STRING_COMMON_H
 
-#include <rflib/string/rf_str_xdecl.h>
-#include <rflib/string/rf_str_retrieval.h>
+#include <rflib/string/xdecl.h>
+#include <rflib/string/retrieval.h>
 
 #include <rflib/defs/defarg.h>
 #include <rflib/defs/imex.h>

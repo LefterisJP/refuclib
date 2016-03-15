@@ -11,10 +11,10 @@
 #include <rflib/utils/fixed_memory_pool.h>
 #include <rflib/system/rf_system.h>
 
-#include <rflib/string/rf_str_common.h>
-#include <rflib/string/rf_str_core.h>
-#include <rflib/string/rf_str_corex.h>
-#include <rflib/string/rf_str_retrieval.h>
+#include <rflib/string/common.h>
+#include <rflib/string/core.h>
+#include <rflib/string/corex.h>
+#include <rflib/string/retrieval.h>
 #include <rflib/io/rf_textfile.h>
 
 struct foo {

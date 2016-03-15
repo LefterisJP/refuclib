@@ -7,9 +7,9 @@
 #include "utilities_for_testing.h"
 
 #include <rflib/refu.h>
-#include <rflib/string/rf_str_traversalx.h>
-#include <rflib/string/rf_str_core.h>
-#include <rflib/string/rf_str_corex.h>
+#include <rflib/string/traversalx.h>
+#include <rflib/string/core.h>
+#include <rflib/string/corex.h>
 
 /* --- Stringx Traversal Tests --- START --- */
 

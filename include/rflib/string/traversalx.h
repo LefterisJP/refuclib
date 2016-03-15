@@ -5,8 +5,8 @@
 #ifndef RF_STRING_TRAVERSALX_H
 #define RF_STRING_TRAVERSALX_H
 
-#include <rflib/string/rf_str_xdecl.h>
-#include <rflib/string/rf_str_flags.h>
+#include <rflib/string/xdecl.h>
+#include <rflib/string/flags.h>
 
 #include <rflib/defs/imex.h>
 #include <rflib/defs/types.h>

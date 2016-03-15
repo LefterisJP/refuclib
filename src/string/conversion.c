@@ -3,10 +3,10 @@
  * @licence: BSD3 (Check repository root for details)
  */
 
-#include <rflib/string/rf_str_conversion.h>
+#include <rflib/string/conversion.h>
 
-#include <rflib/string/rf_str_retrieval.h>
-#include <rflib/string/rf_str_common.h>
+#include <rflib/string/retrieval.h>
+#include <rflib/string/common.h>
 #include "rf_str_common.ph"
 #include "rf_str_defines.ph"
 

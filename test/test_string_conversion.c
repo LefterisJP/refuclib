@@ -7,9 +7,9 @@
 #include "utilities_for_testing.h"
 
 #include <rflib/refu.h>
-#include <rflib/string/rf_str_conversion.h>
-#include <rflib/string/rf_str_core.h>
-#include <rflib/string/rf_str_corex.h>
+#include <rflib/string/conversion.h>
+#include <rflib/string/core.h>
+#include <rflib/string/corex.h>
 
 /* --- String Encoding Tests --- START --- */
 

@@ -3,7 +3,7 @@
 #define RF_UNIT_TESTS_HELPERS
 
 #include <rflib/utils/constcmp.h>
-#include <rflib/string/rf_str_common.h>
+#include <rflib/string/common.h>
 #include <string.h>
 
 /* non null terminated cstring related macros */

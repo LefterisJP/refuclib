@@ -3,8 +3,8 @@
 #ifndef RF_STRING_MANIPULATION_PH
 #define RF_STRING_MANIPULATION_PH
 
-#include <rflib/string/rf_str_corex.h>
-#include <rflib/string/rf_str_flags.h>
+#include <rflib/string/corex.h>
+#include <rflib/string/flags.h>
 #include "rf_str_common.ph"
 
 #include <rflib/defs/inline.h>

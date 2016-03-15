@@ -12,8 +12,8 @@
 #include <rflib/defs/types.h>
 #include <rflib/defs/defarg.h>
 
-#include <rflib/string/rf_str_decl.h>
-#include <rflib/string/rf_str_common.h>
+#include <rflib/string/decl.h>
+#include <rflib/string/common.h>
 
 #include <rflib/persistent/buffers.h>
 

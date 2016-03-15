@@ -9,7 +9,7 @@
 
 #include <rflib/defs/types.h>
 #include <rflib/defs/retcodes.h>
-#include <rflib/string/rf_str_decl.h>
+#include <rflib/string/decl.h>
 #include <rflib/utils/rf_unicode.h>
 #include <rflib/utils/endianess.h>
 

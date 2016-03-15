@@ -6,8 +6,8 @@
 #include <rflib/defs/types.h>
 #include "rf_str_common.ph"
 
-#include <rflib/string/rf_str_decl.h>
-#include <rflib/string/rf_str_flags.h>
+#include <rflib/string/decl.h>
+#include <rflib/string/flags.h>
 
 #include <rflib/utils/bits.h>
 #include <rflib/utils/sanity.h>

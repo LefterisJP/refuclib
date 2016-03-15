@@ -5,8 +5,8 @@
 #ifndef RF_STRING_MANIPULATION_H
 #define RF_STRING_MANIPULATION_H
 
-#include <rflib/string/rf_str_decl.h>
-#include <rflib/string/rf_str_flags.h>
+#include <rflib/string/decl.h>
+#include <rflib/string/flags.h>
 
 #include <rflib/defs/imex.h>
 #include <rflib/defs/types.h>

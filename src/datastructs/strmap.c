@@ -1,8 +1,8 @@
 #include <rflib/datastructs/strmap.h>
 
 #include <rflib/utils/log.h>
-#include <rflib/string/rf_str_retrieval.h>
-#include <rflib/string/rf_str_core.h>
+#include <rflib/string/retrieval.h>
+#include <rflib/string/core.h>
 #include <rflib/math/ilog.h>
 
 #include <assert.h>

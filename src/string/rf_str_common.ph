@@ -30,8 +30,8 @@
 #ifndef RF_STRING_COMMON_PH
 #define RF_STRING_COMMON_PH
 
-#include <rflib/string/rf_str_retrieval.h>
-#include <rflib/string/rf_str_core.h>     
+#include <rflib/string/retrieval.h>
+#include <rflib/string/core.h>     
 
 #include <rflib/defs/retcodes.h>
 #include <rflib/defs/inline.h>

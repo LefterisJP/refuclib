@@ -5,7 +5,7 @@
 
 #include "test_helpers.h"
 #include "utilities_for_testing.h"
-#include <rflib/string/rf_str_core.h>
+#include <rflib/string/core.h>
 #include <rflib/datastructs/htable.h>
 #include <rflib/utils/hash.h>
 

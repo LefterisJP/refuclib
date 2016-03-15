@@ -2,11 +2,11 @@
  * @author: Lefteris Karapetsas
  * @licence: BSD3 (Check repository root for details)
  */
-#include <rflib/string/rf_str_files.h>
+#include <rflib/string/files.h>
 
-#include <rflib/string/rf_str_conversion.h>
-#include <rflib/string/rf_str_manipulation.h>
-#include <rflib/string/rf_str_common.h>
+#include <rflib/string/conversion.h>
+#include <rflib/string/manipulation.h>
+#include <rflib/string/common.h>
 #include "rf_str_files.ph"
 #include "rf_str_common.ph"
 

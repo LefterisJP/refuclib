@@ -6,7 +6,7 @@
 #define RF_STRING_REGEX_H
 
 #include <rflib/datastructs/darray.h>
-#include <rflib/string/rf_str_decl.h>
+#include <rflib/string/decl.h>
 #include <stdbool.h>
 
 struct RFre;

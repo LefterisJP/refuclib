@@ -11,7 +11,7 @@
 #include <rflib/defs/imex.h>
 #include <rflib/defs/defarg.h>
 #include <rflib/defs/retcodes.h>
-#include <rflib/string/rf_str_xdecl.h>
+#include <rflib/string/xdecl.h>
 #include <rflib/utils/array.h>
 
 #include <stdio.h>

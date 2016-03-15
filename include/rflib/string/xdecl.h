@@ -5,7 +5,7 @@
 #ifndef RF_STRINGX_DECL_H
 #define RF_STRINGX_DECL_H
 
-#include <rflib/string/rf_str_decl.h>
+#include <rflib/string/decl.h>
 
 /**
  * @internal

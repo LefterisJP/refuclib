@@ -6,14 +6,14 @@
 #include <rflib/io/rf_file.h>
 #include "rf_textfile.ph"
 
-#include <rflib/string/rf_str_core.h>
-#include <rflib/string/rf_str_corex.h>
-#include <rflib/string/rf_str_retrieval.h>
-#include <rflib/string/rf_str_manipulation.h>
-#include <rflib/string/rf_str_filesx.h>
-#include <rflib/string/rf_str_files.h>
-#include <rflib/string/rf_str_traversalx.h>
-#include <rflib/string/rf_str_manipulationx.h>
+#include <rflib/string/core.h>
+#include <rflib/string/corex.h>
+#include <rflib/string/retrieval.h>
+#include <rflib/string/manipulation.h>
+#include <rflib/string/filesx.h>
+#include <rflib/string/files.h>
+#include <rflib/string/traversalx.h>
+#include <rflib/string/manipulationx.h>
 #include <rflib//utils/rf_unicode.h>
 
 #include <rflib//utils/endianess.h>
