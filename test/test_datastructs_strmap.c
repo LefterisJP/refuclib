@@ -5,8 +5,8 @@
 
 #include "test_helpers.h"
 #include "utilities_for_testing.h"
-#include <String/rf_str_core.h>
-#include <Data_Structures/strmap.h>
+#include <rflib/string/rf_str_core.h>
+#include <rflib/datastructs/strmap.h>
 
 struct object {
     unsigned int val;

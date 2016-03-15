@@ -1,6 +1,6 @@
 /*(C) Timothy B. Terriberry (tterribe@xiph.org) 2001-2009 CC0 (Public domain).
  * See LICENSE file for details. */
-#include <math/ilog.h>
+#include <rflib/math/ilog.h>
 #include <limits.h>
 
 /*The fastest fallback strategy for platforms with fast multiplication appears

@@ -2,20 +2,18 @@
  * @author: Lefteris Karapetsas
  * @licence: BSD3 (Check repository root for details)
  */
-/*------------- Corrensponding Header inclusion -------------*/
-#include <refu.h>
-/*------------- Outside Module inclusion -------------*/
-#include <Utils/log.h> // logging system
-#include <System/rf_system.h> // for rf_system_activate()
-#include "Persistent/buffers.h" // persistent buffers initialization
-/*------------- Modules activation/deactivation -------------*/
-#include "String/rf_str_mod.ph"
-/*------------- libc includes -------------*/
-#include <string.h> //for strcmp
-#include <stdlib.h> //for exit() and at_exit()
+#include <rflib/refu.h>
+
+#include <rflib/utils/log.h>
+#include <rflib/system/rf_system.h>
+#include <rflib/persistent/buffers.h>
+
+#include "string/rf_str_mod.ph"
+
+#include <string.h>
+#include <stdlib.h>
 #include <time.h>
 #include <signal.h>
-/*------------- End of includes -------------*/
 
 void rf_termination_handler(int sig);
 

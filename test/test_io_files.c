@@ -7,16 +7,14 @@
 #include "test_io_helpers.h"
 #include "utilities_for_testing.h"
 
-
-#include <refu.h>
-#include <String/rf_str_files.h>
-#include <String/rf_str_filesx.h>
-#include <String/rf_str_core.h>
-#include <String/rf_str_corex.h>
-#include <String/rf_str_manipulation.h>
-#include <System/rf_system.h>
-#include <IO/rf_file.h>
-
+#include <rflib/refu.h>
+#include <rflib/string/rf_str_files.h>
+#include <rflib/string/rf_str_filesx.h>
+#include <rflib/string/rf_str_core.h>
+#include <rflib/string/rf_str_corex.h>
+#include <rflib/string/rf_str_manipulation.h>
+#include <rflib/system/rf_system.h>
+#include <rflib/io/rf_file.h>
 
 static const uint32_t line_scenario4_bytes[] = {18, 12, 12, 24, 20};
 /* each line is encoded in its own encoding */

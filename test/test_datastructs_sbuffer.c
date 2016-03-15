@@ -6,7 +6,7 @@
 #include "test_helpers.h"
 #include "utilities_for_testing.h"
 
-#include <Data_Structures/sbuffer.h>
+#include <rflib/datastructs/sbuffer.h>
 
 struct foo {
     uint64_t x;

@@ -6,13 +6,12 @@
 #include "test_helpers.h"
 #include "utilities_for_testing.h"
 
+#include <rflib/refu.h>
+#include <rflib/string/rf_str_conversion.h>
+#include <rflib/string/rf_str_core.h>
+#include <rflib/string/rf_str_corex.h>
 
-#include <refu.h>
-#include <String/rf_str_conversion.h>
-#include <String/rf_str_core.h>
-#include <String/rf_str_corex.h>
-
-#include <Utils/array.h>
+#include <rflib/utils/array.h>
 
 /* --- String Acessors Tests --- START --- */
 START_TEST(test_string_length) {

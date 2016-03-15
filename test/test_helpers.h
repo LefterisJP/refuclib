@@ -2,8 +2,8 @@
 #ifndef RF_UNIT_TESTS_HELPERS
 #define RF_UNIT_TESTS_HELPERS
 
-#include <Utils/constcmp.h>
-#include <String/rf_str_common.h>
+#include <rflib/utils/constcmp.h>
+#include <rflib/string/rf_str_common.h>
 #include <string.h>
 
 /* non null terminated cstring related macros */

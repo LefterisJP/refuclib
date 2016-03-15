@@ -6,16 +6,15 @@
 #include "test_helpers.h"
 #include "utilities_for_testing.h"
 
+#include <rflib/refu.h>
+#include <rflib/utils/log.h>
+#include <rflib/system/rf_system.h>
 
-#include <refu.h>
-#include <Utils/log.h>
-#include <System/rf_system.h>
-
-#include <String/rf_str_common.h>
-#include <String/rf_str_core.h>
-#include <String/rf_str_corex.h>
-#include <String/rf_str_retrieval.h>
-#include <IO/rf_textfile.h>
+#include <rflib/string/rf_str_common.h>
+#include <rflib/string/rf_str_core.h>
+#include <rflib/string/rf_str_corex.h>
+#include <rflib/string/rf_str_retrieval.h>
+#include <rflib/io/rf_textfile.h>
 
 void setup_log_tests()
 {

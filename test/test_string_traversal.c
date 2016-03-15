@@ -6,12 +6,10 @@
 #include "test_helpers.h"
 #include "utilities_for_testing.h"
 
-
-#include <refu.h>
-#include <String/rf_str_traversalx.h>
-#include <String/rf_str_core.h>
-#include <String/rf_str_corex.h>
-
+#include <rflib/refu.h>
+#include <rflib/string/rf_str_traversalx.h>
+#include <rflib/string/rf_str_core.h>
+#include <rflib/string/rf_str_corex.h>
 
 /* --- Stringx Traversal Tests --- START --- */
 

@@ -6,8 +6,8 @@
 #include "test_helpers.h"
 #include "utilities_for_testing.h"
 
-#include <refu.h>
-#include <Utils/rf_unicode.h>
+#include <rflib/refu.h>
+#include <rflib/utils/rf_unicode.h>
 
 /* --- UTF8 encoding Tests --- START --- */
 START_TEST(test_utf8_encode) {

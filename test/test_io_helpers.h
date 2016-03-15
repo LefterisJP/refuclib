@@ -1,9 +1,8 @@
 #ifndef TEST_IO_HELPERS_H
 #define TEST_IO_HELPERS_H
 
-/* #include <IO/rf_file.h> */
-#include <Utils/rf_unicode.h>
-#include <Utils/endianess.h>
+#include <rflib/utils/rf_unicode.h>
+#include <rflib/utils/endianess.h>
 
 #define FIRST_LINE_UTF8 "UTF-8 File"
 

@@ -6,8 +6,8 @@
 #include "test_helpers.h"
 #include "utilities_for_testing.h"
 
-#include <String/rf_str_core.h>
-#include <String/regex.h>
+#include <rflib/string/rf_str_core.h>
+#include <rflib/string/regex.h>
 
 START_TEST(test_re_match_single1) {
     struct RFstring pattern = RF_STRING_STATIC_INIT("[a-z]+");
@@ -40,7 +40,6 @@ START_TEST(test_re_match_single2) {
     rfre_match_deinit(&mdata);
     rfre_destroy(re);
 } END_TEST
-
 
 
 Suite *regex_suite_create(void)

@@ -6,8 +6,8 @@
 #include "test_helpers.h"
 #include "utilities_for_testing.h"
 
-#include <refu.h>
-#include <Data_Structures/intrusive_list.h>
+#include <rflib/refu.h>
+#include <rflib/datastructs/intrusive_list.h>
 
 struct foo_elem {
     struct RFilist_node ln;

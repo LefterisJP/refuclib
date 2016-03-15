@@ -12,57 +12,57 @@ set_debug_mode(local_env, True)
 
 unit_test_files = []
 orig_sources = [
-    'Data_Structures/binaryarray.c',
-    'Data_Structures/sbuffer.c',
-    'Data_Structures/objset.c',
-    'Data_Structures/intrusive_list.c',
-    'Data_Structures/htable.c',
-    'Data_Structures/mbuffer.c',
-    'Data_Structures/strmap.c',
-    'Utils/fixed_memory_pool.c',
-    'Utils/endianess.c',
-    'Utils/rf_unicode.c',
-    'Utils/hash.c',
-    'Utils/log.c',
-    'Utils/array.c',
+    'datastructs/binaryarray.c',
+    'datastructs/sbuffer.c',
+    'datastructs/objset.c',
+    'datastructs/intrusive_list.c',
+    'datastructs/htable.c',
+    'datastructs/mbuffer.c',
+    'datastructs/strmap.c',
+    'utils/fixed_memory_pool.c',
+    'utils/endianess.c',
+    'utils/rf_unicode.c',
+    'utils/hash.c',
+    'utils/log.c',
+    'utils/array.c',
     'math/math.c',
     'math/ilog.c',
-    'String/rf_str_commonp.c',
-    'String/rf_str_conversion.c',
-    'String/rf_str_core.c',
-    'String/rf_str_filesx.c',
-    'String/rf_str_traversalx.c',
-    'String/rf_str_corex.c',
-    'String/rf_str_files.c',
-    'String/rf_str_retrieval.c',
-    'String/rf_str_common.c',
-    'String/rf_str_module.c',
-    'String/rf_str_manipulationx.c',
-    'String/rf_str_manipulation.c',
+    'string/rf_str_commonp.c',
+    'string/rf_str_conversion.c',
+    'string/rf_str_core.c',
+    'string/rf_str_filesx.c',
+    'string/rf_str_traversalx.c',
+    'string/rf_str_corex.c',
+    'string/rf_str_files.c',
+    'string/rf_str_retrieval.c',
+    'string/rf_str_common.c',
+    'string/rf_str_module.c',
+    'string/rf_str_manipulationx.c',
+    'string/rf_str_manipulation.c',
     'stdlib/io.c',
-    'Parallel/rf_worker_pool_linux.c',
-    'Parallel/rf_threading_linux.c',
-    'Parallel/rf_threading.c',
+    'parallel/rf_worker_pool_linux.c',
+    'parallel/rf_threading_linux.c',
+    'parallel/rf_threading.c',
     'refu.c',
-    'Persistent/buffers.c',
-    'Numeric/Integer/conversion.c',
-    'IO/rf_file.c',
-    'IO/rf_textfile.c',
+    'persistent/buffers.c',
+    'numeric/Integer/conversion.c',
+    'io/rf_file.c',
+    'io/rf_textfile.c',
 ]
 
 if local_env['TARGET_SYSTEM'] == 'Linux':
     orig_sources += [
-        'Time/time_linux.c',
-        'System/rf_system_info_linux.c',
-        'System/rf_system_linux.c',
-        'System/rf_dlib_linux.c',
+        'time/time_linux.c',
+        'system/rf_system_info_linux.c',
+        'system/rf_system_linux.c',
+        'system/rf_dlib_linux.c',
     ]
 elif local_env['TARGET_SYSTEM'] == 'Windows':
     orig_sources += [
-        'Time/time_win32.c',
-        'System/rf_system_win32.c',
-        'System/rf_system_info_win32.c',
-        'System/rf_dlib_win32.c',
+        'time/time_win32.c',
+        'system/rf_system_win32.c',
+        'system/rf_system_info_win32.c',
+        'system/rf_dlib_win32.c',
     ]
 else:
     build_msg("Unsupported OS detected during source selection", "Error")
@@ -71,7 +71,8 @@ else:
 # only if actually building create the options file
 options_header = SConscript(
     '#build_system/build_extra/clib/options_header_creator.py',
-    exports='local_env')
+    exports='local_env'
+)
 
 # add specific environment variables
 local_env.Append(CPPDEFINES={
@@ -82,7 +83,7 @@ local_env.Append(LIBS=['dl'])
 # if we got PCRE2 add regular expressions
 if local_env['has_pcre2']:
     local_env.ParseConfig("pcre2-config --libs8 --cflags")
-    orig_sources += ['String/regex.c']
+    orig_sources += ['string/regex.c']
     unit_test_files += ['test_regex.c']
 
 
@@ -93,7 +94,8 @@ static_env.VariantDir("build_static", "src", duplicate=0)
 static_sources = [os.path.join("build_static", s) for s in orig_sources]
 clib_static = static_env.StaticLibrary(
     local_env['CLIB_OUT_NAME'],
-    source=static_sources)
+    source=static_sources
+)
 Depends(clib_static, options_header)
 local_env.Alias('clib_static', clib_static)
 

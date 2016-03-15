@@ -5,9 +5,9 @@
 
 #include "test_helpers.h"
 #include "utilities_for_testing.h"
-#include <String/rf_str_core.h>
-#include <Data_Structures/htable.h>
-#include <Utils/hash.h>
+#include <rflib/string/rf_str_core.h>
+#include <rflib/datastructs/htable.h>
+#include <rflib/utils/hash.h>
 
 struct object {
     struct RFstring name;

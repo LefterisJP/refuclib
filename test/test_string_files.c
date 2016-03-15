@@ -6,13 +6,13 @@
 #include "test_helpers.h"
 #include "utilities_for_testing.h"
 
-#include <refu.h>
-#include <String/rf_str_files.h>
-#include <String/rf_str_filesx.h>
-#include <String/rf_str_core.h>
-#include <String/rf_str_corex.h>
-#include <String/rf_str_manipulation.h>
-#include <System/rf_system.h>
+#include <rflib/refu.h>
+#include <rflib/string/rf_str_files.h>
+#include <rflib/string/rf_str_filesx.h>
+#include <rflib/string/rf_str_core.h>
+#include <rflib/string/rf_str_corex.h>
+#include <rflib/string/rf_str_manipulation.h>
+#include <rflib/system/rf_system.h>
 
 // TODO: Work on replacing all these defines with the same
 // from test_io_helpers.h    ... there are some minor differences
