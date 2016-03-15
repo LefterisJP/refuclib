@@ -12,7 +12,7 @@
 #include <rflib/string/core.h>
 #include <rflib/string/corex.h>
 #include <rflib/string/manipulation.h>
-#include <rflib/system/rf_system.h>
+#include <rflib/system/system.h>
 
 // TODO: Work on replacing all these defines with the same
 // from test_io_helpers.h    ... there are some minor differences

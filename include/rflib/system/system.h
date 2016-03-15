@@ -99,9 +99,9 @@ typedef pid_t RFthread_id;
 
 /* include the appropriate system info */
 #ifdef REFU_LINUX_VERSION
-#include <rflib/system/rf_system_info_linux.h>
+#include <rflib/system/system_info_linux.h>
 #elif defined (REFU_WIN32_VERSION)
-#include <rflib/system/rf_system_info_win32.h>
+#include <rflib/system/system_info_win32.h>
 #else
 #error TODO
 #endif

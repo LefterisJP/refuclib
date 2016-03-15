@@ -14,7 +14,7 @@
 #include <rflib/string/corex.h>
 #include <rflib/string/manipulation.h>
 #include <rflib/string/traversalx.h>
-#include <rflib/system/rf_system.h>
+#include <rflib/system/system.h>
 #include <rflib/io/rf_textfile.h>
 #include <rflib/utils/array.h>
 

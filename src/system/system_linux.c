@@ -2,7 +2,7 @@
  * @author: Lefteris Karapetsas
  * @licence: BSD3 (Check repository root for details)
  */
-#include <rflib/system/rf_system.h>
+#include <rflib/system/system.h>
 
 #include <rflib/string/xdecl.h>
 #include <rflib/string/common.h>

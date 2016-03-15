@@ -19,7 +19,7 @@
 #include <rflib//utils/endianess.h>
 #include <rflib//utils/log.h>
 #include <rflib//utils/memory.h>
-#include <rflib/system/rf_system.h>
+#include <rflib/system/system.h>
 #include <rflib//utils/constcmp.h>
 #include <rflib//utils/sanity.h>
 

@@ -13,7 +13,7 @@
 #include <rflib/string/core.h>
 #include <rflib/string/corex.h>
 #include <rflib/string/manipulation.h>
-#include <rflib/system/rf_system.h>
+#include <rflib/system/system.h>
 #include <rflib/io/rf_file.h>
 
 static const uint32_t line_scenario4_bytes[] = {18, 12, 12, 24, 20};

@@ -5,7 +5,7 @@
 #include <rflib/refu.h>
 
 #include <rflib/utils/log.h>
-#include <rflib/system/rf_system.h>
+#include <rflib/system/system.h>
 #include <rflib/persistent/buffers.h>
 
 #include "string/rf_str_mod.ph"
