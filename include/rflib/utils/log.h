@@ -5,7 +5,7 @@
 #ifndef RF_UTILS_LOG_H
 #define RF_UTILS_LOG_H
 
-#include <rflib/rf_options.h>
+#include <rf_options.h>
 #include <rflib/defs/retcodes.h>
 #include <rflib/defs/inline.h>
 #include <rflib/defs/imex.h>

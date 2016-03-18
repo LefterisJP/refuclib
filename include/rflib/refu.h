@@ -5,7 +5,7 @@
 #ifndef REFU_SETUP_H
 #define REFU_SETUP_H
 
-#include <rflib/rf_options.h>
+#include <rf_options.h>
 #include <rflib/utils/log.h>
 #include <rflib/defs/retcodes.h>
 
