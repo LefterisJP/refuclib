@@ -53,7 +53,7 @@ void *strmap_get_(const struct strmap *map, const struct RFstring *member)
 bool strmap_add_(struct strmap *map, const struct RFstring *member, const void *value)
 {
     size_t len = rf_string_length_bytes(member);
-    const uint8_t *arg_bytes = (const uint8_t *)rf_string_data(member);
+    uint8_t *arg_bytes = (uint8_t *)rf_string_data(member);
     struct strmap *n;
     struct node *newn;
     size_t byte_num = 0;

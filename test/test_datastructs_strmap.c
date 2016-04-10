@@ -17,7 +17,7 @@ struct pair {
     struct object obj;
 };
 
-static const struct pair stringobjs[] = {
+static struct pair stringobjs[] = {
     { RF_STRING_STATIC_INIT("String1"), {.val = 1} },
     { RF_STRING_STATIC_INIT("String2"), {.val = 2} },
     { RF_STRING_STATIC_INIT("String3"), {.val = 3} },

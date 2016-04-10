@@ -43,10 +43,9 @@ struct strmap {
  *      STRMAP_MEMBERS(int *);
  *  };
  */
-#define STRMAP_MEMBERS(type)            \
+#define STRMAP_MEMBERS(type)    \
     struct strmap raw;          \
     TCON(type canary)
-
 
 /**
  * strmap_init - initialize a string map (empty)
@@ -61,7 +60,6 @@ struct strmap {
  *  strmap_init(&map);
  */
 #define strmap_init(map) strmap_init_(&(map)->raw)
-
 static inline void strmap_init_(struct strmap *map)
 {
     map->u.n = NULL;
@@ -76,7 +74,6 @@ static inline void strmap_init_(struct strmap *map)
  *      abort();
  */
 #define strmap_empty(map) strmap_empty_(&(map)->raw)
-
 static inline bool strmap_empty_(const struct strmap *map)
 {
     return map->u.n == NULL;
@@ -94,7 +91,7 @@ static inline bool strmap_empty_(const struct strmap *map)
  *  if (val)
  *      printf("hello => %i\n", *val);
  */
-#define strmap_get(map, member) \
+#define strmap_get(map, member)                                     \
     tcon_cast((map), canary, strmap_get_(&(map)->raw, (member)))
 void *strmap_get_(const struct strmap *map, const struct RFstring *member);
 
@@ -117,10 +114,16 @@ void *strmap_get_(const struct strmap *map, const struct RFstring *member);
  *      printf("goodbye was already in the map\n");
  */
 #define strmap_add(map, member, value)              \
-    strmap_add_(&tcon_check((map), canary, (value))->raw,   \
-            (member), (void *)(value))
-
-bool strmap_add_(struct strmap *map, const struct RFstring *member, const void *value);
+    strmap_add_(                                    \
+        &tcon_check((map), canary, (value))->raw,   \
+        (member),                                   \
+        (void *)(value)                             \
+    )
+bool strmap_add_(
+    struct strmap *map,
+    const struct RFstring *member,
+    const void *value
+);
 
 /**
  * strmap_del - remove a member from the string map.
@@ -139,10 +142,17 @@ bool strmap_add_(struct strmap *map, const struct RFstring *member, const void *
  *  if (!strmap_del(&map, "goodbye", NULL))
  *      printf("goodbye was not in the map?\n");
  */
-#define strmap_del(map, member, valuep)                     \
-    strmap_del_(&tcon_check_ptr((map), canary, valuep)->raw,    \
-            (member), (void **)valuep)
-struct RFstring *strmap_del_(struct strmap *map, const struct RFstring *member, void **valuep);
+#define strmap_del(map, member, valuep)                 \
+    strmap_del_(                                        \
+        &tcon_check_ptr((map), canary, valuep)->raw,    \
+        (member),                                       \
+        (void **)valuep                                 \
+    )
+struct RFstring *strmap_del_(
+    struct strmap *map,
+    const struct RFstring *member,
+    void **valuep
+);
 
 /**
  * strmap_clear - remove every member from the map.
@@ -154,7 +164,6 @@ struct RFstring *strmap_del_(struct strmap *map, const struct RFstring *member, 
  *  strmap_clear(&map);
  */
 #define strmap_clear(map) strmap_clear_(&(map)->raw)
-
 void strmap_clear_(struct strmap *map);
 
 /**
@@ -190,14 +199,17 @@ void strmap_clear_(struct strmap *map);
  *          printf("... (truncated to 100 entries)\n");
  *  }
  */
-#define strmap_iterate(map, handle, arg)                \
-    strmap_iterate_(&(map)->raw,                    \
-            typesafe_cb_cast(bool (*)(const struct RFstring *,      \
-                          void *, void *),  \
-                     bool (*)(const struct RFstring *,      \
-                          tcon_type((map), canary), \
-                          __typeof__(arg)), (handle)), \
-            (arg))
+#define strmap_iterate(map, handle, arg)                        \
+    strmap_iterate_(                                            \
+        &(map)->raw,                                            \
+        typesafe_cb_cast(                                       \
+            bool (*)(const struct RFstring *, void *, void *),  \
+            bool (*) (                                          \
+                const struct RFstring *,                        \
+                tcon_type((map), canary),                       \
+                __typeof__(arg)), (handle)),                    \
+        (arg)                                                   \
+    )
 typedef bool (*strmap_it_cb)(const struct RFstring *, void *, void *);
 void strmap_iterate_(const struct strmap *map, strmap_it_cb cb, const void *data);
 
@@ -228,7 +240,6 @@ void strmap_iterate_(const struct strmap *map, strmap_it_cb cb, const void *data
 #define strmap_prefix(map, prefix) \
     ((const void *)strmap_prefix_(&(map)->raw, (prefix)))
 #endif
-
 const struct strmap *strmap_prefix_(const struct strmap *map,
                                     const struct RFstring *prefix);
 
